@@ -22,7 +22,8 @@ class ImageImporter: public Model
 	private:
 		
 		ImageImporter(); 
-		~ImageImporter(); 
+		~ImageImporter();
+	        SDL_Surface* surf;	
 		static ImageImporter* instance;
 		
 

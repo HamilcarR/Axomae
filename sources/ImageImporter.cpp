@@ -14,12 +14,11 @@ ImageImporter::ImageImporter():maptomix::Model()
 	
 {
 
-
 }
 
 ImageImporter::~ImageImporter(){
-
-
+	
+		SDL_FreeSurface(surf);
 }
 
 /*************************************************************************************************************/
@@ -46,7 +45,7 @@ void ImageImporter::close(){
 
 
 SDL_Surface* ImageImporter::load_image(const char* file){
-	SDL_Surface* surf = IMG_Load(file);
+        surf = IMG_Load(file);
 	if(!surf)
 		cout<<"Img load problem : " << IMG_GetError()<<endl;
 	assert(surf!=nullptr);

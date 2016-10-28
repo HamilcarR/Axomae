@@ -1,7 +1,10 @@
 #include "../includes/Window.h"
 #include <assert.h>
-using namespace std;
+#include <iostream>
 namespace maptomix {
+
+using namespace std;
+
 Window::Window(const int w,const int h , const char* n) : maptomix::View(){
 	width=w; 
 	height=h;
@@ -35,9 +38,15 @@ void Window::display_image(SDL_Surface* image){
 }
 
 /*****************************************************************************************************************/
-
-
 /*****************************************************************************************************************/
+
+
+
+
+
+
+
+
 
 
 /*****************************************************************************************************************/

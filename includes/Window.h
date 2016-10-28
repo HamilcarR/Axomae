@@ -20,8 +20,7 @@ class Window : public View
 public:
 	Window(const int width, const int height,const char* name);
 	~Window();
-        void display_image(SDL_Surface* image);	
-
+     	void display_image(SDL_Surface* image); 
 private:
 	int width;
 	int height;

@@ -1,5 +1,5 @@
-CC=g++
-CFLAGS=-std=c++17 -Wall -pedantic -pthread -g
+CC=g++ 
+CFLAGS=-std=c++14 -Wall -pedantic -pthread -g
 CLIBS=-lSDL2 -lSDL2_image
 SRC=$(wildcard *.cpp)
 OBJ=$(SRC:.cpp=.o)

@@ -15,7 +15,7 @@ const int number_event = 2;
 namespace maptomix{
 	
 	
-	class EventHandler : public maptomix::Controller
+	class EventHandler : public Controller
 	{
 
 		public:

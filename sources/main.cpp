@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include "../includes/ImageManager.h"
 #include "../includes/ImageImporter.h"
 #include "../includes/Window.h"
 #include "../includes/EventHandler.h"
@@ -32,9 +33,12 @@ int main(int argv , char** argc){
 	EventHandler *handler=EventHandler::getInstance(); 
 	handler->setEvent(event);
 	ImageImporter *importer = ImageImporter::getInstance();
-	window->display_image(importer->load_image(argc[1]) );
-
+	SDL_Surface *s = importer ->load_image(argc[1]);
+	window->display_image(s);
+	uint32_t color = ImageManager::get_pixel_color(s,39,38);
+	ImageManager::print_pixel(color);
 	handler->main_loop();
+
 
 
 delete window;
