@@ -3,21 +3,34 @@
 
 namespace maptomix{
 	
+EventHandler* EventHandler::instance = nullptr;
 
-
-	EventHandler::EventHandler(SDL_Event &event){
-		m_event = event; 
-		for(int i = 0 ; i < number_event ; i++)
-			event_array[i]=false ; 
-
-		app_quit = false;
-
-	}
-
-	EventHandler::~EventHandler(){
-
-	}
-
+/********************************************************************************/
+	EventHandler::EventHandler():Controller(){				//
+		for(int i = 0 ; i < number_event ; i++){			//
+			event_array[i]=false;					//
+		}								//
+										//
+										//
+		app_quit = false;						//
+										//
+	}									//
+										//
+/********************************************************************************/
+										//
+	EventHandler::EventHandler(SDL_Event &event):maptomix::Controller(){	//
+		m_event = event; 						//
+		for(int i = 0 ; i < number_event ; i++)				//
+			event_array[i]=false ; 					//
+										//
+		app_quit = false;						//
+										//
+	}									//
+/********************************************************************************/
+	EventHandler::~EventHandler(){						//
+										//
+	}									//
+										//
 /*************************************************************************************************************/
 	void EventHandler::event_loop(){
 		while(SDL_PollEvent(&m_event)){
@@ -49,5 +62,41 @@ namespace maptomix{
 
 
 
+/*************************************************************************************************************/
 
+
+	EventHandler* EventHandler::getInstance(){
+		if(instance==nullptr)
+			instance = new EventHandler();
+		return instance;
+
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*************************************************************************************************************/
+
+	void EventHandler::setEvent(SDL_Event &event){
+		m_event=event;
+
+
+	}
+
+	
+	
+	
+/*************************************************************************************************************/
+/*************************************************************************************************************/
 }

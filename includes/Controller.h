@@ -1,8 +1,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
-#include "Data.h"
+#include "Model.h"
 #include "View.h"
-#include "EventHandler.h"
 
 
 
@@ -11,7 +10,8 @@
 
 class Controller{
 	public:
-		Controller(View* view,Data* data);
+		Controller();
+		Controller(View* view,Model* data);
 		~Controller();
 
 
@@ -19,9 +19,8 @@ class Controller{
 
 	private:
 		View *view;
-		Data *data;
+		Model *model;
 
-		EventHandler* m_event_handler;
 
 };
 
