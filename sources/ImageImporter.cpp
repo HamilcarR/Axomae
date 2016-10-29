@@ -59,9 +59,14 @@ SDL_Surface* ImageImporter::load_image(const char* file){
 
 
 
+/**************************************************************************************************************/
 
 
+void ImageImporter::save_image(SDL_Surface* surface,const char* filename){
+	SDL_SaveBMP(surface,filename);
 
+
+}
 
 
 

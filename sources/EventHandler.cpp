@@ -1,8 +1,8 @@
 #include "../includes/EventHandler.h"
-
+#include <iostream>
 
 namespace maptomix{
-	
+using namespace std;
 EventHandler* EventHandler::instance = nullptr;
 
 /********************************************************************************/
@@ -34,12 +34,21 @@ EventHandler* EventHandler::instance = nullptr;
 /*************************************************************************************************************/
 	void EventHandler::event_loop(){
 		while(SDL_PollEvent(&m_event)){
-			if(m_event.type == SDL_QUIT || m_event.key.keysym.sym == SDLK_ESCAPE)
+			if(m_event.type == SDL_QUIT )
 			{
-				event_array[ESC] = true ; 
+
 				event_array[QUIT] = true;
+				cout<<"QUIT" <<endl; 
 				app_quit=true;
 				
+			}
+			else if( m_event.key.keysym.sym == SDLK_ESCAPE){
+
+				
+				cout<<"ESCP" <<endl; 
+			//	app_quit=true;
+				
+				event_array[ESC] = true ; 
 			}
 
 

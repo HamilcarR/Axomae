@@ -17,7 +17,7 @@ class ImageImporter: public Model
 		static ImageImporter* getInstance();
 		static void close();
 		SDL_Surface* load_image(const char* file) ;
-
+		static void save_image(SDL_Surface* surface,const char* filename);
 
 	private:
 		
