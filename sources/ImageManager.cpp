@@ -1,7 +1,7 @@
 #include "../includes/ImageManager.h"
 #include <iostream>
-
-
+#include <assert.h>
+#include <thread>
 namespace maptomix{
 
 	using namespace std;
@@ -194,7 +194,7 @@ namespace maptomix{
 
 				}
 				else{
-				
+						
 					((Uint8*)pix)[0] = color & 0XFF;
 					((Uint8*)pix)[1] = color >> 8 & 0XFF;
 				        ((Uint8*)pix)[2] = color >>16 & 0XFF;
@@ -255,26 +255,48 @@ void RGB::to_string(){
 
 
 
-void ImageManager::set_greyscale(SDL_Surface* image){
-	
+void ImageManager::set_greyscale_average(SDL_Surface* image,uint8_t factor){
+	assert(factor>0);
+	assert(image!=nullptr);	
 	for(int i = 0 ; i < image->w;i++){
 		for(int j = 0 ; j < image->h ; j++){
 			RGB rgb = get_pixel_color(image,i,j);
-			
+			rgb.red =(rgb.red+rgb.blue+rgb.green)/factor;
+			rgb.green =rgb.red;
+			rgb.blue = rgb.red;
+			uint32_t gray = rgb.rgb_to_int();			
+			set_pixel_color(image,i,j,gray);	
 
 		}
 
 	}
 
 
+}
 
 
 
 
+void ImageManager::set_greyscale_luminance(SDL_Surface* image){
+	assert(image!=nullptr);	
+	for(int i = 0 ; i < image->w;i++){
+		for(int j = 0 ; j < image->h ; j++){
+			RGB rgb = get_pixel_color(image,i,j);
+			rgb.red =rgb.red*0.3+rgb.blue*0.11+rgb.green*0.59;
+			rgb.green =rgb.red;
+			rgb.blue = rgb.red;
+			uint32_t gray = rgb.rgb_to_int();			
+			set_pixel_color(image,i,j,gray);	
 
+		}
+
+	}
 
 
 }
+
+
+
 
 
 
@@ -351,16 +373,15 @@ return rgb;
 
 
 
-auto RGB::rgb_to_int(){
+uint32_t RGB::rgb_to_int(){
 	uint32_t image=0 ;
 	if(SDL_BYTEORDER == SDL_BIG_ENDIAN){
 		image = alpha | (blue << 8) | (green << 16) | (red << 24);	
-		cout << "big endian " <<"\n";
 	}
 
 	else{
 	
-		image = red | (green << 8) | (blue << 16) | (red << 24);	
+		image = red | (green << 8) | (blue << 16) | (alpha << 24);	
 
 	}
 return image ; 
@@ -377,5 +398,136 @@ return image ;
 
 
 /**************************************************************************************************************/
+static auto calculate_kernel_pixel(RGB **data,int kernel[3][3],int i,int j,uint8_t flag){
+	if(flag == MAPTOMIX_RED){
+		return  data[i-1][j-1].red*kernel[0][0]+data[i][j-1].red*kernel[0][1]+data[i+1][j-1].red*kernel[0][2]+
+					 data[i-1][j].red*kernel[1][0] + data[i][j].red*kernel[1][1]+data[i+1][j].red*kernel[1][2]+
+					 data[i-1][j+1].red*kernel[2][0]+ data[i][j+1].red*kernel[2][1]+data[i+1][j+1].red*kernel[2][2];			
+	}
+	else if (flag==MAPTOMIX_BLUE){
+		return  data[i-1][j-1].blue*kernel[0][0]+data[i][j-1].blue*kernel[0][1]+data[i+1][j-1].blue*kernel[0][2]+
+					 data[i-1][j].blue*kernel[1][0] + data[i][j].blue*kernel[1][1]+data[i+1][j].blue*kernel[1][2]+
+					 data[i-1][j+1].blue*kernel[2][0]+ data[i][j+1].blue*kernel[2][1]+data[i+1][j+1].blue*kernel[2][2];	
+	}
+	else {
+		return  data[i-1][j-1].green*kernel[0][0]+data[i][j-1].green*kernel[0][1]+data[i+1][j-1].green*kernel[0][2]+
+					 data[i-1][j].green*kernel[1][0] + data[i][j].green*kernel[1][1]+data[i+1][j].green*kernel[1][2]+
+					 data[i-1][j+1].green*kernel[2][0]+ data[i][j+1].green*kernel[2][1]+data[i+1][j+1].green*kernel[2][2];	
+	}
+
+}
+
+
+
+void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t border){
+	//TODO : use multi threading for initialization and greyscale computing
+	/*to avoid concurrent access on image*/
+	int w = surface->w;
+	int h = surface->h; 
+	//thread this :
+	set_greyscale_luminance(surface); 
+
+
+	RGB **data = new RGB*[h];
+        for(int i = 0 ; i < h ; i++)
+		data[i] = new RGB[w];
+	
+		
+	int max_red = 0,max_blue = 0 ,max_green = 0 ; 
+	int min_red = 0,min_blue = 0 , min_green = 0  ; 
+	for(int i = 0 ; i < w ; i++){
+		for(int j = 0 ; j < h ; j++){
+
+			RGB rgb = get_pixel_color(surface,i,j); 
+			max_red = (rgb.red>=max_red) ? rgb.red : max_red ;
+			max_green = (rgb.green>=max_green) ? rgb.green : max_green ;
+			max_blue = (rgb.blue>=max_blue) ? rgb.blue : max_blue ;
+			min_red = (rgb.red<min_red) ? rgb.red : min_red ;
+			min_green = (rgb.green<min_green) ? rgb.green : min_green ;
+			min_blue = (rgb.blue<min_blue) ? rgb.blue : min_blue ;
+
+
+
+
+			data[i][j].red = rgb.red;
+		        data[i][j].blue = rgb.blue;
+			data[i][j].green = rgb.green;	
+		}
+
+	}
+	 thread t1 ; 	
+	 int arr_h[3][3];
+	 int arr_v[3][3] ;
+	for(int i = 0 ;i < 3 ; i ++){
+	 for(int j = 0 ; j < 3 ; j++){      
+		       arr_v[i][j]=(flag == MAPTOMIX_USE_SOBEL) ? sobel_mask_vertical[i][j] : prewitt_mask_vertical[i][j] ;
+		       std::cout<<" val : " << std::to_string(arr_v[i][j]) << "\n";			
+		       arr_h[i][j]=(flag == MAPTOMIX_USE_SOBEL) ? sobel_mask_horizontal[i][j] : prewitt_mask_horizontal[i][j] ;
+	}
+	}
+	for(int i = 1 ; i < w-1 ; i++){
+		for(int j = 1 ; j < h-1 ; j++){
+
+			if(border== MAPTOMIX_REPEAT){
+				int setpix_h_red = 0,setpix_v_red = 0 ,setpix_h_green = 0 , setpix_v_green = 0 , setpix_v_blue = 0 , setpix_h_blue= 0 ; 
+			
+
+
+				setpix_h_red = calculate_kernel_pixel(data,arr_h,i,j,MAPTOMIX_RED);
+				setpix_v_red = calculate_kernel_pixel(data,arr_v,i,j,MAPTOMIX_RED);	
+				setpix_h_green = calculate_kernel_pixel(data,arr_h,i,j,MAPTOMIX_GREEN);
+				setpix_v_green = calculate_kernel_pixel(data,arr_v,i,j,MAPTOMIX_GREEN);				
+				setpix_h_blue = calculate_kernel_pixel(data,arr_h,i,j,MAPTOMIX_BLUE);			
+				setpix_v_blue =	calculate_kernel_pixel(data,arr_v,i,j,MAPTOMIX_BLUE);
+			
+
+				
+				
+				setpix_v_red=normalize(max_red,min_red,setpix_v_red);
+				setpix_h_red=normalize(max_red,min_red,setpix_h_red);
+				setpix_v_green=normalize(max_green,min_green,setpix_v_green);
+				setpix_h_green=normalize(max_green,min_green,setpix_h_green);
+				setpix_v_blue=normalize(max_blue,min_blue,setpix_v_blue);
+				setpix_h_blue=normalize(max_blue,min_blue,setpix_h_blue);
+
+
+				int r=magnitude(setpix_v_red,setpix_h_red); 
+				int g=magnitude(setpix_v_green,setpix_h_green);
+				int b=magnitude(setpix_v_blue,setpix_h_blue);
+
+				
+				RGB rgb = RGB (r,g,b,0);
+			    //    rgb.to_string();
+
+				
+				set_pixel_color(surface,i,j,rgb.rgb_to_int()); 
+				
+
+			}
+		}
+
+	}
+	
+
+	/*for(int i = 0 ; i < h;i++)
+		delete data[i];
+
+	delete data; */ //TODO fix that
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**************************************************************************************************************/
 }

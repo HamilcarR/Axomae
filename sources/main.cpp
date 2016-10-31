@@ -34,19 +34,9 @@ int main(int argv , char** argc){
 	handler->setEvent(event);
 	ImageImporter *importer = ImageImporter::getInstance();
 	SDL_Surface *s = importer ->load_image(argc[1]);
-	for(int i = 0 ; i < s->w ; i++){
-		for(int j = 0 ; j < s->h ; j++){
-			
-			ImageManager::set_pixel_color(s,i,j,0X0FFFFF00);
-
-		}
-
-	}
-	
-
+	ImageManager::set_greyscale_luminance(s);	
+	ImageManager::calculate_edge(s,MAPTOMIX_USE_SOBEL,MAPTOMIX_REPEAT);
 	window->display_image(s);
-//	ImageManager::get_pixel_color(s,10,10).to_string();
-	RGB::int_to_rgb(0XFFFFFF00).to_string();
 
 	handler->main_loop();
 
