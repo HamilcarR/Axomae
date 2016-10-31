@@ -428,9 +428,9 @@ void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t bord
 	set_greyscale_luminance(surface); 
 
 
-	RGB **data = new RGB*[h];
-        for(int i = 0 ; i < h ; i++)
-		data[i] = new RGB[w];
+	RGB **data = new RGB*[w];
+        for(int i = 0 ; i < w ; i++)
+		data[i] = new RGB[h];
 	
 		
 	int max_red = 0,max_blue = 0 ,max_green = 0 ; 
@@ -509,10 +509,10 @@ void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t bord
 	}
 	
 
-	/*for(int i = 0 ; i < h;i++)
-		delete data[i];
+	for(int i = 0 ; i < w;i++)
+		delete [] data[i];
 
-	delete data; */ //TODO fix that
+	delete [] data; 
 
 }
 

@@ -35,8 +35,9 @@ int main(int argv , char** argc){
 	ImageImporter *importer = ImageImporter::getInstance();
 	SDL_Surface *s = importer ->load_image(argc[1]);
 	ImageManager::set_greyscale_luminance(s);	
-	ImageManager::calculate_edge(s,MAPTOMIX_USE_SOBEL,MAPTOMIX_REPEAT);
+	ImageManager::calculate_edge(s,MAPTOMIX_USE_PREWITT,MAPTOMIX_REPEAT);
 	window->display_image(s);
+	ImageImporter::save_image(s,"sobel");
 
 	handler->main_loop();
 
