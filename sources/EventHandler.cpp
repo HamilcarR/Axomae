@@ -32,6 +32,27 @@ EventHandler* EventHandler::instance = nullptr;
 	}									//
 										//
 /*************************************************************************************************************/
+	
+	int EventHandler::get_pushed_button()
+	{
+
+		if( m_event.key.keysym.sym == SDLK_ESCAPE)
+			return ESC;
+		else if (m_event.key.keysym.sym == SDLK_UP)
+			return UP;
+		else if (m_event.key.keysym.sym == SDLK_DOWN)
+			return DOWN;
+
+
+
+
+
+
+
+
+	}
+
+
 	void EventHandler::event_loop(){
 		while(SDL_PollEvent(&m_event)){
 			if(m_event.type == SDL_QUIT )
@@ -42,16 +63,10 @@ EventHandler* EventHandler::instance = nullptr;
 				app_quit=true;
 				
 			}
-			else if( m_event.key.keysym.sym == SDLK_ESCAPE){
-
-				
-				cout<<"ESCP" <<endl; 
-			//	app_quit=true;
-				
-				event_array[ESC] = true ; 
+			if(m_event.type == SDL_KEYDOWN){
+				event_array[get_pushed_button()] = true;			
 			}
-
-
+		
 		}
 
 
@@ -60,14 +75,33 @@ EventHandler* EventHandler::instance = nullptr;
 
 /*************************************************************************************************************/
 
-	void EventHandler::main_loop(){
-		while(app_quit == false)
+	void EventHandler::main_loop( ){
+	
+		while(app_quit == false){
 			event_loop();
+			reset_array();	
+			SDL_Delay(100);
+		}
 
 
 		
 
 	}
+
+
+/***************************************************************************************************************/
+
+	void EventHandler::reset_array(){
+		
+		fill(event_array,event_array+number_event,false);
+		
+
+
+	}
+
+
+
+
 
 
 

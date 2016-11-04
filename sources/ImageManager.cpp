@@ -12,7 +12,7 @@ namespace maptomix{
 		
 	}
 
-	RGB::RGB(uint8_t r,uint8_t g,uint8_t b,uint8_t a):red(r),green(g),blue(b),alpha(a){
+	RGB::RGB(int r , int g , int b , int a):red(r),green(g),blue(b),alpha(a){
 
 	}
 
@@ -165,6 +165,32 @@ namespace maptomix{
 
 
 /**************************************************************************************************************/
+
+
+	void ImageManager::set_pixel_color(SDL_Surface* surface,RGB **arrayc,int w,int h){
+		for(int i = 0 ; i < w ; i++){
+			for(int j = 0 ; j < h ; j++){
+				set_pixel_color(surface,i,j,arrayc[i][j].rgb_to_int());
+
+			}
+			
+		}
+	
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	void ImageManager::set_pixel_color(SDL_Surface* surface ,int x,int y, uint32_t color){	
@@ -455,14 +481,28 @@ void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t bord
 		}
 
 	}
+
+        cout << to_string(max_green) << "\n"; 	
 	 thread t1 ; 	
 	 int arr_h[3][3];
 	 int arr_v[3][3] ;
 	for(int i = 0 ;i < 3 ; i ++){
-	 for(int j = 0 ; j < 3 ; j++){      
-		       arr_v[i][j]=(flag == MAPTOMIX_USE_SOBEL) ? sobel_mask_vertical[i][j] : prewitt_mask_vertical[i][j] ;
-		       std::cout<<" val : " << std::to_string(arr_v[i][j]) << "\n";			
-		       arr_h[i][j]=(flag == MAPTOMIX_USE_SOBEL) ? sobel_mask_horizontal[i][j] : prewitt_mask_horizontal[i][j] ;
+	 for(int j = 0 ; j < 3 ; j++){
+	   	if(flag == MAPTOMIX_USE_SOBEL){	 
+		       arr_v[i][j]=sobel_mask_vertical[i][j];
+		       arr_h[i][j]=sobel_mask_horizontal[i][j];	
+		}
+		else if(flag == MAPTOMIX_USE_PREWITT){
+			arr_h[i][j] = prewitt_mask_horizontal[i][j];
+			arr_v[i][j] = prewitt_mask_vertical[i][j];
+
+		}
+		else if(flag == MAPTOMIX_USE_SCHARR){
+			arr_h[i][j] = scharr_horizontal[i][j];
+			arr_v[i][j] = scharr_vertical[i][j];
+
+		}	
+		
 	}
 	}
 	for(int i = 1 ; i < w-1 ; i++){
@@ -507,6 +547,50 @@ void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t bord
 		}
 
 	}
+
+
+
+	for(int i = 1 ; i < w-1 ; i++){
+		for(int j = 1 ; j < h-1 ;j++){
+			RGB rgb1,rgb2,rgb3,rgb4,rgb5,rgb6,rgb7,rgb8;
+			rgb1   = get_pixel_color(surface,i-1,j-1);
+			rgb2   = get_pixel_color(surface ,i,j-1);
+			rgb3   = get_pixel_color(surface ,i+1,j-1);
+			rgb4   = get_pixel_color(surface ,i-1,j);
+			rgb5   = get_pixel_color(surface ,i+1,j);
+			rgb6   = get_pixel_color(surface ,i+1,j-1);
+			rgb7   = get_pixel_color(surface ,i+1,j);
+			rgb8   = get_pixel_color(surface ,i+1,j+1);
+			
+
+			
+			static auto normalize_rgb = [max_red,max_green,max_blue,min_red,min_green,min_blue](RGB rgb){
+					RGB rgb_ret ;
+					rgb_ret.red = normalize(max_red,min_red,rgb.red);
+					rgb_ret.green = normalize(max_green,min_green,rgb.green);
+					rgb_ret.blue=normalize(max_blue,min_blue,rgb.blue);
+					return rgb_ret ; 
+
+			};
+			rgb1 = normalize_rgb(rgb1);
+			rgb2 = normalize_rgb(rgb2);
+			rgb3 = normalize_rgb(rgb3);
+			rgb4 = normalize_rgb(rgb4);
+			rgb5 = normalize_rgb(rgb5);
+			rgb6 = normalize_rgb(rgb6);
+			rgb7 = normalize_rgb(rgb7);
+			rgb8 = normalize_rgb(rgb8);
+			
+			RGB center = (rgb1+rgb2+rgb3+rgb4+rgb5+rgb6+rgb7+rgb8)/8;
+			
+			center.invert_color();
+
+			data[i][j] = center; 
+		
+		}
+	}
+
+	set_pixel_color(surface,data,w,h); 
 	
 
 	for(int i = 0 ; i < w;i++)
@@ -530,4 +614,283 @@ void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t bord
 
 
 /**************************************************************************************************************/
+
+
+
+RGB RGB::operator+=(int arg){
+	RGB rgb=RGB(red+arg,green+arg,blue+arg,alpha+arg);
+	return rgb;
+	
+}
+
+
+RGB RGB::operator+(RGB arg){
+	
+	
+
+	RGB rgb = RGB(red+arg.red,green+arg.green,blue+arg.blue,alpha+arg.alpha);
+	return rgb;
+
+
+}
+
+
+RGB RGB::operator/(int arg){
+	assert(arg>0);
+	RGB rgb = RGB(red/arg , green/arg, blue/arg,alpha/arg);
+	return rgb;
+}
+
+
+
+
+
+
+/**************************************************************************************************************/
+
+void RGB::invert_color(){
+
+
+  red=abs(red-255);
+  green=abs(green-255) ;
+  blue=abs(blue-255);
+  alpha=abs(alpha-255);
+}
+
+template<typename T>
+RGB RGB::invert_color(T &color){
+
+	
+}
+
+
+
+
+
+
+
+
+
+/**************************************************************************************************************/
+
+
+max_colors *ImageManager::get_colors_max_variation(SDL_Surface* image){
+	max_colors *max_min = new max_colors ;
+        const int INT_MAX = 0;	
+	int max_red = 0 , max_green = 0 , max_blue = 0 , min_red = INT_MAX , min_blue = INT_MAX , min_green = INT_MAX;
+	for(int i = 0 ; i < image->w ; i++){
+		for(int j = 0 ; j < image->h ; j++){
+
+			RGB rgb = get_pixel_color(image,i,j); 
+			max_red = (rgb.red>=max_red) ? rgb.red : max_red ;
+			max_green = (rgb.green>=max_green) ? rgb.green : max_green ;
+			max_blue = (rgb.blue>=max_blue) ? rgb.blue : max_blue ;
+			min_red = (rgb.red<min_red) ? rgb.red : min_red ;
+			min_green = (rgb.green<min_green) ? rgb.green : min_green ;
+			min_blue = (rgb.blue<min_blue) ? rgb.blue : min_blue ;
+		}
+	}
+
+	max_min->max_rgb[0] = max_red;
+	max_min->max_rgb[1] = max_green;
+	max_min->max_rgb[2] = max_blue ; 
+
+	max_min->min_rgb[0] = min_red;
+	max_min->min_rgb[1] = min_green;
+	max_min->min_rgb[2] = min_blue; 
+
+	return max_min ; 
+
+}
+
+int truncate(int n){
+	if(n<=0)
+	  return 0;
+	else if (n>=255)
+	  return 255;
+	else
+	  return n ; 
+
+}
+
+void ImageManager::set_contrast(SDL_Surface* image,int level){
+	double correction_factor = (259*(level+255))/(255*(259-level));
+	max_colors *maxmin = get_colors_max_variation(image);
+	for(int i = 0 ; i < image->w; i++){
+		for(int j = 0 ; j < image->h; j++){
+			RGB col = get_pixel_color(image,i,j);
+			col.red = truncate(correction_factor * (col.red - 128)+128);
+			col.green = truncate(correction_factor * (col.green - 128)+128);
+			col.blue = truncate(correction_factor * (col.blue - 128)+128);
+			col.alpha = 0 ; 
+			set_pixel_color(image,i,j,col.rgb_to_int()); 
+		}
+
+	}
+
+delete maxmin ; 
+}
+
+
+void ImageManager::set_contrast(SDL_Surface* image){
+	const int val = 200 ; 
+	for(int i = 0 ; i < image->w;i++){
+		for(int j = 0 ; j<image->h;j++){
+			RGB col = get_pixel_color(image,i,j);
+			col.red=col.red<=val ? 0 : 255 ;
+			col.blue=col.blue<=val? 0 : 255;
+			col.green=col.green<=val? 0 : 255 ;
+			set_pixel_color(image,i,j,col.rgb_to_int());
+
+		}
+
+	}
+
+
+}
+
+
+
+
+
+/***************************************************************************************************************/
+
+
+void ImageManager::set_contrast_sigmoid(SDL_Surface *image,int threshold){
+	
+	for(int i = 0 ; i < image->w ; i++){
+		for(int j = 0 ; j < image->h ; j++){
+			RGB color = get_pixel_color(image,i,j);
+			//RGB normalized = normalize_0_1(color);
+
+
+		}
+
+	}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

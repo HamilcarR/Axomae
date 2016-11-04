@@ -7,14 +7,13 @@
 	
 
 
- enum KEYS {ESC = 0 , QUIT = 1 };
-typedef enum KEYS KEYS;
-const int number_event = 2; 
-
 
 namespace maptomix{
 	
-	
+	 enum KEYS {ESC = 0 , QUIT = 1, UP = 2 , DOWN = 3 };
+	typedef enum KEYS KEYS;
+	const int number_event = 4; 
+
 	class EventHandler : public Controller
 	{
 
@@ -26,7 +25,9 @@ namespace maptomix{
 			void main_loop();
 			bool* get_event_array(){return event_array;};
 			void close(){delete instance;};
-
+			int get_pushed_button();
+		        bool isQuit(){return app_quit;}	
+			void reset_array();
 		private:
 			static EventHandler* instance;
 			~EventHandler();
