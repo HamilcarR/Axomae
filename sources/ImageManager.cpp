@@ -817,16 +817,23 @@ void ImageManager::calculate_normal_map(SDL_Surface* surface,double fact,Uint8 g
 	}
 
 
-	for(int i = 1 ; i < width-1 ; i++){
-		for(int j = 1 ; j < height-1 ; j++){
-			double col_left = data[i][j-1].green;
-			double col_right = data[i][j+1].green;
-			double col_up = data[i-1][j].green;
-			double col_down = data[i+1][j].green;
-			
-			double dx = fact*(col_right - col_left)/255;
-			double dy = fact*(col_up - col_down)/255 ;
-			
+	for(int i = 0 ; i < width ; i++){
+		for(int j = 0 ; j < height ; j++){
+
+			int x , y , a , b ; 
+			x = (i == 0 ) ? i+1 : i-1 ;
+			y = (j == 0 ) ? j+1 : j-1 ;
+			a = (i == width-1) ? width-2 : i+1;
+			b = (j == height-1)? height-2 :j+1 ; 
+
+
+			double col_left = data[i][y].green;
+			double col_right = data[i][b].green;
+			double col_up = data[x][j].green;
+			double col_down = data[a][j].green;
+			float atten = 1.56 ; 
+			double dx = atten*(fact*(col_right - col_left)/255);
+			double dy = atten*(fact*(col_up - col_down)/255) ;
 			auto Nx = normalize(-1,1,dy); 
 			auto Ny = normalize(-1,1,dx); 
 			auto Nz = 255.0 ; //the normal vector
@@ -855,63 +862,70 @@ void ImageManager::calculate_normal_map(SDL_Surface* surface,double fact,Uint8 g
 
 
 
+/***************************************************************************************************************/
 
 
 
 
+void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
+	
+	int height = surface->h;
+	int width = surface->w;
+	RGB** data = new RGB*[width];
+	for(int i = 0 ; i < width ; i++)
+		data[i]= new RGB[height];
 
 
 
+	for(int i = 0 ; i < width ; i++){
+		for(int j = 0 ; j < height ; j++){
+			data[i][j] = get_pixel_color(surface,i,j);
+		}
+	}
+
+
+	for(int i = 0 ; i < width ; i++){
+		for(int j = 0 ; j < height ; j++){
+
+			int x , y , a , b ; 
+			x = (i == 0 ) ? i+1 : i-1 ;
+			y = (j == 0 ) ? j+1 : j-1 ;
+			a = (i == width-1) ? width-2 : i+1;
+			b = (j == height-1)? height-2 :j+1 ; 
+
+
+			RGB col_left = data[i][y];
+			RGB col_right = data[i][b];
+			RGB col_up = data[x][j];
+			RGB col_down = data[a][j];
+			
+			double dx_red = factor*(col_left.red - col_right.red)/255 ; 
+			double dx_green = factor*(col_left.green - col_right.green)/255;
+			
+			double dy_red = factor*(col_up.red - col_down.red)/255;
+			double dy_green = factor*(col_up.green - col_down.green)/255 ; 
+			
+			auto red_var =normalize(-1,1, dx_red+dy_red);			
+			auto green_var = normalize(-1,1,dx_green+dy_green);
+
+
+			RGB col = RGB( red_var ,  green_var , 0) ; 
+			set_pixel_color(surface,i,j,col.rgb_to_int()); 
+			
+
+
+		}
+
+	}	
+	
+
+	for(int i = 0 ; i < width ; i++)
+		delete[] data[i];
+	delete[] data;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 

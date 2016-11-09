@@ -147,7 +147,9 @@ namespace maptomix{
 			static void set_contrast(SDL_Surface* image);
 			static void set_contrast_sigmoid(SDL_Surface *image,int treshold);
 			static void calculate_normal_map(SDL_Surface* surface , double strength,Uint8 greyscale); 		
+			static void compute_dudv(SDL_Surface* surface,double factor);
 		private:
+
 
 			ImageManager();
 			~ImageManager();

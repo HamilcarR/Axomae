@@ -55,8 +55,10 @@ int main(int argv , char** argc){
 	ImageManager::calculate_edge(s,MAPTOMIX_USE_SOBEL,MAPTOMIX_REPEAT);
 
 	ImageManager::set_contrast(s,atoi(argc[2]));
+
 	
-	ImageManager::calculate_normal_map(s,atoi(argc[3]),3);	
+	ImageManager::calculate_normal_map(s,atoi(argc[3]),4);
+	ImageManager::compute_dudv(s,1.1);	
 	window->display_image(s);
 	
 	ImageImporter::save_image(s,"sobel");
