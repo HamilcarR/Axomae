@@ -1,6 +1,7 @@
 #include "../includes/ImageManager.h"
 #include <iostream>
 #include <assert.h>
+#include <math.h>
 #include <thread>
 namespace maptomix{
 
@@ -10,6 +11,9 @@ namespace maptomix{
 
 	RGB::RGB():red(0),green(0),blue(0),alpha(0){
 		
+	}
+
+	RGB::RGB(int r , int g , int b):red(r),green(g),blue(b),alpha(0){
 	}
 
 	RGB::RGB(int r , int g , int b , int a):red(r),green(g),blue(b),alpha(a){
@@ -34,6 +38,16 @@ namespace maptomix{
 	}
 
 /**************************************************************************************************************/
+
+	int truncate(int n){
+		if(n<=0)
+	  		return 0;
+		else if (n>=255)
+	 		 return 255;
+		else
+	  		return n ; 
+
+}
 
 
 	RGB ImageManager::get_pixel_color(SDL_Surface* surface , int x , int y ){
@@ -344,7 +358,14 @@ void ImageManager::set_greyscale_luminance(SDL_Surface* image){
 
 
 /**************************************************************************************************************/
+const double RGB::intensity(){
 
+const double av= (red+green+blue)/3;
+
+return av/255;
+
+
+}
 
 
 RGB RGB::int_to_rgb(uint32_t val){
@@ -537,7 +558,6 @@ void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t bord
 
 				
 				RGB rgb = RGB (r,g,b,0);
-			    //    rgb.to_string();
 
 				
 				set_pixel_color(surface,i,j,rgb.rgb_to_int()); 
@@ -549,7 +569,7 @@ void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t bord
 	}
 
 
-
+	//we invert the color of the image 
 	for(int i = 1 ; i < w-1 ; i++){
 		for(int j = 1 ; j < h-1 ;j++){
 			RGB rgb1,rgb2,rgb3,rgb4,rgb5,rgb6,rgb7,rgb8;
@@ -703,16 +723,6 @@ max_colors *ImageManager::get_colors_max_variation(SDL_Surface* image){
 
 }
 
-int truncate(int n){
-	if(n<=0)
-	  return 0;
-	else if (n>=255)
-	  return 255;
-	else
-	  return n ; 
-
-}
-
 void ImageManager::set_contrast(SDL_Surface* image,int level){
 	double correction_factor = (259*(level+255))/(255*(259-level));
 	max_colors *maxmin = get_colors_max_variation(image);
@@ -775,12 +785,68 @@ void ImageManager::set_contrast_sigmoid(SDL_Surface *image,int threshold){
 
 
 
+/***************************************************************************************************************/
+
+
+constexpr double radiant_to_degree(double rad){
+
+	return rad*180.f/M_PI; 
+
+}
+
+constexpr double get_pixel_height(double color_component){
+	
+	return (255 - color_component);
+
+}
+void ImageManager::calculate_normal_map(SDL_Surface* surface,double fact,Uint8 greyscale){
+	
+	set_greyscale_average(surface,greyscale);
+	int height = surface->h;
+	int width = surface->w;
+	RGB** data = new RGB*[width];
+	for(int i = 0 ; i < width ; i++)
+		data[i]= new RGB[height];
 
 
 
+	for(int i = 0 ; i < width ; i++){
+		for(int j = 0 ; j < height ; j++){
+			data[i][j] = get_pixel_color(surface,i,j);
+		}
+	}
 
 
+	for(int i = 1 ; i < width-1 ; i++){
+		for(int j = 1 ; j < height-1 ; j++){
+			double col_left = data[i][j-1].green;
+			double col_right = data[i][j+1].green;
+			double col_up = data[i-1][j].green;
+			double col_down = data[i+1][j].green;
+			
+			double dx = fact*(col_right - col_left)/255;
+			double dy = fact*(col_up - col_down)/255 ;
+			
+			auto Nx = normalize(-1,1,dy); 
+			auto Ny = normalize(-1,1,dx); 
+			auto Nz = 255.0 ; //the normal vector
+			
+			
+			RGB col = RGB( Nx ,  Ny , Nz) ; 
+			set_pixel_color(surface,i,j,col.rgb_to_int()); 
+			
 
+
+		}
+
+	}	
+	
+
+	for(int i = 0 ; i < width ; i++)
+		delete[] data[i];
+	delete[] data; 
+
+}
 
 
 

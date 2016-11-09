@@ -8,7 +8,8 @@
 
 
 namespace maptomix{
-
+			
+			const int INT_MAX = 30000;
 			/*we define some constants here...flags,sobel-prewitt operators,kernels etc...*/
 			constexpr uint8_t MAPTOMIX_USE_SOBEL = 0XFF;
 			constexpr uint8_t MAPTOMIX_USE_PREWITT = 0X00;
@@ -24,9 +25,14 @@ namespace maptomix{
 			 //Operators
 			static constexpr int SOBEL= 2 ; 
 			static constexpr int PREWITT = 1 ; 
-
+			
 			//convolution kernels
 			
+
+
+			
+
+					
 
 			static constexpr int scharr_vertical[KERNEL_SIZE][KERNEL_SIZE]={
 				{3 , 10 , 3},
@@ -76,32 +82,18 @@ namespace maptomix{
 				
 
 			};
-			static auto normalize = [](int maxx,int minn,int pixel){
+			template<typename T>
+		        static auto normalize (int maxx,int minn,T pixel){
+				       
+				
+					auto norm = [](int maxx,int minn,T pixel){
 					return ( (pixel-minn)*255 / (maxx-minn) + 0 );
-				};	
-		
+						};	
+				return 	norm(maxx,minn,pixel) ; 
+			}
 			static auto magnitude = [](int x,int y){return sqrt(x*x+y*y);};
-	
-/*			static auto normalize_0_1 = [](RGB rgb){
-					RGB ret ; 
-					ret.red = rgb.red/255;
-					ret.green = rgb.red/255;
-					ret.blue = rgb.red/255;
-					ret.alpha = rgb.alpha; 
-					return ret;
 
-			};	
-			
-			static auto normalize_0_255 =[](RGB rgb){
-					RGB ret;
-				       	ret.red=rgb.red*255;
-					ret.green=rgb.green*255;	
-					ret.blue = rgb.blue*255;
-					ret.alpha = rgb.alpha;
-					return ret;
-			};
 
-*/
 
 	typedef struct max_colors{
 
@@ -115,10 +107,12 @@ namespace maptomix{
 		public:
 			RGB();
 			RGB(int r , int g , int b , int a);
+			RGB(int r, int g , int b);
 			~RGB();
 			static RGB int_to_rgb(uint32_t value);
 			static RGB int_to_rgb(uint8_t value);
 			static RGB int_to_rgb(uint16_t value);
+			const double intensity();
 			void invert_color();
 			
 			template<typename T>
@@ -136,8 +130,7 @@ namespace maptomix{
 
 
 
-
-
+ 
 	class ImageManager{
 		
 		public:
@@ -152,7 +145,8 @@ namespace maptomix{
 			static void set_greyscale_luminance(SDL_Surface* image);
 			static void set_contrast(SDL_Surface* image,int level);
 			static void set_contrast(SDL_Surface* image);
-			static void set_contrast_sigmoid(SDL_Surface *image,int treshold);		
+			static void set_contrast_sigmoid(SDL_Surface *image,int treshold);
+			static void calculate_normal_map(SDL_Surface* surface , double strength,Uint8 greyscale); 		
 		private:
 
 			ImageManager();

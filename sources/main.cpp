@@ -45,15 +45,18 @@ int main(int argv , char** argc){
 	init_api();
 	int contr = 0 ; 
         contrast = &contr;	
-	Window *window = new Window(500,500,"ok");
+	Window *window = new Window(600,600,"shet");
 	SDL_Event event; 
 	EventHandler *handler=EventHandler::getInstance(); 
 	handler->setEvent(event);
 	ImageImporter *importer = ImageImporter::getInstance();
 	SDL_Surface *s = importer ->load_image(argc[1]);
+
 	ImageManager::calculate_edge(s,MAPTOMIX_USE_SOBEL,MAPTOMIX_REPEAT);
 
 	ImageManager::set_contrast(s,atoi(argc[2]));
+	
+	ImageManager::calculate_normal_map(s,atoi(argc[3]),3);	
 	window->display_image(s);
 	
 	ImageImporter::save_image(s,"sobel");
