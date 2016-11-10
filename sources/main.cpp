@@ -10,7 +10,6 @@ using namespace std;
 using namespace maptomix;
 
 
-extern int * contrast = nullptr ; 
 
 void init_api(){
 	if(SDL_Init(SDL_INIT_EVERYTHING)<0)
@@ -28,23 +27,9 @@ void init_api(){
 }
 
 
-void contrast_f(){
-	EventHandler* handler = EventHandler::getInstance();
-	bool  *arr =handler->get_event_array();
-	
-	if(arr[UP])
-		*contrast++;
-	else if (arr[DOWN])
-		*contrast--;
-
-
-}
-
 
 int main(int argv , char** argc){
 	init_api();
-	int contr = 0 ; 
-        contrast = &contr;	
 	Window *window = new Window(600,600,"shet");
 	SDL_Event event; 
 	EventHandler *handler=EventHandler::getInstance(); 
@@ -58,7 +43,7 @@ int main(int argv , char** argc){
 
 	
 	ImageManager::calculate_normal_map(s,atoi(argc[3]),4);
-	ImageManager::compute_dudv(s,1.1);	
+//	ImageManager::compute_dudv(s,1.1);	
 	window->display_image(s);
 	
 	ImageImporter::save_image(s,"sobel");

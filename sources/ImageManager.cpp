@@ -4,6 +4,8 @@
 #include <math.h>
 #include <thread>
 namespace maptomix{
+	
+
 
 	using namespace std;
 
@@ -831,11 +833,17 @@ void ImageManager::calculate_normal_map(SDL_Surface* surface,double fact,Uint8 g
 			double col_right = data[i][b].green;
 			double col_up = data[x][j].green;
 			double col_down = data[a][j].green;
+			double col_up_right = data[x][b].green;
+			double col_up_left = data[x][y].green;
+			double col_down_left = data[a][y].green;
+			double col_down_right = data[a][b].green;
 			float atten = 1.56 ; 
 			double dx = atten*(fact*(col_right - col_left)/255);
 			double dy = atten*(fact*(col_up - col_down)/255) ;
-			auto Nx = normalize(-1,1,dy); 
-			auto Ny = normalize(-1,1,dx); 
+			double ddx = atten*(fact*(col_up_right - col_down_left)/255);
+			double ddy = atten*(fact*(col_up_left - col_down_right)/255) ;
+			auto Nx = normalize(-1,1,lerp(dy , ddy , 1)) ; 
+			auto Ny = normalize(-1,1,lerp(dx , ddx , 1)) ; 
 			auto Nz = 255.0 ; //the normal vector
 			
 			

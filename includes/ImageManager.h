@@ -82,6 +82,10 @@ namespace maptomix{
 				
 
 			};
+
+
+			static auto magnitude = [](int x,int y){return sqrt(x*x+y*y);};
+
 			template<typename T>
 		        static auto normalize (int maxx,int minn,T pixel){
 				       
@@ -91,8 +95,18 @@ namespace maptomix{
 						};	
 				return 	norm(maxx,minn,pixel) ; 
 			}
-			static auto magnitude = [](int x,int y){return sqrt(x*x+y*y);};
 
+			
+			template<typename T , typename D>
+			static auto lerp(T value1 , T value2 ,D cste ){
+				
+				auto lirp = [](T val1 , T val2 , D cst){
+					return (1-cst)*val1 + cst*val2;
+
+				};
+				return lirp(value1,value2,cste);
+
+			}
 
 
 	typedef struct max_colors{
