@@ -1,5 +1,4 @@
 # maptomic
-A free tool for generating maps (normal maps,dudv maps,height maps etc) on linux
 
 From a simple image : 
 
