@@ -1,15 +1,15 @@
 #include <iostream>
 #include <cstdlib>
+#include <regex>
+#include <string>
 #include "../includes/ImageManager.h"
 #include "../includes/ImageImporter.h"
 #include "../includes/Window.h"
 #include "../includes/EventHandler.h"
-
+#include "../includes/TerminalOpt.h"
 
 using namespace std;
 using namespace maptomix;
-
-
 
 void init_api(){
 	if(SDL_Init(SDL_INIT_EVERYTHING)<0)
@@ -27,35 +27,54 @@ void init_api(){
 }
 
 
+void quit_api(){
+	
+
+		IMG_Quit();
+		SDL_Quit();
+
+}
+
+
 
 int main(int argv , char** argc){
 	init_api();
-	Window *window = new Window(600,600,"shet");
-	SDL_Event event; 
-	EventHandler *handler=EventHandler::getInstance(); 
-	handler->setEvent(event);
-	ImageImporter *importer = ImageImporter::getInstance();
-	SDL_Surface *s = importer ->load_image(argc[1]);
-
-	ImageManager::calculate_edge(s,MAPTOMIX_USE_SOBEL,MAPTOMIX_REPEAT);
-
-	ImageManager::set_contrast(s,atoi(argc[2]));
-
 	
-	ImageManager::calculate_normal_map(s,atoi(argc[3]),4);
-//	ImageManager::compute_dudv(s,1.1);	
-	window->display_image(s);
-	
-	ImageImporter::save_image(s,"sobel");
-	handler->main_loop();		
+	string mode = argc[1];
+
+	regex cmd,gui;
+try{	cmd= regex("-cmd",regex_constants::icase);} catch(const std::regex_error& e){cout << e.what() << "\n" ;} 
+	if(regex_match(mode,cmd)){
+		bool ex = false ; 
+		string user_input; 
+
+		while(!ex){
+			
+			cout <<colors[GREEN] << prompt[0] << colors[YELLOW] ; 
+			std::getline(std::cin , user_input) ; 
+			ex = (regex_match(user_input , regex(command[EXIT],regex_constants::icase)));
+			if(!ex)
+				process_command(user_input); 
+			
+		}
+
+	}
+	else if(regex_match(mode,gui)) {
 
 
 
-delete window;
+	}
+	else{
+		cout<<"Wrong argument used"<< "\n" ; 
+		return EXIT_FAILURE;
+	}
 
-handler->close(); 
-importer->close(); 
-IMG_Quit();
-SDL_Quit();
+
+
+
+
+
+
+	quit_api(); 
 return EXIT_SUCCESS ; 
 }

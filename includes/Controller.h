@@ -8,6 +8,8 @@
 
  namespace maptomix {
 
+class View; 
+
 class Controller{
 	public:
 		Controller();

@@ -5,7 +5,7 @@ namespace maptomix {
 
 using namespace std;
 
-Window::Window(const int w,const int h , const char* n) : maptomix::View(){
+Window::Window(const int w,const int h , const char* n) {
 	width=w; 
 	height=h;
 	name =(string) n;

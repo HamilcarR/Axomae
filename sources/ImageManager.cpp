@@ -842,12 +842,12 @@ void ImageManager::calculate_normal_map(SDL_Surface* surface,double fact,Uint8 g
 			double dy = atten*(fact*(col_up - col_down)/255) ;
 			double ddx = atten*(fact*(col_up_right - col_down_left)/255);
 			double ddy = atten*(fact*(col_up_left - col_down_right)/255) ;
-			auto Nx = normalize(-1,1,lerp(dy , ddy , 1)) ; 
-			auto Ny = normalize(-1,1,lerp(dx , ddx , 1)) ; 
+			auto Nx = normalize(-1,1,lerp(dy , ddy , 0.5)) ; 
+			auto Ny = normalize(-1,1,lerp(dx , ddx , 0.5)) ; 
 			auto Nz = 255.0 ; //the normal vector
 			
 			
-			RGB col = RGB( Nx ,  Ny , Nz) ; 
+			RGB col = RGB( truncate(Nx) ,  truncate(Ny) , Nz) ; 
 			set_pixel_color(surface,i,j,col.rgb_to_int()); 
 			
 
@@ -906,18 +906,27 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 			RGB col_right = data[i][b];
 			RGB col_up = data[x][j];
 			RGB col_down = data[a][j];
+			RGB col_up_right = data[x][b];
+			RGB col_up_left = data[x][y];
+			RGB col_down_left = data[a][y];
+			RGB col_down_right = data[a][b];
+			double atten = 0.8 ; 
+			double dx_red = atten*(factor*(col_left.red - col_right.red)/255) ; 
+			double dx_green = atten*(factor*(col_left.green - col_right.green)/255);	
+			double dy_red = atten*(factor*(col_up.red - col_down.red)/255);
+			double dy_green = atten*(factor*(col_up.green - col_down.green)/255) ; 
+
+			double ddx_green = atten*(factor*(col_up_right.green - col_down_left.green)/255);
+			double ddy_green = atten*(factor*(col_up_left.green - col_down_right.green)/255) ;
+			double ddx_red = atten*(factor*(col_up_right.red - col_down_left.red)/255);
+			double ddy_red = atten*(factor*(col_up_left.red - col_down_right.red)/255) ;
+
 			
-			double dx_red = factor*(col_left.red - col_right.red)/255 ; 
-			double dx_green = factor*(col_left.green - col_right.green)/255;
-			
-			double dy_red = factor*(col_up.red - col_down.red)/255;
-			double dy_green = factor*(col_up.green - col_down.green)/255 ; 
-			
-			auto red_var =normalize(-1,1, dx_red+dy_red);			
-			auto green_var = normalize(-1,1,dx_green+dy_green);
+			auto red_var =normalize(-1,1, lerp(dx_red+dy_red, ddx_red+ddy_red,0.5));			
+			auto green_var = normalize(-1,1,lerp(dx_green+dy_green , ddx_green+ddy_green,0.5));
 
 
-			RGB col = RGB( red_var ,  green_var , 0) ; 
+			RGB col = RGB( truncate(red_var) ,  truncate(green_var) , 0.0) ; 
 			set_pixel_color(surface,i,j,col.rgb_to_int()); 
 			
 

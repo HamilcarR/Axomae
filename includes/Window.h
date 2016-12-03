@@ -4,16 +4,14 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-
 #include "images.h"
-#include "View.h"
 
 namespace maptomix{
 
 
 
 
-class Window : public View
+class Window 
 
 	{
 
@@ -25,6 +23,7 @@ public:
 	int getHeight(){return height;}
 	int getWidth(){return width;}	
 private:
+
 	int width;
 	int height;
 	std::string name;

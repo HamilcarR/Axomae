@@ -96,7 +96,7 @@ namespace maptomix{
 				return 	norm(maxx,minn,pixel) ; 
 			}
 
-			
+			/*we add linear interpolation to compute smoother normals differences*/	
 			template<typename T , typename D>
 			static auto lerp(T value1 , T value2 ,D cste ){
 				
@@ -109,7 +109,7 @@ namespace maptomix{
 			}
 
 
-	typedef struct max_colors{
+	 struct max_colors{
 
 		int max_rgb[3];
 		int min_rgb[3];	

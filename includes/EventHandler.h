@@ -9,7 +9,12 @@
 
 
 namespace maptomix{
+
 	
+
+
+
+
 	 enum KEYS {ESC = 0 , QUIT = 1, UP = 2 , DOWN = 3 };
 	typedef enum KEYS KEYS;
 	const int number_event = 4; 
