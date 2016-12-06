@@ -1,3 +1,4 @@
+#include "../includes/ImageImporter.h"
 #include "../includes/TerminalOpt.h"
 #include <regex>
 #include <string>
@@ -11,10 +12,18 @@ namespace maptomix{
 	const int STRING_SIZE = 256 ; 
 
 	ProgramStatus *ProgramStatus::instance = nullptr; 
+	
 
 	static const std::regex command_regex[]={
-		std::regex("window [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
-		
+		std::regex("window [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	
+		std::regex("nmap [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
+		std::regex("hmap [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
+		std::regex("dudv [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
+		std::regex("save [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
+		std::regex("contrast [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
+		std::regex("exit [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
+		std::regex("render [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
+		std::regex("load [a-z]+.[a-z0-9]+",std::regex_constants::icase)
 
 
 	};
@@ -30,10 +39,12 @@ namespace maptomix{
 
 	/*retrieve an argument from a command*/
 	static std::string get_word(std::string& input , Uint8 pos){
+
+
 		if(pos > input.size() || input.size() == 0 ) 
 		      return std::string();
 		else{
-		
+
 			char input_c[STRING_SIZE] = " "; 
 		        strcpy(input_c,input.c_str()) ; 	
 			char * tokens = strtok(input_c , " \n" );
@@ -60,10 +71,27 @@ namespace maptomix{
 /*******************************************************************************************************************************************************/
 
 	static Validation validate_command_load(std::string input){
-		std::string delimiter = " " ; 
-		
+		std::string delimiter = " " ;
+
+		if(std::regex_match(input , command_regex[LOAD])){
+
+				std::vector<std::string> arg_array ; 
+				std::string arg1 = get_word(input,1);
+
+				if(arg1.size()>0)
+				{
+					arg_array.push_back(arg1);
+					return {true , arg_array}; 
+
+				}
+				else
+					return {false,std::vector<std::string>()}; 
 
 
+
+		}			
+
+		else
 		return {false,std::vector<std::string>()}; 
 	}
 
@@ -86,7 +114,7 @@ namespace maptomix{
 			std::string arg3=get_word(input,3);
 		     	bool c1 = check_if_number(arg1);
 			bool c2 = check_if_number(arg2);
-			if(c1 && c2 ){
+			if(c1 && c2 && arg1.size()>0 && arg2.size()>0 && arg3.size()>0){
 				arg_array.push_back(arg1); 
 				arg_array.push_back(arg2); 
 				arg_array.push_back(arg3); 
@@ -151,46 +179,70 @@ namespace maptomix{
 
 
 /*******************************************************************************************************************************************************/
+	void ProgramStatus::process_command(std::string user_input){
 
-
-	void process_command(std::string user_input){
-		/*all inputs*/
-		std::regex matching_save (command[SAVE] , std::regex_constants::icase) ; 
-		std::regex matching_load(command[LOAD],std::regex_constants::icase);
-		std::regex matching_window(command[WIN] , std::regex_constants::icase); 
-		std::regex matching_normalmap(command[NMAP] , std::regex_constants::icase); 
-		std::regex matching_heightmap(command[HMAP] , std::regex_constants::icase); 
-		std::regex matching_contrast(command[CONTRAST],std::regex_constants::icase); 
-		std::regex matching_render(command[RENDER],std::regex_constants::icase); 
-		std::regex matching_dudv(command[DUDV],std::regex_constants::icase);
 
 		/*does it match ?*/
 
-		bool save = std::regex_search(user_input,matching_save);
-		bool load= std::regex_search(user_input,matching_load);
-		bool window = std::regex_search(user_input,matching_window);
-		bool normalmap = std::regex_search(user_input,matching_normalmap);
-		bool heightmap = std::regex_search(user_input,matching_heightmap);
-		bool contrast = std::regex_search(user_input,matching_contrast);
-		bool render = std::regex_search(user_input,matching_render);
-		bool dudv = std::regex_search(user_input,matching_dudv);
-
+		bool save = std::regex_search(user_input,command_regex[SAVE]);
+		bool load= std::regex_search(user_input,command_regex[LOAD]);
+		bool window = std::regex_search(user_input,command_regex[WIN]);
+		bool normalmap = std::regex_search(user_input,command_regex[NMAP]);
+		bool heightmap = std::regex_search(user_input,command_regex[HMAP]);
+		bool contrast = std::regex_search(user_input,command_regex[CONTRAST]);
+		bool render = std::regex_search(user_input,command_regex[RENDER]);
+		bool dudv = std::regex_search(user_input,command_regex[DUDV]);
+		bool closew = std::regex_search(user_input,std::regex("exwin"));
 
 		if(save){
 			/*create a "state" class with pointers to every elements: Save the image of the window if a window exists*/
-
+		std::cout << "dshsds" <<std::endl; 
 
 		}
 		else if(load){
+			Validation v = validate_command_load(user_input);
+			if (v.validated)
+			{
+				std::cout << "File : " << v.command_arguments[0] << " loading..." << "\n" ; 
+				ImageImporter *instance = ImageImporter::getInstance(); 
+				SDL_Surface* im = instance->load_image(static_cast<const char*>(v.command_arguments[0].c_str()));
+				if(im)
+				images.push_back(im);				
+				
 
+
+			}
+			else
+			{
+				std::cout <<"Wrong command used !" << "\n" ; 
+
+			}
+		
+		
 		}
 		else if(window){
 			Validation v = validate_command_window(user_input); 
 			if(v.validated)
 			{
-				for(std::string c : v.command_arguments)
-					std::cout<<c<<"\n";
-				//TODO create window 
+				int w = std::stoi(v.command_arguments[0]) , h = std::stoi(v.command_arguments[1]) ; 
+				std::string window_name = v.command_arguments[2];
+				display = std::unique_ptr<Window>( Window(w,h,window_name.c_str()));
+				display->setEvent(event); 
+				if(images.size()!=0){
+					bool loop = true; 
+					while(loop){
+						while(SDL_PollEvent(&event)){
+							if(event.type == SDL_QUIT)
+								loop = false; 
+
+						}
+
+					display->display_image(images[0]); 
+					}
+				}	
+
+			std::puts("Exiting...\n"); 
+			display.reset(nullptr); 
 			}
 			else
 				std::cout << "wrong command"<<std::endl;
@@ -213,9 +265,13 @@ namespace maptomix{
 		
 		}
 		
+		else if(closew ){
+			std::puts("Exiting...\n"); 
+			display.reset(); 
 
-		
+		}
 
+	
 	}
 
 
@@ -223,11 +279,24 @@ namespace maptomix{
 
 
 
+/*******************************************************************************************************************************************************/
+
+
+/*ProgramStatus class methods*/
+
+
+	ProgramStatus::ProgramStatus(){
+
+
+	}
+
+	ProgramStatus::~ProgramStatus(){
+
+
+	}
 
 
 
-
-
-
+/*******************************************************************************************************************************************************/
 
 }

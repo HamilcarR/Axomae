@@ -40,7 +40,6 @@ namespace maptomix{
 			EventHandler(SDL_Event &event);
 
 
-			
 			SDL_Event m_event;
 			bool event_array[number_event];
 			bool app_quit ; 

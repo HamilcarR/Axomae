@@ -1,6 +1,6 @@
 #ifndef TERMOPT_H
 #define TERMOPT_H
-
+#include "EventHandler.h"
 #include "ImageManager.h"
 #include "ImageImporter.h"
 #include "Window.h"
@@ -62,7 +62,7 @@ namespace maptomix{
 
 
 /*******************************************************************************************************************************************************/
-	void process_command(std::string user_input); 
+
 
 	
 
@@ -74,6 +74,9 @@ namespace maptomix{
 			static ProgramStatus* getInstance(){ if(instance==nullptr) instance = new ProgramStatus();return instance;}
 			static void	       Quit(){if(instance != nullptr) delete instance;instance=nullptr;}
 			
+			void process_command(std::string user_input); 
+			static void loop_thread(void* window);
+			void setEvent(SDL_Event &ev){event = ev;}
 		private:
 			/*functions*/
 			ProgramStatus();
@@ -82,10 +85,12 @@ namespace maptomix{
 
 
 			/*attributes*/
-			std::vector<std::shared_ptr<Window>> display; 
-			std::vector<std::shared_ptr<Renderer>> renderer ; 
+			std::vector<SDL_Surface*> images;
+			std::unique_ptr<Window> display; 
+			std::shared_ptr<Renderer> renderer ; 
 			static ProgramStatus* instance; 
-				
+			SDL_Event event; 
+						
 		
 
 

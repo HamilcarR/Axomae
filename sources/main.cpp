@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <regex>
 #include <string>
+#include <thread> 
 #include "../includes/ImageManager.h"
 #include "../includes/ImageImporter.h"
 #include "../includes/Window.h"
@@ -36,12 +37,18 @@ void quit_api(){
 }
 
 
-
+static void loop_event(EventHandler* ev){
+	ev->main_loop(); 
+}
 int main(int argv , char** argc){
 	init_api();
-	
+	EventHandler *event = EventHandler::getInstance(); 
+	SDL_Event event_sdl;
+	event->setEvent(event_sdl); 
+	thread event_thread;	
 	string mode = argc[1];
-
+	ProgramStatus * main_program_command = ProgramStatus::getInstance();
+	main_program_command->setEvent(event_sdl);
 	regex cmd,gui;
 try{	cmd= regex("-cmd",regex_constants::icase);} catch(const std::regex_error& e){cout << e.what() << "\n" ;} 
 	if(regex_match(mode,cmd)){
@@ -50,12 +57,15 @@ try{	cmd= regex("-cmd",regex_constants::icase);} catch(const std::regex_error& e
 
 		while(!ex){
 			
+		//	event_thread=thread(loop_event,event);
 			cout <<colors[GREEN] << prompt[0] << colors[YELLOW] ; 
 			std::getline(std::cin , user_input) ; 
 			ex = (regex_match(user_input , regex(command[EXIT],regex_constants::icase)));
 			if(!ex)
-				process_command(user_input); 
-			
+				main_program_command->process_command(user_input); 
+		
+		//	event_thread.join(); 	
+
 		}
 
 	}
@@ -71,7 +81,8 @@ try{	cmd= regex("-cmd",regex_constants::icase);} catch(const std::regex_error& e
 
 
 
-
+	
+        
 
 
 

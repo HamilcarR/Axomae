@@ -48,7 +48,7 @@ SDL_Surface* ImageImporter::load_image(const char* file){
         surf = IMG_Load(file);
 	if(!surf)
 		cout<<"Img load problem : " << IMG_GetError()<<endl;
-	assert(surf!=nullptr);
+	
 	return surf;
 
 
