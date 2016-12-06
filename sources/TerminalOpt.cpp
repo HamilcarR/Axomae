@@ -226,7 +226,7 @@ namespace maptomix{
 			{
 				int w = std::stoi(v.command_arguments[0]) , h = std::stoi(v.command_arguments[1]) ; 
 				std::string window_name = v.command_arguments[2];
-				display = std::unique_ptr<Window>( Window(w,h,window_name.c_str()));
+				display = std::unique_ptr<Window>(new Window(w,h,window_name.c_str()));
 				display->setEvent(event); 
 				if(images.size()!=0){
 					bool loop = true; 
