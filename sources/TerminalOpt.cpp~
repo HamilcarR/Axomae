@@ -209,7 +209,7 @@ namespace maptomix{
 				ImageImporter *instance = ImageImporter::getInstance(); 
 				SDL_Surface* im = instance->load_image(static_cast<const char*>(v.command_arguments[0].c_str()));
 				if(im)
-					images.push_back(im);				
+				images.push_back(im);				
 				
 
 

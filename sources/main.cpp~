@@ -50,26 +50,25 @@ int main(int argv , char** argc){
 	ProgramStatus * main_program_command = ProgramStatus::getInstance();
 	main_program_command->setEvent(event_sdl);
 	regex cmd,gui;
-	try{
-		cmd= regex("-cmd",regex_constants::icase);} catch(const std::regex_error& e){cout << e.what() << "\n" ;} 
-		if(regex_match(mode,cmd)){
-			bool ex = false ; 
-			string user_input; 
+try{	cmd= regex("-cmd",regex_constants::icase);} catch(const std::regex_error& e){cout << e.what() << "\n" ;} 
+	if(regex_match(mode,cmd)){
+		bool ex = false ; 
+		string user_input; 
 
-			while(!ex){
+		while(!ex){
 			
-			//	event_thread=thread(loop_event,event);
-				cout <<colors[GREEN] << prompt[0] << colors[YELLOW] ; 
-				std::getline(std::cin , user_input) ; 
-				ex = (regex_match(user_input , regex(command[EXIT],regex_constants::icase)));
-					if(!ex)
-						main_program_command->process_command(user_input); 
+		//	event_thread=thread(loop_event,event);
+			cout <<colors[GREEN] << prompt[0] << colors[YELLOW] ; 
+			std::getline(std::cin , user_input) ; 
+			ex = (regex_match(user_input , regex(command[EXIT],regex_constants::icase)));
+			if(!ex)
+				main_program_command->process_command(user_input); 
 		
-			//	event_thread.join(); 	
-
-			}
+		//	event_thread.join(); 	
 
 		}
+
+	}
 	else if(regex_match(mode,gui)) {
 
 

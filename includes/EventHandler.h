@@ -1,6 +1,6 @@
 #ifndef EVENTHANDLER_H
 #define EVENTHANDLER_H
-#include <SDL2/SDL.h>
+#include <SDL/SDL.h>
 #include <vector>
 
 #include "Controller.h"

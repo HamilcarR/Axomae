@@ -1,7 +1,7 @@
 #ifndef IMAGEMANAGER_H
 #define IMAGEMANAGER_H
 
-#include <SDL2/SDL.h>
+#include <SDL/SDL.h>
 #include <algorithm>
 #include <iostream>
 #include <cmath>
@@ -9,7 +9,7 @@
 
 namespace maptomix{
 			
-			const int INT_MAX = 30000;
+			const int INT_MAXX = 30000;
 			/*we define some constants here...flags,sobel-prewitt operators,kernels etc...*/
 			constexpr uint8_t MAPTOMIX_USE_SOBEL = 0XFF;
 			constexpr uint8_t MAPTOMIX_USE_PREWITT = 0X00;

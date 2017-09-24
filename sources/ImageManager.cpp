@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <math.h>
 #include <thread>
+#include <cstdlib>
+
 namespace maptomix{
 	
 
@@ -169,7 +171,7 @@ namespace maptomix{
 	
 
 	void ImageManager::display_info_surface(SDL_Surface* image){
-	
+		
 		cout << "Bytes per pixel : " << to_string(image->format->BytesPerPixel) <<endl;
 		cout << "Padding on X : " << to_string(image->format->padding[0]) << endl;
 		cout << "Padding on Y : " << to_string(image->format->padding[1]) << endl;
@@ -698,8 +700,8 @@ RGB RGB::invert_color(T &color){
 
 max_colors *ImageManager::get_colors_max_variation(SDL_Surface* image){
 	max_colors *max_min = new max_colors ;
-        const int INT_MAX = 0;	
-	int max_red = 0 , max_green = 0 , max_blue = 0 , min_red = INT_MAX , min_blue = INT_MAX , min_green = INT_MAX;
+        const int INT_MAXX = 0;	
+	int max_red = 0 , max_green = 0 , max_blue = 0 , min_red = INT_MAX , min_blue = INT_MAX , min_green = INT_MAXX;
 	for(int i = 0 ; i < image->w ; i++){
 		for(int j = 0 ; j < image->h ; j++){
 
