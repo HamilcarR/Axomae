@@ -45,7 +45,7 @@ int main(int argv , char** argc){
 	EventHandler *event = EventHandler::getInstance(); 
 	SDL_Event event_sdl;
 	event->setEvent(event_sdl); 
-	thread event_thread;	
+//	thread event_thread;	
 	string mode = argc[1];
 	ProgramStatus * main_program_command = ProgramStatus::getInstance();
 	main_program_command->setEvent(event_sdl);
@@ -57,7 +57,10 @@ int main(int argv , char** argc){
 			string user_input; 
 
 			while(!ex){
-			
+
+
+
+#ifdef __unix__
 			//	event_thread=thread(loop_event,event);
 				cout <<colors[GREEN] << prompt[0] << colors[YELLOW] ; 
 				std::getline(std::cin , user_input) ; 
@@ -66,6 +69,19 @@ int main(int argv , char** argc){
 						main_program_command->process_command(user_input); 
 		
 			//	event_thread.join(); 	
+#elif defined(_WIN32) || defined (WIN32)
+
+				system("COLOR 2");
+				cout << prompt[0] ;
+				system("COLOR 6");
+				std::getline(std::cin, user_input);
+				ex = (regex_match(user_input, regex(command[EXIT], regex_constants::icase)));
+				if (!ex)
+					main_program_command->process_command(user_input);
+				system("COLOR F");
+
+
+#endif
 
 			}
 

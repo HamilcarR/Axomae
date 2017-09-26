@@ -71,7 +71,7 @@ void Window::display_image(SDL_Surface* image){
 
 
 void Window::loop(SDL_Surface* image){
-	thread_data data ; 
+//	thread_data data ; 
 	data.window = this;
         data.image = image; 
 	data.event = event ; 	

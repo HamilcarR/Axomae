@@ -24,7 +24,7 @@ namespace maptomix{
 
 
 	static const char *prompt[] ={
-	">"," :"
+	">"," :" , "=:" , ">>" 
 
 
 	};
@@ -49,8 +49,9 @@ namespace maptomix{
 	
 	enum: unsigned  {RED = 0 , BLUE = 1 , GREEN = 2 , YELLOW = 3 , RESET = 4 };
 
+#ifdef __unix__
 
-	static const char *colors[]={
+	static const char *colors[] = {
 		"\033[31m",
 		"\033[34m",
 		"\033[32m",
@@ -58,7 +59,32 @@ namespace maptomix{
 		"\033[0m"
 
 
-	};
+};
+
+#elif defined (WIN32) || defined(_WIN32)
+
+/*Color Codes:
+0 = Black
+1 = Blue
+2 = Green
+3 = Aqua
+4 = Red
+5 = Purple
+6 = Yellow
+7 = White
+8 = Gray
+9 = Light Blue
+A = Light Green
+B = Light Aqua
+C = Light Red
+D = Light Purple
+E = Light Yellow
+F = Bright White
+*/
+
+
+#endif
+	
 
 
 /*******************************************************************************************************************************************************/

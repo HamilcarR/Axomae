@@ -7,7 +7,7 @@
 #include <iostream>
 #include <iterator>
 #include <algorithm>
-
+#include <cctype>
 namespace maptomix{
 	
 	const int STRING_SIZE = 256 ; 

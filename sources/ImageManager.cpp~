@@ -4,8 +4,6 @@
 #include <math.h>
 #include <thread>
 #include <cstdlib>
-#include <climits>
-#include <string>
 
 namespace maptomix{
 	

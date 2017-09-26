@@ -36,7 +36,7 @@ private:
 	SDL_Event event ; 
 	SDL_Texture *texture;
 	bool free_surface_texture;
-//	std::thread t_sdl; 
+	std::thread t_sdl; 
 
 };
 
