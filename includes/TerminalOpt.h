@@ -44,12 +44,12 @@ namespace maptomix{
 	
 	
 
-	enum: unsigned  {LOAD = 8 , RENDER = 7 , EXIT = 6 , CONTRAST = 5 , SAVE = 4 , DUDV = 3 , HMAP = 2 , NMAP = 1 , WIN = 0 };
+	enum: unsigned  {CHK_CURRENT_IMG = 11 , SELECT = 10 , LISTIDS = 9 , LOAD = 8 , RENDER = 7 , EXIT = 6 , CONTRAST = 5 , SAVE = 4 , DUDV = 3 , HMAP = 2 , NMAP = 1 , WIN = 0 };
 	enum: unsigned	{WIN_ARGS = 3 };
 	
-	enum: unsigned  {RED = 0 , BLUE = 1 , GREEN = 2 , YELLOW = 3 , RESET = 4 };
 
 #ifdef __unix__
+	enum : unsigned { RED = 0, BLUE = 1, GREEN = 2, YELLOW = 3, RESET = 4 };
 
 	static const char *colors[] = {
 		"\033[31m",
@@ -62,6 +62,7 @@ namespace maptomix{
 };
 
 #elif defined (WIN32) || defined(_WIN32)
+	enum : unsigned { RED = 4, BLUE = 1, GREEN = 2, YELLOW = 6, RESET = 10 };
 
 /*Color Codes:
 0 = Black
@@ -85,7 +86,6 @@ F = Bright White
 
 #endif
 	
-
 
 /*******************************************************************************************************************************************************/
 
@@ -111,10 +111,12 @@ F = Bright White
 
 
 			/*attributes*/
-			std::vector<SDL_Surface*> images;
+			std::vector < std::pair< SDL_Surface* , std::string>> images;
 			std::unique_ptr<Window> display; 
 			std::shared_ptr<Renderer> renderer ; 
+			int _idCurrentImage; 
 			static ProgramStatus* instance; 
+
 			SDL_Event event; 
 						
 		

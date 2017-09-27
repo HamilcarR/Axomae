@@ -14,17 +14,20 @@ namespace maptomix{
 
 	ProgramStatus *ProgramStatus::instance = nullptr; 
 	
-
+	static void print(std::string&, int8_t); 
 	static const std::regex command_regex[]={
-		std::regex("window [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	
-		std::regex("nmap [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
-		std::regex("hmap [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
-		std::regex("dudv [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
-		std::regex("save [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
-		std::regex("contrast [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
-		std::regex("exit [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
-		std::regex("render [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),
-		std::regex("load [a-z]+.[a-z0-9]+",std::regex_constants::icase)
+		std::regex("window [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//open a new SDL window
+		std::regex("nmap [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate normal map (from height map)
+		std::regex("hmap [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate height map (from albedo texture) 
+		std::regex("dudv [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate dudv map
+		std::regex("save [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	// save image on the disk
+		std::regex("contrast [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), // set contrast
+		std::regex("exit [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), //exit the app
+		std::regex("render [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), //render the texture on a mesh
+		std::regex("load [a-z]+.[a-z0-9]+",std::regex_constants::icase),	//load an image
+		std::regex("ls" , std::regex_constants::icase),		//list all image ids
+		std::regex("select [0-9]+",std::regex_constants::icase), //select image id as work image
+		std::regex("crtID" , std::regex::icase)			//check current image id 
 
 
 	};
@@ -176,9 +179,20 @@ namespace maptomix{
 		return {false,std::vector<std::string>()}; 
 	}
 
+/*******************************************************************************************************************************************************/
+
+	static Validation validate_command_select(std::string input) {
+		std::string w1 = get_word(input, 1); 
 
 
-
+		if (check_if_number(w1)) {
+			std::vector<std::string> A;
+			A.push_back(w1);
+			return { true , A };
+		}
+		else
+			return { false , std::vector<std::string>() }; 
+	}
 
 /*******************************************************************************************************************************************************/
 	void ProgramStatus::process_command(std::string user_input){
@@ -195,10 +209,11 @@ namespace maptomix{
 		bool render = std::regex_search(user_input,command_regex[RENDER]);
 		bool dudv = std::regex_search(user_input,command_regex[DUDV]);
 		bool closew = std::regex_search(user_input,std::regex("exwin"));
+		bool list_ids = std::regex_search(user_input, command_regex[LISTIDS]); 
+		bool selectid = std::regex_search(user_input, command_regex[SELECT]); 
 
 		if(save){
 			/*create a "state" class with pointers to every elements: Save the image of the window if a window exists*/
-		std::cout << "dshsds" <<std::endl; 
 
 		}
 		else if(load){
@@ -209,7 +224,7 @@ namespace maptomix{
 				ImageImporter *instance = ImageImporter::getInstance(); 
 				SDL_Surface* im = instance->load_image(static_cast<const char*>(v.command_arguments[0].c_str()));
 				if(im)
-					images.push_back(im);				
+					images.push_back(std::pair<SDL_Surface* , std::string>(im , v.command_arguments[0]));				
 				
 
 
@@ -239,7 +254,7 @@ namespace maptomix{
 
 						}
 
-					display->display_image(images[0]); 
+					display->display_image(images[0].first); 
 					}
 				}	
 
@@ -266,10 +281,47 @@ namespace maptomix{
 		else if(dudv){
 		
 		}
+		else if (list_ids) {
+			if (images.size() == 0)
+				print(std::string("No image loaded..."), RED);
+			else {
+				std::string liste = " ";
+				unsigned int count = 0;
+
+				for (std::pair<SDL_Surface*, std::string> p : images) 
+					liste += std::to_string(count) + " : " + p.second +"\n"; 
+				print(liste, BLUE); 
+		
+
+			}
+		
+		}
 		
 		else if(closew ){
+		
 			std::puts("Exiting...\n"); 
 			display.reset(); 
+
+		}
+		else if (selectid) {
+
+			Validation v = validate_command_select(user_input); 
+			if (v.validated) {
+				try {
+					unsigned int id = std::stoi(v.command_arguments[0].c_str());
+					if (id >= images.size() || id < 0) {
+						print(std::string("invalid id input"), RED); 
+					}
+					else
+						_idCurrentImage = id;
+
+				}
+				catch (std::invalid_argument  e) {
+					print(std::string("invalid argument input"), RED); 
+
+				}
+			}
+			
 
 		}
 
@@ -279,7 +331,25 @@ namespace maptomix{
 
 
 
+	static void print(std::string &arg, int8_t color) {
+#ifdef __unix__
+		std::cout << colors[color] << "\n"; 
+		std::cout << arg << "\n";
 
+#elif defined (WIN32) || defined (_WIN32)
+		if (color == RESET) {
+			system("COLOR F");
+			std::cout << arg << "\n"; 
+		}
+		else {
+			system((std::string("COLOR ") + std::to_string(color)).c_str());
+			std::cout << arg << "\n";
+
+		}
+
+
+#endif
+	}
 
 /*******************************************************************************************************************************************************/
 
@@ -288,7 +358,7 @@ namespace maptomix{
 
 
 	ProgramStatus::ProgramStatus(){
-
+		_idCurrentImage = -1; 
 
 	}
 
