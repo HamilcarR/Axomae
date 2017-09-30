@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <future>
 #include <cctype>
+
 namespace maptomix{
 	
 	const int STRING_SIZE = 256 ; 
@@ -21,7 +22,7 @@ namespace maptomix{
 		std::regex("nmap [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate normal map (from height map)
 		std::regex("hmap [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate height map (from albedo texture) 
 		std::regex("dudv [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate dudv map
-		std::regex("save (/?([a-zA-Z0-9]+)/?)*[a-zA-Z0-9]+.[a-zA-Z0-9]+ (/?([a-zA-Z0-9]+)/?)*[a-zA-Z0-9]+.[a-zA-Z0-9]+",std::regex_constants::icase),	// save image on the disk
+		std::regex("save [0-9]+ (/?([a-zA-Z0-9]+)/?)*[a-zA-Z0-9]+.[a-zA-Z0-9]+",std::regex_constants::icase),	// save image on the disk
 		std::regex("contrast [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), // set contrast
 		std::regex("exit [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), //exit the app
 		std::regex("render [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), //render the texture on a mesh
@@ -104,8 +105,18 @@ namespace maptomix{
 /*******************************************************************************************************************************************************/
 	static Validation validate_command_save(std::string input){
 
+		if (std::regex_match(input, command_regex[SAVE])) {
+			std::vector<std::string> arg_array;
+			std::string arg1 = get_word(input, 1);
+			std::string arg2 = get_word(input, 2);
+			arg_array.push_back(arg1);
+			arg_array.push_back(arg2);
+			return { true , arg_array };
 
-		return {false,std::vector<std::string>()}; 
+		}
+		else
+			return { false , std::vector<std::string>() };
+
 	}
 
 
@@ -211,7 +222,7 @@ namespace maptomix{
 
 		int _idCurrentImage = instance->getCurrentImageId(); 
 			
-		if (window >= 0 && window < windows.size) {
+		if (window >= 0 && window < windows.size()) {
 			SDL_Event event = windows[window].second;
 
 		}
@@ -248,8 +259,23 @@ namespace maptomix{
 		bool selectid = std::regex_search(user_input, command_regex[SELECT]); 
 
 		if(save){
-			/*create a "state" class with pointers to every elements: Save the image of the window if a window exists*/
+			Validation v = validate_command_save(user_input); 
+			int id = atoi(v.command_arguments[0].c_str()); 
+			
+			if (v.validated) {
+				if (id >= 0 && id < images.size()) {
+					print(std::string("Saving..."), GREEN);
+					ImageImporter::save_image(images[id].first, v.command_arguments[1].c_str());
+					print(std::string("Done."), GREEN);
 
+				}
+				else {
+					print(std::string("Wrong ID image used!"), RED);
+				}
+			}
+			else {
+				print(std::string("Wrong command used!"), RED);
+			}
 		}
 		else if(load){
 			Validation v = validate_command_load(user_input);

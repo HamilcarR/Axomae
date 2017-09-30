@@ -42,13 +42,9 @@ static void loop_event(EventHandler* ev){
 }
 int main(int argv , char** argc){
 	init_api();
-	EventHandler *event = EventHandler::getInstance(); 
-	SDL_Event event_sdl;
-	event->setEvent(event_sdl); 
-//	thread event_thread;	
+	
 	string mode = argc[1];
 	ProgramStatus * main_program_command = ProgramStatus::getInstance();
-	main_program_command->setEvent(event_sdl);
 	regex cmd,gui;
 	try{
 		cmd= regex("-cmd",regex_constants::icase);} catch(const std::regex_error& e){cout << e.what() << "\n" ;} 
