@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iterator>
 #include <algorithm>
+#include <future>
 #include <cctype>
 namespace maptomix{
 	
@@ -20,11 +21,11 @@ namespace maptomix{
 		std::regex("nmap [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate normal map (from height map)
 		std::regex("hmap [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate height map (from albedo texture) 
 		std::regex("dudv [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate dudv map
-		std::regex("save [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	// save image on the disk
+		std::regex("save (/?([a-zA-Z0-9]+)/?)*[a-zA-Z0-9]+.[a-zA-Z0-9]+ (/?([a-zA-Z0-9]+)/?)*[a-zA-Z0-9]+.[a-zA-Z0-9]+",std::regex_constants::icase),	// save image on the disk
 		std::regex("contrast [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), // set contrast
 		std::regex("exit [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), //exit the app
 		std::regex("render [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), //render the texture on a mesh
-		std::regex("load [a-z]+.[a-z0-9]+",std::regex_constants::icase),	//load an image
+		std::regex("load (/?([a-zA-Z0-9]+)/?)*[a-zA-Z0-9]+.[a-zA-Z0-9]+",std::regex_constants::icase),	//load an image
 		std::regex("ls" , std::regex_constants::icase),		//list all image ids
 		std::regex("select [0-9]+",std::regex_constants::icase), //select image id as work image
 		std::regex("crtID" , std::regex::icase)			//check current image id 
@@ -182,17 +183,51 @@ namespace maptomix{
 /*******************************************************************************************************************************************************/
 
 	static Validation validate_command_select(std::string input) {
-		std::string w1 = get_word(input, 1); 
+		std::string w1 = get_word(input, 1);
+
+		if (std::regex_match(input, command_regex[SELECT])) {
+			if (check_if_number(w1)) {
+				std::vector<std::string> A;
+				A.push_back(w1);
+				return { true , A };
+			}
+			else
+				return { false , std::vector<std::string>() };
+
+		}
+
+		else
+			return { false , std::vector<std::string>() };
 
 
-		if (check_if_number(w1)) {
-			std::vector<std::string> A;
-			A.push_back(w1);
-			return { true , A };
+	}
+
+
+/*******************************************************************************************************************************************************/
+	static void loop_thread(int window , int threadID) {
+		ProgramStatus *instance = ProgramStatus::getInstance(); 
+		std::vector < std::pair< SDL_Surface*, std::string>> images = instance->getImages(); 
+		std::vector<std::pair<std::shared_ptr<Window>, SDL_Event>> windows = instance->getWindows(); 
+
+		int _idCurrentImage = instance->getCurrentImageId(); 
+			
+		if (window >= 0 && window < windows.size) {
+			SDL_Event event = windows[window].second;
+
 		}
 		else
-			return { false , std::vector<std::string>() }; 
+			return; 
 	}
+
+/*******************************************************************************************************************************************************/
+	void ProgramStatus::create_window(int width , int height , const char* name) {
+		std::shared_ptr<Window> display = std::shared_ptr<Window>(new Window(width, height, name));
+		SDL_Event event; 
+		display->setEvent(event);
+		windows.push_back(std::pair<std::shared_ptr<Window>, SDL_Event>(display, event));
+		
+	}
+	
 
 /*******************************************************************************************************************************************************/
 	void ProgramStatus::process_command(std::string user_input){
@@ -243,23 +278,12 @@ namespace maptomix{
 			{
 				int w = std::stoi(v.command_arguments[0]) , h = std::stoi(v.command_arguments[1]) ; 
 				std::string window_name = v.command_arguments[2];
-				display = std::unique_ptr<Window>(new Window(w,h,window_name.c_str()));
-				display->setEvent(event); 
-				if(images.size()!=0){
-					bool loop = true; 
-					while(loop){
-						while(SDL_PollEvent(&event)){
-							if(event.type == SDL_QUIT)
-								loop = false; 
+				//void (ProgramStatus::*ref)(int , int , const char*) = &ProgramStatus::loop_thread;
+				//auto thread = std::async(std::launch::async, ref, this, w, h, window_name.c_str());
+				// std::thread(ref, this, w, h, window_name.c_str()).detach();
+				create_window(w, h, window_name.c_str()); 
+				
 
-						}
-
-					display->display_image(images[0].first); 
-					}
-				}	
-
-			std::puts("Exiting...\n"); 
-			display.reset(nullptr); 
 			}
 			else
 				std::cout << "wrong command"<<std::endl;
@@ -288,8 +312,10 @@ namespace maptomix{
 				std::string liste = " ";
 				unsigned int count = 0;
 
-				for (std::pair<SDL_Surface*, std::string> p : images) 
-					liste += std::to_string(count) + " : " + p.second +"\n"; 
+				for (std::pair<SDL_Surface*, std::string> p : images) {
+					liste += std::to_string(count) + " : " + p.second + "\n";
+					count++;
+				}
 				print(liste, BLUE); 
 		
 
@@ -300,7 +326,7 @@ namespace maptomix{
 		else if(closew ){
 		
 			std::puts("Exiting...\n"); 
-			display.reset(); 
+		//	display.reset(); 
 
 		}
 		else if (selectid) {
@@ -322,6 +348,10 @@ namespace maptomix{
 				}
 			}
 			
+
+		}
+		else {
+			print(std::string("Wrong command ! "), RED); 
 
 		}
 

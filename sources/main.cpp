@@ -78,6 +78,8 @@ int main(int argv , char** argc){
 				ex = (regex_match(user_input, regex(command[EXIT], regex_constants::icase)));
 				if (!ex)
 					main_program_command->process_command(user_input);
+
+
 				system("COLOR F");
 
 

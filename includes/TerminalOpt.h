@@ -6,12 +6,18 @@
 #include "Window.h"
 #include "Renderer.h" 
 #include <memory> 
-
+#include <queue>
+#include <map>
 
 namespace maptomix{
 
 
 	
+
+
+
+
+
 	struct Validation {
 		bool validated ; 
 		std::vector <std::string> command_arguments ; 
@@ -101,23 +107,30 @@ F = Bright White
 			static void	       Quit(){if(instance != nullptr) delete instance;instance=nullptr;}
 			
 			void process_command(std::string user_input); 
-			static void loop_thread(void* window);
-			void setEvent(SDL_Event &ev){event = ev;}
+			std::vector<std::pair<SDL_Surface* , std::string>> getImages() { return images; }
+			std::vector<std::pair<std::shared_ptr<Window>, SDL_Event>> getWindows() { return windows; }
+			int getCurrentImageId() { return _idCurrentImage; }
+
+
+
 		private:
 			/*functions*/
 			ProgramStatus();
 			~ProgramStatus(); 
-			
+			void create_window( int , int , const char*);
+
 
 
 			/*attributes*/
 			std::vector < std::pair< SDL_Surface* , std::string>> images;
-			std::unique_ptr<Window> display; 
+			std::map <std::thread, std::pair<std::shared_ptr<Window>, SDL_Event>> thread_pool; 
+			std::vector<std::pair<std::shared_ptr<Window> , SDL_Event> > windows; 
+			std::queue<std::thread> _threads; 
 			std::shared_ptr<Renderer> renderer ; 
 			int _idCurrentImage; 
 			static ProgramStatus* instance; 
 
-			SDL_Event event; 
+			
 						
 		
 
