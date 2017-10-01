@@ -4,31 +4,6 @@
 namespace maptomix {
 
 
-struct thread_data{
-	Window * window; 
-	SDL_Surface* image; 
-	SDL_Event event; 
-
-}; 
-
-
- void Window::loop_thread(thread_data *data){
-	SDL_Event event = data->event; 
-	Window *window = data->window; 
-	SDL_Surface *image = data->image;
-	bool stop = false; 
-	while(!stop){
-		while(SDL_PollEvent(&event)){
-			if(event.type == SDL_QUIT){
-				stop = true; 
-				std::cout << "quit " <<std::endl; 
-			}
-
-			}
-		window->display_image(image); 
-		}
-//	delete window; 
-}
 
 
 Window::Window(const int w,const int h , const char* n) {
@@ -45,18 +20,18 @@ Window::Window(const int w,const int h , const char* n) {
 }
 
 Window::~Window(){
-	if(free_surface_texture){
-	SDL_DestroyTexture(texture);
-	
-	}
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(m_window);
+	cleanUp(); 
 }
 
 /*****************************************************************************************************************/
 
 void Window::display_image(SDL_Surface* image){
-	texture=SDL_CreateTextureFromSurface(renderer,image);
+	if (free_surface_texture) {
+		SDL_DestroyTexture(texture); 
+		
+	}
+
+	texture = SDL_CreateTextureFromSurface(renderer, image);
 	assert(texture!=nullptr);
 	SDL_RenderCopy(renderer,texture,NULL,NULL);
 	SDL_RenderPresent(renderer);
@@ -68,25 +43,13 @@ void Window::display_image(SDL_Surface* image){
 /*****************************************************************************************************************/
 /*****************************************************************************************************************/
 
+void Window::cleanUp() {
+	if (free_surface_texture) {
+		SDL_DestroyTexture(texture);
 
-
-void Window::loop(SDL_Surface* image){
-	thread_data data ; 
-	data.window = this;
-        data.image = image; 
-	data.event = event ; 	
-//	t_sdl = thread(loop_thread,&data); 
-	
-}
-
-
-
-
-void Window::synchronize(){
-//	t_sdl.join(); 
-       
-
-
+	}
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(m_window);
 }
 
 

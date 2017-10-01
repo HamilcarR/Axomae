@@ -23,9 +23,7 @@ public:
         SDL_Renderer* getRenderer(){return renderer;};
 	int getHeight(){return height;}
 	int getWidth(){return width;}
-	void loop (SDL_Surface* im); 
-	void synchronize(); 	
-	static void loop_thread(thread_data *data); 
+	void cleanUp(); 
 private:
 
 	int width;

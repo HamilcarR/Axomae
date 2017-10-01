@@ -14,8 +14,12 @@ namespace maptomix{
 	
 	const int STRING_SIZE = 256 ; 
 
+
+	std::mutex mutex1, mutex2;
+
+
 	ProgramStatus *ProgramStatus::instance = nullptr; 
-	
+	std::mutex mutex; 
 	static void print(std::string&, int8_t); 
 	static const std::regex command_regex[]={
 		std::regex("window [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//open a new SDL window
@@ -33,6 +37,10 @@ namespace maptomix{
 
 
 	};
+
+
+
+
 
 /*******************************************************************************************************************************************************/
 	static bool check_if_number(std::string& input) {
@@ -215,27 +223,47 @@ namespace maptomix{
 
 
 /*******************************************************************************************************************************************************/
-	static void loop_thread(int window , int threadID) {
-		ProgramStatus *instance = ProgramStatus::getInstance(); 
-		std::vector < std::pair< SDL_Surface*, std::string>> images = instance->getImages(); 
-		std::vector<std::pair<std::shared_ptr<Window>, SDL_Event>> windows = instance->getWindows(); 
+	static void loop_thread(WindowsStack * windows , ImagesStack* images , int width , int height , std::string name) {
+		bool loop = true; 
+		
+		std::shared_ptr<Window> display = std::shared_ptr<Window>(new Window(width, height, name.c_str()));
+		SDL_Event event;
+		display->setEvent(event);
+		mutex1.lock(); 
+		windows->push_back(std::pair<std::shared_ptr<Window>, SDL_Event>(display, event));
+		mutex1.unlock(); 
+		ProgramStatus *instance = ProgramStatus::getInstance();
+		
+		int  prev_image_id= instance->getCurrentImageId();
 
-		int _idCurrentImage = instance->getCurrentImageId(); 
+		int window = windows->size() - 1;
+		while (loop) {
+
+			int _idCurrentImage = (instance->getCurrentImageId() == prev_image_id ) ? prev_image_id : instance->getCurrentImageId();
+
+				SDL_Event event = (*windows)[window].second;
+				mutex2.lock(); 
+				(*windows)[window].first->display_image((*images)[_idCurrentImage].first);
+				mutex2.unlock(); 
+				while (SDL_PollEvent(&event)) {
+					if (event.type == SDL_QUIT)
+						loop = false; 
+				}
+				
 			
-		if (window >= 0 && window < windows.size()) {
-			SDL_Event event = windows[window].second;
 
 		}
-		else
-			return; 
+		display->cleanUp(); 
+		display.reset(); 
 	}
 
 /*******************************************************************************************************************************************************/
 	void ProgramStatus::create_window(int width , int height , const char* name) {
-		std::shared_ptr<Window> display = std::shared_ptr<Window>(new Window(width, height, name));
-		SDL_Event event; 
-		display->setEvent(event);
-		windows.push_back(std::pair<std::shared_ptr<Window>, SDL_Event>(display, event));
+		std::string n(name); 
+		void(*ref)(WindowsStack* , ImagesStack* , int , int , std::string) = &loop_thread;
+		std::thread(ref , &windows , &images , width , height , n).detach();
+
+		
 		
 	}
 	
@@ -304,9 +332,7 @@ namespace maptomix{
 			{
 				int w = std::stoi(v.command_arguments[0]) , h = std::stoi(v.command_arguments[1]) ; 
 				std::string window_name = v.command_arguments[2];
-				//void (ProgramStatus::*ref)(int , int , const char*) = &ProgramStatus::loop_thread;
-				//auto thread = std::async(std::launch::async, ref, this, w, h, window_name.c_str());
-				// std::thread(ref, this, w, h, window_name.c_str()).detach();
+				
 				create_window(w, h, window_name.c_str()); 
 				
 

@@ -96,9 +96,8 @@ F = Bright White
 
 /*******************************************************************************************************************************************************/
 
-
-	
-
+	typedef std::vector<std::pair<std::shared_ptr<Window>, SDL_Event>> WindowsStack;
+	typedef std::vector < std::pair< SDL_Surface*, std::string>> ImagesStack;
 
 
 	class ProgramStatus{
