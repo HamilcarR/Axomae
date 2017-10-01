@@ -67,16 +67,15 @@ int main(int argv , char** argc){
 			//	event_thread.join(); 	
 #elif defined(_WIN32) || defined (WIN32)
 
-				system("COLOR 2");
-				cout << prompt[0] ;
-				system("COLOR 6");
+
+				print( std::string(prompt[0]),YELLOW) ;
 				std::getline(std::cin, user_input);
 				ex = (regex_match(user_input, regex(command[EXIT], regex_constants::icase)));
 				if (!ex)
 					main_program_command->process_command(user_input);
 
-
-				system("COLOR F");
+				print(std::string(), RESET); 
+				
 
 
 #endif
@@ -99,7 +98,7 @@ int main(int argv , char** argc){
 	
         
 
-
+	main_program_command->exit(); 
 
 	quit_api(); 
 return EXIT_SUCCESS ; 

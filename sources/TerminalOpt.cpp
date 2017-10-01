@@ -15,12 +15,10 @@ namespace maptomix{
 	const int STRING_SIZE = 256 ; 
 
 
-	std::mutex mutex1, mutex2;
+	std::mutex mutex_window_thread1, mutex_window_thread2;
 
 
 	ProgramStatus *ProgramStatus::instance = nullptr; 
-	std::mutex mutex; 
-	static void print(std::string&, int8_t); 
 	static const std::regex command_regex[]={
 		std::regex("window [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//open a new SDL window
 		std::regex("nmap [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate normal map (from height map)
@@ -28,12 +26,12 @@ namespace maptomix{
 		std::regex("dudv [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate dudv map
 		std::regex("save [0-9]+ (/?([a-zA-Z0-9]+)/?)*[a-zA-Z0-9]+.[a-zA-Z0-9]+",std::regex_constants::icase),	// save image on the disk
 		std::regex("contrast [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), // set contrast
-		std::regex("exit [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), //exit the app
+		std::regex("exit",std::regex_constants::icase), //exit the app
 		std::regex("render [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), //render the texture on a mesh
 		std::regex("load (/?([a-zA-Z0-9]+)/?)*[a-zA-Z0-9]+.[a-zA-Z0-9]+",std::regex_constants::icase),	//load an image
 		std::regex("ls" , std::regex_constants::icase),		//list all image ids
 		std::regex("select [0-9]+",std::regex_constants::icase), //select image id as work image
-		std::regex("crtID" , std::regex::icase)			//check current image id 
+		std::regex("id" , std::regex_constants::icase)			//check current image id 
 
 
 	};
@@ -222,53 +220,104 @@ namespace maptomix{
 	}
 
 
+
+
+
+
+
+/*******************************************************************************************************************************************************/
+
+
+
+
+
+
+
+
+
+
 /*******************************************************************************************************************************************************/
 	static void loop_thread(WindowsStack * windows , ImagesStack* images , int width , int height , std::string name) {
 		bool loop = true; 
-		
 		std::shared_ptr<Window> display = std::shared_ptr<Window>(new Window(width, height, name.c_str()));
 		SDL_Event event;
 		display->setEvent(event);
-		mutex1.lock(); 
+		mutex_window_thread1.lock();
 		windows->push_back(std::pair<std::shared_ptr<Window>, SDL_Event>(display, event));
-		mutex1.unlock(); 
+		mutex_window_thread1.unlock();
 		ProgramStatus *instance = ProgramStatus::getInstance();
 		
 		int  prev_image_id= instance->getCurrentImageId();
 
 		int window = windows->size() - 1;
+		int image = images->size() - 1; 
 		while (loop) {
 
 			int _idCurrentImage = (instance->getCurrentImageId() == prev_image_id ) ? prev_image_id : instance->getCurrentImageId();
 
 				SDL_Event event = (*windows)[window].second;
-				mutex2.lock(); 
-				(*windows)[window].first->display_image((*images)[_idCurrentImage].first);
-				mutex2.unlock(); 
+				mutex_window_thread2.lock();
+					(*windows)[window].first->display_image((*images)[image].first);
+				mutex_window_thread2.unlock();
 				while (SDL_PollEvent(&event)) {
 					if (event.type == SDL_QUIT)
 						loop = false; 
 				}
+				if (instance->isExited())
+					loop = false; 
 				
 			
 
 		}
+		mutex_window_thread2.lock();
 		display->cleanUp(); 
-		display.reset(); 
+		windows->erase(windows->begin() + window);  
+		mutex_window_thread2.unlock();	
+		 
 	}
 
-/*******************************************************************************************************************************************************/
-	void ProgramStatus::create_window(int width , int height , const char* name) {
-		std::string n(name); 
-		void(*ref)(WindowsStack* , ImagesStack* , int , int , std::string) = &loop_thread;
-		std::thread(ref , &windows , &images , width , height , n).detach();
 
+/*******************************************************************************************************************************************************/
+
+	ProgramStatus::ProgramStatus() {
+		_idCurrentImage = -1;
+		exited = false; 
+		_display_window = std::shared_ptr<Window>(nullptr); 
+	}
+
+	ProgramStatus::~ProgramStatus() {
+		for (std::thread& t : _threads) {
+			t.join();
+		}
+
+	}
+
+
+	void ProgramStatus::exit() {
+		std::mutex mutex;
+		mutex.lock();
+		exited = true;
+		mutex.unlock();
+	}
+
+
+
+
+	void ProgramStatus::create_window(int width , int height , const char* name) {
+		if (_display_window.get() == nullptr) {
+			std::string n(name);
+			void(*ref)(WindowsStack*, ImagesStack*, int, int, std::string) = &loop_thread;
+			std::thread thread = std::thread(ref, &windows, &images, width, height, n);
+			_threads.push_back(std::move(thread));
+		}
+		else {
+			print(std::string("A texture window is already active..."), RED, PROMPT2);
+		}
 		
 		
 	}
 	
 
-/*******************************************************************************************************************************************************/
 	void ProgramStatus::process_command(std::string user_input){
 
 
@@ -284,7 +333,8 @@ namespace maptomix{
 		bool dudv = std::regex_search(user_input,command_regex[DUDV]);
 		bool closew = std::regex_search(user_input,std::regex("exwin"));
 		bool list_ids = std::regex_search(user_input, command_regex[LISTIDS]); 
-		bool selectid = std::regex_search(user_input, command_regex[SELECT]); 
+		bool selectid = std::regex_search(user_input, command_regex[SELECT]);
+		bool what_selected = std::regex_search(user_input, command_regex[CHK_CURRENT_IMG]);
 
 		if(save){
 			Validation v = validate_command_save(user_input); 
@@ -292,9 +342,9 @@ namespace maptomix{
 			
 			if (v.validated) {
 				if (id >= 0 && id < images.size()) {
-					print(std::string("Saving..."), GREEN);
+					print(std::string("Saving..."), GREEN, PROMPT2);
 					ImageImporter::save_image(images[id].first, v.command_arguments[1].c_str());
-					print(std::string("Done."), GREEN);
+					print(std::string("Done."), GREEN, PROMPT2);
 
 				}
 				else {
@@ -309,7 +359,8 @@ namespace maptomix{
 			Validation v = validate_command_load(user_input);
 			if (v.validated)
 			{
-				std::cout << "File : " << v.command_arguments[0] << " loading..." << "\n" ; 
+				 std::string a =  std::string( "File : " + v.command_arguments[0]+ " loading..." ) ; 
+				 print(a, GREEN); 
 				ImageImporter *instance = ImageImporter::getInstance(); 
 				SDL_Surface* im = instance->load_image(static_cast<const char*>(v.command_arguments[0].c_str()));
 				if(im)
@@ -320,7 +371,7 @@ namespace maptomix{
 			}
 			else
 			{
-				std::cout <<"Wrong command used !" << "\n" ; 
+				print("Wrong command used !", RED); 
 
 			}
 		
@@ -338,7 +389,8 @@ namespace maptomix{
 
 			}
 			else
-				std::cout << "wrong command"<<std::endl;
+				print("Wrong command used !", RED);
+
 
 
 
@@ -361,14 +413,14 @@ namespace maptomix{
 			if (images.size() == 0)
 				print(std::string("No image loaded..."), RED);
 			else {
-				std::string liste = " ";
+				std::string liste = "";
 				unsigned int count = 0;
 
 				for (std::pair<SDL_Surface*, std::string> p : images) {
-					liste += std::to_string(count) + " : " + p.second + "\n";
+					liste +="-"+ std::to_string(count) + " : " + p.second + "\n";
 					count++;
 				}
-				print(liste, BLUE); 
+				print(liste, BLUE ,PROMPT2);
 		
 
 			}
@@ -378,8 +430,7 @@ namespace maptomix{
 		else if(closew ){
 		
 			std::puts("Exiting...\n"); 
-		//	display.reset(); 
-
+			
 		}
 		else if (selectid) {
 
@@ -388,20 +439,40 @@ namespace maptomix{
 				try {
 					unsigned int id = std::stoi(v.command_arguments[0].c_str());
 					if (id >= images.size() || id < 0) {
-						print(std::string("invalid id input"), RED); 
+						print(std::string("Invalid id input"), RED); 
 					}
-					else
+					else {
 						_idCurrentImage = id;
+						print(std::string("Selected : " + images[id].second), GREEN , PROMPT2);
+					}
 
 				}
 				catch (std::invalid_argument  e) {
-					print(std::string("invalid argument input"), RED); 
+					print(std::string("Invalid argument input"), RED); 
 
 				}
 			}
 			
 
 		}
+
+
+
+
+		else if (what_selected) {
+			std::string a = "";
+			if (_idCurrentImage != -1) {
+				a = std::to_string(_idCurrentImage);
+				a += ": " + images[_idCurrentImage].second;
+			}
+			else
+				a = "No image ID selected"; 
+
+			print(a, PURPLE , PROMPT2); 
+		}
+
+
+
 		else {
 			print(std::string("Wrong command ! "), RED); 
 
@@ -412,42 +483,9 @@ namespace maptomix{
 
 
 
-
-	static void print(std::string &arg, int8_t color) {
-#ifdef __unix__
-		std::cout << colors[color] << "\n"; 
-		std::cout << arg << "\n";
-
-#elif defined (WIN32) || defined (_WIN32)
-		if (color == RESET) {
-			system("COLOR F");
-			std::cout << arg << "\n"; 
-		}
-		else {
-			system((std::string("COLOR ") + std::to_string(color)).c_str());
-			std::cout << arg << "\n";
-
-		}
-
-
-#endif
-	}
-
 /*******************************************************************************************************************************************************/
 
 
-/*ProgramStatus class methods*/
-
-
-	ProgramStatus::ProgramStatus(){
-		_idCurrentImage = -1; 
-
-	}
-
-	ProgramStatus::~ProgramStatus(){
-
-
-	}
 
 
 

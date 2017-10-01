@@ -8,7 +8,9 @@
 #include <memory> 
 #include <queue>
 #include <map>
-
+#if defined (WIN32) || defined(_WIN32)
+#include <Windows.h>
+#endif
 
 namespace maptomix{
 
@@ -27,7 +29,7 @@ namespace maptomix{
 	};
 
 
-
+	enum : unsigned {PROMPT0 = 0 , PROMPT1 = 1 , PROMPT2 = 2 , PROMPT3 = 3 };
 
 
 	static const char *prompt[] ={
@@ -69,7 +71,7 @@ namespace maptomix{
 };
 
 #elif defined (WIN32) || defined(_WIN32)
-	enum : unsigned { RED = 4, BLUE = 1, GREEN = 2, YELLOW = 6, RESET = 10 };
+	enum : unsigned { RED = 4, BLUE = 1, GREEN = 2, PURPLE = 5 , YELLOW = 6, RESET = 10 };
 
 /*Color Codes:
 0 = Black
@@ -96,9 +98,50 @@ F = Bright White
 
 /*******************************************************************************************************************************************************/
 
+
+
+
+	static void print(std::string &arg, int8_t color , int8_t p = -1) {
+#ifdef __unix__
+		std::cout << colors[color] << "\n";
+		std::cout <<( (p>= 0 && p < 4) ? std::string(prompt[p]) + " " :"")<<  arg << "\n";
+
+#elif defined (WIN32) || defined (_WIN32)
+		HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+		if (color == RESET) {
+			SetConsoleTextAttribute(console, 15);
+			std::cout << "\n" << ((p >= 0 && p < 4) ? std::string(prompt[p])+" " : "")<< arg;
+		}
+		else {
+			SetConsoleTextAttribute(console, color);
+			std::cout << "\n" << ((p >= 0 && p < 4) ? std::string(prompt[p]) + " " : "") << arg;
+
+		}
+
+
+#endif
+	}
+
+	static void print(const char* text, int8_t color , int8_t prompt) {
+		print(std::string(text), color , prompt);
+	}
+	static void print(char* text, int8_t color, int8_t prompt) {
+		print(std::string(text), color , prompt);
+
+	}
+
+	static void print(const char* text, int8_t color ) {
+		print(std::string(text), color); 
+	}
+	static void print(char* text, int8_t color) {
+		print(std::string(text), color);
+
+	}
+	
+
 	typedef std::vector<std::pair<std::shared_ptr<Window>, SDL_Event>> WindowsStack;
 	typedef std::vector < std::pair< SDL_Surface*, std::string>> ImagesStack;
-
+	
 
 	class ProgramStatus{
 		public:
@@ -111,7 +154,9 @@ F = Bright White
 			std::vector<std::pair<std::shared_ptr<Window>, SDL_Event>> getWindows() { return windows; }
 			int getCurrentImageId() { return _idCurrentImage; }
 
+			bool isExited() { return exited; }
 
+			void exit();
 
 		private:
 			/*functions*/
@@ -125,11 +170,12 @@ F = Bright White
 			std::vector < std::pair< SDL_Surface* , std::string>> images;
 			std::map <std::thread, std::pair<std::shared_ptr<Window>, SDL_Event>> thread_pool; 
 			std::vector<std::pair<std::shared_ptr<Window> , SDL_Event> > windows; 
-			std::queue<std::thread> _threads; 
-			std::shared_ptr<Renderer> renderer ; 
+			std::vector<std::thread> _threads;  /*std::move used */
+			std::shared_ptr<Renderer> _renderer ; 
+			std::shared_ptr<Window> _display_window; 
 			int _idCurrentImage; 
 			static ProgramStatus* instance; 
-
+			bool exited;
 			
 						
 		
