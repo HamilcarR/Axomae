@@ -8,6 +8,7 @@
 #include <memory> 
 #include <queue>
 #include <map>
+#include <stack>
 #if defined (WIN32) || defined(_WIN32)
 #include <Windows.h>
 #endif
@@ -20,13 +21,6 @@ namespace maptomix{
 
 
 
-
-	struct Validation {
-		bool validated ; 
-		std::vector <std::string> command_arguments ; 
-
-
-	};
 
 
 	enum : unsigned {PROMPT0 = 0 , PROMPT1 = 1 , PROMPT2 = 2 , PROMPT3 = 3 };
@@ -153,9 +147,10 @@ F = Bright White
 			std::vector<std::pair<SDL_Surface* , std::string>> getImages() { return images; }
 			std::vector<std::pair<std::shared_ptr<Window>, SDL_Event>> getWindows() { return windows; }
 			int getCurrentImageId() { return _idCurrentImage; }
-
+			void setDisplayNULL() { _display_window = nullptr; }
 			bool isExited() { return exited; }
-
+			Window* getDisplay() { return _display_window;  }
+			void setDisplay(Window *d) { _display_window = d;  }
 			void exit();
 
 		private:
@@ -172,7 +167,8 @@ F = Bright White
 			std::vector<std::pair<std::shared_ptr<Window> , SDL_Event> > windows; 
 			std::vector<std::thread> _threads;  /*std::move used */
 			std::shared_ptr<Renderer> _renderer ; 
-			std::shared_ptr<Window> _display_window; 
+			std::stack<std::pair<SDL_Surface*, std::string>>  stack; 
+			Window* _display_window; 
 			int _idCurrentImage; 
 			static ProgramStatus* instance; 
 			bool exited;

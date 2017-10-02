@@ -1,5 +1,7 @@
 #include "../includes/ImageImporter.h"
 #include "../includes/TerminalOpt.h"
+#include "../includes/ImageManager.h"
+
 #include <regex>
 #include <string>
 #include <vector>
@@ -10,10 +12,18 @@
 #include <future>
 #include <cctype>
 
+
 namespace maptomix{
 	
 	const int STRING_SIZE = 256 ; 
 
+	template<typename T>
+	struct Validation {
+		bool validated;
+		std::vector <T> command_arguments;
+
+
+	};
 
 	std::mutex mutex_window_thread1, mutex_window_thread2;
 
@@ -21,9 +31,9 @@ namespace maptomix{
 	ProgramStatus *ProgramStatus::instance = nullptr; 
 	static const std::regex command_regex[]={
 		std::regex("window [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//open a new SDL window
-		std::regex("nmap [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate normal map (from height map)
-		std::regex("hmap [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate height map (from albedo texture) 
-		std::regex("dudv [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//generate dudv map
+		std::regex("nmap [0-9]+ (-sobel|-prewitt|-scharr) (-repeat)",std::regex_constants::icase),	//generate normal map (from height map)
+		std::regex("hmap [0-9]+ (-sobel|-prewitt|-scharr) (-repeat)",std::regex_constants::icase),	//generate height map (from albedo texture) 
+		std::regex("dudv [0-9]+ (-sobel|-prewitt|-scharr) (-repeat)",std::regex_constants::icase),	//generate dudv map
 		std::regex("save [0-9]+ (/?([a-zA-Z0-9]+)/?)*[a-zA-Z0-9]+.[a-zA-Z0-9]+",std::regex_constants::icase),	// save image on the disk
 		std::regex("contrast [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), // set contrast
 		std::regex("exit",std::regex_constants::icase), //exit the app
@@ -83,7 +93,7 @@ namespace maptomix{
 
 /*******************************************************************************************************************************************************/
 
-	static Validation validate_command_load(std::string input){
+	static Validation<std::string> validate_command_load(std::string input){
 		std::string delimiter = " " ;
 
 		if(std::regex_match(input , command_regex[LOAD])){
@@ -109,7 +119,7 @@ namespace maptomix{
 	}
 
 /*******************************************************************************************************************************************************/
-	static Validation validate_command_save(std::string input){
+	static Validation<std::string> validate_command_save(std::string input){
 
 		if (std::regex_match(input, command_regex[SAVE])) {
 			std::vector<std::string> arg_array;
@@ -127,7 +137,7 @@ namespace maptomix{
 
 
 /*******************************************************************************************************************************************************/
-	static Validation validate_command_window(std::string input){
+	static Validation<std::string> validate_command_window(std::string input){
 		std::string delimiter = " " ; 
 		if(std::regex_match(input,command_regex[WIN])){
 			bool validate_input = false;
@@ -156,7 +166,7 @@ namespace maptomix{
 	}
 
 /*******************************************************************************************************************************************************/
-	static Validation validate_command_contrast(std::string input){
+	static Validation<std::string> validate_command_contrast(std::string input){
 
 		return {false,std::vector<std::string>()}; 
 
@@ -164,7 +174,7 @@ namespace maptomix{
 
 /*******************************************************************************************************************************************************/
 
-	static Validation validate_command_dudv(std::string input){
+	static Validation<std::string> validate_command_dudv(std::string input){
 		std::string delimiter = " " ; 
 			
 
@@ -173,7 +183,7 @@ namespace maptomix{
 	}
 
 /*******************************************************************************************************************************************************/
-	static Validation validate_command_nmap(std::string input){
+	static Validation<std::string> validate_command_nmap(std::string input){
 
 		return {false,std::vector<std::string>()}; 
 
@@ -183,23 +193,30 @@ namespace maptomix{
 
 /*******************************************************************************************************************************************************/
 
-	static Validation validate_command_hmap(std::string input){
+	static Validation<std::string> validate_command_hmap(std::string input){
 		std::string delimiter = " " ; 
-			
+		std::string w1 = get_word(input, 1); 
+		std::string w2 = get_word(input, 2); 
+		std::string w3 = get_word(input, 3); 
 
+		std::vector<std::string> a; 
+		a.push_back(w1); 
+		a.push_back(w2); 
+		a.push_back(w3);
+		if ((w2.compare("-prewitt") != 0 && w2.compare("-sobel") != 0 && w2.compare("-scharr") != 0) || !check_if_number(w1) || w3.compare("-repeat"))
+			return { false , std::vector<std::string>() }; 
+		return {true,a}; 
+	}
+
+/*******************************************************************************************************************************************************/
+	static Validation<std::string> validate_command_render(std::string input){
 
 		return {false,std::vector<std::string>()}; 
 	}
 
 /*******************************************************************************************************************************************************/
-	static Validation validate_command_render(std::string input){
 
-		return {false,std::vector<std::string>()}; 
-	}
-
-/*******************************************************************************************************************************************************/
-
-	static Validation validate_command_select(std::string input) {
+	static Validation<std::string> validate_command_select(std::string input) {
 		std::string w1 = get_word(input, 1);
 
 		if (std::regex_match(input, command_regex[SELECT])) {
@@ -237,27 +254,34 @@ namespace maptomix{
 
 
 /*******************************************************************************************************************************************************/
-	static void loop_thread(WindowsStack * windows , ImagesStack* images , int width , int height , std::string name) {
-		bool loop = true; 
-		std::shared_ptr<Window> display = std::shared_ptr<Window>(new Window(width, height, name.c_str()));
-		SDL_Event event;
-		display->setEvent(event);
-		mutex_window_thread1.lock();
-		windows->push_back(std::pair<std::shared_ptr<Window>, SDL_Event>(display, event));
-		mutex_window_thread1.unlock();
+	static void loop_thread( int width , int height , std::string name) {
 		ProgramStatus *instance = ProgramStatus::getInstance();
+		Window *display = instance->getDisplay(); 
+		auto images = instance->getImages(); 
+		bool loop = true; 
+		mutex_window_thread1.lock();
+		display = new Window(width, height, name.c_str());
+		instance->setDisplay(display);
+
+		mutex_window_thread1.unlock(); 
+
+		SDL_Event event;
+
+		display->setEvent(event);
+		
+		
 		
 		int  prev_image_id= instance->getCurrentImageId();
 
-		int window = windows->size() - 1;
-		int image = images->size() - 1; 
+		
+		int image = images.size() - 1; 
 		while (loop) {
 
 			int _idCurrentImage = (instance->getCurrentImageId() == prev_image_id ) ? prev_image_id : instance->getCurrentImageId();
 
-				SDL_Event event = (*windows)[window].second;
 				mutex_window_thread2.lock();
-					(*windows)[window].first->display_image((*images)[image].first);
+					if (instance->getDisplay() != nullptr)
+					instance->getDisplay()->display_image(images[_idCurrentImage].first);
 				mutex_window_thread2.unlock();
 				while (SDL_PollEvent(&event)) {
 					if (event.type == SDL_QUIT)
@@ -271,7 +295,7 @@ namespace maptomix{
 		}
 		mutex_window_thread2.lock();
 		display->cleanUp(); 
-		windows->erase(windows->begin() + window);  
+		instance->setDisplayNULL(); 
 		mutex_window_thread2.unlock();	
 		 
 	}
@@ -282,7 +306,7 @@ namespace maptomix{
 	ProgramStatus::ProgramStatus() {
 		_idCurrentImage = -1;
 		exited = false; 
-		_display_window = std::shared_ptr<Window>(nullptr); 
+		_display_window = nullptr;
 	}
 
 	ProgramStatus::~ProgramStatus() {
@@ -300,14 +324,15 @@ namespace maptomix{
 		mutex.unlock();
 	}
 
+	
 
 
 
 	void ProgramStatus::create_window(int width , int height , const char* name) {
-		if (_display_window.get() == nullptr) {
+		if (_display_window == nullptr) {
 			std::string n(name);
-			void(*ref)(WindowsStack*, ImagesStack*, int, int, std::string) = &loop_thread;
-			std::thread thread = std::thread(ref, &windows, &images, width, height, n);
+			void(*ref)(int, int, std::string) = &loop_thread;
+			std::thread thread = std::thread(ref, width, height, n);
 			_threads.push_back(std::move(thread));
 		}
 		else {
@@ -337,7 +362,7 @@ namespace maptomix{
 		bool what_selected = std::regex_search(user_input, command_regex[CHK_CURRENT_IMG]);
 
 		if(save){
-			Validation v = validate_command_save(user_input); 
+			Validation<std::string> v = validate_command_save(user_input); 
 			int id = atoi(v.command_arguments[0].c_str()); 
 			
 			if (v.validated) {
@@ -356,7 +381,7 @@ namespace maptomix{
 			}
 		}
 		else if(load){
-			Validation v = validate_command_load(user_input);
+			Validation<std::string> v = validate_command_load(user_input);
 			if (v.validated)
 			{
 				 std::string a =  std::string( "File : " + v.command_arguments[0]+ " loading..." ) ; 
@@ -378,7 +403,7 @@ namespace maptomix{
 		
 		}
 		else if(window){
-			Validation v = validate_command_window(user_input); 
+			Validation<std::string> v = validate_command_window(user_input); 
 			if(v.validated)
 			{
 				int w = std::stoi(v.command_arguments[0]) , h = std::stoi(v.command_arguments[1]) ; 
@@ -399,6 +424,8 @@ namespace maptomix{
 		
 		}
 		else if(heightmap){
+			Validation<std::string> v = validate_command_hmap(user_input); 
+
 		
 		}
 		else if(contrast){
@@ -434,7 +461,7 @@ namespace maptomix{
 		}
 		else if (selectid) {
 
-			Validation v = validate_command_select(user_input); 
+			Validation<std::string> v = validate_command_select(user_input); 
 			if (v.validated) {
 				try {
 					unsigned int id = std::stoi(v.command_arguments[0].c_str());
