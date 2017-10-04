@@ -27,7 +27,8 @@ namespace maptomix{
 
 	std::mutex mutex_window_thread1, mutex_window_thread2;
 
-
+	static const char* CMD_ERROR = "Wrong command used !";
+	static const char* LOADERR = "Image loading failed :"; 
 	ProgramStatus *ProgramStatus::instance = nullptr; 
 	static const std::regex command_regex[]={
 		std::regex("window [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//open a new SDL window
@@ -203,7 +204,7 @@ namespace maptomix{
 		a.push_back(w1); 
 		a.push_back(w2); 
 		a.push_back(w3);
-		if ((w2.compare("-prewitt") != 0 && w2.compare("-sobel") != 0 && w2.compare("-scharr") != 0) || !check_if_number(w1) || w3.compare("-repeat"))
+		if ((w2.compare("-prewitt") != 0 && w2.compare("-sobel") != 0 && w2.compare("-scharr") != 0) || !check_if_number(w1) || w3.compare("-repeat") != 0)
 			return { false , std::vector<std::string>() }; 
 		return {true,a}; 
 	}
@@ -280,7 +281,7 @@ namespace maptomix{
 			int _idCurrentImage = (instance->getCurrentImageId() == prev_image_id ) ? prev_image_id : instance->getCurrentImageId();
 
 				mutex_window_thread2.lock();
-					if (instance->getDisplay() != nullptr)
+					if (instance->getDisplay() != nullptr && _idCurrentImage >= 0 && _idCurrentImage < images.size())
 					instance->getDisplay()->display_image(images[_idCurrentImage].first);
 				mutex_window_thread2.unlock();
 				while (SDL_PollEvent(&event)) {
@@ -307,6 +308,7 @@ namespace maptomix{
 		_idCurrentImage = -1;
 		exited = false; 
 		_display_window = nullptr;
+		
 	}
 
 	ProgramStatus::~ProgramStatus() {
@@ -377,7 +379,7 @@ namespace maptomix{
 				}
 			}
 			else {
-				print(std::string("Wrong command used!"), RED);
+				print(CMD_ERROR, RED);
 			}
 		}
 		else if(load){
@@ -388,15 +390,16 @@ namespace maptomix{
 				 print(a, GREEN); 
 				ImageImporter *instance = ImageImporter::getInstance(); 
 				SDL_Surface* im = instance->load_image(static_cast<const char*>(v.command_arguments[0].c_str()));
-				if(im)
-					images.push_back(std::pair<SDL_Surface* , std::string>(im , v.command_arguments[0]));				
-				
+				if (im)
+					images.push_back(std::pair<SDL_Surface*, std::string>(im, v.command_arguments[0]));
+				else
+					print("Loading image failed !", RED); 
 
 
 			}
 			else
 			{
-				print("Wrong command used !", RED); 
+				print(CMD_ERROR, RED); 
 
 			}
 		
@@ -414,7 +417,7 @@ namespace maptomix{
 
 			}
 			else
-				print("Wrong command used !", RED);
+				print(CMD_ERROR, RED);
 
 
 
@@ -425,10 +428,26 @@ namespace maptomix{
 		}
 		else if(heightmap){
 			Validation<std::string> v = validate_command_hmap(user_input); 
+			if (v.validated) {
+				int id = std::stoi(v.command_arguments[0]); 
+				std::string func = v.command_arguments[1]; 
+				std::string bord= v.command_arguments[2];
+				uint8_t f = func.compare("-prewitt") == 0 ? MAPTOMIX_USE_PREWITT : func.compare("-sobel") == 0 ? MAPTOMIX_USE_SOBEL : func.compare("-scharr") == 0 ?  MAPTOMIX_USE_SCHARR : 0;
+				uint8_t b = MAPTOMIX_REPEAT; 
+				
+				ImageManager::calculate_edge(images[id].first, f, b);
+				
+			}
+			else
+				print(CMD_ERROR, RED); 
 
 		
 		}
 		else if(contrast){
+
+
+
+
 		}
 		else if(render){
 		
@@ -501,7 +520,8 @@ namespace maptomix{
 
 
 		else {
-			print(std::string("Wrong command ! "), RED); 
+			print(CMD_ERROR, RED);
+
 
 		}
 

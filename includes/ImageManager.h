@@ -5,15 +5,15 @@
 #include <algorithm>
 #include <iostream>
 #include <cmath>
-
+#include <assert.h>
 
 namespace maptomix{
 			
 			const int INT_MAXX = 30000;
 			/*we define some constants here...flags,sobel-prewitt operators,kernels etc...*/
-			constexpr uint8_t MAPTOMIX_USE_SOBEL = 0XFF;
-			constexpr uint8_t MAPTOMIX_USE_PREWITT = 0X00;
-			constexpr uint8_t MAPTOMIX_USE_SCHARR = 0X01;
+			constexpr uint8_t MAPTOMIX_USE_SOBEL = 0X00;
+			constexpr uint8_t MAPTOMIX_USE_PREWITT = 0X01;
+			constexpr uint8_t MAPTOMIX_USE_SCHARR = 0X02;
 			constexpr uint8_t MAPTOMIX_CLAMP = 0XFF;
 			constexpr uint8_t MAPTOMIX_REPEAT = 0X00;
 			constexpr uint8_t MAPTOMIX_MIRROR = 0X01;
@@ -89,11 +89,10 @@ namespace maptomix{
 			template<typename T>
 		        static auto normalize (int maxx,int minn,T pixel){
 				       
-				
-					auto norm = [](int maxx,int minn,T pixel){
-					return ( (pixel-minn)*255 / (maxx-minn) + 0 );
-						};	
-				return 	norm(maxx,minn,pixel) ; 
+							assert(maxx - minn != 0);
+							return ((pixel - minn) * 255 / (maxx - minn) + 0);
+						 
+						
 			}
 
 			/*we add linear interpolation to compute smoother normals differences*/	

@@ -162,6 +162,7 @@ F = Bright White
 
 
 			/*attributes*/
+
 			std::vector < std::pair< SDL_Surface* , std::string>> images;
 			std::map <std::thread, std::pair<std::shared_ptr<Window>, SDL_Event>> thread_pool; 
 			std::vector<std::pair<std::shared_ptr<Window> , SDL_Event> > windows; 

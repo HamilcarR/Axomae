@@ -67,7 +67,7 @@ namespace maptomix{
 			case 1 :
 			;
 			rgb.red = *color >> 5 & 0x7;
-		        rgb.green = *color >> 2 & 0x7;
+		    rgb.green = *color >> 2 & 0x7;
 			rgb.blue = *color & 0x3 ;	
 			break;
 
@@ -509,8 +509,6 @@ void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t bord
 
 	}
 
-        cout << to_string(max_green) << "\n"; 	
-	 //thread t1 ; 	
 	 int arr_h[3][3];
 	 int arr_v[3][3] ;
 	for(int i = 0 ;i < 3 ; i ++){
