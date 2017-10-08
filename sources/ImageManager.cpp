@@ -1,5 +1,5 @@
 #include "../includes/ImageManager.h"
-#include "../kernels/Kernel.cu"
+#include "../kernels/Kernel.cuh"
 #include <iostream>
 #include <assert.h>
 #include <math.h>
@@ -342,7 +342,7 @@ void ImageManager::set_greyscale_luminance(SDL_Surface* image){
 	for(int i = 0 ; i < image->w;i++){
 		for(int j = 0 ; j < image->h ; j++){
 			RGB rgb = get_pixel_color(image,i,j);
-			rgb.red =rgb.red*0.3+rgb.blue*0.11+rgb.green*0.59;
+			rgb.red = (int) floor(rgb.red*0.3+rgb.blue*0.11+rgb.green*0.59);
 			rgb.green =rgb.red;
 			rgb.blue = rgb.red;
 			uint32_t gray = rgb.rgb_to_int();			
@@ -490,9 +490,8 @@ void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t bord
 	constexpr bool cuda = CHECK_IF_CUDA_AVAILABLE(); 
 
 	if constexpr (cuda) {
-		uint32_t *array_image = GPU_action(surface->w, surface->h);
-		for (int i = 0; i < surface->w*surface->h; i++)
-			std::cout << array_image[i] << "\n"; 
+		uint32_t *array_image = GPU_Initialize(surface->w, surface->h);
+		
 
 		delete[] array_image; 
 	}
@@ -581,9 +580,9 @@ void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t bord
 					setpix_h_blue = normalize(max_blue, min_blue, setpix_h_blue);
 
 
-					int r = magnitude(setpix_v_red, setpix_h_red);
-					int g = magnitude(setpix_v_green, setpix_h_green);
-					int b = magnitude(setpix_v_blue, setpix_h_blue);
+					int r = (int)magnitude(setpix_v_red, setpix_h_red);
+					int g = (int)magnitude(setpix_v_green, setpix_h_green);
+					int b = (int)magnitude(setpix_v_blue, setpix_h_blue);
 
 
 					RGB rgb = RGB(r, g, b, 0);
@@ -760,9 +759,9 @@ void ImageManager::set_contrast(SDL_Surface* image,int level){
 	for(int i = 0 ; i < image->w; i++){
 		for(int j = 0 ; j < image->h; j++){
 			RGB col = get_pixel_color(image,i,j);
-			col.red = truncate(correction_factor * (col.red - 128)+128);
-			col.green = truncate(correction_factor * (col.green - 128)+128);
-			col.blue = truncate(correction_factor * (col.blue - 128)+128);
+			col.red = (int) floor(truncate(correction_factor * (col.red - 128)+128));
+			col.green = (int) floor(truncate(correction_factor * (col.green - 128)+128));
+			col.blue = (int) floor(truncate(correction_factor * (col.blue - 128)+128));
 			col.alpha = 0 ; 
 			set_pixel_color(image,i,j,col.rgb_to_int()); 
 		}
@@ -866,7 +865,7 @@ void ImageManager::calculate_normal_map(SDL_Surface* surface,double fact,Uint8 g
 			double col_up_left = data[x][y].green;
 			double col_down_left = data[a][y].green;
 			double col_down_right = data[a][b].green;
-			float atten = 1.56 ; 
+			float atten = 1.56f ; 
 			double dx = atten*(fact*(col_right - col_left)/255);
 			double dy = atten*(fact*(col_up - col_down)/255) ;
 			double ddx = atten*(fact*(col_up_right - col_down_left)/255);
@@ -876,7 +875,7 @@ void ImageManager::calculate_normal_map(SDL_Surface* surface,double fact,Uint8 g
 			auto Nz = 255.0 ; //the normal vector
 			
 			
-			RGB col = RGB( truncate(Nx) ,  truncate(Ny) , Nz) ; 
+			RGB col = RGB((int) floor(truncate(Nx)) , (int) floor(truncate(Ny)) , (int)Nz) ;
 			set_pixel_color(surface,i,j,col.rgb_to_int()); 
 			
 

@@ -45,7 +45,7 @@ int main(int argv , char** argc){
 
 	ProgramStatus * main_program_command = ProgramStatus::getInstance();
 
-	if (argv > 2) {
+	if (argv >= 2) {
 		string mode = argc[1];
 		regex cmd, gui;
 		try {
@@ -98,7 +98,7 @@ int main(int argv , char** argc){
 		}
 	}
 	else {
-		cout << "Wrong argument used" << "\n";
+		cout << "Wrong command line argument used : Use -cmd for terminal or -gui for a graphical user interface" << "\n";
 	}
 
 
