@@ -1,5 +1,4 @@
 #include "Kernel.cuh"
-#include <SDL/SDL.h>
 #include <cmath>
 
 typedef struct RGB {
@@ -70,14 +69,39 @@ RGB int_to_rgb(uint8_t val,  bool isBigEndian) {
 }
 
 
-uint32_t rgb_to_int(RGB val,  bool isBigEndian , int bpp) {
-	if (bpp == 4) {			//32 bits color
-		if (isBigEndian) 
-			return val.a | (val.b << 8) | (val.g << 16) | (val.r << 24);
-		
-		else 
-			return val.r | (val.g << 8) | (val.b << 16) | (val.a << 24);	
+void* rgb_to_int(RGB val,  bool isBigEndian , int bpp) {
+	
+	if (bpp == 4)
+	{
+		uint32_t* value = new uint32_t;
+		*value = (isBigEndian) ? val.a | (val.b << 8) | (val.g << 16) | (val.r << 24) : val.r | (val.g << 8) | (val.b << 16) | (val.a << 24);
+		return value;
+
 	}
+else if(bpp == 3 )
+	{
+		uint32_t* value = new uint32_t;
+		*value = (isBigEndian) ?  (val.b ) | (val.g << 8) | (val.r << 16) : val.r | (val.g << 8) | (val.b << 16) ;
+		return value;
+		
+	}
+else if(bpp == 2)
+	{
+		uint16_t* value = new uint16_t;
+		*value = (isBigEndian) ? val.a | (val.b << 4) | (val.g << 8) | (val.r << 12) : val.r | (val.g << 4) | (val.b << 8) | (val.a << 12);
+		return value;
+	}
+else if (bpp == 1)
+	{
+		uint8_t* value = new uint8_t;
+		*value = (isBigEndian) ? (val.b) | (val.g << 2) | (val.r << 5) : val.r | (val.g << 2) | (val.b << 5);
+		return value;
+	}
+
+else return nullptr; 
+	
+			 	
+	
 
 }
 
@@ -93,16 +117,18 @@ void initialize_2D_array(uint32_t *array, int size_w, int size_h) {
 
 template<typename T>
 __global__
-void GPU_compute_greyscale_luminance(T *array, uint32_t *new_array ,int size_w, int size_h,constexpr bool isbigEndian) {
+void GPU_compute_greyscale_luminance(T *array, T *new_array ,int size_w, int size_h,const bool isbigEndian , const int bpp) {
 	int i = blockIdx.x; 
 	int j = threadIdx.x; 
 	RGB rgb = int_to_rgb(array[i], isbigEndian);
-	uint8_t value = (int)floor(rgb.red*0.3 + rgb.blue*0.11 + rgb.green*0.59);
+	uint8_t value = (int)floor(rgb.r*0.3 + rgb.b*0.11 + rgb.g*0.59);
 	rgb.r = value; 
 	rgb.g = value; 
 	rgb.b = value; 
 	rgb.a = 0; 
-	array[i*size_w + j] = rgb_to_int(rgb, isbigEndian); 
+	void* val = rgb_to_int(rgb, isbigEndian, bpp); 
+	new_array[i*size_w + j] =*(static_cast<T*>(val)); 
+	delete val; 
 }
 
 
@@ -115,7 +141,7 @@ void GPU_compute_hmap(uint32_t *array, int size_w, int size_h) {
 
 
 
-
+//TODO initialize multi types uint8_t etc ... template 
  uint32_t* GPU_Initialize(int w, int h) {
 	uint32_t * array, *D_array;
 	array = new uint32_t[h*w];
@@ -142,20 +168,20 @@ void GPU_compute_hmap(uint32_t *array, int size_w, int size_h) {
 
 
  template <typename T>
- uint32_t* GPU_compute_greyscale(T* image, int width, int height , int bpp , constexpr bool bigEndian , int pitch ) {
+ uint32_t* GPU_compute_greyscale(T* image, int width, int height , const int bpp , const bool bigEndian , int pitch ) {
 
-	 uint32_t* D_greyscale , *H_greyscale; 
+	 T* D_greyscale , *H_greyscale; 
 	 T *D_image,*H_image; 
-	 H_greyscale = new uint32_t[width*height]; 
-	 cudaMalloc((void**)&D_greyscale, width*height * sizeof(uint32_t)); 
+	 H_greyscale = new T[width*height]; 
+	 cudaMalloc((void**)&D_greyscale, width*height * sizeof(T)); 
 	 cudaMalloc((void**)&D_image, width*height * sizeof(T)); 
-	 cudaMemcpy(D_greyscale, H_greyscale, width*height * sizeof(uint32_t), cudaMemcpyHostToDevice);
-	 cudaMemcpy(D_image, array, width*height * sizeof(T), cudaMemcpyHostToDevice); 
+	 cudaMemcpy(D_greyscale, H_greyscale, width*height * sizeof(T), cudaMemcpyHostToDevice);
+	 cudaMemcpy(D_image, image, width*height * sizeof(T), cudaMemcpyHostToDevice); 
 	 int threads = 512; 
 	 int blocks_per_grid = floor((width*height + threads - 1) / threads) + 1;
 		 GPU_compute_greyscale_luminance << <blocks_per_grid, threads >> > (D_image, D_greyscale , width , height , bigEndian);
-	 cudaMemcpy(array, D_greyscale, width*height * sizeof(uint32_t), cudaMemcpyDeviceToHost);
+	 cudaMemcpy(H_greyscale, D_greyscale, width*height * sizeof(T), cudaMemcpyDeviceToHost);
 	 cudaFree(D_new_array); 
 	 cudaFree(D_array); 
-	 return nullptr; 
+	 return H_greyscale; 
  }
