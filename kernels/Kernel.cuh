@@ -1,3 +1,4 @@
+#include "SDL\SDL_surface.h"
 #include <cuda.h>
 #include <cuda_device_runtime_api.h>
 #include <cuda_runtime_api.h>
@@ -5,11 +6,7 @@
 #include <cstdint>
 #include <stdio.h>
 
-__global__ void  GPU_compute_hmap(uint32_t* array, int width, int height);
-template<typename T> __global__ void  GPU_compute_greyscale_luminance(T* array,uint32_t* new_array ,int width, int height, const bool isbigEndian);
-__global__ void GPU_compute_nmap();
-__global__ void GPU_compute_greyscale();
-__global__ void GPU_set_greyscale();
+
 
 
 
@@ -17,6 +14,8 @@ __global__ void GPU_set_greyscale();
 
 
  uint32_t* GPU_Initialize(int w, int h); 
- template <typename T>
- uint32_t* GPU_compute_greyscale(T* image, int width, int height, const int bpp, const bool bigEndian, int pitch);
 
+
+
+
+ void GPU_compute_greyscale(SDL_Surface* image,  const bool bigEndian);

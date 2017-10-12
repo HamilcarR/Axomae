@@ -144,7 +144,7 @@ namespace maptomix{
 	};
 
 
-	
+
  
 	class ImageManager{
 		

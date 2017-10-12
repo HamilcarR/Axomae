@@ -25,7 +25,8 @@ namespace maptomix{
 
 
 
-
+	template<typename T>
+	static void replace_image(SDL_Surface* surface, T* image, unsigned int size, int bpp);
 
 
 
@@ -225,8 +226,6 @@ namespace maptomix{
 
 
 
-
-
 	void ImageManager::set_pixel_color(SDL_Surface* surface ,int x,int y, uint32_t color){	
 		int bpp = surface->format->BytesPerPixel;
 	
@@ -335,21 +334,97 @@ void ImageManager::set_greyscale_average(SDL_Surface* image,uint8_t factor){
 }
 
 
+static void replace_image(SDL_Surface* surface, uint8_t* image) {
+	//TODO LOCK SURFACE ? 
+	int bpp = surface->format->BytesPerPixel; 
+	int size = surface->w * surface->h;
+
+	SDL_LockSurface(surface);
+	 if (bpp == 1) {
+		 for ( int i = 0; i < surface->w; i++)
+			 for ( int j = 0; j < surface->h; j++)
+				 ((Uint8*)surface->pixels)[i*bpp + j*surface->pitch] = image[i*bpp + j*surface->pitch];
+
+		delete[] static_cast<uint8_t*> (image);
+
+	}
+	else {
+		std::cout << "error reading image ... BPP is : " << std::to_string(bpp) << " Bytes per pixel\n";
+	}
+	SDL_UnlockSurface(surface);
+
+}
 
 
+static void replace_image(SDL_Surface* surface, uint16_t* image) {
+	//TODO LOCK SURFACE ? 
+	int bpp = surface->format->BytesPerPixel;
+	int size = surface->w * surface->h;
+	SDL_LockSurface(surface);
+	 if (bpp == 2) {
+		 for ( int i = 0; i < surface->w; i++)
+			 for ( int j = 0; j < surface->h; j++)
+				 ((Uint16*)surface->pixels)[i*bpp + j*surface->pitch] = image[i*bpp + j*surface->pitch];
+		delete[]  static_cast<uint16_t*> (image);
+
+	}
+	
+	else {
+		std::cout << "error reading image ... BPP is : " << std::to_string(bpp) << " Bytes per pixel\n";
+	}
+	SDL_UnlockSurface(surface);
+
+}
+
+
+static void replace_image(SDL_Surface* surface, uint32_t* image) {
+	//TODO LOCK SURFACE ? 
+	int bpp = surface->format->BytesPerPixel; 
+	int size = surface->w * surface->h; 
+	int pitch = surface->pitch; 
+	SDL_LockSurface(surface);
+	if (bpp == 4) {
+		for ( int i = 0; i < surface->w; i++)
+			for ( int j = 0; j < surface->h; j++) 
+				((Uint32*)surface->pixels)[i*bpp + j*surface->pitch] = image[i*bpp + j*surface->pitch];
+			
+		delete[] static_cast<uint32_t*> (image);
+
+	}
+	else if (bpp == 3) {
+		for ( int i = 0; i < surface->w; i++)
+			for ( int j = 0; j < surface->h; j++)
+				((Uint32*)surface->pixels)[i*bpp + j*surface->pitch] = image[i*bpp + j*surface->pitch];
+
+	}
+
+	
+	else {
+		std::cout << "error reading image ... BPP is : " << std::to_string(bpp) << " Bytes per pixel\n";
+	}
+	SDL_UnlockSurface(surface);
+
+}
 void ImageManager::set_greyscale_luminance(SDL_Surface* image){
-	assert(image!=nullptr);	
-	for(int i = 0 ; i < image->w;i++){
-		for(int j = 0 ; j < image->h ; j++){
-			RGB rgb = get_pixel_color(image,i,j);
-			rgb.red = (int) floor(rgb.red*0.3+rgb.blue*0.11+rgb.green*0.59);
-			rgb.green =rgb.red;
-			rgb.blue = rgb.red;
-			uint32_t gray = rgb.rgb_to_int();			
-			set_pixel_color(image,i,j,gray);	
+	bool cuda = CHECK_IF_CUDA_AVAILABLE(); 
+	if (cuda) 
+		GPU_compute_greyscale(image, SDL_BIG_ENDIAN == SDL_BYTEORDER); 
+
+	
+	else {
+		assert(image != nullptr);
+		for (int i = 0; i < image->w; i++) {
+			for (int j = 0; j < image->h; j++) {
+				RGB rgb = get_pixel_color(image, i, j);
+				rgb.red = (int)floor(rgb.red*0.3 + rgb.blue*0.11 + rgb.green*0.59);
+				rgb.green = rgb.red;
+				rgb.blue = rgb.red;
+				uint32_t gray = rgb.rgb_to_int();
+				set_pixel_color(image, i, j, gray);
+
+			}
 
 		}
-
 	}
 
 
@@ -490,10 +565,7 @@ void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t bord
 	constexpr bool cuda = CHECK_IF_CUDA_AVAILABLE(); 
 
 	if constexpr (cuda) {
-		uint32_t *array_image = GPU_Initialize(surface->w, surface->h);
-		
-
-		delete[] array_image; 
+		set_greyscale_luminance(surface); 
 	}
 
 	else  {
