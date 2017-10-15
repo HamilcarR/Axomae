@@ -9,7 +9,7 @@
 #include <assert.h>
 
 
-namespace maptomix{
+namespace axioma{
 			
 			const int INT_MAXX = 30000;
 			/*we define some constants here...flags,sobel-prewitt operators,kernels etc...*/
@@ -30,7 +30,6 @@ namespace maptomix{
 			
 			//convolution kernels
 			
-			constexpr static bool CHECK_IF_CUDA_AVAILABLE(); 
 
 			
 
@@ -163,9 +162,9 @@ namespace maptomix{
 			static void set_contrast_sigmoid(SDL_Surface *image,int treshold);
 			static void calculate_normal_map(SDL_Surface* surface , double strength,Uint8 greyscale); 		
 			static void compute_dudv(SDL_Surface* surface,double factor);
-
-
-
+			static void USE_GPU_COMPUTING() { gpu = true; }
+			static void USE_CPU_COMPUTING() { gpu = false;  }
+			static bool USING_GPU() { return gpu;  }
 		    
 		private:
 
@@ -173,6 +172,7 @@ namespace maptomix{
 			ImageManager();
 			~ImageManager();
 
+			static bool gpu;
 
 	};
 	

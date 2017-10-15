@@ -2,7 +2,7 @@
 #define SYNTAX_H
 
 
-namespace Maptomix {
+namespace axioma {
 
 	class SyntaxTree{
 

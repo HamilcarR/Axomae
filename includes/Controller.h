@@ -6,7 +6,7 @@
 
 
 
- namespace maptomix {
+ namespace axioma {
 
 class View; 
 

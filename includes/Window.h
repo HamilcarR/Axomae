@@ -6,7 +6,7 @@
 
 #include "images.h"
 #include <thread> 
-namespace maptomix{
+namespace axioma{
 
 struct thread_data; 
 
@@ -20,6 +20,7 @@ public:
 	~Window();
         void display_image(SDL_Surface* image);
 	void setEvent(SDL_Event &ev) {event = ev;}
+	SDL_Event& getEvent() { return event;  }
         SDL_Renderer* getRenderer(){return renderer;};
 	int getHeight(){return height;}
 	int getWidth(){return width;}

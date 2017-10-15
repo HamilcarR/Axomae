@@ -6,11 +6,10 @@
 #include "../includes/ImageManager.h"
 #include "../includes/ImageImporter.h"
 #include "../includes/Window.h"
-#include "../includes/EventHandler.h"
 #include "../includes/TerminalOpt.h"
 
 using namespace std;
-using namespace maptomix;
+using namespace axioma;
 
 void init_api(){
 	if(SDL_Init(SDL_INIT_EVERYTHING)<0)
@@ -37,9 +36,7 @@ void quit_api(){
 }
 
 
-static void loop_event(EventHandler* ev){
-	ev->main_loop(); 
-}
+
 int main(int argv , char** argc){
 	init_api();
 

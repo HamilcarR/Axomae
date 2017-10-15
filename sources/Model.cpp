@@ -2,7 +2,7 @@
 
 
 
-namespace maptomix{
+namespace axioma{
 
 	Model::Model(){
 

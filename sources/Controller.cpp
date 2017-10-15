@@ -1,6 +1,6 @@
 #include "../includes/Controller.h"
 
-namespace maptomix{
+namespace axioma{
 Controller::Controller(View *v,Model *d){
 
 	view=v;

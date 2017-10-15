@@ -13,7 +13,7 @@
 #include <cctype>
 
 
-namespace maptomix{
+namespace axioma{
 	
 	const int STRING_SIZE = 256 ; 
 
@@ -32,11 +32,11 @@ namespace maptomix{
 	ProgramStatus *ProgramStatus::instance = nullptr; 
 	static const std::regex command_regex[]={
 		std::regex("window [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase),	//open a new SDL window
-		std::regex("nmap [0-9]+ () ()",std::regex_constants::icase),	//generate normal map (from height map)
-		std::regex("hmap [0-9]+ (-sobel|-prewitt|-scharr) (-repeat)",std::regex_constants::icase),	//generate height map (from albedo texture) 
-		std::regex("dudv [0-9]+ () (-repeat)",std::regex_constants::icase),	//generate dudv map
+		std::regex("nmap [0-9]+ () () (-gpu|-cpu)" ,std::regex_constants::icase),	//generate normal map (from height map)
+		std::regex("hmap [0-9]+ (-sobel|-prewitt|-scharr) (-repeat) (-gpu|-cpu)",std::regex_constants::icase),	//generate height map (from albedo texture) 
+		std::regex("dudv [0-9]+ () (-repeat) (-gpu|-cpu)",std::regex_constants::icase),	//generate dudv map
 		std::regex("save [0-9]+ (/?([a-zA-Z0-9]+)/?)*[a-zA-Z0-9]+.[a-zA-Z0-9]+",std::regex_constants::icase),	// save image on the disk
-		std::regex("contrast [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), // set contrast
+		std::regex("contrast [0-9]+ [0-9]+ [a-z]+ (-gpu|-cpu)",std::regex_constants::icase), // set contrast
 		std::regex("exit",std::regex_constants::icase), //exit the app
 		std::regex("render [0-9]+ [0-9]+ [a-z]+",std::regex_constants::icase), //render the texture on a mesh
 		std::regex("load (/?([a-zA-Z0-9]+)/?)*[a-zA-Z0-9]+.[a-zA-Z0-9]+",std::regex_constants::icase),	//load an image
@@ -199,11 +199,12 @@ namespace maptomix{
 		std::string w1 = get_word(input, 1); 
 		std::string w2 = get_word(input, 2); 
 		std::string w3 = get_word(input, 3); 
-
+		std::string w4 = get_word(input, 4); 
 		std::vector<std::string> a; 
 		a.push_back(w1); 
 		a.push_back(w2); 
 		a.push_back(w3);
+		a.push_back(w4); 
 		if ((w2.compare("-prewitt") != 0 && w2.compare("-sobel") != 0 && w2.compare("-scharr") != 0) || !check_if_number(w1) || w3.compare("-repeat") != 0)
 			return { false , std::vector<std::string>() }; 
 		return {true,a}; 
@@ -259,7 +260,7 @@ namespace maptomix{
 		ProgramStatus *instance = ProgramStatus::getInstance();
 		Window *display = instance->getDisplay(); 
 		auto images = instance->getImages(); 
-		bool loop = true; 
+		bool loop = instance->getLoop();
 		mutex_window_thread1.lock();
 		display = new Window(width, height, name.c_str());
 		instance->setDisplay(display);
@@ -285,10 +286,13 @@ namespace maptomix{
 					instance->getDisplay()->display_image(images[_idCurrentImage].first);
 				mutex_window_thread2.unlock();
 				while (SDL_PollEvent(&event)) {
-					if (event.type == SDL_QUIT)
-						loop = false; 
+					if (event.type == SDL_QUIT) {
+						
+						loop = false;
+					}
+
 				}
-				if (instance->isExited())
+				if (!instance->getLoop())
 					loop = false; 
 				
 			
@@ -308,22 +312,32 @@ namespace maptomix{
 		_idCurrentImage = -1;
 		exited = false; 
 		_display_window = nullptr;
-		
+		loop = true; 
 	}
 
+	void ProgramStatus::setLoop(bool l) {
+		mutex_window_thread2.lock();
+		loop = l;
+		mutex_window_thread2.unlock();
+		
+
+	}
+
+	bool ProgramStatus::getLoop() {
+		return loop; 
+	}
 	ProgramStatus::~ProgramStatus() {
-		for (std::thread& t : _threads) {
-			t.join();
-		}
+		setLoop(false); 
+		
+
+		
+		
 
 	}
 
 
 	void ProgramStatus::exit() {
-		std::mutex mutex;
-		mutex.lock();
-		exited = true;
-		mutex.unlock();
+		delete instance; 
 	}
 
 	
@@ -432,10 +446,11 @@ namespace maptomix{
 				int id = std::stoi(v.command_arguments[0]); 
 				std::string func = v.command_arguments[1]; 
 				std::string bord= v.command_arguments[2];
+				std::string device_choice = v.command_arguments[3]; 
 				uint8_t f = func.compare("-prewitt") == 0 ? MAPTOMIX_USE_PREWITT : func.compare("-sobel") == 0 ? MAPTOMIX_USE_SOBEL : func.compare("-scharr") == 0 ?  MAPTOMIX_USE_SCHARR : 0;
 				uint8_t b = MAPTOMIX_REPEAT; 
 				
-				ImageManager::calculate_edge(images[id].first, f, b);
+				ImageManager::set_greyscale_luminance(images[id].first);
 				
 			}
 			else

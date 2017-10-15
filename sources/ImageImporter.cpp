@@ -5,12 +5,12 @@
 
 
 using namespace std;
-namespace maptomix {
+namespace axioma {
 
 ImageImporter* ImageImporter::instance = nullptr;
 
 
-ImageImporter::ImageImporter():maptomix::Model()
+ImageImporter::ImageImporter():axioma::Model()
 	
 {
 

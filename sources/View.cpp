@@ -1,6 +1,6 @@
 #include "../includes/View.h"
 
-namespace maptomix{
+namespace axioma{
 
 	View::View(){
 

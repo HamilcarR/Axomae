@@ -2,7 +2,7 @@
 #define VIEW_H
 #include "Controller.h" 
 
- namespace maptomix{
+ namespace axioma{
 
 
 class View{

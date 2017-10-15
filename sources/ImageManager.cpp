@@ -9,21 +9,25 @@
 #include <string>
 
 
-namespace maptomix{
+namespace axioma{
 	
 
 
 	using namespace std;
 
-	constexpr static bool CHECK_IF_CUDA_AVAILABLE() {
-		if constexpr (CUDART_VERSION != 9000) {
+	 static bool CHECK_IF_CUDA_AVAILABLE() {
+		if  (CUDART_VERSION != 9000 ) 
 			return false;
-		}
-		else
-			return true; 
+
+	    if (!ImageManager::USING_GPU()) 
+				return false; 
+		else 
+				return true;
+
+		
 	}
 
-
+	 bool ImageManager::gpu = false; 
 
 	template<typename T>
 	static void replace_image(SDL_Surface* surface, T* image, unsigned int size, int bpp);
@@ -88,83 +92,100 @@ namespace maptomix{
 
 
 			case 2:
-			;{
-			uint16_t colo16bits  =* (uint16_t*) color ; 
-			if(SDL_BYTEORDER == SDL_BIG_ENDIAN){
+				; {
+					uint16_t colo16bits = *(uint16_t*)color;
+					if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
 
-				rgb.red =  colo16bits >> 12 & 0xF;
-				rgb.green = colo16bits >> 8 & 0XF;
-				rgb.blue = colo16bits >> 4 & 0XF;
-				rgb.alpha = colo16bits & 0XF; 
-			}
-			else{
-	
-				rgb.alpha =  colo16bits >> 12 & 0xF;
-				rgb.blue = colo16bits >> 8 & 0XF;
-				rgb.green = colo16bits >> 4 & 0XF;
-				rgb.red = colo16bits & 0XF; 				
+						rgb.red = colo16bits >> 12 & 0xF;
+						rgb.green = colo16bits >> 8 & 0XF;
+						rgb.blue = colo16bits >> 4 & 0XF;
+						rgb.alpha = colo16bits & 0XF;
+					}
+					else {
 
-			}
-			}
+						rgb.alpha = colo16bits >> 12 & 0xF;
+						rgb.blue = colo16bits >> 8 & 0XF;
+						rgb.green = colo16bits >> 4 & 0XF;
+						rgb.red = colo16bits & 0XF;
+
+					}
+				}
 			break;
-
-
 			case 3:
-			;{
-			uint32_t colo24bits = *(uint32_t*) color ; 
-			if(SDL_BYTEORDER == SDL_BIG_ENDIAN){
-				rgb.red = colo24bits >> 16 & 0XFF;
-				rgb.green = colo24bits >> 8 & 0XFF;
-				rgb.blue = colo24bits & 0XFF ; 
+			{
+				uint32_t colo24bits = *(uint32_t*)color;
+				if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+					rgb.red = colo24bits >> 16 & 0XFF;
+					rgb.green = colo24bits >> 8 & 0XFF;
+					rgb.blue = colo24bits & 0XFF;
 
-			}
+				}
 
-			else{
+				else {
 
-				rgb.blue = colo24bits >> 16 & 0XFF;
-				rgb.green = colo24bits >> 8 & 0XFF;
-				rgb.red = colo24bits & 0XFF ; 
-
-			}	
+					rgb.blue = colo24bits >> 16 & 0XFF;
+					rgb.green = colo24bits >> 8 & 0XFF;
+					rgb.red = colo24bits & 0XFF;
+				}
 
 			}
 			break;
-
-
 			case 4:
 			;{
 			uint32_t colo32bits = *(uint32_t*) color ; 
 			if(SDL_BYTEORDER == SDL_BIG_ENDIAN){
-				
 				rgb.red = colo32bits >> 24 & 0XFF;
 				rgb.green = colo32bits >> 16 & 0XFF;
 				rgb.blue = colo32bits >> 8 & 0XFF;
 				rgb.alpha = colo32bits & 0XFF ; 
-
 			}
-
 			else{
-
 				rgb.alpha = colo32bits >> 24 & 0XFF;
 				rgb.blue = colo32bits >> 16 & 0XFF;
 				rgb.green = colo32bits >> 8 & 0XFF;
 				rgb.red = colo32bits & 0XFF ; 
-
-
 			}
 			}
-
 			break;
-
-
 		}
 		return rgb;
 	
 	}
 
 
+/**************************************************************************************************************/
 
+	void ImageManager::set_pixel_color(SDL_Surface* surface, int x, int y, uint32_t color) {
+		int bpp = surface->format->BytesPerPixel;
+		SDL_LockSurface(surface);
+		Uint8* pix = &((Uint8*)surface->pixels)[x*bpp + y*surface->pitch];
+		if (bpp == 1)
+		{
+			Uint8* pixel = (Uint8*)pix;
+			*pixel = color;
+		}
+		else if (bpp == 2) 
+			*((Uint16*)pix) = color;
+		
 
+		else if (bpp == 3) {
+			if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+				((Uint8*)pix)[0] = color >> 16 & 0XFF;
+				((Uint8*)pix)[1] = color >> 8 & 0XFF;
+				((Uint8*)pix)[2] = color & 0XFF;
+			}
+			else {
+				((Uint8*)pix)[0] = color & 0XFF;
+				((Uint8*)pix)[1] = color >> 8 & 0XFF;
+				((Uint8*)pix)[2] = color >> 16 & 0XFF;
+			}
+		}
+
+		else 
+			*((Uint32*)pix) = color;
+		SDL_UnlockSurface(surface);
+
+	}
 
 /**************************************************************************************************************/
 
@@ -226,49 +247,6 @@ namespace maptomix{
 
 
 
-	void ImageManager::set_pixel_color(SDL_Surface* surface ,int x,int y, uint32_t color){	
-		int bpp = surface->format->BytesPerPixel;
-	
-		SDL_LockSurface(surface);
-
-			 Uint8* pix= &((Uint8*)surface->pixels) [ x*bpp + y*surface->pitch ];
-			
-			if(bpp==1)
-			{
-				Uint8* pixel =(Uint8*) pix;
-				*pixel = color ; 
-
-
-			}
-			else if(bpp==2){
-				*((Uint16*) pix) = color ;
-
-			}
-
-			else if(bpp==3){
-				if(SDL_BYTEORDER == SDL_BIG_ENDIAN){
-					((Uint8*)pix)[0] = color >> 16 & 0XFF;
-					((Uint8*)pix)[1] = color >> 8 & 0XFF;
-				        ((Uint8*)pix)[2] = color & 0XFF;
-
-				}
-				else{
-						
-					((Uint8*)pix)[0] = color & 0XFF;
-					((Uint8*)pix)[1] = color >> 8 & 0XFF;
-				        ((Uint8*)pix)[2] = color >>16 & 0XFF;
-
-				}
-			
-			}
-
-			else{
-				*((Uint32*) pix) = color ; 
-			}
-
-		SDL_UnlockSurface(surface);
-
-	}
 
 
 
@@ -406,7 +384,7 @@ static void replace_image(SDL_Surface* surface, uint32_t* image) {
 
 }
 void ImageManager::set_greyscale_luminance(SDL_Surface* image){
-	bool cuda = CHECK_IF_CUDA_AVAILABLE(); 
+	bool cuda = CHECK_IF_CUDA_AVAILABLE() ; 
 	if (cuda) 
 		GPU_compute_greyscale(image, SDL_BIG_ENDIAN == SDL_BYTEORDER); 
 
@@ -562,10 +540,10 @@ static auto calculate_kernel_pixel(RGB **data,int kernel[3][3],int i,int j,uint8
 
 
 void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t border){
-	constexpr bool cuda = CHECK_IF_CUDA_AVAILABLE(); 
+	 bool cuda = CHECK_IF_CUDA_AVAILABLE(); 
 
-	if constexpr (cuda) {
-		set_greyscale_luminance(surface); 
+	if  (cuda) {
+		GPU_compute_greyscale(surface, SDL_BYTEORDER == SDL_BIG_ENDIAN); 
 	}
 
 	else  {

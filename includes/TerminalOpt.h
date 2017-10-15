@@ -1,6 +1,5 @@
 #ifndef TERMOPT_H
 #define TERMOPT_H
-#include "EventHandler.h"
 #include "ImageManager.h"
 #include "ImageImporter.h"
 #include "Window.h"
@@ -13,7 +12,7 @@
 #include <Windows.h>
 #endif
 
-namespace maptomix{
+namespace axioma{
 
 
 	
@@ -148,11 +147,11 @@ F = Bright White
 			std::vector<std::pair<std::shared_ptr<Window>, SDL_Event>> getWindows() { return windows; }
 			int getCurrentImageId() { return _idCurrentImage; }
 			void setDisplayNULL() { _display_window = nullptr; }
-			bool isExited() { return exited; }
 			Window* getDisplay() { return _display_window;  }
 			void setDisplay(Window *d) { _display_window = d;  }
 			void exit();
-
+			void setLoop(bool);
+			bool getLoop(); 
 		private:
 			/*functions*/
 			ProgramStatus();
@@ -170,6 +169,7 @@ F = Bright White
 			std::shared_ptr<Renderer> _renderer ; 
 			std::stack<std::pair<SDL_Surface*, std::string>>  stack; 
 			Window* _display_window; 
+			bool loop; 
 			int _idCurrentImage; 
 			static ProgramStatus* instance; 
 			bool exited;

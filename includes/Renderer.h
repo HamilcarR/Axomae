@@ -2,7 +2,7 @@
 #define RENDERER_H
 
 
-namespace maptomix{
+namespace axioma{
 	class Renderer{
 		public:
 		 Renderer() ; 

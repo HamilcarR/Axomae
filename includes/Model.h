@@ -1,7 +1,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-namespace maptomix{
+namespace axioma{
 
 	class Model {
 
