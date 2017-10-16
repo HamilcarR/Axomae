@@ -1,6 +1,6 @@
 #include "../includes/View.h"
 
-namespace axioma{
+namespace axoma{
 
 	View::View(){
 

@@ -5,12 +5,12 @@
 
 
 using namespace std;
-namespace axioma {
+namespace axoma {
 
 ImageImporter* ImageImporter::instance = nullptr;
 
 
-ImageImporter::ImageImporter():axioma::Model()
+ImageImporter::ImageImporter():axoma::Model()
 	
 {
 

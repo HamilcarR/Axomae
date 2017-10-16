@@ -9,7 +9,7 @@
 #include "../includes/TerminalOpt.h"
 
 using namespace std;
-using namespace axioma;
+using namespace axoma;
 
 void init_api(){
 	if(SDL_Init(SDL_INIT_EVERYTHING)<0)

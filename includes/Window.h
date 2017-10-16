@@ -6,7 +6,7 @@
 
 #include "images.h"
 #include <thread> 
-namespace axioma{
+namespace axoma{
 
 struct thread_data; 
 

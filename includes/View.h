@@ -2,7 +2,7 @@
 #define VIEW_H
 #include "Controller.h" 
 
- namespace axioma{
+ namespace axoma{
 
 
 class View{

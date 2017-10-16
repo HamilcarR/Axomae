@@ -12,7 +12,7 @@
 #include <Windows.h>
 #endif
 
-namespace axioma{
+namespace axoma{
 
 
 	

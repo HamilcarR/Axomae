@@ -9,7 +9,7 @@
 #include <assert.h>
 
 
-namespace axioma{
+namespace axoma{
 			
 			const int INT_MAXX = 30000;
 			/*we define some constants here...flags,sobel-prewitt operators,kernels etc...*/

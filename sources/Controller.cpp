@@ -1,6 +1,6 @@
 #include "../includes/Controller.h"
 
-namespace axioma{
+namespace axoma{
 Controller::Controller(View *v,Model *d){
 
 	view=v;

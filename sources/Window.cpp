@@ -1,7 +1,7 @@
 #include "../includes/Window.h"
 #include <assert.h>
 #include <iostream>
-namespace axioma {
+namespace axoma {
 
 
 

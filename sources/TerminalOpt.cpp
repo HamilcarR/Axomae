@@ -13,7 +13,7 @@
 #include <cctype>
 
 
-namespace axioma{
+namespace axoma{
 	
 	const int STRING_SIZE = 256 ; 
 
