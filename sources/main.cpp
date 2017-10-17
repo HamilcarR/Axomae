@@ -3,6 +3,9 @@
 #include <regex>
 #include <string>
 #include <thread> 
+#include <QtWidgets/qapplication.h>
+#include <QtWidgets/qpushbutton.h>
+#include <QtWidgets/qmainwindow.h>
 #include "../includes/ImageManager.h"
 #include "../includes/ImageImporter.h"
 #include "../includes/Window.h"
@@ -10,6 +13,32 @@
 
 using namespace std;
 using namespace axoma;
+
+
+class Window : private QMainWindow {
+	Q_OBJECT
+
+public :
+	Window(QWidget * parent = nullptr) {
+
+	}
+	~Window() {
+
+	}
+private :
+
+};
+
+
+
+
+
+
+
+
+
+
+
 
 void init_api(){
 	if(SDL_Init(SDL_INIT_EVERYTHING)<0)
@@ -41,12 +70,13 @@ int main(int argv , char** argc){
 	init_api();
 
 	ProgramStatus * main_program_command = ProgramStatus::getInstance();
-
+	
 	if (argv >= 2) {
 		string mode = argc[1];
 		regex cmd, gui;
 		try {
 			cmd = regex("-cmd", regex_constants::icase);
+			gui = regex("-gui", regex_constants::icase); 
 		}
 		catch (const std::regex_error& e) { cout << e.what() << "\n"; }
 		if (regex_match(mode, cmd)) {
@@ -82,11 +112,15 @@ int main(int argv , char** argc){
 #endif
 
 			}
+			main_program_command->exit();
 
 		}
 		else if (regex_match(mode, gui)) {
 
-
+			QApplication Q(argv, argc);
+			QPushButton bouton("Salut les Zéros, la forme ?");
+			bouton.show();
+			Q.exec();
 
 		}
 		else {
@@ -102,7 +136,7 @@ int main(int argv , char** argc){
 	
         
 
-	main_program_command->exit(); 
+	
 
 	quit_api(); 
 return EXIT_SUCCESS ; 

@@ -158,7 +158,8 @@ void initialize_2D_array(uint32_t *array, int size_w, int size_h) {
  gpu_threads get_optimal_distribution(int width, int height, int pitch, int bpp) {
 	 gpu_threads value; 
 	 int flat_array_size = width*height; 
-	 dim3 threads = dim3(32, 32);
+	 /*need compute capability > 2.0*/
+	 dim3 threads = dim3(32, 32); 
 	 value.threads = threads;
 	 if (flat_array_size <= threads.y * threads.x) {
 		

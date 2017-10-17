@@ -547,7 +547,7 @@ static auto calculate_kernel_pixel(RGB **data,int kernel[3][3],int i,int j,uint8
 
 
 
-void ImageManager::calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t border){
+void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border){
 	 bool cuda = CHECK_IF_CUDA_AVAILABLE(); 
 
 	if  (cuda) {

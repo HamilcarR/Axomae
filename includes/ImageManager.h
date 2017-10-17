@@ -149,7 +149,7 @@ namespace axoma{
 		
 		public:
 			static max_colors* get_colors_max_variation(SDL_Surface* image);
-			static void calculate_edge(SDL_Surface* surface,uint8_t flag,uint8_t border_behaviour);
+			static void compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border_behaviour);
 			static RGB get_pixel_color(SDL_Surface* surface,int x,int y);
 			static void print_pixel(uint32_t color);	
 			static void display_info_surface(SDL_Surface* image);
