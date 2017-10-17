@@ -327,12 +327,8 @@ namespace axoma{
 		return loop; 
 	}
 	ProgramStatus::~ProgramStatus() {
-		setLoop(false); 
-		
 
-		
-		
-
+		loop = false; 
 	}
 
 
@@ -449,8 +445,11 @@ namespace axoma{
 				std::string device_choice = v.command_arguments[3]; 
 				uint8_t f = func.compare("-prewitt") == 0 ? MAPTOMIX_USE_PREWITT : func.compare("-sobel") == 0 ? MAPTOMIX_USE_SOBEL : func.compare("-scharr") == 0 ?  MAPTOMIX_USE_SCHARR : 0;
 				uint8_t b = MAPTOMIX_REPEAT; 
-				
-				ImageManager::set_greyscale_luminance(images[id].first);
+				if (device_choice.compare("-gpu") == 0)
+					ImageManager::USE_GPU_COMPUTING();
+				else
+					ImageManager::USE_CPU_COMPUTING(); 
+				ImageManager::set_greyscale_luminance(images[id].first); //TODO change to hmap 
 				
 			}
 			else

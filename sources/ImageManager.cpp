@@ -7,13 +7,14 @@
 #include <cstdlib>
 #include <climits>
 #include <string>
-
+#include <ctime>
 
 namespace axoma{
 	
 
 
 	using namespace std;
+	bool ImageManager::gpu = false;
 
 	 static bool CHECK_IF_CUDA_AVAILABLE() {
 		if  (CUDART_VERSION != 9000 ) 
@@ -27,7 +28,6 @@ namespace axoma{
 		
 	}
 
-	 bool ImageManager::gpu = false; 
 
 	template<typename T>
 	static void replace_image(SDL_Surface* surface, T* image, unsigned int size, int bpp);
@@ -385,13 +385,19 @@ static void replace_image(SDL_Surface* surface, uint32_t* image) {
 }
 void ImageManager::set_greyscale_luminance(SDL_Surface* image){
 	bool cuda = CHECK_IF_CUDA_AVAILABLE() ; 
-	if (cuda) 
-		GPU_compute_greyscale(image, SDL_BIG_ENDIAN == SDL_BYTEORDER); 
+	std::clock_t clock;
+
+	if (cuda) {
+		clock = std::clock(); 
+		GPU_compute_greyscale(image, SDL_BIG_ENDIAN == SDL_BYTEORDER);
+		std::cout << (std::clock() - clock) / (double)CLOCKS_PER_SEC << "\n"; 
+	}
 
 	
 	else {
 		assert(image != nullptr);
-		for (int i = 0; i < image->w; i++) {
+		clock = std::clock();
+		for (int i = 0; i < image->w; i++) 
 			for (int j = 0; j < image->h; j++) {
 				RGB rgb = get_pixel_color(image, i, j);
 				rgb.red = (int)floor(rgb.red*0.3 + rgb.blue*0.11 + rgb.green*0.59);
@@ -401,8 +407,10 @@ void ImageManager::set_greyscale_luminance(SDL_Surface* image){
 				set_pixel_color(image, i, j, gray);
 
 			}
+		std::cout << (std::clock() - clock) / (double)CLOCKS_PER_SEC << "\n";
 
-		}
+
+		
 	}
 
 
