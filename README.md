@@ -1,4 +1,4 @@
-# maptomic
+# Axomae
 
 From a simple image : 
 
