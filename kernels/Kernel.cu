@@ -37,13 +37,30 @@ void initialize_2D_array(uint32_t *array, int size_w, int size_h) {
 
 
 
+__device__
+RGB compute_greyscale(RGB rgb, const bool luminance) {
+	RGB ret;
+	if (luminance) {
+		ret.r = rgb.r* 0.3 + rgb.g*0.59 + rgb.b*0.11;
+		ret.g = ret.r;
+		ret.b = ret.r;
+		
+	}
+	else
+	{
+		ret.r=(rgb.r + rgb.b + rgb.g) / 3;
+		ret.g = ret.r;
+		ret.b = ret.r;
+	}
+	return ret; 
 
+}
 
 
  
 
  __global__
-	 void GPU_compute_greyscale_luminance(void *array, int size_w, int size_h, const bool isbigEndian, const int bpp, int pitch) {
+	 void GPU_compute_greyscale_luminance(void *array, int size_w, int size_h, const bool isbigEndian, const int bpp, int pitch , const bool luminance) {
 
 	 int i = blockIdx.x*blockDim.x + threadIdx.x;
 	 int j = blockIdx.y*blockDim.y + threadIdx.y;
@@ -65,9 +82,7 @@ void initialize_2D_array(uint32_t *array, int size_w, int size_h) {
 				 rgb.g = *pixel_value >> 8 & 0xFF;
 				 rgb.r = *pixel_value & 0xFF;
 			 }
-			 rgb.r = (rgb.r + rgb.b + rgb.g) / 3;
-			 rgb.g = rgb.r;
-			 rgb.b = rgb.r;
+			 rgb = compute_greyscale(rgb, luminance); 
 			 uint32_t toInt = rgb_to_int(rgb, isbigEndian);
 			 *(uint32_t*)(pixel_value) = toInt;
 
@@ -79,9 +94,8 @@ void initialize_2D_array(uint32_t *array, int size_w, int size_h) {
 				 rgb.g = *pixel_value >> 8 & 0XFF;
 				 rgb.b = *pixel_value & 0XFF;
 				 rgb.a = 0;
-				 rgb.r = (rgb.r + rgb.b + rgb.g) / 3;
-				 rgb.g = rgb.r;
-				 rgb.b = rgb.r;
+				 rgb = compute_greyscale(rgb, luminance);
+
 				 uint32_t toInt = rgb_to_int(rgb, isbigEndian);
 				 ((uint8_t*)pixel_value)[0] = toInt >> 16 & 0xFF;
 				 ((uint8_t*)pixel_value)[1] = toInt >> 8 & 0xFF;
@@ -93,9 +107,8 @@ void initialize_2D_array(uint32_t *array, int size_w, int size_h) {
 				 rgb.g = *pixel_value >> 8 & 0XFF;
 				 rgb.r = *pixel_value & 0XFF;
 				 rgb.a = 0;
-				 rgb.r = (rgb.r + rgb.b + rgb.g) / 3;
-				 rgb.g = rgb.r;
-				 rgb.b = rgb.r;
+				 rgb = compute_greyscale(rgb, luminance);
+
 				 uint32_t toInt = rgb_to_int(rgb, isbigEndian);
 				 ((uint8_t*)pixel_value)[0] = toInt & 0xFF;
 				 ((uint8_t*)pixel_value)[1] = toInt >> 8 & 0xFF;
@@ -116,7 +129,8 @@ void initialize_2D_array(uint32_t *array, int size_w, int size_h) {
 				 rgb.g = *pixel_value >> 4 & 0XF;
 				 rgb.r = *pixel_value & 0XF;
 			 }
-			 rgb.r = (rgb.r + rgb.b + rgb.g) / 3;
+			 rgb = compute_greyscale(rgb, luminance);
+
 			 rgb.g = rgb.r;
 			 rgb.b = rgb.r;
 			 uint32_t toInt = rgb_to_int(rgb, isbigEndian);
@@ -136,10 +150,8 @@ void initialize_2D_array(uint32_t *array, int size_w, int size_h) {
 				 rgb.r = *pixel_value & 0X3;
 				 rgb.a = 0;
 			 }
-			 uint8_t grayscale = (rgb.r + rgb.b + rgb.g) / 3;
-			 rgb.r = grayscale;
-			 rgb.g = grayscale;
-			 rgb.b = grayscale;
+			 rgb = compute_greyscale(rgb, luminance);
+
 			 uint32_t toInt = rgb_to_int(rgb, isbigEndian);
 			 *pixel_value = toInt;
 
@@ -184,7 +196,7 @@ void initialize_2D_array(uint32_t *array, int size_w, int size_h) {
 
 
 
- void GPU_compute_greyscale(SDL_Surface* image,  const bool bigEndian) {
+ void GPU_compute_greyscale(SDL_Surface* image,  const bool bigEndian , const bool luminance) {
 	 int width = image->w; 
 	 int height = image->h; 
 	 int pitch = image->pitch; 
@@ -197,7 +209,7 @@ void initialize_2D_array(uint32_t *array, int size_w, int size_h) {
 	 
 	 cudaMemcpy(D_image, image->pixels, size, cudaMemcpyHostToDevice);
 	 gpu_threads D = get_optimal_distribution(width, height, pitch, bpp); 
-	 GPU_compute_greyscale_luminance << <D.blocks, D.threads >> > (D_image, width, height, bigEndian, bpp, pitch);
+	 GPU_compute_greyscale_luminance << <D.blocks, D.threads >> > (D_image, width, height, bigEndian, bpp, pitch , luminance);
 	 SDL_LockSurface(image); 
 	 cudaMemcpy(image->pixels, D_image, size, cudaMemcpyDeviceToHost);
 

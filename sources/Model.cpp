@@ -2,7 +2,7 @@
 
 
 
-namespace axoma{
+namespace axomae{
 
 	Model::Model(){
 

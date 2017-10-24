@@ -2,7 +2,7 @@
 #define SYNTAX_H
 
 
-namespace axoma {
+namespace axomae {
 
 	class SyntaxTree{
 

@@ -6,7 +6,7 @@
 
 
 
- namespace axoma {
+ namespace axomae {
 
 class View; 
 

@@ -4,7 +4,7 @@
 #include "Model.h"
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
-namespace axoma{
+namespace axomae{
 
 
 class ImageImporter: public Model

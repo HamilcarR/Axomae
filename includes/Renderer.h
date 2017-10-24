@@ -2,7 +2,7 @@
 #define RENDERER_H
 
 
-namespace axoma{
+namespace axomae{
 	class Renderer{
 		public:
 		 Renderer() ; 

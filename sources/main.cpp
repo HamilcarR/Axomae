@@ -3,31 +3,15 @@
 #include <regex>
 #include <string>
 #include <thread> 
-#include <QtWidgets/qapplication.h>
-#include <QtWidgets/qpushbutton.h>
-#include <QtWidgets/qmainwindow.h>
+
 #include "../includes/ImageManager.h"
 #include "../includes/ImageImporter.h"
 #include "../includes/Window.h"
 #include "../includes/TerminalOpt.h"
-
+#include "../includes/GUIWindow.h"
 using namespace std;
-using namespace axoma;
+using namespace axomae;
 
-
-class Window : private QMainWindow {
-	Q_OBJECT
-
-public :
-	Window(QWidget * parent = nullptr) {
-
-	}
-	~Window() {
-
-	}
-private :
-
-};
 
 
 
@@ -116,11 +100,13 @@ int main(int argv , char** argc){
 
 		}
 		else if (regex_match(mode, gui)) {
+			
+			QApplication app(argv, argc); 
+			GUIWindow win; 
+			win.show(); 
+			
 
-			QApplication Q(argv, argc);
-			QPushButton bouton("Salut les Zéros, la forme ?");
-			bouton.show();
-			Q.exec();
+			return app.exec(); 
 
 		}
 		else {

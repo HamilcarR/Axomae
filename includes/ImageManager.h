@@ -9,7 +9,7 @@
 #include <assert.h>
 
 
-namespace axoma{
+namespace axomae{
 			
 			const int INT_MAXX = 30000;
 			/*we define some constants here...flags,sobel-prewitt operators,kernels etc...*/
@@ -165,6 +165,7 @@ namespace axoma{
 			static void USE_GPU_COMPUTING() { gpu = true; }
 			static void USE_CPU_COMPUTING() { gpu = false;  }
 			static bool USING_GPU() { return gpu;  }
+			static SDL_Surface* copy_surface(SDL_Surface* src); 
 		    
 		private:
 

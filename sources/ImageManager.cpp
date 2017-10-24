@@ -9,7 +9,7 @@
 #include <string>
 #include <ctime>
 
-namespace axoma{
+namespace axomae{
 	
 
 
@@ -294,18 +294,24 @@ void RGB::to_string(){
 
 void ImageManager::set_greyscale_average(SDL_Surface* image,uint8_t factor){
 	assert(factor>0);
+
 	assert(image!=nullptr);	
-	for(int i = 0 ; i < image->w;i++){
-		for(int j = 0 ; j < image->h ; j++){
-			RGB rgb = get_pixel_color(image,i,j);
-			rgb.red =(rgb.red+rgb.blue+rgb.green)/factor;
-			rgb.green =rgb.red;
-			rgb.blue = rgb.red;
-			uint32_t gray = rgb.rgb_to_int();			
-			set_pixel_color(image,i,j,gray);	
+	if (CHECK_IF_CUDA_AVAILABLE()) {
+		GPU_compute_greyscale(image, SDL_BYTEORDER == SDL_BIG_ENDIAN , false); 
+	}
+	else {
+		for (int i = 0; i < image->w; i++) {
+			for (int j = 0; j < image->h; j++) {
+				RGB rgb = get_pixel_color(image, i, j);
+				rgb.red = (rgb.red + rgb.blue + rgb.green) / factor;
+				rgb.green = rgb.red;
+				rgb.blue = rgb.red;
+				uint32_t gray = rgb.rgb_to_int();
+				set_pixel_color(image, i, j, gray);
+
+			}
 
 		}
-
 	}
 
 
@@ -389,7 +395,7 @@ void ImageManager::set_greyscale_luminance(SDL_Surface* image){
 
 	if (cuda) {
 		clock = std::clock(); 
-		GPU_compute_greyscale(image, SDL_BIG_ENDIAN == SDL_BYTEORDER);
+		GPU_compute_greyscale(image, SDL_BIG_ENDIAN == SDL_BYTEORDER , true);
 		std::cout << (std::clock() - clock) / (double)CLOCKS_PER_SEC << "\n"; 
 	}
 
@@ -422,7 +428,16 @@ void ImageManager::set_greyscale_luminance(SDL_Surface* image){
 
 
 
-
+SDL_Surface* ImageManager::copy_surface(SDL_Surface *src) {
+	SDL_Surface* res; 
+	res = SDL_CreateRGBSurface(src->flags, src->w, src->h, src->format->BitsPerPixel, src->format->Rmask, src->format->Gmask, src->format->Bmask, src->format->Amask); 
+	if (res != nullptr) {
+		SDL_BlitSurface(src, nullptr, res, nullptr); 
+		return res;
+	}
+	else
+		return nullptr; 
+}
 
 
 
@@ -551,7 +566,7 @@ void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border
 	 bool cuda = CHECK_IF_CUDA_AVAILABLE(); 
 
 	if  (cuda) {
-		GPU_compute_greyscale(surface, SDL_BYTEORDER == SDL_BIG_ENDIAN); 
+		GPU_compute_greyscale(surface, SDL_BYTEORDER == SDL_BIG_ENDIAN , true); 
 	}
 
 	else  {

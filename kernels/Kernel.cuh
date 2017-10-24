@@ -27,4 +27,4 @@ inline void write_file_arrays(void* host_array, int size_w, int size_h , int bpp
 
 
 
- void GPU_compute_greyscale(SDL_Surface* image,  const bool bigEndian);
+ void GPU_compute_greyscale(SDL_Surface* image,  const bool bigEndian , const bool luminance);
