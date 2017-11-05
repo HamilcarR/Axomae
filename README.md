@@ -1,23 +1,21 @@
 # Axomae
 
-From a simple image : 
-
-![image](https://cloud.githubusercontent.com/assets/18567118/20143822/c50a4422-a69a-11e6-9eef-1a023102e804.jpg)
-
-Height map computation is done,although it needs some customizable parameters...will be added later.
-We compute the edges of the image, using sobel or prewitt,then invert the colors:
-
-![edge detection](https://cloud.githubusercontent.com/assets/18567118/20143397/2660f704-a699-11e6-9165-8a8569a420d6.jpg)
-
-Normal map computation is done. It needs to compute the height map first,and use it to generate the normal map.
-
-
-![normal map](https://cloud.githubusercontent.com/assets/18567118/20143711/5bcad760-a69a-11e6-8239-112496ff6c19.jpg)
+Axomae is a texture generation tool, to create normal maps , height maps , and distortion maps.
+![axomae](https://user-images.githubusercontent.com/18567118/32418304-88e1e7fe-c267-11e7-83f3-253b3b60df1d.jpg)
 
 
 
-DUDV map computation is done.Use a normal map first,to generate dudvs.
-![dudv map](https://cloud.githubusercontent.com/assets/18567118/20150815/0d44dbd6-a6b8-11e6-9974-9553c61324ff.jpg)
+The software is still in developpement. I plan integrating : 
 
-
-There will soon be an OpenGL window viewer to display objects mapped with textures in real time and a usable executable. 
+  -Full GPGPU support : the software can already use CUDA (not tested for GPUs other than compute capability 61), but needs some               work.
+  
+  -Mesh normals projection into texture : using a high poly mesh to create a normal map texture.
+  
+  -Bach processing : either processing textures or creating normal maps from numerous meshes.
+  
+  -An OpenGL renderer : A 3D renderer using PBR materials and reading GLTF , FBX , OBJ formats.
+  
+  -UV editor .
+  
+  -real time texture modifications and material modifications.
+  
