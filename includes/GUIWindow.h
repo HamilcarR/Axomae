@@ -10,6 +10,7 @@
 #include "Renderer.h"
 #include "Window.h"
 #include "../Form Files/test.h"
+#include "constants.h"
 
 
 
@@ -35,8 +36,12 @@ namespace axomae {
 	bool save_image();
 	bool greyscale_average(); 
 	bool greyscale_luminance();
+	void use_scharr(); 
+	void use_prewitt(); 
+	void use_sobel(); 
 	void use_gpgpu(bool checked); 
-
+	void use_object_space(); 
+	void use_tangent_space(); 
 
 
 	private:

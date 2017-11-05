@@ -69,14 +69,14 @@ public:
     QRadioButton *use_tangentSpace;
     QGroupBox *nmap_factor_opt;
     QVBoxLayout *verticalLayout_4;
-    QDoubleSpinBox *doubleSpinBox;
-    QSlider *horizontalSlider;
+    QDoubleSpinBox *factor_nmap;
+    QSlider *factor_slider_nmap;
     QGroupBox *dudv_opt;
     QVBoxLayout *verticalLayout_7;
     QGroupBox *nmap_factor_opt_2;
     QVBoxLayout *verticalLayout_6;
-    QDoubleSpinBox *doubleSpinBox_2;
-    QSlider *horizontalSlider_2;
+    QDoubleSpinBox *factor_dudv;
+    QSlider *factor_slider_dudv;
     QWidget *tools;
     QGridLayout *gridLayout_3;
     QToolBox *toolBox;
@@ -88,9 +88,8 @@ public:
     QTabWidget *renderer_tab;
     QWidget *texture;
     QGridLayout *gridLayout_9;
-    QGraphicsView *diffuse_image;
-    QGraphicsView *dudv_image;
     QGraphicsView *normal_image;
+    QGraphicsView *dudv_image;
     QTabWidget *tabWidget;
     QWidget *tab_greyscale;
     QGridLayout *gridLayout_5;
@@ -98,6 +97,7 @@ public:
     QWidget *tab_heightmap;
     QGridLayout *gridLayout_10;
     QGraphicsView *height_image;
+    QGraphicsView *diffuse_image;
     QWidget *gl_renderer;
     QGridLayout *gridLayout_6;
     QWidget *uv_editor;
@@ -273,20 +273,20 @@ public:
         nmap_factor_opt->setSizePolicy(sizePolicy4);
         verticalLayout_4 = new QVBoxLayout(nmap_factor_opt);
         verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
-        doubleSpinBox = new QDoubleSpinBox(nmap_factor_opt);
-        doubleSpinBox->setObjectName(QStringLiteral("doubleSpinBox"));
+        factor_nmap = new QDoubleSpinBox(nmap_factor_opt);
+        factor_nmap->setObjectName(QStringLiteral("factor_nmap"));
 
-        verticalLayout_4->addWidget(doubleSpinBox);
+        verticalLayout_4->addWidget(factor_nmap);
 
-        horizontalSlider = new QSlider(nmap_factor_opt);
-        horizontalSlider->setObjectName(QStringLiteral("horizontalSlider"));
-        horizontalSlider->setStyleSheet(QLatin1String("QSlider {\n"
+        factor_slider_nmap = new QSlider(nmap_factor_opt);
+        factor_slider_nmap->setObjectName(QStringLiteral("factor_slider_nmap"));
+        factor_slider_nmap->setStyleSheet(QLatin1String("QSlider {\n"
 "qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 255, 255, 255), stop:0.1 rgba(255, 255, 255, 255), stop:0.2 rgba(255, 176, 176, 167), stop:0.3 rgba(255, 151, 151, 92), stop:0.4 rgba(255, 125, 125, 51), stop:0.5 rgba(255, 76, 76, 205), stop:0.52 rgba(255, 76, 76, 205), stop:0.6 rgba(255, 180, 180, 84), stop:1 rgba(255, 255, 255, 0))\n"
 "\n"
 "}"));
-        horizontalSlider->setOrientation(Qt::Horizontal);
+        factor_slider_nmap->setOrientation(Qt::Horizontal);
 
-        verticalLayout_4->addWidget(horizontalSlider);
+        verticalLayout_4->addWidget(factor_slider_nmap);
 
 
         verticalLayout_5->addWidget(nmap_factor_opt);
@@ -304,20 +304,20 @@ public:
         nmap_factor_opt_2->setSizePolicy(sizePolicy4);
         verticalLayout_6 = new QVBoxLayout(nmap_factor_opt_2);
         verticalLayout_6->setObjectName(QStringLiteral("verticalLayout_6"));
-        doubleSpinBox_2 = new QDoubleSpinBox(nmap_factor_opt_2);
-        doubleSpinBox_2->setObjectName(QStringLiteral("doubleSpinBox_2"));
+        factor_dudv = new QDoubleSpinBox(nmap_factor_opt_2);
+        factor_dudv->setObjectName(QStringLiteral("factor_dudv"));
 
-        verticalLayout_6->addWidget(doubleSpinBox_2);
+        verticalLayout_6->addWidget(factor_dudv);
 
-        horizontalSlider_2 = new QSlider(nmap_factor_opt_2);
-        horizontalSlider_2->setObjectName(QStringLiteral("horizontalSlider_2"));
-        horizontalSlider_2->setStyleSheet(QLatin1String("QSlider {\n"
+        factor_slider_dudv = new QSlider(nmap_factor_opt_2);
+        factor_slider_dudv->setObjectName(QStringLiteral("factor_slider_dudv"));
+        factor_slider_dudv->setStyleSheet(QLatin1String("QSlider {\n"
 "qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 255, 255, 255), stop:0.1 rgba(255, 255, 255, 255), stop:0.2 rgba(255, 176, 176, 167), stop:0.3 rgba(255, 151, 151, 92), stop:0.4 rgba(255, 125, 125, 51), stop:0.5 rgba(255, 76, 76, 205), stop:0.52 rgba(255, 76, 76, 205), stop:0.6 rgba(255, 180, 180, 84), stop:1 rgba(255, 255, 255, 0))\n"
 "\n"
 "}"));
-        horizontalSlider_2->setOrientation(Qt::Horizontal);
+        factor_slider_dudv->setOrientation(Qt::Horizontal);
 
-        verticalLayout_6->addWidget(horizontalSlider_2);
+        verticalLayout_6->addWidget(factor_slider_dudv);
 
 
         verticalLayout_7->addWidget(nmap_factor_opt_2);
@@ -366,13 +366,12 @@ public:
         texture->setObjectName(QStringLiteral("texture"));
         gridLayout_9 = new QGridLayout(texture);
         gridLayout_9->setObjectName(QStringLiteral("gridLayout_9"));
-        diffuse_image = new QGraphicsView(texture);
-        diffuse_image->setObjectName(QStringLiteral("diffuse_image"));
-        diffuse_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-        diffuse_image->setDragMode(QGraphicsView::ScrollHandDrag);
-        diffuse_image->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+        normal_image = new QGraphicsView(texture);
+        normal_image->setObjectName(QStringLiteral("normal_image"));
+        normal_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        normal_image->setDragMode(QGraphicsView::ScrollHandDrag);
 
-        gridLayout_9->addWidget(diffuse_image, 0, 0, 1, 1);
+        gridLayout_9->addWidget(normal_image, 2, 0, 1, 1);
 
         dudv_image = new QGraphicsView(texture);
         dudv_image->setObjectName(QStringLiteral("dudv_image"));
@@ -380,13 +379,6 @@ public:
         dudv_image->setDragMode(QGraphicsView::ScrollHandDrag);
 
         gridLayout_9->addWidget(dudv_image, 2, 2, 1, 1);
-
-        normal_image = new QGraphicsView(texture);
-        normal_image->setObjectName(QStringLiteral("normal_image"));
-        normal_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-        normal_image->setDragMode(QGraphicsView::ScrollHandDrag);
-
-        gridLayout_9->addWidget(normal_image, 2, 0, 1, 1);
 
         tabWidget = new QTabWidget(texture);
         tabWidget->setObjectName(QStringLiteral("tabWidget"));
@@ -420,6 +412,14 @@ public:
         tabWidget->addTab(tab_heightmap, QString());
 
         gridLayout_9->addWidget(tabWidget, 0, 2, 1, 1);
+
+        diffuse_image = new QGraphicsView(texture);
+        diffuse_image->setObjectName(QStringLiteral("diffuse_image"));
+        diffuse_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        diffuse_image->setDragMode(QGraphicsView::ScrollHandDrag);
+        diffuse_image->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+
+        gridLayout_9->addWidget(diffuse_image, 0, 0, 1, 1);
 
         renderer_tab->addTab(texture, QString());
         gl_renderer = new QWidget();
@@ -488,7 +488,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "Axomae", 0));
         actionNew_Project->setText(QApplication::translate("MainWindow", "New Project", 0));
         actionImport_image->setText(QApplication::translate("MainWindow", "Import image", 0));
         actionSave_image->setText(QApplication::translate("MainWindow", "Save image", 0));
@@ -498,7 +498,7 @@ public:
         actionAxomae_version->setText(QApplication::translate("MainWindow", "Axomae version", 0));
         actionCancel->setText(QApplication::translate("MainWindow", "Undo                            ", 0));
         actionRedo->setText(QApplication::translate("MainWindow", "Redo", 0));
-        use_gpu->setText(QApplication::translate("MainWindow", "Use GPGPU", 0));
+        use_gpu->setText(QApplication::translate("MainWindow", "Use GPU", 0));
         greyscale_opt->setTitle(QApplication::translate("MainWindow", "Greyscale options", 0));
         use_average->setText(QApplication::translate("MainWindow", "Use average", 0));
         use_luminance->setText(QApplication::translate("MainWindow", "Use luminance", 0));

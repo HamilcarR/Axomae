@@ -1,5 +1,4 @@
 #include "../includes/ImageManager.h"
-#include "../kernels/Kernel.cuh"
 #include <iostream>
 #include <assert.h>
 #include <math.h>
@@ -297,7 +296,7 @@ void ImageManager::set_greyscale_average(SDL_Surface* image,uint8_t factor){
 
 	assert(image!=nullptr);	
 	if (CHECK_IF_CUDA_AVAILABLE()) {
-		GPU_compute_greyscale(image, SDL_BYTEORDER == SDL_BIG_ENDIAN , false); 
+		GPU_compute_greyscale(image, false); 
 	}
 	else {
 		for (int i = 0; i < image->w; i++) {
@@ -395,7 +394,7 @@ void ImageManager::set_greyscale_luminance(SDL_Surface* image){
 
 	if (cuda) {
 		clock = std::clock(); 
-		GPU_compute_greyscale(image, SDL_BIG_ENDIAN == SDL_BYTEORDER , true);
+		GPU_compute_greyscale(image, true);
 		std::cout << (std::clock() - clock) / (double)CLOCKS_PER_SEC << "\n"; 
 	}
 
@@ -541,13 +540,13 @@ return image ;
 
 
 /**************************************************************************************************************/
-static auto calculate_kernel_pixel(RGB **data,int kernel[3][3],int i,int j,uint8_t flag){
-	if(flag == MAPTOMIX_RED){
+static auto compute_kernel_pixel(RGB **data,int kernel[3][3],int i,int j,uint8_t flag){
+	if(flag == AXOMAE_RED){
 		return  data[i-1][j-1].red*kernel[0][0]+data[i][j-1].red*kernel[0][1]+data[i+1][j-1].red*kernel[0][2]+
 					 data[i-1][j].red*kernel[1][0] + data[i][j].red*kernel[1][1]+data[i+1][j].red*kernel[1][2]+
 					 data[i-1][j+1].red*kernel[2][0]+ data[i][j+1].red*kernel[2][1]+data[i+1][j+1].red*kernel[2][2];			
 	}
-	else if (flag==MAPTOMIX_BLUE){
+	else if (flag==AXOMAE_BLUE){
 		return  data[i-1][j-1].blue*kernel[0][0]+data[i][j-1].blue*kernel[0][1]+data[i+1][j-1].blue*kernel[0][2]+
 					 data[i-1][j].blue*kernel[1][0] + data[i][j].blue*kernel[1][1]+data[i+1][j].blue*kernel[1][2]+
 					 data[i-1][j+1].blue*kernel[2][0]+ data[i][j+1].blue*kernel[2][1]+data[i+1][j+1].blue*kernel[2][2];	
@@ -562,11 +561,11 @@ static auto calculate_kernel_pixel(RGB **data,int kernel[3][3],int i,int j,uint8
 
 
 
-void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border){
+void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border ){
 	 bool cuda = CHECK_IF_CUDA_AVAILABLE(); 
 
 	if  (cuda) {
-		GPU_compute_greyscale(surface, SDL_BYTEORDER == SDL_BIG_ENDIAN , true); 
+		GPU_compute_height(surface, flag, border);
 	}
 
 	else  {
@@ -575,7 +574,8 @@ void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border
 		int w = surface->w;
 		int h = surface->h;
 		//thread this :
-		set_greyscale_luminance(surface);
+	
+
 
 
 		RGB **data = new RGB*[w];
@@ -610,18 +610,18 @@ void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border
 		int arr_v[3][3];
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				if (flag == MAPTOMIX_USE_SOBEL) {
+				if (flag == AXOMAE_USE_SOBEL) {
 					arr_v[i][j] = sobel_mask_vertical[i][j];
 					arr_h[i][j] = sobel_mask_horizontal[i][j];
 				}
-				else if (flag == MAPTOMIX_USE_PREWITT) {
+				else if (flag == AXOMAE_USE_PREWITT) {
 					arr_h[i][j] = prewitt_mask_horizontal[i][j];
 					arr_v[i][j] = prewitt_mask_vertical[i][j];
 
 				}
-				else if (flag == MAPTOMIX_USE_SCHARR) {
-					arr_h[i][j] = scharr_horizontal[i][j];
-					arr_v[i][j] = scharr_vertical[i][j];
+				else if (flag == AXOMAE_USE_SCHARR) {
+					arr_h[i][j] = scharr_mask_horizontal[i][j];
+					arr_v[i][j] = scharr_mask_vertical[i][j];
 
 				}
 
@@ -630,17 +630,17 @@ void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border
 		for (int i = 1; i < w - 1; i++) {
 			for (int j = 1; j < h - 1; j++) {
 
-				if (border == MAPTOMIX_REPEAT) {
+				if (border == AXOMAE_REPEAT) {
 					int setpix_h_red = 0, setpix_v_red = 0, setpix_h_green = 0, setpix_v_green = 0, setpix_v_blue = 0, setpix_h_blue = 0;
 
 
 
-					setpix_h_red = calculate_kernel_pixel(data, arr_h, i, j, MAPTOMIX_RED);
-					setpix_v_red = calculate_kernel_pixel(data, arr_v, i, j, MAPTOMIX_RED);
-					setpix_h_green = calculate_kernel_pixel(data, arr_h, i, j, MAPTOMIX_GREEN);
-					setpix_v_green = calculate_kernel_pixel(data, arr_v, i, j, MAPTOMIX_GREEN);
-					setpix_h_blue = calculate_kernel_pixel(data, arr_h, i, j, MAPTOMIX_BLUE);
-					setpix_v_blue = calculate_kernel_pixel(data, arr_v, i, j, MAPTOMIX_BLUE);
+					setpix_h_red = compute_kernel_pixel(data, arr_h, i, j, AXOMAE_RED);
+					setpix_v_red = compute_kernel_pixel(data, arr_v, i, j, AXOMAE_RED);
+					setpix_h_green = compute_kernel_pixel(data, arr_h, i, j, AXOMAE_GREEN);
+					setpix_v_green = compute_kernel_pixel(data, arr_v, i, j, AXOMAE_GREEN);
+					setpix_h_blue = compute_kernel_pixel(data, arr_h, i, j, AXOMAE_BLUE);
+					setpix_v_blue = compute_kernel_pixel(data, arr_v, i, j, AXOMAE_BLUE);
 
 
 
@@ -902,9 +902,8 @@ constexpr double get_pixel_height(double color_component){
 	return (255 - color_component);
 
 }
-void ImageManager::calculate_normal_map(SDL_Surface* surface,double fact,Uint8 greyscale){
+void ImageManager::compute_normal_map(SDL_Surface* surface,double fact){
 	
-	set_greyscale_average(surface,greyscale);
 	int height = surface->h;
 	int width = surface->w;
 	RGB** data = new RGB*[width];

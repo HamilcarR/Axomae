@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Axomae</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QMainWindow,QWidget {
@@ -75,7 +75,7 @@
           <item>
            <widget class="QCheckBox" name="use_gpu">
             <property name="text">
-             <string>Use GPGPU</string>
+             <string>Use GPU</string>
             </property>
             <property name="icon">
              <iconset resource="../Ressources/Resource.qrc">
@@ -235,10 +235,10 @@
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_4">
                 <item>
-                 <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+                 <widget class="QDoubleSpinBox" name="factor_nmap"/>
                 </item>
                 <item>
-                 <widget class="QSlider" name="horizontalSlider">
+                 <widget class="QSlider" name="factor_slider_nmap">
                   <property name="styleSheet">
                    <string notr="true">QSlider {
 qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 255, 255, 255), stop:0.1 rgba(255, 255, 255, 255), stop:0.2 rgba(255, 176, 176, 167), stop:0.3 rgba(255, 151, 151, 92), stop:0.4 rgba(255, 125, 125, 51), stop:0.5 rgba(255, 76, 76, 205), stop:0.52 rgba(255, 76, 76, 205), stop:0.6 rgba(255, 180, 180, 84), stop:1 rgba(255, 255, 255, 0))
@@ -275,10 +275,10 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_6">
                 <item>
-                 <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+                 <widget class="QDoubleSpinBox" name="factor_dudv"/>
                 </item>
                 <item>
-                 <widget class="QSlider" name="horizontalSlider_2">
+                 <widget class="QSlider" name="factor_slider_dudv">
                   <property name="styleSheet">
                    <string notr="true">QSlider {
 qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 255, 255, 255), stop:0.1 rgba(255, 255, 255, 255), stop:0.2 rgba(255, 176, 176, 167), stop:0.3 rgba(255, 151, 151, 92), stop:0.4 rgba(255, 125, 125, 51), stop:0.5 rgba(255, 76, 76, 205), stop:0.52 rgba(255, 76, 76, 205), stop:0.6 rgba(255, 180, 180, 84), stop:1 rgba(255, 255, 255, 0))
@@ -373,31 +373,18 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
             <string>Display current loaded image</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_9">
-            <item row="0" column="0">
-             <widget class="QGraphicsView" name="diffuse_image">
+            <item row="2" column="0">
+             <widget class="QGraphicsView" name="normal_image">
               <property name="sizeAdjustPolicy">
                <enum>QAbstractScrollArea::AdjustToContents</enum>
               </property>
               <property name="dragMode">
                <enum>QGraphicsView::ScrollHandDrag</enum>
-              </property>
-              <property name="viewportUpdateMode">
-               <enum>QGraphicsView::FullViewportUpdate</enum>
               </property>
              </widget>
             </item>
             <item row="2" column="2">
              <widget class="QGraphicsView" name="dudv_image">
-              <property name="sizeAdjustPolicy">
-               <enum>QAbstractScrollArea::AdjustToContents</enum>
-              </property>
-              <property name="dragMode">
-               <enum>QGraphicsView::ScrollHandDrag</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QGraphicsView" name="normal_image">
               <property name="sizeAdjustPolicy">
                <enum>QAbstractScrollArea::AdjustToContents</enum>
               </property>
@@ -457,6 +444,19 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                 </item>
                </layout>
               </widget>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QGraphicsView" name="diffuse_image">
+              <property name="sizeAdjustPolicy">
+               <enum>QAbstractScrollArea::AdjustToContents</enum>
+              </property>
+              <property name="dragMode">
+               <enum>QGraphicsView::ScrollHandDrag</enum>
+              </property>
+              <property name="viewportUpdateMode">
+               <enum>QGraphicsView::FullViewportUpdate</enum>
+              </property>
              </widget>
             </item>
            </layout>
