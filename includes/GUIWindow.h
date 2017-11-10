@@ -42,7 +42,9 @@ namespace axomae {
 	void use_gpgpu(bool checked); 
 	void use_object_space(); 
 	void use_tangent_space(); 
-
+	void change_nmap_factor(int factor); 
+	void compute_dudv(); 
+	void change_dudv_nmap(int factor);
 
 	private:
 		void connect_all_slots(); 

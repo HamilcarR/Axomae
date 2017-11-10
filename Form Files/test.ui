@@ -263,6 +263,13 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_7">
              <item>
+              <widget class="QPushButton" name="compute_dudv">
+               <property name="text">
+                <string>Compute distortion map</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QGroupBox" name="nmap_factor_opt_2">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">

@@ -1,7 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 #include <cstdint>
-
+#include <future>
 
 namespace axomae {
 	const int INT_MAXX = 30000;

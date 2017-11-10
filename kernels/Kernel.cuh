@@ -79,7 +79,7 @@ namespace axomae {
 
 	__device__ __host__
 		static double magnitude(int x, int y) {
-			return std::sqrt(x*x + y*y);
+			return sqrtf(x*x + y*y);
 	}
 
 	template<typename T> __host__ __device__

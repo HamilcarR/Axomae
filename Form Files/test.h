@@ -23,6 +23,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QProgressBar>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
@@ -73,6 +74,7 @@ public:
     QSlider *factor_slider_nmap;
     QGroupBox *dudv_opt;
     QVBoxLayout *verticalLayout_7;
+    QPushButton *compute_dudv;
     QGroupBox *nmap_factor_opt_2;
     QVBoxLayout *verticalLayout_6;
     QDoubleSpinBox *factor_dudv;
@@ -298,6 +300,11 @@ public:
         dudv_opt->setObjectName(QStringLiteral("dudv_opt"));
         verticalLayout_7 = new QVBoxLayout(dudv_opt);
         verticalLayout_7->setObjectName(QStringLiteral("verticalLayout_7"));
+        compute_dudv = new QPushButton(dudv_opt);
+        compute_dudv->setObjectName(QStringLiteral("compute_dudv"));
+
+        verticalLayout_7->addWidget(compute_dudv);
+
         nmap_factor_opt_2 = new QGroupBox(dudv_opt);
         nmap_factor_opt_2->setObjectName(QStringLiteral("nmap_factor_opt_2"));
         sizePolicy4.setHeightForWidth(nmap_factor_opt_2->sizePolicy().hasHeightForWidth());
@@ -512,6 +519,7 @@ public:
         use_tangentSpace->setText(QApplication::translate("MainWindow", "Tangent space", 0));
         nmap_factor_opt->setTitle(QApplication::translate("MainWindow", "Factor", 0));
         dudv_opt->setTitle(QApplication::translate("MainWindow", "Distortion options", 0));
+        compute_dudv->setText(QApplication::translate("MainWindow", "Compute distortion map", 0));
         nmap_factor_opt_2->setTitle(QApplication::translate("MainWindow", "Factor", 0));
         renderMaterials->setTabText(renderMaterials->indexOf(functions), QApplication::translate("MainWindow", "functions", 0));
         toolBox->setItemText(toolBox->indexOf(page), QApplication::translate("MainWindow", "Page 1", 0));

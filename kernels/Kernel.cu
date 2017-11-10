@@ -83,6 +83,12 @@ namespace axomae {
 			return rgb;
 
 		}
+
+		__device__
+			void print() {
+			printf("%i %i %i\n", r, g, b); 
+
+		}
 	};
 
 	
@@ -196,19 +202,20 @@ namespace axomae {
 		}
 		else if (bpp == 3) {
 			if (isbigEndian) {
-				rgb.r = *pixel_value >> 16 & 0XFF;
-				rgb.g = *pixel_value >> 8 & 0XFF;
-				rgb.b = *pixel_value & 0XFF;
+				rgb.r = pixel_value[0];
+				rgb.g = pixel_value[1];
+				rgb.b = pixel_value[2];
 				rgb.a = 0;
 
 
 			}
 			else {
-				rgb.b = *pixel_value >> 16 & 0XFF;
-				rgb.g = *pixel_value >> 8 & 0XFF;
-				rgb.r = *pixel_value & 0XFF;
+				rgb.b = pixel_value[0]; 
+				rgb.g = pixel_value[1]; 
+				rgb.r = pixel_value[2]; 
 				rgb.a = 0;
-
+				
+				
 			}
 
 		}
@@ -281,7 +288,11 @@ namespace axomae {
 	}
 	__device__
 		RGB get_pixel_value_at(uint8_t *pixel, int i, int j, const int bpp, int pitch) {
-		return int_to_rgb(pixel + i*bpp + j*pitch, bpp);
+		uint8_t* p = (uint8_t*)(pixel) + i*bpp + j*pitch;
+		RGB A = int_to_rgb(p, bpp); 
+	//	printf("%i %i %i    %i %i %i\n", p[0], p[1], p[2] , A.r , A.g , A.b);
+
+		return A;
 	}
 
 	struct convolution_directions {
@@ -289,6 +300,10 @@ namespace axomae {
 		RGB horizontal; 
 
 	};
+
+
+	
+
 
 	//TODO : case kernel < 0 
 	__device__
@@ -302,22 +317,40 @@ namespace axomae {
 		RGB south_east = get_pixel_value_at(pixel, 1, 1, bpp, pitch);
 		RGB south = get_pixel_value_at(pixel, 1, 0, bpp, pitch);
 		RGB south_west = get_pixel_value_at(pixel, 1, -1, bpp, pitch);
+		
 
-		RGB vertical = north_west * v_kernel[0][0] + north*v_kernel[0][1] + north_east*v_kernel[0][2] +
-			west * v_kernel[1][0] + center*v_kernel[1][1] + east*v_kernel[1][2] +
-			south_west * v_kernel[2][0] + south*v_kernel[2][1] + south_east*v_kernel[2][2];
+		double verticalx = north_west.r * v_kernel[0][0] + north.r*v_kernel[0][1] + north_east.r*v_kernel[0][2] +
+			west.r * v_kernel[1][0] + center.r*v_kernel[1][1] + east.r*v_kernel[1][2] +
+			south_west.r * v_kernel[2][0] + south.r*v_kernel[2][1] + south_east.r*v_kernel[2][2];
+		double verticaly = north_west.g * v_kernel[0][0] + north.g*v_kernel[0][1] + north_east.g*v_kernel[0][2] +
+			west.g * v_kernel[1][0] + center.g*v_kernel[1][1] + east.g*v_kernel[1][2] +
+			south_west.g * v_kernel[2][0] + south.g*v_kernel[2][1] + south_east.g*v_kernel[2][2];
+		double verticalz = north_west.b * v_kernel[0][0] + north.b*v_kernel[0][1] + north_east.b*v_kernel[0][2] +
+			west.b * v_kernel[1][0] + center.b*v_kernel[1][1] + east.b*v_kernel[1][2] +
+			south_west.b * v_kernel[2][0] + south.b*v_kernel[2][1] + south_east.b*v_kernel[2][2];
 
-		RGB horizontal = north_west * h_kernel[0][0] + north*h_kernel[0][1] + north_east*h_kernel[0][2] +
-			west * h_kernel[1][0] + center*h_kernel[1][1] + east*h_kernel[1][2] +
-			south_west * h_kernel[2][0] + south*h_kernel[2][1] + south_east*h_kernel[2][2];
+		double horizontalx = north_west.r * h_kernel[0][0] + north.r*h_kernel[0][1] + north_east.r*h_kernel[0][2] +
+			west.r * h_kernel[1][0] + center.r*h_kernel[1][1] + east.r*h_kernel[1][2] +
+			south_west.r * h_kernel[2][0] + south.r*h_kernel[2][1] + south_east.r*h_kernel[2][2];
+		double horizontaly = north_west.g * h_kernel[0][0] + north.g*h_kernel[0][1] + north_east.g*h_kernel[0][2] +
+			west.g * h_kernel[1][0] + center.g*h_kernel[1][1] + east.g*h_kernel[1][2] +
+			south_west.g * h_kernel[2][0] + south.g*h_kernel[2][1] + south_east.g*h_kernel[2][2];
+		double horizontalz = north_west.b * h_kernel[0][0] + north.b*h_kernel[0][1] + north_east.b*h_kernel[0][2] +
+			west.b * h_kernel[1][0] + center.b*h_kernel[1][1] + east.b*h_kernel[1][2] +
+			south_west.b * h_kernel[2][0] + south.b*h_kernel[2][1] + south_east.b*h_kernel[2][2];
 
 		convolution_directions dir; 
-		uint32_t* max = &max_int_rgb; 
-		uint32_t* min = &min_int_rgb; 
-		RGB minn = int_to_rgb((uint8_t*)min, 4); 
-		RGB maxx = int_to_rgb((uint8_t*)max, 4); 
-	//	dir.vertical = vertical.normalize_rgb(maxx , minn);
-	//	dir.horizontal = horizontal.normalize_rgb(maxx, minn);
+		
+		RGB minn = { 0, 0, 0, 0 };
+		RGB maxx = { 255 , 255 , 255 , 255 };
+		auto rh = normalize(maxx.r, minn.r, horizontalx); 
+		auto rv = normalize(maxx.r, minn.r, verticalx);
+		auto gh = normalize(maxx.r, minn.r, horizontaly);
+		auto gv = normalize(maxx.r, minn.r, verticaly);
+		auto bh = normalize(maxx.r, minn.r, horizontalz);
+		auto bv = normalize(maxx.r, minn.r, verticalz);
+		dir.vertical = { rv , gv , bv , 0 };
+		dir.horizontal = { rh , gh , bh , 0};
 		return dir;
 
 
@@ -348,7 +381,7 @@ namespace axomae {
 				convoluted = compute_convolution(pixel, bpp, pitch, scharr_mask_horizontal, scharr_mask_vertical, border);
 
 			}
-			RGB var = var.magnitude_rgb(convoluted.vertical , convoluted.horizontal);
+			RGB var = convoluted.vertical.magnitude_rgb(convoluted.vertical , convoluted.horizontal);
 			
 			return var;
 		}
@@ -406,10 +439,8 @@ namespace axomae {
 
 
 			rgb = compute_greyscale(int_to_rgb(pixel_value, bpp), luminance);
-			rgb_to_int(rgb);
 			set_pixel_color(pixel_value, rgb, bpp);
-			replace_min(rgb); 
-			replace_max(rgb); 
+		
 
 
 		}
@@ -418,16 +449,20 @@ namespace axomae {
 	}
 
 	__global__
-		void GPU_compute_edges(void* image, unsigned int width, unsigned int height, int bpp, int pitch, uint8_t convolution, uint8_t border) {
+		void GPU_compute_edges(void* image, void* save, unsigned int width, unsigned int height, int bpp, int pitch, uint8_t convolution, uint8_t border) {
 		int i = blockDim.x * blockIdx.x + threadIdx.x;
 		int j = blockDim.y * blockIdx.y + threadIdx.y;
-		uint8_t* pixel = (uint8_t*)(image)+i*bpp + j*pitch;
 		
 		if (i < width - 1 && j < height - 1 && i > 0 && j > 0) {
+			uint8_t* pixel = (uint8_t*)(image)+i*bpp + j*pitch;
+			uint8_t* p = (uint8_t*)(save)+i * bpp + j*pitch;
+
 			RGB rgb = get_convolution_values(pixel, bpp, pitch, convolution, border);
-			set_pixel_color(pixel, rgb, bpp);
+			set_pixel_color(p, rgb, bpp);
 		}
 		else {
+			uint8_t* pixel = (uint8_t*)(image)+i*bpp + j*pitch;
+
 			if (border == AXOMAE_REPEAT) {
 
 			}
@@ -453,7 +488,7 @@ namespace axomae {
 		gpu_threads value;
 		int flat_array_size = width*height;
 		/*need compute capability > 2.0*/
-		dim3 threads = dim3(32, 32);
+		dim3 threads = dim3(24, 24);
 		value.threads = threads;
 		if (flat_array_size <= threads.y * threads.x) {
 
@@ -470,7 +505,7 @@ namespace axomae {
 			dim3 blocks(blockx, blocky);
 			value.blocks = blocks;
 		}
-
+		std::cout << "launching kernel with : " << value.blocks.x << "  " << value.blocks.y << "\n"; 
 		return value;
 	}
 
@@ -503,18 +538,24 @@ namespace axomae {
 	
 	void GPU_compute_height(SDL_Surface* greyscale, uint8_t convolution, uint8_t border) {
 		SDLSurfParam param(greyscale);
-		void* D_image;
+		void* D_image , *R_image;
 		size_t size = param.getByteSize();
 		cudaMalloc((void**)&D_image, size);
+		cudaMalloc((void**)&R_image, size); 
+
 		cudaMemcpy(D_image, param.data, size, cudaMemcpyHostToDevice);
 		gpu_threads D = get_optimal_thread_distribution(param.width, param.height, param.pitch, param.bpp);
 		D.blocks.x++; // border management
 		D.blocks.y++; //
-		GPU_compute_edges << < D.blocks, D.threads >> > (D_image, param.width, param.height, param.bpp, param.pitch, convolution, border);
+		GPU_compute_edges << < D.blocks, D.threads >> > (D_image,R_image, param.width, param.height, param.bpp, param.pitch, convolution, border);
+		cudaError_t err = cudaGetLastError(); 
+		if (err != cudaSuccess)
+			std::cout << cudaGetErrorString(err) << "\n"; 
 		SDL_LockSurface(greyscale);
-		cudaMemcpy(greyscale->pixels, D_image, size, cudaMemcpyDeviceToHost);
+		cudaMemcpy(greyscale->pixels, R_image, size, cudaMemcpyDeviceToHost);
 		SDL_UnlockSurface(greyscale);
 		cudaFree(D_image);
+		cudaFree(R_image); 
 
 	}
 };
