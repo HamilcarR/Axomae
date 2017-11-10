@@ -7,6 +7,7 @@
 #include <climits>
 #include <string>
 #include <ctime>
+#include <future>
 
 namespace axomae{
 	
@@ -671,54 +672,15 @@ void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border
 		}
 
 
-		//we invert the color of the image 
-		for (int i = 1; i < w - 1; i++) {
-			for (int j = 1; j < h - 1; j++) {
-				RGB rgb1, rgb2, rgb3, rgb4, rgb5, rgb6, rgb7, rgb8;
-				rgb1 = get_pixel_color(surface, i - 1, j - 1);
-				rgb2 = get_pixel_color(surface, i, j - 1);
-				rgb3 = get_pixel_color(surface, i + 1, j - 1);
-				rgb4 = get_pixel_color(surface, i - 1, j);
-				rgb5 = get_pixel_color(surface, i + 1, j);
-				rgb6 = get_pixel_color(surface, i + 1, j - 1);
-				rgb7 = get_pixel_color(surface, i + 1, j);
-				rgb8 = get_pixel_color(surface, i + 1, j + 1);
+	
+		auto del = std::async(std::launch::async, [data, w]() {
 
+			for (int i = 0; i < w; i++)
+				delete[] data[i];
+			delete[] data;
 
+		});
 
-				static auto normalize_rgb = [max_red, max_green, max_blue, min_red, min_green, min_blue](RGB rgb) {
-					RGB rgb_ret;
-					rgb_ret.red = normalize(max_red, min_red, rgb.red);
-					rgb_ret.green = normalize(max_green, min_green, rgb.green);
-					rgb_ret.blue = normalize(max_blue, min_blue, rgb.blue);
-					return rgb_ret;
-
-				};
-				rgb1 = normalize_rgb(rgb1);
-				rgb2 = normalize_rgb(rgb2);
-				rgb3 = normalize_rgb(rgb3);
-				rgb4 = normalize_rgb(rgb4);
-				rgb5 = normalize_rgb(rgb5);
-				rgb6 = normalize_rgb(rgb6);
-				rgb7 = normalize_rgb(rgb7);
-				rgb8 = normalize_rgb(rgb8);
-
-				RGB center = (rgb1 + rgb2 + rgb3 + rgb4 + rgb5 + rgb6 + rgb7 + rgb8) / 8;
-
-				center.invert_color();
-
-				data[i][j] = center;
-
-			}
-		}
-
-		set_pixel_color(surface, data, w, h);
-
-
-		for (int i = 0; i < w; i++)
-			delete[] data[i];
-
-		delete[] data;
 	}
 
 }
@@ -957,9 +919,13 @@ void ImageManager::compute_normal_map(SDL_Surface* surface,double fact){
 	}	
 	
 
-	for(int i = 0 ; i < width ; i++)
-		delete[] data[i];
-	delete[] data; 
+	auto del = std::async(std::launch::async, [data, width, height]() {
+
+		for (int i = 0; i < width; i++)
+			delete[] data[i];
+		delete[] data;
+
+	});
 
 }
 
@@ -1036,9 +1002,16 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 	}	
 	
 
-	for(int i = 0 ; i < width ; i++)
-		delete[] data[i];
-	delete[] data;
+	
+	auto del = std::async(std::launch::async, [data, width, height]() {
+
+		for (int i = 0; i < width; i++)
+			delete[] data[i];
+		delete[] data;
+
+	}); 
+
+	
 
 
 

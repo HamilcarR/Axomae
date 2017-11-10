@@ -7,6 +7,9 @@ namespace axomae {
 	//TODO USE QLABEL FOR IMAGES
 	enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4 , ALBEDO = 5 , GREYSCALE_AVG = 6}; 
 
+	static double NORMAL_FACTOR = 1.;
+	static double DUDV_FACTOR = 1.;
+	static double dividor = 10; 
 	template<typename T>
 	struct image_type {
 		T* image; 
@@ -119,8 +122,9 @@ namespace axomae {
 		SDL_Surface* height;
 		SDL_Surface* normalmap;
 		SDL_Surface* dudv;
-
+		std::string filename; 
 		void setAllNull() {
+			filename = ""; 
 			greyscale = nullptr;
 			albedo = nullptr; 
 			height = nullptr; 
@@ -179,11 +183,14 @@ namespace axomae {
 		QObject::connect(_UI.use_scharr, SIGNAL(clicked()), this, SLOT(use_scharr())); 
 		QObject::connect(_UI.use_sobel, SIGNAL(clicked()), this, SLOT(use_sobel()));
 		QObject::connect(_UI.use_prewitt, SIGNAL(clicked()), this, SLOT(use_prewitt()));
-
+		QObject::connect(_UI.actionSave_image, SIGNAL(triggered()), this, SLOT(save_image()));
 
 		QObject::connect(_UI.use_objectSpace, SIGNAL(clicked()), this, SLOT(use_object_space())); 
 		QObject::connect(_UI.use_tangentSpace, SIGNAL(clicked()), this, SLOT(use_tangent_space()));
 		
+		QObject::connect(_UI.factor_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_factor(int)));
+		QObject::connect(_UI.compute_dudv, SIGNAL(pressed()), this, SLOT(compute_dudv())); 
+		QObject::connect(_UI.factor_slider_dudv, SIGNAL(valueChanged(int)), this, SLOT(change_dudv_nmap(int))); 
 		QObject::connect(_UI.use_gpu, SIGNAL(clicked(bool)), this, SLOT(use_gpgpu(bool))); 
 
 	}
@@ -210,6 +217,7 @@ namespace axomae {
 		if (filename.isEmpty())
 			return false;
 		else {
+			image_session_pointers::filename = filename.toStdString(); ;
 			SDL_Surface* surf = ImageImporter::getInstance()->load_image(filename.toStdString().c_str()); 
 			display_image(surf, *this, *_UI.diffuse_image , ALBEDO); 
 			_MemManagement->addToHeap({ surf , ALBEDO });
@@ -327,12 +335,12 @@ namespace axomae {
 	/******************************************************************************************/
 
 
-	void GUIWindow::use_object_space() {
+	void GUIWindow::use_tangent_space() {
 		SDL_Surface* s = image_session_pointers::height;
 		SDL_Surface* copy = ImageManager::copy_surface(s);
 		if (copy != nullptr) {
 			_MemManagement->addToHeap({ copy , NMAP });
-			ImageManager::compute_normal_map(copy, 2); 
+			ImageManager::compute_normal_map(copy, NORMAL_FACTOR); 
 			display_image(copy, *this, *_UI.normal_image, NMAP);
 			image_session_pointers::normalmap = copy;
 
@@ -349,17 +357,74 @@ namespace axomae {
 	/******************************************************************************************/
 
 
-	void GUIWindow::use_tangent_space() {
+	void GUIWindow::use_object_space() {
 
 	}
 
+	/******************************************************************************************/
+
+	void GUIWindow::change_nmap_factor(int f) {
+		NORMAL_FACTOR = f/dividor; 
+		_UI.factor_nmap->setValue(NORMAL_FACTOR); 
+		SDL_Surface* s = image_session_pointers::height;
+		SDL_Surface* copy = ImageManager::copy_surface(s);
+		if (copy != nullptr) {
+			_MemManagement->addToHeap({ copy , NMAP });
+			ImageManager::compute_normal_map(copy, NORMAL_FACTOR);
+			display_image(copy, *this, *_UI.normal_image, NMAP);
+			image_session_pointers::normalmap = copy;
 
 
+		}
+		else {
+			//TODO : error handling
+
+		}
+
+	}
+	/******************************************************************************************/
+
+	void GUIWindow::compute_dudv() {
+		SDL_Surface* s = image_session_pointers::normalmap;
+		SDL_Surface* copy = ImageManager::copy_surface(s);
+		if (copy != nullptr) {
+			_MemManagement->addToHeap({ copy , DUDV });
+			ImageManager::compute_dudv(copy, DUDV_FACTOR);
+			display_image(copy, *this, *_UI.dudv_image, DUDV);
+			image_session_pointers::dudv = copy;
 
 
+		}
+		else {
+			//TODO : error handling
+
+		}
+
+	}
+	/******************************************************************************************/
+	void GUIWindow::change_dudv_nmap(int factor) {
+		DUDV_FACTOR = factor / dividor;
+		_UI.factor_dudv->setValue(DUDV_FACTOR);
+		SDL_Surface* s = image_session_pointers::normalmap;
+		SDL_Surface* copy = ImageManager::copy_surface(s);
+		if (copy != nullptr) {
+			_MemManagement->addToHeap({ copy , DUDV });
+			ImageManager::compute_dudv(copy, DUDV_FACTOR);
+			display_image(copy, *this, *_UI.dudv_image, DUDV);
+			image_session_pointers::dudv = copy;
 
 
+		}
+		else {
+			//TODO : error handling
 
+		}
+
+	}
+	/******************************************************************************************/
+
+
+	/******************************************************************************************/
 
 
 
@@ -374,10 +439,16 @@ namespace axomae {
 	/******************************************************************************************/
 
 	bool GUIWindow::save_image() {
+		ImageImporter *inst = ImageImporter::getInstance(); 
+		QString filename = QFileDialog::getSaveFileName(this, tr("Save files"), "./", tr("All Files (*)"));
+		if (image_session_pointers::height != nullptr)
+			inst->save_image(image_session_pointers::height, (filename.toStdString()+"-height.bmp").c_str());
+		if (image_session_pointers::normalmap != nullptr)
+			inst->save_image(image_session_pointers::normalmap, (filename.toStdString() + "-nmap.bmp").c_str());
+		if (image_session_pointers::dudv != nullptr)
+			inst->save_image(image_session_pointers::dudv, (filename.toStdString() + "-dudv.bmp").c_str());
+
 		return false;
 	}
-	/******************************************************************************************/
-
-
-
+	
 }
