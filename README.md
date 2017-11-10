@@ -1,7 +1,7 @@
 # Axomae
 
 Axomae is a texture generation tool, to create normal maps , height maps , and distortion maps.
-![axomae](https://user-images.githubusercontent.com/18567118/32418304-88e1e7fe-c267-11e7-83f3-253b3b60df1d.jpg)
+![axomae](https://user-images.githubusercontent.com/18567118/32420417-3cce938a-c28a-11e7-92af-d73961700769.png)
 
 
 
