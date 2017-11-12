@@ -92,7 +92,7 @@ namespace axomae {
 	};
 
 	
-
+	
 	
 	
 
@@ -398,7 +398,40 @@ namespace axomae {
 	}
 
 
+	__device__ RGB compute_normal(uint8_t* pixel, int bpp, int pitch, double factor) {
+		RGB center = get_pixel_value_at(pixel, 0, 0, bpp, pitch);
+		RGB west = get_pixel_value_at(pixel, 0, -1, bpp, pitch); 
+		RGB north_west = get_pixel_value_at(pixel, -1, -1, bpp, pitch);
+		RGB north = get_pixel_value_at(pixel, -1, 0, bpp, pitch);
+		RGB north_east = get_pixel_value_at(pixel, -1, 1, bpp, pitch);
+		RGB east = get_pixel_value_at(pixel, 0, 1, bpp, pitch);
+		RGB south_east = get_pixel_value_at(pixel, 1, 1, bpp, pitch);
+		RGB south = get_pixel_value_at(pixel, 1, 0, bpp, pitch);
+		RGB south_west = get_pixel_value_at(pixel, 1, -1, bpp, pitch);
 
+		float dx = factor * (east.g - west.g) / 255; 
+		float dy = factor * (north.g - south.g) / 255; 
+		float ddx = factor * (north_east.g - south_west.g) / 255; 
+		float ddy = factor * (north_west.g - south_east.g) / 255; 
+		auto Nx = normalize(-1, 1, lerp(dy, ddy, 0.5)); 
+		auto Ny = normalize(-1, 1, lerp(dx, ddx, 0.5)); 
+		auto Nz = 255; 
+		if (Nx >= 255)
+			Nx = 255;
+		else if (Nx <= 0)
+			Nx = 0; 
+		if (Ny >= 255)
+			Ny = 255;
+		else if (Ny <= 0)
+			Ny = 0;
+		return { (int)floor(Nx) , (int)floor(Ny) , Nz , 0 }; 
+
+
+
+
+
+
+	}
 
 
 
@@ -477,6 +510,35 @@ namespace axomae {
 
 	}
 
+	__global__
+	void GPU_compute_normals(void* image, void* save, unsigned int width, unsigned int height, int bpp, int pitch, double factor, uint8_t border) {
+		int i = blockDim.x * blockIdx.x + threadIdx.x; 
+		int j = blockDim.y * blockIdx.y + threadIdx.y; 
+
+		uint8_t* pixel = (uint8_t*)(image)+i * bpp + j * pitch; 
+		uint8_t* write = (uint8_t*)(save)+i*bpp + j*pitch; 
+		if (i < width - 1 && j < height - 1 && i > 1 && j > 1) {
+		RGB rgb = 	compute_normal(pixel, bpp, pitch, factor); 
+		set_pixel_color(write, rgb, bpp); 
+
+		}
+		else {
+
+
+			if (border == AXOMAE_REPEAT) {
+
+			}
+			else if (border == AXOMAE_CLAMP)
+			{
+
+			}
+			else {
+
+			}
+		}
+
+
+	}
 
 
 
@@ -509,7 +571,13 @@ namespace axomae {
 		return value;
 	}
 
+	static void check_error() {
+		cudaError_t err = cudaGetLastError(); 
+		if (err != cudaSuccess) {
+			std::cout << cudaGetErrorString(err) << "\n"; 
+		}
 
+	}
 
 
 	void GPU_compute_greyscale(SDL_Surface* image, const bool luminance) {
@@ -527,6 +595,7 @@ namespace axomae {
 		cudaMemcpy(D_image, image->pixels, size, cudaMemcpyHostToDevice);
 		gpu_threads D = get_optimal_thread_distribution(width, height, pitch, bpp);
 		GPU_compute_greyscale << <D.blocks, D.threads >> > (D_image, width, height, bpp, pitch, luminance);
+		check_error(); 
 		SDL_LockSurface(image);
 		cudaMemcpy(image->pixels, D_image, size, cudaMemcpyDeviceToHost);
 		SDL_UnlockSurface(image);
@@ -548,9 +617,7 @@ namespace axomae {
 		D.blocks.x++; // border management
 		D.blocks.y++; //
 		GPU_compute_edges << < D.blocks, D.threads >> > (D_image,R_image, param.width, param.height, param.bpp, param.pitch, convolution, border);
-		cudaError_t err = cudaGetLastError(); 
-		if (err != cudaSuccess)
-			std::cout << cudaGetErrorString(err) << "\n"; 
+		check_error(); 
 		SDL_LockSurface(greyscale);
 		cudaMemcpy(greyscale->pixels, R_image, size, cudaMemcpyDeviceToHost);
 		SDL_UnlockSurface(greyscale);
@@ -558,4 +625,42 @@ namespace axomae {
 		cudaFree(R_image); 
 
 	}
+
+
+
+
+
+	void GPU_compute_normal(SDL_Surface* height, double factor, uint8_t border) {
+
+		SDLSurfParam param(height); 
+		void * D_image, *D_save; 
+		cudaMalloc((void**)&D_image, param.getByteSize()); 
+		cudaMalloc((void**)&D_save, param.getByteSize()); 
+
+		cudaMemcpy(D_image, param.data, param.getByteSize(), cudaMemcpyHostToDevice); 
+		gpu_threads blocks = get_optimal_thread_distribution(param.width, param.height, param.pitch, param.bpp); 
+		blocks.blocks.x++; 
+		blocks.blocks.y++;
+		GPU_compute_normals << < blocks.blocks, blocks.threads >> > (D_image, D_save, param.width, param.height, param.bpp, param.pitch, factor, border); 
+		check_error(); 
+
+		SDL_LockSurface(height); 
+		cudaMemcpy(height->pixels, D_save, param.getByteSize(), cudaMemcpyDeviceToHost); 
+		SDL_UnlockSurface(height); 
+
+
+		cudaFree(D_image); 
+		cudaFree(D_save); 
+
+
+
+
+	}
+
+
+
+
+
+
+
 };

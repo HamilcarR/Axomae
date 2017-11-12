@@ -77,6 +77,9 @@ namespace axomae {
 	};
 
 
+
+
+
 	__device__ __host__
 		static double magnitude(int x, int y) {
 			return sqrtf(x*x + y*y);
@@ -173,7 +176,7 @@ namespace axomae {
 
 	void GPU_compute_height(SDL_Surface* image, uint8_t convolution_flag, uint8_t border_behaviour);
 
-
+	void GPU_compute_normal(SDL_Surface* image, double factor, uint8_t border_behaviour); 
 
 
 
