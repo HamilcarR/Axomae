@@ -177,25 +177,6 @@
                </property>
               </widget>
              </item>
-             <item>
-              <widget class="QGroupBox" name="custom_kernels">
-               <property name="autoFillBackground">
-                <bool>false</bool>
-               </property>
-               <property name="title">
-                <string>Custom kernels</string>
-               </property>
-               <property name="flat">
-                <bool>false</bool>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-               <property name="checked">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
             </layout>
            </widget>
           </item>
@@ -236,6 +217,33 @@
                <layout class="QVBoxLayout" name="verticalLayout_4">
                 <item>
                  <widget class="QDoubleSpinBox" name="factor_nmap"/>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Attenuation</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSlider" name="attenuation_slider_nmap">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>10</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>Factor</string>
+                  </property>
+                 </widget>
                 </item>
                 <item>
                  <widget class="QSlider" name="factor_slider_nmap">
@@ -313,15 +321,15 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
           <item row="0" column="0">
            <widget class="QToolBox" name="toolBox">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>100</width>
-               <height>30</height>
+               <width>164</width>
+               <height>720</height>
               </rect>
              </property>
              <attribute name="label">
@@ -380,6 +388,16 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
             <string>Display current loaded image</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_9">
+            <item row="2" column="2">
+             <widget class="QGraphicsView" name="dudv_image">
+              <property name="sizeAdjustPolicy">
+               <enum>QAbstractScrollArea::AdjustToContents</enum>
+              </property>
+              <property name="dragMode">
+               <enum>QGraphicsView::ScrollHandDrag</enum>
+              </property>
+             </widget>
+            </item>
             <item row="2" column="0">
              <widget class="QGraphicsView" name="normal_image">
               <property name="sizeAdjustPolicy">
@@ -390,13 +408,22 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
               </property>
              </widget>
             </item>
-            <item row="2" column="2">
-             <widget class="QGraphicsView" name="dudv_image">
+            <item row="0" column="0">
+             <widget class="QGraphicsView" name="diffuse_image">
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="lineWidth">
+               <number>1</number>
+              </property>
               <property name="sizeAdjustPolicy">
                <enum>QAbstractScrollArea::AdjustToContents</enum>
               </property>
               <property name="dragMode">
                <enum>QGraphicsView::ScrollHandDrag</enum>
+              </property>
+              <property name="viewportUpdateMode">
+               <enum>QGraphicsView::FullViewportUpdate</enum>
               </property>
              </widget>
             </item>
@@ -409,7 +436,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                <enum>QTabWidget::Triangular</enum>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>1</number>
               </property>
               <property name="elideMode">
                <enum>Qt::ElideLeft</enum>
@@ -451,19 +478,6 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                 </item>
                </layout>
               </widget>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QGraphicsView" name="diffuse_image">
-              <property name="sizeAdjustPolicy">
-               <enum>QAbstractScrollArea::AdjustToContents</enum>
-              </property>
-              <property name="dragMode">
-               <enum>QGraphicsView::ScrollHandDrag</enum>
-              </property>
-              <property name="viewportUpdateMode">
-               <enum>QGraphicsView::FullViewportUpdate</enum>
-              </property>
              </widget>
             </item>
            </layout>

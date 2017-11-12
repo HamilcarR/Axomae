@@ -19,6 +19,7 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -63,7 +64,6 @@ public:
     QRadioButton *use_scharr;
     QRadioButton *use_sobel;
     QRadioButton *use_prewitt;
-    QGroupBox *custom_kernels;
     QGroupBox *normal_opt;
     QVBoxLayout *verticalLayout_5;
     QRadioButton *use_objectSpace;
@@ -71,6 +71,9 @@ public:
     QGroupBox *nmap_factor_opt;
     QVBoxLayout *verticalLayout_4;
     QDoubleSpinBox *factor_nmap;
+    QLabel *label;
+    QSlider *attenuation_slider_nmap;
+    QLabel *label_2;
     QSlider *factor_slider_nmap;
     QGroupBox *dudv_opt;
     QVBoxLayout *verticalLayout_7;
@@ -90,8 +93,9 @@ public:
     QTabWidget *renderer_tab;
     QWidget *texture;
     QGridLayout *gridLayout_9;
-    QGraphicsView *normal_image;
     QGraphicsView *dudv_image;
+    QGraphicsView *normal_image;
+    QGraphicsView *diffuse_image;
     QTabWidget *tabWidget;
     QWidget *tab_greyscale;
     QGridLayout *gridLayout_5;
@@ -99,7 +103,6 @@ public:
     QWidget *tab_heightmap;
     QGridLayout *gridLayout_10;
     QGraphicsView *height_image;
-    QGraphicsView *diffuse_image;
     QWidget *gl_renderer;
     QGridLayout *gridLayout_6;
     QWidget *uv_editor;
@@ -239,15 +242,6 @@ public:
 
         verticalLayout_3->addWidget(use_prewitt);
 
-        custom_kernels = new QGroupBox(height_opt);
-        custom_kernels->setObjectName(QStringLiteral("custom_kernels"));
-        custom_kernels->setAutoFillBackground(false);
-        custom_kernels->setFlat(false);
-        custom_kernels->setCheckable(true);
-        custom_kernels->setChecked(false);
-
-        verticalLayout_3->addWidget(custom_kernels);
-
 
         verticalLayout_2->addWidget(height_opt);
 
@@ -279,6 +273,24 @@ public:
         factor_nmap->setObjectName(QStringLiteral("factor_nmap"));
 
         verticalLayout_4->addWidget(factor_nmap);
+
+        label = new QLabel(nmap_factor_opt);
+        label->setObjectName(QStringLiteral("label"));
+
+        verticalLayout_4->addWidget(label);
+
+        attenuation_slider_nmap = new QSlider(nmap_factor_opt);
+        attenuation_slider_nmap->setObjectName(QStringLiteral("attenuation_slider_nmap"));
+        attenuation_slider_nmap->setMinimum(1);
+        attenuation_slider_nmap->setMaximum(10);
+        attenuation_slider_nmap->setOrientation(Qt::Horizontal);
+
+        verticalLayout_4->addWidget(attenuation_slider_nmap);
+
+        label_2 = new QLabel(nmap_factor_opt);
+        label_2->setObjectName(QStringLiteral("label_2"));
+
+        verticalLayout_4->addWidget(label_2);
 
         factor_slider_nmap = new QSlider(nmap_factor_opt);
         factor_slider_nmap->setObjectName(QStringLiteral("factor_slider_nmap"));
@@ -341,7 +353,7 @@ public:
         toolBox->setObjectName(QStringLiteral("toolBox"));
         page = new QWidget();
         page->setObjectName(QStringLiteral("page"));
-        page->setGeometry(QRect(0, 0, 100, 30));
+        page->setGeometry(QRect(0, 0, 164, 720));
         toolBox->addItem(page, QStringLiteral("Page 1"));
         page_2 = new QWidget();
         page_2->setObjectName(QStringLiteral("page_2"));
@@ -373,6 +385,13 @@ public:
         texture->setObjectName(QStringLiteral("texture"));
         gridLayout_9 = new QGridLayout(texture);
         gridLayout_9->setObjectName(QStringLiteral("gridLayout_9"));
+        dudv_image = new QGraphicsView(texture);
+        dudv_image->setObjectName(QStringLiteral("dudv_image"));
+        dudv_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        dudv_image->setDragMode(QGraphicsView::ScrollHandDrag);
+
+        gridLayout_9->addWidget(dudv_image, 2, 2, 1, 1);
+
         normal_image = new QGraphicsView(texture);
         normal_image->setObjectName(QStringLiteral("normal_image"));
         normal_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
@@ -380,12 +399,15 @@ public:
 
         gridLayout_9->addWidget(normal_image, 2, 0, 1, 1);
 
-        dudv_image = new QGraphicsView(texture);
-        dudv_image->setObjectName(QStringLiteral("dudv_image"));
-        dudv_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-        dudv_image->setDragMode(QGraphicsView::ScrollHandDrag);
+        diffuse_image = new QGraphicsView(texture);
+        diffuse_image->setObjectName(QStringLiteral("diffuse_image"));
+        diffuse_image->setFrameShadow(QFrame::Plain);
+        diffuse_image->setLineWidth(1);
+        diffuse_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        diffuse_image->setDragMode(QGraphicsView::ScrollHandDrag);
+        diffuse_image->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
-        gridLayout_9->addWidget(dudv_image, 2, 2, 1, 1);
+        gridLayout_9->addWidget(diffuse_image, 0, 0, 1, 1);
 
         tabWidget = new QTabWidget(texture);
         tabWidget->setObjectName(QStringLiteral("tabWidget"));
@@ -419,14 +441,6 @@ public:
         tabWidget->addTab(tab_heightmap, QString());
 
         gridLayout_9->addWidget(tabWidget, 0, 2, 1, 1);
-
-        diffuse_image = new QGraphicsView(texture);
-        diffuse_image->setObjectName(QStringLiteral("diffuse_image"));
-        diffuse_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-        diffuse_image->setDragMode(QGraphicsView::ScrollHandDrag);
-        diffuse_image->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-
-        gridLayout_9->addWidget(diffuse_image, 0, 0, 1, 1);
 
         renderer_tab->addTab(texture, QString());
         gl_renderer = new QWidget();
@@ -485,9 +499,9 @@ public:
         QObject::connect(actionExit, SIGNAL(triggered(bool)), MainWindow, SLOT(close()));
 
         renderMaterials->setCurrentIndex(0);
-        toolBox->setCurrentIndex(1);
+        toolBox->setCurrentIndex(0);
         renderer_tab->setCurrentIndex(0);
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -513,11 +527,12 @@ public:
         use_scharr->setText(QApplication::translate("MainWindow", "Use Scharr", 0));
         use_sobel->setText(QApplication::translate("MainWindow", "Use Sobel", 0));
         use_prewitt->setText(QApplication::translate("MainWindow", "Use Prewitt", 0));
-        custom_kernels->setTitle(QApplication::translate("MainWindow", "Custom kernels", 0));
         normal_opt->setTitle(QApplication::translate("MainWindow", "Normals options", 0));
         use_objectSpace->setText(QApplication::translate("MainWindow", "Object space", 0));
         use_tangentSpace->setText(QApplication::translate("MainWindow", "Tangent space", 0));
         nmap_factor_opt->setTitle(QApplication::translate("MainWindow", "Factor", 0));
+        label->setText(QApplication::translate("MainWindow", "Attenuation", 0));
+        label_2->setText(QApplication::translate("MainWindow", "Factor", 0));
         dudv_opt->setTitle(QApplication::translate("MainWindow", "Distortion options", 0));
         compute_dudv->setText(QApplication::translate("MainWindow", "Compute distortion map", 0));
         nmap_factor_opt_2->setTitle(QApplication::translate("MainWindow", "Factor", 0));
