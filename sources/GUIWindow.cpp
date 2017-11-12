@@ -8,6 +8,7 @@ namespace axomae {
 	enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4 , ALBEDO = 5 , GREYSCALE_AVG = 6}; 
 
 	static double NORMAL_FACTOR = 1.;
+	static float NORMAL_ATTENUATION = 1.56; 
 	static double DUDV_FACTOR = 1.;
 	static double dividor = 10; 
 	template<typename T>
@@ -189,6 +190,8 @@ namespace axomae {
 		QObject::connect(_UI.use_tangentSpace, SIGNAL(clicked()), this, SLOT(use_tangent_space()));
 		
 		QObject::connect(_UI.factor_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_factor(int)));
+		QObject::connect(_UI.attenuation_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_attenuation(int)));
+
 		QObject::connect(_UI.compute_dudv, SIGNAL(pressed()), this, SLOT(compute_dudv())); 
 		QObject::connect(_UI.factor_slider_dudv, SIGNAL(valueChanged(int)), this, SLOT(change_dudv_nmap(int))); 
 		QObject::connect(_UI.use_gpu, SIGNAL(clicked(bool)), this, SLOT(use_gpgpu(bool))); 
@@ -340,7 +343,7 @@ namespace axomae {
 		SDL_Surface* copy = ImageManager::copy_surface(s);
 		if (copy != nullptr) {
 			_MemManagement->addToHeap({ copy , NMAP });
-			ImageManager::compute_normal_map(copy, NORMAL_FACTOR); 
+			ImageManager::compute_normal_map(copy, NORMAL_FACTOR , NORMAL_ATTENUATION); 
 			display_image(copy, *this, *_UI.normal_image, NMAP);
 			image_session_pointers::normalmap = copy;
 
@@ -366,19 +369,22 @@ namespace axomae {
 	void GUIWindow::change_nmap_factor(int f) {
 		NORMAL_FACTOR = f/dividor; 
 		_UI.factor_nmap->setValue(NORMAL_FACTOR); 
-		SDL_Surface* s = image_session_pointers::height;
-		SDL_Surface* copy = ImageManager::copy_surface(s);
-		if (copy != nullptr) {
-			_MemManagement->addToHeap({ copy , NMAP });
-			ImageManager::compute_normal_map(copy, NORMAL_FACTOR);
-			display_image(copy, *this, *_UI.normal_image, NMAP);
-			image_session_pointers::normalmap = copy;
-
-
+		if (_UI.use_tangentSpace->isChecked()) {
+			use_tangent_space();
 		}
-		else {
-			//TODO : error handling
+		else if (_UI.use_objectSpace->isChecked()) {
+			use_object_space();
+		}
 
+	}
+
+	void GUIWindow::change_nmap_attenuation(int f) {
+		NORMAL_ATTENUATION = f / dividor;
+		if (_UI.use_tangentSpace->isChecked()) {
+			use_tangent_space(); 
+		}
+		else if (_UI.use_objectSpace->isChecked()) {
+			use_object_space(); 
 		}
 
 	}

@@ -864,69 +864,74 @@ constexpr double get_pixel_height(double color_component){
 	return (255 - color_component);
 
 }
-void ImageManager::compute_normal_map(SDL_Surface* surface,double fact){
-	
-	int height = surface->h;
-	int width = surface->w;
-	RGB** data = new RGB*[width];
-	for(int i = 0 ; i < width ; i++)
-		data[i]= new RGB[height];
+void ImageManager::compute_normal_map(SDL_Surface* surface,double fact , float attenuation){
+	bool cuda = CHECK_IF_CUDA_AVAILABLE(); 
+	if (cuda)
+		GPU_compute_normal(surface, fact , AXOMAE_REPEAT);
 
 
-
-	for(int i = 0 ; i < width ; i++){
-		for(int j = 0 ; j < height ; j++){
-			data[i][j] = get_pixel_color(surface,i,j);
-		}
-	}
-
-
-	for(int i = 0 ; i < width ; i++){
-		for(int j = 0 ; j < height ; j++){
-
-			int x , y , a , b ; 
-			x = (i == 0 ) ? i+1 : i-1 ;
-			y = (j == 0 ) ? j+1 : j-1 ;
-			a = (i == width-1) ? width-2 : i+1;
-			b = (j == height-1)? height-2 :j+1 ; 
-
-
-			double col_left = data[i][y].green;
-			double col_right = data[i][b].green;
-			double col_up = data[x][j].green;
-			double col_down = data[a][j].green;
-			double col_up_right = data[x][b].green;
-			double col_up_left = data[x][y].green;
-			double col_down_left = data[a][y].green;
-			double col_down_right = data[a][b].green;
-			float atten = 1.56f ; 
-			double dx = atten*(fact*(col_right - col_left)/255);
-			double dy = atten*(fact*(col_up - col_down)/255) ;
-			double ddx = atten*(fact*(col_up_right - col_down_left)/255);
-			double ddy = atten*(fact*(col_up_left - col_down_right)/255) ;
-			auto Nx = normalize(-1,1,lerp(dy , ddy , 0.5)) ; 
-			auto Ny = normalize(-1,1,lerp(dx , ddx , 0.5)) ; 
-			auto Nz = 255.0 ; //the normal vector
-			
-			
-			RGB col = RGB((int) floor(truncate(Nx)) , (int) floor(truncate(Ny)) , (int)Nz) ;
-			set_pixel_color(surface,i,j,col.rgb_to_int()); 
-			
-
-
-		}
-
-	}	
-	
-
-	auto del = std::async(std::launch::async, [data, width, height]() {
-
+	else {
+		int height = surface->h;
+		int width = surface->w;
+		RGB** data = new RGB*[width];
 		for (int i = 0; i < width; i++)
-			delete[] data[i];
-		delete[] data;
+			data[i] = new RGB[height];
 
-	});
 
+
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				data[i][j] = get_pixel_color(surface, i, j);
+			}
+		}
+
+
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+
+				int x, y, a, b;
+				x = (i == 0) ? i + 1 : i - 1;
+				y = (j == 0) ? j + 1 : j - 1;
+				a = (i == width - 1) ? width - 2 : i + 1;
+				b = (j == height - 1) ? height - 2 : j + 1;
+
+
+				double col_left = data[i][y].green;
+				double col_right = data[i][b].green;
+				double col_up = data[x][j].green;
+				double col_down = data[a][j].green;
+				double col_up_right = data[x][b].green;
+				double col_up_left = data[x][y].green;
+				double col_down_left = data[a][y].green;
+				double col_down_right = data[a][b].green;
+				float atten = attenuation;
+				double dx = atten*(fact*(col_right - col_left) / 255);
+				double dy = atten*(fact*(col_up - col_down) / 255);
+				double ddx = atten*(fact*(col_up_right - col_down_left) / 255);
+				double ddy = atten*(fact*(col_up_left - col_down_right) / 255);
+				auto Nx = normalize(-1, 1, lerp(dy, ddy, 0.5));
+				auto Ny = normalize(-1, 1, lerp(dx, ddx, 0.5));
+				auto Nz = 255.0; //the normal vector
+
+
+				RGB col = RGB((int)floor(truncate(Nx)), (int)floor(truncate(Ny)), (int)Nz);
+				set_pixel_color(surface, i, j, col.rgb_to_int());
+
+
+
+			}
+
+		}
+
+
+		auto del = std::async(std::launch::async, [data, width, height]() {
+
+			for (int i = 0; i < width; i++)
+				delete[] data[i];
+			delete[] data;
+
+		});
+	}
 }
 
 

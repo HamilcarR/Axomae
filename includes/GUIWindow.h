@@ -43,6 +43,7 @@ namespace axomae {
 	void use_object_space(); 
 	void use_tangent_space(); 
 	void change_nmap_factor(int factor); 
+	void change_nmap_attenuation(int atten); 
 	void compute_dudv(); 
 	void change_dudv_nmap(int factor);
 

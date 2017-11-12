@@ -61,7 +61,7 @@ namespace axomae{
 			static void set_contrast(SDL_Surface* image,int level);
 			static void set_contrast(SDL_Surface* image);
 			static void set_contrast_sigmoid(SDL_Surface *image,int treshold);
-			static void compute_normal_map(SDL_Surface* surface , double strength); 		
+			static void compute_normal_map(SDL_Surface* surface , double strength , float attenuation); 		
 			static void compute_dudv(SDL_Surface* surface,double factor);
 			static void USE_GPU_COMPUTING() { gpu = true; }
 			static void USE_CPU_COMPUTING() { gpu = false;  }
