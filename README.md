@@ -11,7 +11,7 @@ The software is still in developpement. I plan integrating :
   
   -Mesh normals projection into texture : using a high poly mesh to create a normal map texture.
   
-  -Bach processing : either processing textures or creating normal maps from numerous meshes.
+  -Batch processing : either processing textures or creating normal maps from numerous meshes.
   
   -An OpenGL renderer : A 3D renderer using PBR materials and reading GLTF , FBX , OBJ formats.
   
