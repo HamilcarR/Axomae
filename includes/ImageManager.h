@@ -2,7 +2,7 @@
 #define IMAGEMANAGER_H
 
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include <algorithm>
 #include <iostream>
 #include <cmath>

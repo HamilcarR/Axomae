@@ -94,7 +94,7 @@ F = Bright White
 
 
 
-	static void print(std::string &arg, int8_t color , int8_t p = -1) {
+	static void print(std::string arg, int8_t color , int8_t p = -1) {
 #ifdef __unix__
 		std::cout << colors[color] << "\n";
 		std::cout <<( (p>= 0 && p < 4) ? std::string(prompt[p]) + " " :"")<<  arg << "\n";
@@ -158,7 +158,7 @@ F = Bright White
 			~ProgramStatus(); 
 			void create_window( int , int , const char*);
 
-
+			
 
 			/*attributes*/
 
@@ -167,10 +167,9 @@ F = Bright White
 			std::vector<std::pair<std::shared_ptr<Window> , SDL_Event> > windows; 
 			std::vector<std::thread> _threads;  /*std::move used */
 			std::shared_ptr<Renderer> _renderer ; 
-			std::stack<std::pair<SDL_Surface*, std::string>>  stack; 
-			Window* _display_window; 
 			bool loop; 
 			int _idCurrentImage; 
+			Window* _display_window; 
 			static ProgramStatus* instance; 
 			bool exited;
 			

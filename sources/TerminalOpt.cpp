@@ -528,7 +528,7 @@ namespace axomae{
 			else
 				a = "No image ID selected"; 
 
-			print(a, PURPLE , PROMPT2); 
+			print(a, YELLOW , PROMPT2); 
 		}
 
 
