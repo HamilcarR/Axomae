@@ -1,6 +1,6 @@
 #ifndef KERNEL_CUH
 #define KERNEL_CUH
-#include "SDL\SDL_surface.h"
+#include <SDL2/SDL_surface.h>
 #include "../includes/constants.h"
 #include <cuda.h>
 #include <cuda_device_runtime_api.h>

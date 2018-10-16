@@ -13,7 +13,8 @@
 namespace axomae{
 			
 			
-	
+
+
 
 
 	class RGB{
@@ -26,7 +27,7 @@ namespace axomae{
 			static RGB int_to_rgb(uint32_t value);
 			static RGB int_to_rgb(uint8_t value);
 			static RGB int_to_rgb(uint16_t value);
-			const double intensity();
+		        const  double intensity();
 			void invert_color();
 			
 			template<typename T>
@@ -67,7 +68,7 @@ namespace axomae{
 			static void USE_CPU_COMPUTING() { gpu = false;  }
 			static bool USING_GPU() { return gpu;  }
 			static SDL_Surface* copy_surface(SDL_Surface* src); 
-		    
+			static SDL_Surface* project_uv_normals(Object3D object,  int width , int height);		    
 		private:
 
 

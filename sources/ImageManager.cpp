@@ -321,7 +321,6 @@ void ImageManager::set_greyscale_average(SDL_Surface* image,uint8_t factor){
 static void replace_image(SDL_Surface* surface, uint8_t* image) {
 	//TODO LOCK SURFACE ? 
 	int bpp = surface->format->BytesPerPixel; 
-	int size = surface->w * surface->h;
 
 	SDL_LockSurface(surface);
 	 if (bpp == 1) {
@@ -343,7 +342,6 @@ static void replace_image(SDL_Surface* surface, uint8_t* image) {
 static void replace_image(SDL_Surface* surface, uint16_t* image) {
 	//TODO LOCK SURFACE ? 
 	int bpp = surface->format->BytesPerPixel;
-	int size = surface->w * surface->h;
 	SDL_LockSurface(surface);
 	 if (bpp == 2) {
 		 for ( int i = 0; i < surface->w; i++)
@@ -364,7 +362,6 @@ static void replace_image(SDL_Surface* surface, uint16_t* image) {
 static void replace_image(SDL_Surface* surface, uint32_t* image) {
 	//TODO LOCK SURFACE ? 
 	int bpp = surface->format->BytesPerPixel; 
-	int size = surface->w * surface->h; 
 	int pitch = surface->pitch; 
 	SDL_LockSurface(surface);
 	if (bpp == 4) {
@@ -1025,46 +1022,143 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 
 
 
+/***************************************************************************************************************/
+
+	
+
+			
+
+
+
+
+	SDL_Surface* ImageManager::project_uv_normals(Object3D object , int width ,  int height){
+
+				
+	#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	Uint32 rmask = 0xFF000000 ; 
+	Uint32 gmask = 0x00FF0000 ; 
+	Uint32 bmask = 0x0000FF00 ; 
+	Uint32 amask = 0x000000FF ; 
+
+	#else 
+
+	Uint32 amask = 0xFF000000 ; 
+	Uint32 bmask = 0x00FF0000 ; 
+	Uint32 gmask = 0x0000FF00 ; 
+	Uint32 rmask = 0x000000FF ; 
+
+
+	#endif	
+
+		SDL_Surface* surf = SDL_CreateRGBSurface(0 , width , height , 24 , rmask , gmask , bmask , amask) ;
+		assert(surf != nullptr) ; 
+
+
+		for(unsigned int i = 0 ; i < object.indices.size() ; i+=3) {
+			auto index = object.indices; 
+			
+			Point2D P1 = { object.uv[index[i]] , object.uv[index[i] + 1 ] } ; 	
+			Point2D P2 = { object.uv[index[i + 1]] , object.uv[index[i + 1] + 1 ] } ; 
+			Point2D P3 = { object.uv[index[i + 2]] , object.uv[index[i + 2] + 1 ] } ; 
+			
+			P1.print(); 
+			P2.print(); 
+			P3.print(); 
+			std::cout << index[i] << "    " << index[i+1] << "    "<< index[i+2] << "\n" ; 
+			Vect3D N1  = { object.normals[index[i]] , object.normals[index[i] + 1 ] , object.normals[index[i] + 2] } ; 
+			Vect3D N2 = { object.normals[index[i + 1]]  , object.normals[index[i + 1] + 1 ] , object.normals[index[i + 1 ] + 2] } ; 
+			Vect3D N3 = { object.normals[index[i + 2 ]] , object.normals[index[i + 2] + 1 ] , object.normals[index[i + 2 ] + 2 ] } ; 
+
+			
+			P1.x *= width ; 
+			P1.y *= height ; 
+
+			P2.x *= width ; 
+			P2.y *= height ; 
+
+			P3.x *= width ; 
+			P3.y *= height ; 
+
+			set_pixel_color(surf , P1.x , P1.y , 0xFFFFFFFF) ;
+			set_pixel_color(surf , P2.x , P2.y , 0xFFFFFFFF) ;
+			set_pixel_color(surf , P3.x , P3.y , 0xFFFFFFFF) ;
+			auto bounding_coords = [](float x , float y , float z , bool min) { 
+				if( min ) {
+					if( x <= y )
+						return x <= z ? x : z ; 
+					else
+						return y <= z ? y : z ; 
+					}
+				else {
+					if( x >= y )
+						return x >= z ? x : z ; 
+					else
+						return y >= z ? y : z ; 
+					}
+			};
+		
+		
+		
+			auto x_max = static_cast<int>(bounding_coords( P1.x , P2.x , P3.x , false)); 
+			auto x_min = static_cast<int>(bounding_coords( P1.x , P2.x , P3.x , true )); 
+			auto y_max = static_cast<int>(bounding_coords( P1.y , P2.y , P3.y , false)); 
+			auto y_min = static_cast<int>(bounding_coords( P1.y , P2.y , P3.y , true)); 
+			
+
+
+			auto barycentric_lerp = [] (Point2D P1 , Point2D P2 , Point2D P3 , Point2D I){
+				auto W1 = (  (P2.y - P3.y ) * (I.x - P3.x ) + ( P3.x - P2.x) * (I.y - P3.y) ) / ( (P2.y - P3.y ) * (P1.x - P3.x ) + (P3.x - P2.x ) * (P1.y - P3.y ) ) ; 
+				auto W2 = ( (P3.y - P1.y) * (I.x - P3.x) + (P1.x - P3.x) * ( I.y - P3.y ) ) / ( (P2.y - P3.y ) * (P1.x - P3.x) + ( P3.x - P2.x) * (P1.y - P3.y ) ) ; 
+				auto W3 = 1 - W1 - W2 ; 
+				Vect3D v = {W1 , W2 , W3} ; 
+				return v ;  
+
+
+
+			};
+
+
+			
+			for(int x = x_min ; x <= x_max ; x++){
+				for(int y = y_min ; y <= y_max ; y++){
+					
+
+					Point2D I = {static_cast<float>(x) ,static_cast<float> (y)} ; 
+					Vect3D C = barycentric_lerp(P1 , P2 , P3 , I) ; 
+						if(C.x >= 0 && C.y >= 0 && C.z >= 0){
+							Vect3D normal = { N1.x * C.x + N2.x * C.y + N3.x * C.z ,
+									  N1.y * C.x + N2.y * C.y + N3.y * C.z ,
+									  N1.z * C.x + N2.z * C.y + N3.z * C.z }; 
+							RGB rgb = RGB( static_cast<int>(normal.x * 255) ,  static_cast<int>(normal.y * 255)  ,  static_cast<int>(normal.z * 255) , 0 ) ; 
+							uint32_t val = rgb.rgb_to_int() ; 
+							
+							set_pixel_color(surf , x , y , val) ;
 
 
 
 
 
+						}
+
+				}
+
+
+			}
 
 
 
 
+		
+		}
 
 
+		return surf ; 
 
+		}
+	 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
+ 	
 
 
 

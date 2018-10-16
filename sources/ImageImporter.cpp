@@ -10,7 +10,7 @@ namespace axomae {
 ImageImporter* ImageImporter::instance = nullptr;
 
 
-ImageImporter::ImageImporter():axomae::Model()
+ImageImporter::ImageImporter()
 	
 {
 

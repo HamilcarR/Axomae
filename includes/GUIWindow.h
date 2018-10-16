@@ -19,6 +19,7 @@ namespace axomae {
 
 	class HeapManagement; 
 	class GUIWindow : public QMainWindow {
+		
 		Q_OBJECT
 	public:
 
@@ -28,9 +29,10 @@ namespace axomae {
 
 		static HeapManagement *_MemManagement;
 
-
+/* SLOTS */
 	public slots:
 	bool import_image(); 
+	bool import_3DOBJ(); 
 	bool open_project(); 
 	bool save_project(); 
 	bool save_image();
@@ -46,7 +48,7 @@ namespace axomae {
 	void change_nmap_attenuation(int atten); 
 	void compute_dudv(); 
 	void change_dudv_nmap(int factor);
-
+	void compute_projection() ; 
 	private:
 		void connect_all_slots(); 
 
@@ -54,7 +56,7 @@ namespace axomae {
 		Ui::MainWindow _UI;
 		Renderer *_renderer; 
 		Window *_window; 
-		ImageImporter *_imporer; 
+		ImageImporter *_importer; 
 		
 
 	};

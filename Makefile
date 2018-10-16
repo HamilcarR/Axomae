@@ -50,27 +50,23 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = sources/Controller.cpp \
-		sources/GUIWindow.cpp \
+SOURCES       = sources/GUIWindow.cpp \
 		sources/ImageImporter.cpp \
 		sources/ImageManager.cpp \
+		sources/Loader.cpp \
 		sources/main.cpp \
-		sources/Model.cpp \
 		sources/Syntax.cpp \
 		sources/TerminalOpt.cpp \
-		sources/View.cpp \
 		sources/Window.cpp qrc_Resource.cpp \
 		moc_GUIWindow.cpp
 OBJECTS       = Kernel.o \
-		Controller.o \
 		GUIWindow.o \
 		ImageImporter.o \
 		ImageManager.o \
+		Loader.o \
 		main.o \
-		Model.o \
 		Syntax.o \
 		TerminalOpt.o \
-		View.o \
 		Window.o \
 		qrc_Resource.o \
 		moc_GUIWindow.o
@@ -111,9 +107,21 @@ DIST          = /usr/lib64/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_opengl_private.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_openglextensions.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_openglextensions_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_packetprotocol_private.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_platformcompositor_support_private.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_printsupport.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_printsupport_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_qml.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_qml_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_qmldebug_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_qmldevtools_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_qmltest.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_qmltest_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_quick.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_quick_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_quickparticles_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_quickwidgets.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_quickwidgets_private.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_service_support_private.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_sql.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_sql_private.pri \
@@ -150,25 +158,21 @@ DIST          = /usr/lib64/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib64/qt5/mkspecs/features/lex.prf \
 		Axomae.pro Form\ Files/test.h \
 		includes/constants.h \
-		includes/Controller.h \
 		includes/GUIWindow.h \
 		includes/ImageImporter.h \
 		includes/ImageManager.h \
 		includes/images.h \
-		includes/Model.h \
+		includes/Loader.h \
 		includes/Renderer.h \
 		includes/Syntax.h \
 		includes/TerminalOpt.h \
-		includes/View.h \
-		includes/Window.h sources/Controller.cpp \
-		sources/GUIWindow.cpp \
+		includes/Window.h sources/GUIWindow.cpp \
 		sources/ImageImporter.cpp \
 		sources/ImageManager.cpp \
+		sources/Loader.cpp \
 		sources/main.cpp \
-		sources/Model.cpp \
 		sources/Syntax.cpp \
 		sources/TerminalOpt.cpp \
-		sources/View.cpp \
 		sources/Window.cpp
 QMAKE_TARGET  = Axomae
 DESTDIR       = 
@@ -218,9 +222,21 @@ Makefile: Axomae.pro /usr/lib64/qt5/mkspecs/linux-g++/qmake.conf /usr/lib64/qt5/
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_opengl_private.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_openglextensions.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_openglextensions_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_packetprotocol_private.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_platformcompositor_support_private.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_printsupport.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_printsupport_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_qml.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_qml_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_qmldebug_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_qmldevtools_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_qmltest.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_qmltest_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_quick.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_quick_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_quickparticles_private.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_quickwidgets.pri \
+		/usr/lib64/qt5/mkspecs/modules/qt_lib_quickwidgets_private.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_service_support_private.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_sql.pri \
 		/usr/lib64/qt5/mkspecs/modules/qt_lib_sql_private.pri \
@@ -298,9 +314,21 @@ Makefile: Axomae.pro /usr/lib64/qt5/mkspecs/linux-g++/qmake.conf /usr/lib64/qt5/
 /usr/lib64/qt5/mkspecs/modules/qt_lib_opengl_private.pri:
 /usr/lib64/qt5/mkspecs/modules/qt_lib_openglextensions.pri:
 /usr/lib64/qt5/mkspecs/modules/qt_lib_openglextensions_private.pri:
+/usr/lib64/qt5/mkspecs/modules/qt_lib_packetprotocol_private.pri:
 /usr/lib64/qt5/mkspecs/modules/qt_lib_platformcompositor_support_private.pri:
 /usr/lib64/qt5/mkspecs/modules/qt_lib_printsupport.pri:
 /usr/lib64/qt5/mkspecs/modules/qt_lib_printsupport_private.pri:
+/usr/lib64/qt5/mkspecs/modules/qt_lib_qml.pri:
+/usr/lib64/qt5/mkspecs/modules/qt_lib_qml_private.pri:
+/usr/lib64/qt5/mkspecs/modules/qt_lib_qmldebug_private.pri:
+/usr/lib64/qt5/mkspecs/modules/qt_lib_qmldevtools_private.pri:
+/usr/lib64/qt5/mkspecs/modules/qt_lib_qmltest.pri:
+/usr/lib64/qt5/mkspecs/modules/qt_lib_qmltest_private.pri:
+/usr/lib64/qt5/mkspecs/modules/qt_lib_quick.pri:
+/usr/lib64/qt5/mkspecs/modules/qt_lib_quick_private.pri:
+/usr/lib64/qt5/mkspecs/modules/qt_lib_quickparticles_private.pri:
+/usr/lib64/qt5/mkspecs/modules/qt_lib_quickwidgets.pri:
+/usr/lib64/qt5/mkspecs/modules/qt_lib_quickwidgets_private.pri:
 /usr/lib64/qt5/mkspecs/modules/qt_lib_service_support_private.pri:
 /usr/lib64/qt5/mkspecs/modules/qt_lib_sql.pri:
 /usr/lib64/qt5/mkspecs/modules/qt_lib_sql_private.pri:
@@ -357,8 +385,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents kernels/Kernel.cu $(DISTDIR)/
 	$(COPY_FILE) --parents Ressources/Resource.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib64/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents Form\ Files/test.h includes/constants.h includes/Controller.h includes/GUIWindow.h includes/ImageImporter.h includes/ImageManager.h includes/images.h includes/Model.h includes/Renderer.h includes/Syntax.h includes/TerminalOpt.h includes/View.h includes/Window.h $(DISTDIR)/
-	$(COPY_FILE) --parents sources/Controller.cpp sources/GUIWindow.cpp sources/ImageImporter.cpp sources/ImageManager.cpp sources/main.cpp sources/Model.cpp sources/Syntax.cpp sources/TerminalOpt.cpp sources/View.cpp sources/Window.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents Form\ Files/test.h includes/constants.h includes/GUIWindow.h includes/ImageImporter.h includes/ImageManager.h includes/images.h includes/Loader.h includes/Renderer.h includes/Syntax.h includes/TerminalOpt.h includes/Window.h $(DISTDIR)/
+	$(COPY_FILE) --parents sources/GUIWindow.cpp sources/ImageImporter.cpp sources/ImageManager.cpp sources/Loader.cpp sources/main.cpp sources/Syntax.cpp sources/TerminalOpt.cpp sources/Window.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents Form\ Files/test.ui $(DISTDIR)/
 
 
@@ -420,7 +448,6 @@ compiler_moc_header_make_all: moc_GUIWindow.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_GUIWindow.cpp
 moc_GUIWindow.cpp: includes/ImageImporter.h \
-		includes/Model.h \
 		includes/ImageManager.h \
 		kernels/Kernel.cuh \
 		includes/constants.h \
@@ -463,14 +490,8 @@ compiler_clean: compiler_cuda_clean compiler_rcc_clean compiler_moc_predefs_clea
 
 ####### Compile
 
-Controller.o: sources/Controller.cpp includes/Controller.h \
-		includes/Model.h \
-		includes/View.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Controller.o sources/Controller.cpp
-
 GUIWindow.o: sources/GUIWindow.cpp includes/GUIWindow.h \
 		includes/ImageImporter.h \
-		includes/Model.h \
 		includes/ImageManager.h \
 		kernels/Kernel.cuh \
 		includes/constants.h \
@@ -488,11 +509,11 @@ GUIWindow.o: sources/GUIWindow.cpp includes/GUIWindow.h \
 		includes/Renderer.h \
 		includes/Window.h \
 		includes/images.h \
-		Form\ Files/test.h
+		Form\ Files/test.h \
+		includes/Loader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GUIWindow.o sources/GUIWindow.cpp
 
-ImageImporter.o: sources/ImageImporter.cpp includes/ImageImporter.h \
-		includes/Model.h
+ImageImporter.o: sources/ImageImporter.cpp includes/ImageImporter.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ImageImporter.o sources/ImageImporter.cpp
 
 ImageManager.o: sources/ImageManager.cpp includes/ImageManager.h \
@@ -511,6 +532,10 @@ ImageManager.o: sources/ImageManager.cpp includes/ImageManager.h \
 		/usr/local/cuda/include/device_launch_parameters.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ImageManager.o sources/ImageManager.cpp
 
+Loader.o: sources/Loader.cpp includes/Loader.h \
+		includes/constants.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Loader.o sources/Loader.cpp
+
 main.o: sources/main.cpp includes/ImageManager.h \
 		kernels/Kernel.cuh \
 		includes/constants.h \
@@ -526,7 +551,6 @@ main.o: sources/main.cpp includes/ImageManager.h \
 		/usr/local/cuda/include/texture_types.h \
 		/usr/local/cuda/include/device_launch_parameters.h \
 		includes/ImageImporter.h \
-		includes/Model.h \
 		includes/Window.h \
 		includes/images.h \
 		includes/TerminalOpt.h \
@@ -535,14 +559,10 @@ main.o: sources/main.cpp includes/ImageManager.h \
 		Form\ Files/test.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o sources/main.cpp
 
-Model.o: sources/Model.cpp includes/Model.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Model.o sources/Model.cpp
-
 Syntax.o: sources/Syntax.cpp includes/Syntax.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Syntax.o sources/Syntax.cpp
 
 TerminalOpt.o: sources/TerminalOpt.cpp includes/ImageImporter.h \
-		includes/Model.h \
 		includes/TerminalOpt.h \
 		includes/ImageManager.h \
 		kernels/Kernel.cuh \
@@ -562,11 +582,6 @@ TerminalOpt.o: sources/TerminalOpt.cpp includes/ImageImporter.h \
 		includes/images.h \
 		includes/Renderer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TerminalOpt.o sources/TerminalOpt.cpp
-
-View.o: sources/View.cpp includes/View.h \
-		includes/Controller.h \
-		includes/Model.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o View.o sources/View.cpp
 
 Window.o: sources/Window.cpp includes/Window.h \
 		includes/images.h

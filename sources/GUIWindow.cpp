@@ -1,12 +1,13 @@
 #include "../includes/GUIWindow.h"
+#include "../includes/Loader.h"
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsItem>
 
 namespace axomae {
 
 	//TODO USE QLABEL FOR IMAGES
-	enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4 , ALBEDO = 5 , GREYSCALE_AVG = 6}; 
-
+	enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4 , ALBEDO = 5 , GREYSCALE_AVG = 6 , PROJECTED_NMAP = 7}; 
+	
 	static double NORMAL_FACTOR = 1.;
 	static float NORMAL_ATTENUATION = 1.56; 
 	static double DUDV_FACTOR = 1.;
@@ -134,12 +135,13 @@ namespace axomae {
 		}
 	};
 	
+	
 /****************************************************/
 	HeapManagement *GUIWindow::_MemManagement = new HeapManagement;
 	GUIWindow::GUIWindow( QWidget *parent) : QMainWindow(parent) {
 		_UI.setupUi(this);
 		connect_all_slots(); 
-		_UI.progressBar->setValue(0); 
+		_UI.progressBar->setValue(0);
 		image_session_pointers::greyscale = nullptr; 
 		image_session_pointers::albedo = nullptr; 
 		image_session_pointers::height = nullptr; 
@@ -196,6 +198,12 @@ namespace axomae {
 		QObject::connect(_UI.factor_slider_dudv, SIGNAL(valueChanged(int)), this, SLOT(change_dudv_nmap(int))); 
 		QObject::connect(_UI.use_gpu, SIGNAL(clicked(bool)), this, SLOT(use_gpgpu(bool))); 
 
+		QObject::connect(_UI.bake_texture,SIGNAL(clicked()) , this , SLOT(compute_projection())); 
+		QObject::connect(_UI.actionImport_3D_model , SIGNAL(triggered()) , this , SLOT(import_3DOBJ())) ; 	
+	
+	
+	
+	
 	}
 
 
@@ -428,10 +436,43 @@ namespace axomae {
 
 	}
 	/******************************************************************************************/
+	void GUIWindow::compute_projection(){
+		int width = _UI.uv_width->value() ; 
+		int height = _UI.uv_height->value() ; 
+		//SDL_Surface* s = ImageManager::	
+		
+	
+	}
+
+	/******************************************************************************************/
+		
+
+
+	/******************************************************************************************/
+	
+		
+		
 
 
 	/******************************************************************************************/
 
+	bool GUIWindow::import_3DOBJ(){
+		QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx)"));
+		if(!filename.isEmpty())
+			{
+				
+				auto obj = Loader::load(filename.toStdString().c_str()) ;
+
+				SDL_Surface* surf = ImageManager::project_uv_normals(obj[0] , _UI.uv_width->value() , _UI.uv_height->value()); 
+				display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP) ; 
+
+
+			}
+
+	}
+
+
+	/******************************************************************************************/
 
 
 	bool GUIWindow::open_project() {

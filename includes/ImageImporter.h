@@ -1,13 +1,12 @@
 #ifndef IMAGEIMPORTER_H
 #define IMAGEIMPORTER_H
 
-#include "Model.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 namespace axomae{
 
 
-class ImageImporter: public Model
+class ImageImporter
 
 {
 

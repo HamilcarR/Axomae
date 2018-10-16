@@ -49,7 +49,7 @@ QMAKE_EXTRA_COMPILERS+= cuda
 
 
 
-QMAKE_CXXFLAGS += -std=c++17
+QMAKE_CXXFLAGS += -std=c++17 
 
 
 }

@@ -1,9 +1,55 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 #include <cstdint>
+#include <iostream>
 #include <future>
-
+#include <vector>
+#include <SDL2/SDL.h> 
 namespace axomae {
+
+	
+	
+
+	
+	
+	
+	struct Object3D{
+		std::vector<float> vertices; 
+		std::vector<float> uv ; 
+		std::vector<float> normals; 
+		std::vector<unsigned int> indices;
+
+	
+	};
+	
+	
+	struct Point2D{
+
+		float x ; 
+		float y ; 
+
+		void print(){
+			std::cout << x << "     " << y << "\n" ; 
+		}
+	};
+	
+	struct Vect3D {
+
+		float x ; 
+		float y ; 
+		float z ; 
+	
+	
+		
+
+	};
+	
+	
+	
+	
+	
+	
+	
 	const int INT_MAXX = 30000;
 	constexpr uint8_t AXOMAE_USE_SOBEL = 0X00;
 	constexpr uint8_t AXOMAE_USE_PREWITT = 0X01;
