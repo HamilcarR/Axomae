@@ -1056,18 +1056,15 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 
 		for(unsigned int i = 0 ; i < object.indices.size() ; i+=3) {
 			auto index = object.indices; 
+			Point2D P1 = { object.uv[index[i]*2] , object.uv[index[i]*2 + 1 ] } ; 	
+			Point2D P2 = { object.uv[index[i + 1]*2] , object.uv[index[i + 1]*2 + 1 ] } ; 
+			Point2D P3 = { object.uv[index[i + 2]*2] , object.uv[index[i + 2]*2 + 1 ] } ; 
 			
-			Point2D P1 = { object.uv[index[i]] , object.uv[index[i] + 1 ] } ; 	
-			Point2D P2 = { object.uv[index[i + 1]] , object.uv[index[i + 1] + 1 ] } ; 
-			Point2D P3 = { object.uv[index[i + 2]] , object.uv[index[i + 2] + 1 ] } ; 
 			
-			P1.print(); 
-			P2.print(); 
-			P3.print(); 
-			std::cout << index[i] << "    " << index[i+1] << "    "<< index[i+2] << "\n" ; 
-			Vect3D N1  = { object.normals[index[i]] , object.normals[index[i] + 1 ] , object.normals[index[i] + 2] } ; 
-			Vect3D N2 = { object.normals[index[i + 1]]  , object.normals[index[i + 1] + 1 ] , object.normals[index[i + 1 ] + 2] } ; 
-			Vect3D N3 = { object.normals[index[i + 2 ]] , object.normals[index[i + 2] + 1 ] , object.normals[index[i + 2 ] + 2 ] } ; 
+			
+			Vect3D N1  = { object.normals[index[i]*3] , object.normals[index[i]*3 + 1 ] , object.normals[index[i]*3 + 2] } ; 
+			Vect3D N2 = { object.normals[index[i + 1]*3]  , object.normals[index[i + 1]*3 + 1 ] , object.normals[index[i + 1 ]*3 + 2] } ; 
+			Vect3D N3 = { object.normals[index[i + 2 ]*3] , object.normals[index[i + 2]*3 + 1 ] , object.normals[index[i + 2 ]*3 + 2 ] } ; 
 
 			
 			P1.x *= width ; 
@@ -1079,9 +1076,6 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 			P3.x *= width ; 
 			P3.y *= height ; 
 
-			set_pixel_color(surf , P1.x , P1.y , 0xFFFFFFFF) ;
-			set_pixel_color(surf , P2.x , P2.y , 0xFFFFFFFF) ;
-			set_pixel_color(surf , P3.x , P3.y , 0xFFFFFFFF) ;
 			auto bounding_coords = [](float x , float y , float z , bool min) { 
 				if( min ) {
 					if( x <= y )
@@ -1129,7 +1123,7 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 							Vect3D normal = { N1.x * C.x + N2.x * C.y + N3.x * C.z ,
 									  N1.y * C.x + N2.y * C.y + N3.y * C.z ,
 									  N1.z * C.x + N2.z * C.y + N3.z * C.z }; 
-							RGB rgb = RGB( static_cast<int>(normal.x * 255) ,  static_cast<int>(normal.y * 255)  ,  static_cast<int>(normal.z * 255) , 0 ) ; 
+							RGB rgb = RGB( static_cast<int>((normal.x * 255 + 255)/2) ,  static_cast<int>((normal.y * 255+255)/2)  ,  static_cast<int>((normal.z * 255+255)/2) , 0 ) ; 
 							uint32_t val = rgb.rgb_to_int() ; 
 							
 							set_pixel_color(surf , x , y , val) ;

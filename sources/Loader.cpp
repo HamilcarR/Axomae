@@ -33,7 +33,7 @@ namespace axomae{
 
 	std::vector<Object3D> Loader::load(const char* file){
 		Assimp::Importer importer ;
-		const aiScene *modelScene = importer.ReadFile(file , aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices
+		const aiScene *modelScene = importer.ReadFile(file ,   aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices
 								| aiProcess_FlipUVs) ;
 
 		if(modelScene != nullptr)
