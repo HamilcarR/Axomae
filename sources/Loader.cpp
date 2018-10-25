@@ -47,7 +47,8 @@ namespace axomae{
 						const aiVector3D* vert = &(mesh->mVertices[f]) ; 
 						const aiVector3D* norm = &(mesh->mNormals[f]) ; 
 						const aiVector3D* tex = &(mesh->mTextureCoords[0][f]) ; 
-					
+						const aiVector3D* tang = &(mesh->mTangents[f]); 
+						const aiVector3D* bitang = &(mesh->mBitangents[f]) ; 
 					object.vertices.push_back(vert->x); 
 					object.vertices.push_back(vert->y); 
 					object.vertices.push_back(vert->z); 
@@ -58,7 +59,16 @@ namespace axomae{
 					object.normals.push_back(norm->x) ; 
 					object.normals.push_back(norm->y) ; 
 					object.normals.push_back(norm->z) ; 
-					
+	
+					object.tangents.push_back(tang->x); 	
+					object.tangents.push_back(tang->y); 	
+					object.tangents.push_back(tang->z);
+
+					object.bitangents.push_back(bitang->x) ; 
+					object.bitangents.push_back(bitang->y) ; 
+					object.bitangents.push_back(bitang->z) ; 
+
+
 					}
 
 				for(int ind = 0 ; ind < mesh->mNumFaces ; ind++){

@@ -68,7 +68,7 @@ namespace axomae{
 			static void USE_CPU_COMPUTING() { gpu = false;  }
 			static bool USING_GPU() { return gpu;  }
 			static SDL_Surface* copy_surface(SDL_Surface* src); 
-			static SDL_Surface* project_uv_normals(Object3D object,  int width , int height);		    
+			static SDL_Surface* project_uv_normals(Object3D object,  int width , int height , bool tangent_space);		    
 		private:
 
 

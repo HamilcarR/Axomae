@@ -17,6 +17,8 @@ namespace axomae {
 		std::vector<float> vertices; 
 		std::vector<float> uv ; 
 		std::vector<float> normals; 
+		std::vector<float> bitangents ; 
+		std::vector<float> tangents;
 		std::vector<unsigned int> indices;
 
 	

@@ -463,7 +463,7 @@ namespace axomae {
 				
 				auto obj = Loader::load(filename.toStdString().c_str()) ;
 
-				SDL_Surface* surf = ImageManager::project_uv_normals(obj[0] , _UI.uv_width->value() , _UI.uv_height->value()); 
+				SDL_Surface* surf = ImageManager::project_uv_normals(obj[0] , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); 
 				display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP) ; 
 
 

@@ -6,8 +6,8 @@
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef TEST_H
-#define TEST_H
+#ifndef UI_TEST_H
+#define UI_TEST_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
@@ -95,6 +95,7 @@ public:
     QLabel *label_4;
     QSpinBox *uv_width;
     QPushButton *bake_texture;
+    QRadioButton *tangent_space;
     QWidget *widget;
     QGridLayout *gridLayout;
     QGridLayout *gridLayout_4;
@@ -368,7 +369,7 @@ public:
         tools->setObjectName(QStringLiteral("tools"));
         groupBox = new QGroupBox(tools);
         groupBox->setObjectName(QStringLiteral("groupBox"));
-        groupBox->setGeometry(QRect(0, 20, 147, 138));
+        groupBox->setGeometry(QRect(0, 20, 147, 161));
         gridLayout_7 = new QGridLayout(groupBox);
         gridLayout_7->setObjectName(QStringLiteral("gridLayout_7"));
         gridLayout_3 = new QGridLayout();
@@ -400,12 +401,17 @@ public:
         gridLayout_3->addWidget(uv_width, 0, 1, 1, 1);
 
 
-        gridLayout_7->addLayout(gridLayout_3, 0, 0, 1, 1);
+        gridLayout_7->addLayout(gridLayout_3, 1, 0, 1, 1);
 
         bake_texture = new QPushButton(groupBox);
         bake_texture->setObjectName(QStringLiteral("bake_texture"));
 
-        gridLayout_7->addWidget(bake_texture, 1, 0, 1, 1);
+        gridLayout_7->addWidget(bake_texture, 2, 0, 1, 1);
+
+        tangent_space = new QRadioButton(groupBox);
+        tangent_space->setObjectName(QStringLiteral("tangent_space"));
+
+        gridLayout_7->addWidget(tangent_space, 0, 0, 1, 1);
 
         renderMaterials->addTab(tools, QString());
         widget = new QWidget();
@@ -637,6 +643,7 @@ public:
         label_3->setText(QApplication::translate("MainWindow", "Texture height", Q_NULLPTR));
         label_4->setText(QApplication::translate("MainWindow", "Texture width", Q_NULLPTR));
         bake_texture->setText(QApplication::translate("MainWindow", "Bake", Q_NULLPTR));
+        tangent_space->setText(QApplication::translate("MainWindow", "Tangent space", Q_NULLPTR));
         renderMaterials->setTabText(renderMaterials->indexOf(tools), QApplication::translate("MainWindow", "tools", Q_NULLPTR));
         renderMaterials->setTabText(renderMaterials->indexOf(widget), QApplication::translate("MainWindow", "Materials", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab_greyscale), QApplication::translate("MainWindow", "greyscale", Q_NULLPTR));
@@ -660,4 +667,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // TEST_H
+#endif // UI_TEST_H

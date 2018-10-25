@@ -1031,7 +1031,7 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 
 
 
-	SDL_Surface* ImageManager::project_uv_normals(Object3D object , int width ,  int height){
+	SDL_Surface* ImageManager::project_uv_normals(Object3D object , int width ,  int height , bool tangent_space){
 
 				
 	#if SDL_BYTEORDER == SDL_BIG_ENDIAN
@@ -1053,7 +1053,7 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 		SDL_Surface* surf = SDL_CreateRGBSurface(0 , width , height , 24 , rmask , gmask , bmask , amask) ;
 		assert(surf != nullptr) ; 
 
-
+		/* Parallelize : each face = 1 thread ? */
 		for(unsigned int i = 0 ; i < object.indices.size() ; i+=3) {
 			auto index = object.indices; 
 			Point2D P1 = { object.uv[index[i]*2] , object.uv[index[i]*2 + 1 ] } ; 	
@@ -1065,7 +1065,14 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 			Vect3D N1  = { object.normals[index[i]*3] , object.normals[index[i]*3 + 1 ] , object.normals[index[i]*3 + 2] } ; 
 			Vect3D N2 = { object.normals[index[i + 1]*3]  , object.normals[index[i + 1]*3 + 1 ] , object.normals[index[i + 1 ]*3 + 2] } ; 
 			Vect3D N3 = { object.normals[index[i + 2 ]*3] , object.normals[index[i + 2]*3 + 1 ] , object.normals[index[i + 2 ]*3 + 2 ] } ; 
-
+			
+			Vect3D BT1 =  { object.bitangents[index[i]*3] , object.bitangents[index[i]*3 + 1 ] , object.bitangents[index[i]*3 + 2] } ; 
+			Vect3D BT2 = { object.bitangents[index[i + 1]*3]  , object.bitangents[index[i + 1]*3 + 1 ] , object.bitangents[index[i + 1 ]*3 + 2] } ; 
+			Vect3D BT3 = { object.bitangents[index[i + 2 ]*3] , object.bitangents[index[i + 2]*3 + 1 ] , object.bitangents[index[i + 2 ]*3 + 2 ] } ; 
+			
+			Vect3D T1 =  { object.tangents[index[i]*3] , object.tangents[index[i]*3 + 1 ] , object.tangents[index[i]*3 + 2] } ; 
+			Vect3D T2 = { object.tangents[index[i + 1]*3]  , object.tangents[index[i + 1]*3 + 1 ] , object.tangents[index[i + 1 ]*3 + 2] } ; 
+			Vect3D T3 = { object.tangents[index[i + 2 ]*3] , object.tangents[index[i + 2]*3 + 1 ] , object.tangents[index[i + 2 ]*3 + 2 ] } ; 
 			
 			P1.x *= width ; 
 			P1.y *= height ; 
@@ -1106,12 +1113,20 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 				auto W3 = 1 - W1 - W2 ; 
 				Vect3D v = {W1 , W2 , W3} ; 
 				return v ;  
+					};
 
+			auto tan_space_transformV1 = [] (Vect3D T1 , Vect3D BT1 , Vect3D N1 , Vect3D I){
+
+				float TBN[3][3] =  {{T1.x , T1.y , T1.z} ,
+					     {BT1.x , BT1.y , BT1.z},
+					     {N1.x , N1.y , N1.z}} ; 
+				Vect3D result = { I.x * T1.x + I.y * T1.y + I.z * T1.z , 
+						I.x * BT1.x + BT1.y * I.y + BT1.z * I.z ,
+						I.x * N1.x + N1.y * I.y + I.z * N1.z};
+				return result ; 
 
 
 			};
-
-
 			
 			for(int x = x_min ; x <= x_max ; x++){
 				for(int y = y_min ; y <= y_max ; y++){
@@ -1120,15 +1135,41 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 					Point2D I = {static_cast<float>(x) ,static_cast<float> (y)} ; 
 					Vect3D C = barycentric_lerp(P1 , P2 , P3 , I) ; 
 						if(C.x >= 0 && C.y >= 0 && C.z >= 0){
-							Vect3D normal = { N1.x * C.x + N2.x * C.y + N3.x * C.z ,
-									  N1.y * C.x + N2.y * C.y + N3.y * C.z ,
-									  N1.z * C.x + N2.z * C.y + N3.z * C.z }; 
-							RGB rgb = RGB( static_cast<int>((normal.x * 255 + 255)/2) ,  static_cast<int>((normal.y * 255+255)/2)  ,  static_cast<int>((normal.z * 255+255)/2) , 0 ) ; 
-							uint32_t val = rgb.rgb_to_int() ; 
 							
-							set_pixel_color(surf , x , y , val) ;
+							auto interpolate = [&C](Vect3D N1 , Vect3D N2 , Vect3D N3){
+								Vect3D normal = { N1.x * C.x + N2.x * C.y + N3.x * C.z ,
+									  N1.y * C.x + N2.y * C.y + N3.y * C.z ,
+									  N1.z * C.x + N2.z * C.y + N3.z * C.z }; 		
+								return normal ; 
+							};
+							
+							if(tangent_space){
 
+								Vect3D normal = interpolate(N1 , N2 , N3) ; 	
+							//	Vect3D N1T = tan_space_transformV1(T1 , BT1 , N1 , normal ) ; 
+								Vect3D N2T = tan_space_transformV1(T2 , BT2 , N2 , normal ) ; 
+//								Vect3D N3T = tan_space_transformV1(T3 , BT3 , N3 , normal) ; 
+								normal = N2T ; 
 
+								RGB rgb = RGB( static_cast<int>((normal.x * 255 + 255)/2) ,
+										static_cast<int>((normal.y * 255+255)/2)  ,  		
+										static_cast<int>((normal.z * 255+255)/2) , 0 ) ; 
+								uint32_t val = rgb.rgb_to_int() ; 
+								set_pixel_color(surf , x , y , val) ;
+							
+
+							}
+							else{
+								Vect3D normal = interpolate(N1 , N2 , N3) ; 	
+								RGB rgb = RGB( static_cast<int>((normal.x * 255 + 255)/2) ,
+										static_cast<int>((normal.y * 255+255)/2)  ,  
+										static_cast<int>((normal.z * 255+255)/2) , 0 ) ; 
+								
+								uint32_t val = rgb.rgb_to_int() ; 
+								set_pixel_color(surf , x , y , val) ;
+						
+							}
+						
 
 
 

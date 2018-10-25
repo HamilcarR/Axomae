@@ -335,14 +335,14 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
             <x>0</x>
             <y>20</y>
             <width>147</width>
-            <height>138</height>
+            <height>161</height>
            </rect>
           </property>
           <property name="title">
            <string>Baking texture dimensions</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_7">
-           <item row="0" column="0">
+           <item row="1" column="0">
             <layout class="QGridLayout" name="gridLayout_3">
              <item row="1" column="0">
               <widget class="QLabel" name="label_3">
@@ -358,6 +358,9 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                </property>
                <property name="maximum">
                 <number>8096</number>
+               </property>
+               <property name="value">
+                <number>500</number>
                </property>
               </widget>
              </item>
@@ -376,14 +379,24 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                <property name="maximum">
                 <number>8096</number>
                </property>
+               <property name="value">
+                <number>500</number>
+               </property>
               </widget>
              </item>
             </layout>
            </item>
-           <item row="1" column="0">
+           <item row="2" column="0">
             <widget class="QPushButton" name="bake_texture">
              <property name="text">
-              <string>PushButton</string>
+              <string>Bake</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QRadioButton" name="tangent_space">
+             <property name="text">
+              <string>Tangent space</string>
              </property>
             </widget>
            </item>
@@ -624,6 +637,16 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
               </widget>
              </item>
             </layout>
+           </widget>
+           <widget class="QListView" name="model_list">
+            <property name="geometry">
+             <rect>
+              <x>1060</x>
+              <y>-9</y>
+              <width>231</width>
+              <height>791</height>
+             </rect>
+            </property>
            </widget>
           </widget>
          </widget>
