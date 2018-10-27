@@ -19,11 +19,19 @@ Or in tangent space :
 The software is still in developpement. 
 
 Features planned : 
+
 -Full GPU parallelism support (using NVidia Cuda) . 
+
 -Multi-threading. 
+
 -OpenGL viewer with PBR shaders.
+
 -Material editor.
+
 -UV editor. 
+
 -Automatic UV unwrap.
+
 -Batch processing.
+
 
