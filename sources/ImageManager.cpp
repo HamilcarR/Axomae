@@ -1115,19 +1115,15 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 				return v ;  
 					};
 
-			auto tan_space_transformV1 = [] (Vect3D T1 , Vect3D BT1 , Vect3D N1 , Vect3D I){
-
-				float TBN[3][3] =  {{T1.x , T1.y , T1.z} ,
-					     {BT1.x , BT1.y , BT1.z},
-					     {N1.x , N1.y , N1.z}} ; 
-				Vect3D result = { I.x * T1.x + I.y * T1.y + I.z * T1.z , 
-						I.x * BT1.x + BT1.y * I.y + BT1.z * I.z ,
-						I.x * N1.x + N1.y * I.y + I.z * N1.z};
+			auto tan_space_transform = [] (Vect3D T , Vect3D BT , Vect3D N , Vect3D I){
+				Vect3D result = { I.x * BT.x + I.y * BT.y + I.z * BT.z , 
+						I.x * T.x + T.y * I.y + T.z * I.z ,
+						I.x * N.x + N.y * I.y + I.z * N.z};
 				return result ; 
 
 
 			};
-			
+		
 			for(int x = x_min ; x <= x_max ; x++){
 				for(int y = y_min ; y <= y_max ; y++){
 					
@@ -1144,13 +1140,19 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 							};
 							
 							if(tangent_space){
-
+								
 								Vect3D normal = interpolate(N1 , N2 , N3) ; 	
-							//	Vect3D N1T = tan_space_transformV1(T1 , BT1 , N1 , normal ) ; 
-								Vect3D N2T = tan_space_transformV1(T2 , BT2 , N2 , normal ) ; 
-//								Vect3D N3T = tan_space_transformV1(T3 , BT3 , N3 , normal) ; 
-								normal = N2T ; 
+								
+								Vect3D B = {(BT1.x + BT2.x + BT3.x)/3 , (BT1.y + BT2.y + BT3.y)/3 , (BT1.z + BT2.z + BT3.z)/3 }; 
+								Vect3D T = {(T1.x + T2.x + T3.x)/3 , (T1.y + T2.y + T3.y)/3 , (T1.z + T2.z + T3.z)/3 }; 
+								Vect3D N = {(N1.x + N2.x + N3.x)/3 , (N1.y + N2.y + N3.y)/3 , (N1.z + N2.z + N3.z)/3 }; 
+								
+								B.normalize(); 
+								T.normalize(); 
+								N.normalize(); 
+								normal = tan_space_transform(T , B , N , normal); 
 
+								normal.normalize() ; 	
 								RGB rgb = RGB( static_cast<int>((normal.x * 255 + 255)/2) ,
 										static_cast<int>((normal.y * 255+255)/2)  ,  		
 										static_cast<int>((normal.z * 255+255)/2) , 0 ) ; 
@@ -1160,7 +1162,12 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 
 							}
 							else{
-								Vect3D normal = interpolate(N1 , N2 , N3) ; 	
+								N1.normalize(); 
+								N2.normalize(); 
+								N3.normalize(); 
+
+								Vect3D normal = interpolate(N1 , N2 , N3) ; 
+
 								RGB rgb = RGB( static_cast<int>((normal.x * 255 + 255)/2) ,
 										static_cast<int>((normal.y * 255+255)/2)  ,  
 										static_cast<int>((normal.z * 255+255)/2) , 0 ) ; 

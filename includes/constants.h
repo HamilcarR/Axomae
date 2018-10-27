@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <iostream>
 #include <future>
+#include <cmath>
 #include <vector>
 #include <SDL2/SDL.h> 
 namespace axomae {
@@ -41,7 +42,28 @@ namespace axomae {
 		float y ; 
 		float z ; 
 	
-	
+		void print(){
+			std::cout << x << "     " << y << "      " << z <<  "\n" ; 
+		}
+		
+
+		auto magnitude() {
+		
+			return sqrt(x*x + y*y + z*z); 
+
+		}
+
+		void normalize(){
+			auto mag = this->magnitude() ; 
+			x = abs(x/mag) ; 
+			y = abs(y/mag) ; 
+			z = abs(z/mag) ; 
+
+		}
+		auto dot(Vect3D V ) {
+			return x * V.x + y * V.y + z * V.z ; 
+
+		}
 		
 
 	};
