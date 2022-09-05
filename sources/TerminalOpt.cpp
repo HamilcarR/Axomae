@@ -21,12 +21,8 @@ namespace axomae{
 	struct Validation {
 		bool validated;
 		std::vector <T> command_arguments;
-
-
 	};
-
 	std::mutex mutex_window_thread1, mutex_window_thread2;
-
 	static const char* CMD_ERROR = "Wrong command used !";
 	static const char* LOADERR = "Image loading failed :"; 
 	ProgramStatus *ProgramStatus::instance = nullptr; 
@@ -43,32 +39,21 @@ namespace axomae{
 		std::regex("ls" , std::regex_constants::icase),		//list all image ids
 		std::regex("select [0-9]+",std::regex_constants::icase), //select image id as work image
 		std::regex("id" , std::regex_constants::icase)			//check current image id 
-
-
 	};
-
-
-
-
 
 /*******************************************************************************************************************************************************/
 	static bool check_if_number(std::string& input) {
-		
 		bool it = std::all_of(input.begin(),input.end(), [](char c){ return std::isdigit(c);});
 		return it;
-
 	}
 
 /*******************************************************************************************************************************************************/
 
 	/*retrieve an argument from a command*/
 	static std::string get_word(std::string& input , Uint8 pos){
-
-
 		if(pos > input.size() || input.size() == 0 ) 
 		      return std::string();
 		else{
-
 			char input_c[STRING_SIZE] = " "; 
 		        strcpy(input_c,input.c_str()) ; 	
 			char * tokens = strtok(input_c , " \n" );
@@ -76,47 +61,29 @@ namespace axomae{
 		       	while(tokens){
 				if(pos == number_args)
 					return std::string(tokens); 
-			
-					tokens = strtok(NULL , " \n" ); 
-					number_args ++; 	
-				
-
+				tokens = strtok(NULL , " \n" ); 
+				number_args ++; 	
 			}
 			return std::string() ; 
-
-
 		}	
-
-
 	}
-
-
 
 /*******************************************************************************************************************************************************/
 
 	static Validation<std::string> validate_command_load(std::string input){
 		std::string delimiter = " " ;
-
 		if(std::regex_match(input , command_regex[LOAD])){
-
-				std::vector<std::string> arg_array ; 
-				std::string arg1 = get_word(input,1);
-
-				if(arg1.size()>0)
-				{
-					arg_array.push_back(arg1);
-					return {true , arg_array}; 
-
-				}
-				else
-					return {false,std::vector<std::string>()}; 
-
-
-
+			std::vector<std::string> arg_array ; 
+			std::string arg1 = get_word(input,1);
+			if(arg1.size()>0){
+				arg_array.push_back(arg1);
+				return {true , arg_array}; 
+			}
+			else
+				return {false,std::vector<std::string>()}; 
 		}			
-
 		else
-		return {false,std::vector<std::string>()}; 
+			return {false,std::vector<std::string>()}; 
 	}
 
 /*******************************************************************************************************************************************************/
@@ -264,39 +231,23 @@ namespace axomae{
 		mutex_window_thread1.lock();
 		display = new Window(width, height, name.c_str());
 		instance->setDisplay(display);
-
 		mutex_window_thread1.unlock(); 
-
 		SDL_Event event;
-
 		display->setEvent(event);
-		
-		
-		
 		int  prev_image_id= instance->getCurrentImageId();
-
-		
 		int image = images.size() - 1; 
 		while (loop) {
-
 			int _idCurrentImage = (instance->getCurrentImageId() == prev_image_id ) ? prev_image_id : instance->getCurrentImageId();
-
-				mutex_window_thread2.lock();
-					if (instance->getDisplay() != nullptr && _idCurrentImage >= 0 && _idCurrentImage < images.size())
-					instance->getDisplay()->display_image(images[_idCurrentImage].first);
-				mutex_window_thread2.unlock();
-				while (SDL_PollEvent(&event)) {
-					if (event.type == SDL_QUIT) {
-						
-						loop = false;
-					}
-
-				}
-				if (!instance->getLoop())
-					loop = false; 
-				
-			
-
+			mutex_window_thread2.lock();
+			if (instance->getDisplay() != nullptr && _idCurrentImage >= 0 && (unsigned int) _idCurrentImage < images.size())
+				instance->getDisplay()->display_image(images[_idCurrentImage].first);
+			mutex_window_thread2.unlock();
+			while (SDL_PollEvent(&event)) {
+				if (event.type == SDL_QUIT) 		
+					loop = false;					
+			}
+			if (!instance->getLoop())
+				loop = false; 
 		}
 		mutex_window_thread2.lock();
 		display->cleanUp(); 
@@ -375,10 +326,9 @@ namespace axomae{
 
 		if(save){
 			Validation<std::string> v = validate_command_save(user_input); 
-			int id = atoi(v.command_arguments[0].c_str()); 
-			
+			int id = atoi(v.command_arguments[0].c_str()); 	
 			if (v.validated) {
-				if (id >= 0 && id < images.size()) {
+				if (id >= 0 && (unsigned int) id < images.size()) {
 					print(std::string("Saving..."), GREEN, PROMPT2);
 					ImageImporter::save_image(images[id].first, v.command_arguments[1].c_str());
 					print(std::string("Done."), GREEN, PROMPT2);
@@ -428,10 +378,6 @@ namespace axomae{
 			}
 			else
 				print(CMD_ERROR, RED);
-
-
-
-
 		}
 		else if(normalmap){
 		
@@ -450,17 +396,11 @@ namespace axomae{
 				else
 					ImageManager::USE_CPU_COMPUTING(); 
 				ImageManager::set_greyscale_luminance(images[id].first); //TODO change to hmap 
-				
 			}
 			else
-				print(CMD_ERROR, RED); 
-
-		
+				print(CMD_ERROR, RED); 		
 		}
 		else if(contrast){
-
-
-
 
 		}
 		else if(render){
@@ -475,50 +415,34 @@ namespace axomae{
 			else {
 				std::string liste = "";
 				unsigned int count = 0;
-
 				for (std::pair<SDL_Surface*, std::string> p : images) {
 					liste +="-"+ std::to_string(count) + " : " + p.second + "\n";
 					count++;
 				}
 				print(liste, BLUE ,PROMPT2);
-		
-
 			}
-		
 		}
-		
-		else if(closew ){
-		
+		else if(closew )
 			std::puts("Exiting...\n"); 
-			
-		}
 		else if (selectid) {
-
 			Validation<std::string> v = validate_command_select(user_input); 
 			if (v.validated) {
 				try {
-					unsigned int id = std::stoi(v.command_arguments[0].c_str());
-					if (id >= images.size() || id < 0) {
+					int id = std::stoi(v.command_arguments[0].c_str());
+					if ((unsigned int) id >= images.size() || id < 0) 
 						print(std::string("Invalid id input"), RED); 
-					}
+					
 					else {
 						_idCurrentImage = id;
 						print(std::string("Selected : " + images[id].second), GREEN , PROMPT2);
 					}
-
 				}
 				catch (std::invalid_argument  e) {
 					print(std::string("Invalid argument input"), RED); 
 
 				}
 			}
-			
-
 		}
-
-
-
-
 		else if (what_selected) {
 			std::string a = "";
 			if (_idCurrentImage != -1) {
@@ -527,19 +451,11 @@ namespace axomae{
 			}
 			else
 				a = "No image ID selected"; 
-
 			print(a, YELLOW , PROMPT2); 
 		}
-
-
-
-		else {
+		else 
 			print(CMD_ERROR, RED);
 
-
-		}
-
-	
 	}
 
 

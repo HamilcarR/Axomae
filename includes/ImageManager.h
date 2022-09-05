@@ -13,12 +13,7 @@
 namespace axomae{
 			
 			
-
-
-
-
 	class RGB{
-
 		public:
 			RGB();
 			RGB(int r , int g , int b , int a);
@@ -27,11 +22,8 @@ namespace axomae{
 			static RGB int_to_rgb(uint32_t value);
 			static RGB int_to_rgb(uint8_t value);
 			static RGB int_to_rgb(uint16_t value);
-		        const  double intensity();
-			void invert_color();
-			
-			template<typename T>
-			static RGB invert_color(T &color);
+		        double intensity();
+			void invert_color();			
 			RGB operator+=(int arg);
 			RGB operator+(RGB arg);
 			RGB operator/(int arg);

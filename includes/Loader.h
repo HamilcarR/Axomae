@@ -14,10 +14,8 @@
 
 namespace axomae{
 
-	class Loader {
-
+	class Loader{
 		public:
-
 			static Loader* getInstance(); 	
 			static std::vector<Object3D> load(const char* file);   				
 			static void close(); 	
@@ -28,11 +26,7 @@ namespace axomae{
 			static Loader* instance; 
 	
 	
-	
 	};
-
-
-
 
 
 

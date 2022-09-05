@@ -1,12 +1,18 @@
 let SessionLoad = 1
-let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
+let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1
 let v:this_session=expand("<sfile>:p")
 silent only
-cd ~/Desktop/Projets/Axomae
+silent tabonly
+cd ~/Desktop/projects/Axomae
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
-set shortmess=aoO
+let s:shortmess_save = &shortmess
+if &shortmess =~ 'A'
+  set shortmess=aoOA
+else
+  set shortmess=aoO
+endif
 badd +4 sources/Controller.cpp
 badd +1 sources/GUIWindow.cpp
 badd +1 sources/ImageImporter.cpp
@@ -26,13 +32,13 @@ badd +1 includes/Loader.h
 badd +1 includes/Controller.h
 badd +1 includes/Object.h
 badd +1 sources/Object.cpp
-badd +0 includes/ImageManager.h
+badd +1 includes/ImageManager.h
 badd +17 includes/constants.h
 badd +1 kernels/Kernel.cuh
-badd +0 kernels/Kernel.cu
-badd +0 includes/View.h
+badd +1 kernels/Kernel.cu
+badd +1 includes/View.h
 argglobal
-silent! argdel *
+%argdel
 $argadd sources/Controller.cpp
 $argadd sources/GUIWindow.cpp
 $argadd sources/ImageImporter.cpp
@@ -44,21 +50,41 @@ $argadd sources/TerminalOpt.cpp
 $argadd sources/View.cpp
 $argadd sources/Window.cpp
 set stal=2
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabrewind
 edit includes/GUIWindow.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
 1wincmd h
 wincmd w
-set nosplitbelow
-set nosplitright
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
 wincmd t
-set winminheight=1 winminwidth=1 winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 379)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 379)
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
 argglobal
 2argu
-if bufexists('includes/GUIWindow.h') | buffer includes/GUIWindow.h | else | edit includes/GUIWindow.h | endif
+if bufexists(fnamemodify("includes/GUIWindow.h", ":p")) | buffer includes/GUIWindow.h | else | edit includes/GUIWindow.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/GUIWindow.h
+endif
+balt sources/GUIWindow.cpp
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -68,15 +94,17 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 40 - ((39 * winheight(0) + 38) / 77)
+let &fdl = &fdl
+let s:l = 40 - ((36 * winheight(0) + 35) / 71)
 if s:l < 1 | let s:l = 1 | endif
-exe s:l
+keepjumps exe s:l
 normal! zt
-40
+keepjumps 40
 normal! 0
 wincmd w
 argglobal
 2argu
+balt includes/GUIWindow.h
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -86,131 +114,42 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 442 - ((15 * winheight(0) + 38) / 77)
+let &fdl = &fdl
+let s:l = 442 - ((14 * winheight(0) + 35) / 71)
 if s:l < 1 | let s:l = 1 | endif
-exe s:l
+keepjumps exe s:l
 normal! zt
-442
-normal! 056|
-wincmd w
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 379)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 379)
-tabedit kernels/Kernel.cuh
-set splitbelow splitright
-wincmd _ | wincmd |
-vsplit
-1wincmd h
-wincmd w
-set nosplitbelow
-set nosplitright
-wincmd t
-set winminheight=1 winminwidth=1 winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 379)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 379)
-argglobal
-if bufexists('kernels/Kernel.cuh') | buffer kernels/Kernel.cuh | else | edit kernels/Kernel.cuh | endif
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 38) / 77)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-1
-normal! 0
-wincmd w
-argglobal
-if bufexists('kernels/Kernel.cu') | buffer kernels/Kernel.cu | else | edit kernels/Kernel.cu | endif
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 38) / 77)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-1
-normal! 0
-wincmd w
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 379)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 379)
-tabedit includes/ImageImporter.h
-set splitbelow splitright
-wincmd _ | wincmd |
-vsplit
-1wincmd h
-wincmd w
-set nosplitbelow
-set nosplitright
-wincmd t
-set winminheight=1 winminwidth=1 winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 379)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 379)
-argglobal
-3argu
-if bufexists('includes/ImageImporter.h') | buffer includes/ImageImporter.h | else | edit includes/ImageImporter.h | endif
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 14 - ((13 * winheight(0) + 38) / 77)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-14
-normal! 0
-wincmd w
-argglobal
-3argu
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let s:l = 34 - ((24 * winheight(0) + 38) / 77)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-34
+keepjumps 442
 normal! 08|
 wincmd w
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 379)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 379)
-tabedit includes/ImageManager.h
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
+tabnext
+edit kernels/Kernel.cuh
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
 1wincmd h
 wincmd w
-set nosplitbelow
-set nosplitright
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
 wincmd t
-set winminheight=1 winminwidth=1 winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 379)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 379)
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
 argglobal
-4argu
-if bufexists('includes/ImageManager.h') | buffer includes/ImageManager.h | else | edit includes/ImageManager.h | endif
+if bufexists(fnamemodify("kernels/Kernel.cuh", ":p")) | buffer kernels/Kernel.cuh | else | edit kernels/Kernel.cuh | endif
+if &buftype ==# 'terminal'
+  silent file kernels/Kernel.cuh
+endif
+balt includes/GUIWindow.h
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -220,15 +159,152 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 16 - ((15 * winheight(0) + 38) / 77)
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 35) / 71)
 if s:l < 1 | let s:l = 1 | endif
-exe s:l
+keepjumps exe s:l
 normal! zt
-16
+keepjumps 1
+normal! 0
+wincmd w
+argglobal
+if bufexists(fnamemodify("kernels/Kernel.cu", ":p")) | buffer kernels/Kernel.cu | else | edit kernels/Kernel.cu | endif
+if &buftype ==# 'terminal'
+  silent file kernels/Kernel.cu
+endif
+balt kernels/Kernel.cuh
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 35) / 71)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
+tabnext
+edit includes/ImageImporter.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
+argglobal
+3argu
+if bufexists(fnamemodify("includes/ImageImporter.h", ":p")) | buffer includes/ImageImporter.h | else | edit includes/ImageImporter.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/ImageImporter.h
+endif
+balt sources/ImageImporter.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 14 - ((12 * winheight(0) + 35) / 71)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 14
+normal! 0
+wincmd w
+argglobal
+3argu
+balt includes/ImageImporter.h
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 34 - ((22 * winheight(0) + 35) / 71)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 34
+normal! 08|
+wincmd w
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
+tabnext
+edit includes/ImageManager.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
+argglobal
+4argu
+if bufexists(fnamemodify("includes/ImageManager.h", ":p")) | buffer includes/ImageManager.h | else | edit includes/ImageManager.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/ImageManager.h
+endif
+balt sources/ImageManager.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 16 - ((14 * winheight(0) + 35) / 71)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 16
 normal! 0
 wincmd w
 argglobal
 4argu
+balt includes/ImageManager.h
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -238,24 +314,25 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1067 - ((33 * winheight(0) + 38) / 77)
+let &fdl = &fdl
+let s:l = 1067 - ((30 * winheight(0) + 35) / 71)
 if s:l < 1 | let s:l = 1 | endif
-exe s:l
+keepjumps exe s:l
 normal! zt
-1067
+keepjumps 1067
 normal! 024|
 wincmd w
 2wincmd w
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 379)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 379)
-tabedit includes/constants.h
-set splitbelow splitright
-set nosplitbelow
-set nosplitright
-wincmd t
-set winminheight=1 winminwidth=1 winheight=1 winwidth=1
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
+tabnext
+edit includes/constants.h
 argglobal
-if bufexists('includes/constants.h') | buffer includes/constants.h | else | edit includes/constants.h | endif
+if bufexists(fnamemodify("includes/constants.h", ":p")) | buffer includes/constants.h | else | edit includes/constants.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/constants.h
+endif
+balt sources/ImageManager.cpp
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -265,20 +342,18 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 38) / 77)
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 35) / 71)
 if s:l < 1 | let s:l = 1 | endif
-exe s:l
+keepjumps exe s:l
 normal! zt
-1
+keepjumps 1
 normal! 0
-tabedit sources/main.cpp
-set splitbelow splitright
-set nosplitbelow
-set nosplitright
-wincmd t
-set winminheight=1 winminwidth=1 winheight=1 winwidth=1
+tabnext
+edit sources/main.cpp
 argglobal
 5argu
+balt includes/constants.h
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -288,20 +363,18 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 38) / 77)
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 35) / 71)
 if s:l < 1 | let s:l = 1 | endif
-exe s:l
+keepjumps exe s:l
 normal! zt
-1
+keepjumps 1
 normal! 0
-tabedit sources/TerminalOpt.cpp
-set splitbelow splitright
-set nosplitbelow
-set nosplitright
-wincmd t
-set winminheight=1 winminwidth=1 winheight=1 winwidth=1
+tabnext
+edit sources/TerminalOpt.cpp
 argglobal
 8argu
+balt sources/main.cpp
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -311,26 +384,39 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 38) / 77)
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 35) / 71)
 if s:l < 1 | let s:l = 1 | endif
-exe s:l
+keepjumps exe s:l
 normal! zt
-1
+keepjumps 1
 normal! 0
-tabedit includes/Loader.h
+tabnext
+edit includes/Loader.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
 1wincmd h
 wincmd w
-set nosplitbelow
-set nosplitright
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
 wincmd t
-set winminheight=1 winminwidth=1 winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 379)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 379)
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
 argglobal
-if bufexists('includes/Loader.h') | buffer includes/Loader.h | else | edit includes/Loader.h | endif
+if bufexists(fnamemodify("includes/Loader.h", ":p")) | buffer includes/Loader.h | else | edit includes/Loader.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/Loader.h
+endif
+balt sources/TerminalOpt.cpp
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -340,15 +426,20 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 32 - ((31 * winheight(0) + 38) / 77)
+let &fdl = &fdl
+let s:l = 32 - ((29 * winheight(0) + 35) / 71)
 if s:l < 1 | let s:l = 1 | endif
-exe s:l
+keepjumps exe s:l
 normal! zt
-32
+keepjumps 32
 normal! 010|
 wincmd w
 argglobal
-if bufexists('sources/Loader.cpp') | buffer sources/Loader.cpp | else | edit sources/Loader.cpp | endif
+if bufexists(fnamemodify("sources/Loader.cpp", ":p")) | buffer sources/Loader.cpp | else | edit sources/Loader.cpp | endif
+if &buftype ==# 'terminal'
+  silent file sources/Loader.cpp
+endif
+balt includes/Loader.h
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -358,23 +449,21 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 45 - ((31 * winheight(0) + 38) / 77)
+let &fdl = &fdl
+let s:l = 45 - ((29 * winheight(0) + 35) / 71)
 if s:l < 1 | let s:l = 1 | endif
-exe s:l
+keepjumps exe s:l
 normal! zt
-45
-normal! 016|
+keepjumps 45
+normal! 08|
 wincmd w
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 379)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 379)
-tabedit sources/Window.cpp
-set splitbelow splitright
-set nosplitbelow
-set nosplitright
-wincmd t
-set winminheight=1 winminwidth=1 winheight=1 winwidth=1
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
+tabnext
+edit sources/Window.cpp
 argglobal
 10argu
+balt includes/Loader.h
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -384,24 +473,28 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 2 - ((1 * winheight(0) + 38) / 77)
+let &fdl = &fdl
+let s:l = 2 - ((1 * winheight(0) + 35) / 71)
 if s:l < 1 | let s:l = 1 | endif
-exe s:l
+keepjumps exe s:l
 normal! zt
-2
+keepjumps 2
 normal! 0
 tabnext 4
 set stal=1
-if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
+if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
 unlet! s:wipebuf
-set winheight=1 winwidth=20 winminheight=1 winminwidth=1 shortmess=filnxtToO
+set winheight=1 winwidth=20
+let &shortmess = s:shortmess_save
 let s:sx = expand("<sfile>:p:r")."x.vim"
-if file_readable(s:sx)
+if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
-let &so = s:so_save | let &siso = s:siso_save
+let &g:so = s:so_save | let &g:siso = s:siso_save
+set hlsearch
+nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :

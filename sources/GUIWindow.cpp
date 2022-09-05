@@ -133,9 +133,8 @@ namespace axomae {
 			normalmap = nullptr;
 			dudv = nullptr;
 		}
-	};
-	
-	
+	}
+		
 /****************************************************/
 	HeapManagement *GUIWindow::_MemManagement = new HeapManagement;
 	GUIWindow::GUIWindow( QWidget *parent) : QMainWindow(parent) {
@@ -436,9 +435,11 @@ namespace axomae {
 
 	}
 	/******************************************************************************************/
-	void GUIWindow::compute_projection(){
+	void GUIWindow::compute_projection(){ //TODO : complete uv projection method
 		int width = _UI.uv_width->value() ; 
 		int height = _UI.uv_height->value() ; 
+		width = 0 ; 
+		height = 0 ; 
 		//SDL_Surface* s = ImageManager::	
 		
 	
@@ -458,23 +459,16 @@ namespace axomae {
 
 	bool GUIWindow::import_3DOBJ(){
 		QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx)"));
-		if(!filename.isEmpty())
-			{
-				
-				auto obj = Loader::load(filename.toStdString().c_str()) ;
-
-				SDL_Surface* surf = ImageManager::project_uv_normals(obj[0] , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); 
-				display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP) ; 
-
-
-			}
-
+		if(!filename.isEmpty()){
+			auto obj = Loader::load(filename.toStdString().c_str()) ;
+			SDL_Surface* surf = ImageManager::project_uv_normals(obj[0] , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); 
+			display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP) ; 
+			return true ; 
+		}
+		return false ; 
 	}
 
-
 	/******************************************************************************************/
-
-
 	bool GUIWindow::open_project() {
 		return false; 
 	}

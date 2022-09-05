@@ -14,7 +14,7 @@
 
 
 
-/*/*we define some constants here...flags,sobel-prewitt operators,kernels etc...***************************************************************************/
+/**we define some constants here...flags,sobel-prewitt operators,kernels etc...***************************************************************************/
 
 namespace axomae {
 	
@@ -76,17 +76,13 @@ namespace axomae {
 
 	};
 
-
-
-
-
 	__device__ __host__
 		static double magnitude(int x, int y) {
 			return sqrtf(x*x + y*y);
 	}
 
 	template<typename T> __host__ __device__
-		static auto normalize(int maxx, int minn, T pixel) {
+		static uint8_t normalize(int maxx, int minn, T pixel) {
 
 		assert(maxx - minn != 0);
 		return ((pixel - minn) * 255 / (maxx - minn) + 0);
@@ -189,6 +185,6 @@ namespace axomae {
 
 
 
-};
+}
 
 #endif

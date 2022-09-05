@@ -10,57 +10,27 @@
 #include <future>
 
 namespace axomae{
-	
-
 
 	using namespace std;
 	bool ImageManager::gpu = false;
-
-	 static bool CHECK_IF_CUDA_AVAILABLE() {
+	static bool CHECK_IF_CUDA_AVAILABLE() {
 		if  (CUDART_VERSION != 9000 ) 
 			return false;
-
-	    if (!ImageManager::USING_GPU()) 
-				return false; 
+	    	if (!ImageManager::USING_GPU()) 
+			return false; 
 		else 
-				return true;
-
-		
+			return true;
 	}
-
 
 	template<typename T>
 	static void replace_image(SDL_Surface* surface, T* image, unsigned int size, int bpp);
 
-
-
-	RGB::RGB():red(0),green(0),blue(0),alpha(0){
-		
-	}
-
-	RGB::RGB(int r , int g , int b):red(r),green(g),blue(b),alpha(0){
-	}
-
-	RGB::RGB(int r , int g , int b , int a):red(r),green(g),blue(b),alpha(a){
-
-	}
-
-	RGB::~RGB(){
-
-
-	}
-
-
-
-
-	ImageManager::ImageManager(){
-
-	}
-
-	ImageManager::~ImageManager(){
-
-
-	}
+	RGB::RGB():red(0),green(0),blue(0),alpha(0){}
+	RGB::RGB(int r , int g , int b):red(r),green(g),blue(b),alpha(0){}
+	RGB::RGB(int r , int g , int b , int a):red(r),green(g),blue(b),alpha(a){}
+	RGB::~RGB(){}
+	ImageManager::ImageManager(){}
+	ImageManager::~ImageManager({{}
 
 /**************************************************************************************************************/
 
@@ -70,46 +40,36 @@ namespace axomae{
 		else if (n>=255)
 	 		 return 255;
 		else
-	  		return n ; 
-
-}
-
+  			 return n ; 
+	}
 
 	RGB ImageManager::get_pixel_color(SDL_Surface* surface , int x , int y ){
-
 		int bpp = surface->format->BytesPerPixel;
-		
 		uint8_t *color = (uint8_t*) (surface->pixels) + x*bpp + y*surface->pitch;
 		RGB rgb=RGB();
-
 		switch(bpp){
 			case 1 :
 			;
-			rgb.red = *color >> 5 & 0x7;
-		    rgb.green = *color >> 2 & 0x7;
-			rgb.blue = *color & 0x3 ;	
+				rgb.red = *color >> 5 & 0x7;
+		   		rgb.green = *color >> 2 & 0x7;
+				rgb.blue = *color & 0x3 ;	
 			break;
-
-
 			case 2:
-				; {
-					uint16_t colo16bits = *(uint16_t*)color;
-					if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-
-						rgb.red = colo16bits >> 12 & 0xF;
-						rgb.green = colo16bits >> 8 & 0XF;
-						rgb.blue = colo16bits >> 4 & 0XF;
-						rgb.alpha = colo16bits & 0XF;
-					}
-					else {
-
-						rgb.alpha = colo16bits >> 12 & 0xF;
-						rgb.blue = colo16bits >> 8 & 0XF;
-						rgb.green = colo16bits >> 4 & 0XF;
-						rgb.red = colo16bits & 0XF;
-
-					}
+			; {
+				uint16_t colo16bits = *(uint16_t*)color;
+				if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+					rgb.red = colo16bits >> 12 & 0xF;
+					rgb.green = colo16bits >> 8 & 0XF;
+					rgb.blue = colo16bits >> 4 & 0XF;
+					rgb.alpha = colo16bits & 0XF;
 				}
+				else {
+					rgb.alpha = colo16bits >> 12 & 0xF;
+					rgb.blue = colo16bits >> 8 & 0XF;
+					rgb.green = colo16bits >> 4 & 0XF;
+					rgb.red = colo16bits & 0XF;
+				}
+			}
 			break;
 			case 3:
 			{
@@ -118,40 +78,34 @@ namespace axomae{
 					rgb.red = colo24bits >> 16 & 0XFF;
 					rgb.green = colo24bits >> 8 & 0XFF;
 					rgb.blue = colo24bits & 0XFF;
-
 				}
-
 				else {
-
 					rgb.blue = colo24bits >> 16 & 0XFF;
 					rgb.green = colo24bits >> 8 & 0XFF;
 					rgb.red = colo24bits & 0XFF;
 				}
-
 			}
 			break;
 			case 4:
 			;{
-			uint32_t colo32bits = *(uint32_t*) color ; 
-			if(SDL_BYTEORDER == SDL_BIG_ENDIAN){
-				rgb.red = colo32bits >> 24 & 0XFF;
-				rgb.green = colo32bits >> 16 & 0XFF;
-				rgb.blue = colo32bits >> 8 & 0XFF;
-				rgb.alpha = colo32bits & 0XFF ; 
-			}
-			else{
-				rgb.alpha = colo32bits >> 24 & 0XFF;
-				rgb.blue = colo32bits >> 16 & 0XFF;
-				rgb.green = colo32bits >> 8 & 0XFF;
-				rgb.red = colo32bits & 0XFF ; 
-			}
+				uint32_t colo32bits = *(uint32_t*) color ; 
+				if(SDL_BYTEORDER == SDL_BIG_ENDIAN){
+					rgb.red = colo32bits >> 24 & 0XFF;
+					rgb.green = colo32bits >> 16 & 0XFF;
+					rgb.blue = colo32bits >> 8 & 0XFF;
+					rgb.alpha = colo32bits & 0XFF ; 
+				}
+				else{
+					rgb.alpha = colo32bits >> 24 & 0XFF;
+					rgb.blue = colo32bits >> 16 & 0XFF;
+					rgb.green = colo32bits >> 8 & 0XFF;
+					rgb.red = colo32bits & 0XFF ; 
+				}
 			}
 			break;
 		}
 		return rgb;
-	
 	}
-
 
 /**************************************************************************************************************/
 
@@ -184,12 +138,9 @@ namespace axomae{
 		else 
 			*((Uint32*)pix) = color;
 		SDL_UnlockSurface(surface);
-
 	}
 
 /**************************************************************************************************************/
-
-
 
 	void ImageManager::print_pixel(uint32_t color){
 		uint8_t red = color >> 24 & 0XFF;
@@ -199,193 +150,122 @@ namespace axomae{
 
 			cout<<"red : " <<to_string( red )<<"\n"<<"green : "<<to_string(green)<<"\n" <<"blue : \n"<<to_string(blue)<<"\n"<<"alpha : "<<to_string(alpha)<<"\n" <<endl;
 	
-
-
 	}	
-
 
 /**************************************************************************************************************/
 
-	
-
-	void ImageManager::display_info_surface(SDL_Surface* image){
-		
+	void ImageManager::display_info_surface(SDL_Surface* image){		
 		cout << "Bytes per pixel : " << to_string(image->format->BytesPerPixel) <<endl;
 		cout << "Padding on X : " << to_string(image->format->padding[0]) << endl;
 		cout << "Padding on Y : " << to_string(image->format->padding[1]) << endl;
 }
 
-
-
-
-
-
 /**************************************************************************************************************/
-
 
 	void ImageManager::set_pixel_color(SDL_Surface* surface,RGB **arrayc,int w,int h){
-		for(int i = 0 ; i < w ; i++){
-			for(int j = 0 ; j < h ; j++){
+		for(int i = 0 ; i < w ; i++)
+			for(int j = 0 ; j < h ; j++)
 				set_pixel_color(surface,i,j,arrayc[i][j].rgb_to_int());
-
-			}
-			
-		}
-	
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**************************************************************************************************************/
 
 
-void RGB::to_string(){
-	cout << "RED : " << std::to_string(red)<<"\n";
-	cout << "GREEN : " << std::to_string(green)<<"\n";
-	cout << "BLUE : " << std::to_string(blue)<<"\n";
-	cout << "ALPHA : " << std::to_string(alpha)<<"\n";
+	void RGB::to_string(){
+		cout << "RED : " << std::to_string(red)<<"\n";
+		cout << "GREEN : " << std::to_string(green)<<"\n";
+		cout << "BLUE : " << std::to_string(blue)<<"\n";
+		cout << "ALPHA : " << std::to_string(alpha)<<"\n";
+	}
 
-}
+/**************************************************************************************************************/
+
+	void ImageManager::set_greyscale_average(SDL_Surface* image,uint8_t factor){
+		assert(factor>0);
+		assert(image!=nullptr);	
+		if (CHECK_IF_CUDA_AVAILABLE()) 
+			GPU_compute_greyscale(image, false); 
+	
+		else {
+			for (int i = 0; i < image->w; i++) 
+				for (int j = 0; j < image->h; j++) {
+					RGB rgb = get_pixel_color(image, i, j);
+					rgb.red = (rgb.red + rgb.blue + rgb.green) / factor;
+					rgb.green = rgb.red;
+					rgb.blue = rgb.red;
+					uint32_t gray = rgb.rgb_to_int();
+					set_pixel_color(image, i, j, gray);
+				}		
+		}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	}
 
 
 /**************************************************************************************************************/
 
+	static void replace_image(SDL_Surface* surface, uint8_t* image) {
+		int bpp = surface->format->BytesPerPixel; 
+		SDL_LockSurface(surface);
+	 	if (bpp == 1) {
+			for ( int i = 0; i < surface->w; i++)
+				for ( int j = 0; j < surface->h; j++)
+					 ((Uint8*)surface->pixels)[i*bpp + j*surface->pitch] = image[i*bpp + j*surface->pitch];
 
-
-
-
-void ImageManager::set_greyscale_average(SDL_Surface* image,uint8_t factor){
-	assert(factor>0);
-
-	assert(image!=nullptr);	
-	if (CHECK_IF_CUDA_AVAILABLE()) {
-		GPU_compute_greyscale(image, false); 
+			delete[] static_cast<uint8_t*> (image);
+		}
+		else 
+			std::cout << "error reading image ... BPP is : " << std::to_string(bpp) << " Bytes per pixel\n";
+	
+		SDL_UnlockSurface(surface);
 	}
-	else {
-		for (int i = 0; i < image->w; i++) {
-			for (int j = 0; j < image->h; j++) {
-				RGB rgb = get_pixel_color(image, i, j);
-				rgb.red = (rgb.red + rgb.blue + rgb.green) / factor;
-				rgb.green = rgb.red;
-				rgb.blue = rgb.red;
-				uint32_t gray = rgb.rgb_to_int();
-				set_pixel_color(image, i, j, gray);
 
-			}
+
+/**************************************************************************************************************/
+
+	static void replace_image(SDL_Surface* surface, uint16_t* image) {
+		int bpp = surface->format->BytesPerPixel;
+		SDL_LockSurface(surface);
+	 	if (bpp == 2) {
+			for ( int i = 0; i < surface->w; i++)
+				for ( int j = 0; j < surface->h; j++)
+					((Uint16*)surface->pixels)[i*bpp + j*surface->pitch] = image[i*bpp + j*surface->pitch];
+			delete[]  static_cast<uint16_t*> (image);
+		}		
+		else 
+			std::cout << "error reading image ... BPP is : " << std::to_string(bpp) << " Bytes per pixel\n";
+	
+		SDL_UnlockSurface(surface);
+	}
+
+
+/**************************************************************************************************************/
+
+	static void replace_image(SDL_Surface* surface, uint32_t* image) {
+		int bpp = surface->format->BytesPerPixel; 
+		int pitch = surface->pitch; 
+		SDL_LockSurface(surface);
+		if (bpp == 4) {
+			for ( int i = 0; i < surface->w; i++)
+				for ( int j = 0; j < surface->h; j++) 
+					((Uint32*)surface->pixels)[i*bpp + j*surface->pitch] = image[i*bpp + j*surface->pitch];
+			
+			delete[] static_cast<uint32_t*> (image);
 
 		}
-	}
+		else if (bpp == 3) 
+			for ( int i = 0; i < surface->w; i++)
+				for ( int j = 0; j < surface->h; j++)
+					((Uint32*)surface->pixels)[i*bpp + j*surface->pitch] = image[i*bpp + j*surface->pitch];
 
-
-}
-
-
-static void replace_image(SDL_Surface* surface, uint8_t* image) {
-	//TODO LOCK SURFACE ? 
-	int bpp = surface->format->BytesPerPixel; 
-
-	SDL_LockSurface(surface);
-	 if (bpp == 1) {
-		 for ( int i = 0; i < surface->w; i++)
-			 for ( int j = 0; j < surface->h; j++)
-				 ((Uint8*)surface->pixels)[i*bpp + j*surface->pitch] = image[i*bpp + j*surface->pitch];
-
-		delete[] static_cast<uint8_t*> (image);
-
-	}
-	else {
-		std::cout << "error reading image ... BPP is : " << std::to_string(bpp) << " Bytes per pixel\n";
-	}
-	SDL_UnlockSurface(surface);
-
-}
-
-
-static void replace_image(SDL_Surface* surface, uint16_t* image) {
-	//TODO LOCK SURFACE ? 
-	int bpp = surface->format->BytesPerPixel;
-	SDL_LockSurface(surface);
-	 if (bpp == 2) {
-		 for ( int i = 0; i < surface->w; i++)
-			 for ( int j = 0; j < surface->h; j++)
-				 ((Uint16*)surface->pixels)[i*bpp + j*surface->pitch] = image[i*bpp + j*surface->pitch];
-		delete[]  static_cast<uint16_t*> (image);
-
-	}
-	
-	else {
-		std::cout << "error reading image ... BPP is : " << std::to_string(bpp) << " Bytes per pixel\n";
-	}
-	SDL_UnlockSurface(surface);
-
-}
-
-
-static void replace_image(SDL_Surface* surface, uint32_t* image) {
-	//TODO LOCK SURFACE ? 
-	int bpp = surface->format->BytesPerPixel; 
-	int pitch = surface->pitch; 
-	SDL_LockSurface(surface);
-	if (bpp == 4) {
-		for ( int i = 0; i < surface->w; i++)
-			for ( int j = 0; j < surface->h; j++) 
-				((Uint32*)surface->pixels)[i*bpp + j*surface->pitch] = image[i*bpp + j*surface->pitch];
-			
-		delete[] static_cast<uint32_t*> (image);
-
-	}
-	else if (bpp == 3) {
-		for ( int i = 0; i < surface->w; i++)
-			for ( int j = 0; j < surface->h; j++)
-				((Uint32*)surface->pixels)[i*bpp + j*surface->pitch] = image[i*bpp + j*surface->pitch];
+		
+		else 
+			std::cout << "error reading image ... BPP is : " << std::to_string(bpp) << " Bytes per pixel\n";	
+		SDL_UnlockSurface(surface);
 
 	}
 
-	
-	else {
-		std::cout << "error reading image ... BPP is : " << std::to_string(bpp) << " Bytes per pixel\n";
-	}
-	SDL_UnlockSurface(surface);
 
-}
 void ImageManager::set_greyscale_luminance(SDL_Surface* image){
 	bool cuda = CHECK_IF_CUDA_AVAILABLE() ; 
 	std::clock_t clock;
@@ -451,9 +331,9 @@ SDL_Surface* ImageManager::copy_surface(SDL_Surface *src) {
 
 
 /**************************************************************************************************************/
-const double RGB::intensity(){
+double RGB::intensity(){
 
-const double av= (red+green+blue)/3;
+double av=(red+green+blue)/3;
 
 return av/255;
 
@@ -731,24 +611,11 @@ RGB RGB::operator/(int arg){
 /**************************************************************************************************************/
 
 void RGB::invert_color(){
-
-
   red=abs(red-255);
   green=abs(green-255) ;
   blue=abs(blue-255);
   alpha=abs(alpha-255);
 }
-
-template<typename T>
-RGB RGB::invert_color(T &color){
-
-	
-}
-
-
-
-
-
 
 
 
@@ -1059,9 +926,7 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 			Point2D P1 = { object.uv[index[i]*2] , object.uv[index[i]*2 + 1 ] } ; 	
 			Point2D P2 = { object.uv[index[i + 1]*2] , object.uv[index[i + 1]*2 + 1 ] } ; 
 			Point2D P3 = { object.uv[index[i + 2]*2] , object.uv[index[i + 2]*2 + 1 ] } ; 
-			
-			
-			
+				
 			Vect3D N1  = { object.normals[index[i]*3] , object.normals[index[i]*3 + 1 ] , object.normals[index[i]*3 + 2] } ; 
 			Vect3D N2 = { object.normals[index[i + 1]*3]  , object.normals[index[i + 1]*3 + 1 ] , object.normals[index[i + 1 ]*3 + 2] } ; 
 			Vect3D N3 = { object.normals[index[i + 2 ]*3] , object.normals[index[i + 2]*3 + 1 ] , object.normals[index[i + 2 ]*3 + 2 ] } ; 
