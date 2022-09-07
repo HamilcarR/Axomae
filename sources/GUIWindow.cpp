@@ -440,7 +440,6 @@ namespace axomae {
 		int height = _UI.uv_height->value() ; 
 		width = 0 ; 
 		height = 0 ; 
-		//SDL_Surface* s = ImageManager::	
 		
 	
 	}
@@ -461,8 +460,11 @@ namespace axomae {
 		QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx)"));
 		if(!filename.isEmpty()){
 			auto obj = Loader::load(filename.toStdString().c_str()) ;
-			SDL_Surface* surf = ImageManager::project_uv_normals(obj[0] , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); 
+			//SDL_Surface* surf = ImageManager::project_uv_normals(obj[0] , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); 
+			std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, obj[0] , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); 
+			SDL_Surface* surf = async_get_surf.get() ; 
 			display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP) ; 
+				
 			return true ; 
 		}
 		return false ; 
