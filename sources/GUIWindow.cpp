@@ -1,5 +1,9 @@
 #include "../includes/GUIWindow.h"
 #include "../includes/Loader.h"
+#include "../includes/ImageImporter.h"
+#include "../includes/ImageManager.h"
+#include "../includes/Renderer.h"
+#include "../includes/GLViewer.h" 
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsItem>
 
@@ -445,22 +449,13 @@ namespace axomae {
 	}
 
 	/******************************************************************************************/
-		
-
-
-	/******************************************************************************************/
-	
-		
-		
-
-
-	/******************************************************************************************/
 
 	bool GUIWindow::import_3DOBJ(){
-		QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx)"));
+		QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
 		if(!filename.isEmpty()){
 			auto obj = Loader::load(filename.toStdString().c_str()) ;
-			//SDL_Surface* surf = ImageManager::project_uv_normals(obj[0] , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); 
+			_UI.renderer_view->setNewScene(&obj[0]);
+			//_UI.uv_viewer->setNewScene(&obj[0]); 
 			std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, obj[0] , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); 
 			SDL_Surface* surf = async_get_surf.get() ; 
 			display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP) ; 

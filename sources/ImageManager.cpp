@@ -30,7 +30,7 @@ namespace axomae{
 	RGB::RGB(int r , int g , int b , int a):red(r),green(g),blue(b),alpha(a){}
 	RGB::~RGB(){}
 	ImageManager::ImageManager(){}
-	ImageManager::~ImageManager({{}
+	ImageManager::~ImageManager(){} 
 
 /**************************************************************************************************************/
 
@@ -891,176 +891,120 @@ void ImageManager::compute_dudv(SDL_Surface* surface,double factor){
 
 /***************************************************************************************************************/
 
-	
-
-			
-
-
-
-
 	SDL_Surface* ImageManager::project_uv_normals(Object3D object , int width ,  int height , bool tangent_space){
-
-				
+		
 	#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	Uint32 rmask = 0xFF000000 ; 
-	Uint32 gmask = 0x00FF0000 ; 
-	Uint32 bmask = 0x0000FF00 ; 
-	Uint32 amask = 0x000000FF ; 
-
+		Uint32 rmask = 0xFF000000 ; 
+		Uint32 gmask = 0x00FF0000 ; 
+		Uint32 bmask = 0x0000FF00 ; 
+		Uint32 amask = 0x000000FF ; 
 	#else 
-
-	Uint32 amask = 0xFF000000 ; 
-	Uint32 bmask = 0x00FF0000 ; 
-	Uint32 gmask = 0x0000FF00 ; 
-	Uint32 rmask = 0x000000FF ; 
-
-
+		Uint32 amask = 0xFF000000 ; 
+		Uint32 bmask = 0x00FF0000 ; 
+		Uint32 gmask = 0x0000FF00 ; 
+		Uint32 rmask = 0x000000FF ; 
 	#endif	
 
 		SDL_Surface* surf = SDL_CreateRGBSurface(0 , width , height , 24 , rmask , gmask , bmask , amask) ;
 		assert(surf != nullptr) ; 
-
 		/* Parallelize : each face = 1 thread ? */
 		for(unsigned int i = 0 ; i < object.indices.size() ; i+=3) {
 			auto index = object.indices; 
 			Point2D P1 = { object.uv[index[i]*2] , object.uv[index[i]*2 + 1 ] } ; 	
 			Point2D P2 = { object.uv[index[i + 1]*2] , object.uv[index[i + 1]*2 + 1 ] } ; 
 			Point2D P3 = { object.uv[index[i + 2]*2] , object.uv[index[i + 2]*2 + 1 ] } ; 
-				
 			Vect3D N1  = { object.normals[index[i]*3] , object.normals[index[i]*3 + 1 ] , object.normals[index[i]*3 + 2] } ; 
 			Vect3D N2 = { object.normals[index[i + 1]*3]  , object.normals[index[i + 1]*3 + 1 ] , object.normals[index[i + 1 ]*3 + 2] } ; 
 			Vect3D N3 = { object.normals[index[i + 2 ]*3] , object.normals[index[i + 2]*3 + 1 ] , object.normals[index[i + 2 ]*3 + 2 ] } ; 
-			
 			Vect3D BT1 =  { object.bitangents[index[i]*3] , object.bitangents[index[i]*3 + 1 ] , object.bitangents[index[i]*3 + 2] } ; 
-			Vect3D BT2 = { object.bitangents[index[i + 1]*3]  , object.bitangents[index[i + 1]*3 + 1 ] , object.bitangents[index[i + 1 ]*3 + 2] } ; 
-			Vect3D BT3 = { object.bitangents[index[i + 2 ]*3] , object.bitangents[index[i + 2]*3 + 1 ] , object.bitangents[index[i + 2 ]*3 + 2 ] } ; 
-			
+			Vect3D BT2 = { object.bitangents[index[i + 1]*3]  , object.bitangents[index[i + 1]*3 + 1 ] , object.bitangents[index[i + 1 ]*3 + 2] };
+			Vect3D BT3 = { object.bitangents[index[i + 2 ]*3] , object.bitangents[index[i + 2]*3 + 1 ] , object.bitangents[index[i + 2 ]*3 + 2 ]};
 			Vect3D T1 =  { object.tangents[index[i]*3] , object.tangents[index[i]*3 + 1 ] , object.tangents[index[i]*3 + 2] } ; 
 			Vect3D T2 = { object.tangents[index[i + 1]*3]  , object.tangents[index[i + 1]*3 + 1 ] , object.tangents[index[i + 1 ]*3 + 2] } ; 
 			Vect3D T3 = { object.tangents[index[i + 2 ]*3] , object.tangents[index[i + 2]*3 + 1 ] , object.tangents[index[i + 2 ]*3 + 2 ] } ; 
-			
 			P1.x *= width ; 
 			P1.y *= height ; 
-
 			P2.x *= width ; 
 			P2.y *= height ; 
-
 			P3.x *= width ; 
 			P3.y *= height ; 
-
 			auto bounding_coords = [](float x , float y , float z , bool min) { 
 				if( min ) {
 					if( x <= y )
 						return x <= z ? x : z ; 
 					else
 						return y <= z ? y : z ; 
-					}
+				}
 				else {
 					if( x >= y )
 						return x >= z ? x : z ; 
 					else
 						return y >= z ? y : z ; 
-					}
+				}
 			};
-		
-		
-		
 			auto x_max = static_cast<int>(bounding_coords( P1.x , P2.x , P3.x , false)); 
 			auto x_min = static_cast<int>(bounding_coords( P1.x , P2.x , P3.x , true )); 
 			auto y_max = static_cast<int>(bounding_coords( P1.y , P2.y , P3.y , false)); 
 			auto y_min = static_cast<int>(bounding_coords( P1.y , P2.y , P3.y , true)); 
-			
-
-
 			auto barycentric_lerp = [] (Point2D P1 , Point2D P2 , Point2D P3 , Point2D I){
 				auto W1 = (  (P2.y - P3.y ) * (I.x - P3.x ) + ( P3.x - P2.x) * (I.y - P3.y) ) / ( (P2.y - P3.y ) * (P1.x - P3.x ) + (P3.x - P2.x ) * (P1.y - P3.y ) ) ; 
 				auto W2 = ( (P3.y - P1.y) * (I.x - P3.x) + (P1.x - P3.x) * ( I.y - P3.y ) ) / ( (P2.y - P3.y ) * (P1.x - P3.x) + ( P3.x - P2.x) * (P1.y - P3.y ) ) ; 
 				auto W3 = 1 - W1 - W2 ; 
 				Vect3D v = {W1 , W2 , W3} ; 
 				return v ;  
-					};
-
+			};
 			auto tan_space_transform = [] (Vect3D T , Vect3D BT , Vect3D N , Vect3D I){
 				Vect3D result = { I.x * BT.x + I.y * BT.y + I.z * BT.z , 
 						I.x * T.x + T.y * I.y + T.z * I.z ,
 						I.x * N.x + N.y * I.y + I.z * N.z};
 				return result ; 
-
-
 			};
-		
 			for(int x = x_min ; x <= x_max ; x++){
 				for(int y = y_min ; y <= y_max ; y++){
-					
-
 					Point2D I = {static_cast<float>(x) ,static_cast<float> (y)} ; 
 					Vect3D C = barycentric_lerp(P1 , P2 , P3 , I) ; 
 						if(C.x >= 0 && C.y >= 0 && C.z >= 0){
-							
 							auto interpolate = [&C](Vect3D N1 , Vect3D N2 , Vect3D N3){
 								Vect3D normal = { N1.x * C.x + N2.x * C.y + N3.x * C.z ,
 									  N1.y * C.x + N2.y * C.y + N3.y * C.z ,
 									  N1.z * C.x + N2.z * C.y + N3.z * C.z }; 		
 								return normal ; 
 							};
-							
 							if(tangent_space){
-								
 								Vect3D normal = interpolate(N1 , N2 , N3) ; 	
-								
 								Vect3D B = {(BT1.x + BT2.x + BT3.x)/3 , (BT1.y + BT2.y + BT3.y)/3 , (BT1.z + BT2.z + BT3.z)/3 }; 
 								Vect3D T = {(T1.x + T2.x + T3.x)/3 , (T1.y + T2.y + T3.y)/3 , (T1.z + T2.z + T3.z)/3 }; 
 								Vect3D N = {(N1.x + N2.x + N3.x)/3 , (N1.y + N2.y + N3.y)/3 , (N1.z + N2.z + N3.z)/3 }; 
-								
 								B.normalize(); 
 								T.normalize(); 
 								N.normalize(); 
 								normal = tan_space_transform(T , B , N , normal); 
-
 								normal.normalize() ; 	
 								RGB rgb = RGB( static_cast<int>((normal.x * 255 + 255)/2) ,
 										static_cast<int>((normal.y * 255+255)/2)  ,  		
 										static_cast<int>((normal.z * 255+255)/2) , 0 ) ; 
 								uint32_t val = rgb.rgb_to_int() ; 
 								set_pixel_color(surf , x , y , val) ;
-							
-
 							}
 							else{
 								N1.normalize(); 
 								N2.normalize(); 
 								N3.normalize(); 
-
 								Vect3D normal = interpolate(N1 , N2 , N3) ; 
-
 								RGB rgb = RGB( static_cast<int>((normal.x * 255 + 255)/2) ,
 										static_cast<int>((normal.y * 255+255)/2)  ,  
 										static_cast<int>((normal.z * 255+255)/2) , 0 ) ; 
 								
 								uint32_t val = rgb.rgb_to_int() ; 
 								set_pixel_color(surf , x , y , val) ;
-						
 							}
-						
-
-
-
 						}
-
 				}
 
-
 			}
-
-
-
-
 		
 		}
-
-
 		return surf ; 
-
 		}
 	 
 

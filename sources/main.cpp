@@ -13,17 +13,6 @@ using namespace std;
 using namespace axomae;
 
 
-
-
-
-
-
-
-
-
-
-
-
 void init_api(){
 	if(SDL_Init(SDL_INIT_EVERYTHING)<0)
 	{
@@ -33,7 +22,8 @@ void init_api(){
 	if(!IMG_Init(IMG_INIT_JPG|IMG_INIT_PNG)) {
 
 		cout<<"IMG init problem : " <<IMG_GetError()<<endl;             
-	}	
+	}
+
 
 	
 
@@ -41,20 +31,14 @@ void init_api(){
 
 
 void quit_api(){
-	
-
-		IMG_Quit();
-		SDL_Quit();
-
+	IMG_Quit();
+	SDL_Quit();
 }
-
 
 
 int main(int argv , char** argc){
 	init_api();
-
 	ProgramStatus * main_program_command = ProgramStatus::getInstance();
-	
 	if (argv >= 2) {
 		string mode = argc[1];
 		regex cmd, gui;
@@ -66,46 +50,29 @@ int main(int argv , char** argc){
 		if (regex_match(mode, cmd)) {
 			bool ex = false;
 			string user_input;
-
 			while (!ex) {
-
-
-
 #ifdef __unix__
-				//	event_thread=thread(loop_event,event);
 				cout << colors[GREEN] << prompt[0] << colors[YELLOW];
 				std::getline(std::cin, user_input);
 				ex = (regex_match(user_input, regex(command[EXIT], regex_constants::icase)));
 				if (!ex)
 					main_program_command->process_command(user_input);
-
-				//	event_thread.join(); 	
 #elif defined(_WIN32) || defined (WIN32)
-
 
 				print(std::string(prompt[0]), YELLOW);
 				std::getline(std::cin, user_input);
 				ex = (regex_match(user_input, regex(command[EXIT], regex_constants::icase)));
 				if (!ex)
 					main_program_command->process_command(user_input);
-
-				print(std::string(), RESET);
-
-
-
+				print(std::string(), RESET)
 #endif
-
 			}
 			main_program_command->exit();
-
 		}
 		else if (regex_match(mode, gui)) {
-			
 			QApplication app(argv, argc); 
 			GUIWindow win; 
 			win.show(); 
-			
-
 			return app.exec(); 
 
 		}
@@ -114,15 +81,8 @@ int main(int argv , char** argc){
 			return EXIT_FAILURE;
 		}
 	}
-	else {
+	else 
 		cout << "Wrong command line argument used : Use -cmd for terminal or -gui for a graphical user interface" << "\n";
-	}
-
-
-	
-        
-
-	
 	quit_api(); 
-return EXIT_SUCCESS ; 
+	return EXIT_SUCCESS ; 
 }

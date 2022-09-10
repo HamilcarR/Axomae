@@ -8,10 +8,6 @@ namespace axomae{
 		 Renderer() ; 
 		virtual ~Renderer() = 0 ; 
 
-
-
-
-
 	};
 
 

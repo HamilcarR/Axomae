@@ -5,6 +5,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "constants.h"
+#include "utils_3D.h" 
 #include <cstdlib>
 #include <assert.h>
 #include <iostream>
@@ -13,7 +14,6 @@
 /*3D obj loader*/
 
 namespace axomae{
-
 	class Loader{
 		public:
 			static Loader* getInstance(); 	
@@ -27,10 +27,6 @@ namespace axomae{
 	
 	
 	};
-
-
-
-
 
 }
 
