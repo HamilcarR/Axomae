@@ -17,7 +17,7 @@ namespace axomae{
 	class Loader{
 		public:
 			static Loader* getInstance(); 	
-			static std::vector<Object3D> load(const char* file);   				
+			static std::vector<Mesh> load(const char* file);   				
 			static void close(); 	
 		
 		private: 
