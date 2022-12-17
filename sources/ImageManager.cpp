@@ -734,11 +734,7 @@ uint32_t compute_normals_set_pixels_rgb(SDL_Surface* surf ,
 		}
 	}
 	else{
-		P1.print(); 
-		P2.print();
-		P3.print();
-		I.print();
-		C.print(); 
+	 
 		return 0 ; 
 	}
 }
