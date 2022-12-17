@@ -1,16 +1,16 @@
-
 TEMPLATE = app
 TARGET = Axomae
-QT += widgets
+
+QT += widgets\
+      gui
+
 CONFIG += debug \
 	opengl \
-	warn_on \
+	warn_on \	
 
-	
 #Configure these env variables before compiling#
 CUDA_ARCH = sm_75
 CUDA_SRC += kernels/*.cu
-
 
 #Linux rules#
 linux:{

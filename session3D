@@ -42,8 +42,10 @@ badd +1 includes/GLViewer.h
 badd +1 includes/utils_3D.h
 badd +1 shaders/simple.fs
 badd +1 shaders/simple.vs
-badd +0 shaders/simple.frag
-badd +0 shaders/simple.vert
+badd +1 shaders/simple.frag
+badd +1 shaders/simple.vert
+badd +0 sources/Texture.cpp
+badd +0 includes/Texture.h
 argglobal
 %argdel
 $argadd sources/Controller.cpp
@@ -57,6 +59,7 @@ $argadd sources/TerminalOpt.cpp
 $argadd sources/View.cpp
 $argadd sources/Window.cpp
 set stal=2
+tabnew +setlocal\ bufhidden=wipe
 tabnew +setlocal\ bufhidden=wipe
 tabnew +setlocal\ bufhidden=wipe
 tabnew +setlocal\ bufhidden=wipe
@@ -80,8 +83,8 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 188 + 189) / 378)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 378)
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
 argglobal
 2argu
 if bufexists(fnamemodify("includes/GUIWindow.h", ":p")) | buffer includes/GUIWindow.h | else | edit includes/GUIWindow.h | endif
@@ -99,7 +102,7 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 40 - ((39 * winheight(0) + 38) / 76)
+let s:l = 40 - ((35 * winheight(0) + 34) / 68)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -119,15 +122,15 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 442 - ((15 * winheight(0) + 38) / 76)
+let s:l = 442 - ((13 * winheight(0) + 34) / 68)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
 keepjumps 442
 normal! 0
 wincmd w
-exe 'vert 1resize ' . ((&columns * 188 + 189) / 378)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 378)
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
 tabnext
 edit includes/GLViewer.h
 let s:save_splitbelow = &splitbelow
@@ -146,8 +149,8 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 378)
-exe 'vert 2resize ' . ((&columns * 188 + 189) / 378)
+exe 'vert 1resize ' . ((&columns * 158 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 157 + 158) / 316)
 argglobal
 1argu
 if bufexists(fnamemodify("includes/GLViewer.h", ":p")) | buffer includes/GLViewer.h | else | edit includes/GLViewer.h | endif
@@ -165,7 +168,7 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 38) / 76)
+let s:l = 1 - ((0 * winheight(0) + 34) / 68)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -189,16 +192,15 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 38 - ((37 * winheight(0) + 38) / 76)
+let s:l = 40 - ((35 * winheight(0) + 34) / 68)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 38
-normal! 097|
+keepjumps 40
+normal! 024|
 wincmd w
-2wincmd w
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 378)
-exe 'vert 2resize ' . ((&columns * 188 + 189) / 378)
+exe 'vert 1resize ' . ((&columns * 158 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 157 + 158) / 316)
 tabnext
 edit includes/utils_3D.h
 argglobal
@@ -217,7 +219,7 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 38) / 76)
+let s:l = 1 - ((0 * winheight(0) + 34) / 68)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -241,7 +243,7 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 38) / 76)
+let s:l = 1 - ((0 * winheight(0) + 34) / 68)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -265,8 +267,8 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 188 + 189) / 378)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 378)
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
 argglobal
 if bufexists(fnamemodify("includes/Loader.h", ":p")) | buffer includes/Loader.h | else | edit includes/Loader.h | endif
 if &buftype ==# 'terminal'
@@ -283,7 +285,7 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 32 - ((31 * winheight(0) + 38) / 76)
+let s:l = 32 - ((28 * winheight(0) + 34) / 68)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -306,15 +308,83 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 45 - ((31 * winheight(0) + 38) / 76)
+let s:l = 45 - ((28 * winheight(0) + 34) / 68)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
 keepjumps 45
 normal! 0
 wincmd w
-exe 'vert 1resize ' . ((&columns * 188 + 189) / 378)
-exe 'vert 2resize ' . ((&columns * 189 + 189) / 378)
+exe 'vert 1resize ' . ((&columns * 157 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 158 + 158) / 316)
+tabnext
+edit includes/Texture.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 158 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 157 + 158) / 316)
+argglobal
+if bufexists(fnamemodify("includes/Texture.h", ":p")) | buffer includes/Texture.h | else | edit includes/Texture.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/Texture.h
+endif
+balt sources/Texture.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 34) / 68)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+argglobal
+if bufexists(fnamemodify("sources/Texture.cpp", ":p")) | buffer sources/Texture.cpp | else | edit sources/Texture.cpp | endif
+if &buftype ==# 'terminal'
+  silent file sources/Texture.cpp
+endif
+balt includes/Texture.h
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 34) / 68)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+exe 'vert 1resize ' . ((&columns * 158 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 157 + 158) / 316)
 tabnext
 edit shaders/simple.vert
 let s:save_splitbelow = &splitbelow
@@ -333,8 +403,8 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 378)
-exe 'vert 2resize ' . ((&columns * 188 + 189) / 378)
+exe 'vert 1resize ' . ((&columns * 158 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 157 + 158) / 316)
 argglobal
 if bufexists(fnamemodify("shaders/simple.vert", ":p")) | buffer shaders/simple.vert | else | edit shaders/simple.vert | endif
 if &buftype ==# 'terminal'
@@ -351,7 +421,7 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 38) / 76)
+let s:l = 1 - ((0 * winheight(0) + 34) / 68)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -374,16 +444,16 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 38) / 76)
+let s:l = 1 - ((0 * winheight(0) + 34) / 68)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
 keepjumps 1
 normal! 0
 wincmd w
-exe 'vert 1resize ' . ((&columns * 189 + 189) / 378)
-exe 'vert 2resize ' . ((&columns * 188 + 189) / 378)
-tabnext 2
+exe 'vert 1resize ' . ((&columns * 158 + 158) / 316)
+exe 'vert 2resize ' . ((&columns * 157 + 158) / 316)
+tabnext 6
 set stal=1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

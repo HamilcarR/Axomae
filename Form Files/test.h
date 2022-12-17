@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'test.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.4
+** Created by: Qt User Interface Compiler version 5.15.5
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,22 +10,20 @@
 #define TEST_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QListView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QOpenGLWidget>
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
@@ -35,6 +33,7 @@
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include "../includes/GLViewer.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -95,6 +94,7 @@ public:
     QLabel *label_4;
     QSpinBox *uv_width;
     QPushButton *bake_texture;
+    QRadioButton *tangent_space;
     QWidget *widget;
     QGridLayout *gridLayout;
     QGridLayout *gridLayout_4;
@@ -113,6 +113,7 @@ public:
     QGraphicsView *height_image;
     QWidget *gl_renderer;
     QGridLayout *gridLayout_6;
+    GLViewer *renderer_view;
     QWidget *uv_editor;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout_11;
@@ -120,7 +121,7 @@ public:
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *verticalLayout_12;
     QGraphicsView *uv_projection;
-    QOpenGLWidget *uv_viewer;
+    GLViewer *uv_viewer;
     QListView *model_list;
     QMenuBar *menubar;
     QMenu *menuFiles;
@@ -132,55 +133,55 @@ public:
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
-            MainWindow->setObjectName(QStringLiteral("MainWindow"));
+            MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
         MainWindow->resize(1528, 900);
-        MainWindow->setStyleSheet(QLatin1String("QMainWindow,QWidget {\n"
+        MainWindow->setStyleSheet(QString::fromUtf8("QMainWindow,QWidget {\n"
 "	background-color :rgb(42, 42, 42);\n"
 "	\n"
 "}\n"
 "\n"
 ""));
         actionNew_Project = new QAction(MainWindow);
-        actionNew_Project->setObjectName(QStringLiteral("actionNew_Project"));
+        actionNew_Project->setObjectName(QString::fromUtf8("actionNew_Project"));
         actionImport_image = new QAction(MainWindow);
-        actionImport_image->setObjectName(QStringLiteral("actionImport_image"));
+        actionImport_image->setObjectName(QString::fromUtf8("actionImport_image"));
         actionSave_image = new QAction(MainWindow);
-        actionSave_image->setObjectName(QStringLiteral("actionSave_image"));
+        actionSave_image->setObjectName(QString::fromUtf8("actionSave_image"));
         actionSave_project = new QAction(MainWindow);
-        actionSave_project->setObjectName(QStringLiteral("actionSave_project"));
+        actionSave_project->setObjectName(QString::fromUtf8("actionSave_project"));
         actionExit = new QAction(MainWindow);
-        actionExit->setObjectName(QStringLiteral("actionExit"));
+        actionExit->setObjectName(QString::fromUtf8("actionExit"));
         actionDocumentation = new QAction(MainWindow);
-        actionDocumentation->setObjectName(QStringLiteral("actionDocumentation"));
+        actionDocumentation->setObjectName(QString::fromUtf8("actionDocumentation"));
         actionAxomae_version = new QAction(MainWindow);
-        actionAxomae_version->setObjectName(QStringLiteral("actionAxomae_version"));
+        actionAxomae_version->setObjectName(QString::fromUtf8("actionAxomae_version"));
         actionCancel = new QAction(MainWindow);
-        actionCancel->setObjectName(QStringLiteral("actionCancel"));
+        actionCancel->setObjectName(QString::fromUtf8("actionCancel"));
         actionRedo = new QAction(MainWindow);
-        actionRedo->setObjectName(QStringLiteral("actionRedo"));
+        actionRedo->setObjectName(QString::fromUtf8("actionRedo"));
         actionImport_3D_model = new QAction(MainWindow);
-        actionImport_3D_model->setObjectName(QStringLiteral("actionImport_3D_model"));
+        actionImport_3D_model->setObjectName(QString::fromUtf8("actionImport_3D_model"));
         centralwidget = new QWidget(MainWindow);
-        centralwidget->setObjectName(QStringLiteral("centralwidget"));
+        centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(centralwidget->sizePolicy().hasHeightForWidth());
         centralwidget->setSizePolicy(sizePolicy);
         gridLayout_2 = new QGridLayout(centralwidget);
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         progressBar = new QProgressBar(centralwidget);
-        progressBar->setObjectName(QStringLiteral("progressBar"));
+        progressBar->setObjectName(QString::fromUtf8("progressBar"));
         progressBar->setValue(24);
 
         gridLayout_2->addWidget(progressBar, 1, 0, 1, 2);
 
         verticalLayout = new QVBoxLayout();
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setSizeConstraint(QLayout::SetFixedSize);
         verticalLayout->setContentsMargins(-1, -1, 0, -1);
         renderMaterials = new QTabWidget(centralwidget);
-        renderMaterials->setObjectName(QStringLiteral("renderMaterials"));
+        renderMaterials->setObjectName(QString::fromUtf8("renderMaterials"));
         QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Preferred);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -188,25 +189,25 @@ public:
         renderMaterials->setSizePolicy(sizePolicy1);
         renderMaterials->setMinimumSize(QSize(208, 0));
         renderMaterials->setMaximumSize(QSize(208, 813));
-        renderMaterials->setStyleSheet(QStringLiteral(""));
+        renderMaterials->setStyleSheet(QString::fromUtf8(""));
         renderMaterials->setTabShape(QTabWidget::Triangular);
         renderMaterials->setMovable(true);
         renderMaterials->setTabBarAutoHide(true);
         functions = new QWidget();
-        functions->setObjectName(QStringLiteral("functions"));
+        functions->setObjectName(QString::fromUtf8("functions"));
         verticalLayout_2 = new QVBoxLayout(functions);
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         use_gpu = new QCheckBox(functions);
-        use_gpu->setObjectName(QStringLiteral("use_gpu"));
+        use_gpu->setObjectName(QString::fromUtf8("use_gpu"));
         QIcon icon;
-        icon.addFile(QStringLiteral(":/new/prefix1/nvidia-cuda21.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8(":/new/prefix1/nvidia-cuda21.png"), QSize(), QIcon::Normal, QIcon::Off);
         use_gpu->setIcon(icon);
         use_gpu->setIconSize(QSize(32, 16));
 
         verticalLayout_2->addWidget(use_gpu);
 
         greyscale_opt = new QGroupBox(functions);
-        greyscale_opt->setObjectName(QStringLiteral("greyscale_opt"));
+        greyscale_opt->setObjectName(QString::fromUtf8("greyscale_opt"));
         greyscale_opt->setEnabled(true);
         QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Preferred);
         sizePolicy2.setHorizontalStretch(0);
@@ -216,23 +217,23 @@ public:
         greyscale_opt->setFlat(false);
         greyscale_opt->setCheckable(false);
         verticalLayout_8 = new QVBoxLayout(greyscale_opt);
-        verticalLayout_8->setObjectName(QStringLiteral("verticalLayout_8"));
+        verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
         use_average = new QRadioButton(greyscale_opt);
-        use_average->setObjectName(QStringLiteral("use_average"));
+        use_average->setObjectName(QString::fromUtf8("use_average"));
         QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
         sizePolicy3.setHeightForWidth(use_average->sizePolicy().hasHeightForWidth());
         use_average->setSizePolicy(sizePolicy3);
         QFont font;
-        font.setFamily(QStringLiteral("MS Shell Dlg 2"));
+        font.setFamily(QString::fromUtf8("MS Shell Dlg 2"));
         use_average->setFont(font);
         use_average->setChecked(true);
 
         verticalLayout_8->addWidget(use_average);
 
         use_luminance = new QRadioButton(greyscale_opt);
-        use_luminance->setObjectName(QStringLiteral("use_luminance"));
+        use_luminance->setObjectName(QString::fromUtf8("use_luminance"));
         sizePolicy3.setHeightForWidth(use_luminance->sizePolicy().hasHeightForWidth());
         use_luminance->setSizePolicy(sizePolicy3);
 
@@ -242,22 +243,22 @@ public:
         verticalLayout_2->addWidget(greyscale_opt);
 
         height_opt = new QGroupBox(functions);
-        height_opt->setObjectName(QStringLiteral("height_opt"));
+        height_opt->setObjectName(QString::fromUtf8("height_opt"));
         verticalLayout_3 = new QVBoxLayout(height_opt);
-        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         use_scharr = new QRadioButton(height_opt);
-        use_scharr->setObjectName(QStringLiteral("use_scharr"));
+        use_scharr->setObjectName(QString::fromUtf8("use_scharr"));
 
         verticalLayout_3->addWidget(use_scharr);
 
         use_sobel = new QRadioButton(height_opt);
-        use_sobel->setObjectName(QStringLiteral("use_sobel"));
+        use_sobel->setObjectName(QString::fromUtf8("use_sobel"));
         use_sobel->setChecked(true);
 
         verticalLayout_3->addWidget(use_sobel);
 
         use_prewitt = new QRadioButton(height_opt);
-        use_prewitt->setObjectName(QStringLiteral("use_prewitt"));
+        use_prewitt->setObjectName(QString::fromUtf8("use_prewitt"));
 
         verticalLayout_3->addWidget(use_prewitt);
 
@@ -265,41 +266,41 @@ public:
         verticalLayout_2->addWidget(height_opt);
 
         normal_opt = new QGroupBox(functions);
-        normal_opt->setObjectName(QStringLiteral("normal_opt"));
+        normal_opt->setObjectName(QString::fromUtf8("normal_opt"));
         verticalLayout_5 = new QVBoxLayout(normal_opt);
-        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
+        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
         use_objectSpace = new QRadioButton(normal_opt);
-        use_objectSpace->setObjectName(QStringLiteral("use_objectSpace"));
+        use_objectSpace->setObjectName(QString::fromUtf8("use_objectSpace"));
         use_objectSpace->setChecked(true);
 
         verticalLayout_5->addWidget(use_objectSpace);
 
         use_tangentSpace = new QRadioButton(normal_opt);
-        use_tangentSpace->setObjectName(QStringLiteral("use_tangentSpace"));
+        use_tangentSpace->setObjectName(QString::fromUtf8("use_tangentSpace"));
 
         verticalLayout_5->addWidget(use_tangentSpace);
 
         nmap_factor_opt = new QGroupBox(normal_opt);
-        nmap_factor_opt->setObjectName(QStringLiteral("nmap_factor_opt"));
+        nmap_factor_opt->setObjectName(QString::fromUtf8("nmap_factor_opt"));
         QSizePolicy sizePolicy4(QSizePolicy::Expanding, QSizePolicy::Fixed);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
         sizePolicy4.setHeightForWidth(nmap_factor_opt->sizePolicy().hasHeightForWidth());
         nmap_factor_opt->setSizePolicy(sizePolicy4);
         verticalLayout_4 = new QVBoxLayout(nmap_factor_opt);
-        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         factor_nmap = new QDoubleSpinBox(nmap_factor_opt);
-        factor_nmap->setObjectName(QStringLiteral("factor_nmap"));
+        factor_nmap->setObjectName(QString::fromUtf8("factor_nmap"));
 
         verticalLayout_4->addWidget(factor_nmap);
 
         label = new QLabel(nmap_factor_opt);
-        label->setObjectName(QStringLiteral("label"));
+        label->setObjectName(QString::fromUtf8("label"));
 
         verticalLayout_4->addWidget(label);
 
         attenuation_slider_nmap = new QSlider(nmap_factor_opt);
-        attenuation_slider_nmap->setObjectName(QStringLiteral("attenuation_slider_nmap"));
+        attenuation_slider_nmap->setObjectName(QString::fromUtf8("attenuation_slider_nmap"));
         attenuation_slider_nmap->setMinimum(1);
         attenuation_slider_nmap->setMaximum(10);
         attenuation_slider_nmap->setOrientation(Qt::Horizontal);
@@ -307,13 +308,13 @@ public:
         verticalLayout_4->addWidget(attenuation_slider_nmap);
 
         label_2 = new QLabel(nmap_factor_opt);
-        label_2->setObjectName(QStringLiteral("label_2"));
+        label_2->setObjectName(QString::fromUtf8("label_2"));
 
         verticalLayout_4->addWidget(label_2);
 
         factor_slider_nmap = new QSlider(nmap_factor_opt);
-        factor_slider_nmap->setObjectName(QStringLiteral("factor_slider_nmap"));
-        factor_slider_nmap->setStyleSheet(QLatin1String("QSlider {\n"
+        factor_slider_nmap->setObjectName(QString::fromUtf8("factor_slider_nmap"));
+        factor_slider_nmap->setStyleSheet(QString::fromUtf8("QSlider {\n"
 "qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 255, 255, 255), stop:0.1 rgba(255, 255, 255, 255), stop:0.2 rgba(255, 176, 176, 167), stop:0.3 rgba(255, 151, 151, 92), stop:0.4 rgba(255, 125, 125, 51), stop:0.5 rgba(255, 76, 76, 205), stop:0.52 rgba(255, 76, 76, 205), stop:0.6 rgba(255, 180, 180, 84), stop:1 rgba(255, 255, 255, 0))\n"
 "\n"
 "}"));
@@ -328,28 +329,28 @@ public:
         verticalLayout_2->addWidget(normal_opt);
 
         dudv_opt = new QGroupBox(functions);
-        dudv_opt->setObjectName(QStringLiteral("dudv_opt"));
+        dudv_opt->setObjectName(QString::fromUtf8("dudv_opt"));
         verticalLayout_7 = new QVBoxLayout(dudv_opt);
-        verticalLayout_7->setObjectName(QStringLiteral("verticalLayout_7"));
+        verticalLayout_7->setObjectName(QString::fromUtf8("verticalLayout_7"));
         compute_dudv = new QPushButton(dudv_opt);
-        compute_dudv->setObjectName(QStringLiteral("compute_dudv"));
+        compute_dudv->setObjectName(QString::fromUtf8("compute_dudv"));
 
         verticalLayout_7->addWidget(compute_dudv);
 
         nmap_factor_opt_2 = new QGroupBox(dudv_opt);
-        nmap_factor_opt_2->setObjectName(QStringLiteral("nmap_factor_opt_2"));
+        nmap_factor_opt_2->setObjectName(QString::fromUtf8("nmap_factor_opt_2"));
         sizePolicy4.setHeightForWidth(nmap_factor_opt_2->sizePolicy().hasHeightForWidth());
         nmap_factor_opt_2->setSizePolicy(sizePolicy4);
         verticalLayout_6 = new QVBoxLayout(nmap_factor_opt_2);
-        verticalLayout_6->setObjectName(QStringLiteral("verticalLayout_6"));
+        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
         factor_dudv = new QDoubleSpinBox(nmap_factor_opt_2);
-        factor_dudv->setObjectName(QStringLiteral("factor_dudv"));
+        factor_dudv->setObjectName(QString::fromUtf8("factor_dudv"));
 
         verticalLayout_6->addWidget(factor_dudv);
 
         factor_slider_dudv = new QSlider(nmap_factor_opt_2);
-        factor_slider_dudv->setObjectName(QStringLiteral("factor_slider_dudv"));
-        factor_slider_dudv->setStyleSheet(QLatin1String("QSlider {\n"
+        factor_slider_dudv->setObjectName(QString::fromUtf8("factor_slider_dudv"));
+        factor_slider_dudv->setStyleSheet(QString::fromUtf8("QSlider {\n"
 "qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 255, 255, 255), stop:0.1 rgba(255, 255, 255, 255), stop:0.2 rgba(255, 176, 176, 167), stop:0.3 rgba(255, 151, 151, 92), stop:0.4 rgba(255, 125, 125, 51), stop:0.5 rgba(255, 76, 76, 205), stop:0.52 rgba(255, 76, 76, 205), stop:0.6 rgba(255, 180, 180, 84), stop:1 rgba(255, 255, 255, 0))\n"
 "\n"
 "}"));
@@ -365,21 +366,21 @@ public:
 
         renderMaterials->addTab(functions, QString());
         tools = new QWidget();
-        tools->setObjectName(QStringLiteral("tools"));
+        tools->setObjectName(QString::fromUtf8("tools"));
         groupBox = new QGroupBox(tools);
-        groupBox->setObjectName(QStringLiteral("groupBox"));
-        groupBox->setGeometry(QRect(0, 20, 147, 138));
+        groupBox->setObjectName(QString::fromUtf8("groupBox"));
+        groupBox->setGeometry(QRect(0, 20, 147, 161));
         gridLayout_7 = new QGridLayout(groupBox);
-        gridLayout_7->setObjectName(QStringLiteral("gridLayout_7"));
+        gridLayout_7->setObjectName(QString::fromUtf8("gridLayout_7"));
         gridLayout_3 = new QGridLayout();
-        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
         label_3 = new QLabel(groupBox);
-        label_3->setObjectName(QStringLiteral("label_3"));
+        label_3->setObjectName(QString::fromUtf8("label_3"));
 
         gridLayout_3->addWidget(label_3, 1, 0, 1, 1);
 
         uv_height = new QSpinBox(groupBox);
-        uv_height->setObjectName(QStringLiteral("uv_height"));
+        uv_height->setObjectName(QString::fromUtf8("uv_height"));
         uv_height->setMinimum(50);
         uv_height->setMaximum(8096);
         uv_height->setValue(500);
@@ -387,12 +388,12 @@ public:
         gridLayout_3->addWidget(uv_height, 1, 1, 1, 1);
 
         label_4 = new QLabel(groupBox);
-        label_4->setObjectName(QStringLiteral("label_4"));
+        label_4->setObjectName(QString::fromUtf8("label_4"));
 
         gridLayout_3->addWidget(label_4, 0, 0, 1, 1);
 
         uv_width = new QSpinBox(groupBox);
-        uv_width->setObjectName(QStringLiteral("uv_width"));
+        uv_width->setObjectName(QString::fromUtf8("uv_width"));
         uv_width->setMinimum(50);
         uv_width->setMaximum(8096);
         uv_width->setValue(500);
@@ -400,16 +401,21 @@ public:
         gridLayout_3->addWidget(uv_width, 0, 1, 1, 1);
 
 
-        gridLayout_7->addLayout(gridLayout_3, 0, 0, 1, 1);
+        gridLayout_7->addLayout(gridLayout_3, 1, 0, 1, 1);
 
         bake_texture = new QPushButton(groupBox);
-        bake_texture->setObjectName(QStringLiteral("bake_texture"));
+        bake_texture->setObjectName(QString::fromUtf8("bake_texture"));
 
-        gridLayout_7->addWidget(bake_texture, 1, 0, 1, 1);
+        gridLayout_7->addWidget(bake_texture, 2, 0, 1, 1);
+
+        tangent_space = new QRadioButton(groupBox);
+        tangent_space->setObjectName(QString::fromUtf8("tangent_space"));
+
+        gridLayout_7->addWidget(tangent_space, 0, 0, 1, 1);
 
         renderMaterials->addTab(tools, QString());
         widget = new QWidget();
-        widget->setObjectName(QStringLiteral("widget"));
+        widget->setObjectName(QString::fromUtf8("widget"));
         renderMaterials->addTab(widget, QString());
 
         verticalLayout->addWidget(renderMaterials);
@@ -418,36 +424,36 @@ public:
         gridLayout_2->addLayout(verticalLayout, 0, 0, 1, 1);
 
         gridLayout = new QGridLayout();
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout_4 = new QGridLayout();
-        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
+        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
         renderer_tab = new QTabWidget(centralwidget);
-        renderer_tab->setObjectName(QStringLiteral("renderer_tab"));
+        renderer_tab->setObjectName(QString::fromUtf8("renderer_tab"));
         sizePolicy.setHeightForWidth(renderer_tab->sizePolicy().hasHeightForWidth());
         renderer_tab->setSizePolicy(sizePolicy);
         renderer_tab->setTabShape(QTabWidget::Triangular);
         renderer_tab->setMovable(true);
         renderer_tab->setTabBarAutoHide(true);
         texture = new QWidget();
-        texture->setObjectName(QStringLiteral("texture"));
+        texture->setObjectName(QString::fromUtf8("texture"));
         gridLayout_9 = new QGridLayout(texture);
-        gridLayout_9->setObjectName(QStringLiteral("gridLayout_9"));
+        gridLayout_9->setObjectName(QString::fromUtf8("gridLayout_9"));
         dudv_image = new QGraphicsView(texture);
-        dudv_image->setObjectName(QStringLiteral("dudv_image"));
+        dudv_image->setObjectName(QString::fromUtf8("dudv_image"));
         dudv_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         dudv_image->setDragMode(QGraphicsView::ScrollHandDrag);
 
         gridLayout_9->addWidget(dudv_image, 2, 2, 1, 1);
 
         normal_image = new QGraphicsView(texture);
-        normal_image->setObjectName(QStringLiteral("normal_image"));
+        normal_image->setObjectName(QString::fromUtf8("normal_image"));
         normal_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         normal_image->setDragMode(QGraphicsView::ScrollHandDrag);
 
         gridLayout_9->addWidget(normal_image, 2, 0, 1, 1);
 
         diffuse_image = new QGraphicsView(texture);
-        diffuse_image->setObjectName(QStringLiteral("diffuse_image"));
+        diffuse_image->setObjectName(QString::fromUtf8("diffuse_image"));
         diffuse_image->setFrameShadow(QFrame::Plain);
         diffuse_image->setLineWidth(1);
         diffuse_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
@@ -457,7 +463,7 @@ public:
         gridLayout_9->addWidget(diffuse_image, 0, 0, 1, 1);
 
         tabWidget = new QTabWidget(texture);
-        tabWidget->setObjectName(QStringLiteral("tabWidget"));
+        tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
         tabWidget->setTabPosition(QTabWidget::East);
         tabWidget->setTabShape(QTabWidget::Triangular);
         tabWidget->setElideMode(Qt::ElideLeft);
@@ -465,22 +471,22 @@ public:
         tabWidget->setMovable(true);
         tabWidget->setTabBarAutoHide(true);
         tab_greyscale = new QWidget();
-        tab_greyscale->setObjectName(QStringLiteral("tab_greyscale"));
+        tab_greyscale->setObjectName(QString::fromUtf8("tab_greyscale"));
         gridLayout_5 = new QGridLayout(tab_greyscale);
-        gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
+        gridLayout_5->setObjectName(QString::fromUtf8("gridLayout_5"));
         greyscale_image = new QGraphicsView(tab_greyscale);
-        greyscale_image->setObjectName(QStringLiteral("greyscale_image"));
+        greyscale_image->setObjectName(QString::fromUtf8("greyscale_image"));
         greyscale_image->setDragMode(QGraphicsView::ScrollHandDrag);
 
         gridLayout_5->addWidget(greyscale_image, 0, 0, 1, 1);
 
         tabWidget->addTab(tab_greyscale, QString());
         tab_heightmap = new QWidget();
-        tab_heightmap->setObjectName(QStringLiteral("tab_heightmap"));
+        tab_heightmap->setObjectName(QString::fromUtf8("tab_heightmap"));
         gridLayout_10 = new QGridLayout(tab_heightmap);
-        gridLayout_10->setObjectName(QStringLiteral("gridLayout_10"));
+        gridLayout_10->setObjectName(QString::fromUtf8("gridLayout_10"));
         height_image = new QGraphicsView(tab_heightmap);
-        height_image->setObjectName(QStringLiteral("height_image"));
+        height_image->setObjectName(QString::fromUtf8("height_image"));
         height_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
         gridLayout_10->addWidget(height_image, 0, 0, 1, 1);
@@ -491,39 +497,44 @@ public:
 
         renderer_tab->addTab(texture, QString());
         gl_renderer = new QWidget();
-        gl_renderer->setObjectName(QStringLiteral("gl_renderer"));
+        gl_renderer->setObjectName(QString::fromUtf8("gl_renderer"));
         sizePolicy2.setHeightForWidth(gl_renderer->sizePolicy().hasHeightForWidth());
         gl_renderer->setSizePolicy(sizePolicy2);
         gridLayout_6 = new QGridLayout(gl_renderer);
-        gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
+        gridLayout_6->setObjectName(QString::fromUtf8("gridLayout_6"));
+        renderer_view = new GLViewer(gl_renderer);
+        renderer_view->setObjectName(QString::fromUtf8("renderer_view"));
+
+        gridLayout_6->addWidget(renderer_view, 0, 0, 1, 1);
+
         renderer_tab->addTab(gl_renderer, QString());
         uv_editor = new QWidget();
-        uv_editor->setObjectName(QStringLiteral("uv_editor"));
+        uv_editor->setObjectName(QString::fromUtf8("uv_editor"));
         sizePolicy.setHeightForWidth(uv_editor->sizePolicy().hasHeightForWidth());
         uv_editor->setSizePolicy(sizePolicy);
         uv_editor->setLayoutDirection(Qt::LeftToRight);
         uv_editor->setAutoFillBackground(false);
         verticalLayoutWidget = new QWidget(uv_editor);
-        verticalLayoutWidget->setObjectName(QStringLiteral("verticalLayoutWidget"));
+        verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
         verticalLayoutWidget->setGeometry(QRect(0, -1, 1061, 781));
         verticalLayout_11 = new QVBoxLayout(verticalLayoutWidget);
-        verticalLayout_11->setObjectName(QStringLiteral("verticalLayout_11"));
+        verticalLayout_11->setObjectName(QString::fromUtf8("verticalLayout_11"));
         verticalLayout_11->setContentsMargins(0, 0, 0, 0);
         groupBox_2 = new QGroupBox(verticalLayoutWidget);
-        groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
+        groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
         sizePolicy.setHeightForWidth(groupBox_2->sizePolicy().hasHeightForWidth());
         groupBox_2->setSizePolicy(sizePolicy);
         groupBox_2->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
         groupBox_2->setFlat(true);
         groupBox_2->setCheckable(false);
         horizontalLayout = new QHBoxLayout(groupBox_2);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
         verticalLayout_12 = new QVBoxLayout();
-        verticalLayout_12->setObjectName(QStringLiteral("verticalLayout_12"));
+        verticalLayout_12->setObjectName(QString::fromUtf8("verticalLayout_12"));
         verticalLayout_12->setSizeConstraint(QLayout::SetDefaultConstraint);
         uv_projection = new QGraphicsView(groupBox_2);
-        uv_projection->setObjectName(QStringLiteral("uv_projection"));
+        uv_projection->setObjectName(QString::fromUtf8("uv_projection"));
         QSizePolicy sizePolicy5(QSizePolicy::Preferred, QSizePolicy::Minimum);
         sizePolicy5.setHorizontalStretch(0);
         sizePolicy5.setVerticalStretch(0);
@@ -532,8 +543,8 @@ public:
 
         verticalLayout_12->addWidget(uv_projection);
 
-        uv_viewer = new QOpenGLWidget(groupBox_2);
-        uv_viewer->setObjectName(QStringLiteral("uv_viewer"));
+        uv_viewer = new GLViewer(groupBox_2);
+        uv_viewer->setObjectName(QString::fromUtf8("uv_viewer"));
         sizePolicy2.setHeightForWidth(uv_viewer->sizePolicy().hasHeightForWidth());
         uv_viewer->setSizePolicy(sizePolicy2);
         uv_viewer->setMaximumSize(QSize(16777215, 16777215));
@@ -547,7 +558,7 @@ public:
         verticalLayout_11->addWidget(groupBox_2);
 
         model_list = new QListView(uv_editor);
-        model_list->setObjectName(QStringLiteral("model_list"));
+        model_list->setObjectName(QString::fromUtf8("model_list"));
         model_list->setGeometry(QRect(1060, -9, 231, 791));
         renderer_tab->addTab(uv_editor, QString());
 
@@ -561,19 +572,19 @@ public:
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
-        menubar->setObjectName(QStringLiteral("menubar"));
-        menubar->setGeometry(QRect(0, 0, 1528, 26));
+        menubar->setObjectName(QString::fromUtf8("menubar"));
+        menubar->setGeometry(QRect(0, 0, 1528, 21));
         menuFiles = new QMenu(menubar);
-        menuFiles->setObjectName(QStringLiteral("menuFiles"));
+        menuFiles->setObjectName(QString::fromUtf8("menuFiles"));
         menuEdit = new QMenu(menubar);
-        menuEdit->setObjectName(QStringLiteral("menuEdit"));
+        menuEdit->setObjectName(QString::fromUtf8("menuEdit"));
         menuTools = new QMenu(menubar);
-        menuTools->setObjectName(QStringLiteral("menuTools"));
+        menuTools->setObjectName(QString::fromUtf8("menuTools"));
         menuHelp = new QMenu(menubar);
-        menuHelp->setObjectName(QStringLiteral("menuHelp"));
+        menuHelp->setObjectName(QString::fromUtf8("menuHelp"));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
-        statusbar->setObjectName(QStringLiteral("statusbar"));
+        statusbar->setObjectName(QString::fromUtf8("statusbar"));
         MainWindow->setStatusBar(statusbar);
 
         menubar->addAction(menuFiles->menuAction());
@@ -604,52 +615,55 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "Axomae", Q_NULLPTR));
-        actionNew_Project->setText(QApplication::translate("MainWindow", "&New Project", Q_NULLPTR));
-        actionImport_image->setText(QApplication::translate("MainWindow", "&Import image", Q_NULLPTR));
-        actionSave_image->setText(QApplication::translate("MainWindow", "&Save image", Q_NULLPTR));
-        actionSave_project->setText(QApplication::translate("MainWindow", "Save &project", Q_NULLPTR));
-        actionExit->setText(QApplication::translate("MainWindow", "&Exit", Q_NULLPTR));
-        actionDocumentation->setText(QApplication::translate("MainWindow", "&Documentation", Q_NULLPTR));
-        actionAxomae_version->setText(QApplication::translate("MainWindow", "&Axomae version", Q_NULLPTR));
-        actionCancel->setText(QApplication::translate("MainWindow", "&Undo                            ", Q_NULLPTR));
-        actionRedo->setText(QApplication::translate("MainWindow", "&Redo", Q_NULLPTR));
-        actionImport_3D_model->setText(QApplication::translate("MainWindow", "Import &3D model", Q_NULLPTR));
-        use_gpu->setText(QApplication::translate("MainWindow", "Use GPU", Q_NULLPTR));
-        greyscale_opt->setTitle(QApplication::translate("MainWindow", "Greyscale options", Q_NULLPTR));
-        use_average->setText(QApplication::translate("MainWindow", "Use a&verage", Q_NULLPTR));
-        use_luminance->setText(QApplication::translate("MainWindow", "Use luminance", Q_NULLPTR));
-        height_opt->setTitle(QApplication::translate("MainWindow", "Height options", Q_NULLPTR));
-        use_scharr->setText(QApplication::translate("MainWindow", "Use Scharr", Q_NULLPTR));
-        use_sobel->setText(QApplication::translate("MainWindow", "Use Sobel", Q_NULLPTR));
-        use_prewitt->setText(QApplication::translate("MainWindow", "Use Prewitt", Q_NULLPTR));
-        normal_opt->setTitle(QApplication::translate("MainWindow", "Normals options", Q_NULLPTR));
-        use_objectSpace->setText(QApplication::translate("MainWindow", "Ob&ject space", Q_NULLPTR));
-        use_tangentSpace->setText(QApplication::translate("MainWindow", "Tangent space", Q_NULLPTR));
-        nmap_factor_opt->setTitle(QApplication::translate("MainWindow", "Factor", Q_NULLPTR));
-        label->setText(QApplication::translate("MainWindow", "Attenuation", Q_NULLPTR));
-        label_2->setText(QApplication::translate("MainWindow", "Factor", Q_NULLPTR));
-        dudv_opt->setTitle(QApplication::translate("MainWindow", "Distortion options", Q_NULLPTR));
-        compute_dudv->setText(QApplication::translate("MainWindow", "Compute distortion map", Q_NULLPTR));
-        nmap_factor_opt_2->setTitle(QApplication::translate("MainWindow", "Factor", Q_NULLPTR));
-        renderMaterials->setTabText(renderMaterials->indexOf(functions), QApplication::translate("MainWindow", "functions", Q_NULLPTR));
-        groupBox->setTitle(QApplication::translate("MainWindow", "Baking texture dimensions", Q_NULLPTR));
-        label_3->setText(QApplication::translate("MainWindow", "Texture height", Q_NULLPTR));
-        label_4->setText(QApplication::translate("MainWindow", "Texture width", Q_NULLPTR));
-        bake_texture->setText(QApplication::translate("MainWindow", "Bake", Q_NULLPTR));
-        renderMaterials->setTabText(renderMaterials->indexOf(tools), QApplication::translate("MainWindow", "tools", Q_NULLPTR));
-        renderMaterials->setTabText(renderMaterials->indexOf(widget), QApplication::translate("MainWindow", "Materials", Q_NULLPTR));
-        tabWidget->setTabText(tabWidget->indexOf(tab_greyscale), QApplication::translate("MainWindow", "greyscale", Q_NULLPTR));
-        tabWidget->setTabText(tabWidget->indexOf(tab_heightmap), QApplication::translate("MainWindow", "Height map", Q_NULLPTR));
-        renderer_tab->setTabText(renderer_tab->indexOf(texture), QApplication::translate("MainWindow", "textures", Q_NULLPTR));
-        renderer_tab->setTabWhatsThis(renderer_tab->indexOf(texture), QApplication::translate("MainWindow", "Display current loaded image", Q_NULLPTR));
-        renderer_tab->setTabText(renderer_tab->indexOf(gl_renderer), QApplication::translate("MainWindow", "renderer", Q_NULLPTR));
-        groupBox_2->setTitle(QApplication::translate("MainWindow", "GroupBox", Q_NULLPTR));
-        renderer_tab->setTabText(renderer_tab->indexOf(uv_editor), QApplication::translate("MainWindow", "UV editor", Q_NULLPTR));
-        menuFiles->setTitle(QApplication::translate("MainWindow", "Fi&les", Q_NULLPTR));
-        menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", Q_NULLPTR));
-        menuTools->setTitle(QApplication::translate("MainWindow", "Tools", Q_NULLPTR));
-        menuHelp->setTitle(QApplication::translate("MainWindow", "Help", Q_NULLPTR));
+        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "Axomae", nullptr));
+        actionNew_Project->setText(QCoreApplication::translate("MainWindow", "&New Project", nullptr));
+        actionImport_image->setText(QCoreApplication::translate("MainWindow", "&Import image", nullptr));
+        actionSave_image->setText(QCoreApplication::translate("MainWindow", "&Save image", nullptr));
+        actionSave_project->setText(QCoreApplication::translate("MainWindow", "Save &project", nullptr));
+        actionExit->setText(QCoreApplication::translate("MainWindow", "&Exit", nullptr));
+        actionDocumentation->setText(QCoreApplication::translate("MainWindow", "&Documentation", nullptr));
+        actionAxomae_version->setText(QCoreApplication::translate("MainWindow", "&Axomae version", nullptr));
+        actionCancel->setText(QCoreApplication::translate("MainWindow", "&Undo                            ", nullptr));
+        actionRedo->setText(QCoreApplication::translate("MainWindow", "&Redo", nullptr));
+        actionImport_3D_model->setText(QCoreApplication::translate("MainWindow", "Import &3D model", nullptr));
+        use_gpu->setText(QCoreApplication::translate("MainWindow", "Use GPU", nullptr));
+        greyscale_opt->setTitle(QCoreApplication::translate("MainWindow", "Greyscale options", nullptr));
+        use_average->setText(QCoreApplication::translate("MainWindow", "Use a&verage", nullptr));
+        use_luminance->setText(QCoreApplication::translate("MainWindow", "Use luminance", nullptr));
+        height_opt->setTitle(QCoreApplication::translate("MainWindow", "Height options", nullptr));
+        use_scharr->setText(QCoreApplication::translate("MainWindow", "Use Scharr", nullptr));
+        use_sobel->setText(QCoreApplication::translate("MainWindow", "Use Sobel", nullptr));
+        use_prewitt->setText(QCoreApplication::translate("MainWindow", "Use Prewitt", nullptr));
+        normal_opt->setTitle(QCoreApplication::translate("MainWindow", "Normals options", nullptr));
+        use_objectSpace->setText(QCoreApplication::translate("MainWindow", "Ob&ject space", nullptr));
+        use_tangentSpace->setText(QCoreApplication::translate("MainWindow", "Tangent space", nullptr));
+        nmap_factor_opt->setTitle(QCoreApplication::translate("MainWindow", "Factor", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "Attenuation", nullptr));
+        label_2->setText(QCoreApplication::translate("MainWindow", "Factor", nullptr));
+        dudv_opt->setTitle(QCoreApplication::translate("MainWindow", "Distortion options", nullptr));
+        compute_dudv->setText(QCoreApplication::translate("MainWindow", "Compute distortion map", nullptr));
+        nmap_factor_opt_2->setTitle(QCoreApplication::translate("MainWindow", "Factor", nullptr));
+        renderMaterials->setTabText(renderMaterials->indexOf(functions), QCoreApplication::translate("MainWindow", "functions", nullptr));
+        groupBox->setTitle(QCoreApplication::translate("MainWindow", "Baking texture dimensions", nullptr));
+        label_3->setText(QCoreApplication::translate("MainWindow", "Texture height", nullptr));
+        label_4->setText(QCoreApplication::translate("MainWindow", "Texture width", nullptr));
+        bake_texture->setText(QCoreApplication::translate("MainWindow", "Bake", nullptr));
+        tangent_space->setText(QCoreApplication::translate("MainWindow", "Tangent space", nullptr));
+        renderMaterials->setTabText(renderMaterials->indexOf(tools), QCoreApplication::translate("MainWindow", "tools", nullptr));
+        renderMaterials->setTabText(renderMaterials->indexOf(widget), QCoreApplication::translate("MainWindow", "Materials", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_greyscale), QCoreApplication::translate("MainWindow", "greyscale", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_heightmap), QCoreApplication::translate("MainWindow", "Height map", nullptr));
+        renderer_tab->setTabText(renderer_tab->indexOf(texture), QCoreApplication::translate("MainWindow", "textures", nullptr));
+#if QT_CONFIG(whatsthis)
+        renderer_tab->setTabWhatsThis(renderer_tab->indexOf(texture), QCoreApplication::translate("MainWindow", "Display current loaded image", nullptr));
+#endif // QT_CONFIG(whatsthis)
+        renderer_tab->setTabText(renderer_tab->indexOf(gl_renderer), QCoreApplication::translate("MainWindow", "renderer", nullptr));
+        groupBox_2->setTitle(QCoreApplication::translate("MainWindow", "GroupBox", nullptr));
+        renderer_tab->setTabText(renderer_tab->indexOf(uv_editor), QCoreApplication::translate("MainWindow", "UV editor", nullptr));
+        menuFiles->setTitle(QCoreApplication::translate("MainWindow", "Fi&les", nullptr));
+        menuEdit->setTitle(QCoreApplication::translate("MainWindow", "Edit", nullptr));
+        menuTools->setTitle(QCoreApplication::translate("MainWindow", "Tools", nullptr));
+        menuHelp->setTitle(QCoreApplication::translate("MainWindow", "Help", nullptr));
     } // retranslateUi
 
 };

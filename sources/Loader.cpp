@@ -49,24 +49,28 @@ static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 		 	image.loadFromData((const unsigned char*) buffer , fromtexture->mWidth ) ; 
 			totexture->data = new uint32_t[image.width() * image.height()]; 
 			memcpy((void*) totexture->data , (void*) image.bits() , image.width() * image.height() * sizeof(uint32_t)) ; 
+			totexture->width = image.width() ; 
+			totexture->height = image.height() ; 
+			std::cout << "image of size " << totexture->width << " x " << totexture->height << " uncompressed " << std::endl ; 
 		}
 	}
 }
 
 static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	Material mesh_material; 
-	TextureData diffuse , metallic , roughness ; 
+	TextureData diffuse , metallic , roughness ;
+	diffuse.name = "diffuse" ; 
+	metallic.name = "metallic" ; 
+	roughness.name = "roughness" ; 
 	unsigned int color_index = 0, metallic_index = 0 , roughness_index = 0; 
 	aiString color_texture , normal_texture , metallic_texture , roughness_texture , occlusion_texture ; //we get indexes of embedded textures , since we will use GLB format  
 	std::string color_index_string , metallic_index_string , roughness_index_string ; // returned index is in the form *X , we want to get rid of *
-	
 	material->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE , &color_texture) ; 
 	material->GetTexture(AI_MATKEY_METALLIC_TEXTURE , &metallic_texture) ; 
 	material->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE , &roughness_texture) ;
 	color_index_string = color_texture.C_Str(); 
 	metallic_index_string = metallic_texture.C_Str() ; 
 	roughness_texture = roughness_texture.C_Str() ;
-
 	if(color_index_string.size() != 0){
 		color_index_string = color_index_string.substr(1) ;
 		color_index = std::stoi(color_index_string) ; 
@@ -79,14 +83,15 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 		roughness_index_string = roughness_index_string.substr(1) ; 
 		roughness_index = std::stoi(roughness_index_string) ; 
 	}
-
 	copyTexels(&diffuse , &*scene->mTextures[color_index]); 
 	copyTexels(&metallic , &*scene->mTextures[metallic_index]); 
 	copyTexels(&roughness , &*scene->mTextures[roughness_index]); 
-
 	mesh_material.textures.diffuse = diffuse ; 
 	mesh_material.textures.metallic = metallic ; 
-	mesh_material.textures.roughness = roughness ; 
+	mesh_material.textures.roughness = roughness ;
+	diffuse.clean() ; 
+	roughness.clean() ; 
+	metallic.clean() ; 
 	return mesh_material ; 
 }
 

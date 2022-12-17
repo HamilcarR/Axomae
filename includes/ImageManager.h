@@ -1,14 +1,12 @@
 #ifndef IMAGEMANAGER_H
 #define IMAGEMANAGER_H
-
-
 #include <SDL2/SDL.h>
 #include <algorithm>
 #include <iostream>
 #include <cmath>
 #include <assert.h>
-#include "../kernels/Kernel.cuh"
-
+#include "constants.h" 
+#include "../kernels/Kernel.cuh" 
 
 namespace axomae{
 			

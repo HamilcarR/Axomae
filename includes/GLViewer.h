@@ -10,9 +10,8 @@
 #include <QOpenGLVertexArrayObject> 
 
 
-
 class QOpenGLShaderProgram ; 
-
+class QOpenGLTexture ; 
 class GLViewer : public QOpenGLWidget , protected QOpenGLFunctions_4_3_Core {
 
 	Q_OBJECT
@@ -20,8 +19,7 @@ class GLViewer : public QOpenGLWidget , protected QOpenGLFunctions_4_3_Core {
 	public:
 		GLViewer(QWidget* parent = nullptr); 
 		virtual ~GLViewer();	
-		virtual void setNewScene(axomae::Object3D* new_scene);   
-
+		virtual void setNewScene(std::vector<axomae::Mesh> &new_scene);   
 	protected:
 		void initializeGL() override ; 
 		void paintGL() override ; 
@@ -35,7 +33,8 @@ class GLViewer : public QOpenGLWidget , protected QOpenGLFunctions_4_3_Core {
 		QOpenGLBuffer index_buffer ; 
 		QOpenGLBuffer texture_buffer ;
 		QOpenGLBuffer color_buffer ;
-		axomae::Object3D *current_scene;
+		unsigned int sampler2D ; 
+		axomae::Mesh *current_scene;
 		bool start_draw ; 
 		
 };

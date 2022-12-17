@@ -427,7 +427,7 @@ namespace axomae {
 			DEVICE_RGB rgb = get_convolution_values(pixel, bpp, pitch, convolution, border);
 			set_pixel_color(p, rgb, bpp);
 		}
-		else {
+		else { //just some weird cases 
 			uint8_t* pixel = (uint8_t*)(image)+i*bpp + j*pitch;
 			if (border == AXOMAE_REPEAT) {
 

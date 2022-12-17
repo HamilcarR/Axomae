@@ -14,14 +14,6 @@
 
 namespace axomae{
 
-
-	
-
-
-
-
-
-
 	enum : unsigned {PROMPT0 = 0 , PROMPT1 = 1 , PROMPT2 = 2 , PROMPT3 = 3 };
 
 

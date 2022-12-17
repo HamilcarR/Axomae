@@ -81,8 +81,12 @@ int main(int argv , char** argc){
 			return EXIT_FAILURE;
 		}
 	}
-	else 
-		cout << "Wrong command line argument used : Use -cmd for terminal or -gui for a graphical user interface" << "\n";
+	else{
+		QApplication app(argv, argc); 
+		GUIWindow win; 
+		win.show(); 
+		return app.exec(); 
+	}
 	quit_api(); 
 	return EXIT_SUCCESS ; 
 }

@@ -9,154 +9,153 @@
 
 namespace axomae {
 
-	//TODO USE QLABEL FOR IMAGES
-	enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4 , ALBEDO = 5 , GREYSCALE_AVG = 6 , PROJECTED_NMAP = 7}; 
-	
-	static double NORMAL_FACTOR = 1.;
-	static float NORMAL_ATTENUATION = 1.56; 
-	static double DUDV_FACTOR = 1.;
-	static double dividor = 10; 
-	template<typename T>
-	struct image_type {
-		T* image; 
-		IMAGETYPE imagetype; 
-	};
+//TODO USE QLABEL FOR IMAGES
+enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4 , ALBEDO = 5 , GREYSCALE_AVG = 6 , PROJECTED_NMAP = 7}; 
 
-	/*structure to keep track of pointers to destroy*/
+static double NORMAL_FACTOR = 1.;
+static float NORMAL_ATTENUATION = 1.56; 
+static double DUDV_FACTOR = 1.;
+static double dividor = 10; 
+template<typename T>
+struct image_type {
+	T* image; 
+	IMAGETYPE imagetype; 
+};
 
-	class HeapManagement {
-	public:
-		 void addToHeap(image_type<SDL_Surface> a) {
-			
-		    std::vector<image_type<SDL_Surface>>::iterator it = std::find_if(SDLSurf_heap.begin(), SDLSurf_heap.end(), [a](image_type<SDL_Surface> b) { if (a.imagetype == b.imagetype) return true; else return false; });
-			if (it != SDLSurf_heap.end()) {
-					image_type<SDL_Surface> temp = *it;
-					SDLSurf_heap.erase(it);
-					SDLSurf_heap.push_back(a);
-					SDL_FreeSurface(temp.image);
-				}
-			 else
-				SDLSurf_heap.push_back(a);
-		}
-		 void addToTemp(image_type<SDL_Surface> a) {
-			 temp_surfaces.push_back(a);
-		 }
-		 void addToHeap(image_type<QPaintDevice> a) {
-			 std::vector<image_type<QPaintDevice>>::iterator it = std::find_if(paintDevice_heap.begin(), paintDevice_heap.end(), [a](image_type<QPaintDevice> b) { if (a.imagetype == b.imagetype) return true; else return false; });
-			 if (it != paintDevice_heap.end()) {
-				 image_type<QPaintDevice> temp = *it;
-				 paintDevice_heap.erase(it);
-				 paintDevice_heap.push_back(a);
-				 delete temp.image; 
-			 }
-			 else
-				 paintDevice_heap.push_back(a);
-		 }
-		 void addToHeap(image_type<QGraphicsItem> a) {
-			 std::vector<image_type<QGraphicsItem>>::iterator it = std::find_if(graphicsItem_heap.begin(), graphicsItem_heap.end(), [a](image_type<QGraphicsItem> b) { if (a.imagetype == b.imagetype) return true; else return false; });
-			 if (it != graphicsItem_heap.end()) {
-				 image_type<QGraphicsItem> temp = *it;
-				 graphicsItem_heap.erase(it);
-				 graphicsItem_heap.push_back(a);
-				 delete temp.image;
-			 }
-			 else
-				 graphicsItem_heap.push_back(a);
-		 }
-		 void addToHeap(image_type<QObject> a) {
-			 std::vector<image_type<QObject>>::iterator it = std::find_if(object_heap.begin(), object_heap.end(), [a](image_type<QObject> b) { if (a.imagetype == b.imagetype) return true; else return false; });
-			 if (it != object_heap.end()) {
-				 image_type<QObject> temp = *it;
-				 object_heap.erase(it);
-				 object_heap.push_back(a);
-				 delete temp.image;
-			 }
-			 else
-				 object_heap.push_back(a);
-		 }
+/*structure to keep track of pointers to destroy*/
 
-		 bool contain(IMAGETYPE A) {
-			 auto lambda = [A](image_type<SDL_Surface> a) {
-				 if (a.imagetype == A)
-					 return true;
-				 else
-					 return false;
-
-			 }; 
-			return  std::any_of(SDLSurf_heap.begin(), SDLSurf_heap.end(), lambda); 
-		}
-
-		 
-
-		~HeapManagement() {
-				for (image_type<SDL_Surface> a : temp_surfaces) {
-				SDL_FreeSurface(a.image);
-				}
-				for (image_type<SDL_Surface> a : SDLSurf_heap) {
-				SDL_FreeSurface(a.image);
-				}
-				for (image_type<QPaintDevice> a : paintDevice_heap) {
-					delete a.image;
-					a.image = nullptr; 
-				}
-				for (image_type<QGraphicsItem> a : graphicsItem_heap) {
-					delete a.image;
-					a.image = nullptr;
-				}
-				for (image_type<QObject> a : object_heap) {
-					delete a.image;
-					a.image = nullptr;	
-				}
-		}
-		image_type<SDL_Surface> getLastSurface() { return SDLSurf_heap.back();  }
-	private:
-		 std::vector<image_type<SDL_Surface>> SDLSurf_heap;
-		 std::vector<image_type <QPaintDevice>> paintDevice_heap;
-		 std::vector<image_type <QGraphicsItem>> graphicsItem_heap;
-		 std::vector<image_type <QObject>> object_heap;
-		 std::vector<image_type<SDL_Surface>> temp_surfaces;
-
+class HeapManagement {
+public:
+	 void addToHeap(image_type<SDL_Surface> a) {
 		
-
-
-	};
-
-	/*structure fields pointing to the session datas*/
-	namespace image_session_pointers {
-		SDL_Surface* greyscale;
-		SDL_Surface* albedo;
-		SDL_Surface* height;
-		SDL_Surface* normalmap;
-		SDL_Surface* dudv;
-		std::string filename; 
-		void setAllNull() {
-			filename = ""; 
-			greyscale = nullptr;
-			albedo = nullptr; 
-			height = nullptr; 
-			normalmap = nullptr;
-			dudv = nullptr;
-		}
+	    std::vector<image_type<SDL_Surface>>::iterator it = std::find_if(SDLSurf_heap.begin(), SDLSurf_heap.end(), [a](image_type<SDL_Surface> b) { if (a.imagetype == b.imagetype) return true; else return false; });
+		if (it != SDLSurf_heap.end()) {
+				image_type<SDL_Surface> temp = *it;
+				SDLSurf_heap.erase(it);
+				SDLSurf_heap.push_back(a);
+				SDL_FreeSurface(temp.image);
+			}
+		 else
+			SDLSurf_heap.push_back(a);
 	}
+	 void addToTemp(image_type<SDL_Surface> a) {
+		 temp_surfaces.push_back(a);
+	 }
+	 void addToHeap(image_type<QPaintDevice> a) {
+		 std::vector<image_type<QPaintDevice>>::iterator it = std::find_if(paintDevice_heap.begin(), paintDevice_heap.end(), [a](image_type<QPaintDevice> b) { if (a.imagetype == b.imagetype) return true; else return false; });
+		 if (it != paintDevice_heap.end()) {
+			 image_type<QPaintDevice> temp = *it;
+			 paintDevice_heap.erase(it);
+			 paintDevice_heap.push_back(a);
+			 delete temp.image; 
+		 }
+		 else
+			 paintDevice_heap.push_back(a);
+	 }
+	 void addToHeap(image_type<QGraphicsItem> a) {
+		 std::vector<image_type<QGraphicsItem>>::iterator it = std::find_if(graphicsItem_heap.begin(), graphicsItem_heap.end(), [a](image_type<QGraphicsItem> b) { if (a.imagetype == b.imagetype) return true; else return false; });
+		 if (it != graphicsItem_heap.end()) {
+			 image_type<QGraphicsItem> temp = *it;
+			 graphicsItem_heap.erase(it);
+			 graphicsItem_heap.push_back(a);
+			 delete temp.image;
+		 }
+		 else
+			 graphicsItem_heap.push_back(a);
+	 }
+	 void addToHeap(image_type<QObject> a) {
+		 std::vector<image_type<QObject>>::iterator it = std::find_if(object_heap.begin(), object_heap.end(), [a](image_type<QObject> b) { if (a.imagetype == b.imagetype) return true; else return false; });
+		 if (it != object_heap.end()) {
+			 image_type<QObject> temp = *it;
+			 object_heap.erase(it);
+			 object_heap.push_back(a);
+			 delete temp.image;
+		 }
+		 else
+			 object_heap.push_back(a);
+	 }
+
+	 bool contain(IMAGETYPE A) {
+		 auto lambda = [A](image_type<SDL_Surface> a) {
+			 if (a.imagetype == A)
+				 return true;
+			 else
+				 return false;
+
+		 }; 
+		return  std::any_of(SDLSurf_heap.begin(), SDLSurf_heap.end(), lambda); 
+	}
+
+	 
+
+	~HeapManagement() {
+			for (image_type<SDL_Surface> a : temp_surfaces) {
+			SDL_FreeSurface(a.image);
+			}
+			for (image_type<SDL_Surface> a : SDLSurf_heap) {
+			SDL_FreeSurface(a.image);
+			}
+			for (image_type<QPaintDevice> a : paintDevice_heap) {
+				delete a.image;
+				a.image = nullptr; 
+			}
+			for (image_type<QGraphicsItem> a : graphicsItem_heap) {
+				delete a.image;
+				a.image = nullptr;
+			}
+			for (image_type<QObject> a : object_heap) {
+				delete a.image;
+				a.image = nullptr;	
+			}
+	}
+	image_type<SDL_Surface> getLastSurface() { return SDLSurf_heap.back();  }
+private:
+	 std::vector<image_type<SDL_Surface>> SDLSurf_heap;
+	 std::vector<image_type <QPaintDevice>> paintDevice_heap;
+	 std::vector<image_type <QGraphicsItem>> graphicsItem_heap;
+	 std::vector<image_type <QObject>> object_heap;
+	 std::vector<image_type<SDL_Surface>> temp_surfaces;
+
+	
+
+
+};
+
+/*structure fields pointing to the session datas*/
+namespace image_session_pointers {
+	SDL_Surface* greyscale;
+	SDL_Surface* albedo;
+	SDL_Surface* height;
+	SDL_Surface* normalmap;
+	SDL_Surface* dudv;
+	std::string filename; 
+	void setAllNull() {
+		filename = ""; 
+		greyscale = nullptr;
+		albedo = nullptr; 
+		height = nullptr; 
+		normalmap = nullptr;
+		dudv = nullptr;
+	}
+}
 		
 /****************************************************/
-	HeapManagement *GUIWindow::_MemManagement = new HeapManagement;
-	GUIWindow::GUIWindow( QWidget *parent) : QMainWindow(parent) {
-		_UI.setupUi(this);
-		connect_all_slots(); 
-		_UI.progressBar->setValue(0);
-		image_session_pointers::greyscale = nullptr; 
-		image_session_pointers::albedo = nullptr; 
-		image_session_pointers::height = nullptr; 
-		image_session_pointers::normalmap = nullptr;
-		image_session_pointers::dudv = nullptr; 
+HeapManagement *GUIWindow::_MemManagement = new HeapManagement;
+GUIWindow::GUIWindow( QWidget *parent) : QMainWindow(parent) {
+	_UI.setupUi(this);
+	connect_all_slots(); 
+	_UI.progressBar->setValue(0);
+	image_session_pointers::greyscale = nullptr; 
+	image_session_pointers::albedo = nullptr; 
+	image_session_pointers::height = nullptr; 
+	image_session_pointers::normalmap = nullptr;
+	image_session_pointers::dudv = nullptr; 
 
-	}
+}
 
-
-	GUIWindow::~GUIWindow() {
-		delete _MemManagement;
-	}
+GUIWindow::~GUIWindow() {
+	delete _MemManagement;
+}
 
 /******************************************************************************************************************************************************************************************/
 
@@ -208,18 +207,6 @@ namespace axomae {
 	
 	
 	}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /*SLOTS*/
@@ -453,10 +440,12 @@ namespace axomae {
 	bool GUIWindow::import_3DOBJ(){
 		QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
 		if(!filename.isEmpty()){
-			auto obj = Loader::load(filename.toStdString().c_str()) ;
-			_UI.renderer_view->setNewScene(&obj[0]);
-			//_UI.uv_viewer->setNewScene(&obj[0]); 
-			std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, obj[0] , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); 
+			std::vector<Mesh> scene = Loader::load(filename.toStdString().c_str()) ;
+			std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, 
+									scene[0].geometry , _UI.uv_width->value() , 
+									_UI.uv_height->value() , 
+									_UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 
+			_UI.renderer_view->setNewScene(scene);
 			SDL_Surface* surf = async_get_surf.get() ; 
 			display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP) ; 
 				
