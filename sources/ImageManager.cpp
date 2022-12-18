@@ -680,8 +680,7 @@ Vect3D tan_space_transform(Vect3D T , Vect3D BT , Vect3D N , Vect3D I){
 		return result ; 
 }
 /***************************************************************************************************************/
-uint32_t compute_normals_set_pixels_rgb(SDL_Surface* surf ,
-					  Point2D P1 , 
+uint32_t compute_normals_set_pixels_rgb(  Point2D P1 , 
 					  Point2D P2 , 
 					  Point2D P3 , 
 					  Vect3D N1 ,
@@ -704,11 +703,10 @@ uint32_t compute_normals_set_pixels_rgb(SDL_Surface* surf ,
 	Point2D I = {static_cast<float>(x) ,static_cast<float> (y)} ; 
 	Vect3D C = barycentric_lerp(P1 , P2 , P3 , I) ;
 	if(C.x >= 0 && C.y >= 0 && C.z >= 0){
-		auto interpolate = [&C](Vect3D N1 , Vect3D N2 , Vect3D N3)
-			{
+		auto interpolate = [&C](Vect3D N1 , Vect3D N2 , Vect3D N3){
 			Vect3D normal = { N1.x * C.x + N2.x * C.y + N3.x * C.z , N1.y * C.x + N2.y * C.y + N3.y * C.z ,N1.z * C.x + N2.z * C.y + N3.z * C.z }; 		
 			return normal ; 
-			};
+		};
 		if(tangent_space){
 			Vect3D normal = interpolate(N1 , N2 , N3) ; 	
 			Vect3D B = {(BT1.x + BT2.x + BT3.x)/3 , (BT1.y + BT2.y + BT3.y)/3 , (BT1.z + BT2.z + BT3.z)/3 }; 
@@ -733,8 +731,7 @@ uint32_t compute_normals_set_pixels_rgb(SDL_Surface* surf ,
 			return val; 
 		}
 	}
-	else{
-	 
+	else{ 
 		return 0 ; 
 	}
 }
@@ -759,18 +756,18 @@ SDL_Surface* ImageManager::project_uv_normals(Object3D object , int width ,  int
 	/* TODO : Parallelize : each face = 1 thread ? */
 	for(unsigned int i = 0 ; i < object.indices.size() ; i+=3) {
 		std::vector<unsigned int> index = object.indices; 
-		Point2D P1 = { object.uv[index[i] * 2] , object.uv[index[i] * 2 + 1] } ; 	
-		Point2D P2 = { object.uv[index[i + 1] * 2] , object.uv[index[i + 1] * 2 + 1] } ; 
-		Point2D P3 = { object.uv[index[i + 2] * 2] , object.uv[index[i + 2] * 2 + 1] } ; 
-		Vect3D N1  = { object.normals[index[i] * 3] , object.normals[index[i] * 3 + 1] , object.normals[index[i] * 3 + 2] } ; 
-		Vect3D N2 = { object.normals[index[i + 1]*3]  , object.normals[index[i + 1]*3 + 1 ] , object.normals[index[i + 1 ]*3 + 2] } ; 
-		Vect3D N3 = { object.normals[index[i + 2 ]*3] , object.normals[index[i + 2]*3 + 1 ] , object.normals[index[i + 2 ]*3 + 2 ] } ; 
-		Vect3D BT1 = { object.bitangents[index[i]*3] , object.bitangents[index[i]*3 + 1 ] , object.bitangents[index[i]*3 + 2] } ; 
-		Vect3D BT2 = { object.bitangents[index[i + 1]*3]  , object.bitangents[index[i + 1]*3 + 1 ] , object.bitangents[index[i + 1 ]*3 + 2] };
-		Vect3D BT3 = { object.bitangents[index[i + 2 ]*3] , object.bitangents[index[i + 2]*3 + 1 ] , object.bitangents[index[i + 2 ]*3 + 2 ]};
-		Vect3D T1 =  { object.tangents[index[i]*3] , object.tangents[index[i]*3 + 1 ] , object.tangents[index[i]*3 + 2] } ; 
-		Vect3D T2 = { object.tangents[index[i + 1]*3]  , object.tangents[index[i + 1]*3 + 1 ] , object.tangents[index[i + 1 ]*3 + 2] } ; 
-		Vect3D T3 = { object.tangents[index[i + 2 ]*3] , object.tangents[index[i + 2]*3 + 1 ] , object.tangents[index[i + 2 ]*3 + 2 ] } ; 
+		Point2D P1 = {object.uv[index[i] * 2] , object.uv[index[i] * 2 + 1]} ; 	
+		Point2D P2 = {object.uv[index[i + 1] * 2] , object.uv[index[i + 1] * 2 + 1]} ; 
+		Point2D P3 = {object.uv[index[i + 2] * 2] , object.uv[index[i + 2] * 2 + 1]} ; 
+		Vect3D N1  = {object.normals[index[i] * 3] , object.normals[index[i] * 3 + 1] , object.normals[index[i] * 3 + 2]} ; 
+		Vect3D N2  = {object.normals[index[i + 1] * 3] , object.normals[index[i + 1] * 3 + 1] , object.normals[index[i + 1] * 3 + 2]} ; 
+		Vect3D N3  = {object.normals[index[i + 2] * 3] , object.normals[index[i + 2] * 3 + 1] , object.normals[index[i + 2] * 3 + 2]} ; 
+		Vect3D BT1 = {object.bitangents[index[i] * 3] , object.bitangents[index[i] * 3 + 1] , object.bitangents[index[i] * 3 + 2]} ; 
+		Vect3D BT2 = {object.bitangents[index[i + 1] * 3]  , object.bitangents[index[i + 1] * 3 + 1] , object.bitangents[index[i + 1] * 3 + 2]};
+		Vect3D BT3 = {object.bitangents[index[i + 2] * 3] , object.bitangents[index[i + 2] * 3 + 1] , object.bitangents[index[i + 2] * 3 + 2]};
+		Vect3D T1  = {object.tangents[index[i] * 3] , object.tangents[index[i] * 3 + 1] , object.tangents[index[i] * 3 + 2]} ; 
+		Vect3D T2  = {object.tangents[index[i + 1] * 3]  , object.tangents[index[i + 1] * 3 + 1] , object.tangents[index[i + 1] * 3 + 2]} ; 
+		Vect3D T3  = {object.tangents[index[i + 2] * 3] , object.tangents[index[i + 2] * 3 + 1] , object.tangents[index[i + 2] * 3 + 2]} ; 
 		auto clamp_uv = [&](Point2D P) { /*check if UVs are correctly set in bounds ... if not , we use modulus*/
 			if (P.x > 1.f)
 				P.x = std::fmod(P.x , 1.f) ; 
@@ -791,13 +788,12 @@ SDL_Surface* ImageManager::project_uv_normals(Object3D object , int width ,  int
 		int x_min = static_cast<int>(bounding_coords( P1.x , P2.x , P3.x , true )); 
 		int y_max = static_cast<int>(bounding_coords( P1.y , P2.y , P3.y , false)); 
 		int y_min = static_cast<int>(bounding_coords( P1.y , P2.y , P3.y , true)); 
-
-		for(int x = x_min ; x <= x_max ; x++){
+		for(int x = x_min ; x <= x_max ; x++)
 			for(int y = y_min ; y <= y_max ; y++){
-				uint32_t val = compute_normals_set_pixels_rgb(surf , P1 , P2 , P3 , N1 , N2 , N3 , BT1 , BT2 , BT3 , T1 , T2 , T3 , x , y , x_min , y_min , x_max , y_max , tangent_space); 
-				set_pixel_color(surf , x , y , val) ;
+				uint32_t val = compute_normals_set_pixels_rgb( P1 , P2 , P3 , N1 , N2 , N3 , BT1 , BT2 , BT3 , T1 , T2 , T3 , x , y , x_min , y_min , x_max , y_max , tangent_space); 
+				if (val != 0)
+					set_pixel_color(surf , x , y , val) ;
 			}
-		}
 	}
 	return surf ; 
 } 
