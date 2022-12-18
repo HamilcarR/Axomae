@@ -11,10 +11,6 @@
 
 namespace axomae{
 
-
-
-
-	
 using namespace std;
 bool ImageManager::gpu = false;
 static bool CHECK_IF_CUDA_AVAILABLE() {
@@ -36,7 +32,6 @@ ImageManager::ImageManager(){}
 ImageManager::~ImageManager(){} 
 
 /**************************************************************************************************************/
-
 int truncate(int n){
 	if(n<=0)
 		return 0;
@@ -113,7 +108,6 @@ RGB ImageManager::get_pixel_color(SDL_Surface* surface , int x , int y ){
 }
 
 /**************************************************************************************************************/
-
 void ImageManager::set_pixel_color(SDL_Surface* surface, int x, int y, uint32_t color) {
 	//TODO : Add Tiling management when uv coordinates greater than limit
 	int bpp = surface->format->BytesPerPixel;
@@ -178,7 +172,6 @@ void RGB::to_string(){
 }
 
 /**************************************************************************************************************/
-
 void ImageManager::set_greyscale_average(SDL_Surface* image,uint8_t factor){
 	assert(factor>0);
 	assert(image!=nullptr);	
@@ -199,9 +192,7 @@ void ImageManager::set_greyscale_average(SDL_Surface* image,uint8_t factor){
 
 }
 
-
 /**************************************************************************************************************/
-
 static void replace_image(SDL_Surface* surface, uint8_t* image) {
 	int bpp = surface->format->BytesPerPixel; 
 	SDL_LockSurface(surface);
@@ -218,7 +209,6 @@ static void replace_image(SDL_Surface* surface, uint8_t* image) {
 
 
 /**************************************************************************************************************/
-
 static void replace_image(SDL_Surface* surface, uint16_t* image) {
 	int bpp = surface->format->BytesPerPixel;
 	SDL_LockSurface(surface);
@@ -475,7 +465,6 @@ void RGB::invert_color(){
   	alpha=abs(alpha-255);
 }
 
-
 /**************************************************************************************************************/
 max_colors *ImageManager::get_colors_max_variation(SDL_Surface* image){
 	max_colors *max_min = new max_colors ;
@@ -546,10 +535,12 @@ void ImageManager::set_contrast_sigmoid(SDL_Surface *image,int threshold){
 constexpr double radiant_to_degree(double rad){
 	return rad*180.f/M_PI; 
 }
+
 /**************************************************************************************************************/
 constexpr double get_pixel_height(double color_component){
 	return (255 - color_component);
 }
+
 /**************************************************************************************************************/
 void ImageManager::compute_normal_map(SDL_Surface* surface,double fact , float attenuation){
 	bool cuda = CHECK_IF_CUDA_AVAILABLE(); 
@@ -665,7 +656,7 @@ float bounding_coords(float x , float y , float z , bool min) {
 }
 
 /***************************************************************************************************************/
-/* Convert get barycentric coordinates of I in triangle P1P2P3 */
+/* Get barycentric coordinates of I in triangle P1P2P3 */
 Vect3D barycentric_lerp(Point2D P1 , Point2D P2 , Point2D P3 , Point2D I){
 		float W1 = (( P2.y - P3.y ) * ( I.x - P3.x ) + ( P3.x - P2.x ) * ( I.y - P3.y )) / (( P2.y - P3.y ) * ( P1.x - P3.x ) + ( P3.x - P2.x ) * ( P1.y - P3.y )) ; 
 		float W2 = (( P3.y - P1.y ) * ( I.x - P3.x ) + ( P1.x - P3.x ) * ( I.y - P3.y )) / (( P2.y - P3.y ) * ( P1.x - P3.x ) + ( P3.x - P2.x ) * ( P1.y - P3.y )) ; 
@@ -679,6 +670,7 @@ Vect3D tan_space_transform(Vect3D T , Vect3D BT , Vect3D N , Vect3D I){
 		Vect3D result = { I.x * BT.x + I.y * BT.y + I.z * BT.z , I.x * T.x + T.y * I.y + T.z * I.z ,I.x * N.x + N.y * I.y + I.z * N.z};
 		return result ; 
 }
+
 /***************************************************************************************************************/
 uint32_t compute_normals_set_pixels_rgb(  Point2D P1 , 
 					  Point2D P2 , 
@@ -735,9 +727,10 @@ uint32_t compute_normals_set_pixels_rgb(  Point2D P1 ,
 		return 0 ; 
 	}
 }
-
-
 /***************************************************************************************************************/
+/** @brief Computes the normals at the position of each texel of a 3D model and displays them on the projected UV
+ * This function allows us to check the distribution of normals across the mesh.  
+ */
 SDL_Surface* ImageManager::project_uv_normals(Object3D object , int width ,  int height , bool tangent_space){
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 	Uint32 rmask = 0xFF000000 ; 
