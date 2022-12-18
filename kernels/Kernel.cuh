@@ -63,7 +63,7 @@ static double magnitude(int x, int y) {return sqrtf(x*x + y*y);}
 
 template<typename T> 
  __host__ __device__
-	 uint8_t normalize(int maxx, int minn, T pixel) {
+	 double normalize(int maxx, int minn, T pixel) {
 		assert(maxx - minn != 0);
 		return ((pixel - minn) * 255 / (maxx - minn) + 0);
 	}

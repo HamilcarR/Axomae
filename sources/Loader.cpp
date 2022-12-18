@@ -72,26 +72,26 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	metallic_index_string = metallic_texture.C_Str() ; 
 	roughness_texture = roughness_texture.C_Str() ;
 	if(color_index_string.size() != 0){
-		color_index_string = color_index_string.substr(1) ;
-		color_index = std::stoi(color_index_string) ; 
+		color_index_string = color_index_string.substr(1);
+		color_index = std::stoi(color_index_string); 
+		copyTexels(&diffuse , &*scene->mTextures[color_index]); 
+		mesh_material.textures.diffuse = diffuse ; 
+		diffuse.clean() ; 
 	}
 	if(metallic_index_string.size() != 0){
 		metallic_index_string = metallic_index_string.substr(1) ; 
 		metallic_index = std::stoi(metallic_index_string) ; 
+		copyTexels(&metallic , &*scene->mTextures[metallic_index]); 
+		mesh_material.textures.metallic = metallic ; 
+		metallic.clean() ; 
 	}
 	if(roughness_index_string.size() != 0){
 		roughness_index_string = roughness_index_string.substr(1) ; 
 		roughness_index = std::stoi(roughness_index_string) ; 
+		copyTexels(&roughness , &*scene->mTextures[roughness_index]); 
+		mesh_material.textures.roughness = roughness ;
+		roughness.clean() ; 
 	}
-	copyTexels(&diffuse , &*scene->mTextures[color_index]); 
-	copyTexels(&metallic , &*scene->mTextures[metallic_index]); 
-	copyTexels(&roughness , &*scene->mTextures[roughness_index]); 
-	mesh_material.textures.diffuse = diffuse ; 
-	mesh_material.textures.metallic = metallic ; 
-	mesh_material.textures.roughness = roughness ;
-	diffuse.clean() ; 
-	roughness.clean() ; 
-	metallic.clean() ; 
 	return mesh_material ; 
 }
 

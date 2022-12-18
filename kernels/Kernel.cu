@@ -285,12 +285,12 @@ namespace axomae {
 		convolution_directions dir; 	
 		DEVICE_RGB minn = { 0, 0, 0, 0 };
 		DEVICE_RGB maxx = { 255 , 255 , 255 , 255 };
-		auto rh = normalize(maxx.r, minn.r, horizontalx); 
-		auto rv = normalize(maxx.r, minn.r, verticalx);
-		auto gh = normalize(maxx.r, minn.r, horizontaly);
-		auto gv = normalize(maxx.r, minn.r, verticaly);
-		auto bh = normalize(maxx.r, minn.r, horizontalz);
-		auto bv = normalize(maxx.r, minn.r, verticalz);
+		uint8_t rh = (uint8_t) normalize(maxx.r, minn.r, horizontalx); 
+		uint8_t rv = (uint8_t) normalize(maxx.r, minn.r, verticalx);
+		uint8_t gh = (uint8_t) normalize(maxx.r, minn.r, horizontaly);
+		uint8_t gv = (uint8_t) normalize(maxx.r, minn.r, verticaly);
+		uint8_t bh = (uint8_t) normalize(maxx.r, minn.r, horizontalz);
+		uint8_t bv = (uint8_t) normalize(maxx.r, minn.r, verticalz);
 		DEVICE_RGB vertical = {rv , gv , bv , 0} ; 
 		DEVICE_RGB horizontal = {rh , gh , bh , 0} ; 
 		dir.vertical = vertical ; 
@@ -353,9 +353,9 @@ namespace axomae {
 		float dy = factor * (north.g - south.g) / 255; 
 		float ddx = factor * (north_east.g - south_west.g) / 255; 
 		float ddy = factor * (north_west.g - south_east.g) / 255; 
-		auto Nx = normalize(-1, 1, lerp(dy, ddy, 0.5)); 
-		auto Ny = normalize(-1, 1, lerp(dx, ddx, 0.5)); 
-		auto Nz = 255; 
+		float Nx = normalize(-1, 1, lerp(dy, ddy, 0.5)); 
+		float Ny = normalize(-1, 1, lerp(dx, ddx, 0.5)); 
+		uint8_t Nz = 255; 
 		if (Nx >= 255)
 			Nx = 255;
 		else if (Nx <= 0)
