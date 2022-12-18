@@ -83,12 +83,24 @@ struct Point2D{
 	void print(){
 		std::cout << x << "     " << y << "\n" ; 
 	}
-};
+	friend std::ostream& operator<<(std::ostream& os , const Point2D& p) {
+		os << "(" << p.x << "," << p.y << ")" ; 
+		return os ; 	
+	}
+};	
+
 
 struct Vect3D {
 	float x ; 
 	float y ; 
-	float z ; 
+	float z ;
+
+	friend std::ostream& operator<<(std::ostream& os , const Vect3D& v){
+		os << "(" << v.x << "," << v.y << "," << v.z << ")" ; 
+		return os ; 
+
+	}
+
 	void print(){
 		std::cout << x << "     " << y << "      " << z <<  "\n" ; 
 	}

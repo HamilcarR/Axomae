@@ -1,6 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 #include <cstdint>
+#include <ostream>
 #include <iostream>
 #include <future>
 #include <cmath>
