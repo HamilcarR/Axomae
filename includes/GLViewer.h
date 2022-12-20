@@ -3,19 +3,22 @@
 
 #include "constants.h"
 #include "utils_3D.h" 
+#include "SceneData.h" 
+#include "Mesh.h"
 
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions_4_3_Core> 
-#include <QOpenGLBuffer>
-#include <QOpenGLVertexArrayObject> 
 
+
+
+/**
+ * @brief Class responsible for the 3D rendering
+ */
 
 class QOpenGLShaderProgram ; 
 class QOpenGLTexture ; 
 class GLViewer : public QOpenGLWidget , protected QOpenGLFunctions_4_3_Core {
 
 	Q_OBJECT
-
+	
 	public:
 		GLViewer(QWidget* parent = nullptr); 
 		virtual ~GLViewer();	
@@ -26,17 +29,14 @@ class GLViewer : public QOpenGLWidget , protected QOpenGLFunctions_4_3_Core {
 		void resizeGL(int width , int height) override ; 
 		void printInfo() ; 
 	private:
-		QOpenGLShaderProgram *shader_program ; 	
-		QOpenGLVertexArrayObject vao ; 
-		QOpenGLBuffer vertex_buffer ; 
-		QOpenGLBuffer normal_buffer ; 
-		QOpenGLBuffer index_buffer ; 
-		QOpenGLBuffer texture_buffer ;
-		QOpenGLBuffer color_buffer ;
-		unsigned int sampler2D ; 
-		axomae::Mesh *current_scene;
-		bool start_draw ; 
-		
+		SceneData* scene_data;	
+	
+
+
+
+
+
+
 };
 
 

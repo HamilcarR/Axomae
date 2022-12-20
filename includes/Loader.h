@@ -6,6 +6,7 @@
 #include <assimp/postprocess.h>
 #include "constants.h"
 #include "utils_3D.h" 
+#include "Mesh.h"
 #include <cstdlib>
 #include <assert.h>
 #include <iostream>

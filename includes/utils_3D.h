@@ -70,12 +70,6 @@ struct Material{
 	float emissive_factor;
 };
 
-//make it proper class
-struct Mesh{
-	Object3D geometry ; 
-	Material material ;
-};
-
 
 struct Point2D{
 	float x ; 

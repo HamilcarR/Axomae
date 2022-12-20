@@ -210,272 +210,273 @@ GUIWindow::~GUIWindow() {
 
 
 /*SLOTS*/
-/******************************************************************************************************************************************************************************************/
-	bool GUIWindow::import_image() {
-		HeapManagement* temp = _MemManagement; 
-		_MemManagement = new HeapManagement; 
-		QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("Images (*.png *.bmp *.jpg)")); 
-		if (filename.isEmpty())
-			return false;
-		else {
-			image_session_pointers::filename = filename.toStdString(); ;
-			SDL_Surface* surf = ImageImporter::getInstance()->load_image(filename.toStdString().c_str()); 
-			display_image(surf, *this, *_UI.diffuse_image , ALBEDO); 
-			_MemManagement->addToHeap({ surf , ALBEDO });
-			delete temp; 
-			image_session_pointers::setAllNull(); 
-			image_session_pointers::albedo = surf; 
-			return true;
-
-		}
-	
-	}
-
-	/******************************************************************************************/
-	bool GUIWindow::greyscale_average() {
-		SDL_Surface* s = image_session_pointers::albedo; 
-		SDL_Surface* copy = ImageManager::copy_surface(s); 
-
-		if (copy != nullptr) {
-			_MemManagement->addToHeap({ copy , GREYSCALE_AVG });
-			ImageManager::set_greyscale_average(copy, 3);
-			display_image(copy, *this, *_UI.greyscale_image , GREYSCALE_AVG);
-			image_session_pointers::greyscale = copy; 
-			return true; 
-		}
-		else
-			return false;
-	}
-
-	/******************************************************************************************/
-
-	bool GUIWindow::greyscale_luminance() {
-		SDL_Surface* s = image_session_pointers::albedo; // use image_session_pointers TODO 
-		SDL_Surface *copy = ImageManager::copy_surface(s);
-
-		if (copy != nullptr) {
-			_MemManagement->addToHeap({ copy , GREYSCALE_LUMI });
-			ImageManager::set_greyscale_luminance(copy);
-			display_image(copy, *this, *_UI.greyscale_image , GREYSCALE_LUMI);
-			image_session_pointers::greyscale = copy;
-
-			return true;
-		}
-		else
-			return false;
-	}
-
-	/******************************************************************************************/
-
-	void GUIWindow::use_gpgpu(bool checked) {
-		if (checked)
-			ImageManager::USE_GPU_COMPUTING();
-		else
-			ImageManager::USE_CPU_COMPUTING(); 
+/**************************************************************************************************************/
+bool GUIWindow::import_image() {
+	HeapManagement* temp = _MemManagement; 
+	_MemManagement = new HeapManagement; 
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("Images (*.png *.bmp *.jpg)")); 
+	if (filename.isEmpty())
+		return false;
+	else {
+		image_session_pointers::filename = filename.toStdString(); ;
+		SDL_Surface* surf = ImageImporter::getInstance()->load_image(filename.toStdString().c_str()); 
+		display_image(surf, *this, *_UI.diffuse_image , ALBEDO); 
+		_MemManagement->addToHeap({ surf , ALBEDO });
+		delete temp; 
+		image_session_pointers::setAllNull(); 
+		image_session_pointers::albedo = surf; 
+		return true;
 
 	}
 
-	/******************************************************************************************/
+}
 
+/**************************************************************************************************************/
+bool GUIWindow::greyscale_average() {
+	SDL_Surface* s = image_session_pointers::albedo; 
+	SDL_Surface* copy = ImageManager::copy_surface(s); 
 
-	void GUIWindow::use_scharr() {
-		SDL_Surface* s = image_session_pointers::greyscale; 
-		SDL_Surface* copy = ImageManager::copy_surface(s);
-		if (copy != nullptr) {
-			_MemManagement->addToHeap({ copy , HEIGHT });
-			ImageManager::compute_edge(copy, AXOMAE_USE_SCHARR, AXOMAE_REPEAT); 
-			display_image(copy, *this, *_UI.height_image, HEIGHT); 
-			image_session_pointers::height = copy; 
-			
-
-		}
-		else {
-			//TODO : error handling
-
-		}
-
+	if (copy != nullptr) {
+		_MemManagement->addToHeap({ copy , GREYSCALE_AVG });
+		ImageManager::set_greyscale_average(copy, 3);
+		display_image(copy, *this, *_UI.greyscale_image , GREYSCALE_AVG);
+		image_session_pointers::greyscale = copy; 
+		return true; 
 	}
-	/******************************************************************************************/
+	else
+		return false;
+}
 
-	void GUIWindow::use_prewitt() {
-		SDL_Surface* s = image_session_pointers::greyscale;
-		SDL_Surface* copy = ImageManager::copy_surface(s);
-		if (copy != nullptr) {
-			_MemManagement->addToHeap({ copy , HEIGHT });
-			ImageManager::compute_edge(copy, AXOMAE_USE_PREWITT, AXOMAE_REPEAT);
-			display_image(copy, *this, *_UI.height_image, HEIGHT);
-			image_session_pointers::height = copy;
+/**************************************************************************************************************/
 
+bool GUIWindow::greyscale_luminance() {
+	SDL_Surface* s = image_session_pointers::albedo; // use image_session_pointers TODO 
+	SDL_Surface *copy = ImageManager::copy_surface(s);
 
-		}
-		else {
-			//TODO : error handling
+	if (copy != nullptr) {
+		_MemManagement->addToHeap({ copy , GREYSCALE_LUMI });
+		ImageManager::set_greyscale_luminance(copy);
+		display_image(copy, *this, *_UI.greyscale_image , GREYSCALE_LUMI);
+		image_session_pointers::greyscale = copy;
 
-		}
+		return true;
 	}
-	/******************************************************************************************/
+	else
+		return false;
+}
 
-	void GUIWindow::use_sobel() {
-		SDL_Surface* s = image_session_pointers::greyscale;
-		SDL_Surface* copy = ImageManager::copy_surface(s);
-		if (copy != nullptr) {
-			_MemManagement->addToHeap({ copy , HEIGHT });
-			ImageManager::compute_edge(copy, AXOMAE_USE_SOBEL, AXOMAE_REPEAT);
-			display_image(copy, *this, *_UI.height_image, HEIGHT);
-			image_session_pointers::height = copy;
+/**************************************************************************************************************/
 
+void GUIWindow::use_gpgpu(bool checked) {
+	if (checked)
+		ImageManager::USE_GPU_COMPUTING();
+	else
+		ImageManager::USE_CPU_COMPUTING(); 
 
-		}
-		else {
-			//TODO : error handling
+}
 
-		}
-	}
+/**************************************************************************************************************/
 
 
-	/******************************************************************************************/
-
-
-	void GUIWindow::use_tangent_space() {
-		SDL_Surface* s = image_session_pointers::height;
-		SDL_Surface* copy = ImageManager::copy_surface(s);
-		if (copy != nullptr) {
-			_MemManagement->addToHeap({ copy , NMAP });
-			ImageManager::compute_normal_map(copy, NORMAL_FACTOR , NORMAL_ATTENUATION); 
-			display_image(copy, *this, *_UI.normal_image, NMAP);
-			image_session_pointers::normalmap = copy;
-
-
-		}
-		else {
-			//TODO : error handling
-
-		}
-
-	}
-
-
-	/******************************************************************************************/
-
-
-	void GUIWindow::use_object_space() {
-
-	}
-
-	/******************************************************************************************/
-
-	void GUIWindow::change_nmap_factor(int f) {
-		NORMAL_FACTOR = f/dividor; 
-		_UI.factor_nmap->setValue(NORMAL_FACTOR); 
-		if (_UI.use_tangentSpace->isChecked()) {
-			use_tangent_space();
-		}
-		else if (_UI.use_objectSpace->isChecked()) {
-			use_object_space();
-		}
-
-	}
-
-	void GUIWindow::change_nmap_attenuation(int f) {
-		NORMAL_ATTENUATION = f / dividor;
-		if (_UI.use_tangentSpace->isChecked()) {
-			use_tangent_space(); 
-		}
-		else if (_UI.use_objectSpace->isChecked()) {
-			use_object_space(); 
-		}
-
-	}
-	/******************************************************************************************/
-
-	void GUIWindow::compute_dudv() {
-		SDL_Surface* s = image_session_pointers::normalmap;
-		SDL_Surface* copy = ImageManager::copy_surface(s);
-		if (copy != nullptr) {
-			_MemManagement->addToHeap({ copy , DUDV });
-			ImageManager::compute_dudv(copy, DUDV_FACTOR);
-			display_image(copy, *this, *_UI.dudv_image, DUDV);
-			image_session_pointers::dudv = copy;
-
-
-		}
-		else {
-			//TODO : error handling
-
-		}
-
-	}
-	/******************************************************************************************/
-	void GUIWindow::change_dudv_nmap(int factor) {
-		DUDV_FACTOR = factor / dividor;
-		_UI.factor_dudv->setValue(DUDV_FACTOR);
-		SDL_Surface* s = image_session_pointers::normalmap;
-		SDL_Surface* copy = ImageManager::copy_surface(s);
-		if (copy != nullptr) {
-			_MemManagement->addToHeap({ copy , DUDV });
-			ImageManager::compute_dudv(copy, DUDV_FACTOR);
-			display_image(copy, *this, *_UI.dudv_image, DUDV);
-			image_session_pointers::dudv = copy;
-
-
-		}
-		else {
-			//TODO : error handling
-
-		}
-
-	}
-	/******************************************************************************************/
-	void GUIWindow::compute_projection(){ //TODO : complete uv projection method
-		int width = _UI.uv_width->value() ; 
-		int height = _UI.uv_height->value() ; 
-		width = 0 ; 
-		height = 0 ; 
+void GUIWindow::use_scharr() {
+	SDL_Surface* s = image_session_pointers::greyscale; 
+	SDL_Surface* copy = ImageManager::copy_surface(s);
+	if (copy != nullptr) {
+		_MemManagement->addToHeap({ copy , HEIGHT });
+		ImageManager::compute_edge(copy, AXOMAE_USE_SCHARR, AXOMAE_REPEAT); 
+		display_image(copy, *this, *_UI.height_image, HEIGHT); 
+		image_session_pointers::height = copy; 
 		
+
+	}
+	else {
+		//TODO : error handling
+
+	}
+
+}
+
+/**************************************************************************************************************/
+void GUIWindow::use_prewitt() {
+	SDL_Surface* s = image_session_pointers::greyscale;
+	SDL_Surface* copy = ImageManager::copy_surface(s);
+	if (copy != nullptr) {
+		_MemManagement->addToHeap({ copy , HEIGHT });
+		ImageManager::compute_edge(copy, AXOMAE_USE_PREWITT, AXOMAE_REPEAT);
+		display_image(copy, *this, *_UI.height_image, HEIGHT);
+		image_session_pointers::height = copy;
+
+
+	}
+	else {
+		//TODO : error handling
+
+	}
+}
+
+/**************************************************************************************************************/
+void GUIWindow::use_sobel() {
+	SDL_Surface* s = image_session_pointers::greyscale;
+	SDL_Surface* copy = ImageManager::copy_surface(s);
+	if (copy != nullptr) {
+		_MemManagement->addToHeap({ copy , HEIGHT });
+		ImageManager::compute_edge(copy, AXOMAE_USE_SOBEL, AXOMAE_REPEAT);
+		display_image(copy, *this, *_UI.height_image, HEIGHT);
+		image_session_pointers::height = copy;
+
+
+	}
+	else {
+		//TODO : error handling
+
+	}
+}
+
+
+
+/**************************************************************************************************************/
+
+void GUIWindow::use_tangent_space() {
+	SDL_Surface* s = image_session_pointers::height;
+	SDL_Surface* copy = ImageManager::copy_surface(s);
+	if (copy != nullptr) {
+		_MemManagement->addToHeap({ copy , NMAP });
+		ImageManager::compute_normal_map(copy, NORMAL_FACTOR , NORMAL_ATTENUATION); 
+		display_image(copy, *this, *_UI.normal_image, NMAP);
+		image_session_pointers::normalmap = copy;
+
+
+	}
+	else {
+		//TODO : error handling
+
+	}
+
+}
+
+
+/**************************************************************************************************************/
+
+
+void GUIWindow::use_object_space() {
+
+}
+
+/**************************************************************************************************************/
+
+void GUIWindow::change_nmap_factor(int f) {
+	NORMAL_FACTOR = f/dividor; 
+	_UI.factor_nmap->setValue(NORMAL_FACTOR); 
+	if (_UI.use_tangentSpace->isChecked()) {
+		use_tangent_space();
+	}
+	else if (_UI.use_objectSpace->isChecked()) {
+		use_object_space();
+	}
+
+}
+
+void GUIWindow::change_nmap_attenuation(int f) {
+	NORMAL_ATTENUATION = f / dividor;
+	if (_UI.use_tangentSpace->isChecked()) {
+		use_tangent_space(); 
+	}
+	else if (_UI.use_objectSpace->isChecked()) {
+		use_object_space(); 
+	}
+
+}
+
+/**************************************************************************************************************/
+void GUIWindow::compute_dudv() {
+	SDL_Surface* s = image_session_pointers::normalmap;
+	SDL_Surface* copy = ImageManager::copy_surface(s);
+	if (copy != nullptr) {
+		_MemManagement->addToHeap({ copy , DUDV });
+		ImageManager::compute_dudv(copy, DUDV_FACTOR);
+		display_image(copy, *this, *_UI.dudv_image, DUDV);
+		image_session_pointers::dudv = copy;
+
+
+	}
+	else {
+		//TODO : error handling
+
+	}
+
+}
+
+/**************************************************************************************************************/
+void GUIWindow::change_dudv_nmap(int factor) {
+	DUDV_FACTOR = factor / dividor;
+	_UI.factor_dudv->setValue(DUDV_FACTOR);
+	SDL_Surface* s = image_session_pointers::normalmap;
+	SDL_Surface* copy = ImageManager::copy_surface(s);
+	if (copy != nullptr) {
+		_MemManagement->addToHeap({ copy , DUDV });
+		ImageManager::compute_dudv(copy, DUDV_FACTOR);
+		display_image(copy, *this, *_UI.dudv_image, DUDV);
+		image_session_pointers::dudv = copy;
+
+
+	}
+	else {
+		//TODO : error handling
+
+	}
+
+}
+
+/**************************************************************************************************************/
+void GUIWindow::compute_projection(){ //TODO : complete uv projection method
+	int width = _UI.uv_width->value() ; 
+	int height = _UI.uv_height->value() ; 
+	width = 0 ; 
+	height = 0 ; 
 	
+
+}
+
+
+/**************************************************************************************************************/
+bool GUIWindow::import_3DOBJ(){
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
+	if(!filename.isEmpty()){
+		std::vector<Mesh> scene = Loader::load(filename.toStdString().c_str()) ;
+		std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, 
+								scene[0].geometry , _UI.uv_width->value() , 
+								_UI.uv_height->value() , 
+								_UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 
+		_UI.renderer_view->setNewScene(scene);
+		SDL_Surface* surf = async_get_surf.get() ; 
+		display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP) ; 
+			
+		return true ; 
 	}
+	return false ; 
+}
 
-	/******************************************************************************************/
+/**************************************************************************************************************/
+bool GUIWindow::open_project() {
+	return false; 
+}
 
-	bool GUIWindow::import_3DOBJ(){
-		QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
-		if(!filename.isEmpty()){
-			std::vector<Mesh> scene = Loader::load(filename.toStdString().c_str()) ;
-			std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, 
-									scene[0].geometry , _UI.uv_width->value() , 
-									_UI.uv_height->value() , 
-									_UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 
-			_UI.renderer_view->setNewScene(scene);
-			SDL_Surface* surf = async_get_surf.get() ; 
-			display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP) ; 
-				
-			return true ; 
-		}
-		return false ; 
-	}
+/**************************************************************************************************************/
+bool GUIWindow::save_project() {
+	return false;
+}
 
-	/******************************************************************************************/
-	bool GUIWindow::open_project() {
-		return false; 
-	}
-	/******************************************************************************************/
-
-	bool GUIWindow::save_project() {
-		return false;
-	}
-	/******************************************************************************************/
-
-	bool GUIWindow::save_image() {
-		ImageImporter *inst = ImageImporter::getInstance(); 
-		QString filename = QFileDialog::getSaveFileName(this, tr("Save files"), "./", tr("All Files (*)"));
-		if (image_session_pointers::height != nullptr)
-			inst->save_image(image_session_pointers::height, (filename.toStdString()+"-height.bmp").c_str());
-		if (image_session_pointers::normalmap != nullptr)
-			inst->save_image(image_session_pointers::normalmap, (filename.toStdString() + "-nmap.bmp").c_str());
-		if (image_session_pointers::dudv != nullptr)
-			inst->save_image(image_session_pointers::dudv, (filename.toStdString() + "-dudv.bmp").c_str());
-
-		return false;
-	}
+/**************************************************************************************************************/
+bool GUIWindow::save_image() {
+	ImageImporter *inst = ImageImporter::getInstance(); 
+	QString filename = QFileDialog::getSaveFileName(this, tr("Save files"), "./", tr("All Files (*)"));
+	if (image_session_pointers::height != nullptr)
+		inst->save_image(image_session_pointers::height, (filename.toStdString()+"-height.bmp").c_str());
+	if (image_session_pointers::normalmap != nullptr)
+		inst->save_image(image_session_pointers::normalmap, (filename.toStdString() + "-nmap.bmp").c_str());
+	if (image_session_pointers::dudv != nullptr)
+		inst->save_image(image_session_pointers::dudv, (filename.toStdString() + "-dudv.bmp").c_str());
+	return false;
+}
 	
 }
