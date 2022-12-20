@@ -1,13 +1,13 @@
 /********************************************************************************
 ** Form generated from reading UI file 'test.ui'
 **
-** Created by: Qt User Interface Compiler version 5.15.5
+** Created by: Qt User Interface Compiler version 5.15.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef TEST_H
-#define TEST_H
+#ifndef UI_TEST_H
+#define UI_TEST_H
 
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
@@ -122,7 +122,12 @@ public:
     QVBoxLayout *verticalLayout_12;
     QGraphicsView *uv_projection;
     GLViewer *uv_viewer;
-    QListView *model_list;
+    QWidget *verticalLayoutWidget_2;
+    QVBoxLayout *verticalLayout_9;
+    QGridLayout *gridLayout_8;
+    QPushButton *next_mesh;
+    QPushButton *previous_mesh;
+    QListView *meshs_view;
     QMenuBar *menubar;
     QMenu *menuFiles;
     QMenu *menuEdit;
@@ -557,9 +562,32 @@ public:
 
         verticalLayout_11->addWidget(groupBox_2);
 
-        model_list = new QListView(uv_editor);
-        model_list->setObjectName(QString::fromUtf8("model_list"));
-        model_list->setGeometry(QRect(1060, -9, 231, 791));
+        verticalLayoutWidget_2 = new QWidget(uv_editor);
+        verticalLayoutWidget_2->setObjectName(QString::fromUtf8("verticalLayoutWidget_2"));
+        verticalLayoutWidget_2->setGeometry(QRect(1059, 0, 241, 781));
+        verticalLayout_9 = new QVBoxLayout(verticalLayoutWidget_2);
+        verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
+        verticalLayout_9->setContentsMargins(0, 0, 0, 0);
+        gridLayout_8 = new QGridLayout();
+        gridLayout_8->setObjectName(QString::fromUtf8("gridLayout_8"));
+        next_mesh = new QPushButton(verticalLayoutWidget_2);
+        next_mesh->setObjectName(QString::fromUtf8("next_mesh"));
+
+        gridLayout_8->addWidget(next_mesh, 0, 1, 1, 1);
+
+        previous_mesh = new QPushButton(verticalLayoutWidget_2);
+        previous_mesh->setObjectName(QString::fromUtf8("previous_mesh"));
+
+        gridLayout_8->addWidget(previous_mesh, 0, 0, 1, 1);
+
+
+        verticalLayout_9->addLayout(gridLayout_8);
+
+        meshs_view = new QListView(verticalLayoutWidget_2);
+        meshs_view->setObjectName(QString::fromUtf8("meshs_view"));
+
+        verticalLayout_9->addWidget(meshs_view);
+
         renderer_tab->addTab(uv_editor, QString());
 
         gridLayout_4->addWidget(renderer_tab, 0, 0, 1, 1);
@@ -573,7 +601,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 1528, 21));
+        menubar->setGeometry(QRect(0, 0, 1528, 19));
         menuFiles = new QMenu(menubar);
         menuFiles->setObjectName(QString::fromUtf8("menuFiles"));
         menuEdit = new QMenu(menubar);
@@ -658,7 +686,9 @@ public:
         renderer_tab->setTabWhatsThis(renderer_tab->indexOf(texture), QCoreApplication::translate("MainWindow", "Display current loaded image", nullptr));
 #endif // QT_CONFIG(whatsthis)
         renderer_tab->setTabText(renderer_tab->indexOf(gl_renderer), QCoreApplication::translate("MainWindow", "renderer", nullptr));
-        groupBox_2->setTitle(QCoreApplication::translate("MainWindow", "GroupBox", nullptr));
+        groupBox_2->setTitle(QString());
+        next_mesh->setText(QCoreApplication::translate("MainWindow", "Next", nullptr));
+        previous_mesh->setText(QCoreApplication::translate("MainWindow", "Previous", nullptr));
         renderer_tab->setTabText(renderer_tab->indexOf(uv_editor), QCoreApplication::translate("MainWindow", "UV editor", nullptr));
         menuFiles->setTitle(QCoreApplication::translate("MainWindow", "Fi&les", nullptr));
         menuEdit->setTitle(QCoreApplication::translate("MainWindow", "Edit", nullptr));
@@ -674,4 +704,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // TEST_H
+#endif // UI_TEST_H
