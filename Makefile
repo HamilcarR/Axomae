@@ -59,6 +59,9 @@ SOURCES       = sources/GLMaterialViewer.cpp \
 		sources/ImageManager.cpp \
 		sources/Loader.cpp \
 		sources/main.cpp \
+		sources/Mesh.cpp \
+		sources/SceneData.cpp \
+		sources/SceneSelector.cpp \
 		sources/Syntax.cpp \
 		sources/TerminalOpt.cpp \
 		sources/Texture.cpp \
@@ -73,6 +76,9 @@ OBJECTS       = Kernel.o \
 		generated_files/ImageManager.o \
 		generated_files/Loader.o \
 		generated_files/main.o \
+		generated_files/Mesh.o \
+		generated_files/SceneData.o \
+		generated_files/SceneSelector.o \
 		generated_files/Syntax.o \
 		generated_files/TerminalOpt.o \
 		generated_files/Texture.o \
@@ -185,7 +191,10 @@ DIST          = /usr/lib64/qt5/mkspecs/features/spec_pre.prf \
 		includes/images.h \
 		includes/Loader.h \
 		includes/MathFuncs.h \
+		includes/Mesh.h \
 		includes/Renderer.h \
+		includes/SceneData.h \
+		includes/SceneSelector.h \
 		includes/Syntax.h \
 		includes/TerminalOpt.h \
 		includes/Texture.h \
@@ -197,6 +206,9 @@ DIST          = /usr/lib64/qt5/mkspecs/features/spec_pre.prf \
 		sources/ImageManager.cpp \
 		sources/Loader.cpp \
 		sources/main.cpp \
+		sources/Mesh.cpp \
+		sources/SceneData.cpp \
+		sources/SceneSelector.cpp \
 		sources/Syntax.cpp \
 		sources/TerminalOpt.cpp \
 		sources/Texture.cpp \
@@ -425,8 +437,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents kernels/Kernel.cu $(DISTDIR)/
 	$(COPY_FILE) --parents Ressources/Resource.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib64/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents Form\ Files/test.h includes/constants.h includes/GLMaterialViewer.h includes/GLViewer.h includes/GUIWindow.h includes/ImageImporter.h includes/ImageManager.h includes/images.h includes/Loader.h includes/MathFuncs.h includes/Renderer.h includes/Syntax.h includes/TerminalOpt.h includes/Texture.h includes/utils_3D.h includes/Window.h $(DISTDIR)/
-	$(COPY_FILE) --parents sources/GLMaterialViewer.cpp sources/GLViewer.cpp sources/GUIWindow.cpp sources/ImageImporter.cpp sources/ImageManager.cpp sources/Loader.cpp sources/main.cpp sources/Syntax.cpp sources/TerminalOpt.cpp sources/Texture.cpp sources/Window.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents Form\ Files/test.h includes/constants.h includes/GLMaterialViewer.h includes/GLViewer.h includes/GUIWindow.h includes/ImageImporter.h includes/ImageManager.h includes/images.h includes/Loader.h includes/MathFuncs.h includes/Mesh.h includes/Renderer.h includes/SceneData.h includes/SceneSelector.h includes/Syntax.h includes/TerminalOpt.h includes/Texture.h includes/utils_3D.h includes/Window.h $(DISTDIR)/
+	$(COPY_FILE) --parents sources/GLMaterialViewer.cpp sources/GLViewer.cpp sources/GUIWindow.cpp sources/ImageImporter.cpp sources/ImageManager.cpp sources/Loader.cpp sources/main.cpp sources/Mesh.cpp sources/SceneData.cpp sources/SceneSelector.cpp sources/Syntax.cpp sources/TerminalOpt.cpp sources/Texture.cpp sources/Window.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents Form\ Files/test.ui $(DISTDIR)/
 
 
@@ -491,6 +503,9 @@ compiler_moc_header_clean:
 moc_GLViewer.cpp: includes/GLViewer.h \
 		includes/constants.h \
 		includes/utils_3D.h \
+		includes/SceneData.h \
+		includes/Loader.h \
+		includes/Mesh.h \
 		moc_predefs.h \
 		/usr/lib64/qt5/bin/moc
 	/usr/lib64/qt5/bin/moc $(DEFINES) --include /home/hamilcar/Desktop/projects/Axomae/moc_predefs.h -I/usr/lib64/qt5/mkspecs/linux-g++ -I/home/hamilcar/Desktop/projects/Axomae -I/usr/include/SDL2 -I/usr/local/cuda/include -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/12 -I/usr/include/c++/12/x86_64-suse-linux -I/usr/include/c++/12/backward -I/usr/lib64/gcc/x86_64-suse-linux/12/include -I/usr/local/include -I/usr/lib64/gcc/x86_64-suse-linux/12/include-fixed -I/usr/x86_64-suse-linux/include -I/usr/include includes/GLViewer.h -o moc_GLViewer.cpp
@@ -502,6 +517,9 @@ moc_GUIWindow.cpp: includes/GUIWindow.h \
 		includes/GLViewer.h \
 		includes/constants.h \
 		includes/utils_3D.h \
+		includes/SceneData.h \
+		includes/Loader.h \
+		includes/Mesh.h \
 		moc_predefs.h \
 		/usr/lib64/qt5/bin/moc
 	/usr/lib64/qt5/bin/moc $(DEFINES) --include /home/hamilcar/Desktop/projects/Axomae/moc_predefs.h -I/usr/lib64/qt5/mkspecs/linux-g++ -I/home/hamilcar/Desktop/projects/Axomae -I/usr/include/SDL2 -I/usr/local/cuda/include -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I/usr/include/c++/12 -I/usr/include/c++/12/x86_64-suse-linux -I/usr/include/c++/12/backward -I/usr/lib64/gcc/x86_64-suse-linux/12/include -I/usr/local/include -I/usr/lib64/gcc/x86_64-suse-linux/12/include-fixed -I/usr/x86_64-suse-linux/include -I/usr/include includes/GUIWindow.h -o moc_GUIWindow.cpp
@@ -517,7 +535,10 @@ Form\ Files/ui_test.h: Form\ Files/test.ui \
 		/usr/lib64/qt5/bin/uic \
 		includes/GLViewer.h \
 		includes/constants.h \
-		includes/utils_3D.h
+		includes/utils_3D.h \
+		includes/SceneData.h \
+		includes/Loader.h \
+		includes/Mesh.h
 	/usr/lib64/qt5/bin/uic Form\ Files/test.ui -o Form\ Files/ui_test.h
 
 compiler_yacc_decl_make_all:
@@ -536,7 +557,9 @@ generated_files/GLMaterialViewer.o: sources/GLMaterialViewer.cpp includes/GLMate
 generated_files/GLViewer.o: sources/GLViewer.cpp includes/GLViewer.h \
 		includes/constants.h \
 		includes/utils_3D.h \
-		includes/Loader.h
+		includes/SceneData.h \
+		includes/Loader.h \
+		includes/Mesh.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/GLViewer.o sources/GLViewer.cpp
 
 generated_files/GUIWindow.o: sources/GUIWindow.cpp includes/GUIWindow.h \
@@ -546,9 +569,23 @@ generated_files/GUIWindow.o: sources/GUIWindow.cpp includes/GUIWindow.h \
 		includes/GLViewer.h \
 		includes/constants.h \
 		includes/utils_3D.h \
+		includes/SceneData.h \
 		includes/Loader.h \
+		includes/Mesh.h \
 		includes/ImageImporter.h \
 		includes/ImageManager.h \
+		kernels/Kernel.cuh \
+		/usr/local/cuda/include/cuda.h \
+		/usr/local/cuda/include/cuda_device_runtime_api.h \
+		/usr/local/cuda/include/driver_types.h \
+		/usr/local/cuda/include/crt/host_defines.h \
+		/usr/local/cuda/include/vector_types.h \
+		/usr/local/cuda/include/cuda_runtime_api.h \
+		/usr/local/cuda/include/builtin_types.h \
+		/usr/local/cuda/include/device_types.h \
+		/usr/local/cuda/include/surface_types.h \
+		/usr/local/cuda/include/texture_types.h \
+		/usr/local/cuda/include/device_launch_parameters.h \
 		includes/Renderer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/GUIWindow.o sources/GUIWindow.cpp
 
@@ -574,12 +611,25 @@ generated_files/ImageManager.o: sources/ImageManager.cpp includes/ImageManager.h
 
 generated_files/Loader.o: sources/Loader.cpp includes/Loader.h \
 		includes/constants.h \
-		includes/utils_3D.h
+		includes/utils_3D.h \
+		includes/Mesh.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Loader.o sources/Loader.cpp
 
 generated_files/main.o: sources/main.cpp includes/ImageManager.h \
 		includes/constants.h \
 		includes/utils_3D.h \
+		kernels/Kernel.cuh \
+		/usr/local/cuda/include/cuda.h \
+		/usr/local/cuda/include/cuda_device_runtime_api.h \
+		/usr/local/cuda/include/driver_types.h \
+		/usr/local/cuda/include/crt/host_defines.h \
+		/usr/local/cuda/include/vector_types.h \
+		/usr/local/cuda/include/cuda_runtime_api.h \
+		/usr/local/cuda/include/builtin_types.h \
+		/usr/local/cuda/include/device_types.h \
+		/usr/local/cuda/include/surface_types.h \
+		/usr/local/cuda/include/texture_types.h \
+		/usr/local/cuda/include/device_launch_parameters.h \
 		includes/ImageImporter.h \
 		includes/Window.h \
 		includes/images.h \
@@ -587,8 +637,30 @@ generated_files/main.o: sources/main.cpp includes/ImageManager.h \
 		includes/Renderer.h \
 		includes/GUIWindow.h \
 		Form\ Files/test.h \
-		includes/GLViewer.h
+		includes/GLViewer.h \
+		includes/SceneData.h \
+		includes/Loader.h \
+		includes/Mesh.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/main.o sources/main.cpp
+
+generated_files/Mesh.o: sources/Mesh.cpp includes/Mesh.h \
+		includes/utils_3D.h \
+		includes/constants.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Mesh.o sources/Mesh.cpp
+
+generated_files/SceneData.o: sources/SceneData.cpp includes/SceneData.h \
+		includes/constants.h \
+		includes/utils_3D.h \
+		includes/Loader.h \
+		includes/Mesh.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/SceneData.o sources/SceneData.cpp
+
+generated_files/SceneSelector.o: sources/SceneSelector.cpp includes/SceneSelector.h \
+		includes/Loader.h \
+		includes/constants.h \
+		includes/utils_3D.h \
+		includes/Mesh.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/SceneSelector.o sources/SceneSelector.cpp
 
 generated_files/Syntax.o: sources/Syntax.cpp includes/Syntax.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Syntax.o sources/Syntax.cpp
@@ -598,12 +670,26 @@ generated_files/TerminalOpt.o: sources/TerminalOpt.cpp includes/ImageImporter.h 
 		includes/ImageManager.h \
 		includes/constants.h \
 		includes/utils_3D.h \
+		kernels/Kernel.cuh \
+		/usr/local/cuda/include/cuda.h \
+		/usr/local/cuda/include/cuda_device_runtime_api.h \
+		/usr/local/cuda/include/driver_types.h \
+		/usr/local/cuda/include/crt/host_defines.h \
+		/usr/local/cuda/include/vector_types.h \
+		/usr/local/cuda/include/cuda_runtime_api.h \
+		/usr/local/cuda/include/builtin_types.h \
+		/usr/local/cuda/include/device_types.h \
+		/usr/local/cuda/include/surface_types.h \
+		/usr/local/cuda/include/texture_types.h \
+		/usr/local/cuda/include/device_launch_parameters.h \
 		includes/Window.h \
 		includes/images.h \
 		includes/Renderer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/TerminalOpt.o sources/TerminalOpt.cpp
 
-generated_files/Texture.o: sources/Texture.cpp includes/Texture.h
+generated_files/Texture.o: sources/Texture.cpp includes/Texture.h \
+		includes/constants.h \
+		includes/utils_3D.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Texture.o sources/Texture.cpp
 
 generated_files/Window.o: sources/Window.cpp includes/Window.h \

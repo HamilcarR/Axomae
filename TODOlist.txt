@@ -1,22 +1,27 @@
-sources/GUIWindow.cpp:12
-294
-313
-331
-352
-404
-424
-430
-447 //TODO USE QLABEL FOR IMAGES
-//TODO : error handling
-//TODO : error handling
-//TODO : error handling
-//TODO : error handling
-//TODO : error handling
-//TODO : error handling
-void GUIWindow::compute_projection(){ //TODO : complete uv projection method
-std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, scene[0].geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 
-sources/ImageManager.cpp:450 //TODO : use multi threading for initialization and greyscale computing
-sources/TerminalOpt.cpp:398 ImageManager::set_greyscale_luminance(images[id].first); //TODO change to hmap 
-kernels/Kernel.cu:255
-331 //TODO : case kernel < 0 
-//TODO : add custom kernels processing
+
+sources/GUIWindow.cpp:
+
+12://TODO USE QLABEL FOR IMAGES
+293://TODO : error handling
+312://TODO : error handling
+330://TODO : error handling
+351://TODO : error handling
+403://TODO : error handling
+423://TODO : error handling
+429:void GUIWindow::compute_projection(){ //TODO : complete uv projection method
+447:_UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 
+
+sources/ImageManager.cpp:
+
+112://TODO : Add Tiling management when uv coordinates greater than limit
+365://TODO : use multi threading for initialization and greyscale computing
+710:normal = tan_space_transform(T , B , N , normal);//TODO : provide a better algorithm for tang space  
+
+sources/TerminalOpt.cpp:
+
+398:ImageManager::set_greyscale_luminance(images[id].first); //TODO change to hmap 
+
+kernels/Kernel.cu:
+
+236://TODO : case kernel < 0 
+298://TODO : add custom kernels processing

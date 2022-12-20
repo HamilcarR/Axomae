@@ -20,10 +20,10 @@
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QListView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QOpenGLWidget>
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
@@ -33,7 +33,6 @@
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
-#include "../includes/GLViewer.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -94,7 +93,6 @@ public:
     QLabel *label_4;
     QSpinBox *uv_width;
     QPushButton *bake_texture;
-    QRadioButton *tangent_space;
     QWidget *widget;
     QGridLayout *gridLayout;
     QGridLayout *gridLayout_4;
@@ -113,7 +111,6 @@ public:
     QGraphicsView *height_image;
     QWidget *gl_renderer;
     QGridLayout *gridLayout_6;
-    GLViewer *renderer_view;
     QWidget *uv_editor;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout_11;
@@ -121,13 +118,7 @@ public:
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *verticalLayout_12;
     QGraphicsView *uv_projection;
-    GLViewer *uv_viewer;
-    QWidget *verticalLayoutWidget_2;
-    QVBoxLayout *verticalLayout_9;
-    QGridLayout *gridLayout_8;
-    QPushButton *next_mesh_button;
-    QPushButton *previous_mesh_button;
-    QListView *meshs_list_view;
+    QOpenGLWidget *uv_viewer;
     QMenuBar *menubar;
     QMenu *menuFiles;
     QMenu *menuEdit;
@@ -374,7 +365,7 @@ public:
         tools->setObjectName(QString::fromUtf8("tools"));
         groupBox = new QGroupBox(tools);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(0, 20, 147, 161));
+        groupBox->setGeometry(QRect(0, 20, 147, 138));
         gridLayout_7 = new QGridLayout(groupBox);
         gridLayout_7->setObjectName(QString::fromUtf8("gridLayout_7"));
         gridLayout_3 = new QGridLayout();
@@ -388,7 +379,6 @@ public:
         uv_height->setObjectName(QString::fromUtf8("uv_height"));
         uv_height->setMinimum(50);
         uv_height->setMaximum(8096);
-        uv_height->setValue(500);
 
         gridLayout_3->addWidget(uv_height, 1, 1, 1, 1);
 
@@ -401,22 +391,16 @@ public:
         uv_width->setObjectName(QString::fromUtf8("uv_width"));
         uv_width->setMinimum(50);
         uv_width->setMaximum(8096);
-        uv_width->setValue(500);
 
         gridLayout_3->addWidget(uv_width, 0, 1, 1, 1);
 
 
-        gridLayout_7->addLayout(gridLayout_3, 1, 0, 1, 1);
+        gridLayout_7->addLayout(gridLayout_3, 0, 0, 1, 1);
 
         bake_texture = new QPushButton(groupBox);
         bake_texture->setObjectName(QString::fromUtf8("bake_texture"));
 
-        gridLayout_7->addWidget(bake_texture, 2, 0, 1, 1);
-
-        tangent_space = new QRadioButton(groupBox);
-        tangent_space->setObjectName(QString::fromUtf8("tangent_space"));
-
-        gridLayout_7->addWidget(tangent_space, 0, 0, 1, 1);
+        gridLayout_7->addWidget(bake_texture, 1, 0, 1, 1);
 
         renderMaterials->addTab(tools, QString());
         widget = new QWidget();
@@ -507,11 +491,6 @@ public:
         gl_renderer->setSizePolicy(sizePolicy2);
         gridLayout_6 = new QGridLayout(gl_renderer);
         gridLayout_6->setObjectName(QString::fromUtf8("gridLayout_6"));
-        renderer_view = new GLViewer(gl_renderer);
-        renderer_view->setObjectName(QString::fromUtf8("renderer_view"));
-
-        gridLayout_6->addWidget(renderer_view, 0, 0, 1, 1);
-
         renderer_tab->addTab(gl_renderer, QString());
         uv_editor = new QWidget();
         uv_editor->setObjectName(QString::fromUtf8("uv_editor"));
@@ -548,7 +527,7 @@ public:
 
         verticalLayout_12->addWidget(uv_projection);
 
-        uv_viewer = new GLViewer(groupBox_2);
+        uv_viewer = new QOpenGLWidget(groupBox_2);
         uv_viewer->setObjectName(QString::fromUtf8("uv_viewer"));
         sizePolicy2.setHeightForWidth(uv_viewer->sizePolicy().hasHeightForWidth());
         uv_viewer->setSizePolicy(sizePolicy2);
@@ -561,32 +540,6 @@ public:
 
 
         verticalLayout_11->addWidget(groupBox_2);
-
-        verticalLayoutWidget_2 = new QWidget(uv_editor);
-        verticalLayoutWidget_2->setObjectName(QString::fromUtf8("verticalLayoutWidget_2"));
-        verticalLayoutWidget_2->setGeometry(QRect(1059, 0, 241, 781));
-        verticalLayout_9 = new QVBoxLayout(verticalLayoutWidget_2);
-        verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
-        verticalLayout_9->setContentsMargins(0, 0, 0, 0);
-        gridLayout_8 = new QGridLayout();
-        gridLayout_8->setObjectName(QString::fromUtf8("gridLayout_8"));
-        next_mesh_button = new QPushButton(verticalLayoutWidget_2);
-        next_mesh_button->setObjectName(QString::fromUtf8("next_mesh_button"));
-
-        gridLayout_8->addWidget(next_mesh_button, 0, 1, 1, 1);
-
-        previous_mesh_button = new QPushButton(verticalLayoutWidget_2);
-        previous_mesh_button->setObjectName(QString::fromUtf8("previous_mesh_button"));
-
-        gridLayout_8->addWidget(previous_mesh_button, 0, 0, 1, 1);
-
-
-        verticalLayout_9->addLayout(gridLayout_8);
-
-        meshs_list_view = new QListView(verticalLayoutWidget_2);
-        meshs_list_view->setObjectName(QString::fromUtf8("meshs_list_view"));
-
-        verticalLayout_9->addWidget(meshs_list_view);
 
         renderer_tab->addTab(uv_editor, QString());
 
@@ -601,7 +554,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 1528, 19));
+        menubar->setGeometry(QRect(0, 0, 1528, 26));
         menuFiles = new QMenu(menubar);
         menuFiles->setObjectName(QString::fromUtf8("menuFiles"));
         menuEdit = new QMenu(menubar);
@@ -675,8 +628,7 @@ public:
         groupBox->setTitle(QCoreApplication::translate("MainWindow", "Baking texture dimensions", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "Texture height", nullptr));
         label_4->setText(QCoreApplication::translate("MainWindow", "Texture width", nullptr));
-        bake_texture->setText(QCoreApplication::translate("MainWindow", "Bake", nullptr));
-        tangent_space->setText(QCoreApplication::translate("MainWindow", "Tangent space", nullptr));
+        bake_texture->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
         renderMaterials->setTabText(renderMaterials->indexOf(tools), QCoreApplication::translate("MainWindow", "tools", nullptr));
         renderMaterials->setTabText(renderMaterials->indexOf(widget), QCoreApplication::translate("MainWindow", "Materials", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_greyscale), QCoreApplication::translate("MainWindow", "greyscale", nullptr));
@@ -686,9 +638,7 @@ public:
         renderer_tab->setTabWhatsThis(renderer_tab->indexOf(texture), QCoreApplication::translate("MainWindow", "Display current loaded image", nullptr));
 #endif // QT_CONFIG(whatsthis)
         renderer_tab->setTabText(renderer_tab->indexOf(gl_renderer), QCoreApplication::translate("MainWindow", "renderer", nullptr));
-        groupBox_2->setTitle(QString());
-        next_mesh_button->setText(QCoreApplication::translate("MainWindow", "Next", nullptr));
-        previous_mesh_button->setText(QCoreApplication::translate("MainWindow", "Previous", nullptr));
+        groupBox_2->setTitle(QCoreApplication::translate("MainWindow", "GroupBox", nullptr));
         renderer_tab->setTabText(renderer_tab->indexOf(uv_editor), QCoreApplication::translate("MainWindow", "UV editor", nullptr));
         menuFiles->setTitle(QCoreApplication::translate("MainWindow", "Fi&les", nullptr));
         menuEdit->setTitle(QCoreApplication::translate("MainWindow", "Edit", nullptr));

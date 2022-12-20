@@ -7,6 +7,7 @@
 
 #include "Window.h"
 #include "../Form Files/test.h"
+#include "SceneSelector.h" 
 #include "constants.h"
 #include "utils_3D.h" 
 
@@ -46,7 +47,8 @@ namespace axomae {
 		void compute_dudv(); 
 		void change_dudv_nmap(int factor);
 		void compute_projection() ; 
-
+		void next_mesh(); 
+		void previous_mesh(); 
 	private:
 		void connect_all_slots(); 
 		Ui::MainWindow _UI;

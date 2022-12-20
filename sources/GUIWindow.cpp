@@ -203,7 +203,8 @@ GUIWindow::~GUIWindow() {
 		QObject::connect(_UI.bake_texture,SIGNAL(clicked()) , this , SLOT(compute_projection())); 
 		QObject::connect(_UI.actionImport_3D_model , SIGNAL(triggered()) , this , SLOT(import_3DOBJ())) ; 	
 	
-	
+		QObject::connect(_UI.next_mesh_button , SIGNAL(clicked()) , this , SLOT(next_mesh()));
+		QObject::connect(_UI.previous_mesh_button , SIGNAL(clicked()) , this , SLOT(previous_mesh()));	
 	
 	
 	}
@@ -434,7 +435,6 @@ void GUIWindow::compute_projection(){ //TODO : complete uv projection method
 	width = 0 ; 
 	height = 0 ; 
 	
-
 }
 
 
@@ -443,10 +443,7 @@ bool GUIWindow::import_3DOBJ(){
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
 	if(!filename.isEmpty()){
 		std::vector<Mesh> scene = Loader::load(filename.toStdString().c_str()) ;
-		std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, 
-								scene[0].geometry , _UI.uv_width->value() , 
-								_UI.uv_height->value() , 
-								_UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 
+		std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, scene[0].geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 	
 		_UI.renderer_view->setNewScene(scene);
 		SDL_Surface* surf = async_get_surf.get() ; 
 		display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP) ; 
@@ -455,6 +452,15 @@ bool GUIWindow::import_3DOBJ(){
 	}
 	return false ; 
 }
+/**************************************************************************************************************/
+void GUIWindow::next_mesh(){
+	std::cout << "next mesh" << std::endl; 
+}
+/**************************************************************************************************************/
+void GUIWindow::previous_mesh(){
+	std::cout << "previous mesh" << std::endl; 
+}
+
 
 /**************************************************************************************************************/
 bool GUIWindow::open_project() {
@@ -478,5 +484,22 @@ bool GUIWindow::save_image() {
 		inst->save_image(image_session_pointers::dudv, (filename.toStdString() + "-dudv.bmp").c_str());
 	return false;
 }
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
