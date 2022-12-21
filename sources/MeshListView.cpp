@@ -16,8 +16,10 @@ MeshListView::~MeshListView(){
 
 
 void MeshListView::remove(){
-	for(auto A : mesh_names_list)
-		delete A ; 
+	for(auto A : mesh_names_list){
+		delete A ; 	
+	}
+	mesh_names_list.clear();  
 
 }
 
