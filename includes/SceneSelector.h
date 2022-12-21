@@ -10,16 +10,20 @@
 
 class SceneSelector{
 public:
-	SceneSelector(std::vector<axomae::Mesh> &meshes);
-	virtual ~SceneSelector();
-	axomae::Mesh getNext() ; 
-	axomae::Mesh getPrevious() ;
+	static SceneSelector* getInstance(); 
+	static void remove() ;
+	void setScene(std::vector<axomae::Mesh> &meshes); 
+	axomae::Mesh toNext() ; 
+	axomae::Mesh toPrevious() ;
 	axomae::Mesh getCurrent() ; 
 
 
 private:
+	SceneSelector();
+	virtual ~SceneSelector();	
 	std::vector<axomae::Mesh> scene ; 
 	unsigned int mesh_index ;
+	static SceneSelector *instance;
 };
 
 
