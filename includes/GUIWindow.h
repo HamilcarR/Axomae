@@ -49,6 +49,8 @@ namespace axomae {
 		void compute_projection() ; 
 		void next_mesh(); 
 		void previous_mesh(); 
+		void project_uv_normals();
+		
 	private:
 		void connect_all_slots(); 
 		Ui::MainWindow _UI;

@@ -4,6 +4,8 @@
 #include "../includes/ImageManager.h"
 #include "../includes/Renderer.h"
 #include "../includes/GLViewer.h" 
+#include "../includes/SceneSelector.h" 
+
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsItem>
 
@@ -27,8 +29,7 @@ struct image_type {
 class HeapManagement {
 public:
 	 void addToHeap(image_type<SDL_Surface> a) {
-		
-	    std::vector<image_type<SDL_Surface>>::iterator it = std::find_if(SDLSurf_heap.begin(), SDLSurf_heap.end(), [a](image_type<SDL_Surface> b) { if (a.imagetype == b.imagetype) return true; else return false; });
+		std::vector<image_type<SDL_Surface>>::iterator it = std::find_if(SDLSurf_heap.begin(), SDLSurf_heap.end(), [a](image_type<SDL_Surface> b) { if (a.imagetype == b.imagetype) return true; else return false; });
 		if (it != SDLSurf_heap.end()) {
 				image_type<SDL_Surface> temp = *it;
 				SDLSurf_heap.erase(it);
@@ -38,9 +39,11 @@ public:
 		 else
 			SDLSurf_heap.push_back(a);
 	}
+
 	 void addToTemp(image_type<SDL_Surface> a) {
 		 temp_surfaces.push_back(a);
 	 }
+
 	 void addToHeap(image_type<QPaintDevice> a) {
 		 std::vector<image_type<QPaintDevice>>::iterator it = std::find_if(paintDevice_heap.begin(), paintDevice_heap.end(), [a](image_type<QPaintDevice> b) { if (a.imagetype == b.imagetype) return true; else return false; });
 		 if (it != paintDevice_heap.end()) {
@@ -52,6 +55,7 @@ public:
 		 else
 			 paintDevice_heap.push_back(a);
 	 }
+
 	 void addToHeap(image_type<QGraphicsItem> a) {
 		 std::vector<image_type<QGraphicsItem>>::iterator it = std::find_if(graphicsItem_heap.begin(), graphicsItem_heap.end(), [a](image_type<QGraphicsItem> b) { if (a.imagetype == b.imagetype) return true; else return false; });
 		 if (it != graphicsItem_heap.end()) {
@@ -63,6 +67,7 @@ public:
 		 else
 			 graphicsItem_heap.push_back(a);
 	 }
+
 	 void addToHeap(image_type<QObject> a) {
 		 std::vector<image_type<QObject>>::iterator it = std::find_if(object_heap.begin(), object_heap.end(), [a](image_type<QObject> b) { if (a.imagetype == b.imagetype) return true; else return false; });
 		 if (it != object_heap.end()) {
@@ -84,11 +89,10 @@ public:
 
 		 }; 
 		return  std::any_of(SDLSurf_heap.begin(), SDLSurf_heap.end(), lambda); 
-	}
-
-	 
+	 }
 
 	~HeapManagement() {
+			SceneSelector::remove();
 			for (image_type<SDL_Surface> a : temp_surfaces) {
 			SDL_FreeSurface(a.image);
 			}
@@ -108,7 +112,9 @@ public:
 				a.image = nullptr;	
 			}
 	}
-	image_type<SDL_Surface> getLastSurface() { return SDLSurf_heap.back();  }
+
+	image_type<SDL_Surface> getLastSurface() { return SDLSurf_heap.back();}
+
 private:
 	 std::vector<image_type<SDL_Surface>> SDLSurf_heap;
 	 std::vector<image_type <QPaintDevice>> paintDevice_heap;
@@ -418,8 +424,6 @@ void GUIWindow::change_dudv_nmap(int factor) {
 		ImageManager::compute_dudv(copy, DUDV_FACTOR);
 		display_image(copy, *this, *_UI.dudv_image, DUDV);
 		image_session_pointers::dudv = copy;
-
-
 	}
 	else {
 		//TODO : error handling
@@ -429,7 +433,7 @@ void GUIWindow::change_dudv_nmap(int factor) {
 }
 
 /**************************************************************************************************************/
-void GUIWindow::compute_projection(){ //TODO : complete uv projection method
+void GUIWindow::compute_projection(){ //TODO : complete uv projection method , implement baking
 	int width = _UI.uv_width->value() ; 
 	int height = _UI.uv_height->value() ; 
 	width = 0 ; 
@@ -437,30 +441,38 @@ void GUIWindow::compute_projection(){ //TODO : complete uv projection method
 	
 }
 
+/**************************************************************************************************************/
+void GUIWindow::project_uv_normals(){	
+	SceneSelector* instance = SceneSelector::getInstance(); 
+	SDL_Surface* surf = ImageManager::project_uv_normals(instance->getCurrent().geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 	
+	display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP); 
 
+}
 /**************************************************************************************************************/
 bool GUIWindow::import_3DOBJ(){
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
 	if(!filename.isEmpty()){
 		std::vector<Mesh> scene = Loader::load(filename.toStdString().c_str()) ;
-		std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, scene[0].geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 	
+		SceneSelector *instance = SceneSelector::getInstance();
+		instance->setScene(scene);
+		std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, scene[0].geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked());	
 		_UI.renderer_view->setNewScene(scene);
 		SDL_Surface* surf = async_get_surf.get() ; 
 		display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP) ; 
-			
 		return true ; 
 	}
 	return false ; 
 }
 /**************************************************************************************************************/
 void GUIWindow::next_mesh(){
-	std::cout << "next mesh" << std::endl; 
+	SceneSelector::getInstance()->toNext();
+	project_uv_normals(); 
 }
 /**************************************************************************************************************/
 void GUIWindow::previous_mesh(){
-	std::cout << "previous mesh" << std::endl; 
+	SceneSelector::getInstance()->toPrevious();
+	project_uv_normals(); 
 }
-
 
 /**************************************************************************************************************/
 bool GUIWindow::open_project() {
