@@ -654,13 +654,6 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
             <layout class="QVBoxLayout" name="verticalLayout_9">
              <item>
               <layout class="QGridLayout" name="gridLayout_8">
-               <item row="0" column="1">
-                <widget class="QPushButton" name="next_mesh_button">
-                 <property name="text">
-                  <string>Next</string>
-                 </property>
-                </widget>
-               </item>
                <item row="0" column="0">
                 <widget class="QPushButton" name="previous_mesh_button">
                  <property name="text">
@@ -668,10 +661,17 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                  </property>
                 </widget>
                </item>
+               <item row="0" column="1">
+                <widget class="QPushButton" name="next_mesh_button">
+                 <property name="text">
+                  <string>Next</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
              <item>
-              <widget class="QListView" name="meshs_list_view"/>
+              <widget class="QListWidget" name="meshes_list"/>
              </item>
             </layout>
            </widget>

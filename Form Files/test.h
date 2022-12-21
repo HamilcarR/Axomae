@@ -20,7 +20,7 @@
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QListView>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -125,9 +125,9 @@ public:
     QWidget *verticalLayoutWidget_2;
     QVBoxLayout *verticalLayout_9;
     QGridLayout *gridLayout_8;
-    QPushButton *next_mesh_button;
     QPushButton *previous_mesh_button;
-    QListView *meshs_list_view;
+    QPushButton *next_mesh_button;
+    QListWidget *meshes_list;
     QMenuBar *menubar;
     QMenu *menuFiles;
     QMenu *menuEdit;
@@ -570,23 +570,23 @@ public:
         verticalLayout_9->setContentsMargins(0, 0, 0, 0);
         gridLayout_8 = new QGridLayout();
         gridLayout_8->setObjectName(QString::fromUtf8("gridLayout_8"));
-        next_mesh_button = new QPushButton(verticalLayoutWidget_2);
-        next_mesh_button->setObjectName(QString::fromUtf8("next_mesh_button"));
-
-        gridLayout_8->addWidget(next_mesh_button, 0, 1, 1, 1);
-
         previous_mesh_button = new QPushButton(verticalLayoutWidget_2);
         previous_mesh_button->setObjectName(QString::fromUtf8("previous_mesh_button"));
 
         gridLayout_8->addWidget(previous_mesh_button, 0, 0, 1, 1);
 
+        next_mesh_button = new QPushButton(verticalLayoutWidget_2);
+        next_mesh_button->setObjectName(QString::fromUtf8("next_mesh_button"));
+
+        gridLayout_8->addWidget(next_mesh_button, 0, 1, 1, 1);
+
 
         verticalLayout_9->addLayout(gridLayout_8);
 
-        meshs_list_view = new QListView(verticalLayoutWidget_2);
-        meshs_list_view->setObjectName(QString::fromUtf8("meshs_list_view"));
+        meshes_list = new QListWidget(verticalLayoutWidget_2);
+        meshes_list->setObjectName(QString::fromUtf8("meshes_list"));
 
-        verticalLayout_9->addWidget(meshs_list_view);
+        verticalLayout_9->addWidget(meshes_list);
 
         renderer_tab->addTab(uv_editor, QString());
 
@@ -687,8 +687,8 @@ public:
 #endif // QT_CONFIG(whatsthis)
         renderer_tab->setTabText(renderer_tab->indexOf(gl_renderer), QCoreApplication::translate("MainWindow", "renderer", nullptr));
         groupBox_2->setTitle(QString());
-        next_mesh_button->setText(QCoreApplication::translate("MainWindow", "Next", nullptr));
         previous_mesh_button->setText(QCoreApplication::translate("MainWindow", "Previous", nullptr));
+        next_mesh_button->setText(QCoreApplication::translate("MainWindow", "Next", nullptr));
         renderer_tab->setTabText(renderer_tab->indexOf(uv_editor), QCoreApplication::translate("MainWindow", "UV editor", nullptr));
         menuFiles->setTitle(QCoreApplication::translate("MainWindow", "Fi&les", nullptr));
         menuEdit->setTitle(QCoreApplication::translate("MainWindow", "Edit", nullptr));
