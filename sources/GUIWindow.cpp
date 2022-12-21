@@ -5,7 +5,7 @@
 #include "../includes/Renderer.h"
 #include "../includes/GLViewer.h" 
 #include "../includes/SceneSelector.h" 
-
+#include "../includes/MeshListView.h" 
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsItem>
 
@@ -453,8 +453,9 @@ bool GUIWindow::import_3DOBJ(){
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
 	if(!filename.isEmpty()){
 		std::vector<Mesh> scene = Loader::load(filename.toStdString().c_str()) ;
-		SceneSelector *instance = SceneSelector::getInstance();
+		SceneSelector *instance = SceneSelector::getInstance(); 
 		instance->setScene(scene);
+		_UI.meshes_list->setList(scene) ; 
 		std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, scene[0].geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked());	
 		_UI.renderer_view->setNewScene(scene);
 		SDL_Surface* surf = async_get_surf.get() ; 
