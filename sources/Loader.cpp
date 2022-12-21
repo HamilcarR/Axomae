@@ -103,6 +103,8 @@ std::vector<Mesh> Loader::load(const char* file){
 		const aiMaterial* ai_material ;
 		for(unsigned int i = 0 ; i < modelScene->mNumMeshes ; i++){
 			const aiMesh* mesh = modelScene->mMeshes[i] ; 
+			const char* mesh_name = mesh->mName.C_Str(); 
+			std::string name(mesh_name); 
 			Object3D object ;
 			assert(mesh->HasTextureCoords(0) ) ; 
 			ai_material = modelScene->mMaterials[modelScene->mMeshes[i]->mMaterialIndex]; 
@@ -137,7 +139,8 @@ std::vector<Mesh> Loader::load(const char* file){
 			std::cout << "object loaded : " << mesh->mName.C_Str()<< "\n" ; 
 			Mesh loaded_mesh ; 
 			loaded_mesh.geometry = object ; 
-			loaded_mesh.material = mesh_material ; 
+			loaded_mesh.material = mesh_material ;
+			loaded_mesh.name = name ; 
 			objects.push_back(loaded_mesh);
 		}
 		return objects ; 
