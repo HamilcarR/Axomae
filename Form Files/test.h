@@ -20,7 +20,6 @@
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -34,6 +33,7 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include "../includes/GLViewer.h"
+#include "../includes/MeshListView.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -127,7 +127,7 @@ public:
     QGridLayout *gridLayout_8;
     QPushButton *previous_mesh_button;
     QPushButton *next_mesh_button;
-    QListWidget *meshes_list;
+    MeshListView *meshes_list;
     QMenuBar *menubar;
     QMenu *menuFiles;
     QMenu *menuEdit;
@@ -583,7 +583,7 @@ public:
 
         verticalLayout_9->addLayout(gridLayout_8);
 
-        meshes_list = new QListWidget(verticalLayoutWidget_2);
+        meshes_list = new MeshListView(verticalLayoutWidget_2);
         meshes_list->setObjectName(QString::fromUtf8("meshes_list"));
 
         verticalLayout_9->addWidget(meshes_list);
