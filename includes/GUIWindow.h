@@ -12,22 +12,26 @@
 #include "utils_3D.h" 
 
 
+namespace gui {
+	enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4 , ALBEDO = 5 , GREYSCALE_AVG = 6 , PROJECTED_NMAP = 7 , INVALID = 8}; 
+}
 
 namespace axomae {
 	class HeapManagement; 
 	class Renderer ; 
-	class ImageImporter ; 
+	class ImageImporter ;
+	 		
 	class GUIWindow : public QMainWindow {
 
 		Q_OBJECT
 	public:
+	
 		GUIWindow( QWidget *parent = nullptr);
 		~GUIWindow();
 		Ui::MainWindow& getUi() { return _UI;  }
 		static HeapManagement *_MemManagement;
-
-
-/* SLOTS */
+	
+	/* SLOTS */
 	public slots:
 		bool import_image(); 
 		bool import_3DOBJ(); 
@@ -50,15 +54,18 @@ namespace axomae {
 		void next_mesh(); 
 		void previous_mesh(); 
 		void project_uv_normals();
-		
+		void smooth_edge(int factor); 
+		void undo();
+		void redo(); 
 	private:
 		void connect_all_slots(); 
+		QGraphicsView* get_corresponding_view(gui::IMAGETYPE image); 
+		void display_image(SDL_Surface *surf , gui::IMAGETYPE image , bool save_in_heap); 
 		Ui::MainWindow _UI;
 		Renderer *_renderer; 
 		Window *_window; 
 		ImageImporter *_importer; 
 		
-
 	};
 
 

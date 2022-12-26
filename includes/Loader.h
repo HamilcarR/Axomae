@@ -15,19 +15,52 @@
 /*3D obj loader*/
 
 namespace axomae{
-	class Loader{
-		public:
-			static Loader* getInstance(); 	
-			static std::vector<Mesh> load(const char* file);   				
-			static void close(); 	
+
+
+
+class Loader{
+public:
+	static Loader* getInstance(); 	
+	static std::vector<Mesh> load(const char* file);   				
+	static void close(); 	
 		
-		private: 
-			Loader();	
-			~Loader();
-			static Loader* instance; 
+private: 
+	Loader();	
+	~Loader();
+	static Loader* instance; 
 	
 	
-	};
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 

@@ -14,9 +14,6 @@ private:
 	const char* name ; 
 	unsigned int GL_id ; 
 	
-
-
-
 };
 
 

@@ -9,6 +9,7 @@ namespace axomae {
 class Mesh{
 public:
 	Mesh();
+	Mesh(const Mesh& copy); 
 	Mesh(Object3D const& obj , Material const& mat); 
 	Mesh(std::string name , Object3D const& obj , Material const& mat); 
 	virtual ~Mesh(); 
