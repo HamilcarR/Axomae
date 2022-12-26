@@ -137,6 +137,7 @@ void ImageManager::set_pixel_color(SDL_Surface* surface, int x, int y, uint32_t 
 	SDL_UnlockSurface(surface);
 }
 
+
 /**************************************************************************************************************/
 
 void ImageManager::print_pixel(uint32_t color){
@@ -336,7 +337,8 @@ uint32_t RGB::rgb_to_int(){
 }
 
 /**************************************************************************************************************/
-static int compute_kernel_pixel(RGB **data,int kernel[3][3],int i,int j,uint8_t flag){
+template<typename T>
+static T compute_kernel_pixel(RGB **data,const T kernel[3][3],int i,int j,uint8_t flag){
 	if(flag == AXOMAE_RED){
 		return  data[i-1][j-1].red*kernel[0][0]+data[i][j-1].red*kernel[0][1]+data[i+1][j-1].red*kernel[0][2]+
 					 data[i-1][j].red*kernel[1][0] + data[i][j].red*kernel[1][1]+data[i+1][j].red*kernel[1][2]+
@@ -790,6 +792,59 @@ SDL_Surface* ImageManager::project_uv_normals(Object3D object , int width ,  int
 	}
 	return surf ; 
 } 
- 	
+ /**************************************************************************************************************/
+void ImageManager::smooth_image(SDL_Surface* surface , float factor){
+	if(surface!= nullptr){
+		int height = surface->h;
+		int width = surface->w;
+		RGB** data = new RGB*[width];
+		for(int i = 0 ; i < width ; i++)
+			data[i]= new RGB[height];
+		for(int i = 0 ; i < width ; i++){
+			for(int j = 0 ; j < height ; j++)
+				data[i][j] = get_pixel_color(surface,i,j);
+		}
+		float gaussian_blur[3][3] ; 
+		for(int i = 0 ; i < 3 ; i++)
+			for(int j = 0 ; j < 3 ; j++)
+				gaussian_blur[i][j]=gaussian_blur_3_3[i][j] * ((factor != 0) ? (1./factor) : 1.) ;
+
+		for(int i = 1 ; i < width-1 ; i++){
+			for(int j = 1 ; j < height-1 ; j++){	
+				RGB col;
+				col.red = (int) compute_kernel_pixel(data , gaussian_blur , i , j , AXOMAE_RED);
+				col.green = (int) compute_kernel_pixel(data , gaussian_blur , i , j , AXOMAE_GREEN); 
+				col.blue = (int) compute_kernel_pixel(data , gaussian_blur , i , j , AXOMAE_BLUE); 
+				set_pixel_color(surface,i,j,col.rgb_to_int()); 
+			}
+		}					
+		auto del = std::async(std::launch::async, [data, width, height]() {
+		for (int i = 0; i < width; i++)
+			delete[] data[i];
+		delete[] data;
+		}); 	
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //end namespace 
 }

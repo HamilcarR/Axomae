@@ -71,7 +71,7 @@
          <enum>QTabWidget::Triangular</enum>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <property name="movable">
          <bool>true</bool>
@@ -100,6 +100,30 @@
              </size>
             </property>
            </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QPushButton" name="undo_button">
+              <property name="text">
+               <string>undo</string>
+              </property>
+              <property name="icon">
+               <iconset theme="go-previous"/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="redo_button">
+              <property name="text">
+               <string>redo</string>
+              </property>
+              <property name="icon">
+               <iconset theme="go-next"/>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <widget class="QGroupBox" name="greyscale_opt">
@@ -187,6 +211,37 @@
                <property name="text">
                 <string>Use Prewitt</string>
                </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_3">
+               <property name="minimumSize">
+                <size>
+                 <width>174</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="title">
+                <string>Smoothness Factor</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_10">
+                <item>
+                 <widget class="QDoubleSpinBox" name="smooth_float_box"/>
+                </item>
+                <item>
+                 <widget class="QSlider" name="smooth_slider">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>10</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
             </layout>
@@ -428,7 +483,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
            <enum>QTabWidget::Triangular</enum>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <property name="movable">
            <bool>true</bool>
@@ -708,7 +763,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionCancel"/>
+    <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
    </widget>
    <widget class="QMenu" name="menuTools">
@@ -764,7 +819,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
     <string>&amp;Axomae version</string>
    </property>
   </action>
-  <action name="actionCancel">
+  <action name="actionUndo">
    <property name="text">
     <string>&amp;Undo                            </string>
    </property>

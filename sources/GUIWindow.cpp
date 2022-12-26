@@ -8,11 +8,10 @@
 #include "../includes/MeshListView.h" 
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsItem>
+#include <stack> 
 
-namespace axomae {
-
-//TODO USE QLABEL FOR IMAGES
-enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4 , ALBEDO = 5 , GREYSCALE_AVG = 6 , PROJECTED_NMAP = 7}; 
+namespace axomae { 
+using namespace gui ; 
 
 static double NORMAL_FACTOR = 1.;
 static float NORMAL_ATTENUATION = 1.56; 
@@ -25,19 +24,59 @@ struct image_type {
 };
 
 /*structure to keep track of pointers to destroy*/
-
 class HeapManagement {
 public:
-	 void addToHeap(image_type<SDL_Surface> a) {
+	
+	void addToStack(image_type<SDL_Surface> a){
+		image_type<SDL_Surface> copy = a ; 
+		copy.image = ImageManager::copy_surface(a.image);  
+		SDLSurf_stack.push(copy); 		
+	}
+	image_type<SDL_Surface> topStack(){
+		if(SDLSurf_stack.empty())
+			return {nullptr , INVALID};  
+		return SDLSurf_stack.top(); 
+	}
+	/* removes top element */
+	void removeTopStack(){
+		auto a = SDLSurf_stack.top(); 
+		SDLSurf_stack.pop(); 
+		SDLSurf_stack_temp.push(a); 
+		//SDL_FreeSurface(a.image); 
+	}
+	void addTemptoStack(){
+		if(!SDLSurf_stack_temp.empty()){
+			auto a = SDLSurf_stack_temp.top(); 
+			SDLSurf_stack_temp.pop() ; 
+			SDLSurf_stack.push(a); 
+		}
+	}
+	void clearStack(){
+		while(!SDLSurf_stack.empty()){
+				auto a = SDLSurf_stack.top(); 
+				SDL_FreeSurface(a.image); 
+				SDLSurf_stack.pop(); 
+		}
+	}
+	void clearTempStack(){
+		while(!SDLSurf_stack_temp.empty()){
+				auto a = SDLSurf_stack_temp.top(); 
+				SDL_FreeSurface(a.image); 
+				SDLSurf_stack_temp.pop(); 
+		}
+	}
+	void addToHeap(image_type<SDL_Surface> a) {
+		addToStack(a); 
 		std::vector<image_type<SDL_Surface>>::iterator it = std::find_if(SDLSurf_heap.begin(), SDLSurf_heap.end(), [a](image_type<SDL_Surface> b) { if (a.imagetype == b.imagetype) return true; else return false; });
 		if (it != SDLSurf_heap.end()) {
-				image_type<SDL_Surface> temp = *it;
-				SDLSurf_heap.erase(it);
-				SDLSurf_heap.push_back(a);
-				SDL_FreeSurface(temp.image);
-			}
+			image_type<SDL_Surface> temp = *it;
+			SDLSurf_heap.erase(it);
+			SDLSurf_heap.push_back(a);	
+			SDL_FreeSurface(temp.image);
+		}
 		 else
 			SDLSurf_heap.push_back(a);
+		
 	}
 
 	 void addToTemp(image_type<SDL_Surface> a) {
@@ -93,12 +132,12 @@ public:
 
 	~HeapManagement() {
 			SceneSelector::remove();
-			for (image_type<SDL_Surface> a : temp_surfaces) {
-			SDL_FreeSurface(a.image);
-			}
-			for (image_type<SDL_Surface> a : SDLSurf_heap) {
-			SDL_FreeSurface(a.image);
-			}
+			clearStack(); 
+			clearTempStack(); 
+			for (image_type<SDL_Surface> a : temp_surfaces) 
+				SDL_FreeSurface(a.image);
+			for (image_type<SDL_Surface> a : SDLSurf_heap) 
+				SDL_FreeSurface(a.image);
 			for (image_type<QPaintDevice> a : paintDevice_heap) {
 				delete a.image;
 				a.image = nullptr; 
@@ -113,18 +152,20 @@ public:
 			}
 	}
 
-	image_type<SDL_Surface> getLastSurface() { return SDLSurf_heap.back();}
+	image_type<SDL_Surface> getLastSurface() { 
+		return SDLSurf_heap.back();
+	}
 
 private:
-	 std::vector<image_type<SDL_Surface>> SDLSurf_heap;
-	 std::vector<image_type <QPaintDevice>> paintDevice_heap;
-	 std::vector<image_type <QGraphicsItem>> graphicsItem_heap;
-	 std::vector<image_type <QObject>> object_heap;
-	 std::vector<image_type<SDL_Surface>> temp_surfaces;
+	std::stack<image_type<SDL_Surface>> SDLSurf_stack;
+	std::stack<image_type<SDL_Surface>> SDLSurf_stack_temp; 
+	std::vector<image_type<SDL_Surface>> SDLSurf_heap;
+	std::vector<image_type <QPaintDevice>> paintDevice_heap;
+	std::vector<image_type <QGraphicsItem>> graphicsItem_heap;
+	std::vector<image_type <QObject>> object_heap;
+	std::vector<image_type<SDL_Surface>> temp_surfaces;
 
 	
-
-
 };
 
 /*structure fields pointing to the session datas*/
@@ -165,55 +206,95 @@ GUIWindow::~GUIWindow() {
 
 /******************************************************************************************************************************************************************************************/
 
-	static void display_image(SDL_Surface* surf , GUIWindow& window, QGraphicsView &view , IMAGETYPE type) {
-		
+void GUIWindow::display_image(SDL_Surface* surf , IMAGETYPE type , bool save_in_heap) {
+	QGraphicsView *view = get_corresponding_view(type);
+	if(surf != nullptr && type != INVALID && save_in_heap){
+		_MemManagement->addToHeap({surf , type}); 
+		_MemManagement->clearTempStack(); 
+	}
+	if(view != nullptr){
 		QImage *qimage = new QImage(static_cast<uchar*>(surf->pixels), surf->w, surf->h, QImage::Format_RGB888);
 		QPixmap pix = QPixmap::fromImage(*qimage);
-		QGraphicsPixmapItem * item = new QGraphicsPixmapItem(pix); //	std::shared_ptr<QGraphicsPixmapItem>  item(new QGraphicsPixmapItem(pix));
-		auto scene = new QGraphicsScene(); //std::shared_ptr<QGraphicsScene> scene(new QGraphicsScene());
+		QGraphicsPixmapItem * item = new QGraphicsPixmapItem(pix); 
+		auto scene = new QGraphicsScene();
 		scene->addItem(&*item);
-		view.setScene(&*scene);
-		view.fitInView(item);
-		window._MemManagement->addToHeap({ qimage , type });
-		window._MemManagement->addToHeap({ item , type });
-		window._MemManagement->addToHeap({ scene , type });
-		
+		view->setScene(&*scene);
+		view->fitInView(item);
+		_MemManagement->addToHeap({ qimage , type });
+		_MemManagement->addToHeap({ item , type });
+		_MemManagement->addToHeap({ scene , type });
 	}
+}
 
+/**************************************************************************************************************/
+QGraphicsView* GUIWindow::get_corresponding_view(IMAGETYPE type) {
+	switch(type){
+		case HEIGHT:
+			return _UI.height_image; 
+		break;
 
-
-
-
-/******************************************************************************************************************************************************************************************/
-
-
-	void GUIWindow::connect_all_slots() {
-		QObject::connect(_UI.actionImport_image, SIGNAL(triggered()), this, SLOT(import_image()));
-		QObject::connect(_UI.use_average, SIGNAL(clicked()), this, SLOT(greyscale_average()));
-		QObject::connect(_UI.use_luminance, SIGNAL(clicked()), this, SLOT(greyscale_luminance()));
-		QObject::connect(_UI.use_scharr, SIGNAL(clicked()), this, SLOT(use_scharr())); 
-		QObject::connect(_UI.use_sobel, SIGNAL(clicked()), this, SLOT(use_sobel()));
-		QObject::connect(_UI.use_prewitt, SIGNAL(clicked()), this, SLOT(use_prewitt()));
-		QObject::connect(_UI.actionSave_image, SIGNAL(triggered()), this, SLOT(save_image()));
-
-		QObject::connect(_UI.use_objectSpace, SIGNAL(clicked()), this, SLOT(use_object_space())); 
-		QObject::connect(_UI.use_tangentSpace, SIGNAL(clicked()), this, SLOT(use_tangent_space()));
+		case PROJECTED_NMAP:
+			return _UI.uv_projection ; 
+		break;
 		
-		QObject::connect(_UI.factor_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_factor(int)));
-		QObject::connect(_UI.attenuation_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_attenuation(int)));
+		case ALBEDO:
+			return _UI.diffuse_image ; 
+		break;
 
-		QObject::connect(_UI.compute_dudv, SIGNAL(pressed()), this, SLOT(compute_dudv())); 
-		QObject::connect(_UI.factor_slider_dudv, SIGNAL(valueChanged(int)), this, SLOT(change_dudv_nmap(int))); 
-		QObject::connect(_UI.use_gpu, SIGNAL(clicked(bool)), this, SLOT(use_gpgpu(bool))); 
+		case GREYSCALE_LUMI :
+			return _UI.greyscale_image ; 
+		break ;
 
-		QObject::connect(_UI.bake_texture,SIGNAL(clicked()) , this , SLOT(compute_projection())); 
-		QObject::connect(_UI.actionImport_3D_model , SIGNAL(triggered()) , this , SLOT(import_3DOBJ())) ; 	
-	
-		QObject::connect(_UI.next_mesh_button , SIGNAL(clicked()) , this , SLOT(next_mesh()));
-		QObject::connect(_UI.previous_mesh_button , SIGNAL(clicked()) , this , SLOT(previous_mesh()));	
-	
-	
+		case GREYSCALE_AVG:
+			return _UI.greyscale_image; 
+		break;
+
+		case NMAP:
+			return _UI.normal_image ; 
+		break ; 
+
+		case DUDV:
+			return _UI.dudv_image ; 
+		break ; 		
+		
+		default:
+			return nullptr; 
+		break; 
 	}
+}
+
+
+
+/**************************************************************************************************************/
+void GUIWindow::connect_all_slots() {
+	QObject::connect(_UI.actionImport_image, SIGNAL(triggered()), this, SLOT(import_image()));
+	QObject::connect(_UI.use_average, SIGNAL(clicked()), this, SLOT(greyscale_average()));
+	QObject::connect(_UI.use_luminance, SIGNAL(clicked()), this, SLOT(greyscale_luminance()));
+	QObject::connect(_UI.use_scharr, SIGNAL(clicked()), this, SLOT(use_scharr())); 
+	QObject::connect(_UI.use_sobel, SIGNAL(clicked()), this, SLOT(use_sobel()));
+	QObject::connect(_UI.use_prewitt, SIGNAL(clicked()), this, SLOT(use_prewitt()));
+	QObject::connect(_UI.actionSave_image, SIGNAL(triggered()), this, SLOT(save_image()));
+	QObject::connect(_UI.actionUndo , SIGNAL(triggered()) , this , SLOT(undo())); 
+	QObject::connect(_UI.actionRedo , SIGNAL(triggered()) , this , SLOT(redo()));
+	QObject::connect(_UI.undo_button , SIGNAL(clicked()) , this , SLOT(undo()));
+	QObject::connect(_UI.redo_button , SIGNAL(clicked()) , this , SLOT(redo())); 
+	QObject::connect(_UI.use_objectSpace, SIGNAL(clicked()), this, SLOT(use_object_space())); 
+	QObject::connect(_UI.use_tangentSpace, SIGNAL(clicked()), this, SLOT(use_tangent_space()));
+	
+	QObject::connect(_UI.smooth_slider , SIGNAL(valueChanged(int)) , this , SLOT(smooth_edge(int))); 
+	QObject::connect(_UI.factor_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_factor(int)));
+	QObject::connect(_UI.attenuation_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_attenuation(int)));
+
+	QObject::connect(_UI.compute_dudv, SIGNAL(pressed()), this, SLOT(compute_dudv())); 
+	QObject::connect(_UI.factor_slider_dudv, SIGNAL(valueChanged(int)), this, SLOT(change_dudv_nmap(int))); 
+	QObject::connect(_UI.use_gpu, SIGNAL(clicked(bool)), this, SLOT(use_gpgpu(bool))); 
+
+	QObject::connect(_UI.bake_texture,SIGNAL(clicked()) , this , SLOT(compute_projection())); 
+	QObject::connect(_UI.actionImport_3D_model , SIGNAL(triggered()) , this , SLOT(import_3DOBJ())) ; 	
+
+	QObject::connect(_UI.next_mesh_button , SIGNAL(clicked()) , this , SLOT(next_mesh()));
+	QObject::connect(_UI.previous_mesh_button , SIGNAL(clicked()) , this , SLOT(previous_mesh()));	
+}
 
 
 /*SLOTS*/
@@ -227,8 +308,8 @@ bool GUIWindow::import_image() {
 	else {
 		image_session_pointers::filename = filename.toStdString(); ;
 		SDL_Surface* surf = ImageImporter::getInstance()->load_image(filename.toStdString().c_str()); 
-		display_image(surf, *this, *_UI.diffuse_image , ALBEDO); 
-		_MemManagement->addToHeap({ surf , ALBEDO });
+		display_image(surf,  ALBEDO , true); 
+		//_MemManagement->addToHeap({ surf , ALBEDO });
 		delete temp; 
 		image_session_pointers::setAllNull(); 
 		image_session_pointers::albedo = surf; 
@@ -244,9 +325,9 @@ bool GUIWindow::greyscale_average() {
 	SDL_Surface* copy = ImageManager::copy_surface(s); 
 
 	if (copy != nullptr) {
-		_MemManagement->addToHeap({ copy , GREYSCALE_AVG });
+		//_MemManagement->addToHeap({ copy , GREYSCALE_AVG });
 		ImageManager::set_greyscale_average(copy, 3);
-		display_image(copy, *this, *_UI.greyscale_image , GREYSCALE_AVG);
+		display_image(copy,  GREYSCALE_AVG , true);
 		image_session_pointers::greyscale = copy; 
 		return true; 
 	}
@@ -259,11 +340,10 @@ bool GUIWindow::greyscale_average() {
 bool GUIWindow::greyscale_luminance() {
 	SDL_Surface* s = image_session_pointers::albedo; // use image_session_pointers TODO 
 	SDL_Surface *copy = ImageManager::copy_surface(s);
-
 	if (copy != nullptr) {
-		_MemManagement->addToHeap({ copy , GREYSCALE_LUMI });
+		//_MemManagement->addToHeap({ copy , GREYSCALE_LUMI });
 		ImageManager::set_greyscale_luminance(copy);
-		display_image(copy, *this, *_UI.greyscale_image , GREYSCALE_LUMI);
+		display_image(copy,  GREYSCALE_LUMI , true);
 		image_session_pointers::greyscale = copy;
 
 		return true;
@@ -289,9 +369,9 @@ void GUIWindow::use_scharr() {
 	SDL_Surface* s = image_session_pointers::greyscale; 
 	SDL_Surface* copy = ImageManager::copy_surface(s);
 	if (copy != nullptr) {
-		_MemManagement->addToHeap({ copy , HEIGHT });
+		//_MemManagement->addToHeap({ copy , HEIGHT });
 		ImageManager::compute_edge(copy, AXOMAE_USE_SCHARR, AXOMAE_REPEAT); 
-		display_image(copy, *this, *_UI.height_image, HEIGHT); 
+		display_image(copy,  HEIGHT , true); 
 		image_session_pointers::height = copy; 
 		
 
@@ -308,9 +388,9 @@ void GUIWindow::use_prewitt() {
 	SDL_Surface* s = image_session_pointers::greyscale;
 	SDL_Surface* copy = ImageManager::copy_surface(s);
 	if (copy != nullptr) {
-		_MemManagement->addToHeap({ copy , HEIGHT });
+		//_MemManagement->addToHeap({ copy , HEIGHT });
 		ImageManager::compute_edge(copy, AXOMAE_USE_PREWITT, AXOMAE_REPEAT);
-		display_image(copy, *this, *_UI.height_image, HEIGHT);
+		display_image(copy,  HEIGHT , true);
 		image_session_pointers::height = copy;
 
 
@@ -326,9 +406,9 @@ void GUIWindow::use_sobel() {
 	SDL_Surface* s = image_session_pointers::greyscale;
 	SDL_Surface* copy = ImageManager::copy_surface(s);
 	if (copy != nullptr) {
-		_MemManagement->addToHeap({ copy , HEIGHT });
+		//_MemManagement->addToHeap({ copy , HEIGHT });
 		ImageManager::compute_edge(copy, AXOMAE_USE_SOBEL, AXOMAE_REPEAT);
-		display_image(copy, *this, *_UI.height_image, HEIGHT);
+		display_image(copy,  HEIGHT , true);
 		image_session_pointers::height = copy;
 
 
@@ -347,9 +427,9 @@ void GUIWindow::use_tangent_space() {
 	SDL_Surface* s = image_session_pointers::height;
 	SDL_Surface* copy = ImageManager::copy_surface(s);
 	if (copy != nullptr) {
-		_MemManagement->addToHeap({ copy , NMAP });
+		//_MemManagement->addToHeap({ copy , NMAP });
 		ImageManager::compute_normal_map(copy, NORMAL_FACTOR , NORMAL_ATTENUATION); 
-		display_image(copy, *this, *_UI.normal_image, NMAP);
+		display_image(copy,  NMAP , true);
 		image_session_pointers::normalmap = copy;
 
 
@@ -399,9 +479,9 @@ void GUIWindow::compute_dudv() {
 	SDL_Surface* s = image_session_pointers::normalmap;
 	SDL_Surface* copy = ImageManager::copy_surface(s);
 	if (copy != nullptr) {
-		_MemManagement->addToHeap({ copy , DUDV });
+		//_MemManagement->addToHeap({ copy , DUDV });
 		ImageManager::compute_dudv(copy, DUDV_FACTOR);
-		display_image(copy, *this, *_UI.dudv_image, DUDV);
+		display_image(copy,  DUDV , true);
 		image_session_pointers::dudv = copy;
 
 
@@ -420,9 +500,9 @@ void GUIWindow::change_dudv_nmap(int factor) {
 	SDL_Surface* s = image_session_pointers::normalmap;
 	SDL_Surface* copy = ImageManager::copy_surface(s);
 	if (copy != nullptr) {
-		_MemManagement->addToHeap({ copy , DUDV });
+		//_MemManagement->addToHeap({ copy , DUDV });
 		ImageManager::compute_dudv(copy, DUDV_FACTOR);
-		display_image(copy, *this, *_UI.dudv_image, DUDV);
+		display_image(copy,  DUDV , true);
 		image_session_pointers::dudv = copy;
 	}
 	else {
@@ -445,7 +525,7 @@ void GUIWindow::compute_projection(){ //TODO : complete uv projection method , i
 void GUIWindow::project_uv_normals(){	
 	SceneSelector* instance = SceneSelector::getInstance(); 
 	SDL_Surface* surf = ImageManager::project_uv_normals(instance->getCurrent().geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 	
-	display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP); 
+	display_image(surf , PROJECTED_NMAP , true); 
 
 }
 /**************************************************************************************************************/
@@ -459,7 +539,7 @@ bool GUIWindow::import_3DOBJ(){
 		std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, scene[0].geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked());	
 		_UI.renderer_view->setNewScene(scene);
 		SDL_Surface* surf = async_get_surf.get() ; 
-		display_image(surf , *this , *_UI.uv_projection , PROJECTED_NMAP) ; 
+		display_image(surf , PROJECTED_NMAP , true) ; 
 		return true ; 
 	}
 	return false ; 
@@ -467,7 +547,7 @@ bool GUIWindow::import_3DOBJ(){
 /**************************************************************************************************************/
 void GUIWindow::next_mesh(){
 	SceneSelector::getInstance()->toNext();
-	project_uv_normals(); 
+	 project_uv_normals(); 
 }
 /**************************************************************************************************************/
 void GUIWindow::previous_mesh(){
@@ -498,14 +578,42 @@ bool GUIWindow::save_image() {
 	return false;
 }
 
+/**************************************************************************************************************/
+void GUIWindow::smooth_edge(int factor){
+	SDL_Surface* surface = image_session_pointers::height;
+	SDL_Surface* copy = ImageManager::copy_surface(surface) ; 
+	if (copy != nullptr) {
+		//_MemManagement->addToHeap({copy , HEIGHT}) ; 
+		_UI.smooth_float_box->setValue((float)factor); 	
+		ImageManager::smooth_image(copy, (float) 1.);
+		display_image(copy, HEIGHT , true);
+		image_session_pointers::height = copy ; 
+	}
 
+}
 
+/**************************************************************************************************************/
 
+void GUIWindow::undo(){
+	image_type<SDL_Surface> previous = _MemManagement->topStack(); 
+	if(previous.image != nullptr && previous.imagetype != INVALID){
+		display_image(previous.image , previous.imagetype , false); 
+		_MemManagement->removeTopStack(); 
+	}
 
+}
 
+/**************************************************************************************************************/
 
+void GUIWindow::redo(){
+	_MemManagement->addTemptoStack() ; 
+	image_type<SDL_Surface> next = _MemManagement->topStack(); 
+	if(next.image != nullptr && next.imagetype != INVALID){
+		display_image(next.image , next.imagetype , false); 
+		//_MemManagement->removeTopStack(); 
+	}
 
-
+}
 
 
 
@@ -516,3 +624,4 @@ bool GUIWindow::save_image() {
 
 
 }
+

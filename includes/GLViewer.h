@@ -3,7 +3,7 @@
 
 #include "constants.h"
 #include "utils_3D.h" 
-#include "SceneData.h" 
+#include "Renderer.h" 
 #include "Mesh.h"
 
 
@@ -29,7 +29,7 @@ class GLViewer : public QOpenGLWidget , protected QOpenGLFunctions_4_3_Core {
 		void resizeGL(int width , int height) override ; 
 		void printInfo() ; 
 	private:
-		SceneData* scene_data;	
+		Renderer* renderer;	
 	
 
 

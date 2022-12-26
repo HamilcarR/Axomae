@@ -4,28 +4,27 @@ using namespace axomae ;
 
 
 GLViewer::GLViewer(QWidget* parent) : QOpenGLWidget (parent) {
-	scene_data = new SceneData  ; 	
+	renderer = new Renderer()  ; 	
 }
 
 GLViewer::~GLViewer(){
 	makeCurrent() ; 
-	delete scene_data ; 
+	delete renderer ; 
 	doneCurrent(); 
 }
 
 void GLViewer::initializeGL() {
 	initializeOpenGLFunctions(); 
-	scene_data->initialize() ; 
+	renderer->initialize() ; 
 	errorCheck() ;
 }
 
 void GLViewer::paintGL(){
-	if(scene_data->prep_draw()){
-		errorCheck() ;  
-		glDrawElements(GL_TRIANGLES , scene_data->current_scene->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
-		scene_data->end_draw(); 
+	if(renderer->prep_draw()){
+		errorCheck() ; 
+		renderer->draw(dynamic_cast<QOpenGLFunctions_4_3_Core*> (this) ) ; 
+		renderer->end_draw(); 
 	}
-
 }
 void GLViewer::resizeGL(int width , int height){
 
@@ -35,7 +34,7 @@ void GLViewer::printInfo(){
 }
 void GLViewer::setNewScene(std::vector<Mesh> &new_scene){
 	makeCurrent();
-	scene_data->setNewScene(new_scene); 
+	renderer->set_new_scene(new_scene); 
 	doneCurrent();
 
 }

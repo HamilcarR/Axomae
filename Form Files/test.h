@@ -47,7 +47,7 @@ public:
     QAction *actionExit;
     QAction *actionDocumentation;
     QAction *actionAxomae_version;
-    QAction *actionCancel;
+    QAction *actionUndo;
     QAction *actionRedo;
     QAction *actionImport_3D_model;
     QWidget *centralwidget;
@@ -58,6 +58,9 @@ public:
     QWidget *functions;
     QVBoxLayout *verticalLayout_2;
     QCheckBox *use_gpu;
+    QHBoxLayout *horizontalLayout_2;
+    QPushButton *undo_button;
+    QPushButton *redo_button;
     QGroupBox *greyscale_opt;
     QVBoxLayout *verticalLayout_8;
     QRadioButton *use_average;
@@ -67,6 +70,10 @@ public:
     QRadioButton *use_scharr;
     QRadioButton *use_sobel;
     QRadioButton *use_prewitt;
+    QGroupBox *groupBox_3;
+    QVBoxLayout *verticalLayout_10;
+    QDoubleSpinBox *smooth_float_box;
+    QSlider *smooth_slider;
     QGroupBox *normal_opt;
     QVBoxLayout *verticalLayout_5;
     QRadioButton *use_objectSpace;
@@ -160,8 +167,8 @@ public:
         actionDocumentation->setObjectName(QString::fromUtf8("actionDocumentation"));
         actionAxomae_version = new QAction(MainWindow);
         actionAxomae_version->setObjectName(QString::fromUtf8("actionAxomae_version"));
-        actionCancel = new QAction(MainWindow);
-        actionCancel->setObjectName(QString::fromUtf8("actionCancel"));
+        actionUndo = new QAction(MainWindow);
+        actionUndo->setObjectName(QString::fromUtf8("actionUndo"));
         actionRedo = new QAction(MainWindow);
         actionRedo->setObjectName(QString::fromUtf8("actionRedo"));
         actionImport_3D_model = new QAction(MainWindow);
@@ -210,6 +217,25 @@ public:
         use_gpu->setIconSize(QSize(32, 16));
 
         verticalLayout_2->addWidget(use_gpu);
+
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        undo_button = new QPushButton(functions);
+        undo_button->setObjectName(QString::fromUtf8("undo_button"));
+        QIcon icon1(QIcon::fromTheme(QString::fromUtf8("go-previous")));
+        undo_button->setIcon(icon1);
+
+        horizontalLayout_2->addWidget(undo_button);
+
+        redo_button = new QPushButton(functions);
+        redo_button->setObjectName(QString::fromUtf8("redo_button"));
+        QIcon icon2(QIcon::fromTheme(QString::fromUtf8("go-next")));
+        redo_button->setIcon(icon2);
+
+        horizontalLayout_2->addWidget(redo_button);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_2);
 
         greyscale_opt = new QGroupBox(functions);
         greyscale_opt->setObjectName(QString::fromUtf8("greyscale_opt"));
@@ -266,6 +292,27 @@ public:
         use_prewitt->setObjectName(QString::fromUtf8("use_prewitt"));
 
         verticalLayout_3->addWidget(use_prewitt);
+
+        groupBox_3 = new QGroupBox(height_opt);
+        groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
+        groupBox_3->setMinimumSize(QSize(174, 0));
+        verticalLayout_10 = new QVBoxLayout(groupBox_3);
+        verticalLayout_10->setObjectName(QString::fromUtf8("verticalLayout_10"));
+        smooth_float_box = new QDoubleSpinBox(groupBox_3);
+        smooth_float_box->setObjectName(QString::fromUtf8("smooth_float_box"));
+
+        verticalLayout_10->addWidget(smooth_float_box);
+
+        smooth_slider = new QSlider(groupBox_3);
+        smooth_slider->setObjectName(QString::fromUtf8("smooth_slider"));
+        smooth_slider->setMinimum(1);
+        smooth_slider->setMaximum(10);
+        smooth_slider->setOrientation(Qt::Horizontal);
+
+        verticalLayout_10->addWidget(smooth_slider);
+
+
+        verticalLayout_3->addWidget(groupBox_3);
 
 
         verticalLayout_2->addWidget(height_opt);
@@ -625,7 +672,7 @@ public:
         menuFiles->addAction(actionSave_image);
         menuFiles->addAction(actionSave_project);
         menuFiles->addAction(actionExit);
-        menuEdit->addAction(actionCancel);
+        menuEdit->addAction(actionUndo);
         menuEdit->addAction(actionRedo);
         menuHelp->addAction(actionDocumentation);
         menuHelp->addAction(actionAxomae_version);
@@ -633,8 +680,8 @@ public:
         retranslateUi(MainWindow);
         QObject::connect(actionExit, SIGNAL(triggered(bool)), MainWindow, SLOT(close()));
 
-        renderMaterials->setCurrentIndex(1);
-        renderer_tab->setCurrentIndex(2);
+        renderMaterials->setCurrentIndex(0);
+        renderer_tab->setCurrentIndex(0);
         tabWidget->setCurrentIndex(1);
 
 
@@ -651,10 +698,12 @@ public:
         actionExit->setText(QCoreApplication::translate("MainWindow", "&Exit", nullptr));
         actionDocumentation->setText(QCoreApplication::translate("MainWindow", "&Documentation", nullptr));
         actionAxomae_version->setText(QCoreApplication::translate("MainWindow", "&Axomae version", nullptr));
-        actionCancel->setText(QCoreApplication::translate("MainWindow", "&Undo                            ", nullptr));
+        actionUndo->setText(QCoreApplication::translate("MainWindow", "&Undo                            ", nullptr));
         actionRedo->setText(QCoreApplication::translate("MainWindow", "&Redo", nullptr));
         actionImport_3D_model->setText(QCoreApplication::translate("MainWindow", "Import &3D model", nullptr));
         use_gpu->setText(QCoreApplication::translate("MainWindow", "Use GPU", nullptr));
+        undo_button->setText(QCoreApplication::translate("MainWindow", "undo", nullptr));
+        redo_button->setText(QCoreApplication::translate("MainWindow", "redo", nullptr));
         greyscale_opt->setTitle(QCoreApplication::translate("MainWindow", "Greyscale options", nullptr));
         use_average->setText(QCoreApplication::translate("MainWindow", "Use a&verage", nullptr));
         use_luminance->setText(QCoreApplication::translate("MainWindow", "Use luminance", nullptr));
@@ -662,6 +711,7 @@ public:
         use_scharr->setText(QCoreApplication::translate("MainWindow", "Use Scharr", nullptr));
         use_sobel->setText(QCoreApplication::translate("MainWindow", "Use Sobel", nullptr));
         use_prewitt->setText(QCoreApplication::translate("MainWindow", "Use Prewitt", nullptr));
+        groupBox_3->setTitle(QCoreApplication::translate("MainWindow", "Smoothness Factor", nullptr));
         normal_opt->setTitle(QCoreApplication::translate("MainWindow", "Normals options", nullptr));
         use_objectSpace->setText(QCoreApplication::translate("MainWindow", "Ob&ject space", nullptr));
         use_tangentSpace->setText(QCoreApplication::translate("MainWindow", "Tangent space", nullptr));
