@@ -341,26 +341,47 @@ template<typename T>
 static T compute_kernel_pixel(RGB **data,const T kernel[3][3],int i,int j,uint8_t flag){
 	if(flag == AXOMAE_RED){
 		return  data[i-1][j-1].red*kernel[0][0]+data[i][j-1].red*kernel[0][1]+data[i+1][j-1].red*kernel[0][2]+
-					 data[i-1][j].red*kernel[1][0] + data[i][j].red*kernel[1][1]+data[i+1][j].red*kernel[1][2]+
-					 data[i-1][j+1].red*kernel[2][0]+ data[i][j+1].red*kernel[2][1]+data[i+1][j+1].red*kernel[2][2];			
+			 data[i-1][j].red*kernel[1][0] + data[i][j].red*kernel[1][1]+data[i+1][j].red*kernel[1][2]+
+			 data[i-1][j+1].red*kernel[2][0]+ data[i][j+1].red*kernel[2][1]+data[i+1][j+1].red*kernel[2][2];			
 	}
 	else if (flag==AXOMAE_BLUE){
 		return  data[i-1][j-1].blue*kernel[0][0]+data[i][j-1].blue*kernel[0][1]+data[i+1][j-1].blue*kernel[0][2]+
-					 data[i-1][j].blue*kernel[1][0] + data[i][j].blue*kernel[1][1]+data[i+1][j].blue*kernel[1][2]+
-					 data[i-1][j+1].blue*kernel[2][0]+ data[i][j+1].blue*kernel[2][1]+data[i+1][j+1].blue*kernel[2][2];	
+			 data[i-1][j].blue*kernel[1][0] + data[i][j].blue*kernel[1][1]+data[i+1][j].blue*kernel[1][2]+
+			 data[i-1][j+1].blue*kernel[2][0]+ data[i][j+1].blue*kernel[2][1]+data[i+1][j+1].blue*kernel[2][2];	
 	}
 	else {
 		return  data[i-1][j-1].green*kernel[0][0]+data[i][j-1].green*kernel[0][1]+data[i+1][j-1].green*kernel[0][2]+
-					 data[i-1][j].green*kernel[1][0] + data[i][j].green*kernel[1][1]+data[i+1][j].green*kernel[1][2]+
-					 data[i-1][j+1].green*kernel[2][0]+ data[i][j+1].green*kernel[2][1]+data[i+1][j+1].green*kernel[2][2];	
+			 data[i-1][j].green*kernel[1][0] + data[i][j].green*kernel[1][1]+data[i+1][j].green*kernel[1][2]+
+			 data[i-1][j+1].green*kernel[2][0]+ data[i][j+1].green*kernel[2][1]+data[i+1][j+1].green*kernel[2][2];	
 	}
 
 }
 
+
+template<typename T>
+static RGB compute_generic_kernel_pixel(RGB **data ,const unsigned int size ,const T **kernel , const int x , const int y){
+	float r = 0 , g = 0 , b = 0 ; 
+	uint8_t middle = std::floor(size / 2) ; 
+	for(unsigned int i = 0 ; i < size ; i ++)
+		for(unsigned int j = 0 ; j < size ; j ++){
+			T kernel_val = kernel[i][j] ; 
+			int new_i = i - middle , new_j = j - middle ;
+			r += data[x - new_i][y - new_j].red * kernel_val ;
+			g += data[x - new_i][y - new_j].green * kernel_val ; 
+			b += data[x - new_i][y - new_j].blue * kernel_val ; 
+		}
+	return RGB((int)r , (int)g ,(int) b) ; 
+	
+}
+
+
+
+
+
+
 /**************************************************************************************************************/
 void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border ){
 	bool cuda = CHECK_IF_CUDA_AVAILABLE();
-	SDL_SaveBMP(surface , "before.png"); 
 	if  (cuda) 
 		GPU_compute_height(surface, flag, border);
 	else  {
@@ -437,13 +458,27 @@ void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border
 		});
 
 	}
-
-	SDL_SaveBMP(surface , "after.png"); 
 }
 
 /**************************************************************************************************************/
+
+
+
+template<typename T>
+RGB RGB::operator*(T arg){
+	RGB rgb = RGB(static_cast<int>(red * arg) , static_cast<int> (green * arg) , static_cast<int> (blue * arg) , static_cast<int> (alpha * arg)); 
+	return rgb ; 
+}
+
+
 RGB RGB::operator+=(int arg){
 	RGB rgb=RGB(red+arg,green+arg,blue+arg,alpha+arg);
+	return rgb;
+	
+}
+
+RGB RGB::operator+=(RGB arg){
+	RGB rgb=RGB(red+arg.red,green+arg.green,blue+arg.blue,alpha+arg.alpha);
 	return rgb;
 	
 }
@@ -804,20 +839,28 @@ void ImageManager::smooth_image(SDL_Surface* surface , float factor){
 			for(int j = 0 ; j < height ; j++)
 				data[i][j] = get_pixel_color(surface,i,j);
 		}
-		float gaussian_blur[3][3] ; 
+
+		float **gaussian_blur = new float*[3] ;
+		for(int i = 0 ; i < 3 ; i++)
+			gaussian_blur[i] = new float[3]; 
 		for(int i = 0 ; i < 3 ; i++)
 			for(int j = 0 ; j < 3 ; j++)
 				gaussian_blur[i][j]=gaussian_blur_3_3[i][j] * ((factor != 0) ? (1./factor) : 1.) ;
-
+		
 		for(int i = 1 ; i < width-1 ; i++){
 			for(int j = 1 ; j < height-1 ; j++){	
 				RGB col;
-				col.red = (int) compute_kernel_pixel(data , gaussian_blur , i , j , AXOMAE_RED);
-				col.green = (int) compute_kernel_pixel(data , gaussian_blur , i , j , AXOMAE_GREEN); 
-				col.blue = (int) compute_kernel_pixel(data , gaussian_blur , i , j , AXOMAE_BLUE); 
+				col = compute_generic_kernel_pixel(data , 3 , const_cast<const float**>(gaussian_blur)  , i , j) ; 
+				//col.red = (int) compute_kernel_pixel(data , gaussian_blur , i , j , AXOMAE_RED);
+				//col.green = (int) compute_kernel_pixel(data , gaussian_blur , i , j , AXOMAE_GREEN); 
+				//col.blue = (int) compute_kernel_pixel(data , gaussian_blur , i , j , AXOMAE_BLUE); 
 				set_pixel_color(surface,i,j,col.rgb_to_int()); 
 			}
-		}					
+		}
+		for(int i = 0 ; i < 3 ; i++)
+			delete[] gaussian_blur[i] ; 
+		delete[] gaussian_blur ; 
+
 		auto del = std::async(std::launch::async, [data, width, height]() {
 		for (int i = 0; i < width; i++)
 			delete[] data[i];

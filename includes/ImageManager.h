@@ -22,7 +22,9 @@ public:
 	static RGB int_to_rgb(uint16_t value);
         double intensity();
 	void invert_color();			
+	template<typename T> RGB operator*(T arg); 
 	RGB operator+=(int arg);
+	RGB operator+=(RGB arg); 
 	RGB operator+(RGB arg);
 	RGB operator/(int arg);
 	uint32_t rgb_to_int();

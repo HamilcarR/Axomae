@@ -15,7 +15,21 @@
 
 namespace axomae{
 /**we define some constants here...flags,sobel-prewitt operators,kernels etc...***************************************************************************/
- __device__
+	
+
+static const float gaussian_blur_normalized[KERNEL_SIZE][KERNEL_SIZE] = {
+		{1./9 , 1./9 , 1./9},
+		{1./9 , 1./9 , 1./9},
+		{1./9 , 1./9 , 1./9}
+};
+
+static const float gaussian_blur_3_3[KERNEL_SIZE][KERNEL_SIZE] = {
+		{1./16 , 2./16 , 1./16},
+		{2./16 , 4./16 , 2./16},
+		{1./16 , 2./16 , 1./16}
+};
+
+__device__
 const int scharr_mask_vertical[KERNEL_SIZE][KERNEL_SIZE] = {
 			{ 3 , 10 , 3 },
 			{ 0 , 0  , 0 },
