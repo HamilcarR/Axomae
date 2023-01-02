@@ -39,7 +39,7 @@
     <item row="0" column="0">
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="sizeConstraint">
-       <enum>QLayout::SetFixedSize</enum>
+       <enum>QLayout::SetMaximumSize</enum>
       </property>
       <property name="rightMargin">
        <number>0</number>
@@ -109,7 +109,8 @@
                <string>undo</string>
               </property>
               <property name="icon">
-               <iconset theme="go-previous"/>
+               <iconset theme="go-previous">
+                <normaloff>.</normaloff>.</iconset>
               </property>
              </widget>
             </item>
@@ -119,7 +120,8 @@
                <string>redo</string>
               </property>
               <property name="icon">
-               <iconset theme="go-next"/>
+               <iconset theme="go-next">
+                <normaloff>.</normaloff>.</iconset>
               </property>
              </widget>
             </item>
@@ -190,58 +192,158 @@
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
-              <widget class="QRadioButton" name="use_scharr">
-               <property name="text">
-                <string>Use Scharr</string>
+              <widget class="QTabWidget" name="tabWidget_2">
+               <property name="currentIndex">
+                <number>0</number>
                </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="use_sobel">
-               <property name="text">
-                <string>Use Sobel</string>
-               </property>
-               <property name="checked">
+               <property name="tabBarAutoHide">
                 <bool>true</bool>
                </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="use_prewitt">
-               <property name="text">
-                <string>Use Prewitt</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QGroupBox" name="groupBox_3">
-               <property name="minimumSize">
-                <size>
-                 <width>174</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="title">
-                <string>Smoothness Factor</string>
-               </property>
-               <layout class="QVBoxLayout" name="verticalLayout_10">
-                <item>
-                 <widget class="QDoubleSpinBox" name="smooth_float_box"/>
-                </item>
-                <item>
-                 <widget class="QSlider" name="smooth_slider">
-                  <property name="minimum">
-                   <number>1</number>
-                  </property>
-                  <property name="maximum">
-                   <number>10</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <widget class="QWidget" name="tab">
+                <attribute name="title">
+                 <string>Kernels</string>
+                </attribute>
+                <layout class="QGridLayout" name="gridLayout_13">
+                 <item row="0" column="0">
+                  <layout class="QGridLayout" name="gridLayout_12">
+                   <item row="2" column="0">
+                    <widget class="QRadioButton" name="use_scharr">
+                     <property name="text">
+                      <string>Use Scharr</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QRadioButton" name="use_sobel">
+                     <property name="text">
+                      <string>Use Sobel</string>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QRadioButton" name="use_prewitt">
+                     <property name="text">
+                      <string>Use Prewitt</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="verticalLayout_16">
+                <attribute name="title">
+                 <string>Sharpen</string>
+                </attribute>
+                <layout class="QVBoxLayout" name="verticalLayout_14">
+                 <item>
+                  <layout class="QGridLayout" name="gridLayout_11">
+                   <item row="0" column="0">
+                    <layout class="QVBoxLayout" name="verticalLayout_13">
+                     <item>
+                      <widget class="QRadioButton" name="sharpen_radio">
+                       <property name="text">
+                        <string>Sharpen</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QRadioButton" name="sharpen_masking_radio">
+                       <property name="text">
+                        <string>Unsharp masking</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QDoubleSpinBox" name="sharpen_float_box"/>
+                     </item>
+                     <item>
+                      <widget class="QSlider" name="sharpen_slider">
+                       <property name="minimum">
+                        <number>1</number>
+                       </property>
+                       <property name="maximum">
+                        <number>10</number>
+                       </property>
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="sharpen_button">
+                       <property name="text">
+                        <string>Sharpen</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="smoother_grid">
+                <attribute name="title">
+                 <string>Smooth</string>
+                </attribute>
+                <layout class="QGridLayout" name="gridLayout_7">
+                 <item row="0" column="0">
+                  <layout class="QVBoxLayout" name="verticalLayout_17">
+                   <property name="sizeConstraint">
+                    <enum>QLayout::SetNoConstraint</enum>
+                   </property>
+                   <item>
+                    <widget class="QRadioButton" name="box_blur_radio">
+                     <property name="text">
+                      <string>Box Blur</string>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="gaussian_5_5_radio">
+                     <property name="text">
+                      <string>Gaussian Blur (5x5)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="gaussian_3_3_radio">
+                     <property name="text">
+                      <string>Gaussian Blur (3x3)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QDoubleSpinBox" name="smooth_float_box"/>
+                   </item>
+                   <item>
+                    <widget class="QSlider" name="smooth_slider">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="smooth_button">
+                     <property name="text">
+                      <string>Smooth</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
               </widget>
              </item>
             </layout>
@@ -389,15 +491,22 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
            <rect>
             <x>0</x>
             <y>20</y>
-            <width>147</width>
-            <height>161</height>
+            <width>139</width>
+            <height>129</height>
            </rect>
           </property>
           <property name="title">
            <string>Baking texture dimensions</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_7">
-           <item row="1" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout_15">
+           <item>
+            <widget class="QRadioButton" name="tangent_space">
+             <property name="text">
+              <string>Tangent space</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <layout class="QGridLayout" name="gridLayout_3">
              <item row="1" column="0">
               <widget class="QLabel" name="label_3">
@@ -441,17 +550,10 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
              </item>
             </layout>
            </item>
-           <item row="2" column="0">
+           <item>
             <widget class="QPushButton" name="bake_texture">
              <property name="text">
               <string>Bake</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QRadioButton" name="tangent_space">
-             <property name="text">
-              <string>Tangent space</string>
              </property>
             </widget>
            </item>

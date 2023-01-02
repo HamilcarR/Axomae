@@ -67,9 +67,15 @@ public:
     QRadioButton *use_luminance;
     QGroupBox *height_opt;
     QVBoxLayout *verticalLayout_3;
+    QTabWidget *tabWidget_2;
+    QWidget *tab;
+    QGridLayout *gridLayout_13;
+    QGridLayout *gridLayout_12;
     QRadioButton *use_scharr;
     QRadioButton *use_sobel;
     QRadioButton *use_prewitt;
+    QWidget *verticalLayout_16;
+    QVBoxLayout *verticalLayout_14;
     QGridLayout *gridLayout_11;
     QVBoxLayout *verticalLayout_13;
     QRadioButton *sharpen_radio;
@@ -77,6 +83,8 @@ public:
     QDoubleSpinBox *sharpen_float_box;
     QSlider *sharpen_slider;
     QPushButton *sharpen_button;
+    QWidget *smoother_grid;
+    QGridLayout *gridLayout_7;
     QVBoxLayout *verticalLayout_17;
     QRadioButton *box_blur_radio;
     QRadioButton *gaussian_5_5_radio;
@@ -299,43 +307,60 @@ public:
         height_opt->setObjectName(QString::fromUtf8("height_opt"));
         verticalLayout_3 = new QVBoxLayout(height_opt);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
-        use_scharr = new QRadioButton(height_opt);
+        tabWidget_2 = new QTabWidget(height_opt);
+        tabWidget_2->setObjectName(QString::fromUtf8("tabWidget_2"));
+        tabWidget_2->setTabBarAutoHide(true);
+        tab = new QWidget();
+        tab->setObjectName(QString::fromUtf8("tab"));
+        gridLayout_13 = new QGridLayout(tab);
+        gridLayout_13->setObjectName(QString::fromUtf8("gridLayout_13"));
+        gridLayout_12 = new QGridLayout();
+        gridLayout_12->setObjectName(QString::fromUtf8("gridLayout_12"));
+        use_scharr = new QRadioButton(tab);
         use_scharr->setObjectName(QString::fromUtf8("use_scharr"));
 
-        verticalLayout_3->addWidget(use_scharr);
+        gridLayout_12->addWidget(use_scharr, 2, 0, 1, 1);
 
-        use_sobel = new QRadioButton(height_opt);
+        use_sobel = new QRadioButton(tab);
         use_sobel->setObjectName(QString::fromUtf8("use_sobel"));
         use_sobel->setChecked(true);
 
-        verticalLayout_3->addWidget(use_sobel);
+        gridLayout_12->addWidget(use_sobel, 0, 0, 1, 1);
 
-        use_prewitt = new QRadioButton(height_opt);
+        use_prewitt = new QRadioButton(tab);
         use_prewitt->setObjectName(QString::fromUtf8("use_prewitt"));
 
-        verticalLayout_3->addWidget(use_prewitt);
+        gridLayout_12->addWidget(use_prewitt, 1, 0, 1, 1);
 
+
+        gridLayout_13->addLayout(gridLayout_12, 0, 0, 1, 1);
+
+        tabWidget_2->addTab(tab, QString());
+        verticalLayout_16 = new QWidget();
+        verticalLayout_16->setObjectName(QString::fromUtf8("verticalLayout_16"));
+        verticalLayout_14 = new QVBoxLayout(verticalLayout_16);
+        verticalLayout_14->setObjectName(QString::fromUtf8("verticalLayout_14"));
         gridLayout_11 = new QGridLayout();
         gridLayout_11->setObjectName(QString::fromUtf8("gridLayout_11"));
         verticalLayout_13 = new QVBoxLayout();
         verticalLayout_13->setObjectName(QString::fromUtf8("verticalLayout_13"));
-        sharpen_radio = new QRadioButton(height_opt);
+        sharpen_radio = new QRadioButton(verticalLayout_16);
         sharpen_radio->setObjectName(QString::fromUtf8("sharpen_radio"));
         sharpen_radio->setChecked(true);
 
         verticalLayout_13->addWidget(sharpen_radio);
 
-        sharpen_masking_radio = new QRadioButton(height_opt);
+        sharpen_masking_radio = new QRadioButton(verticalLayout_16);
         sharpen_masking_radio->setObjectName(QString::fromUtf8("sharpen_masking_radio"));
 
         verticalLayout_13->addWidget(sharpen_masking_radio);
 
-        sharpen_float_box = new QDoubleSpinBox(height_opt);
+        sharpen_float_box = new QDoubleSpinBox(verticalLayout_16);
         sharpen_float_box->setObjectName(QString::fromUtf8("sharpen_float_box"));
 
         verticalLayout_13->addWidget(sharpen_float_box);
 
-        sharpen_slider = new QSlider(height_opt);
+        sharpen_slider = new QSlider(verticalLayout_16);
         sharpen_slider->setObjectName(QString::fromUtf8("sharpen_slider"));
         sharpen_slider->setMinimum(1);
         sharpen_slider->setMaximum(10);
@@ -343,7 +368,7 @@ public:
 
         verticalLayout_13->addWidget(sharpen_slider);
 
-        sharpen_button = new QPushButton(height_opt);
+        sharpen_button = new QPushButton(verticalLayout_16);
         sharpen_button->setObjectName(QString::fromUtf8("sharpen_button"));
 
         verticalLayout_13->addWidget(sharpen_button);
@@ -352,45 +377,54 @@ public:
         gridLayout_11->addLayout(verticalLayout_13, 0, 0, 1, 1);
 
 
-        verticalLayout_3->addLayout(gridLayout_11);
+        verticalLayout_14->addLayout(gridLayout_11);
 
+        tabWidget_2->addTab(verticalLayout_16, QString());
+        smoother_grid = new QWidget();
+        smoother_grid->setObjectName(QString::fromUtf8("smoother_grid"));
+        gridLayout_7 = new QGridLayout(smoother_grid);
+        gridLayout_7->setObjectName(QString::fromUtf8("gridLayout_7"));
         verticalLayout_17 = new QVBoxLayout();
         verticalLayout_17->setObjectName(QString::fromUtf8("verticalLayout_17"));
         verticalLayout_17->setSizeConstraint(QLayout::SetNoConstraint);
-        box_blur_radio = new QRadioButton(height_opt);
+        box_blur_radio = new QRadioButton(smoother_grid);
         box_blur_radio->setObjectName(QString::fromUtf8("box_blur_radio"));
         box_blur_radio->setChecked(true);
 
         verticalLayout_17->addWidget(box_blur_radio);
 
-        gaussian_5_5_radio = new QRadioButton(height_opt);
+        gaussian_5_5_radio = new QRadioButton(smoother_grid);
         gaussian_5_5_radio->setObjectName(QString::fromUtf8("gaussian_5_5_radio"));
 
         verticalLayout_17->addWidget(gaussian_5_5_radio);
 
-        gaussian_3_3_radio = new QRadioButton(height_opt);
+        gaussian_3_3_radio = new QRadioButton(smoother_grid);
         gaussian_3_3_radio->setObjectName(QString::fromUtf8("gaussian_3_3_radio"));
 
         verticalLayout_17->addWidget(gaussian_3_3_radio);
 
-        smooth_float_box = new QDoubleSpinBox(height_opt);
+        smooth_float_box = new QDoubleSpinBox(smoother_grid);
         smooth_float_box->setObjectName(QString::fromUtf8("smooth_float_box"));
 
         verticalLayout_17->addWidget(smooth_float_box);
 
-        smooth_slider = new QSlider(height_opt);
+        smooth_slider = new QSlider(smoother_grid);
         smooth_slider->setObjectName(QString::fromUtf8("smooth_slider"));
         smooth_slider->setOrientation(Qt::Horizontal);
 
         verticalLayout_17->addWidget(smooth_slider);
 
-        smooth_button = new QPushButton(height_opt);
+        smooth_button = new QPushButton(smoother_grid);
         smooth_button->setObjectName(QString::fromUtf8("smooth_button"));
 
         verticalLayout_17->addWidget(smooth_button);
 
 
-        verticalLayout_3->addLayout(verticalLayout_17);
+        gridLayout_7->addLayout(verticalLayout_17, 0, 0, 1, 1);
+
+        tabWidget_2->addTab(smoother_grid, QString());
+
+        verticalLayout_3->addWidget(tabWidget_2);
 
 
         verticalLayout_2->addWidget(height_opt);
@@ -759,6 +793,7 @@ public:
         QObject::connect(actionExit, SIGNAL(triggered(bool)), MainWindow, SLOT(close()));
 
         renderMaterials->setCurrentIndex(0);
+        tabWidget_2->setCurrentIndex(0);
         renderer_tab->setCurrentIndex(0);
         tabWidget->setCurrentIndex(1);
 
@@ -789,13 +824,16 @@ public:
         use_scharr->setText(QCoreApplication::translate("MainWindow", "Use Scharr", nullptr));
         use_sobel->setText(QCoreApplication::translate("MainWindow", "Use Sobel", nullptr));
         use_prewitt->setText(QCoreApplication::translate("MainWindow", "Use Prewitt", nullptr));
+        tabWidget_2->setTabText(tabWidget_2->indexOf(tab), QCoreApplication::translate("MainWindow", "Kernels", nullptr));
         sharpen_radio->setText(QCoreApplication::translate("MainWindow", "Sharpen", nullptr));
         sharpen_masking_radio->setText(QCoreApplication::translate("MainWindow", "Unsharp masking", nullptr));
         sharpen_button->setText(QCoreApplication::translate("MainWindow", "Sharpen", nullptr));
+        tabWidget_2->setTabText(tabWidget_2->indexOf(verticalLayout_16), QCoreApplication::translate("MainWindow", "Sharpen", nullptr));
         box_blur_radio->setText(QCoreApplication::translate("MainWindow", "Box Blur", nullptr));
         gaussian_5_5_radio->setText(QCoreApplication::translate("MainWindow", "Gaussian Blur (5x5)", nullptr));
         gaussian_3_3_radio->setText(QCoreApplication::translate("MainWindow", "Gaussian Blur (3x3)", nullptr));
         smooth_button->setText(QCoreApplication::translate("MainWindow", "Smooth", nullptr));
+        tabWidget_2->setTabText(tabWidget_2->indexOf(smoother_grid), QCoreApplication::translate("MainWindow", "Smooth", nullptr));
         normal_opt->setTitle(QCoreApplication::translate("MainWindow", "Normals options", nullptr));
         use_objectSpace->setText(QCoreApplication::translate("MainWindow", "Ob&ject space", nullptr));
         use_tangentSpace->setText(QCoreApplication::translate("MainWindow", "Tangent space", nullptr));

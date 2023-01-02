@@ -23,6 +23,7 @@ struct image_type {
 	IMAGETYPE imagetype; 
 };
 
+
 /*structure to keep track of pointers to destroy*/
 class HeapManagement {
 public:
@@ -186,7 +187,9 @@ namespace image_session_pointers {
 	}
 }
 		
-/****************************************************/
+
+/**************************************************************************************************************/
+
 HeapManagement *GUIWindow::_MemManagement = new HeapManagement;
 GUIWindow::GUIWindow( QWidget *parent) : QMainWindow(parent) {
 	_UI.setupUi(this);
@@ -204,8 +207,7 @@ GUIWindow::~GUIWindow() {
 	delete _MemManagement;
 }
 
-/******************************************************************************************************************************************************************************************/
-
+/**************************************************************************************************************/
 void GUIWindow::display_image(SDL_Surface* surf , IMAGETYPE type , bool save_in_heap) {
 	QGraphicsView *view = get_corresponding_view(type);
 	if(surf != nullptr && type != INVALID && save_in_heap){
@@ -263,8 +265,6 @@ QGraphicsView* GUIWindow::get_corresponding_view(IMAGETYPE type) {
 	}
 }
 
-
-
 /**************************************************************************************************************/
 void GUIWindow::connect_all_slots() {
 	QObject::connect(_UI.actionImport_image, SIGNAL(triggered()), this, SLOT(import_image()));
@@ -281,7 +281,8 @@ void GUIWindow::connect_all_slots() {
 	QObject::connect(_UI.use_objectSpace, SIGNAL(clicked()), this, SLOT(use_object_space())); 
 	QObject::connect(_UI.use_tangentSpace, SIGNAL(clicked()), this, SLOT(use_tangent_space()));
 	
-	QObject::connect(_UI.smooth_slider , SIGNAL(valueChanged(int)) , this , SLOT(smooth_edge(int))); 
+	QObject::connect(_UI.sharpen_button , SIGNAL(clicked()) , this , SLOT(sharpen_edge())); 
+	QObject::connect(_UI.smooth_button , SIGNAL(clicked()) , this , SLOT(smooth_edge())); 
 	QObject::connect(_UI.factor_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_factor(int)));
 	QObject::connect(_UI.attenuation_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_attenuation(int)));
 
@@ -579,19 +580,34 @@ bool GUIWindow::save_image() {
 }
 
 /**************************************************************************************************************/
-void GUIWindow::smooth_edge(int factor){
+void GUIWindow::smooth_edge(){
 	SDL_Surface* surface = image_session_pointers::height;
 	SDL_Surface* copy = ImageManager::copy_surface(surface) ; 
 	if (copy != nullptr) {
-		//_MemManagement->addToHeap({copy , HEIGHT}) ; 
-		_UI.smooth_float_box->setValue((float)factor); 	
-		ImageManager::smooth_image(copy, (float) 1.);
+		float factor = _UI.smooth_float_box->value(); 
+		ImageManager::FILTER box_blur = _UI.box_blur_radio->isChecked() ? ImageManager::BOX_BLUR : ImageManager::FILTER_NULL ; 
+		ImageManager::FILTER gaussian_blur_5_5 = _UI.gaussian_5_5_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_5_5 : ImageManager::FILTER_NULL ; 
+		ImageManager::FILTER gaussian_blur_3_3 = _UI.gaussian_3_3_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_3_3 : ImageManager::FILTER_NULL ; 			
+		ImageManager::smooth_image(copy, static_cast<ImageManager::FILTER> (box_blur | gaussian_blur_5_5 | gaussian_blur_3_3) , factor);
+		display_image(copy, HEIGHT , true);
+		image_session_pointers::height = copy ; 
+	}
+}
+
+/**************************************************************************************************************/
+void GUIWindow::sharpen_edge(){
+	SDL_Surface* surface = image_session_pointers::height;
+	SDL_Surface* copy = ImageManager::copy_surface(surface) ; 
+	if (copy != nullptr) {
+		float factor = _UI.sharpen_float_box->value(); 
+		ImageManager::FILTER sharpen = _UI.sharpen_radio->isChecked() ? ImageManager::SHARPEN : ImageManager::FILTER_NULL ; 
+		ImageManager::FILTER unsharp_masking = _UI.sharpen_masking_radio->isChecked() ? ImageManager::UNSHARP_MASKING : ImageManager::FILTER_NULL ; 
+		ImageManager::sharpen_image(copy, static_cast<ImageManager::FILTER>(sharpen | unsharp_masking) , factor);
 		display_image(copy, HEIGHT , true);
 		image_session_pointers::height = copy ; 
 	}
 
 }
-
 /**************************************************************************************************************/
 
 void GUIWindow::undo(){
@@ -614,12 +630,6 @@ void GUIWindow::redo(){
 	}
 
 }
-
-
-
-
-
-
 
 
 

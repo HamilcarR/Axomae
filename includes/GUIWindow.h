@@ -6,7 +6,7 @@
 #include <QtWidgets/qmainwindow.h>
 
 #include "Window.h"
-#include "../Form Files/test.h"
+#include "../Form Files/ui_test.h"
 #include "SceneSelector.h" 
 #include "constants.h"
 #include "utils_3D.h" 
@@ -54,7 +54,8 @@ namespace axomae {
 		void next_mesh(); 
 		void previous_mesh(); 
 		void project_uv_normals();
-		void smooth_edge(int factor); 
+		void smooth_edge(); 
+		void sharpen_edge(); 
 		void undo();
 		void redo(); 
 	private:
