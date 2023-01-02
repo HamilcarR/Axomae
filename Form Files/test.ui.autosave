@@ -328,6 +328,9 @@
                    </item>
                    <item>
                     <widget class="QDial" name="smooth_dial">
+                     <property name="toolTip">
+                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Will compute successive iterations of the Blur function&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     </property>
                      <property name="maximum">
                       <number>10</number>
                      </property>
@@ -591,7 +594,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
            <enum>QTabWidget::Triangular</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <property name="movable">
            <bool>true</bool>
@@ -834,7 +837,11 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
               </layout>
              </item>
              <item>
-              <widget class="MeshListView" name="meshes_list"/>
+              <widget class="MeshListView" name="meshes_list">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;List all meshes names in the 3D model&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
