@@ -17,12 +17,43 @@ namespace axomae{
 /**we define some constants here...flags,sobel-prewitt operators,kernels etc...***************************************************************************/
 	
 
-static const float gaussian_blur_normalized[KERNEL_SIZE][KERNEL_SIZE] = {
+
+
+
+__device__
+static const float sharpen[KERNEL_SIZE][KERNEL_SIZE] = {
+	{0 , -1 , 0} ,
+	{-1 , 5 , -1} , 
+	{0 , -1 , 0} 
+};
+
+
+__device__
+static const float gaussian_blur_5_5[5][5] = {
+	{1./256 , 4./256 , 6./256 , 4./256 , 1./256},
+	{4./256 , 16./256 , 24./256 , 16./256 , 4./256},
+	{6./256 , 24./256, 36./256 , 24./256 , 6./256}, 
+	{4./256 , 16./256 , 24./256 , 16./256 , 4./256},
+	{1./256 , 4./256 , 6./256 , 4./256 , 1./256} 
+};
+
+
+__device__
+static const float unsharp_masking[5][5] = {
+	{-1./256 ,-4./256 , -6./256 , -4./256 , -1./256},
+	{-4./256 , -16./256 , -24./256 , -16./256 , -4./256},
+	{-6./256 , -24./256, -476./256 , -24./256 , -6./256}, 
+	{-4./256 , -16./256 , 24./256 , -16./256 , -4./256},
+	{-1./256 , -4./256 , 6./256 , -4./256 , -1./256} 
+};
+
+__device__
+static const float box_blur[KERNEL_SIZE][KERNEL_SIZE] = {
 		{1./9 , 1./9 , 1./9},
 		{1./9 , 1./9 , 1./9},
 		{1./9 , 1./9 , 1./9}
 };
-
+__device__
 static const float gaussian_blur_3_3[KERNEL_SIZE][KERNEL_SIZE] = {
 		{1./16 , 2./16 , 1./16},
 		{2./16 , 4./16 , 2./16},
