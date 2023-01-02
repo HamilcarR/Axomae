@@ -57,7 +57,11 @@ namespace axomae {
 		void smooth_edge(); 
 		void sharpen_edge(); 
 		void undo();
-		void redo(); 
+		void redo();
+
+
+	protected slots:
+		void update_smooth_factor(int factor);
 	private:
 		void connect_all_slots(); 
 		QGraphicsView* get_corresponding_view(gui::IMAGETYPE image); 
