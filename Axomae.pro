@@ -2,7 +2,8 @@ TEMPLATE = app
 TARGET = Axomae
 
 QT += widgets\
-      gui
+      gui\
+      openglwidgets
 
 CONFIG += debug \
 	opengl \
@@ -29,9 +30,9 @@ CUDA_SRC += kernels/*.cu
 
 #Linux rules#
 linux:{
-QMAKE_CC = gcc-7
-QMAKE_CXX = g++-7
-QMAKE_LINK = g++-7
+QMAKE_CC = gcc
+QMAKE_CXX = g++
+QMAKE_LINK = g++
 INCLUDEPATH +=	/usr/include/SDL2
 #QMAKE_DEFAULT_INCDIRS += -I/usr/include/c++/7 
 QMAKE_LIBDIR += $$CUDA_DIR/lib
@@ -42,7 +43,6 @@ cuda.commands = nvcc --expt-relaxed-constexpr --compiler-bindir /usr/bin/g++-7 -
 cuda.dependency_type = TYPE_C
 cuda.input = CUDA_SRC
 cuda.output = ${QMAKE_FILE_BASE}.o
-compile_form.commands = uic-qt5 $$FORMS > "Form Files/test.h"
 QMAKE_EXTRA_COMPILERS+= cuda 
 QMAKE_CXXFLAGS += -std=c++17 -g -Wall -pedantic -Wno-unused
 }
