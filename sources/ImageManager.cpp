@@ -374,11 +374,6 @@ static RGB compute_generic_kernel_pixel(RGB **data ,const unsigned int size ,con
 	
 }
 
-
-
-
-
-
 /**************************************************************************************************************/
 void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border ){
 	bool cuda = CHECK_IF_CUDA_AVAILABLE();
@@ -827,8 +822,8 @@ SDL_Surface* ImageManager::project_uv_normals(Object3D object , int width ,  int
 	}
 	return surf ; 
 } 
- /**************************************************************************************************************/
-void ImageManager::smooth_image(SDL_Surface* surface , float factor){
+/**************************************************************************************************************/
+void ImageManager::smooth_image(SDL_Surface* surface , FILTER filter , float factor){
 	if(surface!= nullptr){
 		int height = surface->h;
 		int width = surface->w;
@@ -839,27 +834,45 @@ void ImageManager::smooth_image(SDL_Surface* surface , float factor){
 			for(int j = 0 ; j < height ; j++)
 				data[i][j] = get_pixel_color(surface,i,j);
 		}
-
-		float **gaussian_blur = new float*[3] ;
-		for(int i = 0 ; i < 3 ; i++)
-			gaussian_blur[i] = new float[3]; 
-		for(int i = 0 ; i < 3 ; i++)
-			for(int j = 0 ; j < 3 ; j++)
-				gaussian_blur[i][j]=gaussian_blur_3_3[i][j] * ((factor != 0) ? (1./factor) : 1.) ;
-		
-		for(int i = 1 ; i < width-1 ; i++){
-			for(int j = 1 ; j < height-1 ; j++){	
+		int n = 0 ;
+		void* convolution_kernel = nullptr ; 
+		switch (filter) {
+			case GAUSSIAN_SMOOTH_3_3:
+				convolution_kernel = (void*) gaussian_blur_3_3 ; 
+				n = 3 ;
+			break ; 
+			case GAUSSIAN_SMOOTH_5_5:
+				convolution_kernel = (void*) gaussian_blur_5_5 ; 
+				n = 5 ; 
+			break ; 
+			case BOX_BLUR:
+				convolution_kernel = (void*) box_blur ;  
+				n = 3 ; 
+			break ; 
+			default : 
+				convolution_kernel = nullptr ; 
+				n = 0 ; 
+			break ; 
+		}
+		float **blur = new float*[n] ;
+		static unsigned int kernel_index = 0 ; 
+		for(int i = 0 ; i < n ; i++)
+			blur[i] = new float[n]; 
+		for(int i = 0 ; i < n ; i++)
+			for(int j = 0 ; j < n ; j++ , kernel_index++)
+				blur[i][j]=static_cast<float*>(convolution_kernel)[kernel_index] * ((factor != 0) ? (1./factor) : 1.);
+		kernel_index = 0 ;
+		unsigned int middle = std::floor(n/2) ; 	
+		for(int i = middle ; i < width-middle ; i++){
+			for(int j = middle ; j < height-middle ; j++){	
 				RGB col;
-				col = compute_generic_kernel_pixel(data , 3 , const_cast<const float**>(gaussian_blur)  , i , j) ; 
-				//col.red = (int) compute_kernel_pixel(data , gaussian_blur , i , j , AXOMAE_RED);
-				//col.green = (int) compute_kernel_pixel(data , gaussian_blur , i , j , AXOMAE_GREEN); 
-				//col.blue = (int) compute_kernel_pixel(data , gaussian_blur , i , j , AXOMAE_BLUE); 
+				col = compute_generic_kernel_pixel(data , n , const_cast<const float**>(blur)  , i , j) ; 
 				set_pixel_color(surface,i,j,col.rgb_to_int()); 
 			}
 		}
-		for(int i = 0 ; i < 3 ; i++)
-			delete[] gaussian_blur[i] ; 
-		delete[] gaussian_blur ; 
+		for(int i = 0 ; i < n ; i++)
+			delete[] blur[i] ; 
+		delete[] blur ; 
 
 		auto del = std::async(std::launch::async, [data, width, height]() {
 		for (int i = 0; i < width; i++)
@@ -868,8 +881,12 @@ void ImageManager::smooth_image(SDL_Surface* surface , float factor){
 		}); 	
 	}
 }
+/**************************************************************************************************************/
+void ImageManager::sharpen_image(SDL_Surface* surf , FILTER filter , float factor){
+	if(surf != nullptr){
 
-
+	}
+}
 
 
 
