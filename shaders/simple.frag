@@ -9,6 +9,7 @@ out vec4 fragment ;
 
 void main(){
 
-	fragment = texture(diffuse , texcoord) ; 
+	//fragment = texture(diffuse , texcoord) ; 
+	fragment = vec4(1); 
 }
 
