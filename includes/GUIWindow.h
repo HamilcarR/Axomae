@@ -20,7 +20,7 @@ namespace axomae {
 	class HeapManagement; 
 	class Renderer ; 
 	class ImageImporter ;
-	 		
+	template <typename T> struct image_type ;  		
 	class GUIWindow : public QMainWindow {
 
 		Q_OBJECT
@@ -30,7 +30,7 @@ namespace axomae {
 		~GUIWindow();
 		Ui::MainWindow& getUi() { return _UI;  }
 		static HeapManagement *_MemManagement;
-	
+		static SDL_Surface* copy_surface(SDL_Surface* surface); 	
 	/* SLOTS */
 	public slots:
 		bool import_image(); 
@@ -64,7 +64,9 @@ namespace axomae {
 		void update_smooth_factor(int factor);
 	private:
 		void connect_all_slots(); 
-		QGraphicsView* get_corresponding_view(gui::IMAGETYPE image); 
+		QGraphicsView* get_corresponding_view(gui::IMAGETYPE image);
+		SDL_Surface* get_corresponding_session_pointer(gui::IMAGETYPE image);
+		bool set_corresponding_session_pointer(image_type<SDL_Surface> *image_type_pointer) ; 
 		void display_image(SDL_Surface *surf , gui::IMAGETYPE image , bool save_in_heap); 
 		Ui::MainWindow _UI;
 		Renderer *_renderer; 

@@ -10,6 +10,7 @@
 #include <QtWidgets/QGraphicsItem>
 #include <stack> 
 
+
 namespace axomae { 
 using namespace gui ; 
 
@@ -30,7 +31,7 @@ public:
 	
 	void addToStack(image_type<SDL_Surface> a){
 		image_type<SDL_Surface> copy = a ; 
-		copy.image = ImageManager::copy_surface(a.image);  
+		copy.image = GUIWindow::copy_surface(a.image);  
 		SDLSurf_stack.push(copy); 		
 	}
 	image_type<SDL_Surface> topStack(){
@@ -176,9 +177,11 @@ namespace image_session_pointers {
 	SDL_Surface* height;
 	SDL_Surface* normalmap;
 	SDL_Surface* dudv;
+	SDL_Surface* uv_projection ; 
 	std::string filename; 
 	void setAllNull() {
-		filename = ""; 
+		filename = "";
+		uv_projection = nullptr ; 
 		greyscale = nullptr;
 		albedo = nullptr; 
 		height = nullptr; 
@@ -229,6 +232,17 @@ void GUIWindow::display_image(SDL_Surface* surf , IMAGETYPE type , bool save_in_
 }
 
 /**************************************************************************************************************/
+SDL_Surface* GUIWindow::copy_surface(SDL_Surface *src) {
+	SDL_Surface* res; 
+	res = SDL_CreateRGBSurface(src->flags, src->w, src->h, src->format->BitsPerPixel, src->format->Rmask, src->format->Gmask, src->format->Bmask, src->format->Amask); 
+	if (res != nullptr) {
+		SDL_BlitSurface(src, nullptr, res, nullptr); 
+		return res;
+	}
+	else
+		return nullptr; 
+}
+/**************************************************************************************************************/
 QGraphicsView* GUIWindow::get_corresponding_view(IMAGETYPE type) {
 	switch(type){
 		case HEIGHT:
@@ -264,6 +278,83 @@ QGraphicsView* GUIWindow::get_corresponding_view(IMAGETYPE type) {
 		break; 
 	}
 }
+/**************************************************************************************************************/
+SDL_Surface* GUIWindow::get_corresponding_session_pointer(IMAGETYPE type){
+	switch(type){
+		case HEIGHT:
+			return image_session_pointers::height; 
+		break;
+
+		case PROJECTED_NMAP:
+			return image_session_pointers::uv_projection ; 
+		break;
+		
+		case ALBEDO:
+			return image_session_pointers::albedo ; 
+		break;
+
+		case GREYSCALE_LUMI :
+			return image_session_pointers::greyscale; 
+		break ;
+
+		case GREYSCALE_AVG:
+			return image_session_pointers::greyscale; 
+		break;
+
+		case NMAP:
+			return image_session_pointers::normalmap ; 
+		break ; 
+
+		case DUDV:
+			return image_session_pointers::dudv; 
+		break ; 		
+		
+		default:
+			return nullptr; 
+		break; 
+	}
+}
+
+/**************************************************************************************************************/
+bool GUIWindow::set_corresponding_session_pointer(image_type<SDL_Surface> *image){
+	switch(image->imagetype){
+		case HEIGHT:
+			image_session_pointers::height = image->image; 
+		break;
+
+		case PROJECTED_NMAP:
+			image_session_pointers::uv_projection = image->image ; 
+		break;
+		
+		case ALBEDO:
+			image_session_pointers::albedo = image->image; 
+		break;
+
+		case GREYSCALE_LUMI :
+			image_session_pointers::greyscale = image->image; 
+		break ;
+
+		case GREYSCALE_AVG:
+			image_session_pointers::greyscale = image->image; 
+		break;
+
+		case NMAP:
+			image_session_pointers::normalmap = image->image; 
+		break ; 
+
+		case DUDV:
+			image_session_pointers::dudv = image->image; 
+		break ; 		
+		
+		default:
+			return false; 
+		break; 
+	}
+	return true; 
+}
+
+
+
 
 /**************************************************************************************************************/
 void GUIWindow::connect_all_slots() {
@@ -281,6 +372,7 @@ void GUIWindow::connect_all_slots() {
 	QObject::connect(_UI.use_objectSpace, SIGNAL(clicked()), this, SLOT(use_object_space())); 
 	QObject::connect(_UI.use_tangentSpace, SIGNAL(clicked()), this, SLOT(use_tangent_space()));
 	
+	QObject::connect(_UI.smooth_dial , SIGNAL(valueChanged(int)) , this , SLOT(update_smooth_factor(int))); 
 	QObject::connect(_UI.sharpen_button , SIGNAL(clicked()) , this , SLOT(sharpen_edge())); 
 	QObject::connect(_UI.smooth_button , SIGNAL(clicked()) , this , SLOT(smooth_edge())); 
 	QObject::connect(_UI.factor_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_factor(int)));
@@ -323,7 +415,7 @@ bool GUIWindow::import_image() {
 /**************************************************************************************************************/
 bool GUIWindow::greyscale_average() {
 	SDL_Surface* s = image_session_pointers::albedo; 
-	SDL_Surface* copy = ImageManager::copy_surface(s); 
+	SDL_Surface* copy = GUIWindow::copy_surface(s); 
 
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , GREYSCALE_AVG });
@@ -340,7 +432,7 @@ bool GUIWindow::greyscale_average() {
 
 bool GUIWindow::greyscale_luminance() {
 	SDL_Surface* s = image_session_pointers::albedo; // use image_session_pointers TODO 
-	SDL_Surface *copy = ImageManager::copy_surface(s);
+	SDL_Surface *copy = GUIWindow::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , GREYSCALE_LUMI });
 		ImageManager::set_greyscale_luminance(copy);
@@ -368,7 +460,7 @@ void GUIWindow::use_gpgpu(bool checked) {
 
 void GUIWindow::use_scharr() {
 	SDL_Surface* s = image_session_pointers::greyscale; 
-	SDL_Surface* copy = ImageManager::copy_surface(s);
+	SDL_Surface* copy = GUIWindow::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , HEIGHT });
 		ImageManager::compute_edge(copy, AXOMAE_USE_SCHARR, AXOMAE_REPEAT); 
@@ -387,7 +479,7 @@ void GUIWindow::use_scharr() {
 /**************************************************************************************************************/
 void GUIWindow::use_prewitt() {
 	SDL_Surface* s = image_session_pointers::greyscale;
-	SDL_Surface* copy = ImageManager::copy_surface(s);
+	SDL_Surface* copy = GUIWindow::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , HEIGHT });
 		ImageManager::compute_edge(copy, AXOMAE_USE_PREWITT, AXOMAE_REPEAT);
@@ -405,7 +497,7 @@ void GUIWindow::use_prewitt() {
 /**************************************************************************************************************/
 void GUIWindow::use_sobel() {
 	SDL_Surface* s = image_session_pointers::greyscale;
-	SDL_Surface* copy = ImageManager::copy_surface(s);
+	SDL_Surface* copy = GUIWindow::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , HEIGHT });
 		ImageManager::compute_edge(copy, AXOMAE_USE_SOBEL, AXOMAE_REPEAT);
@@ -426,7 +518,7 @@ void GUIWindow::use_sobel() {
 
 void GUIWindow::use_tangent_space() {
 	SDL_Surface* s = image_session_pointers::height;
-	SDL_Surface* copy = ImageManager::copy_surface(s);
+	SDL_Surface* copy = GUIWindow::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , NMAP });
 		ImageManager::compute_normal_map(copy, NORMAL_FACTOR , NORMAL_ATTENUATION); 
@@ -478,7 +570,7 @@ void GUIWindow::change_nmap_attenuation(int f) {
 /**************************************************************************************************************/
 void GUIWindow::compute_dudv() {
 	SDL_Surface* s = image_session_pointers::normalmap;
-	SDL_Surface* copy = ImageManager::copy_surface(s);
+	SDL_Surface* copy = GUIWindow::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , DUDV });
 		ImageManager::compute_dudv(copy, DUDV_FACTOR);
@@ -499,7 +591,7 @@ void GUIWindow::change_dudv_nmap(int factor) {
 	DUDV_FACTOR = factor / dividor;
 	_UI.factor_dudv->setValue(DUDV_FACTOR);
 	SDL_Surface* s = image_session_pointers::normalmap;
-	SDL_Surface* copy = ImageManager::copy_surface(s);
+	SDL_Surface* copy = GUIWindow::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , DUDV });
 		ImageManager::compute_dudv(copy, DUDV_FACTOR);
@@ -582,12 +674,12 @@ bool GUIWindow::save_image() {
 /**************************************************************************************************************/
 void GUIWindow::smooth_edge(){
 	SDL_Surface* surface = image_session_pointers::height;
-	SDL_Surface* copy = ImageManager::copy_surface(surface) ; 
+	SDL_Surface* copy = GUIWindow::copy_surface(surface) ; 
 	if (copy != nullptr) {
-		float factor = _UI.smooth_float_box->value(); 
+		unsigned int factor = _UI.smooth_dial->value(); 
 		ImageManager::FILTER box_blur = _UI.box_blur_radio->isChecked() ? ImageManager::BOX_BLUR : ImageManager::FILTER_NULL ; 
 		ImageManager::FILTER gaussian_blur_5_5 = _UI.gaussian_5_5_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_5_5 : ImageManager::FILTER_NULL ; 
-		ImageManager::FILTER gaussian_blur_3_3 = _UI.gaussian_3_3_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_3_3 : ImageManager::FILTER_NULL ; 			
+		ImageManager::FILTER gaussian_blur_3_3 = _UI.gaussian_3_3_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_3_3 : ImageManager::FILTER_NULL ; 				
 		ImageManager::smooth_image(copy, static_cast<ImageManager::FILTER> (box_blur | gaussian_blur_5_5 | gaussian_blur_3_3) , factor);
 		display_image(copy, HEIGHT , true);
 		image_session_pointers::height = copy ; 
@@ -597,7 +689,7 @@ void GUIWindow::smooth_edge(){
 /**************************************************************************************************************/
 void GUIWindow::sharpen_edge(){
 	SDL_Surface* surface = image_session_pointers::height;
-	SDL_Surface* copy = ImageManager::copy_surface(surface) ; 
+	SDL_Surface* copy = GUIWindow::copy_surface(surface) ; 
 	if (copy != nullptr) {
 		float factor = _UI.sharpen_float_box->value(); 
 		ImageManager::FILTER sharpen = _UI.sharpen_radio->isChecked() ? ImageManager::SHARPEN : ImageManager::FILTER_NULL ; 
@@ -615,6 +707,7 @@ void GUIWindow::undo(){
 	if(previous.image != nullptr && previous.imagetype != INVALID){
 		display_image(previous.image , previous.imagetype , false); 
 		_MemManagement->removeTopStack(); 
+		set_corresponding_session_pointer(&previous) ; 
 	}
 
 }
@@ -626,10 +719,82 @@ void GUIWindow::redo(){
 	image_type<SDL_Surface> next = _MemManagement->topStack(); 
 	if(next.image != nullptr && next.imagetype != INVALID){
 		display_image(next.image , next.imagetype , false); 
-		//_MemManagement->removeTopStack(); 
+		set_corresponding_session_pointer(&next); 
 	}
 
 }
+
+
+
+
+
+
+
+
+/**************************************************************************************************************/
+/*Protected utility methods*/
+
+void GUIWindow::update_smooth_factor(int factor){
+	_UI.smooth_factor->setValue(factor); 
+}
+
+
+
+
+/*
+ * TODO: add custom QGraphicsView class , reimplement resizeEvent() to scale GraphicsView to window size */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
