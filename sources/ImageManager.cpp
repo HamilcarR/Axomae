@@ -272,17 +272,7 @@ void ImageManager::set_greyscale_luminance(SDL_Surface* image){
 	}
 }
 
-/**************************************************************************************************************/
-SDL_Surface* ImageManager::copy_surface(SDL_Surface *src) {
-	SDL_Surface* res; 
-	res = SDL_CreateRGBSurface(src->flags, src->w, src->h, src->format->BitsPerPixel, src->format->Rmask, src->format->Gmask, src->format->Bmask, src->format->Amask); 
-	if (res != nullptr) {
-		SDL_BlitSurface(src, nullptr, res, nullptr); 
-		return res;
-	}
-	else
-		return nullptr; 
-}
+
 
 /**************************************************************************************************************/
 double RGB::intensity(){
@@ -823,7 +813,7 @@ SDL_Surface* ImageManager::project_uv_normals(Object3D object , int width ,  int
 	return surf ; 
 } 
 /**************************************************************************************************************/
-void ImageManager::smooth_image(SDL_Surface* surface , FILTER filter , float factor){
+void ImageManager::smooth_image(SDL_Surface* surface , FILTER filter , const unsigned int factor){
 	if(surface!= nullptr){
 		int height = surface->h;
 		int width = surface->w;
@@ -860,16 +850,16 @@ void ImageManager::smooth_image(SDL_Surface* surface , FILTER filter , float fac
 			blur[i] = new float[n]; 
 		for(int i = 0 ; i < n ; i++)
 			for(int j = 0 ; j < n ; j++ , kernel_index++)
-				blur[i][j]=static_cast<float*>(convolution_kernel)[kernel_index] * ((factor != 0) ? (1./factor) : 1.);
+				blur[i][j]=static_cast<float*>(convolution_kernel)[kernel_index] ;
 		kernel_index = 0 ;
 		unsigned int middle = std::floor(n/2) ; 	
-		for(int i = middle ; i < width-middle ; i++){
-			for(int j = middle ; j < height-middle ; j++){	
-				RGB col;
-				col = compute_generic_kernel_pixel(data , n , const_cast<const float**>(blur)  , i , j) ; 
-				set_pixel_color(surface,i,j,col.rgb_to_int()); 
+			for(int i = middle ; i < width-middle ; i++){
+				for(int j = middle ; j < height-middle ; j++){	
+					RGB col;
+					col = compute_generic_kernel_pixel(data , n , const_cast<const float**>(blur)  , i , j) ; 
+					set_pixel_color(surface,i,j,col.rgb_to_int()); 
+				}
 			}
-		}
 		for(int i = 0 ; i < n ; i++)
 			delete[] blur[i] ; 
 		delete[] blur ; 
@@ -878,11 +868,13 @@ void ImageManager::smooth_image(SDL_Surface* surface , FILTER filter , float fac
 		for (int i = 0; i < width; i++)
 			delete[] data[i];
 		delete[] data;
-		}); 	
+		}); 
+		if(factor != 0)
+			smooth_image(surface , filter , factor - 1); 
 	}
 }
 /**************************************************************************************************************/
-void ImageManager::sharpen_image(SDL_Surface* surf , FILTER filter , float factor){
+void ImageManager::sharpen_image(SDL_Surface* surf , FILTER filter , const unsigned int factor){
 	if(surf != nullptr){
 
 	}

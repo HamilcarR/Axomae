@@ -68,10 +68,9 @@ public:
 	static void USE_GPU_COMPUTING() { gpu = true; }
 	static void USE_CPU_COMPUTING() { gpu = false;  }
 	static bool USING_GPU() { return gpu;  }
-	static SDL_Surface* copy_surface(SDL_Surface* src); 
 	static SDL_Surface* project_uv_normals(Object3D object,  int width , int height , bool tangent_space);		    
-	static void smooth_image(SDL_Surface* surf , FILTER filter, float smooth_factor); 
-	static void sharpen_image(SDL_Surface* surf , FILTER filter , float sharpen_factor); 
+	static void smooth_image(SDL_Surface* surf , FILTER filter, const unsigned int smooth_iterations); 
+	static void sharpen_image(SDL_Surface* surf , FILTER filter , const unsigned int sharpen_iterations); 
 private:
 
 
