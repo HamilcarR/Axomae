@@ -437,7 +437,7 @@ namespace axomae{
 						print(std::string("Selected : " + images[id].second), GREEN , PROMPT2);
 					}
 				}
-				catch (std::invalid_argument  e) {
+				catch (std::invalid_argument&  e) {
 					print(std::string("Invalid argument input"), RED); 
 
 				}
