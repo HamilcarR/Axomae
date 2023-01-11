@@ -14,25 +14,26 @@ namespace axomae{
 class RGB{
 public:
 	RGB();
-	RGB(int r , int g , int b , int a);
-	RGB(int r, int g , int b);
+	RGB(float r , float g , float b , float a);
+	RGB(float r, float g , float b);
 	~RGB();
 	static RGB int_to_rgb(uint32_t value);
 	static RGB int_to_rgb(uint8_t value);
 	static RGB int_to_rgb(uint16_t value);
         double intensity();
 	void invert_color();			
-	template<typename T> RGB operator*(T arg); 
-	RGB operator+=(int arg);
-	RGB operator+=(RGB arg); 
-	RGB operator+(RGB arg);
-	RGB operator/(int arg);
+	template<typename T> RGB operator*(T arg) const ; 
+	RGB operator+=(float arg) const ;
+	RGB operator+=(RGB arg) const ; 
+	RGB operator+(RGB arg) const ;
+	RGB operator/(float arg) const ;
+	RGB operator-(RGB arg) const ; 
 	uint32_t rgb_to_int();
 	void to_string();
-	int red;
-	int green;
-	int blue;
-	int alpha;
+	float red;
+	float green;
+	float blue;
+	float alpha;
 };
 
 

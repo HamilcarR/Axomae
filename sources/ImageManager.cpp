@@ -24,50 +24,51 @@ static bool CHECK_IF_CUDA_AVAILABLE() {
 
 template<typename T> 
 static void replace_image(SDL_Surface* surface, T* image, unsigned int size, int bpp);
-RGB::RGB():red(0),green(0),blue(0),alpha(0){}
-RGB::RGB(int r , int g , int b):red(r),green(g),blue(b),alpha(0){}
-RGB::RGB(int r , int g , int b , int a):red(r),green(g),blue(b),alpha(a){}
+RGB::RGB():red(0.),green(0.),blue(0.),alpha(0.){}
+RGB::RGB(float r , float g , float b):red(r),green(g),blue(b),alpha(0){}
+RGB::RGB(float r , float g , float b , float a):red(r),green(g),blue(b),alpha(a){}
 RGB::~RGB(){}
 ImageManager::ImageManager(){}
 ImageManager::~ImageManager(){} 
 
 /**************************************************************************************************************/
-int truncate(int n){
-	if(n<=0)
+template <typename T> 
+uint8_t truncate(T n){
+	if(static_cast<float> (n) <= 0.)
 		return 0;
-	else if (n>=255)
+	else if (static_cast<float>(n) >= 255)
 		 return 255;
 	else
-  		 return n ; 
+  		 return static_cast<float> (n) ; 
 }
 
 /**************************************************************************************************************/
 RGB ImageManager::get_pixel_color(SDL_Surface* surface , int x , int y ){
 	int bpp = surface->format->BytesPerPixel;
 	uint8_t *color = (uint8_t*) (surface->pixels) + x*bpp + y*surface->pitch;
-	RGB rgb=RGB();
+	float red = 0 , blue = 0 , green = 0 , alpha = 0 ; 
 	switch(bpp){
 		case 1 :
 			{
-				rgb.red = *color >> 5 & 0x7;
-				rgb.green = *color >> 2 & 0x7;
-				rgb.blue = *color & 0x3 ;
+				red = *color >> 5 & 0x7;
+				green = *color >> 2 & 0x7;
+				blue = *color & 0x3 ;
 			}
 		break;
 		case 2:
 			{
 				uint16_t colo16bits = *(uint16_t*)color;
 				if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-					rgb.red = colo16bits >> 12 & 0xF;
-					rgb.green = colo16bits >> 8 & 0XF;
-					rgb.blue = colo16bits >> 4 & 0XF;
-					rgb.alpha = colo16bits & 0XF;
+					red = colo16bits >> 12 & 0xF;
+					green = colo16bits >> 8 & 0XF;
+					blue = colo16bits >> 4 & 0XF;
+					alpha = colo16bits & 0XF;
 				}
 				else {
-					rgb.alpha = colo16bits >> 12 & 0xF;
-					rgb.blue = colo16bits >> 8 & 0XF;
-					rgb.green = colo16bits >> 4 & 0XF;
-					rgb.red = colo16bits & 0XF;
+					alpha = colo16bits >> 12 & 0xF;
+					blue = colo16bits >> 8 & 0XF;
+					green = colo16bits >> 4 & 0XF;
+					red = colo16bits & 0XF;
 				}
 			}
 		break;
@@ -75,14 +76,14 @@ RGB ImageManager::get_pixel_color(SDL_Surface* surface , int x , int y ){
 			{
 				uint32_t colo24bits = *(uint32_t*)color;
 				if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-					rgb.red = colo24bits >> 16 & 0XFF;
-					rgb.green = colo24bits >> 8 & 0XFF;
-					rgb.blue = colo24bits & 0XFF;
+					red = colo24bits >> 16 & 0XFF;
+					green = colo24bits >> 8 & 0XFF;
+					blue = colo24bits & 0XFF;
 				}
 				else {
-					rgb.blue = colo24bits >> 16 & 0XFF;
-					rgb.green = colo24bits >> 8 & 0XFF;
-					rgb.red = colo24bits & 0XFF;
+					blue = colo24bits >> 16 & 0XFF;
+					green = colo24bits >> 8 & 0XFF;
+					red = colo24bits & 0XFF;
 				}
 			}
 		break;
@@ -90,20 +91,21 @@ RGB ImageManager::get_pixel_color(SDL_Surface* surface , int x , int y ){
 			{
 				uint32_t colo32bits = *(uint32_t*) color ; 
 				if(SDL_BYTEORDER == SDL_BIG_ENDIAN){
-					rgb.red = colo32bits >> 24 & 0XFF;
-					rgb.green = colo32bits >> 16 & 0XFF;
-					rgb.blue = colo32bits >> 8 & 0XFF;
-					rgb.alpha = colo32bits & 0XFF ; 
+					red = colo32bits >> 24 & 0XFF;
+					green = colo32bits >> 16 & 0XFF;
+					blue = colo32bits >> 8 & 0XFF;
+					alpha = colo32bits & 0XFF ; 
 				}
 				else{
-					rgb.alpha = colo32bits >> 24 & 0XFF;
-					rgb.blue = colo32bits >> 16 & 0XFF;
-					rgb.green = colo32bits >> 8 & 0XFF;
-					rgb.red = colo32bits & 0XFF ; 
+					alpha = colo32bits >> 24 & 0XFF;
+					blue = colo32bits >> 16 & 0XFF;
+					green = colo32bits >> 8 & 0XFF;
+					red = colo32bits & 0XFF ; 
 				}
 			}
 		break;
 		}
+	RGB rgb = RGB(static_cast<float> (red) ,static_cast<float> (green) ,static_cast<float> (blue) ,static_cast<float> (alpha)) ; 
 	return rgb;
 }
 
@@ -178,7 +180,7 @@ void ImageManager::set_greyscale_average(SDL_Surface* image,uint8_t factor){
 	assert(image!=nullptr);	
 	if (CHECK_IF_CUDA_AVAILABLE()) 
 		GPU_compute_greyscale(image, false); 
-	else {
+	else 
 		for (int i = 0; i < image->w; i++) 
 			for (int j = 0; j < image->h; j++) {
 				RGB rgb = get_pixel_color(image, i, j);
@@ -188,9 +190,6 @@ void ImageManager::set_greyscale_average(SDL_Surface* image,uint8_t factor){
 				uint32_t gray = rgb.rgb_to_int();
 				set_pixel_color(image, i, j, gray);
 			}		
-	}
-
-
 }
 
 /**************************************************************************************************************/
@@ -252,23 +251,19 @@ void ImageManager::set_greyscale_luminance(SDL_Surface* image){
 	bool cuda = CHECK_IF_CUDA_AVAILABLE() ; 
 	std::clock_t clock;
 	if (cuda) {
-		clock = std::clock(); 
 		GPU_compute_greyscale(image, true);
-		std::cout << (std::clock() - clock) / (double)CLOCKS_PER_SEC << "\n"; 
 	}	
 	else {
 		assert(image != nullptr);
-		clock = std::clock();
 		for (int i = 0; i < image->w; i++) 
 			for (int j = 0; j < image->h; j++) {
 				RGB rgb = get_pixel_color(image, i, j);
-				rgb.red = (int)floor(rgb.red*0.3 + rgb.blue*0.11 + rgb.green*0.59);
+				rgb.red = floor(rgb.red*0.3 + rgb.blue*0.11 + rgb.green*0.59);
 				rgb.green = rgb.red;
 				rgb.blue = rgb.red;
 				uint32_t gray = rgb.rgb_to_int();
 				set_pixel_color(image, i, j, gray);
 			}
-		std::cout << (std::clock() - clock) / (double)CLOCKS_PER_SEC << "\n";		
 	}
 }
 
@@ -284,16 +279,16 @@ double RGB::intensity(){
 RGB RGB::int_to_rgb(uint32_t val){
 	RGB rgb = RGB(); 
 	if(SDL_BYTEORDER == SDL_BIG_ENDIAN){
-		rgb.red = val >> 24 & 0XFF ; 
-		rgb.green = val >> 16 & 0XFF ; 
-		rgb.blue = val >> 8 & 0XFF ; 
-		rgb.alpha = val & 0XFF;
+		rgb.red   = static_cast<float> (val >> 24 & 0XFF) ; 
+		rgb.green = static_cast<float> (val >> 16 & 0XFF) ; 
+		rgb.blue  = static_cast<float> (val >> 8 & 0XFF) ; 
+		rgb.alpha = static_cast<float> (val & 0XFF);
 	}
 	else{
-		rgb.alpha = val >> 24 & 0XFF ; 
-		rgb.blue = val >> 16 & 0XFF ; 
-		rgb.green = val >> 8 & 0XFF ; 
-		rgb.red = val & 0XFF;
+		rgb.alpha = static_cast<float> (val >> 24 & 0XFF) ; 
+		rgb.blue  = static_cast<float> (val >> 16 & 0XFF) ; 
+		rgb.green = static_cast<float> (val >> 8 & 0XFF) ; 
+		rgb.red   = static_cast<float> (val & 0XFF);
 	}
 	return rgb; 
 }
@@ -302,16 +297,16 @@ RGB RGB::int_to_rgb(uint32_t val){
 RGB RGB::int_to_rgb(uint16_t val){
 	RGB rgb = RGB(); 
 	if(SDL_BYTEORDER == SDL_BIG_ENDIAN){
-		rgb.red = val >> 12 & 0XF ; 
-		rgb.green = val >> 8 & 0XF ; 
-		rgb.blue = val >> 4 & 0XF ; 
-		rgb.alpha = val & 0XF;
+		rgb.red   = static_cast<float> (val >> 12 & 0XF) ; 
+		rgb.green = static_cast<float> (val >> 8 & 0XF) ; 
+		rgb.blue  = static_cast<float> (val >> 4 & 0XF) ; 
+		rgb.alpha = static_cast<float> (val & 0XF);
 	}
 	else{
-		rgb.alpha = val >> 12 & 0XF ; 
-		rgb.blue = val >> 8 & 0XF ; 
-		rgb.green = val >> 4 & 0XF ; 
-		rgb.red = val & 0XF;
+		rgb.alpha = static_cast<float> (val >> 12 & 0XF) ; 
+		rgb.blue  = static_cast<float> (val >> 8 & 0XF) ; 
+		rgb.green = static_cast<float> (val >> 4 & 0XF) ; 
+		rgb.red   = static_cast<float> (val & 0XF);
 	}
 	return rgb; 
 }
@@ -319,10 +314,11 @@ RGB RGB::int_to_rgb(uint16_t val){
 /**************************************************************************************************************/
 uint32_t RGB::rgb_to_int(){
 	uint32_t image=0 ;
+	int b = static_cast<int> (std::round(blue))  , g = static_cast<int> (std::round(green)) , r = static_cast<int> (std::round(red)) , a = static_cast<int> (std::round(alpha)) ; 
 	if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
-		image = alpha | (blue << 8) | (green << 16) | (red << 24);	
+		image = a | (b << 8) | (g << 16) | (r << 24);	
 	else
-		image = red | (green << 8) | (blue << 16) | (alpha << 24);	
+		image = r | (g << 8) | (b << 16) | (a << 24);	
 	return image ; 
 }
 
@@ -346,21 +342,21 @@ static T compute_kernel_pixel(RGB **data,const T kernel[3][3],int i,int j,uint8_
 	}
 
 }
-
-
 template<typename T>
-static RGB compute_generic_kernel_pixel(RGB **data ,const unsigned int size ,const T **kernel , const int x , const int y){
+static RGB compute_generic_kernel_pixel(const RGB **data ,const unsigned int size ,const T **kernel , const unsigned int x , const unsigned int y){
 	float r = 0 , g = 0 , b = 0 ; 
 	uint8_t middle = std::floor(size / 2) ; 
 	for(unsigned int i = 0 ; i < size ; i ++)
 		for(unsigned int j = 0 ; j < size ; j ++){
 			T kernel_val = kernel[i][j] ; 
 			int new_i = i - middle , new_j = j - middle ;
-			r += data[x - new_i][y - new_j].red * kernel_val ;
-			g += data[x - new_i][y - new_j].green * kernel_val ; 
-			b += data[x - new_i][y - new_j].blue * kernel_val ; 
+			r += data[x + new_i][y + new_j].red * kernel_val ;
+			g += data[x + new_i][y + new_j].green * kernel_val ; 
+			b += data[x + new_i][y + new_j].blue * kernel_val ;
 		}
-	return RGB((int)r , (int)g ,(int) b) ; 
+	assert( r >= 0 || g >= 0 || b >= 0) ; 
+	return  RGB(r ,g ,b) ; 
+	 
 	
 }
 
@@ -378,8 +374,8 @@ void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border
 		RGB **data = new RGB*[w];
 		for (int i = 0; i < w; i++)
 			data[i] = new RGB[h];
-		int max_red = 0, max_blue = 0, max_green = 0;
-		int min_red = 0, min_blue = 0, min_green = 0;
+		float max_red = 0, max_blue = 0, max_green = 0;
+		float min_red = 0, min_blue = 0, min_green = 0;
 		for (int i = 0; i < w; i++) {
 			for (int j = 0; j < h; j++) {
 				RGB rgb = get_pixel_color(surface, i, j);
@@ -428,9 +424,9 @@ void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border
 					setpix_h_green = normalize(max_green, min_green, setpix_h_green);
 					setpix_v_blue = normalize(max_blue, min_blue, setpix_v_blue);
 					setpix_h_blue = normalize(max_blue, min_blue, setpix_h_blue);
-					int r = (int)magnitude(setpix_v_red, setpix_h_red);
-					int g = (int)magnitude(setpix_v_green, setpix_h_green);
-					int b = (int)magnitude(setpix_v_blue, setpix_h_blue);
+					float r = magnitude(setpix_v_red, setpix_h_red);
+					float g = magnitude(setpix_v_green, setpix_h_green);
+					float b = magnitude(setpix_v_blue, setpix_h_blue);
 					RGB rgb = RGB(r, g, b, 0);
 					set_pixel_color(surface, i, j, rgb.rgb_to_int());
 				}
@@ -450,33 +446,38 @@ void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border
 
 
 template<typename T>
-RGB RGB::operator*(T arg){
-	RGB rgb = RGB(static_cast<int>(red * arg) , static_cast<int> (green * arg) , static_cast<int> (blue * arg) , static_cast<int> (alpha * arg)); 
+RGB RGB::operator*(T arg) const {
+	RGB rgb = RGB(static_cast<float>(red * arg) , static_cast<float> (green * arg) , static_cast<float> (blue * arg) , static_cast<float> (alpha * arg)); 
 	return rgb ; 
 }
 
 
-RGB RGB::operator+=(int arg){
+RGB RGB::operator+=(float arg) const {
 	RGB rgb=RGB(red+arg,green+arg,blue+arg,alpha+arg);
 	return rgb;
 	
 }
 
-RGB RGB::operator+=(RGB arg){
+RGB RGB::operator+=(RGB arg) const {
 	RGB rgb=RGB(red+arg.red,green+arg.green,blue+arg.blue,alpha+arg.alpha);
 	return rgb;
 	
 }
 
-RGB RGB::operator+(RGB arg){
+RGB RGB::operator+(RGB arg) const {
 	RGB rgb = RGB(red+arg.red,green+arg.green,blue+arg.blue,alpha+arg.alpha);
 	return rgb;
 }
 
-RGB RGB::operator/(int arg){
+RGB RGB::operator/(float arg) const {
 	assert(arg>0);
 	RGB rgb = RGB(red/arg , green/arg, blue/arg,alpha/arg);
 	return rgb;
+}
+
+RGB RGB::operator-(RGB arg) const {
+	RGB rgb = RGB(red - arg.red , green - arg.green , blue - arg.blue); 
+	return rgb ; 
 }
 
 /**************************************************************************************************************/
@@ -519,9 +520,9 @@ void ImageManager::set_contrast(SDL_Surface* image,int level){
 	for(int i = 0 ; i < image->w; i++){
 		for(int j = 0 ; j < image->h; j++){
 			RGB col = get_pixel_color(image,i,j);
-			col.red = (int) floor(truncate(correction_factor * (col.red - 128)+128));
-			col.green = (int) floor(truncate(correction_factor * (col.green - 128)+128));
-			col.blue = (int) floor(truncate(correction_factor * (col.blue - 128)+128));
+			col.red =  floor(truncate(correction_factor * (col.red - 128)+128));
+			col.green =  floor(truncate(correction_factor * (col.green - 128)+128));
+			col.blue =  floor(truncate(correction_factor * (col.blue - 128)+128));
 			col.alpha = 0 ; 
 			set_pixel_color(image,i,j,col.rgb_to_int()); 
 		}
@@ -544,6 +545,7 @@ void ImageManager::set_contrast(SDL_Surface* image){
 }
 
 /***************************************************************************************************************/
+/*TODO : Contrast image enhancement */
 void ImageManager::set_contrast_sigmoid(SDL_Surface *image,int threshold){
 	for(int i = 0 ; i < image->w ; i++){
 		for(int j = 0 ; j < image->h ; j++){
@@ -552,7 +554,6 @@ void ImageManager::set_contrast_sigmoid(SDL_Surface *image,int threshold){
 		}
 	}
 }
-
 /***************************************************************************************************************/
 constexpr double radiant_to_degree(double rad){
 	return rad*180.f/M_PI; 
@@ -601,7 +602,7 @@ void ImageManager::compute_normal_map(SDL_Surface* surface,double fact , float a
 				auto Nx = normalize(-1, 1, lerp(dy, ddy, 0.5));
 				auto Ny = normalize(-1, 1, lerp(dx, ddx, 0.5));
 				auto Nz = 255.0; //the normal vector
-				RGB col = RGB((int)floor(truncate(Nx)), (int)floor(truncate(Ny)), (int)Nz);
+				RGB col = RGB(floor(truncate(Nx)), floor(truncate(Ny)), Nz);
 				set_pixel_color(surface, i, j, col.rgb_to_int());
 			}
 		}
@@ -731,7 +732,7 @@ uint32_t compute_normals_set_pixels_rgb(  Point2D P1 ,
 			N.normalize(); 
 			normal = tan_space_transform(T , B , N , normal);//TODO : provide a better algorithm for tang space  
 			normal.normalize() ; 	
-			RGB rgb = RGB( static_cast<int>((normal.x * 255 + 255)/2) ,static_cast<int>((normal.y * 255+255)/2) , static_cast<int>((normal.z * 255+255)/2) , 0 ) ; 
+			RGB rgb = RGB( (normal.x * 255 + 255)/2 ,(normal.y * 255+255)/2 , (normal.z * 255+255)/2 , 0 ) ; 
 			uint32_t val = rgb.rgb_to_int() ; 
 			return val;   
 		}
@@ -740,7 +741,7 @@ uint32_t compute_normals_set_pixels_rgb(  Point2D P1 ,
 			N2.normalize(); 
 			N3.normalize(); 
 			Vect3D normal = interpolate(N1 , N2 , N3) ; 
-			RGB rgb = RGB( static_cast<int>((normal.x * 255 + 255)/2) , static_cast<int>((normal.y * 255+255)/2) , static_cast<int>((normal.z * 255+255)/2) , 0 ) ; 
+			RGB rgb = RGB((normal.x * 255 + 255)/2 ,(normal.y * 255+255)/2 , (normal.z * 255+255)/2 , 0) ; 
 			uint32_t val = rgb.rgb_to_int() ;
 			return val; 
 		}
@@ -853,10 +854,10 @@ void ImageManager::smooth_image(SDL_Surface* surface , FILTER filter , const uns
 				blur[i][j]=static_cast<float*>(convolution_kernel)[kernel_index] ;
 		kernel_index = 0 ;
 		unsigned int middle = std::floor(n/2) ; 	
-			for(int i = middle ; i < width-middle ; i++){
-				for(int j = middle ; j < height-middle ; j++){	
+			for(unsigned int i = middle ; i < width-middle ; i++){
+				for(unsigned int j = middle ; j < height-middle ; j++){	
 					RGB col;
-					col = compute_generic_kernel_pixel(data , n , const_cast<const float**>(blur)  , i , j) ; 
+					col = compute_generic_kernel_pixel(const_cast<const RGB**> (data) , n , const_cast<const float**>(blur)  , i , j) ; 
 					set_pixel_color(surface,i,j,col.rgb_to_int()); 
 				}
 			}
@@ -874,9 +875,60 @@ void ImageManager::smooth_image(SDL_Surface* surface , FILTER filter , const uns
 	}
 }
 /**************************************************************************************************************/
-void ImageManager::sharpen_image(SDL_Surface* surf , FILTER filter , const unsigned int factor){
-	if(surf != nullptr){
+void ImageManager::sharpen_image(SDL_Surface* surface , FILTER filter , const unsigned int factor){
+	if(surface!= nullptr){
+		int height = surface->h;
+		int width = surface->w;
+		RGB** data = new RGB*[width];
+		for(int i = 0 ; i < width ; i++)
+			data[i]= new RGB[height];
+		for(int i = 0 ; i < width ; i++)
+			for(int j = 0 ; j < height ; j++)
+				data[i][j] = get_pixel_color(surface,i,j);
+		
+		int n = 0 ;
+		void* convolution_kernel = nullptr ; 
+		switch (filter) {
+			case SHARPEN:
+				convolution_kernel = (void*) sharpen_kernel ; 
+				n = 3 ;
+			break ; 
+			case UNSHARP_MASKING:
+				convolution_kernel = (void*) unsharp_masking ; 
+				n = 5 ; 
+			break ; 
+			default : 
+				convolution_kernel = nullptr ; 
+				n = 0 ; 
+			break ; 
+		}
+		float **sharp = new float*[n] ;
+		static unsigned int kernel_index = 0 ; 
+		for(int i = 0 ; i < n ; i++)
+			sharp[i] = new float[n]; 
+		for(int i = 0 ; i < n ; i++)
+			for(int j = 0 ; j < n ; j++ , kernel_index++)
+				sharp[i][j]=static_cast<float*>(convolution_kernel)[kernel_index] ;
+		kernel_index = 0 ;
+		unsigned int middle = std::floor(n/2) ; 	
+			for(unsigned int i = middle ; i < width-middle ; i++){
+				for(unsigned int j = middle ; j < height-middle ; j++){	
+					RGB col;
+					col = compute_generic_kernel_pixel(const_cast<const RGB**> (data) , n , const_cast<const float**>(sharp)  , i , j) ; 
+					set_pixel_color(surface,i,j,col.rgb_to_int()); 
+				}
+			}
+		for(int i = 0 ; i < n ; i++)
+			delete[] sharp[i] ; 
+		delete[] sharp ; 
 
+		auto del = std::async(std::launch::async, [data, width, height]() {
+		for (int i = 0; i < width; i++)
+			delete[] data[i];
+		delete[] data;
+		}); 
+		//if(factor != 0)
+			//sharpen_image(surface , filter , factor - 1); 
 	}
 }
 
