@@ -18,15 +18,19 @@ namespace axomae{
 	
 
 
-
-
 __device__
-static const float sharpen[KERNEL_SIZE][KERNEL_SIZE] = {
-	{0 , -1 , 0} ,
-	{-1 , 5 , -1} , 
-	{0 , -1 , 0} 
+static const float mean_smoothing_3_3[KERNEL_SIZE][KERNEL_SIZE] = {
+	{1 , 1 , 1},
+	{1 , 1 , 1},
+	{1 , 1 , 1}
 };
 
+__device__
+static const float sharpen_kernel[KERNEL_SIZE][KERNEL_SIZE] = {
+	{0. , -1. , 0.} ,
+	{-1. , 5. , -1.} , 
+	{0. , -1. , 0.} 
+};
 
 __device__
 static const float gaussian_blur_5_5[5][5] = {
