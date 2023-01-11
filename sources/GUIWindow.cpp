@@ -715,6 +715,7 @@ void GUIWindow::undo(){
 /**************************************************************************************************************/
 
 void GUIWindow::redo(){
+	//TODO : bug here , greyscale -> prewitt -> sharpen -> undo -> sharpen -> prewitt ->  ... ? 
 	_MemManagement->addTemptoStack() ; 
 	image_type<SDL_Surface> next = _MemManagement->topStack(); 
 	if(next.image != nullptr && next.imagetype != INVALID){
