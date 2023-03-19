@@ -276,6 +276,27 @@ double RGB::intensity(){
 }
 
 /**************************************************************************************************************/
+
+void RGB::clamp(){
+	if(red > 255) 
+		red = 255 ; 
+	if(green > 255)
+		green = 255 ; 
+	if(blue > 255) 
+		blue = 255 ;
+	if(red < 0)
+		red = 0 ; 
+	if(green < 0) 
+		green = 0 ; 
+	if(blue < 0)
+		blue = 0 ; 
+
+}
+
+
+
+
+/**************************************************************************************************************/
 RGB RGB::int_to_rgb(uint32_t val){
 	RGB rgb = RGB(); 
 	if(SDL_BYTEORDER == SDL_BIG_ENDIAN){
@@ -348,16 +369,13 @@ static RGB compute_generic_kernel_pixel(const RGB **data ,const unsigned int siz
 	uint8_t middle = std::floor(size / 2) ; 
 	for(unsigned int i = 0 ; i < size ; i ++)
 		for(unsigned int j = 0 ; j < size ; j ++){
-			T kernel_val = kernel[i][j] ; 
+			float kernel_val = kernel[i][j] ; 
 			int new_i = i - middle , new_j = j - middle ;
 			r += data[x + new_i][y + new_j].red * kernel_val ;
 			g += data[x + new_i][y + new_j].green * kernel_val ; 
 			b += data[x + new_i][y + new_j].blue * kernel_val ;
-		}
-	assert( r >= 0 || g >= 0 || b >= 0) ; 
+		}	
 	return  RGB(r ,g ,b) ; 
-	 
-	
 }
 
 /**************************************************************************************************************/
@@ -411,7 +429,7 @@ void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border
 		for (int i = 1; i < w - 1; i++) {
 			for (int j = 1; j < h - 1; j++) {
 				if (border == AXOMAE_REPEAT) {
-					int setpix_h_red = 0, setpix_v_red = 0, setpix_h_green = 0, setpix_v_green = 0, setpix_v_blue = 0, setpix_h_blue = 0;
+					float setpix_h_red = 0, setpix_v_red = 0, setpix_h_green = 0, setpix_v_green = 0, setpix_v_blue = 0, setpix_h_blue = 0;
 					setpix_h_red = compute_kernel_pixel(data, arr_h, i, j, AXOMAE_RED);
 					setpix_v_red = compute_kernel_pixel(data, arr_v, i, j, AXOMAE_RED);
 					setpix_h_green = compute_kernel_pixel(data, arr_h, i, j, AXOMAE_GREEN);
@@ -915,20 +933,20 @@ void ImageManager::sharpen_image(SDL_Surface* surface , FILTER filter , const un
 				for(unsigned int j = middle ; j < height-middle ; j++){	
 					RGB col;
 					col = compute_generic_kernel_pixel(const_cast<const RGB**> (data) , n , const_cast<const float**>(sharp)  , i , j) ; 
-					set_pixel_color(surface,i,j,col.rgb_to_int()); 
+					col.clamp(); 
+					set_pixel_color(surface,i,j,col.rgb_to_int());								
 				}
-			}
+			}	
 		for(int i = 0 ; i < n ; i++)
 			delete[] sharp[i] ; 
 		delete[] sharp ; 
-
 		auto del = std::async(std::launch::async, [data, width, height]() {
 		for (int i = 0; i < width; i++)
 			delete[] data[i];
 		delete[] data;
 		}); 
-		//if(factor != 0)
-			//sharpen_image(surface , filter , factor - 1); 
+	//	if(factor != 0)
+	//		sharpen_image(surface , filter , factor - 1); 
 	}
 }
 

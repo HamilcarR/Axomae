@@ -9,7 +9,7 @@ Renderer::Renderer(){
 }
 
 Renderer::~Renderer(){
-	for(int i = 0 ; i < scene.size() ; i++){
+	for(unsigned int i = 0 ; i < scene.size() ; i++){
 		if(scene[i] != nullptr){
 			scene[i]->clean();
 			delete scene[i]; 

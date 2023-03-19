@@ -10,7 +10,7 @@
 
 namespace axomae{
 			
-			
+
 class RGB{
 public:
 	RGB();
@@ -28,6 +28,7 @@ public:
 	RGB operator+(RGB arg) const ;
 	RGB operator/(float arg) const ;
 	RGB operator-(RGB arg) const ; 
+	void clamp() ; 
 	uint32_t rgb_to_int();
 	void to_string();
 	float red;
@@ -35,6 +36,7 @@ public:
 	float blue;
 	float alpha;
 };
+
 
 
 

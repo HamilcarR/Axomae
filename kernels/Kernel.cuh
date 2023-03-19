@@ -107,15 +107,15 @@ const int prewitt_mask_horizontal[KERNEL_SIZE][KERNEL_SIZE] = {
 };
 
  __host__ __device__
-static double magnitude(int x, int y) {return sqrtf(x*x + y*y);}
+static float magnitude(float x, float y) {return sqrtf(x*x + y*y);}
 
 
-template<typename T> 
+template<typename U , typename  T> 
  __host__ __device__
-	 double normalize(int maxx, int minn, T pixel) {
-		assert(maxx - minn != 0);
-		return ((pixel - minn) * 255 / (maxx - minn) + 0);
-	}
+static T normalize(U maxx, U minn, T pixel) {
+	assert(maxx - minn != 0);
+	return ((pixel - minn) * 255 / (maxx - minn) + 0);
+}
 
 /*we add linear interpolation to compute smoother normals differences*/
 

@@ -92,7 +92,6 @@ struct Vect3D {
 	friend std::ostream& operator<<(std::ostream& os , const Vect3D& v){
 		os << "(" << v.x << "," << v.y << "," << v.z << ")" ; 
 		return os ; 
-
 	}
 
 	void print(){

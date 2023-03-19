@@ -1,21 +1,25 @@
 
+sources/Drawable.cpp:
+
+45:       texture_buffer.isCreated() ; //TODO : add color buffer if useful ? 
+
 sources/GUIWindow.cpp:
 
-12://TODO USE QLABEL FOR IMAGES
-293://TODO : error handling
-312://TODO : error handling
-330://TODO : error handling
-351://TODO : error handling
-403://TODO : error handling
-423://TODO : error handling
-429:void GUIWindow::compute_projection(){ //TODO : complete uv projection method
-447:_UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 
+473://TODO : error handling
+492://TODO : error handling
+510://TODO : error handling
+531://TODO : error handling
+583://TODO : error handling
+602://TODO : error handling
+609:void GUIWindow::compute_projection(){ //TODO : complete uv projection method , implement baking
+620:SDL_Surface* surf = ImageManager::project_uv_normals(instance->getCurrent().geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 
+718://TODO : bug here , greyscale -> prewitt -> sharpen -> undo -> sharpen -> prewitt ->  ... ? 
 
 sources/ImageManager.cpp:
 
-112://TODO : Add Tiling management when uv coordinates greater than limit
-365://TODO : use multi threading for initialization and greyscale computing
-710:normal = tan_space_transform(T , B , N , normal);//TODO : provide a better algorithm for tang space  
+114://TODO : Add Tiling management when uv coordinates greater than limit
+387://TODO : use multi threading for initialization and greyscale computing
+751:normal = tan_space_transform(T , B , N , normal);//TODO : provide a better algorithm for tang space  
 
 sources/TerminalOpt.cpp:
 

@@ -688,7 +688,7 @@ void GUIWindow::smooth_edge(){
 
 /**************************************************************************************************************/
 void GUIWindow::sharpen_edge(){
-	SDL_Surface* surface = image_session_pointers::height;
+	SDL_Surface* surface = image_session_pointers::greyscale;
 	SDL_Surface* copy = GUIWindow::copy_surface(surface) ; 
 	if (copy != nullptr) {
 		float factor = _UI.sharpen_float_box->value(); 
@@ -724,12 +724,6 @@ void GUIWindow::redo(){
 	}
 
 }
-
-
-
-
-
-
 
 
 /**************************************************************************************************************/
