@@ -3,13 +3,17 @@
 in vec4 color ; 
 in vec2 texcoord ;
 
-uniform sampler2D diffuse ; 
+layout(binding=0) uniform sampler2D diffuse ; 
+layout(binding=1) uniform sampler2D normal ; 
+layout(binding=2) uniform sampler2D metallic ; 
+layout(binding=3) uniform sampler2D roughness ; 
+layout(binding=4) uniform sampler2D ambiantocclusion ;
+layout(binding=5) uniform sampler2D generic ;
 
 out vec4 fragment ;
 
 void main(){
 
-	//fragment = texture(diffuse , texcoord) ; 
-	fragment = vec4(1); 
+	fragment = texture(diffuse , texcoord) ; 
 }
 
