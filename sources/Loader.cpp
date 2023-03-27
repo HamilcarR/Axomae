@@ -22,9 +22,7 @@ Loader* Loader::getInstance(){
 	return instance ; 
 }
 
-
 /* copy texture data from GLB , to ARGB8888 buffer*/
-
 static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 	if(totexture != nullptr){
 		if(fromtexture->mHeight != 0){ //checking if texture is uncompressed
@@ -58,7 +56,7 @@ static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 
 static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	Material mesh_material; 
-	TextureData diffuse , metallic , roughness ;
+	TextureData diffuse , metallic , roughness , normal , ambiantocclusion  ;
 	diffuse.name = "diffuse" ; 
 	metallic.name = "metallic" ; 
 	roughness.name = "roughness" ; 
@@ -75,21 +73,21 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 		color_index_string = color_index_string.substr(1);
 		color_index = std::stoi(color_index_string); 
 		copyTexels(&diffuse , &*scene->mTextures[color_index]); 
-		mesh_material.textures.diffuse = diffuse ; 
+		mesh_material.addTexture(diffuse , Texture::DIFFUSE) ; 
 		diffuse.clean() ; 
 	}
 	if(metallic_index_string.size() != 0){
 		metallic_index_string = metallic_index_string.substr(1) ; 
 		metallic_index = std::stoi(metallic_index_string) ; 
 		copyTexels(&metallic , &*scene->mTextures[metallic_index]); 
-		mesh_material.textures.metallic = metallic ; 
+		mesh_material.addTexture(metallic , Texture::METALLIC) ; 
 		metallic.clean() ; 
 	}
 	if(roughness_index_string.size() != 0){
 		roughness_index_string = roughness_index_string.substr(1) ; 
 		roughness_index = std::stoi(roughness_index_string) ; 
 		copyTexels(&roughness , &*scene->mTextures[roughness_index]); 
-		mesh_material.textures.roughness = roughness ;
+		mesh_material.addTexture(roughness , Texture::ROUGHNESS) ;
 		roughness.clean() ; 
 	}
 	return mesh_material ; 
