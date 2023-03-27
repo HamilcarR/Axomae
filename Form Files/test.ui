@@ -1045,7 +1045,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
            <enum>QTabWidget::Triangular</enum>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>1</number>
           </property>
           <property name="movable">
            <bool>true</bool>
@@ -1154,7 +1154,11 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
            </attribute>
            <layout class="QGridLayout" name="gridLayout_6">
             <item row="0" column="0">
-             <widget class="GLViewer" name="renderer_view"/>
+             <widget class="GLViewer" name="renderer_view">
+              <property name="mouseTracking">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -1286,7 +1290,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
      <x>0</x>
      <y>0</y>
      <width>1528</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFiles">
