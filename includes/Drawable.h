@@ -2,6 +2,7 @@
 #define DRAWABLE_H
 
 #include "Mesh.h"
+#include "TextureGroup.h" 
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_4_3_Core> 
@@ -9,8 +10,7 @@
 #include <QOpenGLVertexArrayObject> 
 #include <QDebug>
 #include <QString> 
-#include <QOpenGLShaderProgram>
-#include <QOpenGLTexture> 
+
 
 
 
@@ -33,8 +33,8 @@ public:
 	void unbind();
 	bool ready();
 	
-	axomae::Mesh *mesh_object ; 
-	
+	axomae::Mesh *mesh_object ;
+
 	QOpenGLShaderProgram *shader_program ; 	
 	QOpenGLVertexArrayObject vao ; 
 	QOpenGLBuffer vertex_buffer ; 
@@ -42,12 +42,6 @@ public:
 	QOpenGLBuffer index_buffer ; 
 	QOpenGLBuffer texture_buffer ;
 	QOpenGLBuffer color_buffer ;
-	unsigned int sampler2D ; 
-
-
-
-
-
 };
 
 
@@ -62,12 +56,7 @@ inline void errorCheck(){
 
 }
 
-inline void shaderErrorCheck(QOpenGLShaderProgram* shader_program){
-	if(shader_program){
-		QString log = shader_program->log(); 
-		std::cout << log.constData() << std::endl; 
-	}
-}
+
 
 
 
