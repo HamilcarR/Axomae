@@ -3,6 +3,7 @@ TARGET = Axomae
 
 QT += widgets\
       gui\
+      opengl\
       openglwidgets
 
 CONFIG += debug \
