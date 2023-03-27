@@ -1,2 +1,5 @@
 assets/
 generated_files/
+bin/
+.codel/
+.TODOList.txt
