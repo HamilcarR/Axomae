@@ -4,7 +4,7 @@
 namespace axomae {
 
 Mesh::Mesh(){
-
+	mesh_initialized = false ; 
 }
 
 Mesh::Mesh(const Mesh& copy){
@@ -29,12 +29,25 @@ Mesh::~Mesh(){
 
 }
 
+void Mesh::initializeGlData(){
+	shader_program.initializeShader();
+	material.initializeMaterial();
+	mesh_initialized = true ; 
+}
 
+void Mesh::bindMaterials(){
+	material.bind(); 
 
+}
 
+void Mesh::clean(){
+	shader_program.clean(); 
+	material.clean(); 
+}
 
-
-
+bool Mesh::isInitialized(){
+	return mesh_initialized; 	
+}
 
 
 

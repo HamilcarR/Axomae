@@ -2,6 +2,7 @@
 #define MESH_H
 
 #include "utils_3D.h" 
+#include "Material.h" 
 
 namespace axomae {
 
@@ -12,13 +13,20 @@ public:
 	Mesh(const Mesh& copy); 
 	Mesh(Object3D const& obj , Material const& mat); 
 	Mesh(std::string name , Object3D const& obj , Material const& mat); 
-	virtual ~Mesh(); 
+	virtual ~Mesh();
+	virtual void bindMaterials(); 
+	virtual void clean() ; 
+	virtual bool isInitialized();
+	virtual void initializeGlData(); 
 
-
-	Object3D geometry; 
+public:
+	Object3D geometry;
+	Shader shader_program; 
 	Material material; 
 	std::string name; 
 
+private:
+	bool mesh_initialized ; 
 
 
 
