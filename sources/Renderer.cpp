@@ -52,8 +52,6 @@ void Renderer::draw(QOpenGLFunctions_4_3_Core* gl){
 	}
 }
 
-
-
 void Renderer::end_draw(){
 	for(Drawable *A : scene)
 		A->end_draw(); 
@@ -67,7 +65,7 @@ void Renderer::set_new_scene(std::vector<Mesh> &new_scene){
 	}
 	scene.clear(); 
 	for (Mesh m : new_scene)
-		scene.push_back(new Drawable(&m)); 
+		scene.push_back(new Drawable(m)); 
 	start_draw = true ;
 }
 

@@ -40,6 +40,13 @@ void Mesh::bindMaterials(){
 
 }
 
+void Mesh::bindShaders(){
+	shader_program.bind(); 
+}
+
+void Mesh::releaseShaders(){
+	shader_program.release(); 
+}
 void Mesh::clean(){
 	shader_program.clean(); 
 	material.clean(); 

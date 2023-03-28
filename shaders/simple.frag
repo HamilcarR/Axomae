@@ -13,7 +13,7 @@ layout(binding=5) uniform sampler2D generic ;
 out vec4 fragment ;
 
 void main(){
-
-	fragment = texture(diffuse , texcoord) ; 
+	//fragment = vec4(1.);  
+	fragment = texture(ambiantocclusion , texcoord) ; 
 }
 

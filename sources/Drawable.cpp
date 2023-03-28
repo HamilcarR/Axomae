@@ -8,9 +8,8 @@ Drawable::Drawable(){
 	mesh_object = nullptr; 
 }
 
-Drawable::Drawable(Mesh *mesh){
-	Mesh m = *mesh ; 
-	mesh_object = new Mesh(m); 
+Drawable::Drawable(Mesh &mesh){
+	mesh_object = new Mesh(mesh); 
 	initialize() ; 
 }
 
@@ -64,14 +63,14 @@ bool Drawable::initialize(){
 	vao.bind(); 
 	vertex_buffer.bind(); 
 	index_buffer.bind();
-	mesh_object->shader_program.bind(); 
+	mesh_object->bindShaders(); 
 	mesh_object->shader_program.enableAttributeArray(0);
 	mesh_object->shader_program.setAttributeBuffer(0 , GL_FLOAT , 0 , 3 , 0 ) ;
 	texture_buffer.bind(); 
 	mesh_object->shader_program.enableAttributeArray(1) ; 
 	mesh_object->shader_program.setAttributeBuffer(1 , GL_FLOAT , 0 , 2 , 0 ) ; 
 	vao.release(); 
-	mesh_object->shader_program.release();
+	mesh_object->releaseShaders();
 	vertex_buffer.release();
 	index_buffer.release();
 	
@@ -90,7 +89,7 @@ void Drawable::start_draw(){
 		index_buffer.bind();
 		index_buffer.allocate(mesh_object->geometry.indices.data() , mesh_object->geometry.indices.size() * sizeof(unsigned int)); 
 		index_buffer.release();
-		mesh_object->shader_program.bind();
+		mesh_object->bindShaders();
 		vao.bind();
 	}
 
@@ -98,20 +97,20 @@ void Drawable::start_draw(){
 
 void Drawable::end_draw(){
 	vao.release();
-	mesh_object->shader_program.release();
+	mesh_object->releaseShaders();
 
 
 }
 
 void Drawable::bind(){
-	mesh_object->shader_program.bind(); 
+	mesh_object->bindShaders(); 
 	vao.bind();
 	mesh_object->bindMaterials(); 
 }
 
 void Drawable::unbind(){
 	vao.release();
-	mesh_object->shader_program.release();
+	mesh_object->releaseShaders();
 }
 
 

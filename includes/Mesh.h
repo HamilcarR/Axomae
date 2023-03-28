@@ -14,7 +14,9 @@ public:
 	Mesh(Object3D const& obj , Material const& mat); 
 	Mesh(std::string name , Object3D const& obj , Material const& mat); 
 	virtual ~Mesh();
-	virtual void bindMaterials(); 
+	virtual void bindMaterials();
+	virtual void bindShaders();
+	virtual void releaseShaders(); 
 	virtual void clean() ; 
 	virtual bool isInitialized();
 	virtual void initializeGlData(); 

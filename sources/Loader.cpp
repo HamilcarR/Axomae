@@ -54,41 +54,47 @@ static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 	}
 }
 
+
+static void loadTexture(const aiScene* scene , Material *material ,TextureData &texture ,aiString texture_string ,Texture::TYPE type ){
+	std::string texture_index_string = texture_string.C_Str();
+	std::cout << "Texture type loaded : " << texture.name << " texture. GLB index is: " << texture_index_string <<  "\n" ; 
+	 if(texture_index_string.size() != 0){
+		texture_index_string = texture_index_string.substr(1) ; 
+		unsigned int texture_index_int = stoi(texture_index_string); 
+		copyTexels(&texture , &*scene->mTextures[texture_index_int]) ; 
+		material->addTexture(texture , type);
+		texture.clean(); 
+	 }
+	 else
+		 std::cout << "Loader can't load texture\n" ;  
+}
+
+
 static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	Material mesh_material; 
 	TextureData diffuse , metallic , roughness , normal , ambiantocclusion  ;
 	diffuse.name = "diffuse" ; 
 	metallic.name = "metallic" ; 
 	roughness.name = "roughness" ; 
+	normal.name = "normal" ; 
+	ambiantocclusion.name= "occlusion" ; 
 	unsigned int color_index = 0, metallic_index = 0 , roughness_index = 0; 
 	aiString color_texture , normal_texture , metallic_texture , roughness_texture , occlusion_texture ; //we get indexes of embedded textures , since we will use GLB format  
-	std::string color_index_string , metallic_index_string , roughness_index_string ; // returned index is in the form *X , we want to get rid of *
+	std::string color_index_string ,normal_index_string,  metallic_index_string , roughness_index_string ; // returned index is in the form *X , we want to get rid of *
 	material->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE , &color_texture) ; 
 	material->GetTexture(AI_MATKEY_METALLIC_TEXTURE , &metallic_texture) ; 
-	material->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE , &roughness_texture) ;
-	color_index_string = color_texture.C_Str(); 
-	metallic_index_string = metallic_texture.C_Str() ; 
-	roughness_texture = roughness_texture.C_Str() ;
-	if(color_index_string.size() != 0){
-		color_index_string = color_index_string.substr(1);
-		color_index = std::stoi(color_index_string); 
-		copyTexels(&diffuse , &*scene->mTextures[color_index]); 
-		mesh_material.addTexture(diffuse , Texture::DIFFUSE) ; 
-		diffuse.clean() ; 
-	}
-	if(metallic_index_string.size() != 0){
-		metallic_index_string = metallic_index_string.substr(1) ; 
-		metallic_index = std::stoi(metallic_index_string) ; 
-		copyTexels(&metallic , &*scene->mTextures[metallic_index]); 
-		mesh_material.addTexture(metallic , Texture::METALLIC) ; 
-		metallic.clean() ; 
-	}
-	if(roughness_index_string.size() != 0){
-		roughness_index_string = roughness_index_string.substr(1) ; 
-		roughness_index = std::stoi(roughness_index_string) ; 
-		copyTexels(&roughness , &*scene->mTextures[roughness_index]); 
-		mesh_material.addTexture(roughness , Texture::ROUGHNESS) ;
-		roughness.clean() ; 
+	material->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE , &roughness_texture) ;	
+
+	loadTexture(scene , &mesh_material , diffuse , color_texture , Texture::DIFFUSE); 
+	loadTexture(scene , &mesh_material , metallic , metallic_texture , Texture::METALLIC); 
+	loadTexture(scene , &mesh_material , roughness , roughness_texture , Texture::ROUGHNESS); 
+	if(material->GetTextureCount(aiTextureType_NORMALS) > 0){
+		material->GetTexture(aiTextureType_NORMALS , 0 , &normal_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
+		loadTexture(scene , &mesh_material , normal , normal_texture , Texture::NORMAL); 
+	}	
+	if(material->GetTextureCount(aiTextureType_LIGHTMAP) > 0){
+		material->GetTexture(aiTextureType_LIGHTMAP , 0 , &occlusion_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
+		loadTexture(scene , &mesh_material , ambiantocclusion , occlusion_texture , Texture::AMBIANTOCCLUSION); 
 	}
 	return mesh_material ; 
 }
