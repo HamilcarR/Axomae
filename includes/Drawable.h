@@ -35,7 +35,6 @@ public:
 	
 	axomae::Mesh *mesh_object ;
 
-	QOpenGLShaderProgram *shader_program ; 	
 	QOpenGLVertexArrayObject vao ; 
 	QOpenGLBuffer vertex_buffer ; 
 	QOpenGLBuffer normal_buffer ; 
