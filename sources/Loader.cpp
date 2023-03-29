@@ -69,7 +69,7 @@ static void loadTexture(const aiScene* scene , Material *material ,TextureData &
 		 std::cout << "Loader can't load texture\n" ;  
 }
 
-
+//TODO : optimize in case different meshes use a same texture
 static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	Material mesh_material; 
 	TextureData diffuse , metallic , roughness , normal , ambiantocclusion  ;
@@ -98,6 +98,7 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	}
 	return mesh_material ; 
 }
+
 
 std::vector<Mesh> Loader::load(const char* file){
 	Assimp::Importer importer ;
