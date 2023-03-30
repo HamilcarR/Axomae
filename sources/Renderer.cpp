@@ -5,7 +5,8 @@ using namespace axomae ;
 
 
 Renderer::Renderer(){
-	start_draw = false ;	
+	start_draw = false ;
+	texture_database = TextureDatabase::getInstance(); 
 }
 
 Renderer::~Renderer(){
@@ -16,6 +17,7 @@ Renderer::~Renderer(){
 		}
 	}
 	scene.clear(); 
+	texture_database->clean(); 
 }
 
 void Renderer::initialize(){
@@ -63,7 +65,7 @@ void Renderer::set_new_scene(std::vector<Mesh> &new_scene){
 		A->clean(); 
 		delete A ; 
 	}
-	scene.clear(); 
+	scene.clear();
 	for (Mesh m : new_scene)
 		scene.push_back(new Drawable(m)); 
 	start_draw = true ;

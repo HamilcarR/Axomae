@@ -7,7 +7,7 @@ out vec4 color ;
 out vec2 texcoord ;
 
 void main(){
-	gl_Position = vec4(position * 10 , 1.f) ; 
+	gl_Position = vec4(position * 0.055 , 1.f) ; 
 	color = vec4(1.) ; 
 	texcoord = uv ; 
 }

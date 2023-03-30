@@ -39,11 +39,14 @@ void Shader::setTextureUniforms(){
 
 
 void Shader::initializeShader(){
+
 	shader_program = new QOpenGLShaderProgram(); 
 	shader_program->addShaderFromSourceFile(QOpenGLShader::Vertex , "../shaders/simple.vert"); 
 	shader_program->addShaderFromSourceFile(QOpenGLShader::Fragment , "../shaders/simple.frag"); 	
 	shader_program->link();
-	shaderErrorCheck(shader_program) ; 
+	shaderErrorCheck(shader_program) ;
+
+
 	setTextureUniforms();
 	
 

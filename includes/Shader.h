@@ -4,6 +4,7 @@
 #include "utils_3D.h" 
 #include "Material.h" 
 #include "Texture.h"
+#include "DebugGL.h" 
 #include <QOpenGLShaderProgram>
 
 class Shader{

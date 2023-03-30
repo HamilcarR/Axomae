@@ -1,16 +1,20 @@
 #ifndef LOADER_H
 #define LOADER_H
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include "constants.h"
-#include "utils_3D.h" 
-#include "Mesh.h"
+
 #include <cstdlib>
 #include <assert.h>
 #include <iostream>
 #include <memory>
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+#include "constants.h"
+#include "utils_3D.h" 
+#include "Mesh.h"
+#include "TextureDatabase.h"
 
 /*3D obj loader*/
 

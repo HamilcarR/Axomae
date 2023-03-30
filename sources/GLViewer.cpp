@@ -22,7 +22,7 @@ void GLViewer::initializeGL() {
 void GLViewer::paintGL(){
 	if(renderer->prep_draw()){
 		std::cout << "renderer prepped" << std::endl ; 
-		errorCheck() ; 
+		errorCheck(); 	
 		renderer->draw(dynamic_cast<QOpenGLFunctions_4_3_Core*> (this) ) ; 
 		renderer->end_draw(); 
 	}

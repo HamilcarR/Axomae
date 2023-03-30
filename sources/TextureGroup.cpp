@@ -2,15 +2,14 @@
 
 
 TextureGroup::TextureGroup(){
-
+	texture_database = TextureDatabase::getInstance(); 
 }
 
 TextureGroup::~TextureGroup(){
 }
 
-void TextureGroup::addTexture(TextureData &tex , Texture::TYPE type){
-	Texture* texture = Texture::constructTexture(tex , type); 
-	texture_collection.push_back(texture); 
+void TextureGroup::addTexture(unsigned int index , Texture::TYPE type){
+	texture_collection.push_back(texture_database->get(index)); 
 	
 }
 
@@ -23,10 +22,6 @@ void TextureGroup::initializeGlTextureData(){
 
 
 void TextureGroup::clean(){
-	for(Texture* A : texture_collection){
-		A->clean(); 
-		delete A ;
-	}
 	initialized = false ; 
 }
 

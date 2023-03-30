@@ -50,7 +50,7 @@ public:
 	virtual ~Texture();
 	void set(TextureData *texture); 
 	void clean();
-	static Texture* constructTexture(TextureData &data , TYPE type); 	
+	static Texture* constructTexture(TextureData *data , TYPE type); 	
 	virtual void bindTexture() = 0 ; 
 	virtual void unbindTexture() = 0;
 	virtual void setGlData() = 0 ; 

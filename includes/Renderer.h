@@ -6,6 +6,7 @@
 #include "Loader.h"
 #include "Mesh.h"
 #include "Drawable.h" 
+#include "TextureDatabase.h" 
 
 
 
@@ -22,7 +23,7 @@ public:
 public:
 	std::vector<Drawable*> scene ; 
 	bool start_draw ; 
-		
+	TextureDatabase* texture_database; 		
 };
 
 #endif

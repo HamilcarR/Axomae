@@ -56,14 +56,20 @@ static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 
 
 static void loadTexture(const aiScene* scene , Material *material ,TextureData &texture ,aiString texture_string ,Texture::TYPE type ){
+	TextureDatabase* texture_database = TextureDatabase::getInstance(); 
 	std::string texture_index_string = texture_string.C_Str();
 	std::cout << "Texture type loaded : " << texture.name << " texture. GLB index is: " << texture_index_string <<  "\n" ; 
 	 if(texture_index_string.size() != 0){
 		texture_index_string = texture_index_string.substr(1) ; 
-		unsigned int texture_index_int = stoi(texture_index_string); 
-		copyTexels(&texture , &*scene->mTextures[texture_index_int]) ; 
-		material->addTexture(texture , type);
-		texture.clean(); 
+		unsigned int texture_index_int = stoi(texture_index_string);
+		if(!texture_database->contains(texture_index_int)){
+			copyTexels(&texture , &*scene->mTextures[texture_index_int]) ; 
+			texture_database->addTexture(texture_index_int , &texture , type); 
+			material->addTexture(texture_index_int , type);
+			texture.clean(); 
+		}
+		else
+			material->addTexture(texture_index_int , type); 
 	 }
 	 else
 		 std::cout << "Loader can't load texture\n" ;  
@@ -101,6 +107,8 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 
 
 std::vector<Mesh> Loader::load(const char* file){
+	TextureDatabase *texture_database = TextureDatabase::getInstance() ; 
+	texture_database->clean(); 
 	Assimp::Importer importer ;
 	const aiScene *modelScene = importer.ReadFile(file , aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs) ;
 	if(modelScene != nullptr){
@@ -157,7 +165,8 @@ std::vector<Mesh> Loader::load(const char* file){
 }
 
 void Loader::close(){
-	delete instance ; 
+	if(instance != nullptr)
+		delete instance ; 
 	instance = nullptr; 
 }
 

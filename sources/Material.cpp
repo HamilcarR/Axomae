@@ -12,8 +12,8 @@ Material::~Material(){
 
 }
 
-void Material::addTexture(TextureData &data , Texture::TYPE type){
-	textures_group.addTexture(data , type) ; 
+void Material::addTexture(unsigned int index , Texture::TYPE type){
+	textures_group.addTexture(index , type) ; 
 
 }
 

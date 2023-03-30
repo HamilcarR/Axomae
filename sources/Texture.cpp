@@ -58,27 +58,25 @@ void Texture::clean(){
 
 }
 
-Texture* Texture::constructTexture(TextureData &T , TYPE type){
-	TextureData data ; 
-	data = T ; 
+Texture* Texture::constructTexture(TextureData *data , TYPE type){
 	switch(type){
 		case DIFFUSE:
-			return new DiffuseTexture(&data); 
+			return new DiffuseTexture(data); 
 		break; 
 		case NORMAL:
-			return new NormalTexture(&data);
+			return new NormalTexture(data);
 		break ; 
 		case METALLIC:
-			return new MetallicTexture(&data); 
+			return new MetallicTexture(data); 
 		break ; 
 		case ROUGHNESS:
-			return new RoughnessTexture(&data); 
+			return new RoughnessTexture(data); 
 		break ; 
 		case AMBIANTOCCLUSION:
-			return new AmbiantOcclusionTexture(&data); 
+			return new AmbiantOcclusionTexture(data); 
 		break ; 
 		case GENERIC: 
-			return new GenericTexture(&data); 
+			return new GenericTexture(data); 
 		break ; 
 		default : 
 			return nullptr ;

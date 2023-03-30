@@ -10,7 +10,7 @@ class Material{
 public:
 	Material(); 
 	virtual ~Material(); 
-	virtual void addTexture(TextureData &data , Texture::TYPE type);
+	virtual void addTexture(unsigned int index , Texture::TYPE type);
 	virtual void bind();
 	virtual void clean();
 	virtual void initializeMaterial(); 

@@ -28,9 +28,9 @@ Mesh::Mesh(std::string n , Object3D const& geo , Material const& mat){
 Mesh::~Mesh(){
 
 }
-
 void Mesh::initializeGlData(){
 	shader_program.initializeShader();
+
 	material.initializeMaterial();
 	mesh_initialized = true ; 
 }
