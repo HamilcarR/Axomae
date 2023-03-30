@@ -10,7 +10,8 @@ Drawable::Drawable(){
 
 Drawable::Drawable(Mesh &mesh){
 	mesh_object = new Mesh(mesh); 
-	initialize() ; 
+	if(!initialize())
+		exit(0); 
 }
 
 Drawable::~Drawable(){
@@ -41,7 +42,8 @@ bool Drawable::ready(){
 
 bool Drawable::initialize(){
 	if(mesh_object == nullptr)
-		return false ; 
+		return false ;
+
 	mesh_object->initializeGlData(); 
 	bool vao_okay = vao.create();
 	assert(vao_okay == true) ; 
@@ -60,37 +62,34 @@ bool Drawable::initialize(){
 	index_buffer.setUsagePattern(QOpenGLBuffer::StreamDraw);
 	normal_buffer.setUsagePattern(QOpenGLBuffer::StreamDraw); 
 	color_buffer.setUsagePattern(QOpenGLBuffer::StreamDraw); 
+	mesh_object->bindShaders(); 
 	vao.bind(); 
 	vertex_buffer.bind(); 
-	index_buffer.bind();
-	mesh_object->bindShaders(); 
 	mesh_object->shader_program.enableAttributeArray(0);
 	mesh_object->shader_program.setAttributeBuffer(0 , GL_FLOAT , 0 , 3 , 0 ) ;
 	texture_buffer.bind(); 
 	mesh_object->shader_program.enableAttributeArray(1) ; 
 	mesh_object->shader_program.setAttributeBuffer(1 , GL_FLOAT , 0 , 2 , 0 ) ; 
+	index_buffer.bind();
 	vao.release(); 
 	mesh_object->releaseShaders();
-	vertex_buffer.release();
-	index_buffer.release();
 	
-	/*manage in texture class*/
 	return true ; 
 }
 
 void Drawable::start_draw(){
-	if(mesh_object != nullptr){
+	if(mesh_object != nullptr){	
+		
+		vao.bind();
+		mesh_object->bindShaders();
+
 		vertex_buffer.bind();
 		vertex_buffer.allocate(mesh_object->geometry.vertices.data() , mesh_object->geometry.vertices.size() * sizeof(float)); 
-		vertex_buffer.release();
 		texture_buffer.bind();
 		texture_buffer.allocate(mesh_object->geometry.uv.data() , mesh_object->geometry.uv.size() * sizeof(float)) ; 
-		texture_buffer.release(); 
 		index_buffer.bind();
 		index_buffer.allocate(mesh_object->geometry.indices.data() , mesh_object->geometry.indices.size() * sizeof(unsigned int)); 
-		index_buffer.release();
-		mesh_object->bindShaders();
-		vao.bind();
+
 	}
 
 }
@@ -104,8 +103,9 @@ void Drawable::end_draw(){
 
 void Drawable::bind(){
 	mesh_object->bindShaders(); 
-	vao.bind();
 	mesh_object->bindMaterials(); 
+	vao.bind();
+
 }
 
 void Drawable::unbind(){

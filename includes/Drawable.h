@@ -1,6 +1,7 @@
 #ifndef DRAWABLE_H
 #define DRAWABLE_H
 
+
 #include "Mesh.h"
 #include "TextureGroup.h" 
 
@@ -43,17 +44,6 @@ public:
 	QOpenGLBuffer color_buffer ;
 };
 
-
-
-inline void errorCheck(){
-	GLenum error = GL_NO_ERROR;
-	do {
-    		error = glGetError();
-    		if (error != GL_NO_ERROR) 
-        		std::cout << "Error:" << error << std::endl ; 
-	} while (error != GL_NO_ERROR);
-
-}
 
 
 
