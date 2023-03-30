@@ -69,6 +69,7 @@ SOURCES       = sources/Drawable.cpp \
 		sources/Syntax.cpp \
 		sources/TerminalOpt.cpp \
 		sources/Texture.cpp \
+		sources/TextureDatabase.cpp \
 		sources/TextureGroup.cpp \
 		sources/Window.cpp qrc_Resource.cpp \
 		moc_GLViewer.cpp \
@@ -91,6 +92,7 @@ OBJECTS       = Kernel.o \
 		generated_files/Syntax.o \
 		generated_files/TerminalOpt.o \
 		generated_files/Texture.o \
+		generated_files/TextureDatabase.o \
 		generated_files/TextureGroup.o \
 		generated_files/Window.o \
 		generated_files/qrc_Resource.o \
@@ -174,6 +176,7 @@ DIST          = /usr/lib64/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib64/qt6/mkspecs/features/lex.prf \
 		Axomae.pro Form\ Files/test.h \
 		includes/constants.h \
+		includes/DebugGL.h \
 		includes/Drawable.h \
 		includes/GLMaterialViewer.h \
 		includes/GLViewer.h \
@@ -192,6 +195,7 @@ DIST          = /usr/lib64/qt6/mkspecs/features/spec_pre.prf \
 		includes/Syntax.h \
 		includes/TerminalOpt.h \
 		includes/Texture.h \
+		includes/TextureDatabase.h \
 		includes/TextureGroup.h \
 		includes/utils_3D.h \
 		includes/Window.h sources/Drawable.cpp \
@@ -211,6 +215,7 @@ DIST          = /usr/lib64/qt6/mkspecs/features/spec_pre.prf \
 		sources/Syntax.cpp \
 		sources/TerminalOpt.cpp \
 		sources/Texture.cpp \
+		sources/TextureDatabase.cpp \
 		sources/TextureGroup.cpp \
 		sources/Window.cpp
 QMAKE_TARGET  = Axomae
@@ -409,8 +414,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents kernels/Kernel.cu $(DISTDIR)/
 	$(COPY_FILE) --parents Ressources/Resource.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib64/qt6/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents Form\ Files/test.h includes/constants.h includes/Drawable.h includes/GLMaterialViewer.h includes/GLViewer.h includes/GUIWindow.h includes/ImageImporter.h includes/ImageManager.h includes/images.h includes/Loader.h includes/Material.h includes/MathFuncs.h includes/Mesh.h includes/MeshListView.h includes/Renderer.h includes/SceneSelector.h includes/Shader.h includes/Syntax.h includes/TerminalOpt.h includes/Texture.h includes/TextureGroup.h includes/utils_3D.h includes/Window.h $(DISTDIR)/
-	$(COPY_FILE) --parents sources/Drawable.cpp sources/GLMaterialViewer.cpp sources/GLViewer.cpp sources/GUIWindow.cpp sources/ImageImporter.cpp sources/ImageManager.cpp sources/Loader.cpp sources/main.cpp sources/Material.cpp sources/Mesh.cpp sources/MeshListView.cpp sources/Renderer.cpp sources/SceneSelector.cpp sources/Shader.cpp sources/Syntax.cpp sources/TerminalOpt.cpp sources/Texture.cpp sources/TextureGroup.cpp sources/Window.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents Form\ Files/test.h includes/constants.h includes/DebugGL.h includes/Drawable.h includes/GLMaterialViewer.h includes/GLViewer.h includes/GUIWindow.h includes/ImageImporter.h includes/ImageManager.h includes/images.h includes/Loader.h includes/Material.h includes/MathFuncs.h includes/Mesh.h includes/MeshListView.h includes/Renderer.h includes/SceneSelector.h includes/Shader.h includes/Syntax.h includes/TerminalOpt.h includes/Texture.h includes/TextureDatabase.h includes/TextureGroup.h includes/utils_3D.h includes/Window.h $(DISTDIR)/
+	$(COPY_FILE) --parents sources/Drawable.cpp sources/GLMaterialViewer.cpp sources/GLViewer.cpp sources/GUIWindow.cpp sources/ImageImporter.cpp sources/ImageManager.cpp sources/Loader.cpp sources/main.cpp sources/Material.cpp sources/Mesh.cpp sources/MeshListView.cpp sources/Renderer.cpp sources/SceneSelector.cpp sources/Shader.cpp sources/Syntax.cpp sources/TerminalOpt.cpp sources/Texture.cpp sources/TextureDatabase.cpp sources/TextureGroup.cpp sources/Window.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents Form\ Files/test.ui $(DISTDIR)/
 
 
@@ -481,7 +486,9 @@ moc_GLViewer.cpp: includes/GLViewer.h \
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
+		includes/TextureDatabase.h \
 		includes/Shader.h \
+		includes/DebugGL.h \
 		includes/Drawable.h \
 		moc_predefs.h \
 		/usr/lib64/qt6/libexec/moc
@@ -499,7 +506,9 @@ moc_GUIWindow.cpp: includes/GUIWindow.h \
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
+		includes/TextureDatabase.h \
 		includes/Shader.h \
+		includes/DebugGL.h \
 		moc_predefs.h \
 		/usr/lib64/qt6/libexec/moc
 	/usr/lib64/qt6/libexec/moc $(DEFINES) --include /home/hamilcar/Desktop/projects/Axomae/moc_predefs.h -I/usr/lib64/qt6/mkspecs/linux-g++ -I/home/hamilcar/Desktop/projects/Axomae -I/usr/include/SDL2 -I/usr/local/cuda/include -I/usr/include/qt6 -I/usr/include/qt6/QtOpenGLWidgets -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I/usr/include/c++/12 -I/usr/include/c++/12/x86_64-suse-linux -I/usr/include/c++/12/backward -I/usr/lib64/gcc/x86_64-suse-linux/12/include -I/usr/local/include -I/usr/lib64/gcc/x86_64-suse-linux/12/include-fixed -I/usr/x86_64-suse-linux/include -I/usr/include includes/GUIWindow.h -o moc_GUIWindow.cpp
@@ -523,7 +532,9 @@ Form\ Files/ui_test.h: Form\ Files/test.ui \
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
+		includes/TextureDatabase.h \
 		includes/Shader.h \
+		includes/DebugGL.h \
 		includes/Drawable.h \
 		includes/constants.h \
 		includes/utils_3D.h \
@@ -531,7 +542,9 @@ Form\ Files/ui_test.h: Form\ Files/test.ui \
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
-		includes/Shader.h
+		includes/TextureDatabase.h \
+		includes/Shader.h \
+		includes/DebugGL.h
 	/usr/lib64/qt6/libexec/uic Form\ Files/test.ui -o Form\ Files/ui_test.h
 
 compiler_yacc_decl_make_all:
@@ -551,7 +564,9 @@ generated_files/Drawable.o: sources/Drawable.cpp includes/Drawable.h \
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
-		includes/Shader.h
+		includes/TextureDatabase.h \
+		includes/Shader.h \
+		includes/DebugGL.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Drawable.o sources/Drawable.cpp
 
 generated_files/GLMaterialViewer.o: sources/GLMaterialViewer.cpp includes/GLMaterialViewer.h
@@ -566,7 +581,9 @@ generated_files/GLViewer.o: sources/GLViewer.cpp includes/GLViewer.h \
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
+		includes/TextureDatabase.h \
 		includes/Shader.h \
+		includes/DebugGL.h \
 		includes/Drawable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/GLViewer.o sources/GLViewer.cpp
 
@@ -582,7 +599,9 @@ generated_files/GUIWindow.o: sources/GUIWindow.cpp includes/GUIWindow.h \
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
+		includes/TextureDatabase.h \
 		includes/Shader.h \
+		includes/DebugGL.h \
 		includes/ImageImporter.h \
 		includes/ImageManager.h \
 		kernels/Kernel.cuh \
@@ -630,7 +649,9 @@ generated_files/Loader.o: sources/Loader.cpp includes/Loader.h \
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
-		includes/Shader.h
+		includes/TextureDatabase.h \
+		includes/Shader.h \
+		includes/DebugGL.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Loader.o sources/Loader.cpp
 
 generated_files/main.o: sources/main.cpp includes/ImageManager.h \
@@ -658,7 +679,9 @@ generated_files/main.o: sources/main.cpp includes/ImageManager.h \
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
+		includes/TextureDatabase.h \
 		includes/Shader.h \
+		includes/DebugGL.h \
 		includes/Drawable.h \
 		includes/GUIWindow.h \
 		Form\ Files/ui_test.h \
@@ -670,7 +693,9 @@ generated_files/Material.o: sources/Material.cpp includes/Material.h \
 		includes/Texture.h \
 		includes/constants.h \
 		includes/utils_3D.h \
-		includes/Shader.h
+		includes/TextureDatabase.h \
+		includes/Shader.h \
+		includes/DebugGL.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Material.o sources/Material.cpp
 
 generated_files/Mesh.o: sources/Mesh.cpp includes/Mesh.h \
@@ -679,7 +704,9 @@ generated_files/Mesh.o: sources/Mesh.cpp includes/Mesh.h \
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
-		includes/Shader.h
+		includes/TextureDatabase.h \
+		includes/Shader.h \
+		includes/DebugGL.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Mesh.o sources/Mesh.cpp
 
 generated_files/MeshListView.o: sources/MeshListView.cpp includes/MeshListView.h \
@@ -689,7 +716,9 @@ generated_files/MeshListView.o: sources/MeshListView.cpp includes/MeshListView.h
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
-		includes/Shader.h
+		includes/TextureDatabase.h \
+		includes/Shader.h \
+		includes/DebugGL.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/MeshListView.o sources/MeshListView.cpp
 
 generated_files/Renderer.o: sources/Renderer.cpp includes/Renderer.h \
@@ -700,7 +729,9 @@ generated_files/Renderer.o: sources/Renderer.cpp includes/Renderer.h \
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
+		includes/TextureDatabase.h \
 		includes/Shader.h \
+		includes/DebugGL.h \
 		includes/Drawable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Renderer.o sources/Renderer.cpp
 
@@ -712,7 +743,9 @@ generated_files/SceneSelector.o: sources/SceneSelector.cpp includes/SceneSelecto
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
-		includes/Shader.h
+		includes/TextureDatabase.h \
+		includes/Shader.h \
+		includes/DebugGL.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/SceneSelector.o sources/SceneSelector.cpp
 
 generated_files/Shader.o: sources/Shader.cpp includes/Shader.h \
@@ -720,7 +753,9 @@ generated_files/Shader.o: sources/Shader.cpp includes/Shader.h \
 		includes/constants.h \
 		includes/Material.h \
 		includes/TextureGroup.h \
-		includes/Texture.h
+		includes/Texture.h \
+		includes/TextureDatabase.h \
+		includes/DebugGL.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Shader.o sources/Shader.cpp
 
 generated_files/Syntax.o: sources/Syntax.cpp includes/Syntax.h
@@ -751,7 +786,9 @@ generated_files/TerminalOpt.o: sources/TerminalOpt.cpp includes/ImageImporter.h 
 		includes/Material.h \
 		includes/TextureGroup.h \
 		includes/Texture.h \
+		includes/TextureDatabase.h \
 		includes/Shader.h \
+		includes/DebugGL.h \
 		includes/Drawable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/TerminalOpt.o sources/TerminalOpt.cpp
 
@@ -760,10 +797,17 @@ generated_files/Texture.o: sources/Texture.cpp includes/Texture.h \
 		includes/utils_3D.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Texture.o sources/Texture.cpp
 
-generated_files/TextureGroup.o: sources/TextureGroup.cpp includes/TextureGroup.h \
+generated_files/TextureDatabase.o: sources/TextureDatabase.cpp includes/TextureDatabase.h \
 		includes/Texture.h \
 		includes/constants.h \
 		includes/utils_3D.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/TextureDatabase.o sources/TextureDatabase.cpp
+
+generated_files/TextureGroup.o: sources/TextureGroup.cpp includes/TextureGroup.h \
+		includes/Texture.h \
+		includes/constants.h \
+		includes/utils_3D.h \
+		includes/TextureDatabase.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/TextureGroup.o sources/TextureGroup.cpp
 
 generated_files/Window.o: sources/Window.cpp includes/Window.h \
