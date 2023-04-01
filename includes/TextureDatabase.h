@@ -3,7 +3,7 @@
 
 #include <map>
 #include "Texture.h" 
-
+#include "TextureFactory.h"
 class TextureDatabase{
 public:
 	static TextureDatabase* getInstance(); 

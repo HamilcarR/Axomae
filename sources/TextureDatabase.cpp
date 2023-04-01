@@ -37,7 +37,7 @@ TextureDatabase::~TextureDatabase(){
 
 
 void TextureDatabase::addTexture(unsigned int index , TextureData *texture , Texture::TYPE type){
-	std::pair<unsigned int , Texture*> pair(index , Texture::constructTexture(texture , type));
+	std::pair<unsigned int , Texture*> pair(index , TextureFactory::constructTexture(texture , type));
 	texture_database.insert(pair); 
 }
 

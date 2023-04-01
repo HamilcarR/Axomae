@@ -1,0 +1,904 @@
+let SessionLoad = 1
+let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1
+let v:this_session=expand("<sfile>:p")
+silent only
+silent tabonly
+cd ~/Desktop/projects/Axomae
+if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
+  let s:wipebuf = bufnr('%')
+endif
+let s:shortmess_save = &shortmess
+if &shortmess =~ 'A'
+  set shortmess=aoOA
+else
+  set shortmess=aoO
+endif
+badd +1 sources/Controller.cpp
+badd +442 sources/GUIWindow.cpp
+badd +34 sources/ImageImporter.cpp
+badd +1 sources/ImageManager.cpp
+badd +1 sources/main.cpp
+badd +13 sources/Model.cpp
+badd +1 sources/Syntax.cpp
+badd +1 sources/TerminalOpt.cpp
+badd +1 sources/View.cpp
+badd +2 sources/Window.cpp
+badd +1 includes/GUIWindow.h
+badd +654 Form\ Files/test.h
+badd +1 includes/ImageImporter.h
+badd +1 includes/Model.h
+badd +45 sources/Loader.cpp
+badd +1 includes/Loader.h
+badd +1 includes/Controller.h
+badd +1 includes/Object.h
+badd +1 sources/Object.cpp
+badd +16 includes/ImageManager.h
+badd +1 includes/constants.h
+badd +1 kernels/Kernel.cuh
+badd +1 kernels/Kernel.cu
+badd +1 includes/View.h
+badd +1 sources/GLViewer.cpp
+badd +1 includes/GLViewer.h
+badd +1 includes/utils_3D.h
+badd +1 shaders/simple.fs
+badd +1 shaders/simple.vs
+badd +1 shaders/simple.frag
+badd +1 shaders/simple.vert
+badd +1 sources/Texture.cpp
+badd +1 includes/Texture.h
+badd +0 includes/TextureGroup.h
+badd +0 sources/TextureGroup.cpp
+badd +0 includes/TextureDatabase.h
+badd +0 sources/TextureDatabase.cpp
+badd +0 sources/Renderer.cpp
+badd +0 includes/Renderer.h
+badd +0 sources/Drawable.cpp
+badd +0 includes/Drawable.h
+badd +0 sources/Shader.cpp
+badd +0 includes/Shader.h
+badd +0 sources/Material.cpp
+badd +0 includes/Material.h
+badd +0 sources/Mesh.cpp
+badd +1 includes/MeshListView.h
+badd +1 includes/Mesh
+badd +0 includes/Mesh.h
+argglobal
+%argdel
+$argadd sources/Controller.cpp
+$argadd sources/GUIWindow.cpp
+$argadd sources/ImageImporter.cpp
+$argadd sources/ImageManager.cpp
+$argadd sources/main.cpp
+$argadd sources/Model.cpp
+$argadd sources/Syntax.cpp
+$argadd sources/TerminalOpt.cpp
+$argadd sources/View.cpp
+$argadd sources/Window.cpp
+set stal=2
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
+tabrewind
+edit includes/GLViewer.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 160 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 158 + 159) / 319)
+argglobal
+if bufexists(fnamemodify("includes/GLViewer.h", ":p")) | buffer includes/GLViewer.h | else | edit includes/GLViewer.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/GLViewer.h
+endif
+balt sources/GLViewer.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+argglobal
+if bufexists(fnamemodify("sources/GLViewer.cpp", ":p")) | buffer sources/GLViewer.cpp | else | edit sources/GLViewer.cpp | endif
+if &buftype ==# 'terminal'
+  silent file sources/GLViewer.cpp
+endif
+balt includes/GLViewer.h
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 40 - ((39 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 40
+normal! 022|
+wincmd w
+exe 'vert 1resize ' . ((&columns * 160 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 158 + 159) / 319)
+tabnext
+edit includes/Renderer.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+argglobal
+if bufexists(fnamemodify("includes/Renderer.h", ":p")) | buffer includes/Renderer.h | else | edit includes/Renderer.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/Renderer.h
+endif
+balt sources/Renderer.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+argglobal
+if bufexists(fnamemodify("sources/Renderer.cpp", ":p")) | buffer sources/Renderer.cpp | else | edit sources/Renderer.cpp | endif
+if &buftype ==# 'terminal'
+  silent file sources/Renderer.cpp
+endif
+balt includes/Renderer.h
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+tabnext
+edit includes/Drawable.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+argglobal
+if bufexists(fnamemodify("includes/Drawable.h", ":p")) | buffer includes/Drawable.h | else | edit includes/Drawable.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/Drawable.h
+endif
+balt sources/Drawable.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+argglobal
+if bufexists(fnamemodify("sources/Drawable.cpp", ":p")) | buffer sources/Drawable.cpp | else | edit sources/Drawable.cpp | endif
+if &buftype ==# 'terminal'
+  silent file sources/Drawable.cpp
+endif
+balt includes/Drawable.h
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+tabnext
+edit includes/Shader.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+argglobal
+if bufexists(fnamemodify("includes/Shader.h", ":p")) | buffer includes/Shader.h | else | edit includes/Shader.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/Shader.h
+endif
+balt sources/Shader.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+argglobal
+if bufexists(fnamemodify("sources/Shader.cpp", ":p")) | buffer sources/Shader.cpp | else | edit sources/Shader.cpp | endif
+if &buftype ==# 'terminal'
+  silent file sources/Shader.cpp
+endif
+balt includes/Shader.h
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+tabnext
+edit includes/Material.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+argglobal
+if bufexists(fnamemodify("includes/Material.h", ":p")) | buffer includes/Material.h | else | edit includes/Material.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/Material.h
+endif
+balt sources/Material.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+argglobal
+if bufexists(fnamemodify("sources/Material.cpp", ":p")) | buffer sources/Material.cpp | else | edit sources/Material.cpp | endif
+if &buftype ==# 'terminal'
+  silent file sources/Material.cpp
+endif
+balt includes/Material.h
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+tabnext
+edit includes/Mesh.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+argglobal
+if bufexists(fnamemodify("includes/Mesh.h", ":p")) | buffer includes/Mesh.h | else | edit includes/Mesh.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/Mesh.h
+endif
+balt includes/Mesh
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+argglobal
+if bufexists(fnamemodify("sources/Mesh.cpp", ":p")) | buffer sources/Mesh.cpp | else | edit sources/Mesh.cpp | endif
+if &buftype ==# 'terminal'
+  silent file sources/Mesh.cpp
+endif
+balt includes/MeshListView.h
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+tabnext
+edit includes/utils_3D.h
+argglobal
+if bufexists(fnamemodify("includes/utils_3D.h", ":p")) | buffer includes/utils_3D.h | else | edit includes/utils_3D.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/utils_3D.h
+endif
+balt sources/GLViewer.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+tabnext
+edit includes/constants.h
+argglobal
+if bufexists(fnamemodify("includes/constants.h", ":p")) | buffer includes/constants.h | else | edit includes/constants.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/constants.h
+endif
+balt sources/ImageManager.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+tabnext
+edit includes/Texture.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 160 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 158 + 159) / 319)
+argglobal
+if bufexists(fnamemodify("includes/Texture.h", ":p")) | buffer includes/Texture.h | else | edit includes/Texture.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/Texture.h
+endif
+balt sources/Texture.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 02|
+wincmd w
+argglobal
+if bufexists(fnamemodify("sources/Texture.cpp", ":p")) | buffer sources/Texture.cpp | else | edit sources/Texture.cpp | endif
+if &buftype ==# 'terminal'
+  silent file sources/Texture.cpp
+endif
+balt includes/Texture.h
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+exe 'vert 1resize ' . ((&columns * 160 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 158 + 159) / 319)
+tabnext
+edit includes/TextureGroup.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+argglobal
+if bufexists(fnamemodify("includes/TextureGroup.h", ":p")) | buffer includes/TextureGroup.h | else | edit includes/TextureGroup.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/TextureGroup.h
+endif
+balt sources/TextureGroup.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+argglobal
+if bufexists(fnamemodify("sources/TextureGroup.cpp", ":p")) | buffer sources/TextureGroup.cpp | else | edit sources/TextureGroup.cpp | endif
+if &buftype ==# 'terminal'
+  silent file sources/TextureGroup.cpp
+endif
+balt includes/TextureGroup.h
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+tabnext
+edit includes/TextureDatabase.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+argglobal
+if bufexists(fnamemodify("includes/TextureDatabase.h", ":p")) | buffer includes/TextureDatabase.h | else | edit includes/TextureDatabase.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/TextureDatabase.h
+endif
+balt sources/TextureDatabase.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+argglobal
+if bufexists(fnamemodify("sources/TextureDatabase.cpp", ":p")) | buffer sources/TextureDatabase.cpp | else | edit sources/TextureDatabase.cpp | endif
+if &buftype ==# 'terminal'
+  silent file sources/TextureDatabase.cpp
+endif
+balt includes/TextureDatabase.h
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+tabnext
+edit includes/Loader.h
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+argglobal
+if bufexists(fnamemodify("includes/Loader.h", ":p")) | buffer includes/Loader.h | else | edit includes/Loader.h | endif
+if &buftype ==# 'terminal'
+  silent file includes/Loader.h
+endif
+balt sources/Loader.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 14 - ((13 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 14
+normal! 022|
+wincmd w
+argglobal
+if bufexists(fnamemodify("sources/Loader.cpp", ":p")) | buffer sources/Loader.cpp | else | edit sources/Loader.cpp | endif
+if &buftype ==# 'terminal'
+  silent file sources/Loader.cpp
+endif
+balt includes/Loader.h
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 26 - ((25 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 26
+normal! 024|
+wincmd w
+exe 'vert 1resize ' . ((&columns * 159 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 159 + 159) / 319)
+tabnext
+edit shaders/simple.vert
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 160 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 158 + 159) / 319)
+argglobal
+if bufexists(fnamemodify("shaders/simple.vert", ":p")) | buffer shaders/simple.vert | else | edit shaders/simple.vert | endif
+if &buftype ==# 'terminal'
+  silent file shaders/simple.vert
+endif
+balt shaders/simple.frag
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+argglobal
+if bufexists(fnamemodify("shaders/simple.frag", ":p")) | buffer shaders/simple.frag | else | edit shaders/simple.frag | endif
+if &buftype ==# 'terminal'
+  silent file shaders/simple.frag
+endif
+balt shaders/simple.vert
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 41) / 82)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
+wincmd w
+exe 'vert 1resize ' . ((&columns * 160 + 159) / 319)
+exe 'vert 2resize ' . ((&columns * 158 + 159) / 319)
+tabnext 6
+set stal=1
+if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
+  silent exe 'bwipe ' . s:wipebuf
+endif
+unlet! s:wipebuf
+set winheight=1 winwidth=20
+let &shortmess = s:shortmess_save
+let &winminheight = s:save_winminheight
+let &winminwidth = s:save_winminwidth
+let s:sx = expand("<sfile>:p:r")."x.vim"
+if filereadable(s:sx)
+  exe "source " . fnameescape(s:sx)
+endif
+let &g:so = s:so_save | let &g:siso = s:siso_save
+set hlsearch
+doautoall SessionLoadPost
+unlet SessionLoad
+" vim: set ft=vim :

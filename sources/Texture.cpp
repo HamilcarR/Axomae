@@ -9,6 +9,7 @@ static std::map<Texture::TYPE , const char*> texture_type_c_str = {
 	{Texture::METALLIC , "metallic"}, 
 	{Texture::ROUGHNESS , "roughness"}, 
 	{Texture::AMBIANTOCCLUSION , "ambiantocclusion"}, 
+	{Texture::SPECULARTINT , "speculartint"},
 	{Texture::GENERIC , "generic"}
 
 };
@@ -58,33 +59,15 @@ void Texture::clean(){
 
 }
 
-Texture* Texture::constructTexture(TextureData *data , TYPE type){
-	switch(type){
-		case DIFFUSE:
-			return new DiffuseTexture(data); 
-		break; 
-		case NORMAL:
-			return new NormalTexture(data);
-		break ; 
-		case METALLIC:
-			return new MetallicTexture(data); 
-		break ; 
-		case ROUGHNESS:
-			return new RoughnessTexture(data); 
-		break ; 
-		case AMBIANTOCCLUSION:
-			return new AmbiantOcclusionTexture(data); 
-		break ; 
-		case GENERIC: 
-			return new GenericTexture(data); 
-		break ; 
-		default : 
-			return nullptr ;
-		break ;
-	}
-
-
+void Texture::initializeTexture2D(){
+	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA , width , height , 0 , GL_BGRA , GL_UNSIGNED_BYTE , data); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
+
+
 void Texture::cleanGlData(){
 	if(sampler2D != 0)
 		glDeleteTextures(1 , &sampler2D); 
@@ -105,12 +88,7 @@ void DiffuseTexture::setGlData(){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + DIFFUSE); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA , width , height , 0 , GL_BGRA , GL_UNSIGNED_BYTE , data); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+	Texture::initializeTexture2D(); 
 }
 
 
@@ -142,12 +120,7 @@ void NormalTexture::setGlData(){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + NORMAL); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA , width , height , 0 , GL_BGRA , GL_UNSIGNED_BYTE , data); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+	Texture::initializeTexture2D(); 
 
 }
 
@@ -184,12 +157,7 @@ void MetallicTexture::setGlData(){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + METALLIC); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA , width , height , 0 , GL_BGRA , GL_UNSIGNED_BYTE , data); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+	Texture::initializeTexture2D(); 
 }
 
 
@@ -223,12 +191,7 @@ void RoughnessTexture::setGlData(){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + ROUGHNESS); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA , width , height , 0 , GL_BGRA , GL_UNSIGNED_BYTE , data); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+	Texture::initializeTexture2D(); 
 }
 
 void RoughnessTexture::bindTexture(){
@@ -261,12 +224,7 @@ void AmbiantOcclusionTexture::setGlData(){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + AMBIANTOCCLUSION); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA , width , height , 0 , GL_BGRA , GL_UNSIGNED_BYTE , data); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+	Texture::initializeTexture2D(); 
 }
 
 void AmbiantOcclusionTexture::bindTexture(){
@@ -286,7 +244,38 @@ const char* AmbiantOcclusionTexture::getTextureTypeCStr()  {
 
 
 /****************************************************************************************************************************/
+SpecularTintTexture::SpecularTintTexture(){
 
+}
+
+SpecularTintTexture::~SpecularTintTexture(){
+
+}
+
+void SpecularTintTexture::setGlData(){
+	glGenTextures(1 , &sampler2D); 	
+	glActiveTexture(GL_TEXTURE0 + SPECULARTINT); 
+	glBindTexture(GL_TEXTURE_2D , sampler2D); 
+	Texture::initializeTexture2D(); 
+}
+
+void SpecularTintTexture::bindTexture(){
+	glActiveTexture(GL_TEXTURE0 + SPECULARTINT); 
+	glBindTexture(GL_TEXTURE_2D , sampler2D);
+}
+
+void SpecularTintTexture::unbindTexture(){
+	glActiveTexture(GL_TEXTURE0 + SPECULARTINT); 
+	glBindTexture(GL_TEXTURE_2D , 0); 
+}
+
+
+const char* SpecularTintTexture::getTextureTypeCStr() {
+	return texture_type_c_str[SPECULARTINT] ; 		
+}
+
+
+/****************************************************************************************************************************/
 GenericTexture::GenericTexture(){
 
 }
@@ -299,13 +288,7 @@ void GenericTexture::setGlData(){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + GENERIC); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA , width , height , 0 , GL_BGRA , GL_UNSIGNED_BYTE , data); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-
+	Texture::initializeTexture2D(); 
 }
 
 void GenericTexture::bindTexture(){
@@ -322,5 +305,8 @@ void GenericTexture::unbindTexture(){
 const char* GenericTexture::getTextureTypeCStr() {
 	return texture_type_c_str[GENERIC] ; 		
 }
+
+
+/****************************************************************************************************************************/
 
 

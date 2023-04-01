@@ -43,18 +43,22 @@ public:
 
 class Texture{
 public:
-	enum TYPE : unsigned {DIFFUSE = 0 , NORMAL = 1 , METALLIC = 2 , ROUGHNESS = 3 , AMBIANTOCCLUSION = 4 , GENERIC = 5} ; 
+	enum TYPE : unsigned {DIFFUSE = 0 , NORMAL = 1 , METALLIC = 2 , ROUGHNESS = 3 , AMBIANTOCCLUSION = 4 , SPECULARTINT= 5,  GENERIC = 6} ; 
 	
 	Texture(); 
 	Texture(TextureData *tex); 
 	virtual ~Texture();
 	void set(TextureData *texture); 
 	void clean();
-	static Texture* constructTexture(TextureData *data , TYPE type); 	
 	virtual void bindTexture() = 0 ; 
 	virtual void unbindTexture() = 0;
 	virtual void setGlData() = 0 ; 
 	void cleanGlData(); 
+
+protected:
+	void initializeTexture2D(); 
+
+
 
 protected:
 	std::string name ;
@@ -62,6 +66,8 @@ protected:
 	unsigned int height ; 
 	uint32_t *data ; 
 	unsigned int sampler2D ; 
+
+
 	
 };
 
@@ -121,6 +127,16 @@ public:
 	virtual void unbindTexture();
 	static  const char* getTextureTypeCStr() ; 	
 };
+class SpecularTintTexture : public Texture{
+public:
+	SpecularTintTexture(); 
+	SpecularTintTexture(TextureData *data):Texture(data){};
+	virtual ~SpecularTintTexture(); 
+	virtual void setGlData(); 
+	virtual void bindTexture(); 
+	virtual void unbindTexture(); 
+	static const char* getTextureTypeCStr(); 
+}; 
 
 class GenericTexture : public Texture{
 public:
