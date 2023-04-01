@@ -58,7 +58,7 @@ static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 static void loadTexture(const aiScene* scene , Material *material ,TextureData &texture ,aiString texture_string ,Texture::TYPE type ){
 	TextureDatabase* texture_database = TextureDatabase::getInstance(); 
 	std::string texture_index_string = texture_string.C_Str();
-	std::cout << "Texture type loaded : " << texture.name << " texture. GLB index is: " << texture_index_string <<  "\n" ; 
+	std::cout << "Texture type loaded : " << texture.name << " / GLB index is: " << texture_index_string <<  "\n" ; 
 	 if(texture_index_string.size() != 0){
 		texture_index_string = texture_index_string.substr(1) ; 
 		unsigned int texture_index_int = stoi(texture_index_string);
@@ -78,15 +78,16 @@ static void loadTexture(const aiScene* scene , Material *material ,TextureData &
 //TODO : optimize in case different meshes use a same texture
 static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	Material mesh_material; 
-	TextureData diffuse , metallic , roughness , normal , ambiantocclusion  ;
+	TextureData diffuse , metallic , roughness , normal , ambiantocclusion , specular ;
 	diffuse.name = "diffuse" ; 
 	metallic.name = "metallic" ; 
 	roughness.name = "roughness" ; 
 	normal.name = "normal" ; 
 	ambiantocclusion.name= "occlusion" ; 
+	specular.name = "specular" ; 
 	unsigned int color_index = 0, metallic_index = 0 , roughness_index = 0; 
-	aiString color_texture , normal_texture , metallic_texture , roughness_texture , occlusion_texture ; //we get indexes of embedded textures , since we will use GLB format  
-	std::string color_index_string ,normal_index_string,  metallic_index_string , roughness_index_string ; // returned index is in the form *X , we want to get rid of *
+	aiString color_texture , normal_texture , metallic_texture , roughness_texture , specular_texture , occlusion_texture ; //we get indexes of embedded textures , since we will use GLB format  
+	std::string color_index_string ,normal_index_string,  metallic_index_string , specular_texture_string , roughness_index_string ; // returned index is in the form *X , we want to get rid of *
 	material->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE , &color_texture) ; 
 	material->GetTexture(AI_MATKEY_METALLIC_TEXTURE , &metallic_texture) ; 
 	material->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE , &roughness_texture) ;	
@@ -102,6 +103,10 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 		material->GetTexture(aiTextureType_LIGHTMAP , 0 , &occlusion_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
 		loadTexture(scene , &mesh_material , ambiantocclusion , occlusion_texture , Texture::AMBIANTOCCLUSION); 
 	}
+	if(material->GetTextureCount(aiTextureType_SHEEN) > 0){
+		material-> GetTexture(aiTextureType_SHEEN , 0 , &specular_texture , nullptr , nullptr , nullptr , nullptr , nullptr);
+		loadTexture(scene , &mesh_material , specular , specular_texture , Texture::SPECULARTINT); 
+	}
 	return mesh_material ; 
 }
 
@@ -110,7 +115,7 @@ std::vector<Mesh> Loader::load(const char* file){
 	TextureDatabase *texture_database = TextureDatabase::getInstance() ; 
 	texture_database->clean(); 
 	Assimp::Importer importer ;
-	const aiScene *modelScene = importer.ReadFile(file , aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs) ;
+	const aiScene *modelScene = importer.ReadFile(file , aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs ) ;
 	if(modelScene != nullptr){
 		std::vector<Mesh> objects; 
 		const aiMaterial* ai_material ;
