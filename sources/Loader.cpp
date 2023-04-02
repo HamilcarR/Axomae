@@ -78,16 +78,16 @@ static void loadTexture(const aiScene* scene , Material *material ,TextureData &
 //TODO : optimize in case different meshes use a same texture
 static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	Material mesh_material; 
-	TextureData diffuse , metallic , roughness , normal , ambiantocclusion , specular ;
+	TextureData diffuse , metallic , roughness , normal , ambiantocclusion , emissive , specular ;
 	diffuse.name = "diffuse" ; 
 	metallic.name = "metallic" ; 
 	roughness.name = "roughness" ; 
 	normal.name = "normal" ; 
 	ambiantocclusion.name= "occlusion" ; 
 	specular.name = "specular" ; 
+	emissive.name = "emissive" ; 
 	unsigned int color_index = 0, metallic_index = 0 , roughness_index = 0; 
-	aiString color_texture , normal_texture , metallic_texture , roughness_texture , specular_texture , occlusion_texture ; //we get indexes of embedded textures , since we will use GLB format  
-	std::string color_index_string ,normal_index_string,  metallic_index_string , specular_texture_string , roughness_index_string ; // returned index is in the form *X , we want to get rid of *
+	aiString color_texture , normal_texture , metallic_texture , roughness_texture , emissive_texture , specular_texture , occlusion_texture ; //we get indexes of embedded textures , since we will use GLB format  
 	material->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE , &color_texture) ; 
 	material->GetTexture(AI_MATKEY_METALLIC_TEXTURE , &metallic_texture) ; 
 	material->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE , &roughness_texture) ;	
@@ -105,7 +105,11 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	}
 	if(material->GetTextureCount(aiTextureType_SHEEN) > 0){
 		material-> GetTexture(aiTextureType_SHEEN , 0 , &specular_texture , nullptr , nullptr , nullptr , nullptr , nullptr);
-		loadTexture(scene , &mesh_material , specular , specular_texture , Texture::SPECULARTINT); 
+		loadTexture(scene , &mesh_material , specular , specular_texture , Texture::SPECULAR); 
+	}
+	if(material->GetTextureCount(aiTextureType_EMISSIVE) > 0){
+		material->GetTexture(aiTextureType_EMISSIVE , 0 , &emissive_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
+		loadTexture(scene , &mesh_material , emissive , emissive_texture , Texture::EMISSIVE); 
 	}
 	return mesh_material ; 
 }

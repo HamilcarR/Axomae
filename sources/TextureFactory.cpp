@@ -27,9 +27,12 @@ Texture* TextureFactory::constructTexture(TextureData *data , Texture::TYPE type
 		case Texture::AMBIANTOCCLUSION:
 			return new AmbiantOcclusionTexture(data); 
 		break ;
-		case Texture::SPECULARTINT:
-			return new SpecularTintTexture(data); 
+		case Texture::SPECULAR:
+			return new SpecularTexture(data); 
 		break ;
+		case Texture::EMISSIVE: 
+			return new EmissiveTexture(data);
+		break ; 
 		case Texture::GENERIC: 
 			return new GenericTexture(data); 
 		break ; 

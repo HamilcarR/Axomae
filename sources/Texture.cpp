@@ -9,7 +9,8 @@ static std::map<Texture::TYPE , const char*> texture_type_c_str = {
 	{Texture::METALLIC , "metallic"}, 
 	{Texture::ROUGHNESS , "roughness"}, 
 	{Texture::AMBIANTOCCLUSION , "ambiantocclusion"}, 
-	{Texture::SPECULARTINT , "speculartint"},
+	{Texture::SPECULAR , "specular"},
+	{Texture::EMISSIVE , "emissive"},
 	{Texture::GENERIC , "generic"}
 
 };
@@ -244,35 +245,67 @@ const char* AmbiantOcclusionTexture::getTextureTypeCStr()  {
 
 
 /****************************************************************************************************************************/
-SpecularTintTexture::SpecularTintTexture(){
+SpecularTexture::SpecularTexture(){
 
 }
 
-SpecularTintTexture::~SpecularTintTexture(){
+SpecularTexture::~SpecularTexture(){
 
 }
 
-void SpecularTintTexture::setGlData(){
+void SpecularTexture::setGlData(){
 	glGenTextures(1 , &sampler2D); 	
-	glActiveTexture(GL_TEXTURE0 + SPECULARTINT); 
+	glActiveTexture(GL_TEXTURE0 + SPECULAR); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
 	Texture::initializeTexture2D(); 
 }
 
-void SpecularTintTexture::bindTexture(){
-	glActiveTexture(GL_TEXTURE0 + SPECULARTINT); 
+void SpecularTexture::bindTexture(){
+	glActiveTexture(GL_TEXTURE0 + SPECULAR); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D);
 }
 
-void SpecularTintTexture::unbindTexture(){
-	glActiveTexture(GL_TEXTURE0 + SPECULARTINT); 
+void SpecularTexture::unbindTexture(){
+	glActiveTexture(GL_TEXTURE0 + SPECULAR); 
 	glBindTexture(GL_TEXTURE_2D , 0); 
 }
 
 
-const char* SpecularTintTexture::getTextureTypeCStr() {
-	return texture_type_c_str[SPECULARTINT] ; 		
+const char* SpecularTexture::getTextureTypeCStr() {
+	return texture_type_c_str[SPECULAR] ; 		
 }
+
+/****************************************************************************************************************************/
+EmissiveTexture::EmissiveTexture(){
+
+}
+
+EmissiveTexture::~EmissiveTexture(){
+
+}
+
+void EmissiveTexture::setGlData(){
+	glGenTextures(1 , &sampler2D); 	
+	glActiveTexture(GL_TEXTURE0 + EMISSIVE); 
+	glBindTexture(GL_TEXTURE_2D , sampler2D); 
+	Texture::initializeTexture2D(); 
+}
+
+void EmissiveTexture::bindTexture(){
+	glActiveTexture(GL_TEXTURE0 + EMISSIVE); 
+	glBindTexture(GL_TEXTURE_2D , sampler2D);
+}
+
+void EmissiveTexture::unbindTexture(){
+	glActiveTexture(GL_TEXTURE0 + EMISSIVE); 
+	glBindTexture(GL_TEXTURE_2D , 0); 
+}
+
+
+const char* EmissiveTexture::getTextureTypeCStr() {
+	return texture_type_c_str[EMISSIVE] ; 		
+}
+
 
 
 /****************************************************************************************************************************/

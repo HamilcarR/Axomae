@@ -43,8 +43,7 @@ public:
 
 class Texture{
 public:
-	enum TYPE : unsigned {DIFFUSE = 0 , NORMAL = 1 , METALLIC = 2 , ROUGHNESS = 3 , AMBIANTOCCLUSION = 4 , SPECULARTINT= 5,  GENERIC = 6} ; 
-	
+	enum TYPE : unsigned {DIFFUSE = 0 , NORMAL = 1 , METALLIC = 2 , ROUGHNESS = 3 , AMBIANTOCCLUSION = 4 , SPECULAR = 5, EMISSIVE = 6 , GENERIC = 7} ; 	
 	Texture(); 
 	Texture(TextureData *tex); 
 	virtual ~Texture();
@@ -127,16 +126,28 @@ public:
 	virtual void unbindTexture();
 	static  const char* getTextureTypeCStr() ; 	
 };
-class SpecularTintTexture : public Texture{
+class SpecularTexture : public Texture{
 public:
-	SpecularTintTexture(); 
-	SpecularTintTexture(TextureData *data):Texture(data){};
-	virtual ~SpecularTintTexture(); 
+	SpecularTexture(); 
+	SpecularTexture(TextureData *data):Texture(data){};
+	virtual ~SpecularTexture(); 
 	virtual void setGlData(); 
 	virtual void bindTexture(); 
 	virtual void unbindTexture(); 
 	static const char* getTextureTypeCStr(); 
 }; 
+
+class EmissiveTexture : public Texture{
+public:
+	EmissiveTexture(); 
+	EmissiveTexture(TextureData *data):Texture(data){};
+	virtual ~EmissiveTexture(); 
+	virtual void setGlData(); 
+	virtual void bindTexture(); 
+	virtual void unbindTexture(); 
+	static const char* getTextureTypeCStr(); 
+}; 
+
 
 class GenericTexture : public Texture{
 public:
