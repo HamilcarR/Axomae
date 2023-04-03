@@ -6,10 +6,12 @@ using namespace axomae ;
 
 Drawable::Drawable(){
 	mesh_object = nullptr; 
+	camera_pointer = nullptr ; 
 }
 
 Drawable::Drawable(Mesh &mesh){
-	mesh_object = new Mesh(mesh); 
+	mesh_object = new Mesh(mesh);
+	camera_pointer = nullptr ; 
 	if(!initialize())
 		exit(0); 
 }
@@ -78,11 +80,9 @@ bool Drawable::initialize(){
 }
 
 void Drawable::start_draw(){
-	if(mesh_object != nullptr){	
-		
+	if(mesh_object != nullptr){		
 		vao.bind();
 		mesh_object->bindShaders();
-
 		vertex_buffer.bind();
 		vertex_buffer.allocate(mesh_object->geometry.vertices.data() , mesh_object->geometry.vertices.size() * sizeof(float)); 
 		texture_buffer.bind();
@@ -112,5 +112,13 @@ void Drawable::unbind(){
 	vao.release();
 	mesh_object->releaseShaders();
 }
+
+void Drawable::setSceneCameraPointer(Camera* camera){
+	camera_pointer = camera ;
+	mesh_object->setSceneCameraPointer(camera); 
+}
+
+
+
 
 

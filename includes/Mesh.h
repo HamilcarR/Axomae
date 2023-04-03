@@ -3,7 +3,7 @@
 
 #include "utils_3D.h" 
 #include "Material.h" 
-
+#include "Camera.h"
 
 namespace axomae {
 
@@ -21,6 +21,7 @@ public:
 	virtual void clean() ; 
 	virtual bool isInitialized();
 	virtual void initializeGlData(); 
+	virtual void setSceneCameraPointer(Camera *camera); 
 
 public:
 	Object3D geometry;
@@ -30,7 +31,7 @@ public:
 
 private:
 	bool mesh_initialized ; 
-
+	Camera* camera; 
 
 
 

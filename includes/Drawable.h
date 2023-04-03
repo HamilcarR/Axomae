@@ -4,7 +4,7 @@
 
 #include "Mesh.h"
 #include "TextureGroup.h" 
-
+#include "Camera.h"
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_4_3_Core> 
 #include <QOpenGLBuffer>
@@ -33,15 +33,20 @@ public:
 	void bind();
 	void unbind();
 	bool ready();
-	
+	void setSceneCameraPointer(Camera* camera); 
+public:
 	axomae::Mesh *mesh_object ;
 
+private:	
+	Camera *camera_pointer ; 
 	QOpenGLVertexArrayObject vao ; 
 	QOpenGLBuffer vertex_buffer ; 
 	QOpenGLBuffer normal_buffer ; 
 	QOpenGLBuffer index_buffer ; 
 	QOpenGLBuffer texture_buffer ;
 	QOpenGLBuffer color_buffer ;
+
+
 };
 
 

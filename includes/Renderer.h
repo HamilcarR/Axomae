@@ -7,7 +7,7 @@
 #include "Mesh.h"
 #include "Drawable.h" 
 #include "TextureDatabase.h" 
-
+#include "Camera.h"
 
 
 class Renderer {
@@ -24,6 +24,7 @@ public:
 	std::vector<Drawable*> scene ; 
 	bool start_draw ; 
 	TextureDatabase* texture_database; 		
+	Camera *scene_camera ; 
 };
 
 #endif

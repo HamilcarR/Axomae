@@ -16,6 +16,6 @@ out vec4 fragment ;
 
 void main(){
 	//fragment = vec4(1.);  
-	fragment = texture(emissive , texcoord) ; 
+	fragment = texture(diffuse , texcoord) ; 
 }
 

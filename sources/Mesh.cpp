@@ -30,7 +30,6 @@ Mesh::~Mesh(){
 }
 void Mesh::initializeGlData(){
 	shader_program.initializeShader();
-
 	material.initializeMaterial();
 	mesh_initialized = true ; 
 }
@@ -57,7 +56,9 @@ bool Mesh::isInitialized(){
 }
 
 
-
+void Mesh::setSceneCameraPointer(Camera *camera){
+	shader_program.setSceneCameraPointer(camera); 
+}
 
 
 
