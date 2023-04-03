@@ -17,7 +17,7 @@ CXX           = g++
 DEFINES       = -DQT_OPENGLWIDGETS_LIB -DQT_WIDGETS_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -Wextra -D_REENTRANT $(DEFINES)
 CXXFLAGS      = -pipe -std=c++17 -g -Wall -pedantic -Wno-unused -g -Wall -Wextra -D_REENTRANT $(DEFINES)
-INCPATH       = -I. -I/usr/include/SDL2 -I/usr/local/cuda/include -I/usr/include/qt6 -I/usr/include/qt6/QtOpenGLWidgets -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I. -IForm\ Files -I/usr/lib64/qt6/mkspecs/linux-g++
+INCPATH       = -I. -I/usr/include/SDL2 -I/usr/local/cuda/include -I/usr/include/glm -I/usr/include/qt6 -I/usr/include/qt6/QtOpenGLWidgets -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I. -IForm\ Files -I/usr/lib64/qt6/mkspecs/linux-g++
 QMAKE         = /usr/bin/qmake6
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -52,7 +52,8 @@ OBJECTS_DIR   = generated_files/
 
 ####### Files
 
-SOURCES       = sources/Drawable.cpp \
+SOURCES       = sources/Camera.cpp \
+		sources/Drawable.cpp \
 		sources/GLMaterialViewer.cpp \
 		sources/GLViewer.cpp \
 		sources/GUIWindow.cpp \
@@ -76,6 +77,7 @@ SOURCES       = sources/Drawable.cpp \
 		moc_GLViewer.cpp \
 		moc_GUIWindow.cpp
 OBJECTS       = Kernel.o \
+		generated_files/Camera.o \
 		generated_files/Drawable.o \
 		generated_files/GLMaterialViewer.o \
 		generated_files/GLViewer.o \
@@ -177,6 +179,7 @@ DIST          = /usr/lib64/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib64/qt6/mkspecs/features/yacc.prf \
 		/usr/lib64/qt6/mkspecs/features/lex.prf \
 		Axomae.pro Form\ Files/test.h \
+		includes/Camera.h \
 		includes/constants.h \
 		includes/DebugGL.h \
 		includes/Drawable.h \
@@ -201,7 +204,8 @@ DIST          = /usr/lib64/qt6/mkspecs/features/spec_pre.prf \
 		includes/TextureFactory.h \
 		includes/TextureGroup.h \
 		includes/utils_3D.h \
-		includes/Window.h sources/Drawable.cpp \
+		includes/Window.h sources/Camera.cpp \
+		sources/Drawable.cpp \
 		sources/GLMaterialViewer.cpp \
 		sources/GLViewer.cpp \
 		sources/GUIWindow.cpp \
@@ -418,8 +422,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents kernels/Kernel.cu $(DISTDIR)/
 	$(COPY_FILE) --parents Ressources/Resource.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib64/qt6/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents Form\ Files/test.h includes/constants.h includes/DebugGL.h includes/Drawable.h includes/GLMaterialViewer.h includes/GLViewer.h includes/GUIWindow.h includes/ImageImporter.h includes/ImageManager.h includes/images.h includes/Loader.h includes/Material.h includes/MathFuncs.h includes/Mesh.h includes/MeshListView.h includes/Renderer.h includes/SceneSelector.h includes/Shader.h includes/Syntax.h includes/TerminalOpt.h includes/Texture.h includes/TextureDatabase.h includes/TextureFactory.h includes/TextureGroup.h includes/utils_3D.h includes/Window.h $(DISTDIR)/
-	$(COPY_FILE) --parents sources/Drawable.cpp sources/GLMaterialViewer.cpp sources/GLViewer.cpp sources/GUIWindow.cpp sources/ImageImporter.cpp sources/ImageManager.cpp sources/Loader.cpp sources/main.cpp sources/Material.cpp sources/Mesh.cpp sources/MeshListView.cpp sources/Renderer.cpp sources/SceneSelector.cpp sources/Shader.cpp sources/Syntax.cpp sources/TerminalOpt.cpp sources/Texture.cpp sources/TextureDatabase.cpp sources/TextureFactory.cpp sources/TextureGroup.cpp sources/Window.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents Form\ Files/test.h includes/Camera.h includes/constants.h includes/DebugGL.h includes/Drawable.h includes/GLMaterialViewer.h includes/GLViewer.h includes/GUIWindow.h includes/ImageImporter.h includes/ImageManager.h includes/images.h includes/Loader.h includes/Material.h includes/MathFuncs.h includes/Mesh.h includes/MeshListView.h includes/Renderer.h includes/SceneSelector.h includes/Shader.h includes/Syntax.h includes/TerminalOpt.h includes/Texture.h includes/TextureDatabase.h includes/TextureFactory.h includes/TextureGroup.h includes/utils_3D.h includes/Window.h $(DISTDIR)/
+	$(COPY_FILE) --parents sources/Camera.cpp sources/Drawable.cpp sources/GLMaterialViewer.cpp sources/GLViewer.cpp sources/GUIWindow.cpp sources/ImageImporter.cpp sources/ImageManager.cpp sources/Loader.cpp sources/main.cpp sources/Material.cpp sources/Mesh.cpp sources/MeshListView.cpp sources/Renderer.cpp sources/SceneSelector.cpp sources/Shader.cpp sources/Syntax.cpp sources/TerminalOpt.cpp sources/Texture.cpp sources/TextureDatabase.cpp sources/TextureFactory.cpp sources/TextureGroup.cpp sources/Window.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents Form\ Files/test.ui $(DISTDIR)/
 
 
@@ -497,7 +501,7 @@ moc_GLViewer.cpp: includes/GLViewer.h \
 		includes/Drawable.h \
 		moc_predefs.h \
 		/usr/lib64/qt6/libexec/moc
-	/usr/lib64/qt6/libexec/moc $(DEFINES) --include /home/hamilcar/Desktop/projects/Axomae/moc_predefs.h -I/usr/lib64/qt6/mkspecs/linux-g++ -I/home/hamilcar/Desktop/projects/Axomae -I/usr/include/SDL2 -I/usr/local/cuda/include -I/usr/include/qt6 -I/usr/include/qt6/QtOpenGLWidgets -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I/usr/include/c++/12 -I/usr/include/c++/12/x86_64-suse-linux -I/usr/include/c++/12/backward -I/usr/lib64/gcc/x86_64-suse-linux/12/include -I/usr/local/include -I/usr/lib64/gcc/x86_64-suse-linux/12/include-fixed -I/usr/x86_64-suse-linux/include -I/usr/include includes/GLViewer.h -o moc_GLViewer.cpp
+	/usr/lib64/qt6/libexec/moc $(DEFINES) --include /home/hamilcar/Desktop/projects/Axomae/moc_predefs.h -I/usr/lib64/qt6/mkspecs/linux-g++ -I/home/hamilcar/Desktop/projects/Axomae -I/usr/include/SDL2 -I/usr/local/cuda/include -I/usr/include/glm -I/usr/include/qt6 -I/usr/include/qt6/QtOpenGLWidgets -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I/usr/include/c++/12 -I/usr/include/c++/12/x86_64-suse-linux -I/usr/include/c++/12/backward -I/usr/lib64/gcc/x86_64-suse-linux/12/include -I/usr/local/include -I/usr/lib64/gcc/x86_64-suse-linux/12/include-fixed -I/usr/x86_64-suse-linux/include -I/usr/include includes/GLViewer.h -o moc_GLViewer.cpp
 
 moc_GUIWindow.cpp: includes/GUIWindow.h \
 		includes/Window.h \
@@ -521,7 +525,7 @@ moc_GUIWindow.cpp: includes/GUIWindow.h \
 		includes/SceneSelector.h \
 		moc_predefs.h \
 		/usr/lib64/qt6/libexec/moc
-	/usr/lib64/qt6/libexec/moc $(DEFINES) --include /home/hamilcar/Desktop/projects/Axomae/moc_predefs.h -I/usr/lib64/qt6/mkspecs/linux-g++ -I/home/hamilcar/Desktop/projects/Axomae -I/usr/include/SDL2 -I/usr/local/cuda/include -I/usr/include/qt6 -I/usr/include/qt6/QtOpenGLWidgets -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I/usr/include/c++/12 -I/usr/include/c++/12/x86_64-suse-linux -I/usr/include/c++/12/backward -I/usr/lib64/gcc/x86_64-suse-linux/12/include -I/usr/local/include -I/usr/lib64/gcc/x86_64-suse-linux/12/include-fixed -I/usr/x86_64-suse-linux/include -I/usr/include includes/GUIWindow.h -o moc_GUIWindow.cpp
+	/usr/lib64/qt6/libexec/moc $(DEFINES) --include /home/hamilcar/Desktop/projects/Axomae/moc_predefs.h -I/usr/lib64/qt6/mkspecs/linux-g++ -I/home/hamilcar/Desktop/projects/Axomae -I/usr/include/SDL2 -I/usr/local/cuda/include -I/usr/include/glm -I/usr/include/qt6 -I/usr/include/qt6/QtOpenGLWidgets -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I/usr/include/c++/12 -I/usr/include/c++/12/x86_64-suse-linux -I/usr/include/c++/12/backward -I/usr/lib64/gcc/x86_64-suse-linux/12/include -I/usr/local/include -I/usr/lib64/gcc/x86_64-suse-linux/12/include-fixed -I/usr/x86_64-suse-linux/include -I/usr/include includes/GUIWindow.h -o moc_GUIWindow.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -568,6 +572,11 @@ compiler_lex_clean:
 compiler_clean: compiler_cuda_clean compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_header_clean compiler_uic_clean 
 
 ####### Compile
+
+generated_files/Camera.o: sources/Camera.cpp includes/Camera.h \
+		includes/utils_3D.h \
+		includes/constants.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Camera.o sources/Camera.cpp
 
 generated_files/Drawable.o: sources/Drawable.cpp includes/Drawable.h \
 		includes/Mesh.h \
