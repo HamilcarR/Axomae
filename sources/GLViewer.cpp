@@ -1,4 +1,6 @@
 #include "../includes/GLViewer.h" 
+#include <QPoint>
+#include <QCursor>
 
 using namespace axomae ; 
 
@@ -36,10 +38,15 @@ void GLViewer::printInfo(){
 	std::cout << "Renderer info here : < >" << std::endl; 	
 }
 
+void GLViewer::mouseMoveEvent(QMouseEvent *event){
+	QPoint p = this->mapFromGlobal(QCursor::pos()); 	
+	update(); 
+}
+
+
 void GLViewer::setNewScene(std::vector<Mesh> &new_scene){
 	makeCurrent();
 	renderer->set_new_scene(new_scene); 
 	doneCurrent();
-	update(); 
 }
 

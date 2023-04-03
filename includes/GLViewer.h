@@ -1,6 +1,8 @@
 #ifndef GLVIEWER_H
 #define GLVIEWER_H
 
+#include <QMouseEvent> 
+
 #include "constants.h"
 #include "utils_3D.h" 
 #include "Renderer.h" 
@@ -29,8 +31,10 @@ class GLViewer : public QOpenGLWidget , protected QOpenGLFunctions_4_3_Core {
 		void resizeGL(int width , int height) override ; 
 		void printInfo() ; 
 	private:
+		void mouseMoveEvent(QMouseEvent *event) override; 
+	private:
 		Renderer* renderer;	
-	
+			
 
 
 
