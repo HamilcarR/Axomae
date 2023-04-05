@@ -498,6 +498,7 @@ moc_GLViewer.cpp: includes/GLViewer.h \
 		includes/TextureFactory.h \
 		includes/Shader.h \
 		includes/DebugGL.h \
+		includes/Camera.h \
 		includes/Drawable.h \
 		moc_predefs.h \
 		/usr/lib64/qt6/libexec/moc
@@ -520,6 +521,7 @@ moc_GUIWindow.cpp: includes/GUIWindow.h \
 		includes/TextureFactory.h \
 		includes/Shader.h \
 		includes/DebugGL.h \
+		includes/Camera.h \
 		includes/Drawable.h \
 		includes/MeshListView.h \
 		includes/SceneSelector.h \
@@ -550,6 +552,7 @@ Form\ Files/ui_test.h: Form\ Files/test.ui \
 		includes/TextureFactory.h \
 		includes/Shader.h \
 		includes/DebugGL.h \
+		includes/Camera.h \
 		includes/Drawable.h \
 		includes/constants.h \
 		includes/utils_3D.h \
@@ -560,7 +563,8 @@ Form\ Files/ui_test.h: Form\ Files/test.ui \
 		includes/TextureDatabase.h \
 		includes/TextureFactory.h \
 		includes/Shader.h \
-		includes/DebugGL.h
+		includes/DebugGL.h \
+		includes/Camera.h
 	/usr/lib64/qt6/libexec/uic Form\ Files/test.ui -o Form\ Files/ui_test.h
 
 compiler_yacc_decl_make_all:
@@ -588,7 +592,8 @@ generated_files/Drawable.o: sources/Drawable.cpp includes/Drawable.h \
 		includes/TextureDatabase.h \
 		includes/TextureFactory.h \
 		includes/Shader.h \
-		includes/DebugGL.h
+		includes/DebugGL.h \
+		includes/Camera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Drawable.o sources/Drawable.cpp
 
 generated_files/GLMaterialViewer.o: sources/GLMaterialViewer.cpp includes/GLMaterialViewer.h
@@ -607,6 +612,7 @@ generated_files/GLViewer.o: sources/GLViewer.cpp includes/GLViewer.h \
 		includes/TextureFactory.h \
 		includes/Shader.h \
 		includes/DebugGL.h \
+		includes/Camera.h \
 		includes/Drawable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/GLViewer.o sources/GLViewer.cpp
 
@@ -627,6 +633,7 @@ generated_files/GUIWindow.o: sources/GUIWindow.cpp includes/GUIWindow.h \
 		includes/TextureFactory.h \
 		includes/Shader.h \
 		includes/DebugGL.h \
+		includes/Camera.h \
 		includes/Drawable.h \
 		includes/MeshListView.h \
 		includes/SceneSelector.h \
@@ -676,7 +683,8 @@ generated_files/Loader.o: sources/Loader.cpp includes/Loader.h \
 		includes/TextureDatabase.h \
 		includes/TextureFactory.h \
 		includes/Shader.h \
-		includes/DebugGL.h
+		includes/DebugGL.h \
+		includes/Camera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Loader.o sources/Loader.cpp
 
 generated_files/main.o: sources/main.cpp includes/ImageManager.h \
@@ -708,6 +716,7 @@ generated_files/main.o: sources/main.cpp includes/ImageManager.h \
 		includes/TextureFactory.h \
 		includes/Shader.h \
 		includes/DebugGL.h \
+		includes/Camera.h \
 		includes/Drawable.h \
 		includes/GUIWindow.h \
 		Form\ Files/ui_test.h \
@@ -724,7 +733,8 @@ generated_files/Material.o: sources/Material.cpp includes/Material.h \
 		includes/TextureDatabase.h \
 		includes/TextureFactory.h \
 		includes/Shader.h \
-		includes/DebugGL.h
+		includes/DebugGL.h \
+		includes/Camera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Material.o sources/Material.cpp
 
 generated_files/Mesh.o: sources/Mesh.cpp includes/Mesh.h \
@@ -736,7 +746,8 @@ generated_files/Mesh.o: sources/Mesh.cpp includes/Mesh.h \
 		includes/TextureDatabase.h \
 		includes/TextureFactory.h \
 		includes/Shader.h \
-		includes/DebugGL.h
+		includes/DebugGL.h \
+		includes/Camera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Mesh.o sources/Mesh.cpp
 
 generated_files/MeshListView.o: sources/MeshListView.cpp includes/MeshListView.h \
@@ -749,7 +760,8 @@ generated_files/MeshListView.o: sources/MeshListView.cpp includes/MeshListView.h
 		includes/TextureDatabase.h \
 		includes/TextureFactory.h \
 		includes/Shader.h \
-		includes/DebugGL.h
+		includes/DebugGL.h \
+		includes/Camera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/MeshListView.o sources/MeshListView.cpp
 
 generated_files/Renderer.o: sources/Renderer.cpp includes/Renderer.h \
@@ -764,6 +776,7 @@ generated_files/Renderer.o: sources/Renderer.cpp includes/Renderer.h \
 		includes/TextureFactory.h \
 		includes/Shader.h \
 		includes/DebugGL.h \
+		includes/Camera.h \
 		includes/Drawable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Renderer.o sources/Renderer.cpp
 
@@ -778,7 +791,8 @@ generated_files/SceneSelector.o: sources/SceneSelector.cpp includes/SceneSelecto
 		includes/TextureDatabase.h \
 		includes/TextureFactory.h \
 		includes/Shader.h \
-		includes/DebugGL.h
+		includes/DebugGL.h \
+		includes/Camera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/SceneSelector.o sources/SceneSelector.cpp
 
 generated_files/Shader.o: sources/Shader.cpp includes/Shader.h \
@@ -789,7 +803,8 @@ generated_files/Shader.o: sources/Shader.cpp includes/Shader.h \
 		includes/Texture.h \
 		includes/TextureDatabase.h \
 		includes/TextureFactory.h \
-		includes/DebugGL.h
+		includes/DebugGL.h \
+		includes/Camera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/Shader.o sources/Shader.cpp
 
 generated_files/Syntax.o: sources/Syntax.cpp includes/Syntax.h
@@ -824,6 +839,7 @@ generated_files/TerminalOpt.o: sources/TerminalOpt.cpp includes/ImageImporter.h 
 		includes/TextureFactory.h \
 		includes/Shader.h \
 		includes/DebugGL.h \
+		includes/Camera.h \
 		includes/Drawable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o generated_files/TerminalOpt.o sources/TerminalOpt.cpp
 
