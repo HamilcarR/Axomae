@@ -7,7 +7,15 @@ using namespace axomae ;
 Renderer::Renderer(){
 	start_draw = false ;
 	texture_database = TextureDatabase::getInstance(); 
-	scene_camera = new Camera(45.f , 1920.f / 1080.f , 0.001f , 1000.f); 	
+	mouse_state.pos_x = 0 ;  
+	mouse_state.pos_y = 0 ; 
+	mouse_state.left_button_clicked = false ;
+	mouse_state.left_button_released = true ; 
+	mouse_state.right_button_clicked = false ;
+	mouse_state.right_button_released = true ; 
+	mouse_state.previous_pos_x = 0 ; 
+	mouse_state.previous_pos_y = 0 ;  
+	scene_camera = new ArcballCamera(45.f , &screen_size ,  0.001f , 1000.f , 100.f, &mouse_state); 	
 }
 
 Renderer::~Renderer(){
@@ -47,6 +55,7 @@ bool Renderer::prep_draw(){
 		return true; 				
 	}
 	else{
+
 		glClearColor(0 , 0 , 0, 1.f);
 		return false ;	
 	}
@@ -78,5 +87,26 @@ void Renderer::set_new_scene(std::vector<Mesh> &new_scene){
 		scene.push_back(new Drawable(m)); 
 	start_draw = true ;
 }
+
+void Renderer::setScreenSize(unsigned int width , unsigned int height){
+	screen_size.width = width; 
+	screen_size.height = height; 
+}
+
+void Renderer::onLeftClick(){
+	scene_camera->onLeftClick(); 
+}
+void Renderer::onRightClick(){
+	scene_camera->onRightClick(); 
+}
+void Renderer::onLeftClickRelease(){
+	scene_camera->onLeftClickRelease(); 
+}
+void Renderer::onRightClickRelease(){
+	scene_camera->onRightClickRelease();
+}
+	
+
+
 
 

@@ -20,11 +20,19 @@ public:
 	void end_draw();
 	void set_new_scene(std::vector<axomae::Mesh> &new_scene);
 	bool scene_ready() ; 
+	MouseState* getMouseStatePointer(){ return &mouse_state;} ;  
+	void onLeftClick(); 
+	void onRightClick(); 
+	void onLeftClickRelease(); 
+	void onRightClickRelease();
+	void setScreenSize(unsigned int width , unsigned int height); 
 public:
 	std::vector<Drawable*> scene ; 
 	bool start_draw ; 
 	TextureDatabase* texture_database; 		
-	Camera *scene_camera ; 
+	Camera *scene_camera ;
+	MouseState mouse_state ;
+	ScreenSize screen_size ; 	
 };
 
 #endif
