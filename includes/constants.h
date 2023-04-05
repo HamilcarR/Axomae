@@ -32,10 +32,24 @@ namespace axomae {
 }
 
 
+struct MouseState{
+	unsigned int pos_x ;
+	unsigned int pos_y ; 
+	bool left_button_clicked ; 
+	bool left_button_released ; 
+	bool right_button_clicked ; 
+	bool right_button_released ; 
+	unsigned int previous_pos_x; 
+	unsigned int previous_pos_y ; 
+
+};
 
 
+struct ScreenSize{
+	unsigned int width ; 
+	unsigned int height ; 
 
-
+}; 
 
 
 
