@@ -7,7 +7,7 @@ using namespace axomae ;
 
 GLViewer::GLViewer(QWidget* parent) : QOpenGLWidget (parent) {
 	renderer = new Renderer()  ; 
-
+	renderer->setScreenSize(width() , height()); 
 }
 
 GLViewer::~GLViewer(){
@@ -49,6 +49,14 @@ void GLViewer::mouseMoveEvent(QMouseEvent *event){
 	mouse->pos_x = p.x(); 
 	mouse->pos_y = p.y();
 	update(); 
+}
+
+void GLViewer::wheelEvent(QWheelEvent *event){
+	if (event->angleDelta().y() > 0) //scroll up 
+		renderer->onScrollUp(); 	
+	else if (event->angleDelta().y() < 0)
+		renderer->onScrollDown(); 
+	update();
 }
 
 void GLViewer::mousePressEvent(QMouseEvent *event){

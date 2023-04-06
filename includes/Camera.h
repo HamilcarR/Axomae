@@ -10,7 +10,8 @@ public:
 	Camera(float radians , ScreenSize* screen ,  float clip_near , float clip_far , MouseState* pointer); 
 	virtual ~Camera(); 
 	virtual void computeViewSpace();
-	virtual void computeProjectionSpace(); 
+	virtual void computeProjectionSpace();
+	virtual void computeViewProjection(); 
 	virtual glm::mat4 getView(){return view; }
 	virtual glm::mat4 getViewProjection(); 
 	virtual void onLeftClick() = 0 ;  
@@ -18,14 +19,16 @@ public:
 	virtual void onLeftClickRelease() = 0 ; 
 	virtual void onRightClickRelease() = 0 ; 
 	virtual void movePosition() = 0 ; 
-
-
+	virtual void zoomIn() = 0 ; 
+	virtual void zoomOut() = 0 ; 
+	virtual void reset() ; 
 protected:
 	float near ; 
 	float far ;
 	float fov ; 
 	glm::mat4 projection ;	
 	glm::mat4 view; 
+	glm::mat4 view_projection ; 
 	glm::vec3 position ; 
 	glm::vec3 target ; 
 	glm::vec3 right ;
@@ -48,11 +51,13 @@ public:
 	virtual void onRightClick() override ;
 	virtual void onLeftClickRelease() override; 
 	virtual void onRightClickRelease() override;
-
+	virtual void zoomIn() override ; 
+	virtual void zoomOut() override ;
+	virtual void reset() ; 
 protected:
 	virtual void rotate(); 
 	virtual void movePosition() override ;
-
+	virtual void updateZoom(float step) ; 
 
 protected: 
 	float angle ;
@@ -62,8 +67,10 @@ protected:
 	glm::vec3 last_position ; 
 	glm::quat rotation;
 	glm::quat last_rotation ;
-	glm::vec3 axis ;  
-
+	glm::vec3 axis ; 
+	bool radius_updated ; 
+private:
+	float default_radius; 
 };
 
 
@@ -74,12 +81,13 @@ public:
 	FreePerspectiveCamera(); 
 	FreePerspectiveCamera(float radians , ScreenSize* screen , float near , float far , float radius, MouseState* pointer); 
 	virtual ~FreePerspectiveCamera(); 
-	virtual void onLeftClick()  ;  
-	virtual void onRightClick() ;
-	virtual void onLeftClickRelease()  ; 
-	virtual void onRightClickRelease() ; 
-	virtual void movePosition() ; 
-
+	virtual void onLeftClick() override ;  
+	virtual void onRightClick() override ;
+	virtual void onLeftClickRelease() override ; 
+	virtual void onRightClickRelease() override ; 
+	virtual void movePosition() override ; 
+	virtual void zoomIn() override ; 
+	virtual void zoomOut() override ; 
 
 
 

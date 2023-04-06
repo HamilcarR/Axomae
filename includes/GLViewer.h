@@ -34,6 +34,7 @@ class GLViewer : public QOpenGLWidget , protected QOpenGLFunctions_4_3_Core {
 		void mouseMoveEvent(QMouseEvent *event) override; 
 		void mousePressEvent(QMouseEvent *event) override; 
 		void mouseReleaseEvent(QMouseEvent *event) override; 
+		void wheelEvent(QWheelEvent *event) override;
 	private:
 		Renderer* renderer;	
 			

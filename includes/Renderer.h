@@ -25,7 +25,10 @@ public:
 	void onRightClick(); 
 	void onLeftClickRelease(); 
 	void onRightClickRelease();
-	void setScreenSize(unsigned int width , unsigned int height); 
+	void onScrollDown(); 
+	void onScrollUp(); 
+	void setScreenSize(unsigned int width , unsigned int height);
+
 public:
 	std::vector<Drawable*> scene ; 
 	bool start_draw ; 

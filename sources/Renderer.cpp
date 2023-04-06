@@ -62,7 +62,7 @@ bool Renderer::prep_draw(){
 }
 
 void Renderer::draw(QOpenGLFunctions_4_3_Core* gl){
-	scene_camera->computeViewSpace(); 
+	scene_camera->computeViewProjection(); 
 	for (Drawable *A : scene){
 		A->bind();
 		gl->glDrawElements(GL_TRIANGLES , A->mesh_object->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
@@ -86,13 +86,8 @@ void Renderer::set_new_scene(std::vector<Mesh> &new_scene){
 	for (Mesh m : new_scene)
 		scene.push_back(new Drawable(m)); 
 	start_draw = true ;
+	scene_camera->reset() ; 
 }
-
-void Renderer::setScreenSize(unsigned int width , unsigned int height){
-	screen_size.width = width; 
-	screen_size.height = height; 
-}
-
 void Renderer::onLeftClick(){
 	scene_camera->onLeftClick(); 
 }
@@ -105,7 +100,18 @@ void Renderer::onLeftClickRelease(){
 void Renderer::onRightClickRelease(){
 	scene_camera->onRightClickRelease();
 }
-	
+void Renderer::onScrollDown(){
+	scene_camera->zoomOut(); 
+}
+void Renderer::onScrollUp(){
+	scene_camera->zoomIn(); 
+}
+
+void Renderer::setScreenSize(unsigned int width , unsigned int height){
+	screen_size.width = width; 
+	screen_size.height = height; 
+}
+
 
 
 
