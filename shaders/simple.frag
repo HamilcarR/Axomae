@@ -15,7 +15,8 @@ layout(binding=7) uniform sampler2D generic ;
 out vec4 fragment ;
 
 void main(){
-	//fragment = vec4(1.);  
+	//fragment = vec4(1.); 
 	fragment = texture(diffuse , texcoord) ; 
+
 }
 
