@@ -17,18 +17,20 @@ GLViewer::~GLViewer(){
 }
 
 void GLViewer::initializeGL() {
-	initializeOpenGLFunctions(); 
+	makeCurrent();	
+	GLenum err = glewInit();
+	if( err != GLEW_OK){
+		std::cerr << "failed to initialize glew with error : " << reinterpret_cast<const char*> (glewGetErrorString(err)) << "\n" ; 
+		exit(EXIT_FAILURE) ; 
+	}
 	renderer->setScreenSize(width() , height()); 
 	renderer->initialize() ; 
 	errorCheck() ;
 }
 
 void GLViewer::paintGL(){
-	
-
 	if(renderer->prep_draw()){
-	//	errorCheck(); 	
-		renderer->draw(dynamic_cast<QOpenGLFunctions_4_3_Core*> (this) ) ; 
+		renderer->draw() ; 
 		renderer->end_draw(); 
 	}
 }

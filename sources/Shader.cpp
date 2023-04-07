@@ -1,14 +1,41 @@
 #include "../includes/Shader.h"
 #include <QMatrix4x4>
+#include <cstring>
 
-inline void shaderErrorCheck(QOpenGLShaderProgram* shader_program){
-	if(shader_program){
-		QString log = shader_program->log(); 
-		std::cout << log.constData() << std::endl; 
+#define SHADER_ERROR_LOG_SIZE 512
+
+static int success  ; 
+static char infoLog[SHADER_ERROR_LOG_SIZE] ; 
+
+inline void shaderCompilationErrorCheck(unsigned int shader_id){
+	success = 0; 
+	memset(infoLog , 0 , SHADER_ERROR_LOG_SIZE) ; 
+	glGetShaderiv(shader_id , GL_COMPILE_STATUS , &success) ; 
+	if(!success){
+		glGetShaderInfoLog(shader_id , SHADER_ERROR_LOG_SIZE , nullptr , infoLog);
+		std::cerr << "Shader compilation failed with error : " << infoLog << "\n" ; 
 	}
 }
 
+inline void programLinkingErrorCheck(unsigned int program_id){
+	success = 0; 
+	memset(infoLog , 0 , SHADER_ERROR_LOG_SIZE) ; 
+	glGetProgramiv(program_id, GL_LINK_STATUS , &success) ; 
+	if(!success){
+		glGetProgramInfoLog(program_id , SHADER_ERROR_LOG_SIZE , nullptr , infoLog); 
+		std::cerr << "Shader linkage failed with error : " << infoLog << "\n" ; 
+	}
+}
+
+
+
 Shader::Shader(){
+	camera_pointer = nullptr ; 
+}
+
+Shader::Shader(const std::string vertex_code , const std::string fragment_code){
+	fragment_shader_txt = fragment_code ; 
+	vertex_shader_txt = vertex_code ; 
 	camera_pointer = nullptr ; 
 }
 
@@ -17,22 +44,24 @@ Shader::~Shader(){
 }
 
 void Shader::enableAttributeArray(GLuint att){
-	shader_program->enableAttributeArray(att); 
+	glEnableVertexAttribArray(att); 
 }
 
 void Shader::setAttributeBuffer(GLuint location , GLenum type , int offset , int tuplesize , int stride ){
-	shader_program->setAttributeBuffer(location , type , offset , tuplesize , stride); 
+	glVertexAttribPointer(location , tuplesize , type , GL_FALSE , stride , (void*) 0); 
 }
 
 void Shader::setTextureUniforms(){
-	setUniformValue(shader_program->uniformLocation(DiffuseTexture::getTextureTypeCStr()) , Texture::DIFFUSE) ; 
-	setUniformValue(shader_program->uniformLocation(NormalTexture::getTextureTypeCStr()) , Texture::NORMAL) ; 
-	setUniformValue(shader_program->uniformLocation(MetallicTexture::getTextureTypeCStr()) , Texture::METALLIC) ; 
-	setUniformValue(shader_program->uniformLocation(RoughnessTexture::getTextureTypeCStr()) , Texture::ROUGHNESS) ; 
-	setUniformValue(shader_program->uniformLocation(AmbiantOcclusionTexture::getTextureTypeCStr()) , Texture::AMBIANTOCCLUSION) ; 	
-	setUniformValue(shader_program->uniformLocation(GenericTexture::getTextureTypeCStr()) , Texture::SPECULAR) ; 
-	setUniformValue(shader_program->uniformLocation(GenericTexture::getTextureTypeCStr()) , Texture::GENERIC) ; 
-	setUniformValue(shader_program->uniformLocation(GenericTexture::getTextureTypeCStr()) , Texture::GENERIC) ; 
+	glUseProgram(shader_program) ; 
+	setUniform(DiffuseTexture::getTextureTypeCStr() , static_cast<int> (Texture::DIFFUSE)) ; 
+	setUniform(NormalTexture::getTextureTypeCStr() , static_cast<int> (Texture::NORMAL)) ; 
+	setUniform(MetallicTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::METALLIC)) ; 
+	setUniform(RoughnessTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::ROUGHNESS)) ; 
+	setUniform(AmbiantOcclusionTexture::getTextureTypeCStr() , static_cast<int> (Texture::AMBIANTOCCLUSION)) ; 	
+	setUniform(GenericTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::SPECULAR)) ; 
+	setUniform(GenericTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::GENERIC)) ; 
+	setUniform(GenericTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::GENERIC)) ; 
+
 }
 
 void Shader::setSceneCameraPointer(Camera* camera){
@@ -40,54 +69,69 @@ void Shader::setSceneCameraPointer(Camera* camera){
 }
 
 void Shader::updateCamera(){
-	if(camera_pointer != nullptr)
-		setMatrixUniform(camera_pointer->getViewProjection() , "VP"); 
+	if(camera_pointer != nullptr){
+		glUseProgram(shader_program) ; 
+		setMatrixUniform("VP" , camera_pointer->getViewProjection()); 
+	}
+}
+
+template<typename T> 
+void Shader::setUniform(const char* name , const T value){
+	glUseProgram(shader_program) ; 
+	int location = glGetUniformLocation(shader_program , name);
+	setUniformValue(location , value);
 }
 
 
-template<class T> 
-void Shader::setUniformValue(int location , T value) {
-	shader_program->setUniformValue(location , value); 
+void Shader::setUniformValue(int location , const int value) {
+	glUniform1i(location , value); 
 }
 
-void Shader::setMatrixUniform(glm::mat4 matrix , const char* name){
-	QMatrix4x4 q_matrix (glm::value_ptr(matrix)) ; 
-	int location = shader_program->uniformLocation(name); 
-	assert(location != -1 && "Shader uniform value for matrix is invalid"); 
-	setUniformValue(location , q_matrix.transposed()); 
+void Shader::setMatrixUniform(const char* name , const glm::mat4 &matrix){
+	int location =  glGetUniformLocation(shader_program , name); 
+	glUniformMatrix4fv(location ,1 , GL_FALSE , glm::value_ptr(matrix)); 
 }
 
-void Shader::setMatrixUniform(glm::mat3 matrix , const char* name){
-	QMatrix3x3 q_matrix (glm::value_ptr(matrix)); 
-	int location = shader_program->uniformLocation(name); 
-	assert(location != -1 && "Shader uniform value for matrix is invalid"); 
-	setUniformValue(location , q_matrix); 
+void Shader::setMatrixUniform(const char* name , const glm::mat3 &matrix){
+	int location = glGetUniformLocation(shader_program , name); 
+	glUniformMatrix3fv(location ,1 , GL_FALSE , glm::value_ptr(matrix)); 
 }
 
 void Shader::initializeShader(){
-	shader_program = new QOpenGLShaderProgram(); 
-	shader_program->addShaderFromSourceFile(QOpenGLShader::Vertex , "../shaders/simple.vert"); 
-	shader_program->addShaderFromSourceFile(QOpenGLShader::Fragment , "../shaders/simple.frag"); 	
-	shader_program->link();
-	shaderErrorCheck(shader_program) ;
+	const char* vertex_shader_source = (const char*) vertex_shader_txt.c_str() ; 
+	const char* fragment_shader_source = (const char*) fragment_shader_txt.c_str(); 
+	vertex_shader = glCreateShader(GL_VERTEX_SHADER) ; 
+	glShaderSource(vertex_shader , 1 , &vertex_shader_source , nullptr) ; 
+	glCompileShader(vertex_shader); 
+	shaderCompilationErrorCheck(vertex_shader) ; 
+	fragment_shader = glCreateShader(GL_FRAGMENT_SHADER) ; 
+	glShaderSource(fragment_shader , 1 , &fragment_shader_source , nullptr) ; 
+	glCompileShader(fragment_shader); 
+	shaderCompilationErrorCheck(fragment_shader) ; 
+	shader_program = glCreateProgram();
+	glAttachShader(shader_program , vertex_shader); 
+	glAttachShader(shader_program , fragment_shader);
+	glLinkProgram(shader_program) ; 
+	programLinkingErrorCheck(shader_program) ; 
 	setTextureUniforms();
 }
 
 void Shader::bind(){
 	updateCamera(); 
-	shader_program->bind(); 
+	glUseProgram(shader_program);  
 }
 
 void Shader::release(){
-	shader_program->release(); 
+	glUseProgram(0); 
 }
 
 void Shader::clean(){
-	if(shader_program != nullptr){
-		shader_program->release(); 
+	if(shader_program != 0){	
 		std::cout << "Destroying shader : "<< shader_program  << std::endl ;  
-		delete shader_program ;
-		shader_program = nullptr ; 
+		glDeleteShader(vertex_shader) ; 
+		glDeleteShader(fragment_shader) ; 
+		glDeleteProgram(shader_program) ; 
+		shader_program = 0 ; 
 	}
 }
 

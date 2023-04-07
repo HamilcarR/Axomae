@@ -3,7 +3,6 @@
 
 #include "constants.h" 
 #include "utils_3D.h" 
-#include <QOpenGLTexture> 
 
 class TextureData{
 public:

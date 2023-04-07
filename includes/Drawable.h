@@ -5,10 +5,8 @@
 #include "Mesh.h"
 #include "TextureGroup.h" 
 #include "Camera.h"
+#include "GLBuffers.h"
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions_4_3_Core> 
-#include <QOpenGLBuffer>
-#include <QOpenGLVertexArrayObject> 
 #include <QDebug>
 #include <QString> 
 
@@ -39,14 +37,7 @@ public:
 
 private:	
 	Camera *camera_pointer ; 
-	QOpenGLVertexArrayObject vao ; 
-	QOpenGLBuffer vertex_buffer ; 
-	QOpenGLBuffer normal_buffer ; 
-	QOpenGLBuffer index_buffer ; 
-	QOpenGLBuffer texture_buffer ;
-	QOpenGLBuffer color_buffer ;
-
-
+	GLBuffers gl_buffers ; 
 };
 
 

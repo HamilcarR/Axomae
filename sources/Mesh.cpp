@@ -5,18 +5,20 @@ namespace axomae {
 
 Mesh::Mesh(){
 	mesh_initialized = false ; 
+	name = "uninitialized mesh"  ;
 }
 
 Mesh::Mesh(const Mesh& copy){
 	geometry = copy.geometry ; 
 	material = copy.material ; 
 	name = copy.name ; 
-
+	shader_program = copy.shader_program; 
 }
 
 Mesh::Mesh(Object3D const& geo , Material const& mat){
 	geometry = geo; 
 	material = mat;
+	name = "uninitialized mesh"  ;
 }
 
 Mesh::Mesh(std::string n , Object3D const& geo , Material const& mat){

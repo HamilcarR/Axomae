@@ -16,7 +16,7 @@
 #include "Mesh.h"
 #include "TextureDatabase.h"
 
-/*3D obj loader*/
+/*3D loader*/
 
 namespace axomae{
 
@@ -26,8 +26,9 @@ class Loader{
 public:
 	static Loader* getInstance(); 	
 	static std::vector<Mesh> load(const char* file);   				
+	static std::string loadShader(const char* filename); 
 	static void close(); 	
-		
+			
 private: 
 	Loader();	
 	~Loader();

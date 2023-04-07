@@ -6,28 +6,35 @@
 #include "Texture.h"
 #include "DebugGL.h" 
 #include "Camera.h" 
-#include <QOpenGLShaderProgram>
 
 class Shader{
 public:
-	Shader(); 
+	Shader();
+	Shader(const std::string vertex_code , const std::string fragment_code); 
 	virtual ~Shader();
 	virtual void initializeShader();
 	virtual void bind(); 
 	virtual void release();
-	virtual void clean(); 
+	virtual void clean();
+	virtual void setShadersRawText(std::string vs , std::string fs) { fragment_shader_txt = fs ; vertex_shader_txt = vs ; } 	
+	virtual void updateCamera(); 
 	void enableAttributeArray(GLuint att);
 	void setAttributeBuffer(GLuint location , GLenum type , int offset , int tuplesize , int stride = 0 ); 
-	void setMatrixUniform(glm::mat4 matrix_value , const char* uniform_name); 
-	void setMatrixUniform(glm::mat3 matrix_value , const char* uniform_name); 
+	void setMatrixUniform(const char* uniform_name , const glm::mat4 &value); 
+	void setMatrixUniform(const char* uniform_name , const glm::mat3 &value); 
 	void setSceneCameraPointer(Camera *camera);  
-	virtual void updateCamera(); 
+	template<typename T> 
+	void setUniform(const char* name , const T value) ; 
+
 protected:
 	virtual void setTextureUniforms();
-	template <class T> void setUniformValue(int location , T value); 
-
+	void setUniformValue(int location , const int value); 
 private:
-	QOpenGLShaderProgram *shader_program; 	
+	unsigned int shader_program; 	
+	unsigned int fragment_shader ; 
+	unsigned int vertex_shader ;
+	std::string fragment_shader_txt ; 
+	std::string vertex_shader_txt ; 
 	Camera* camera_pointer; 
 
 
