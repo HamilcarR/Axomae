@@ -24,8 +24,9 @@ Drawable::~Drawable(){
 }
 
 void Drawable::clean(){
-	mesh_object->clean(); 	
 	gl_buffers.clean() ; 
+	mesh_object->clean(); 	
+
 }
 
 
@@ -38,6 +39,7 @@ bool Drawable::initialize(){
 		return false ;
 	mesh_object->initializeGlData(); 
 	gl_buffers.initializeBuffers(); 
+	errorCheck(); 
 	return gl_buffers.isReady();  ; 
 }
 
@@ -66,20 +68,13 @@ void Drawable::start_draw(){
 		gl_buffers.bindTangentBuffer() ;
 		mesh_object->shader_program.enableAttributeArray(4);
 		mesh_object->shader_program.setAttributeBuffer(4 , GL_FLOAT , 0 , 3 , 0 ) ; 
-		
-
-
+	
 		gl_buffers.unbindVao() ; 
 	}
 
 }
 
-void Drawable::end_draw(){
-	gl_buffers.unbindVao(); 
-	mesh_object->releaseShaders();
 
-
-}
 
 void Drawable::bind(){
 	mesh_object->bindShaders(); 

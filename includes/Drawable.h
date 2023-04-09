@@ -26,7 +26,6 @@ public:
 	virtual ~Drawable(); 
 	bool initialize();
 	void start_draw(); 
-	void end_draw(); 
 	void clean();
 	void bind();
 	void unbind();
