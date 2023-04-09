@@ -46,13 +46,14 @@ bool GLBuffers::isReady(){
 }
 
 void GLBuffers::clean(){
-	if (vao != 0) glDeleteBuffers(1 , &vao); 
+	unbindVao(); 
 	if (vertex_buffer != 0) glDeleteBuffers(1 , &vertex_buffer); 
 	if (normal_buffer != 0) glDeleteBuffers(1 , &normal_buffer); 
 	if (index_buffer != 0) glDeleteBuffers(1 , &index_buffer); 
 	if (texture_buffer != 0) glDeleteBuffers(1 , &texture_buffer); 
 	if (color_buffer != 0) glDeleteBuffers(1 , &color_buffer); 
 	if (tangent_buffer != 0) glDeleteBuffers(1 , &tangent_buffer); 
+	if (vao != 0) glDeleteVertexArrays(1 , &vao); 
 }
 
 void GLBuffers::initializeBuffers(){
@@ -111,6 +112,7 @@ void GLBuffers::fillBuffers(){
 	glBufferData(GL_ARRAY_BUFFER , geometry->tangents.size() * sizeof(float) , geometry->tangents.data() , GL_STATIC_DRAW) ;  
 	bindIndexBuffer(); 
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER , geometry->indices.size() * sizeof(unsigned int) , geometry->indices.data() , GL_STATIC_DRAW); 
+	errorCheck(); 
 }
 
 
