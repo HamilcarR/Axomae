@@ -71,12 +71,6 @@ void Renderer::draw(){
 
 }
 
-void Renderer::end_draw(){
-	for(Drawable *A : scene)
-		A->end_draw(); 
-	
-}
-
 void Renderer::set_new_scene(std::vector<Mesh> &new_scene){
 	for (Drawable *A : scene){
 		A->clean(); 
