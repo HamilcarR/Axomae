@@ -3,11 +3,9 @@ TARGET = Axomae
 
 QT += widgets\
       gui\
-      opengl\
       openglwidgets\
 
 CONFIG += debug \
-	  opengl \
           warn_on \	
 
 
