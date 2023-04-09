@@ -2,7 +2,7 @@
 #define UTILS_3D_H
 
 #include "constants.h" 
-
+#include "DebugGL.h" 
 #include <GL/glew.h>
 #include <GL/glu.h>
 #include <GL/gl.h>
@@ -13,6 +13,24 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp> 
+
+
+
+
+
+
+
+inline void errorCheck(){
+	GLenum error = GL_NO_ERROR;
+    	error = glGetError();
+    	if (error != GL_NO_ERROR) 
+        	std::cout << "Error:" << error << std::endl ; 
+
+}
+
+
+
+
 
 
 

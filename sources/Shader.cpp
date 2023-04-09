@@ -114,6 +114,7 @@ void Shader::initializeShader(){
 	glLinkProgram(shader_program) ; 
 	programLinkingErrorCheck(shader_program) ; 
 	setTextureUniforms();
+	errorCheck(); 
 }
 
 void Shader::bind(){
