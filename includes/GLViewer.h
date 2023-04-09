@@ -35,7 +35,7 @@ class GLViewer : public QOpenGLWidget {
 		void wheelEvent(QWheelEvent *event) override;
 	private:
 		Renderer* renderer;	
-			
+		bool glew_initialized ; 			
 
 
 
