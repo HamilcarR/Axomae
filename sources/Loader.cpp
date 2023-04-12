@@ -1,5 +1,6 @@
 #include "../includes/Loader.h"
 #include <fstream>
+#include <iostream>
 #include <unistd.h> 
 #include <QImage>
 #include <QBuffer>
@@ -118,6 +119,8 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 std::vector<Mesh> Loader::load(const char* file){
 	TextureDatabase *texture_database = TextureDatabase::getInstance() ; 
 	texture_database->clean(); 
+	std::string vertex_shader = loadShader("../shaders/simple.vert"); 
+	std::string fragment_shader = loadShader("../shaders/simple.frag");
 	Assimp::Importer importer ;
 	const aiScene *modelScene = importer.ReadFile(file , aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs ) ;
 	if(modelScene != nullptr){
@@ -163,7 +166,9 @@ std::vector<Mesh> Loader::load(const char* file){
 			loaded_mesh.geometry = object ; 
 			loaded_mesh.material = mesh_material ;
 			loaded_mesh.name = name ; 
+			loaded_mesh.shader_program.setShadersRawText(vertex_shader , fragment_shader) ; 
 			objects.push_back(loaded_mesh);
+
 		}
 		return objects ; 
 	}
@@ -178,5 +183,28 @@ void Loader::close(){
 		delete instance ; 
 	instance = nullptr; 
 }
+
+
+std::string Loader::loadShader(const char* filename){
+	std::ifstream stream(filename) ; 
+	std::string buffer; 
+	std::string shader_text ; 
+	while(getline(stream , buffer))
+		shader_text = shader_text + buffer + "\n" ;
+	stream.close(); 
+	return shader_text ; 
+
+}
+
+
+
+
+
+
+
+
+
+
+
 
 }

@@ -15,9 +15,7 @@
  * @brief Class responsible for the 3D rendering
  */
 
-class QOpenGLShaderProgram ; 
-class QOpenGLTexture ; 
-class GLViewer : public QOpenGLWidget , protected QOpenGLFunctions_4_3_Core {
+class GLViewer : public QOpenGLWidget {
 
 	Q_OBJECT
 	
@@ -37,7 +35,7 @@ class GLViewer : public QOpenGLWidget , protected QOpenGLFunctions_4_3_Core {
 		void wheelEvent(QWheelEvent *event) override;
 	private:
 		Renderer* renderer;	
-			
+		bool glew_initialized ; 			
 
 
 

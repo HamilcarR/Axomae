@@ -11,9 +11,12 @@ Drawable::Drawable(){
 
 Drawable::Drawable(Mesh &mesh){
 	mesh_object = new Mesh(mesh);
-	camera_pointer = nullptr ; 
-	if(!initialize())
-		exit(0); 
+	camera_pointer = nullptr ;
+	gl_buffers.setGeometryPointer(&mesh_object->geometry) ; 
+	if(!initialize()){
+		std::cerr << "failed initializing Drawable data" << "\n" ; 
+		exit(EXIT_FAILURE); 
+	}
 }
 
 Drawable::~Drawable(){
@@ -21,95 +24,67 @@ Drawable::~Drawable(){
 }
 
 void Drawable::clean(){
+	gl_buffers.clean() ; 
 	mesh_object->clean(); 	
-	if(vao.isCreated()){
-		vao.release(); 
-		vao.destroy(); 
-	}
-	vertex_buffer.destroy() ; 
-	normal_buffer.destroy() ; 
-	index_buffer.destroy() ; 
-	texture_buffer.destroy() ;
+
 }
 
 
 bool Drawable::ready(){
-	bool vao_created = vao.isCreated() ; 
-	bool buffers_created = vertex_buffer.isCreated() && 
-			       normal_buffer.isCreated() && 
-			       index_buffer.isCreated() && 
-			       texture_buffer.isCreated() ; //TODO : add color buffer if useful ? 
-	return vao_created && buffers_created  ; 
+	return gl_buffers.isReady() ; 
 }
 
 bool Drawable::initialize(){
 	if(mesh_object == nullptr)
 		return false ;
-
 	mesh_object->initializeGlData(); 
-	bool vao_okay = vao.create();
-	assert(vao_okay == true) ; 
-	vertex_buffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer); 	
-	texture_buffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer); 
-	index_buffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
-	normal_buffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-	color_buffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer); 
-	vertex_buffer.create();
-	color_buffer.create();
-	texture_buffer.create(); 
-	index_buffer.create();
-	normal_buffer.create();
-	vertex_buffer.setUsagePattern(QOpenGLBuffer::StreamDraw);	
-	texture_buffer.setUsagePattern(QOpenGLBuffer::StreamDraw); 
-	index_buffer.setUsagePattern(QOpenGLBuffer::StreamDraw);
-	normal_buffer.setUsagePattern(QOpenGLBuffer::StreamDraw); 
-	color_buffer.setUsagePattern(QOpenGLBuffer::StreamDraw); 
-	mesh_object->bindShaders(); 
-	vao.bind(); 
-	vertex_buffer.bind(); 
-	mesh_object->shader_program.enableAttributeArray(0);
-	mesh_object->shader_program.setAttributeBuffer(0 , GL_FLOAT , 0 , 3 , 0 ) ;
-	texture_buffer.bind(); 
-	mesh_object->shader_program.enableAttributeArray(1) ; 
-	mesh_object->shader_program.setAttributeBuffer(1 , GL_FLOAT , 0 , 2 , 0 ) ; 
-	index_buffer.bind();
-	vao.release(); 
-	mesh_object->releaseShaders();
-	
-	return true ; 
+	gl_buffers.initializeBuffers(); 
+	errorCheck(); 
+	return gl_buffers.isReady();  ; 
 }
 
 void Drawable::start_draw(){
 	if(mesh_object != nullptr){		
-		vao.bind();
 		mesh_object->bindShaders();
-		vertex_buffer.bind();
-		vertex_buffer.allocate(mesh_object->geometry.vertices.data() , mesh_object->geometry.vertices.size() * sizeof(float)); 
-		texture_buffer.bind();
-		texture_buffer.allocate(mesh_object->geometry.uv.data() , mesh_object->geometry.uv.size() * sizeof(float)) ; 
-		index_buffer.bind();
-		index_buffer.allocate(mesh_object->geometry.indices.data() , mesh_object->geometry.indices.size() * sizeof(unsigned int)); 
+		gl_buffers.bindVao() ;  
+		gl_buffers.fillBuffers() ; 	
+		
+		gl_buffers.bindVertexBuffer(); 
+		mesh_object->shader_program.enableAttributeArray(0);
+		mesh_object->shader_program.setAttributeBuffer(0 , GL_FLOAT , 0 , 3 , 0 ) ;
+		
+		gl_buffers.bindColorBuffer() ;
+		mesh_object->shader_program.enableAttributeArray(1);
+		mesh_object->shader_program.setAttributeBuffer(1 , GL_FLOAT , 0 , 3 , 0 ) ; 
+	
+		gl_buffers.bindNormalBuffer() ;
+		mesh_object->shader_program.enableAttributeArray(2);
+		mesh_object->shader_program.setAttributeBuffer(2 , GL_FLOAT , 0 , 3 , 0 ) ; 
+		
+		gl_buffers.bindTextureBuffer() ;
+		mesh_object->shader_program.enableAttributeArray(3);
+		mesh_object->shader_program.setAttributeBuffer(3 , GL_FLOAT , 0 , 2 , 0 ) ; 
 
+		gl_buffers.bindTangentBuffer() ;
+		mesh_object->shader_program.enableAttributeArray(4);
+		mesh_object->shader_program.setAttributeBuffer(4 , GL_FLOAT , 0 , 3 , 0 ) ; 
+	
+		gl_buffers.unbindVao() ; 
 	}
 
 }
 
-void Drawable::end_draw(){
-	vao.release();
-	mesh_object->releaseShaders();
 
-
-}
 
 void Drawable::bind(){
 	mesh_object->bindShaders(); 
 	mesh_object->bindMaterials(); 
-	vao.bind();
+	gl_buffers.bindVao(); 
 
 }
 
 void Drawable::unbind(){
-	vao.release();
+	gl_buffers.unbindVao(); 
 	mesh_object->releaseShaders();
 }
 

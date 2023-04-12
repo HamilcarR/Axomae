@@ -61,20 +61,14 @@ bool Renderer::prep_draw(){
 	}
 }
 
-void Renderer::draw(QOpenGLFunctions_4_3_Core* gl){
+void Renderer::draw(){
 	scene_camera->computeViewProjection(); 
 	for (Drawable *A : scene){
 		A->bind();
-		gl->glDrawElements(GL_TRIANGLES , A->mesh_object->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
+		glDrawElements(GL_TRIANGLES , A->mesh_object->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
 		A->unbind();
 	}
 
-}
-
-void Renderer::end_draw(){
-	for(Drawable *A : scene)
-		A->end_draw(); 
-	
 }
 
 void Renderer::set_new_scene(std::vector<Mesh> &new_scene){

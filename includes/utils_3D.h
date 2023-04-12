@@ -2,6 +2,10 @@
 #define UTILS_3D_H
 
 #include "constants.h" 
+#include "DebugGL.h" 
+#include <GL/glew.h>
+#include <GL/glu.h>
+#include <GL/gl.h>
 #include <glm/vec3.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/common.hpp>
@@ -12,6 +16,24 @@
 
 
 
+
+
+
+
+inline void errorCheck(){
+	GLenum error = GL_NO_ERROR;
+    	error = glGetError();
+    	if (error != GL_NO_ERROR) 
+        	std::cout << "Error:" << error << std::endl ; 
+
+}
+
+
+
+
+
+
+
 /*TODO : Create classes , implement clean up */
 namespace axomae {
 
@@ -19,6 +41,7 @@ namespace axomae {
 struct Object3D{
 	std::vector<float> vertices; 
 	std::vector<float> uv ; 
+	std::vector<float> colors; 
 	std::vector<float> normals; 
 	std::vector<float> bitangents ; 
 	std::vector<float> tangents;

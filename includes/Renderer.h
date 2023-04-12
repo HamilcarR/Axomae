@@ -16,8 +16,7 @@ public:
 	virtual ~Renderer();	
 	void initialize();
 	bool prep_draw();
-	void draw(QOpenGLFunctions_4_3_Core* api_functions); 
-	void end_draw();
+	void draw(); 
 	void set_new_scene(std::vector<axomae::Mesh> &new_scene);
 	bool scene_ready() ; 
 	MouseState* getMouseStatePointer(){ return &mouse_state;} ;  
