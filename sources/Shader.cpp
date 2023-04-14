@@ -58,10 +58,10 @@ void Shader::setTextureUniforms(){
 	setUniform(MetallicTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::METALLIC)) ; 
 	setUniform(RoughnessTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::ROUGHNESS)) ; 
 	setUniform(AmbiantOcclusionTexture::getTextureTypeCStr() , static_cast<int> (Texture::AMBIANTOCCLUSION)) ; 	
-	setUniform(GenericTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::SPECULAR)) ; 
+	setUniform(SpecularTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::SPECULAR)) ; 
+	setUniform(EmissiveTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::EMISSIVE)) ; 
+	setUniform(CubeMapTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::CUBEMAP)) ; 
 	setUniform(GenericTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::GENERIC)) ; 
-	setUniform(GenericTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::GENERIC)) ; 
-
 }
 
 void Shader::setSceneCameraPointer(Camera* camera){
