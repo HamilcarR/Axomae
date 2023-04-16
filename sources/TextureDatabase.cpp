@@ -20,12 +20,13 @@ void TextureDatabase::destroy(){
 
 
 void TextureDatabase::clean(){
-	for(std::pair<unsigned int , Texture*> A : texture_database){
-		Texture* texture = A.second ; 
-		texture->clean(); 
-		delete texture ; 	
+	for(std::pair<const unsigned int , Texture*>& A : texture_database){
+		A.second->clean(); 
+		delete A.second ; 
+		A.second = nullptr ; 
 	}
-	texture_database.clear(); 
+	texture_database.clear();
+	
 }
 
 TextureDatabase::TextureDatabase(){
@@ -37,8 +38,8 @@ TextureDatabase::~TextureDatabase(){
 
 
 void TextureDatabase::addTexture(unsigned int index , TextureData *texture , Texture::TYPE type){
-	std::pair<unsigned int , Texture*> pair(index , TextureFactory::constructTexture(texture , type));
-	texture_database.insert(pair); 
+	texture_database[index] = TextureFactory::constructTexture(texture , type) ; 
+
 }
 
 Texture* TextureDatabase::get(unsigned int index){

@@ -26,8 +26,12 @@ Renderer::~Renderer(){
 		}
 	}
 	scene.clear(); 
-	texture_database->clean();
+	if(TextureDatabase::isInstanced()){
+		texture_database->clean();
+		texture_database->destroy();   
+	}	
 	delete scene_camera ; 
+	scene_camera = nullptr ; 
 }
 
 void Renderer::initialize(){
@@ -48,8 +52,8 @@ bool Renderer::prep_draw(){
 	if(start_draw && scene_ready()){
 		/*Bind buffers*/
 		for(Drawable *A : scene){
-			A->start_draw(); 
 			A->setSceneCameraPointer(scene_camera); 
+			A->start_draw(); 
 		}
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 		return true; 				
