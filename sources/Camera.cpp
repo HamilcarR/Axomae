@@ -9,10 +9,11 @@ Camera::Camera() : up(glm::vec3(0,1,0)){
 	target = glm::vec3(0,0,0);
 	direction = glm::vec3(0,0,0);
 	right = glm::vec3(0,0,0);
-
+	type = EMPTY ; 
 }
 
 Camera::Camera(float rad , ScreenSize *screen, float near , float far , MouseState* pointer) : up(glm::vec3(0,1,0)){
+	type = EMPTY ; 
 	position = glm::vec3(0,0,-1.f); 
 	target = glm::vec3(0,0,0);
 	direction = glm::vec3(0,0,0);
@@ -33,7 +34,9 @@ Camera::~Camera(){
 
 }
 
-
+glm::mat4 Camera::getProjection(){
+	return projection; 
+}
 void Camera::reset(){
 	projection = glm::mat4(1.f); 
 	view = glm::mat4(1.f) ; 
@@ -67,10 +70,20 @@ void Camera::computeViewSpace(){
 }
 /**********************************************************************************************************************************************/
 ArcballCamera::ArcballCamera(){
-
+	type = ARCBALL ;
+	scene_rotation_matrix = glm::mat4(1.f); 
+	angle = 0 ; 
+	radius = 0 ;
+	default_radius = radius ; 
+	radius_updated = false ; 
+	start_position =  position = glm::vec3(0 , 0 , radius)  ; 
+	cursor_position = glm::vec2(0); 
+	rotation = last_rotation = glm::quat(1.f , 0.f , 0.f , 0.f ) ; 
+	axis = glm::vec3(0.f); 
 }
 
 ArcballCamera::ArcballCamera(float radians , ScreenSize* screen  , float near , float far , float radius , MouseState* pointer): Camera(radians ,screen, near , far , pointer) {
+	type = ARCBALL ; 
 	angle = 0 ; 
 	this->radius = radius ;
 	default_radius = radius ; 
@@ -79,6 +92,7 @@ ArcballCamera::ArcballCamera(float radians , ScreenSize* screen  , float near , 
 	cursor_position = glm::vec2(0); 
 	rotation = last_rotation = glm::quat(1.f , 0.f , 0.f , 0.f ) ; 
 	axis = glm::vec3(0.f); 
+	scene_rotation_matrix = glm::mat4(1.f); 
 }
 
 ArcballCamera::~ArcballCamera(){
@@ -106,11 +120,13 @@ void ArcballCamera::computeViewSpace(){
 		rotate(); 
 		glm::mat4 rotation_matrix = glm::mat4_cast(rotation) ; 
 		position = rotation_matrix * glm::vec4(position + glm::vec3(0 , 0 , radius) , 0) ; 
-		view = glm::lookAt(glm::vec3(0 , 0 , radius) , target , up) * rotation_matrix ; 
-	
+		view = glm::lookAt(glm::vec3(0 , 0 , radius) , target , up)  ; 
+		scene_rotation_matrix = rotation_matrix ; 	
 	}
-	else
-		view = glm::lookAt(glm::vec3(0 , 0 , radius) , target , up) * glm::mat4_cast(last_rotation); 
+	else{
+		view = glm::lookAt(glm::vec3(0 , 0 , radius) , target , up) ; 
+		scene_rotation_matrix = glm::mat4_cast(last_rotation); 
+	}
 }
 
 void ArcballCamera::rotate(){
@@ -176,7 +192,7 @@ void ArcballCamera::zoomOut(){
 /**********************************************************************************************************************************************/
 
 FreePerspectiveCamera::FreePerspectiveCamera(){
-
+	type = PERSPECTIVE ; 
 }
 
 FreePerspectiveCamera::FreePerspectiveCamera(float radians , ScreenSize* screen , float near , float far , float radius , MouseState* pointer): Camera(radians , screen ,  near , far , pointer) {

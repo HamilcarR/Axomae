@@ -6,6 +6,7 @@
 
 class Camera{
 public:
+	enum TYPE : signed {EMPTY = -1 , ARCBALL = 0 , PERSPECTIVE = 1} ; 
 	Camera(); 
 	Camera(float radians , ScreenSize* screen ,  float clip_near , float clip_far , MouseState* pointer); 
 	virtual ~Camera(); 
@@ -14,6 +15,7 @@ public:
 	virtual void computeViewProjection(); 
 	virtual glm::mat4 getView(){return view; }
 	virtual glm::mat4 getViewProjection(); 
+	virtual glm::mat4 getProjection() ; 
 	virtual void onLeftClick() = 0 ;  
 	virtual void onRightClick() = 0 ;
 	virtual void onLeftClickRelease() = 0 ; 
@@ -21,8 +23,11 @@ public:
 	virtual void movePosition() = 0 ; 
 	virtual void zoomIn() = 0 ; 
 	virtual void zoomOut() = 0 ; 
-	virtual void reset() ; 
+	virtual void reset() ;
+	virtual const glm::mat4& getSceneRotationMatrix() const = 0; 
+	TYPE getType() const {return type ; } 
 protected:
+	TYPE type ; 
 	float near ; 
 	float far ;
 	float fov ; 
@@ -53,7 +58,8 @@ public:
 	virtual void onRightClickRelease() override;
 	virtual void zoomIn() override ; 
 	virtual void zoomOut() override ;
-	virtual void reset() ; 
+	virtual void reset() ;
+	virtual const glm::mat4& getSceneRotationMatrix() const {return scene_rotation_matrix ; }  
 protected:
 	virtual void rotate(); 
 	virtual void movePosition() override ;
@@ -70,6 +76,7 @@ protected:
 	glm::vec3 axis ; 
 	bool radius_updated ; 
 private:
+	glm::mat4 scene_rotation_matrix;
 	float default_radius; 
 };
 
