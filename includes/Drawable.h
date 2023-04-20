@@ -22,7 +22,7 @@ class Drawable{
 public:
 	Drawable();
 	Drawable(axomae::Mesh &mesh); 
-
+	Drawable(axomae::Mesh *mesh); 
 	virtual ~Drawable(); 
 	bool initialize();
 	void start_draw(); 

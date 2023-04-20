@@ -19,8 +19,21 @@ Drawable::Drawable(Mesh &mesh){
 	}
 }
 
-Drawable::~Drawable(){
+Drawable::Drawable(Mesh *mesh){
+	assert(mesh != nullptr) ; 
+	if(mesh != nullptr){
+		mesh_object = mesh;  
+		camera_pointer = nullptr ; 
+		gl_buffers.setGeometryPointer(&mesh_object->geometry); 
+		if(!initialize()){
+			std::cerr << "failed initializing Drawable data" << "\n" ; 
+			exit(EXIT_FAILURE); 
+		}
+	}
+}
 
+
+Drawable::~Drawable(){
 }
 
 void Drawable::clean(){

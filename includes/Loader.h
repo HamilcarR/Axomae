@@ -16,8 +16,7 @@
 #include "Mesh.h"
 #include "TextureDatabase.h"
 
-/*3D loader*/
-
+/*3D loader : Will import , construct , and load meshes into the program . Additionnally , loads textures*/
 namespace axomae{
 
 
@@ -25,16 +24,18 @@ namespace axomae{
 class Loader{
 public:
 	static Loader* getInstance(); 	
-	static std::vector<Mesh> load(const char* file);   				
+	static std::vector<Mesh*> load(const char* file);   				
 	static std::string loadShader(const char* filename); 
 	static void close(); 	
-			
+				
 private: 
 	Loader();	
 	~Loader();
+	static Mesh* generateCubeMap(unsigned num_textures , bool is_glb_model) ; 
+	static std::pair<unsigned int , std::vector<Mesh*>> loadObjects(const char* filename) ; 
+	
+private:
 	static Loader* instance; 
-	
-	
 };
 
 

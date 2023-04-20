@@ -116,15 +116,22 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 }
 
 
-std::vector<Mesh> Loader::load(const char* file){
-	TextureDatabase *texture_database = TextureDatabase::getInstance() ; 
+
+
+
+
+
+
+
+std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* file){
+	TextureDatabase *texture_database = TextureDatabase::getInstance() ; 	
+	std::vector<Mesh*> objects; 
 	texture_database->clean(); 
 	std::string vertex_shader = loadShader("../shaders/simple.vert"); 
 	std::string fragment_shader = loadShader("../shaders/simple.frag");
-	Assimp::Importer importer ;
+	Assimp::Importer importer ;	
 	const aiScene *modelScene = importer.ReadFile(file , aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs ) ;
 	if(modelScene != nullptr){
-		std::vector<Mesh> objects; 
 		const aiMaterial* ai_material ;
 		for(unsigned int i = 0 ; i < modelScene->mNumMeshes ; i++){
 			const aiMesh* mesh = modelScene->mMeshes[i] ; 
@@ -162,20 +169,33 @@ std::vector<Mesh> Loader::load(const char* file){
 				object.indices.push_back(static_cast<unsigned int> (mesh->mFaces[ind].mIndices[2]));
 			}
 			std::cout << "object loaded : " << mesh->mName.C_Str()<< "\n" ; 
-			Mesh loaded_mesh ; 
-			loaded_mesh.geometry = object ; 
-			loaded_mesh.material = mesh_material ;
-			loaded_mesh.name = name ; 
-			loaded_mesh.shader_program.setShadersRawText(vertex_shader , fragment_shader) ; 
+			Mesh *loaded_mesh = new Mesh() ; 
+			loaded_mesh->geometry = object ; 
+			loaded_mesh->material = mesh_material ;
+			loaded_mesh->name = name ; 
+			loaded_mesh->shader_program.setShadersRawText(vertex_shader , fragment_shader) ; 
 			objects.push_back(loaded_mesh);
-
 		}
-		return objects ; 
-	}
+		return std::pair<unsigned int , std::vector<Mesh*>> (modelScene->mNumTextures , objects) ; 
+	}	
 	else{
 		std::cout << "Problem loading scene" << std::endl ; 
-		return std::vector<Mesh>() ; 	
+		return std::pair<unsigned int , std::vector<Mesh*>> (0 , std::vector<Mesh*>()) ; 
 	}
+
+
+}
+
+
+
+std::vector<Mesh*> Loader::load(const char* file){
+	std::pair<unsigned int , std::vector<Mesh*>> scene = loadObjects(file); 
+	Mesh* cube_map = generateCubeMap(scene.first , false) ; 	
+	if(cube_map != nullptr)
+		scene.second.push_back(cube_map); 
+	return scene.second ; 
+
+
 }
 
 void Loader::close(){
@@ -198,7 +218,49 @@ std::string Loader::loadShader(const char* filename){
 
 
 
+Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
+	Mesh *cube_map = new CubeMapMesh();  
+	std::string vertex_shader = loadShader("../shaders/cubemap.vert"); 
+	std::string fragment_shader = loadShader("../shaders/cubemap.frag"); 
+	cube_map->shader_program.setShadersRawText(vertex_shader , fragment_shader); 
+	TextureDatabase* texture_database = TextureDatabase::getInstance(); 	
+	TextureData cubemap ; 
+	QString skybox_folder = "sky" ; 
+	QString path = "../Ressources/Skybox_Textures/Sky/" ;
+	auto format = "jpg"; 
+	QImage left(":/"+skybox_folder+"/negx.jpg" , format); 		
+	QImage bot(":/"+skybox_folder+"/negy.jpg" , format); 		
+	QImage front(":/"+skybox_folder+"/negz.jpg" , format); 		
+	QImage right(":/"+skybox_folder+"/posx.jpg" , format); 		
+	QImage top(":/"+skybox_folder+"/posy.jpg" , format); 		
+	QImage back(":/"+skybox_folder+"/posz.jpg" , format); 
+	std::vector<QImage> array = { right , left , top , bot , back , front} ; 
+	cubemap.width = left.width() ; 
+	cubemap.height = left.height(); 	
+	cubemap.data = new uint32_t [cubemap.width * cubemap.height * 6] ;
+	unsigned int k = 0 ; 
+	for(unsigned i = 0 ; i < array.size() ; i++)
+		for(unsigned y = 0 ; y < array[i].height() ; y++){		
+			QRgb *line = reinterpret_cast<QRgb*>(array[i].scanLine(y)) ; 
+			for(unsigned x = 0 ; x < array[i].width() ; x++){
+				QRgb rgba = line[x] ; 
+				int r = qRed(rgba) ; 
+				int g = qGreen(rgba) ; 
+				int b = qBlue(rgba) ; 
+				int a = qAlpha(rgba) ; 
+				uint32_t rgba_final = (a << 24) | (b << 16) | (g << 8) | r ; 
+				cubemap.data[k] = rgba_final ; 
+				k++ ;		
+			}
+		}
+	
+	Material material ; 
+	texture_database->addTexture(num_textures + 1 , &cubemap , Texture::CUBEMAP ) ; 
+	material.addTexture(num_textures + 1 , Texture::CUBEMAP); 
+	cube_map->material = material ; 	
+	return cube_map; 		
 
+}
 
 
 
