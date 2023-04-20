@@ -17,7 +17,7 @@ public:
 	void initialize();
 	bool prep_draw();
 	void draw(); 
-	void set_new_scene(std::vector<axomae::Mesh> &new_scene);
+	void set_new_scene(std::vector<axomae::Mesh*> &new_scene);
 	bool scene_ready() ; 
 	MouseState* getMouseStatePointer(){ return &mouse_state;} ;  
 	void onLeftClick(); 

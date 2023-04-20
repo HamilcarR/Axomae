@@ -15,7 +15,7 @@ Renderer::Renderer(){
 	mouse_state.right_button_released = true ; 
 	mouse_state.previous_pos_x = 0 ; 
 	mouse_state.previous_pos_y = 0 ;  
-	scene_camera = new ArcballCamera(45.f , &screen_size ,  0.001f , 1000.f , 100.f, &mouse_state); 	
+	scene_camera = new ArcballCamera(45.f , &screen_size ,  0.1f , 10000.f , 100.f, &mouse_state); 	
 }
 
 Renderer::~Renderer(){
@@ -29,6 +29,7 @@ Renderer::~Renderer(){
 	if(TextureDatabase::isInstanced()){
 		texture_database->clean();
 		texture_database->destroy();   
+		texture_database = nullptr ; 
 	}	
 	delete scene_camera ; 
 	scene_camera = nullptr ; 
@@ -36,8 +37,6 @@ Renderer::~Renderer(){
 
 void Renderer::initialize(){
 	glEnable(GL_DEPTH_TEST); 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
 }
 
 
@@ -75,13 +74,13 @@ void Renderer::draw(){
 
 }
 
-void Renderer::set_new_scene(std::vector<Mesh> &new_scene){
+void Renderer::set_new_scene(std::vector<Mesh*> &new_scene){
 	for (Drawable *A : scene){
 		A->clean(); 
 		delete A ; 
 	}
 	scene.clear();
-	for (Mesh m : new_scene)
+	for (Mesh *m : new_scene)
 		scene.push_back(new Drawable(m)); 
 	start_draw = true ;
 	scene_camera->reset() ; 

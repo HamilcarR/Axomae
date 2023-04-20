@@ -787,6 +787,13 @@ SDL_Surface* ImageManager::project_uv_normals(Object3D object , int width ,  int
 
 	SDL_Surface* surf = SDL_CreateRGBSurface(0 , width , height , 24 , rmask , gmask , bmask , amask) ;
 	assert(surf != nullptr) ; 
+	bool tangents_empty = object.tangents.empty()  , 
+	     bitangents_empty = object.bitangents.empty() , 
+	     normals_empty = object.normals.empty() ,
+	     uv_empty = object.uv.empty() , 
+	     indices_empty = object.indices.empty(); 
+	if(tangents_empty || normals_empty || uv_empty || indices_empty)
+		return surf ; 
 	/* TODO : Parallelize : each face = 1 thread ? */
 	for(unsigned int i = 0 ; i < object.indices.size() ; i+=3) {
 		std::vector<unsigned int> index = object.indices; 

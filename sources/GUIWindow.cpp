@@ -625,12 +625,12 @@ void GUIWindow::project_uv_normals(){
 bool GUIWindow::import_3DOBJ(){
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
 	if(!filename.isEmpty()){
-		std::vector<Mesh> scene = Loader::load(filename.toStdString().c_str()) ;
-		SceneSelector *instance = SceneSelector::getInstance(); 
+		std::vector<Mesh*> scene = Loader::load(filename.toStdString().c_str()) ;
+		SceneSelector *instance = SceneSelector::getInstance(); 	
+		_UI.renderer_view->setNewScene(scene);
 		instance->setScene(scene);
 		_UI.meshes_list->setList(scene) ; 
-		std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, scene[0].geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked());	
-		_UI.renderer_view->setNewScene(scene);
+		std::future<SDL_Surface*> async_get_surf = std::async(ImageManager::project_uv_normals, scene[0]->geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked());	
 		SDL_Surface* surf = async_get_surf.get() ; 
 		display_image(surf , PROJECTED_NMAP , true) ; 
 		return true ; 

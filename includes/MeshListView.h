@@ -12,7 +12,7 @@ class MeshListView : public QListWidget {
 public:
 	MeshListView(QWidget* parent=nullptr);
 	virtual ~MeshListView();
-	void setList(std::vector<axomae::Mesh> &meshes); 
+	void setList(const std::vector<axomae::Mesh*> &meshes); 
 	void remove();
 
 private:
