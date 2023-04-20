@@ -1,5 +1,6 @@
 #version 460 core
 
+
 layout(location=0) in vec3 positions ;
 layout(location=1) in vec3 colors ;
 layout(location=2) in vec3 normals ; 
@@ -10,18 +11,12 @@ layout(location=4) in vec3 tangents ;
 uniform mat4 VP ; 
 uniform mat4 MVP ; 
 uniform mat4 view ;
-out vec4 COL ; 
-out vec2 UV ;
-out vec3 NORM; 
-out vec3 POS ; 
+uniform mat4 model ; 
+uniform mat4 projection ; 
+out vec3 cubemap_vector_sample;
 
 void main(){
-	COL = vec4(1.) ; 
-	UV = uv ; 
-	NORM = normals; 
-	POS = positions;   
-
-
-
-	gl_Position = MVP * vec4(positions , 1.f) ; 	
+	cubemap_vector_sample = positions ;
+	vec4 POS = MVP * vec4(positions , 1.f) ; 	
+	gl_Position = POS.xyww; 
 }
