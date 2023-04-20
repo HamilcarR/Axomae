@@ -11,8 +11,10 @@ public:
 	void clean();
 	void addTexture(unsigned int index , TextureData* texture , Texture::TYPE type); 
 	Texture* get(unsigned int index);
-	bool contains(unsigned int index); 
+	bool contains(unsigned int index);
+	std::vector<std::pair<unsigned int , Texture*>> getTexturesByType(Texture::TYPE texture_type) const ; 
 	static bool isInstanced(){ return instance != nullptr ; } ; 
+	
 private:
 	TextureDatabase(); 	
 	virtual ~TextureDatabase(); 

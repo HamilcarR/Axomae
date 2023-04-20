@@ -6,19 +6,14 @@
 
 class TextureData{
 public:
-	unsigned int width ; 
-	unsigned int height ; 
-	std::string name ; 
-	uint32_t *data ; 
-	
+
+	enum CHANNELS : unsigned { RGB = 0 , RGBA = 1} ; 		
 	TextureData(){
 		width = 0 ; 
 		height = 0 ; 
 		data = nullptr ; 
 	}
-
 	~TextureData(){}
-	
 	/*provides deep copy of the object , but doesn't do the cleanup for the copied object*/
 	TextureData& operator=(const TextureData& from){ 
 		width = from.width ;
@@ -28,7 +23,6 @@ public:
 		name = from.name ; 
 		return *this ; 
 	}
-
 	void clean(){
 		if(data != nullptr)
 			delete data ; 
@@ -37,29 +31,39 @@ public:
 		height = 0 ;
 		name = "" ; 
 	}
+
+public:
+	unsigned int width ; 
+	unsigned int height ; 
+	std::string name ; 
+	uint32_t *data ; 
+
 };
 
 
 class Texture{
 public:
-	enum TYPE : unsigned {DIFFUSE = 0 , NORMAL = 1 , METALLIC = 2 , ROUGHNESS = 3 , AMBIANTOCCLUSION = 4 , SPECULAR = 5, EMISSIVE = 6 , GENERIC = 7} ; 	
+	enum TYPE : signed {EMPTY = -1 , DIFFUSE = 0 , NORMAL = 1 , METALLIC = 2 , ROUGHNESS = 3 , AMBIANTOCCLUSION = 4 , SPECULAR = 5, EMISSIVE = 6 , CUBEMAP = 7 , GENERIC = 8} ; 	
+
 	Texture(); 
 	Texture(TextureData *tex); 
 	virtual ~Texture();
 	void set(TextureData *texture); 
 	void clean();
+	void setTextureType(TYPE type){name = type;} 	
+	TYPE getTextureType(){return name;} ;  
 	virtual void bindTexture() = 0 ; 
 	virtual void unbindTexture() = 0;
 	virtual void setGlData() = 0 ; 
 	void cleanGlData(); 
 
 protected:
-	void initializeTexture2D(); 
+	virtual void initializeTexture2D(); 
 
 
 
 protected:
-	std::string name ;
+	TYPE name ;
 	unsigned int width ; 
 	unsigned int height ; 
 	uint32_t *data ; 
@@ -73,7 +77,7 @@ protected:
 class DiffuseTexture : public Texture{
 public:
 	DiffuseTexture();
-	DiffuseTexture(TextureData *data):Texture(data){}; 
+	DiffuseTexture(TextureData *data); 
 	virtual ~DiffuseTexture(); 
 	virtual void setGlData() ;
 	virtual void bindTexture() ; 
@@ -85,7 +89,7 @@ public:
 class NormalTexture : public Texture{
 public:
 	NormalTexture();
-	NormalTexture(TextureData* data):Texture(data){} ; 
+	NormalTexture(TextureData* data) ; 
 	virtual ~NormalTexture(); 
 	virtual void setGlData() ;
 	virtual void bindTexture() ; 
@@ -96,7 +100,7 @@ public:
 class MetallicTexture : public Texture{
 public:
 	MetallicTexture();
-	MetallicTexture(TextureData* data):Texture(data){}; 
+	MetallicTexture(TextureData* data); 
 	virtual ~MetallicTexture(); 
 	virtual void setGlData() ;
 	virtual void bindTexture() ; 
@@ -107,7 +111,7 @@ public:
 class RoughnessTexture : public Texture{
 public:
 	RoughnessTexture();
-	RoughnessTexture(TextureData *data):Texture(data){}; 
+	RoughnessTexture(TextureData *data); 
 	virtual ~RoughnessTexture(); 
 	virtual void setGlData() ;
 	virtual void bindTexture()  ; 
@@ -118,7 +122,7 @@ public:
 class AmbiantOcclusionTexture : public Texture{
 public:
 	AmbiantOcclusionTexture();
-	AmbiantOcclusionTexture(TextureData *data):Texture(data){}; 
+	AmbiantOcclusionTexture(TextureData *data); 
 	virtual ~AmbiantOcclusionTexture(); 
 	virtual void setGlData() ;
 	virtual void bindTexture()  ; 
@@ -128,7 +132,7 @@ public:
 class SpecularTexture : public Texture{
 public:
 	SpecularTexture(); 
-	SpecularTexture(TextureData *data):Texture(data){};
+	SpecularTexture(TextureData *data);
 	virtual ~SpecularTexture(); 
 	virtual void setGlData(); 
 	virtual void bindTexture(); 
@@ -139,7 +143,7 @@ public:
 class EmissiveTexture : public Texture{
 public:
 	EmissiveTexture(); 
-	EmissiveTexture(TextureData *data):Texture(data){};
+	EmissiveTexture(TextureData *data);
 	virtual ~EmissiveTexture(); 
 	virtual void setGlData(); 
 	virtual void bindTexture(); 
@@ -151,7 +155,7 @@ public:
 class GenericTexture : public Texture{
 public:
 	GenericTexture();
-	GenericTexture(TextureData* data):Texture(data){}; 
+	GenericTexture(TextureData* data);  
 	virtual ~GenericTexture(); 
 	virtual void setGlData(); 
 	virtual void bindTexture()  ; 
@@ -160,7 +164,32 @@ public:
 }; 
 
 
+/*
+ * We will use width * height as being the size of one single face. The total size of the cubemap will be hence : 
+ * 6 * width * height * sizeof(uint32_t) bytes , with height = width .
+ * 
+ *     width² = RIGHT /  GL_TEXTURE_CUBE_MAP_POSITIVE_X
+ * 2 * width² = LEFT / GL_TEXTURE_CUBE_MAP_NEGATIVE_X
+ * 3 * width² = TOP / GL_TEXTURE_CUBE_MAP_POSITIVE_Y
+ * 4 * width² = BOTTOM / GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
+ * 5 * width² = BACK / GL_TEXTURE_CUBE_MAP_POSITIVE_Z
+ * 6 * width² = FRONT / GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+ *
+ * Data array is still 1D 
+ */
+class CubeMapTexture : public Texture{
+public:
+	CubeMapTexture();
+	CubeMapTexture(TextureData* data);  
+	virtual ~CubeMapTexture();
+	virtual void initializeCubeMapTexture(); 
+	virtual void setGlData(); 
+	virtual void bindTexture()  ; 
+	virtual void unbindTexture() ;
+	static  const char* getTextureTypeCStr() ; 	
+protected:
+	virtual void setCubeMapTextureData(TextureData* texture); 
 
-
+}; 
 
 #endif 

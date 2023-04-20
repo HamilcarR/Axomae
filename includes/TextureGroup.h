@@ -15,7 +15,7 @@ public:
 	virtual void unbind();
 	bool isInitialized(){return initialized;}; 
 private:
-	std::vector<Texture*> texture_collection; //Pointer to a texture in the texture database 
+	std::vector<Texture*> texture_collection; //Array of Pointers to textures in the texture database 
 	bool initialized; 
 	TextureDatabase* texture_database ; 
 };

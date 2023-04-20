@@ -39,7 +39,6 @@ TextureDatabase::~TextureDatabase(){
 
 void TextureDatabase::addTexture(unsigned int index , TextureData *texture , Texture::TYPE type){
 	texture_database[index] = TextureFactory::constructTexture(texture , type) ; 
-
 }
 
 Texture* TextureDatabase::get(unsigned int index){
@@ -54,3 +53,11 @@ bool TextureDatabase::contains(unsigned int index){
 
 }
 
+std::vector<std::pair<unsigned int, Texture*>>  TextureDatabase::getTexturesByType(Texture::TYPE type) const {
+	std::vector <std::pair<unsigned int , Texture*>> type_collection ;  
+	for(auto &A : texture_database){
+		if(A.second->getTextureType() == type) 
+			type_collection.push_back(A); 
+	}
+	return type_collection ; 
+}
