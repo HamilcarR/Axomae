@@ -76,7 +76,7 @@ void Shader::setSceneCameraPointer(Camera* camera){
 void Shader::updateCamera(){
 	if(camera_pointer != nullptr){
 		setMatrixUniform(uniform_name_matrix_view_projection , camera_pointer->getViewProjection()); 
-
+		setMatrixUniform(uniform_name_matrix_view , camera_pointer->getView()); 
 	}
 }
 
@@ -87,9 +87,23 @@ void Shader::setModelMatrixUniform(const glm::mat4& matrix){
 void Shader::setModelViewProjection(const glm::mat4& model){
 	if(camera_pointer != nullptr){
 		glm::mat4 view_projection = camera_pointer->getViewProjection(); 
+		glm::mat4 view_matrix = camera_pointer->getView(); 
 		glm::mat4 mvp = view_projection * model ;
+		setMatrixUniform(uniform_name_matrix_view , view_matrix); 
 		setMatrixUniform(uniform_name_matrix_model_view_projection , mvp) ; 
+		setMatrixUniform(uniform_name_matrix_view_projection , view_projection); 
 	}
+}
+
+
+void Shader::setModelViewProjection(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model) {
+		glm::mat4 view_projection = projection * view ; 
+		glm::mat4 mvp = view_projection * model ;
+		setMatrixUniform(uniform_name_matrix_model , model); 		
+		setMatrixUniform(uniform_name_matrix_view , view); 
+		setMatrixUniform(uniform_name_matrix_model_view_projection , mvp) ; 
+		setMatrixUniform(uniform_name_matrix_view_projection , view_projection); 
+		setMatrixUniform(uniform_name_matrix_projection , projection); 
 }
 
 template<typename T> 

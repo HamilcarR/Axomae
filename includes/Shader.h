@@ -18,6 +18,9 @@ public:
 	virtual void clean();
 	virtual void setShadersRawText(std::string vs , std::string fs) { fragment_shader_txt = fs ; vertex_shader_txt = vs ; } 	
 	virtual void updateCamera(); 
+	void setModelMatrixUniform(const glm::mat4& matrix);
+	void setModelViewProjection(const glm::mat4& model) ; 
+	void setModelViewProjection(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model); 
 	void enableAttributeArray(GLuint att);
 	void setAttributeBuffer(GLuint location , GLenum type , int offset , int tuplesize , int stride = 0 ); 
 	void setMatrixUniform(const char* uniform_name , const glm::mat4 &value); 
@@ -25,7 +28,7 @@ public:
 	void setSceneCameraPointer(Camera *camera);  
 	template<typename T> 
 	void setUniform(const char* name , const T value) ; 
-
+	
 protected:
 	virtual void setTextureUniforms();
 	void setUniformValue(int location , const int value); 
