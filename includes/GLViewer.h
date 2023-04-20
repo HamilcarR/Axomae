@@ -22,7 +22,7 @@ class GLViewer : public QOpenGLWidget {
 	public:
 		GLViewer(QWidget* parent = nullptr); 
 		virtual ~GLViewer();	
-		virtual void setNewScene(std::vector<axomae::Mesh> &new_scene);   
+		virtual void setNewScene(std::vector<axomae::Mesh*> &new_scene);   
 	protected:
 		void initializeGL() override ; 
 		void paintGL() override ; 

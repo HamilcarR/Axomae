@@ -8,7 +8,7 @@ using namespace axomae ;
 
 GLViewer::GLViewer(QWidget* parent) : QOpenGLWidget (parent) {
 	QSurfaceFormat format ; 
-	format.setVersion(4,3); 
+	format.setVersion(4,6); 
 	format.setProfile(QSurfaceFormat::CoreProfile); 
 	format.setSwapBehavior(QSurfaceFormat::TripleBuffer); 
 	format.setSwapInterval(1); 
@@ -22,7 +22,7 @@ GLViewer::GLViewer(QWidget* parent) : QOpenGLWidget (parent) {
 
 GLViewer::~GLViewer(){
 	makeCurrent() ; 
-	delete renderer ; 
+	delete renderer ;
 	doneCurrent(); 
 }
 
@@ -114,7 +114,7 @@ void GLViewer::mouseReleaseEvent(QMouseEvent* event){
 	update(); 
 }
 
-void GLViewer::setNewScene(std::vector<Mesh> &new_scene){
+void GLViewer::setNewScene(std::vector<Mesh*> &new_scene){
 	makeCurrent();
 	renderer->set_new_scene(new_scene); 
 	doneCurrent();
