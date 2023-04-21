@@ -2,7 +2,8 @@
 #include <cmath> 
 
 #define DELTA_ZOOM 1.f 
-#define ANGLE_EPSILON 0.0001f 
+#define ANGLE_EPSILON 0.0001f
+#define VECTOR_EPSILON 0.0001f 
 /**********************************************************************************************************************************************/
 Camera::Camera() : up(glm::vec3(0,1,0)){
 	position = glm::vec3(1,0,-1.f); 
@@ -130,10 +131,9 @@ void ArcballCamera::computeViewSpace(){
 }
 
 void ArcballCamera::rotate(){
-	axis = glm::normalize(glm::cross(start_position , position)); 
+	axis = glm::normalize(glm::cross(start_position , position + glm::vec3(VECTOR_EPSILON))); 
 	float temp_angle  = glm::acos(glm::dot(position , start_position)) ; 
-	angle = temp_angle; 
-	rotation = glm::angleAxis(angle , axis) ;
+	angle = temp_angle  ;  
 	rotation =  rotation * last_rotation; 
 }
 
