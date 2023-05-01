@@ -51,7 +51,7 @@ void Mesh::bindShaders(){
 	shader_program.bind(); 	
 	shader_program.setSceneCameraPointer(camera); 
 	if(camera->getType() == Camera::ARCBALL) 
-		model_matrix = camera->getSceneRotationMatrix() ;  
+		model_matrix = camera->getSceneModelMatrix() ;  
 	shader_program.setModelViewProjection(model_matrix) ; 
 }
 

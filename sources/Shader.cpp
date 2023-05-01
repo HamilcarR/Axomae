@@ -37,6 +37,7 @@ inline void programLinkingErrorCheck(unsigned int program_id){
 
 
 Shader::Shader(){
+
 }
 
 Shader::Shader(const std::string vertex_code , const std::string fragment_code){

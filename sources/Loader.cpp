@@ -126,9 +126,9 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* file){
 	TextureDatabase *texture_database = TextureDatabase::getInstance() ; 	
 	std::vector<Mesh*> objects; 
+	std::string vertex_shader = loadShader("../shaders/simple.vert") ; 
+	std::string fragment_shader = loadShader("../shaders/simple.frag"); 
 	texture_database->clean(); 
-	std::string vertex_shader = loadShader("../shaders/simple.vert"); 
-	std::string fragment_shader = loadShader("../shaders/simple.frag");
 	Assimp::Importer importer ;	
 	const aiScene *modelScene = importer.ReadFile(file , aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs ) ;
 	if(modelScene != nullptr){
