@@ -24,7 +24,9 @@ public:
 	virtual void zoomIn() = 0 ; 
 	virtual void zoomOut() = 0 ; 
 	virtual void reset() ;
-	virtual const glm::mat4& getSceneRotationMatrix() const = 0; 
+	virtual const glm::mat4& getSceneRotationMatrix() const = 0;
+	virtual const glm::mat4& getSceneTranslationMatrix() const = 0 ; 
+	virtual const glm::mat4& getSceneModelMatrix() const = 0 ; 
 	TYPE getType() const {return type ; } 
 protected:
 	TYPE type ; 
@@ -39,8 +41,7 @@ protected:
 	glm::vec3 right ;
 	glm::vec3 direction;
 	glm::vec3 camera_up ; 
-
-	const glm::vec3 up ;
+	const glm::vec3 world_up ;
 	MouseState *mouse_state_pointer ; // only a pointer , No free needed 
 	ScreenSize *gl_widget_screen_size; // only a pointer . No free needed
 };
@@ -59,9 +60,12 @@ public:
 	virtual void zoomIn() override ; 
 	virtual void zoomOut() override ;
 	virtual void reset() ;
-	virtual const glm::mat4& getSceneRotationMatrix() const {return scene_rotation_matrix ; }  
+	virtual const glm::mat4& getSceneModelMatrix() const ; 
+	virtual const glm::mat4& getSceneTranslationMatrix() const ;  
+	virtual const glm::mat4& getSceneRotationMatrix() const ;  
 protected:
-	virtual void rotate(); 
+	virtual void rotate();
+	virtual void translate();
 	virtual void movePosition() override ;
 	virtual void updateZoom(float step) ; 
 
@@ -73,11 +77,21 @@ protected:
 	glm::vec3 last_position ; 
 	glm::quat rotation;
 	glm::quat last_rotation ;
+	glm::mat4 translation ; 
+	glm::mat4 last_translation ; 
 	glm::vec3 axis ; 
+	glm::vec3 panning_offset ; 
 	bool radius_updated ; 
 private:
 	glm::mat4 scene_rotation_matrix;
+	glm::mat4 scene_translation_matrix;
+	glm::mat4 scene_model_matrix ; 
+	glm::vec3 prev_delta ;
+	glm::vec3 scene_position ; 
+	glm::vec3 delta_position ; 
 	float default_radius; 
+	
+
 };
 
 
