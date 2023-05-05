@@ -6,7 +6,8 @@ using namespace axomae ;
 
 Renderer::Renderer(){
 	start_draw = false ;
-	texture_database = TextureDatabase::getInstance(); 
+	texture_database = TextureDatabase::getInstance();
+	shader_database = ShaderDatabase::getInstance(); 
 	mouse_state.pos_x = 0 ;  
 	mouse_state.pos_y = 0 ; 
 	mouse_state.left_button_clicked = false ;
@@ -30,7 +31,13 @@ Renderer::~Renderer(){
 		texture_database->clean();
 		texture_database->destroy();   
 		texture_database = nullptr ; 
-	}	
+	}
+	if(ShaderDatabase::isInstanced()){
+		shader_database->clean();
+		shader_database->destroy();
+		shader_database = nullptr ; 
+
+	}
 	delete scene_camera ; 
 	scene_camera = nullptr ; 
 }
@@ -83,7 +90,8 @@ void Renderer::set_new_scene(std::vector<Mesh*> &new_scene){
 	for (Mesh *m : new_scene)
 		scene.push_back(new Drawable(m)); 
 	start_draw = true ;
-	scene_camera->reset() ; 
+	scene_camera->reset() ;
+
 }
 void Renderer::onLeftClick(){
 	scene_camera->onLeftClick(); 

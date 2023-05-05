@@ -32,6 +32,7 @@ public:
 	std::vector<Drawable*> scene ; 
 	bool start_draw ; 
 	TextureDatabase* texture_database; 		
+	ShaderDatabase* shader_database; 
 	Camera *scene_camera ;
 	MouseState mouse_state ;
 	ScreenSize screen_size ; 	
