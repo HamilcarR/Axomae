@@ -86,8 +86,6 @@ private:
 	glm::mat4 scene_rotation_matrix;
 	glm::mat4 scene_translation_matrix;
 	glm::mat4 scene_model_matrix ; 
-	glm::vec3 prev_delta ;
-	glm::vec3 scene_position ; 
 	glm::vec3 delta_position ; 
 	float default_radius; 
 	
