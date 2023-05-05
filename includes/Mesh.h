@@ -40,7 +40,7 @@ public:
 	void setDepthFunc(DEPTHFUNC func); 
 public:
 	Object3D geometry;
-	Shader shader_program; 
+	Shader* shader_program; 
 	Material material; 
 	std::string name; 
 

@@ -4,7 +4,8 @@
 namespace axomae {
 
 Mesh::Mesh(){
-	mesh_initialized = false ; 
+	mesh_initialized = false ;
+	shader_program = nullptr ; 
 	name = "uninitialized mesh"  ;
 }
 
@@ -19,18 +20,21 @@ Mesh::Mesh(Object3D const& geo , Material const& mat){
 	geometry = geo; 
 	material = mat;
 	name = "uninitialized mesh"  ;
+	shader_program = nullptr ; 
 }
 
 Mesh::Mesh(std::string n , Object3D const& geo , Material const& mat){
 	geometry = geo; 
 	material = mat;
 	name = n ; 
+	shader_program = nullptr ; 
 }
 
 Mesh::~Mesh(){}
 
 void Mesh::initializeGlData(){
-	shader_program.initializeShader();
+	if(shader_program != nullptr)
+		shader_program->initializeShader();
 	material.initializeMaterial();
 	mesh_initialized = true ; 
 }
@@ -40,28 +44,30 @@ void Mesh::bindMaterials(){
 }
 
 void Mesh::bindShaders(){
-	if(!face_culling_enabled){ 
-		setFaceCulling(true); 
-		cullBackFace();
-		face_culling_enabled = true ; 
+	if(shader_program != nullptr){
+		if(!face_culling_enabled){ 
+			setFaceCulling(true); 
+			cullBackFace();
+			face_culling_enabled = true ; 
+		}
+		setDepthMask(true); 
+		setDepthFunc(LESS); 	
+		depth_mask_enabled = true ;
+		shader_program->bind(); 	
+		shader_program->setSceneCameraPointer(camera); 
+		if(camera->getType() == Camera::ARCBALL) 
+			model_matrix = camera->getSceneModelMatrix() ;  
+		shader_program->setModelViewProjection(model_matrix) ; 
 	}
-	setDepthMask(true); 
-	setDepthFunc(LESS); 	
-	depth_mask_enabled = true ;
-	shader_program.bind(); 	
-	shader_program.setSceneCameraPointer(camera); 
-	if(camera->getType() == Camera::ARCBALL) 
-		model_matrix = camera->getSceneModelMatrix() ;  
-	shader_program.setModelViewProjection(model_matrix) ; 
 }
 
 void Mesh::releaseShaders(){
-
-	shader_program.release(); 
+	if(shader_program != nullptr)
+		shader_program->release(); 
 }
 void Mesh::clean(){
-	shader_program.clean(); 
-	material.clean(); 
+	shader_program = nullptr; 
+	material.clean();
 }
 
 bool Mesh::isInitialized(){
@@ -150,32 +156,28 @@ CubeMapMesh::CubeMapMesh() : Mesh() {
 	name="CubeMap" ;
 }
 
-
 CubeMapMesh::~CubeMapMesh(){
-
-
 }
 
 void CubeMapMesh::bindShaders(){
-	if(face_culling_enabled){
-		setFaceCulling(false);
-		face_culling_enabled = false;
+	if(shader_program != nullptr){
+		if(face_culling_enabled){
+			setFaceCulling(false);
+			face_culling_enabled = false;
+		}
+		setDepthFunc(LESS_OR_EQUAL); 	
+		shader_program->bind(); 	
+		shader_program->setSceneCameraPointer(camera); 	
+		glm::mat4 view = glm::mat4(glm::mat3(camera->getView()));
+		glm::mat4 projection = camera->getProjection() ; 
+		if(camera->getType() == Camera::ARCBALL){
+			model_matrix = camera->getSceneRotationMatrix() ;  
+			shader_program->setModelViewProjection(projection , view , model_matrix) ; 
+		}
+		else
+			shader_program->setModelViewProjection(projection , view , model_matrix) ; 
 	}
-	setDepthFunc(LESS_OR_EQUAL); 	
-	shader_program.bind(); 	
-	shader_program.setSceneCameraPointer(camera); 	
-	glm::mat4 view = glm::mat4(glm::mat3(camera->getView()));
-	glm::mat4 projection = camera->getProjection() ; 
-	if(camera->getType() == Camera::ARCBALL){
-		model_matrix = camera->getSceneRotationMatrix() ;  
-		shader_program.setModelViewProjection(projection , view , model_matrix) ; 
-	}
-	else
-		shader_program.setModelViewProjection(projection , view , model_matrix) ; 
 }
-
-
-
 
 
 
