@@ -37,10 +37,11 @@ inline void programLinkingErrorCheck(unsigned int program_id){
 
 
 Shader::Shader(){
-
+	type = GENERIC ; 
 }
 
 Shader::Shader(const std::string vertex_code , const std::string fragment_code){
+	type = GENERIC; 
 	fragment_shader_txt = fragment_code ; 
 	vertex_shader_txt = vertex_code ; 
 }
@@ -167,3 +168,31 @@ void Shader::clean(){
 	}
 }
 
+/***********************************************************************************************************************************************************/
+
+BlinnPhongShader::BlinnPhongShader():Shader(){
+	type = BLINN ; 	
+}
+
+
+BlinnPhongShader::BlinnPhongShader(const std::string vertex_code, const std::string fragment_code) : Shader(vertex_code , fragment_code) {
+	type = BLINN ; 
+}
+
+BlinnPhongShader::~BlinnPhongShader(){
+
+}
+
+/***********************************************************************************************************************************************************/
+
+CubeMapShader::CubeMapShader() : Shader() {
+	type = CUBEMAP ; 
+}
+
+CubeMapShader::CubeMapShader(const std::string vertex , const std::string frag) : Shader(vertex , frag) {
+	type = CUBEMAP ; 
+}
+
+CubeMapShader::~CubeMapShader(){
+
+}

@@ -9,6 +9,7 @@
 
 class Shader{
 public:
+	enum TYPE : signed {GENERIC = 0 , BLINN = 1 , CUBEMAP = 2 , PBR = 3};  
 	Shader();
 	Shader(const std::string vertex_code , const std::string fragment_code); 
 	virtual ~Shader();
@@ -31,8 +32,8 @@ public:
 	
 protected:
 	virtual void setTextureUniforms();
-	void setUniformValue(int location , const int value); 
-private:
+	void setUniformValue(int location , const int value);
+	TYPE type ; 
 	unsigned int shader_program; 	
 	unsigned int fragment_shader ; 
 	unsigned int vertex_shader ;
@@ -42,6 +43,44 @@ private:
 
 
 };
+
+/***********************************************************************************************************************************************************/
+class BlinnPhongShader : public Shader{ 
+public:
+	BlinnPhongShader(); 
+	BlinnPhongShader(const std::string vertex_code, const std::string fragment_code) ; 
+	virtual ~BlinnPhongShader(); 	
+
+};
+
+
+/***********************************************************************************************************************************************************/
+class CubeMapShader : public Shader {
+public:
+	CubeMapShader(); 
+	CubeMapShader(const std::string vertex_code , const std::string fragment_code); 
+	virtual ~CubeMapShader(); 
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
