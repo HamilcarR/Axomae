@@ -7,6 +7,7 @@
 #include <cmath>
 #include <vector>
 #include <SDL2/SDL.h> 
+#include <memory>
 #include "utils_3D.h" 
 
 

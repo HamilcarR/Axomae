@@ -95,13 +95,11 @@ ArcballCamera::~ArcballCamera(){
 
 void ArcballCamera::reset(){
 	Camera::reset();
-	prev_delta = glm::vec3(0.f);  ; 
 	type = ARCBALL ; 
 	angle = 0.f ;
 	radius = default_radius ; 
 	radius_updated = false ; 
 	start_position = position = glm::vec3(0 , 0 , radius); 
-	scene_position = glm::vec3(0.f) ; 
 	cursor_position = glm::vec2(0); 
 	rotation = last_rotation = glm::quat(1.f , 0.f , 0.f , 0.f) ; 
 	axis = glm::vec3(0.f); 
@@ -211,7 +209,6 @@ void ArcballCamera::onRightClick(){
 
 
 void ArcballCamera::onRightClickRelease(){
-	scene_position = position ; 
 }
 
 
