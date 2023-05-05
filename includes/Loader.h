@@ -15,11 +15,10 @@
 #include "utils_3D.h" 
 #include "Mesh.h"
 #include "TextureDatabase.h"
+#include "ShaderDatabase.h"
 
 /*3D loader : Will import , construct , and load meshes into the program . Additionnally , loads textures*/
 namespace axomae{
-
-
 
 class Loader{
 public:
@@ -27,7 +26,7 @@ public:
 	static std::vector<Mesh*> load(const char* file);   				
 	static std::string loadShader(const char* filename); 
 	static void close(); 	
-				
+	static void loadShaderDatabase(); 
 private: 
 	Loader();	
 	~Loader();
@@ -37,30 +36,6 @@ private:
 private:
 	static Loader* instance; 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

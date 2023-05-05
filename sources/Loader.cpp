@@ -115,22 +115,23 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	return mesh_material ; 
 }
 
-
-
-
-
-
-
-
+void Loader::loadShaderDatabase(){	
+	ShaderDatabase* shader_database = ShaderDatabase::getInstance(); 
+	std::string vertex_shader = loadShader("../shaders/simple.vert") ; 
+	std::string fragment_shader = loadShader("../shaders/simple.frag"); 
+	std::string vertex_shader_cubemap = loadShader("../shaders/cubemap.vert"); 
+	std::string fragment_shader_cubemap = loadShader("../shaders/cubemap.frag"); 
+	shader_database->addShader(vertex_shader , fragment_shader , Shader::GENERIC) ; 
+	shader_database->addShader(vertex_shader_cubemap , fragment_shader_cubemap , Shader::CUBEMAP) ; 
+}
 
 std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* file){
 	TextureDatabase *texture_database = TextureDatabase::getInstance() ; 	
+	ShaderDatabase *shader_database = ShaderDatabase::getInstance(); 
 	std::vector<Mesh*> objects; 
-	std::string vertex_shader = loadShader("../shaders/simple.vert") ; 
-	std::string fragment_shader = loadShader("../shaders/simple.frag"); 
-	texture_database->clean(); 
 	Assimp::Importer importer ;	
 	const aiScene *modelScene = importer.ReadFile(file , aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs ) ;
+	loadShaderDatabase(); 	
 	if(modelScene != nullptr){
 		const aiMaterial* ai_material ;
 		for(unsigned int i = 0 ; i < modelScene->mNumMeshes ; i++){
@@ -173,7 +174,7 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
 			loaded_mesh->geometry = object ; 
 			loaded_mesh->material = mesh_material ;
 			loaded_mesh->name = name ; 
-			loaded_mesh->shader_program.setShadersRawText(vertex_shader , fragment_shader) ; 
+			loaded_mesh->shader_program = shader_database->get(Shader::GENERIC) ;  //TODO : change for PBR and other nice shaders when needed 		
 			objects.push_back(loaded_mesh);
 		}
 		return std::pair<unsigned int , std::vector<Mesh*>> (modelScene->mNumTextures , objects) ; 
@@ -219,14 +220,12 @@ std::string Loader::loadShader(const char* filename){
 
 
 Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
-	Mesh *cube_map = new CubeMapMesh();  
-	std::string vertex_shader = loadShader("../shaders/cubemap.vert"); 
-	std::string fragment_shader = loadShader("../shaders/cubemap.frag"); 
-	cube_map->shader_program.setShadersRawText(vertex_shader , fragment_shader); 
+	Mesh *cube_map = new CubeMapMesh(); 
+	ShaderDatabase *shader_database = ShaderDatabase::getInstance(); 
 	TextureDatabase* texture_database = TextureDatabase::getInstance(); 	
+	cube_map->shader_program = shader_database->get(Shader::CUBEMAP) ; 
 	TextureData cubemap ; 
-	QString skybox_folder = "sky" ; 
-	QString path = "../Ressources/Skybox_Textures/Sky/" ;
+	QString skybox_folder = "castle" ;
 	auto format = "jpg"; 
 	QImage left(":/"+skybox_folder+"/negx.jpg" , format); 		
 	QImage bot(":/"+skybox_folder+"/negy.jpg" , format); 		
