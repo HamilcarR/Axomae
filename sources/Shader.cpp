@@ -7,12 +7,14 @@
 static int success  ; 
 static char infoLog[SHADER_ERROR_LOG_SIZE] ; 
 
-/*Shader data names*/
-constexpr const char uniform_name_matrix_model[] = "model"; 
-constexpr const char uniform_name_matrix_view[] = "view" ; 
-constexpr const char uniform_name_matrix_projection[] = "projection"; 
-constexpr const char uniform_name_matrix_view_projection[] = "VP"; 
-constexpr const char uniform_name_matrix_model_view_projection[] = "MVP" ; 
+/*Shader matrix uniform names*/
+constexpr const char uniform_name_matrix_model[] = "MAT_MODEL"; 
+constexpr const char uniform_name_matrix_view[] = "MAT_VIEW" ; 
+constexpr const char uniform_name_matrix_projection[] = "MAT_PROJECTION"; 
+constexpr const char uniform_name_matrix_view_projection[] = "MAT_VP"; 
+constexpr const char uniform_name_matrix_model_view_projection[] = "MAT_MVP" ; 
+constexpr const char uniform_name_matrix_normal[] = "MAT_NORMAL" ;
+
 
 inline void shaderCompilationErrorCheck(unsigned int shader_id){
 	success = 0; 
@@ -34,8 +36,6 @@ inline void programLinkingErrorCheck(unsigned int program_id){
 	}
 }
 
-
-
 Shader::Shader(){
 	type = GENERIC ; 
 }
@@ -46,8 +46,7 @@ Shader::Shader(const std::string vertex_code , const std::string fragment_code){
 	vertex_shader_txt = vertex_code ; 
 }
 
-Shader::~Shader(){
-	
+Shader::~Shader(){	
 }
 
 void Shader::enableAttributeArray(GLuint att){
@@ -82,6 +81,20 @@ void Shader::updateCamera(){
 	}
 }
 
+void Shader::setAllMatricesUniforms(const glm::mat4& model){
+	setModelViewProjection(model); 
+	setNormalMatrixUniform(model); 
+}
+
+void Shader::setAllMatricesUniforms(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model){
+	setModelViewProjection(projection , view , model); 
+	setNormalMatrixUniform(model); 
+}
+
+void Shader::setNormalMatrixUniform(const glm::mat4& model){
+	setMatrixUniform(uniform_name_matrix_normal , glm::mat3(glm::transpose(glm::inverse(model)))); 
+}
+
 void Shader::setModelMatrixUniform(const glm::mat4& matrix){
 	setMatrixUniform(uniform_name_matrix_model , matrix) ; 
 }
@@ -96,7 +109,6 @@ void Shader::setModelViewProjection(const glm::mat4& model){
 		setMatrixUniform(uniform_name_matrix_view_projection , view_projection); 
 	}
 }
-
 
 void Shader::setModelViewProjection(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model) {
 		glm::mat4 view_projection = projection * view ; 
@@ -114,7 +126,6 @@ void Shader::setUniform(const char* name , const T value){
 	int location = glGetUniformLocation(shader_program , name);
 	setUniformValue(location , value);
 }
-
 
 void Shader::setUniformValue(int location , const int value) {
 	glUniform1i(location , value); 
