@@ -8,15 +8,18 @@ layout(location=3) in vec2 uv ;
 layout(location=4) in vec3 tangents ; 
 
 
-uniform mat4 VP ; 
-uniform mat4 MVP ; 
-uniform mat4 view ;
-uniform mat4 model ; 
-uniform mat4 projection ; 
+uniform mat4 MAT_VP ; 
+uniform mat4 MAT_MVP ; 
+uniform mat4 MAT_VIEW ;
+uniform mat4 MAT_MODEL ; 
+uniform mat4 MAT_PROJECTION ; 
+uniform mat3 MAT_NORMAL ; 
+
+
 out vec3 cubemap_vector_sample;
 
 void main(){
 	cubemap_vector_sample = positions ;
-	vec4 POS = MVP * vec4(positions , 1.f) ; 	
+	vec4 POS = MAT_MVP * vec4(positions , 1.f) ; 	
 	gl_Position = POS.xyww; 
 }
