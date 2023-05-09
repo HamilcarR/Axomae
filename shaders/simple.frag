@@ -22,6 +22,6 @@ void main(){
 	vec3 R = reflect(I , normalize(NORM));
 	vec3 S = texture(cubemap , R).rgb ;
 
-	fragment = texture(diffuse  , UV) * COL; 
+	fragment = texture(diffuse  , UV) ; 
 }
 
