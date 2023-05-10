@@ -6,13 +6,6 @@ constexpr float ANGLE_EPSILON = 0.0001f;  // we use these to avoid nan values wh
 constexpr float VECTOR_EPSILON = 0.0001f;  //
 constexpr float PANNING_SENSITIVITY = 10.f;  
 
-
-
-
-
-
-
-
 /**********************************************************************************************************************************************/
 Camera::Camera() : world_up(glm::vec3(0,1,0)){
 	position = glm::vec3(1,0,-1.f); 
@@ -99,7 +92,7 @@ void ArcballCamera::reset(){
 	angle = 0.f ;
 	radius = default_radius ; 
 	radius_updated = false ; 
-	start_position = position = glm::vec3(0 , 0 , radius); 
+	ndc_mouse_start_position = ndc_mouse_position = position = glm::vec3(0 , 0 , radius); 
 	cursor_position = glm::vec2(0); 
 	rotation = last_rotation = glm::quat(1.f , 0.f , 0.f , 0.f) ; 
 	axis = glm::vec3(0.f); 
@@ -107,27 +100,22 @@ void ArcballCamera::reset(){
 	panning_offset = glm::vec3(0) ;
 	delta_position = glm::vec3(0.f); 
 	translation = last_translation = scene_translation_matrix = scene_rotation_matrix = scene_model_matrix = glm::mat4(1.f) ; 
-
-
 }
 
 void ArcballCamera::rotate(){
-	axis = glm::normalize(glm::cross(start_position , position + glm::vec3(VECTOR_EPSILON))); 
-	float temp_angle  = glm::acos(glm::dot(position , start_position)) ; 
+	axis = glm::normalize(glm::cross(ndc_mouse_start_position , ndc_mouse_position + glm::vec3(VECTOR_EPSILON))); 
+	float temp_angle  = glm::acos(glm::dot(ndc_mouse_position , ndc_mouse_start_position)) ; 
 	angle = temp_angle > ANGLE_EPSILON ? temp_angle : ANGLE_EPSILON; 
 	rotation = glm::angleAxis(angle , axis) ;
 	rotation =  rotation * last_rotation; 
 }
-
 	
 void ArcballCamera::translate(){
-	delta_position = position - start_position ;
+	delta_position = ndc_mouse_position - ndc_mouse_start_position ;
 	auto new_delta = glm::vec3(glm::inverse(scene_rotation_matrix) * (glm::vec4(delta_position , 1.f)))  ; 
 	panning_offset +=  new_delta * PANNING_SENSITIVITY ;
-	start_position = position ;	
+	ndc_mouse_start_position = ndc_mouse_position ;
 }
-
-
 
 void ArcballCamera::computeViewSpace(){
 	cursor_position = glm::vec2(mouse_state_pointer->pos_x , mouse_state_pointer->pos_y) ; 
@@ -135,7 +123,7 @@ void ArcballCamera::computeViewSpace(){
 		movePosition(); 
 		rotate(); 
 		glm::mat4 rotation_matrix = glm::mat4_cast(rotation) ; 
-		position = rotation_matrix * glm::vec4(position + glm::vec3(0 , 0 , radius) , 0) ; 
+		ndc_mouse_position = rotation_matrix * glm::vec4(ndc_mouse_position + glm::vec3(0 , 0 , radius) , 0) ; 
 		scene_rotation_matrix = rotation_matrix ; 	
 	}
 	else if(mouse_state_pointer -> right_button_clicked){
@@ -151,7 +139,8 @@ void ArcballCamera::computeViewSpace(){
 	}
 		scene_model_matrix = scene_rotation_matrix * scene_translation_matrix; 	
 		direction = target - glm::vec3(0 , 0 , radius) ; 
-		view = glm::lookAt(glm::vec3(0 , 0 , radius) , target , world_up)  ; 
+		position = glm::vec3(0 , 0 , radius) ; 
+		view = glm::lookAt(position , target , world_up)  ; 
 }
 
 const glm::mat4& ArcballCamera::getSceneRotationMatrix() const {
@@ -175,42 +164,39 @@ static float get_z_axis(float x , float y , float radius) {
 
 void ArcballCamera::movePosition(){
 	if(mouse_state_pointer->left_button_clicked){
-		position.x = ((cursor_position.x - (gl_widget_screen_size->width/2)) / (gl_widget_screen_size->width/2)) * radius; 
-		position.y = (((gl_widget_screen_size->height/2) - cursor_position.y) / (gl_widget_screen_size->height/2)) * radius; 
-		position.z = get_z_axis(position.x , position.y , radius) ;  	
-		position = glm::normalize(position); 
+		ndc_mouse_position.x = ((cursor_position.x - (gl_widget_screen_size->width/2)) / (gl_widget_screen_size->width/2)) * radius; 
+		ndc_mouse_position.y = (((gl_widget_screen_size->height/2) - cursor_position.y) / (gl_widget_screen_size->height/2)) * radius; 
+		ndc_mouse_position.z = get_z_axis(ndc_mouse_position.x , ndc_mouse_position.y , radius) ;  	
+		ndc_mouse_position = glm::normalize(ndc_mouse_position); 
 	}
 	if(mouse_state_pointer->right_button_clicked){
-		position.x = ((cursor_position.x - (gl_widget_screen_size->width/2)) / (gl_widget_screen_size->width/2)) ; 
-		position.y = (((gl_widget_screen_size->height/2) - cursor_position.y) / (gl_widget_screen_size->height/2)) ; 
-		position.z = 0.f ; 
+		ndc_mouse_position.x = ((cursor_position.x - (gl_widget_screen_size->width/2)) / (gl_widget_screen_size->width/2)) ; 
+		ndc_mouse_position.y = (((gl_widget_screen_size->height/2) - cursor_position.y) / (gl_widget_screen_size->height/2)) ; 
+		ndc_mouse_position.z = 0.f ; 
 	}
 }
 
 void ArcballCamera::onLeftClick(){
-	start_position.x = ((cursor_position.x - (gl_widget_screen_size->width/2)) / (gl_widget_screen_size->width/2)) * radius; 
-	start_position.y = (((gl_widget_screen_size->height/2) - cursor_position.y) / (gl_widget_screen_size->height/2)) * radius; 
-	start_position.z = get_z_axis(start_position.x , start_position.y , radius) ; 
-	start_position = glm::normalize(start_position); 
+	ndc_mouse_start_position.x = ((cursor_position.x - (gl_widget_screen_size->width/2)) / (gl_widget_screen_size->width/2)) * radius; 
+	ndc_mouse_start_position.y = (((gl_widget_screen_size->height/2) - cursor_position.y) / (gl_widget_screen_size->height/2)) * radius; 
+	ndc_mouse_start_position.z = get_z_axis(ndc_mouse_start_position.x , ndc_mouse_start_position.y , radius) ; 
+	ndc_mouse_start_position = glm::normalize(ndc_mouse_start_position); 
 }
 
 void ArcballCamera::onLeftClickRelease(){
 	last_rotation =  rotation  ; 
 	rotation = glm::quat(1.f , 0.f , 0.f , 0.f); 
-	last_position = position ;
+	ndc_mouse_last_position = position ;
 }
-
 
 void ArcballCamera::onRightClick(){
-	start_position.x = ((cursor_position.x - (gl_widget_screen_size->width/2)) / (gl_widget_screen_size->width/2)) ; 
-	start_position.y = (((gl_widget_screen_size->height/2) - cursor_position.y) / (gl_widget_screen_size->height/2)) ; 
-	start_position.z = 0.f ; 
+	ndc_mouse_start_position.x = ((cursor_position.x - (gl_widget_screen_size->width/2)) / (gl_widget_screen_size->width/2)) ; 
+	ndc_mouse_start_position.y = (((gl_widget_screen_size->height/2) - cursor_position.y) / (gl_widget_screen_size->height/2)) ; 
+	ndc_mouse_start_position.z = 0.f ; 
 }
-
 
 void ArcballCamera::onRightClickRelease(){
 }
-
 
 void ArcballCamera::updateZoom(float step){
 	radius += step ; 
@@ -226,7 +212,6 @@ void ArcballCamera::zoomOut(){
 }
 
 /**********************************************************************************************************************************************/
-
 FreePerspectiveCamera::FreePerspectiveCamera(){
 	type = PERSPECTIVE ; 
 }
