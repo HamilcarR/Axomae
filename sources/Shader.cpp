@@ -1,4 +1,5 @@
 #include "../includes/Shader.h"
+#include "../includes/UniformNames.h"
 #include <QMatrix4x4>
 #include <cstring>
 
@@ -6,14 +7,6 @@
 
 static int success  ; 
 static char infoLog[SHADER_ERROR_LOG_SIZE] ; 
-
-/*Shader matrix uniform names*/
-constexpr const char uniform_name_matrix_model[] = "MAT_MODEL"; 
-constexpr const char uniform_name_matrix_view[] = "MAT_VIEW" ; 
-constexpr const char uniform_name_matrix_projection[] = "MAT_PROJECTION"; 
-constexpr const char uniform_name_matrix_view_projection[] = "MAT_VP"; 
-constexpr const char uniform_name_matrix_model_view_projection[] = "MAT_MVP" ; 
-constexpr const char uniform_name_matrix_normal[] = "MAT_NORMAL" ;
 
 
 inline void shaderCompilationErrorCheck(unsigned int shader_id){
@@ -75,10 +68,14 @@ void Shader::setSceneCameraPointer(Camera* camera){
 }
 
 void Shader::updateCamera(){
-	if(camera_pointer != nullptr){
-		setMatrixUniform(uniform_name_matrix_view_projection , camera_pointer->getViewProjection()); 
-		setMatrixUniform(uniform_name_matrix_view , camera_pointer->getView()); 
-	}
+	if(camera_pointer != nullptr)
+		setCameraPositionUniform(); 
+}
+
+void Shader::setCameraPositionUniform(){
+	if(camera_pointer != nullptr)
+		setUniform(uniform_name_vector_camera_position , camera_pointer->getPosition()); 
+	
 }
 
 void Shader::setAllMatricesUniforms(const glm::mat4& model){
@@ -92,33 +89,40 @@ void Shader::setAllMatricesUniforms(const glm::mat4& projection , const glm::mat
 }
 
 void Shader::setNormalMatrixUniform(const glm::mat4& model){
-	setMatrixUniform(uniform_name_matrix_normal , glm::mat3(glm::transpose(glm::inverse(model)))); 
+	setUniform(uniform_name_matrix_normal , glm::mat3(glm::transpose(glm::inverse(camera_pointer->getView() * model)))); 
 }
 
 void Shader::setModelMatrixUniform(const glm::mat4& matrix){
-	setMatrixUniform(uniform_name_matrix_model , matrix) ; 
+	setUniform(uniform_name_matrix_model , matrix) ; 
+}
+
+void Shader::setModelViewProjectionMatricesUniforms(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model){
+		glm::mat4 mvp = projection * view * model ;	
+		glm::mat4 modelview_matrix = view * model ; 
+		glm::mat4 view_projection = projection * view ; 
+		setUniform(uniform_name_matrix_modelview , modelview_matrix); 
+		setUniform(uniform_name_matrix_model_view_projection , mvp) ; 
+		setUniform(uniform_name_matrix_view_projection , view_projection);
+		setUniform(uniform_name_matrix_model , model); 
+		setUniform(uniform_name_matrix_view , view); 
+		setUniform(uniform_name_matrix_projection , projection); 
+
 }
 
 void Shader::setModelViewProjection(const glm::mat4& model){
 	if(camera_pointer != nullptr){
-		glm::mat4 view_projection = camera_pointer->getViewProjection(); 
-		glm::mat4 view_matrix = camera_pointer->getView(); 
-		glm::mat4 mvp = view_projection * model ;
-		setMatrixUniform(uniform_name_matrix_view , view_matrix); 
-		setMatrixUniform(uniform_name_matrix_model_view_projection , mvp) ; 
-		setMatrixUniform(uniform_name_matrix_view_projection , view_projection); 
+		glm::mat4 view = camera_pointer->getView(); 	
+		glm::mat4 projection = camera_pointer->getProjection(); 
+		updateCamera(); 
+		setModelViewProjectionMatricesUniforms(projection , view , model); 
 	}
 }
 
 void Shader::setModelViewProjection(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model) {
-		glm::mat4 view_projection = projection * view ; 
-		glm::mat4 mvp = view_projection * model ;
-		setMatrixUniform(uniform_name_matrix_model , model); 		
-		setMatrixUniform(uniform_name_matrix_view , view); 
-		setMatrixUniform(uniform_name_matrix_model_view_projection , mvp) ; 
-		setMatrixUniform(uniform_name_matrix_view_projection , view_projection); 
-		setMatrixUniform(uniform_name_matrix_projection , projection); 
+		updateCamera();
+		setModelViewProjectionMatricesUniforms(projection , view , model); 
 }
+
 
 template<typename T> 
 void Shader::setUniform(const char* name , const T value){
@@ -131,14 +135,22 @@ void Shader::setUniformValue(int location , const int value) {
 	glUniform1i(location , value); 
 }
 
-void Shader::setMatrixUniform(const char* name , const glm::mat4 &matrix){
-	int location =  glGetUniformLocation(shader_program , name); 
+void Shader::setUniformValue(int location , const glm::mat4 &matrix){
 	glUniformMatrix4fv(location ,1 , GL_FALSE , glm::value_ptr(matrix)); 
 }
 
-void Shader::setMatrixUniform(const char* name , const glm::mat3 &matrix){
-	int location = glGetUniformLocation(shader_program , name); 
+void Shader::setUniformValue(int location , const glm::mat3 &matrix){
 	glUniformMatrix3fv(location ,1 , GL_FALSE , glm::value_ptr(matrix)); 
+}
+
+void Shader::setUniformValue(int location , const glm::vec4& value){
+	glUniform4f(location , value.x , value.y , value.z , value.w); 
+}
+void Shader::setUniformValue(int location , const glm::vec3& value){
+	glUniform3f(location , value.x , value.y , value.z); 
+}
+void Shader::setUniformValue(int location , const glm::vec2& value){	
+	glUniform2f(location , value.x , value.y); 
 }
 
 void Shader::initializeShader(){
