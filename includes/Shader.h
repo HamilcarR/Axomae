@@ -7,9 +7,12 @@
 #include "DebugGL.h" 
 #include "Camera.h" 
 
+
 class Shader{
 public:
-	enum TYPE : signed {GENERIC = 0 , BLINN = 1 , CUBEMAP = 2 , PBR = 3};  
+	enum TYPE : signed {GENERIC = 0 , BLINN = 1 , CUBEMAP = 2 , PBR = 3};
+
+public:  
 	Shader();
 	Shader(const std::string vertex_code , const std::string fragment_code); 
 	virtual ~Shader();
@@ -17,22 +20,33 @@ public:
 	virtual void bind(); 
 	virtual void release();
 	virtual void clean();
-	virtual void setShadersRawText(std::string vs , std::string fs) { fragment_shader_txt = fs ; vertex_shader_txt = vs ; } 	
-	virtual void updateCamera(); 
+	virtual void setShadersRawText(std::string vs , std::string fs) { fragment_shader_txt = fs ; vertex_shader_txt = vs ; } 		
+	void setSceneCameraPointer(Camera *camera);  
+	virtual void updateCamera();
+	void setCameraPositionUniform(); 
+	//Normal Matrix for transforming normal vectors alongside the model: computed from the invert model matrix and set from here automatically
+	void setAllMatricesUniforms(const glm::mat4& model);
+	void setAllMatricesUniforms(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model); 
+	void setNormalMatrixUniform(const glm::mat4& model);  
 	void setModelMatrixUniform(const glm::mat4& matrix);
 	void setModelViewProjection(const glm::mat4& model) ; 
 	void setModelViewProjection(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model); 
 	void enableAttributeArray(GLuint att);
 	void setAttributeBuffer(GLuint location , GLenum type , int offset , int tuplesize , int stride = 0 ); 
-	void setMatrixUniform(const char* uniform_name , const glm::mat4 &value); 
-	void setMatrixUniform(const char* uniform_name , const glm::mat3 &value); 
-	void setSceneCameraPointer(Camera *camera);  
 	template<typename T> 
 	void setUniform(const char* name , const T value) ; 
 	
 protected:
 	virtual void setTextureUniforms();
 	void setUniformValue(int location , const int value);
+	void setUniformValue(int location , const glm::mat4& value); 
+	void setUniformValue(int location , const glm::mat3& value);
+	void setUniformValue(int location , const glm::vec4& value); 
+	void setUniformValue(int location , const glm::vec3& value);
+	void setUniformValue(int location , const glm::vec2& value);  	
+private:
+	void setModelViewProjectionMatricesUniforms(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model); 
+protected:
 	TYPE type ; 
 	unsigned int shader_program; 	
 	unsigned int fragment_shader ; 
