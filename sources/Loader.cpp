@@ -117,8 +117,8 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 
 void Loader::loadShaderDatabase(){	
 	ShaderDatabase* shader_database = ShaderDatabase::getInstance(); 
-	std::string vertex_shader = loadShader("../shaders/simple.vert") ; 
-	std::string fragment_shader = loadShader("../shaders/simple.frag"); 
+	std::string vertex_shader = loadShader("../shaders/phong.vert") ; 
+	std::string fragment_shader = loadShader("../shaders/phong.frag"); 
 	std::string vertex_shader_cubemap = loadShader("../shaders/cubemap.vert"); 
 	std::string fragment_shader_cubemap = loadShader("../shaders/cubemap.frag"); 
 	shader_database->addShader(vertex_shader , fragment_shader , Shader::GENERIC) ; 

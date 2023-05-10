@@ -57,7 +57,7 @@ void Mesh::bindShaders(){
 		shader_program->setSceneCameraPointer(camera); 
 		if(camera->getType() == Camera::ARCBALL) 
 			model_matrix = camera->getSceneModelMatrix() ;  
-		shader_program->setModelViewProjection(model_matrix) ; 
+		shader_program->setAllMatricesUniforms(model_matrix) ; 
 	}
 }
 
@@ -170,12 +170,9 @@ void CubeMapMesh::bindShaders(){
 		shader_program->setSceneCameraPointer(camera); 	
 		glm::mat4 view = glm::mat4(glm::mat3(camera->getView()));
 		glm::mat4 projection = camera->getProjection() ; 
-		if(camera->getType() == Camera::ARCBALL){
-			model_matrix = camera->getSceneRotationMatrix() ;  
-			shader_program->setModelViewProjection(projection , view , model_matrix) ; 
-		}
-		else
-			shader_program->setModelViewProjection(projection , view , model_matrix) ; 
+		if(camera->getType() == Camera::ARCBALL)
+			model_matrix = camera->getSceneRotationMatrix() ;  			
+		shader_program->setAllMatricesUniforms(projection , view , model_matrix) ; 
 	}
 }
 

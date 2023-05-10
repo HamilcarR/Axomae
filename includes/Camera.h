@@ -24,6 +24,7 @@ public:
 	virtual void zoomIn() = 0 ; 
 	virtual void zoomOut() = 0 ; 
 	virtual void reset() ;
+	virtual const glm::vec3& getPosition() const {return position ; } 
 	virtual const glm::mat4& getSceneRotationMatrix() const = 0;
 	virtual const glm::mat4& getSceneTranslationMatrix() const = 0 ; 
 	virtual const glm::mat4& getSceneModelMatrix() const = 0 ; 
@@ -72,9 +73,10 @@ protected:
 protected: 
 	float angle ;
 	float radius ; 
-	glm::vec2 cursor_position ; 
-	glm::vec3 start_position ; 
-	glm::vec3 last_position ; 
+	glm::vec2 cursor_position ;
+	glm::vec3 ndc_mouse_position ;  
+	glm::vec3 ndc_mouse_start_position ; 
+	glm::vec3 ndc_mouse_last_position ; 
 	glm::quat rotation;
 	glm::quat last_rotation ;
 	glm::mat4 translation ; 
