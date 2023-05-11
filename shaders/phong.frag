@@ -10,9 +10,15 @@ in vec3 vertex_fragment_light_position;
 in vec3 vertex_fragment_camera_position; 
 /*****************************************/
 
-/* Uniforms */
+/* Flat data from vertex shader */
 
-uniform mat4 MAT_MODEL; 
+/*****************************************/
+
+
+/* Uniforms */
+uniform mat4 MAT_MODEL;
+uniform mat4 MAT_MODELVIEW ; 
+uniform mat4 MAT_INV_MODEL ;  
 /*****************************************/
 
 /* Samplers and textures */
@@ -65,21 +71,21 @@ float computeSpecularLight(){
 vec4 computeReflectionCubeMap(){
     vec3 view_direction = normalize(vertex_fragment_fragment_position - camera_position); 
     vec3 normal_vector = normalize(vertex_fragment_normals); 
-    vec3 cubemap_sample_vector = reflect(view_direction , normal_vector); 
-    vec4 sampled_value = texture(cubemap , cubemap_sample_vector); 
+    vec3 cubemap_sample_vector = vec3(MAT_INV_MODEL * vec4(reflect(view_direction , normal_vector) , 1.f)); 
+    vec4 sampled_value = texture(cubemap , cubemap_sample_vector , 1.f); 
     return sampled_value; 
 }
 
 vec4 computeRefractionCubeMap(){
-    float refractive_index_ratio = 1.f / 1.52f ; 
+    float refractive_index_ratio = 1.f / 2.42f ; 
     vec3 view_direction = normalize(vertex_fragment_fragment_position - camera_position) ; 
     vec3 normal_vector = normalize(vertex_fragment_normals); 
-    vec3 cubemap_sample_vector = refract(view_direction , normal_vector , refractive_index_ratio); 
+    vec3 cubemap_sample_vector = vec3(MAT_INV_MODEL * vec4(refract(view_direction , normal_vector , refractive_index_ratio) , 1.f)); 
     vec4 sampled_value = texture(cubemap , cubemap_sample_vector); 
     return sampled_value; 
 
 }
 
 void main(){	
-    fragment = computeReflectionCubeMap() * texture(diffuse  , vertex_fragment_uv) * (computeDiffuseLight() + computeSpecularLight()) ; 
+    fragment = (computeRefractionCubeMap() ) * texture(diffuse  , vertex_fragment_uv) * (computeDiffuseLight() + computeSpecularLight()) ; 
 }

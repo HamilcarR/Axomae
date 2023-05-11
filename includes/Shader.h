@@ -27,7 +27,9 @@ public:
 	//Normal Matrix for transforming normal vectors alongside the model: computed from the invert model matrix and set from here automatically
 	void setAllMatricesUniforms(const glm::mat4& model);
 	void setAllMatricesUniforms(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model); 
-	void setNormalMatrixUniform(const glm::mat4& model);  
+	void setNormalMatrixUniform(const glm::mat4& model); 
+	/*computes inverse(model) and sets uniform*/ 
+	void setInverseModelMatrixUniform(const glm::mat4& model); 
 	void setModelMatrixUniform(const glm::mat4& matrix);
 	void setModelViewProjection(const glm::mat4& model) ; 
 	void setModelViewProjection(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model); 

@@ -10,24 +10,29 @@ layout(location=4) in vec3 tangents ;
 
 /* Uniforms*/
 uniform vec3 camera_position ; 
-
 uniform mat4 MAT_VP ; 
 uniform mat4 MAT_MVP ; 
 uniform mat4 MAT_VIEW ;
 uniform mat3 MAT_NORMAL ; //transpose(invert(model))
 uniform mat4 MAT_MODEL ;
 uniform mat4 MAT_MODELVIEW ; 
-uniform mat4 MAT_PROJECTION ; 
+uniform mat4 MAT_PROJECTION ;
+uniform mat4 MAT_INV_MODEL ;  
 /******************************************/
 
-/* Shader Output */
+/* Interpolated Shader Output */
 out vec4 vertex_fragment_colors ; 
 out vec2 vertex_fragment_uv ;
 out vec3 vertex_fragment_normals; 
 out vec3 vertex_fragment_positions ; 
 out vec3 vertex_fragment_fragment_position ; 
 out vec3 vertex_fragment_light_position; 
-out vec3 vertex_fragment_camera_position ; 
+out vec3 vertex_fragment_camera_position ;
+/******************************************/
+
+
+/* Flat Shader Output*/
+
 /******************************************/
 
 /* Constants */
