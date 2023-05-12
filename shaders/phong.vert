@@ -17,7 +17,8 @@ uniform mat3 MAT_NORMAL ; //transpose(invert(model))
 uniform mat4 MAT_MODEL ;
 uniform mat4 MAT_MODELVIEW ; 
 uniform mat4 MAT_PROJECTION ;
-uniform mat4 MAT_INV_MODEL ;  
+uniform mat4 MAT_INV_MODEL ; 
+uniform mat4 MAT_INV_MODELVIEW ;  
 /******************************************/
 
 /* Interpolated Shader Output */

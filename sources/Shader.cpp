@@ -80,12 +80,19 @@ void Shader::setCameraPositionUniform(){
 void Shader::setAllMatricesUniforms(const glm::mat4& model){
 	setModelViewProjection(model); 
 	setNormalMatrixUniform(model);
-	setInverseModelMatrixUniform(model);  
+	setInverseModelMatrixUniform(model);
+	if(camera_pointer != nullptr) 
+		setInverseModelViewMatrixUniform(camera_pointer->getView() , model);  
 }
 
 void Shader::setAllMatricesUniforms(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model){
 	setModelViewProjection(projection , view , model); 
 	setNormalMatrixUniform(model); 
+}
+
+void Shader::setInverseModelViewMatrixUniform(const glm::mat4& view , const glm::mat4& model){
+	glm::mat4 inverse = glm::inverse(view * model); 
+	setUniform(uniform_name_matrix_inverse_modelview , inverse); 
 }
 
 void Shader::setNormalMatrixUniform(const glm::mat4& model){

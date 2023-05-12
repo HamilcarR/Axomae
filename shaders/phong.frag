@@ -18,7 +18,9 @@ in vec3 vertex_fragment_camera_position;
 /* Uniforms */
 uniform mat4 MAT_MODEL;
 uniform mat4 MAT_MODELVIEW ; 
-uniform mat4 MAT_INV_MODEL ;  
+uniform mat4 MAT_INV_MODEL ;
+uniform mat4 MAT_INV_MODELVIEW ;  
+uniform mat3 MAT_NORMAL ; 
 /*****************************************/
 
 /* Samplers and textures */
@@ -40,7 +42,9 @@ out vec4 fragment ;
 /*Constants*/
 const float specular_intensity = 1.8f; 
 const float shininess = 10; 
-const vec3 camera_position = vec3(0.f); 
+const float n1 = 1.f ; 
+const float n2 = 2.42f ;  
+const vec3 camera_position = vec3(0.f);
 /******************************************/
 
 vec3 getViewDirection(){
@@ -71,21 +75,37 @@ float computeSpecularLight(){
 vec4 computeReflectionCubeMap(){
     vec3 view_direction = normalize(vertex_fragment_fragment_position - camera_position); 
     vec3 normal_vector = normalize(vertex_fragment_normals); 
-    vec3 cubemap_sample_vector = vec3(MAT_INV_MODEL * vec4(reflect(view_direction , normal_vector) , 1.f)); 
+    vec3 cubemap_sample_vector = vec3(inverse(MAT_NORMAL) * reflect(view_direction , normal_vector)); 
     vec4 sampled_value = texture(cubemap , cubemap_sample_vector , 1.f); 
     return sampled_value; 
 }
 
 vec4 computeRefractionCubeMap(){
-    float refractive_index_ratio = 1.f / 2.42f ; 
+    float refractive_index_ratio = n1 / n2 ; 
     vec3 view_direction = normalize(vertex_fragment_fragment_position - camera_position) ; 
     vec3 normal_vector = normalize(vertex_fragment_normals); 
-    vec3 cubemap_sample_vector = vec3(MAT_INV_MODEL * vec4(refract(view_direction , normal_vector , refractive_index_ratio) , 1.f)); 
+    vec3 cubemap_sample_vector = vec3(inverse(MAT_NORMAL) * refract(view_direction , normal_vector , refractive_index_ratio)); 
     vec4 sampled_value = texture(cubemap , cubemap_sample_vector); 
     return sampled_value; 
 
 }
+vec2 computeFresnelCoefficients(){
+    float refractive_index_ratio = n1 / n2 ; 
+    vec3 incident_vector = normalize(vertex_fragment_fragment_position - camera_position) ; 
+    vec3 normal_vector = normalize(vertex_fragment_normals); 
+    float cos_theta1 =  dot(-incident_vector , normal_vector);
+    float sin_theta1 = sqrt(1 - cos_theta1 * cos_theta1);  
+    float sin_theta2 = sin_theta1 * refractive_index_ratio ;  
+    float cos_theta2 = sqrt(1 - sin_theta2 * sin_theta2) ; 
+    float Fr1_ratio = (n1 * cos_theta1 - n2 * cos_theta2) / (n1 * cos_theta1 + n2 * cos_theta2) ;
+    float Fr2_ratio = (n1 * cos_theta2 - n2 * cos_theta1) / (n1 * cos_theta2 + n2 * cos_theta1) ; 
+    float FR1 = Fr1_ratio * Fr1_ratio ; 
+    float FR2 = Fr2_ratio * Fr2_ratio ;
+    float FR = 0.5 * (FR1 + FR2); 
+    return vec2(FR , 1 - FR);  
+}
 
 void main(){	
-    fragment = (computeRefractionCubeMap() ) * texture(diffuse  , vertex_fragment_uv) * (computeDiffuseLight() + computeSpecularLight()) ; 
+    vec2 fresnel = computeFresnelCoefficients() ; 
+    fragment = (fresnel.y * computeRefractionCubeMap() + fresnel.x * computeReflectionCubeMap()) ; //* texture(diffuse  , vertex_fragment_uv) ; //* (computeDiffuseLight() + computeSpecularLight()) ; 
 }
