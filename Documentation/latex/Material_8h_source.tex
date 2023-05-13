@@ -1,0 +1,39 @@
+\hypertarget{Material_8h_source}{}\doxysection{Material.\+h}
+\label{Material_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/Material.h@{/home/hamilcar/Desktop/projects/Axomae/includes/Material.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ MATERIAL\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ MATERIAL\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}TextureGroup.h"{}}\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}Shader.h"{}}\ }
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classMaterial}{Material}}\{}
+\DoxyCodeLine{00010\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00011\ \ \ \ \ \mbox{\hyperlink{classMaterial}{Material}}();\ }
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classMaterial}{\string~Material}}();\ }
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ addTexture(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ index\ ,\ Texture::TYPE\ type);}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ bind();}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ clean();}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ initializeMaterial();\ }
+\DoxyCodeLine{00017\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{classTextureGroup}{TextureGroup}}\ textures\_group\ ;}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordtype}{float}\ dielectric\_factor;\ \textcolor{comment}{//metallic\ factor\ ,\ 0.0\ =\ full\ dielectric\ ,\ 1.0\ =\ full\ metallic}}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordtype}{float}\ roughtness\_factor;\ \textcolor{comment}{//0.0\ =\ smooth\ ,\ 1.0\ =\ rough\ \ \ }}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{float}\ transmission\_factor;\ \textcolor{comment}{//defines\ amount\ of\ light\ transmitted\ through\ the\ surface}}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordtype}{float}\ emissive\_factor;}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \};}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

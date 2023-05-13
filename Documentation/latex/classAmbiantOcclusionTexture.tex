@@ -1,0 +1,138 @@
+\hypertarget{classAmbiantOcclusionTexture}{}\doxysection{Ambiant\+Occlusion\+Texture Class Reference}
+\label{classAmbiantOcclusionTexture}\index{AmbiantOcclusionTexture@{AmbiantOcclusionTexture}}
+Inheritance diagram for Ambiant\+Occlusion\+Texture\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classAmbiantOcclusionTexture}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classAmbiantOcclusionTexture_a02ebc4101dabcfebb3bf9ade0f89d6c9}\label{classAmbiantOcclusionTexture_a02ebc4101dabcfebb3bf9ade0f89d6c9}} 
+{\bfseries Ambiant\+Occlusion\+Texture} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$data)
+\item 
+virtual void \mbox{\hyperlink{classAmbiantOcclusionTexture_a546414c37b4d8a364c4398f83ec270e1}{set\+Gl\+Data}} ()
+\item 
+virtual void \mbox{\hyperlink{classAmbiantOcclusionTexture_ad951dc886f9b9d1ed6f57dc89f1867b9}{bind\+Texture}} ()
+\item 
+virtual void \mbox{\hyperlink{classAmbiantOcclusionTexture_ab9d4efb00d01c7438c9b8721c1888c1b}{unbind\+Texture}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions inherited from \mbox{\hyperlink{classTexture}{Texture}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classTexture_ab2d871f55dfd7f278914ea5dfef3c12a}\label{classTexture_ab2d871f55dfd7f278914ea5dfef3c12a}} 
+{\bfseries Texture} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$tex)
+\item 
+\mbox{\Hypertarget{classTexture_a65f98c2bc79bc91c8aeed02eb0695fd0}\label{classTexture_a65f98c2bc79bc91c8aeed02eb0695fd0}} 
+void {\bfseries set} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$texture)
+\item 
+\mbox{\Hypertarget{classTexture_a2d0283525256389a133f23d0933e207e}\label{classTexture_a2d0283525256389a133f23d0933e207e}} 
+void {\bfseries clean} ()
+\item 
+\mbox{\Hypertarget{classTexture_a3d146627c648426c0f3096451483ce3c}\label{classTexture_a3d146627c648426c0f3096451483ce3c}} 
+void {\bfseries set\+Texture\+Type} (TYPE type)
+\item 
+\mbox{\Hypertarget{classTexture_aa7f1bffe6fe55d92799aebff9bc1919a}\label{classTexture_aa7f1bffe6fe55d92799aebff9bc1919a}} 
+TYPE {\bfseries get\+Texture\+Type} ()
+\item 
+\mbox{\Hypertarget{classTexture_a297a48c11cf62a12ad6a23395e1dd46c}\label{classTexture_a297a48c11cf62a12ad6a23395e1dd46c}} 
+virtual void {\bfseries bind\+Texture} ()=0
+\item 
+\mbox{\Hypertarget{classTexture_a7bef4a5acc61f41c2bb958fdd6b910d1}\label{classTexture_a7bef4a5acc61f41c2bb958fdd6b910d1}} 
+virtual void {\bfseries unbind\+Texture} ()=0
+\item 
+\mbox{\Hypertarget{classTexture_a4a21bebd62df4e91826ed21d23b89165}\label{classTexture_a4a21bebd62df4e91826ed21d23b89165}} 
+virtual void {\bfseries set\+Gl\+Data} ()=0
+\item 
+\mbox{\Hypertarget{classTexture_ae127c522ca6a943775101dc9e8039d8f}\label{classTexture_ae127c522ca6a943775101dc9e8039d8f}} 
+void {\bfseries clean\+Gl\+Data} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classAmbiantOcclusionTexture_aabf64f6a2c6c99a9b3d50b2cc47e5d6a}\label{classAmbiantOcclusionTexture_aabf64f6a2c6c99a9b3d50b2cc47e5d6a}} 
+static const char $\ast$ {\bfseries get\+Texture\+Type\+CStr} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+\doxysubsubsection*{Public Types inherited from \mbox{\hyperlink{classTexture}{Texture}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classTexture_ac1974514d0c1fc17c0f422a63f349376}\label{classTexture_ac1974514d0c1fc17c0f422a63f349376}} 
+enum {\bfseries TYPE} \+: signed \{ \newline
+{\bfseries EMPTY} = -\/1
+, {\bfseries DIFFUSE} = 0
+, {\bfseries NORMAL} = 1
+, {\bfseries METALLIC} = 2
+, \newline
+{\bfseries ROUGHNESS} = 3
+, {\bfseries AMBIANTOCCLUSION} = 4
+, {\bfseries SPECULAR} = 5
+, {\bfseries EMISSIVE} = 6
+, \newline
+{\bfseries CUBEMAP} = 7
+, {\bfseries GENERIC} = 8
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classTexture}{Texture}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classTexture_a14df145286d1b1114c4db94685dd368c}\label{classTexture_a14df145286d1b1114c4db94685dd368c}} 
+virtual void {\bfseries initialize\+Texture2D} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes inherited from \mbox{\hyperlink{classTexture}{Texture}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classTexture_a89ca5996442a334121098ebaa3f9f959}\label{classTexture_a89ca5996442a334121098ebaa3f9f959}} 
+TYPE {\bfseries name}
+\item 
+\mbox{\Hypertarget{classTexture_a5d81cb05821b158ded3d5a46a4cd8f5a}\label{classTexture_a5d81cb05821b158ded3d5a46a4cd8f5a}} 
+unsigned int {\bfseries width}
+\item 
+\mbox{\Hypertarget{classTexture_ab4b01ae73439cbcc210a5977e227a880}\label{classTexture_ab4b01ae73439cbcc210a5977e227a880}} 
+unsigned int {\bfseries height}
+\item 
+\mbox{\Hypertarget{classTexture_adfe232cc4d823d873b2e2eb35d11af2a}\label{classTexture_adfe232cc4d823d873b2e2eb35d11af2a}} 
+uint32\+\_\+t $\ast$ {\bfseries data}
+\item 
+\mbox{\Hypertarget{classTexture_a557c44467fc0a8f66a579a2d6bb708cd}\label{classTexture_a557c44467fc0a8f66a579a2d6bb708cd}} 
+unsigned int {\bfseries sampler2D}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classAmbiantOcclusionTexture_ad951dc886f9b9d1ed6f57dc89f1867b9}\label{classAmbiantOcclusionTexture_ad951dc886f9b9d1ed6f57dc89f1867b9}} 
+\index{AmbiantOcclusionTexture@{AmbiantOcclusionTexture}!bindTexture@{bindTexture}}
+\index{bindTexture@{bindTexture}!AmbiantOcclusionTexture@{AmbiantOcclusionTexture}}
+\doxysubsubsection{\texorpdfstring{bindTexture()}{bindTexture()}}
+{\footnotesize\ttfamily virtual void Ambiant\+Occlusion\+Texture\+::bind\+Texture (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classTexture}{Texture}}.
+
+\mbox{\Hypertarget{classAmbiantOcclusionTexture_a546414c37b4d8a364c4398f83ec270e1}\label{classAmbiantOcclusionTexture_a546414c37b4d8a364c4398f83ec270e1}} 
+\index{AmbiantOcclusionTexture@{AmbiantOcclusionTexture}!setGlData@{setGlData}}
+\index{setGlData@{setGlData}!AmbiantOcclusionTexture@{AmbiantOcclusionTexture}}
+\doxysubsubsection{\texorpdfstring{setGlData()}{setGlData()}}
+{\footnotesize\ttfamily virtual void Ambiant\+Occlusion\+Texture\+::set\+Gl\+Data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classTexture}{Texture}}.
+
+\mbox{\Hypertarget{classAmbiantOcclusionTexture_ab9d4efb00d01c7438c9b8721c1888c1b}\label{classAmbiantOcclusionTexture_ab9d4efb00d01c7438c9b8721c1888c1b}} 
+\index{AmbiantOcclusionTexture@{AmbiantOcclusionTexture}!unbindTexture@{unbindTexture}}
+\index{unbindTexture@{unbindTexture}!AmbiantOcclusionTexture@{AmbiantOcclusionTexture}}
+\doxysubsubsection{\texorpdfstring{unbindTexture()}{unbindTexture()}}
+{\footnotesize\ttfamily virtual void Ambiant\+Occlusion\+Texture\+::unbind\+Texture (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classTexture}{Texture}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/Texture.\+h\end{DoxyCompactItemize}

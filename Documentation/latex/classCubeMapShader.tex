@@ -1,0 +1,141 @@
+\hypertarget{classCubeMapShader}{}\doxysection{Cube\+Map\+Shader Class Reference}
+\label{classCubeMapShader}\index{CubeMapShader@{CubeMapShader}}
+Inheritance diagram for Cube\+Map\+Shader\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classCubeMapShader}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classCubeMapShader_ab7d5a6becb8c64ad86bd18f952a2b60c}\label{classCubeMapShader_ab7d5a6becb8c64ad86bd18f952a2b60c}} 
+{\bfseries Cube\+Map\+Shader} (const std\+::string vertex\+\_\+code, const std\+::string fragment\+\_\+code)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions inherited from \mbox{\hyperlink{classShader}{Shader}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classShader_a15f39315b0f86f9605fb0ce2f9e7eca8}\label{classShader_a15f39315b0f86f9605fb0ce2f9e7eca8}} 
+{\bfseries Shader} (const std\+::string vertex\+\_\+code, const std\+::string fragment\+\_\+code)
+\item 
+\mbox{\Hypertarget{classShader_a427606203c305a04668131570dc9e102}\label{classShader_a427606203c305a04668131570dc9e102}} 
+virtual void {\bfseries initialize\+Shader} ()
+\item 
+\mbox{\Hypertarget{classShader_aa54f63c5d63fa62e81adf12f3f91f5d3}\label{classShader_aa54f63c5d63fa62e81adf12f3f91f5d3}} 
+virtual void {\bfseries bind} ()
+\item 
+\mbox{\Hypertarget{classShader_aa3f910dc8083dfce96cc3a673aebdd4f}\label{classShader_aa3f910dc8083dfce96cc3a673aebdd4f}} 
+virtual void {\bfseries release} ()
+\item 
+\mbox{\Hypertarget{classShader_a36744fb7217617758377f1c8925ab7d8}\label{classShader_a36744fb7217617758377f1c8925ab7d8}} 
+virtual void {\bfseries clean} ()
+\item 
+\mbox{\Hypertarget{classShader_a3b3609068c7e1cdc3bdd880c4487e0a5}\label{classShader_a3b3609068c7e1cdc3bdd880c4487e0a5}} 
+virtual void {\bfseries set\+Shaders\+Raw\+Text} (std\+::string vs, std\+::string fs)
+\item 
+\mbox{\Hypertarget{classShader_ad6c075a3526bbeca0cf6d370aef7ca3f}\label{classShader_ad6c075a3526bbeca0cf6d370aef7ca3f}} 
+void {\bfseries set\+Scene\+Camera\+Pointer} (\mbox{\hyperlink{classCamera}{Camera}} $\ast$camera)
+\item 
+\mbox{\Hypertarget{classShader_afc9540c313934df4a91d3058c938a114}\label{classShader_afc9540c313934df4a91d3058c938a114}} 
+virtual void {\bfseries update\+Camera} ()
+\item 
+\mbox{\Hypertarget{classShader_a2945c569c5a473e6d5b93444488c2ff7}\label{classShader_a2945c569c5a473e6d5b93444488c2ff7}} 
+void {\bfseries set\+Camera\+Position\+Uniform} ()
+\item 
+\mbox{\Hypertarget{classShader_a5f73993ba11c8822ca6651ba0b88b37c}\label{classShader_a5f73993ba11c8822ca6651ba0b88b37c}} 
+void {\bfseries set\+All\+Matrices\+Uniforms} (const glm\+::mat4 \&model)
+\item 
+\mbox{\Hypertarget{classShader_adb7e1c5e26bcfe855c95025fab210eb6}\label{classShader_adb7e1c5e26bcfe855c95025fab210eb6}} 
+void {\bfseries set\+All\+Matrices\+Uniforms} (const glm\+::mat4 \&projection, const glm\+::mat4 \&view, const glm\+::mat4 \&model)
+\item 
+\mbox{\Hypertarget{classShader_a42099342f3dc8f1c2a95989410943093}\label{classShader_a42099342f3dc8f1c2a95989410943093}} 
+void {\bfseries set\+Normal\+Matrix\+Uniform} (const glm\+::mat4 \&model)
+\item 
+\mbox{\Hypertarget{classShader_a53edc9982f9f737d7d7a5e1072661736}\label{classShader_a53edc9982f9f737d7d7a5e1072661736}} 
+void {\bfseries set\+Inverse\+Model\+Matrix\+Uniform} (const glm\+::mat4 \&model)
+\item 
+\mbox{\Hypertarget{classShader_a97798a0124e96b35eef077e744acee6c}\label{classShader_a97798a0124e96b35eef077e744acee6c}} 
+void {\bfseries set\+Inverse\+Model\+View\+Matrix\+Uniform} (const glm\+::mat4 \&view, const glm\+::mat4 \&model)
+\item 
+\mbox{\Hypertarget{classShader_a1bbde57221f13534243c9b9b5f00186c}\label{classShader_a1bbde57221f13534243c9b9b5f00186c}} 
+void {\bfseries set\+Model\+Matrix\+Uniform} (const glm\+::mat4 \&matrix)
+\item 
+\mbox{\Hypertarget{classShader_a0512463666d499f9ce155fa283cc040e}\label{classShader_a0512463666d499f9ce155fa283cc040e}} 
+void {\bfseries set\+Model\+View\+Projection} (const glm\+::mat4 \&model)
+\item 
+\mbox{\Hypertarget{classShader_a96f300d70220ffd4d583963ebe963faa}\label{classShader_a96f300d70220ffd4d583963ebe963faa}} 
+void {\bfseries set\+Model\+View\+Projection} (const glm\+::mat4 \&projection, const glm\+::mat4 \&view, const glm\+::mat4 \&model)
+\item 
+\mbox{\Hypertarget{classShader_ac0d0921d8d7f0dad2c22bb356016ad22}\label{classShader_ac0d0921d8d7f0dad2c22bb356016ad22}} 
+void {\bfseries enable\+Attribute\+Array} (GLuint att)
+\item 
+\mbox{\Hypertarget{classShader_ac5e050fdb23fd00a5d8163f74886cfd1}\label{classShader_ac5e050fdb23fd00a5d8163f74886cfd1}} 
+void {\bfseries set\+Attribute\+Buffer} (GLuint location, GLenum type, int offset, int tuplesize, int stride=0)
+\item 
+\mbox{\Hypertarget{classShader_a260a02013baf685878645cd8dc331510}\label{classShader_a260a02013baf685878645cd8dc331510}} 
+{\footnotesize template$<$typename T $>$ }\\void {\bfseries set\+Uniform} (const char $\ast$name, const T value)
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+\doxysubsubsection*{Public Types inherited from \mbox{\hyperlink{classShader}{Shader}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classShader_a0203e846cef6779a4b2935b50f671358}\label{classShader_a0203e846cef6779a4b2935b50f671358}} 
+enum {\bfseries TYPE} \+: signed \{ {\bfseries GENERIC} = 0
+, {\bfseries BLINN} = 1
+, {\bfseries CUBEMAP} = 2
+, {\bfseries PBR} = 3
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classShader}{Shader}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classShader_ac23427f5f357cfe1a711f67121757ef7}\label{classShader_ac23427f5f357cfe1a711f67121757ef7}} 
+virtual void {\bfseries set\+Texture\+Uniforms} ()
+\item 
+\mbox{\Hypertarget{classShader_a95d72666599e5f9497864d0b1ee02f6c}\label{classShader_a95d72666599e5f9497864d0b1ee02f6c}} 
+void {\bfseries set\+Uniform\+Value} (int location, const int value)
+\item 
+\mbox{\Hypertarget{classShader_aeaa1ef5885e87ebd73bcd2486e7982d1}\label{classShader_aeaa1ef5885e87ebd73bcd2486e7982d1}} 
+void {\bfseries set\+Uniform\+Value} (int location, const glm\+::mat4 \&value)
+\item 
+\mbox{\Hypertarget{classShader_aac86a80383693e87bcd70dec4375a4ce}\label{classShader_aac86a80383693e87bcd70dec4375a4ce}} 
+void {\bfseries set\+Uniform\+Value} (int location, const glm\+::mat3 \&value)
+\item 
+\mbox{\Hypertarget{classShader_a7c33165988921bf7f0c5817b936a0238}\label{classShader_a7c33165988921bf7f0c5817b936a0238}} 
+void {\bfseries set\+Uniform\+Value} (int location, const glm\+::vec4 \&value)
+\item 
+\mbox{\Hypertarget{classShader_a31ca33afc8ddb0e7e4d350685b5e59d3}\label{classShader_a31ca33afc8ddb0e7e4d350685b5e59d3}} 
+void {\bfseries set\+Uniform\+Value} (int location, const glm\+::vec3 \&value)
+\item 
+\mbox{\Hypertarget{classShader_ab14e5295156f4531deaa9b4b1b56fa10}\label{classShader_ab14e5295156f4531deaa9b4b1b56fa10}} 
+void {\bfseries set\+Uniform\+Value} (int location, const glm\+::vec2 \&value)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes inherited from \mbox{\hyperlink{classShader}{Shader}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classShader_a7bc3617135171404f98f4f61952c002d}\label{classShader_a7bc3617135171404f98f4f61952c002d}} 
+TYPE {\bfseries type}
+\item 
+\mbox{\Hypertarget{classShader_a6ee6ac3b6b630eb4b0c2cb784cdcef11}\label{classShader_a6ee6ac3b6b630eb4b0c2cb784cdcef11}} 
+unsigned int {\bfseries shader\+\_\+program}
+\item 
+\mbox{\Hypertarget{classShader_a48c43c0b53f034ed45f26a7ecbbc81cd}\label{classShader_a48c43c0b53f034ed45f26a7ecbbc81cd}} 
+unsigned int {\bfseries fragment\+\_\+shader}
+\item 
+\mbox{\Hypertarget{classShader_a24d37cdd3f7dcd63aea0caf30c820055}\label{classShader_a24d37cdd3f7dcd63aea0caf30c820055}} 
+unsigned int {\bfseries vertex\+\_\+shader}
+\item 
+\mbox{\Hypertarget{classShader_aa273218863d3dce5f4c0dd7559737f52}\label{classShader_aa273218863d3dce5f4c0dd7559737f52}} 
+std\+::string {\bfseries fragment\+\_\+shader\+\_\+txt}
+\item 
+\mbox{\Hypertarget{classShader_a8da7f581286760c5ed17069c45673d7b}\label{classShader_a8da7f581286760c5ed17069c45673d7b}} 
+std\+::string {\bfseries vertex\+\_\+shader\+\_\+txt}
+\item 
+\mbox{\Hypertarget{classShader_a8e1532d7ee62d57d53482b8742ea7695}\label{classShader_a8e1532d7ee62d57d53482b8742ea7695}} 
+\mbox{\hyperlink{classCamera}{Camera}} $\ast$ {\bfseries camera\+\_\+pointer}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/Shader.\+h\end{DoxyCompactItemize}

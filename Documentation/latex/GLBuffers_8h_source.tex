@@ -1,0 +1,49 @@
+\hypertarget{GLBuffers_8h_source}{}\doxysection{GLBuffers.\+h}
+\label{GLBuffers_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/GLBuffers.h@{/home/hamilcar/Desktop/projects/Axomae/includes/GLBuffers.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ GLBUFFERS\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ GLBUFFERS\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}utils\_3D.h"{}}\ }
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classGLBuffers}{GLBuffers}}\{}
+\DoxyCodeLine{00007\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00008\ \ \ \ \ \mbox{\hyperlink{classGLBuffers}{GLBuffers}}();}
+\DoxyCodeLine{00009\ \ \ \ \ \mbox{\hyperlink{classGLBuffers}{GLBuffers}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structaxomae_1_1Object3D}{axomae::Object3D}}\ *geometry)\ ;\ }
+\DoxyCodeLine{00010\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classGLBuffers}{\string~GLBuffers}}();}
+\DoxyCodeLine{00011\ \ \ \ \ \textcolor{keywordtype}{void}\ setGeometryPointer(\textcolor{keyword}{const}\ \mbox{\hyperlink{structaxomae_1_1Object3D}{axomae::Object3D}}\ *geo)\{geometry\ =\ geo;\}\ ;\ }
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keywordtype}{void}\ initializeBuffers();}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keywordtype}{bool}\ isReady();\ }
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keywordtype}{void}\ clean();\ }
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordtype}{void}\ bindVao();}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keywordtype}{void}\ unbindVao();\ }
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{keywordtype}{void}\ bindVertexBuffer();\ }
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keywordtype}{void}\ bindNormalBuffer();\ }
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordtype}{void}\ bindTextureBuffer();\ }
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordtype}{void}\ bindColorBuffer();\ }
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{void}\ bindIndexBuffer();}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordtype}{void}\ bindTangentBuffer();}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keywordtype}{void}\ fillBuffers();\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00025\ \ \ \ \ GLuint\ vao\ ;\ }
+\DoxyCodeLine{00026\ \ \ \ \ GLuint\ vertex\_buffer\ ;\ }
+\DoxyCodeLine{00027\ \ \ \ \ GLuint\ normal\_buffer\ ;\ }
+\DoxyCodeLine{00028\ \ \ \ \ GLuint\ index\_buffer\ ;\ }
+\DoxyCodeLine{00029\ \ \ \ \ GLuint\ texture\_buffer\ ;}
+\DoxyCodeLine{00030\ \ \ \ \ GLuint\ color\_buffer\ ;}
+\DoxyCodeLine{00031\ \ \ \ \ GLuint\ tangent\_buffer\ ;\ }
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structaxomae_1_1Object3D}{axomae::Object3D}}\ *geometry;\ }
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \};\ }
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

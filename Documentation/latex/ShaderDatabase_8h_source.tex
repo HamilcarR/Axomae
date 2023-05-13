@@ -1,0 +1,41 @@
+\hypertarget{ShaderDatabase_8h_source}{}\doxysection{Shader\+Database.\+h}
+\label{ShaderDatabase_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/ShaderDatabase.h@{/home/hamilcar/Desktop/projects/Axomae/includes/ShaderDatabase.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ SHADERDATABASE\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ SHADERDATABASE\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <map>}\ }
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}utils\_3D.h"{}}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}Shader.h"{}}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classShaderDatabase}{ShaderDatabase}}\{}
+\DoxyCodeLine{00010\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00011\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classShaderDatabase}{ShaderDatabase}}*\ getInstance();\ }
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keywordtype}{void}\ clean();\ }
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keywordtype}{void}\ destroy();\ }
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ isInstanced()\{\textcolor{keywordflow}{return}\ instance\ !=\ \textcolor{keyword}{nullptr};\}\ \ \ \ \ \ }
+\DoxyCodeLine{00015\ \ \ \ \ }
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{comment}{/*\ compare\ the\ fragment\ /\ vertex\ /\ geom\ /\ tesselation\ code\ of\ shader\ to\ each\ instance\ in\ shader\_database\ ...\ }}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ \ \ \ \ *\ if\ an\ identical\ shader\ is\ found\ ,\ return\ it's\ address\ .\ If\ not\ ,\ store\ the\ new\ shader\ in\ the\ database\ ,\ and\ returns\ it's\ address\ }}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ \ \ \ \ */}\ }
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{classShader}{Shader}}*\ addShader(\textcolor{keyword}{const}\ std::string\ vertex\_code\ ,\ \textcolor{keyword}{const}\ std::string\ fragment\_code\ ,\textcolor{keyword}{const}\ Shader::TYPE\ type);\ \ }
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordtype}{bool}\ contains(\textcolor{keyword}{const}\ Shader::TYPE\ type);\ }
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{classShader}{Shader}}*\ get(Shader::TYPE\ type)\ \textcolor{keyword}{const}\ ;\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{classShaderDatabase}{ShaderDatabase}}();\ }
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classShaderDatabase}{\string~ShaderDatabase}}()\ ;}
+\DoxyCodeLine{00025\ \ \ \ \ }
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classShaderDatabase}{ShaderDatabase}}*\ instance;\ }
+\DoxyCodeLine{00029\ \ \ \ \ std::map<int,\ Shader*>\ shader\_database\ ;\ }
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \};\ }
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#endif\ }}
+
+\end{DoxyCode}

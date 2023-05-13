@@ -1,0 +1,47 @@
+\hypertarget{Renderer_8h_source}{}\doxysection{Renderer.\+h}
+\label{Renderer_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/Renderer.h@{/home/hamilcar/Desktop/projects/Axomae/includes/Renderer.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ RENDERER\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ RENDERER\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}constants.h"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}utils\_3D.h"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}Loader.h"{}}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}Mesh.h"{}}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}Drawable.h"{}}\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}TextureDatabase.h"{}}\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Camera_8h}{Camera.h}}"{}}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classRenderer}{Renderer}}\ \{}
+\DoxyCodeLine{00014\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{classRenderer}{Renderer}}();}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classRenderer}{\string~Renderer}}();\ \ \ }
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{keywordtype}{void}\ initialize();}
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keywordtype}{bool}\ prep\_draw();}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordtype}{void}\ draw();\ }
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordtype}{void}\ set\_new\_scene(std::vector<axomae::Mesh*>\ \&new\_scene);}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{bool}\ scene\_ready()\ ;\ }
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{structMouseState}{MouseState}}*\ getMouseStatePointer()\{\ \textcolor{keywordflow}{return}\ \&mouse\_state;\}\ ;\ \ }
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keywordtype}{void}\ onLeftClick();\ }
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordtype}{void}\ onRightClick();\ }
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keywordtype}{void}\ onLeftClickRelease();\ }
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordtype}{void}\ onRightClickRelease();}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordtype}{void}\ onScrollDown();\ }
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordtype}{void}\ onScrollUp();\ }
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordtype}{void}\ setScreenSize(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ width\ ,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ height);}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00032\ \ \ \ \ std::vector<Drawable*>\ scene\ ;\ }
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordtype}{bool}\ start\_draw\ ;\ }
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{classTextureDatabase}{TextureDatabase}}*\ texture\_database;\ \ \ \ \ \ \ }
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{classShaderDatabase}{ShaderDatabase}}*\ shader\_database;\ }
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{classCamera}{Camera}}\ *scene\_camera\ ;}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{structMouseState}{MouseState}}\ mouse\_state\ ;}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{structScreenSize}{ScreenSize}}\ screen\_size\ ;\ \ }
+\DoxyCodeLine{00039\ \};}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

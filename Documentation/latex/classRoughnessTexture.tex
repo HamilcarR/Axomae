@@ -1,0 +1,138 @@
+\hypertarget{classRoughnessTexture}{}\doxysection{Roughness\+Texture Class Reference}
+\label{classRoughnessTexture}\index{RoughnessTexture@{RoughnessTexture}}
+Inheritance diagram for Roughness\+Texture\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classRoughnessTexture}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classRoughnessTexture_ad20dcb8f048ec670728258b20bc76d16}\label{classRoughnessTexture_ad20dcb8f048ec670728258b20bc76d16}} 
+{\bfseries Roughness\+Texture} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$data)
+\item 
+virtual void \mbox{\hyperlink{classRoughnessTexture_aa95c02511711d16d3cb8669ba0e9496a}{set\+Gl\+Data}} ()
+\item 
+virtual void \mbox{\hyperlink{classRoughnessTexture_ae91a60a42d0de3d0f4a53ac6ed293b21}{bind\+Texture}} ()
+\item 
+virtual void \mbox{\hyperlink{classRoughnessTexture_a51cab68cb59410ffda3627c811bb38af}{unbind\+Texture}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions inherited from \mbox{\hyperlink{classTexture}{Texture}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classTexture_ab2d871f55dfd7f278914ea5dfef3c12a}\label{classTexture_ab2d871f55dfd7f278914ea5dfef3c12a}} 
+{\bfseries Texture} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$tex)
+\item 
+\mbox{\Hypertarget{classTexture_a65f98c2bc79bc91c8aeed02eb0695fd0}\label{classTexture_a65f98c2bc79bc91c8aeed02eb0695fd0}} 
+void {\bfseries set} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$texture)
+\item 
+\mbox{\Hypertarget{classTexture_a2d0283525256389a133f23d0933e207e}\label{classTexture_a2d0283525256389a133f23d0933e207e}} 
+void {\bfseries clean} ()
+\item 
+\mbox{\Hypertarget{classTexture_a3d146627c648426c0f3096451483ce3c}\label{classTexture_a3d146627c648426c0f3096451483ce3c}} 
+void {\bfseries set\+Texture\+Type} (TYPE type)
+\item 
+\mbox{\Hypertarget{classTexture_aa7f1bffe6fe55d92799aebff9bc1919a}\label{classTexture_aa7f1bffe6fe55d92799aebff9bc1919a}} 
+TYPE {\bfseries get\+Texture\+Type} ()
+\item 
+\mbox{\Hypertarget{classTexture_a297a48c11cf62a12ad6a23395e1dd46c}\label{classTexture_a297a48c11cf62a12ad6a23395e1dd46c}} 
+virtual void {\bfseries bind\+Texture} ()=0
+\item 
+\mbox{\Hypertarget{classTexture_a7bef4a5acc61f41c2bb958fdd6b910d1}\label{classTexture_a7bef4a5acc61f41c2bb958fdd6b910d1}} 
+virtual void {\bfseries unbind\+Texture} ()=0
+\item 
+\mbox{\Hypertarget{classTexture_a4a21bebd62df4e91826ed21d23b89165}\label{classTexture_a4a21bebd62df4e91826ed21d23b89165}} 
+virtual void {\bfseries set\+Gl\+Data} ()=0
+\item 
+\mbox{\Hypertarget{classTexture_ae127c522ca6a943775101dc9e8039d8f}\label{classTexture_ae127c522ca6a943775101dc9e8039d8f}} 
+void {\bfseries clean\+Gl\+Data} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classRoughnessTexture_a49c4cfca60e9a8de9f61244939f2b951}\label{classRoughnessTexture_a49c4cfca60e9a8de9f61244939f2b951}} 
+static const char $\ast$ {\bfseries get\+Texture\+Type\+CStr} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+\doxysubsubsection*{Public Types inherited from \mbox{\hyperlink{classTexture}{Texture}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classTexture_ac1974514d0c1fc17c0f422a63f349376}\label{classTexture_ac1974514d0c1fc17c0f422a63f349376}} 
+enum {\bfseries TYPE} \+: signed \{ \newline
+{\bfseries EMPTY} = -\/1
+, {\bfseries DIFFUSE} = 0
+, {\bfseries NORMAL} = 1
+, {\bfseries METALLIC} = 2
+, \newline
+{\bfseries ROUGHNESS} = 3
+, {\bfseries AMBIANTOCCLUSION} = 4
+, {\bfseries SPECULAR} = 5
+, {\bfseries EMISSIVE} = 6
+, \newline
+{\bfseries CUBEMAP} = 7
+, {\bfseries GENERIC} = 8
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classTexture}{Texture}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classTexture_a14df145286d1b1114c4db94685dd368c}\label{classTexture_a14df145286d1b1114c4db94685dd368c}} 
+virtual void {\bfseries initialize\+Texture2D} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes inherited from \mbox{\hyperlink{classTexture}{Texture}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classTexture_a89ca5996442a334121098ebaa3f9f959}\label{classTexture_a89ca5996442a334121098ebaa3f9f959}} 
+TYPE {\bfseries name}
+\item 
+\mbox{\Hypertarget{classTexture_a5d81cb05821b158ded3d5a46a4cd8f5a}\label{classTexture_a5d81cb05821b158ded3d5a46a4cd8f5a}} 
+unsigned int {\bfseries width}
+\item 
+\mbox{\Hypertarget{classTexture_ab4b01ae73439cbcc210a5977e227a880}\label{classTexture_ab4b01ae73439cbcc210a5977e227a880}} 
+unsigned int {\bfseries height}
+\item 
+\mbox{\Hypertarget{classTexture_adfe232cc4d823d873b2e2eb35d11af2a}\label{classTexture_adfe232cc4d823d873b2e2eb35d11af2a}} 
+uint32\+\_\+t $\ast$ {\bfseries data}
+\item 
+\mbox{\Hypertarget{classTexture_a557c44467fc0a8f66a579a2d6bb708cd}\label{classTexture_a557c44467fc0a8f66a579a2d6bb708cd}} 
+unsigned int {\bfseries sampler2D}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classRoughnessTexture_ae91a60a42d0de3d0f4a53ac6ed293b21}\label{classRoughnessTexture_ae91a60a42d0de3d0f4a53ac6ed293b21}} 
+\index{RoughnessTexture@{RoughnessTexture}!bindTexture@{bindTexture}}
+\index{bindTexture@{bindTexture}!RoughnessTexture@{RoughnessTexture}}
+\doxysubsubsection{\texorpdfstring{bindTexture()}{bindTexture()}}
+{\footnotesize\ttfamily virtual void Roughness\+Texture\+::bind\+Texture (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classTexture}{Texture}}.
+
+\mbox{\Hypertarget{classRoughnessTexture_aa95c02511711d16d3cb8669ba0e9496a}\label{classRoughnessTexture_aa95c02511711d16d3cb8669ba0e9496a}} 
+\index{RoughnessTexture@{RoughnessTexture}!setGlData@{setGlData}}
+\index{setGlData@{setGlData}!RoughnessTexture@{RoughnessTexture}}
+\doxysubsubsection{\texorpdfstring{setGlData()}{setGlData()}}
+{\footnotesize\ttfamily virtual void Roughness\+Texture\+::set\+Gl\+Data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classTexture}{Texture}}.
+
+\mbox{\Hypertarget{classRoughnessTexture_a51cab68cb59410ffda3627c811bb38af}\label{classRoughnessTexture_a51cab68cb59410ffda3627c811bb38af}} 
+\index{RoughnessTexture@{RoughnessTexture}!unbindTexture@{unbindTexture}}
+\index{unbindTexture@{unbindTexture}!RoughnessTexture@{RoughnessTexture}}
+\doxysubsubsection{\texorpdfstring{unbindTexture()}{unbindTexture()}}
+{\footnotesize\ttfamily virtual void Roughness\+Texture\+::unbind\+Texture (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classTexture}{Texture}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/Texture.\+h\end{DoxyCompactItemize}

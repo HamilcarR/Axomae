@@ -1,0 +1,122 @@
+\hypertarget{ImageManager_8h_source}{}\doxysection{Image\+Manager.\+h}
+\label{ImageManager_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/ImageManager.h@{/home/hamilcar/Desktop/projects/Axomae/includes/ImageManager.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ IMAGEMANAGER\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ IMAGEMANAGER\_H}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <SDL2/SDL.h>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}constants.h"{}}\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}../kernels/Kernel.cuh"{}}\ }
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{namespace\ }axomae\{}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\{}
+\DoxyCodeLine{00015\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00016\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}();}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}(\textcolor{keywordtype}{float}\ r\ ,\ \textcolor{keywordtype}{float}\ g\ ,\ \textcolor{keywordtype}{float}\ b\ ,\ \textcolor{keywordtype}{float}\ a);}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}(\textcolor{keywordtype}{float}\ r,\ \textcolor{keywordtype}{float}\ g\ ,\ \textcolor{keywordtype}{float}\ b);}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1RGB}{\string~RGB}}();}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ int\_to\_rgb(uint32\_t\ value);}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ int\_to\_rgb(uint8\_t\ value);}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ int\_to\_rgb(uint16\_t\ value);}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ intensity();}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordtype}{void}\ invert\_color();\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ operator*(T\ arg)\ \textcolor{keyword}{const}\ ;\ }
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ operator+=(\textcolor{keywordtype}{float}\ arg)\ \textcolor{keyword}{const}\ ;}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ operator+=(\mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ arg)\ \textcolor{keyword}{const}\ ;\ }
+\DoxyCodeLine{00028\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ operator+(\mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ arg)\ \textcolor{keyword}{const}\ ;}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ operator/(\textcolor{keywordtype}{float}\ arg)\ \textcolor{keyword}{const}\ ;}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ operator-\/(\mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ arg)\ \textcolor{keyword}{const}\ ;\ }
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordtype}{void}\ clamp()\ ;\ }
+\DoxyCodeLine{00032\ \ \ \ \ uint32\_t\ rgb\_to\_int();}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordtype}{void}\ to\_string();}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordtype}{float}\ red;}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordtype}{float}\ green;}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keywordtype}{float}\ blue;}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordtype}{float}\ alpha;}
+\DoxyCodeLine{00038\ \};}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \textcolor{comment}{/***}}
+\DoxyCodeLine{00044\ \textcolor{comment}{\ *\ \(\backslash\)class\ ImageManager}}
+\DoxyCodeLine{00045\ \textcolor{comment}{\ *\ \(\backslash\)brief\ provides\ algorithms\ for\ image\ processing\ ,\ like\ edge\ detection\ ,\ greyscale\ conversion\ etc.\ }}
+\DoxyCodeLine{00046\ \textcolor{comment}{\ *\ }}
+\DoxyCodeLine{00047\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00048\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classaxomae_1_1ImageManager}{ImageManager}}\{\ \ \ \ \ }
+\DoxyCodeLine{00049\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keyword}{enum}\ FILTER\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ FILTER\_NULL\ =\ 0,\ }
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ GAUSSIAN\_SMOOTH\_3\_3\ =\ 0x01\ ,\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ GAUSSIAN\_SMOOTH\_5\_5\ =\ 0x02\ ,\ }
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ BOX\_BLUR\ =\ 0x03\ ,\ }
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ SHARPEN\ =\ 0x04\ ,\ }
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ UNSHARP\_MASKING\ =\ 0x05\};}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keyword}{static}\ max\_colors*\ get\_colors\_max\_variation(SDL\_Surface*\ image);}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ compute\_edge(SDL\_Surface*\ greyscale\_surface,uint8\_t\ flag,uint8\_t\ border\_behaviour\ );}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ get\_pixel\_color(SDL\_Surface*\ surface,\textcolor{keywordtype}{int}\ x,\textcolor{keywordtype}{int}\ y);}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ print\_pixel(uint32\_t\ color);\ \ \ \ }
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ display\_info\_surface(SDL\_Surface*\ image);}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ set\_pixel\_color(SDL\_Surface*\ image,\textcolor{keywordtype}{int}\ x,\textcolor{keywordtype}{int}\ y\ ,\ uint32\_t\ color);}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ set\_pixel\_color(SDL\_Surface*\ image,\mbox{\hyperlink{classaxomae_1_1RGB}{RGB}}\ **pixel\_array,\textcolor{keywordtype}{int}\ w,\textcolor{keywordtype}{int}\ h);}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ set\_greyscale\_average(SDL\_Surface*\ image,uint8\_t\ factor);\ \ \ }
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ set\_greyscale\_luminance(SDL\_Surface*\ image);}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ set\_contrast(SDL\_Surface*\ image,\textcolor{keywordtype}{int}\ level);}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ set\_contrast(SDL\_Surface*\ image);}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ set\_contrast\_sigmoid(SDL\_Surface\ *image,\textcolor{keywordtype}{int}\ treshold);}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ compute\_normal\_map(SDL\_Surface*\ surface\ ,\ \textcolor{keywordtype}{double}\ strength\ ,\ \textcolor{keywordtype}{float}\ attenuation);\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ compute\_dudv(SDL\_Surface*\ surface,\textcolor{keywordtype}{double}\ factor);}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ USE\_GPU\_COMPUTING()\ \{\ gpu\ =\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ USE\_CPU\_COMPUTING()\ \{\ gpu\ =\ \textcolor{keyword}{false};\ \ \}}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ USING\_GPU()\ \{\ \textcolor{keywordflow}{return}\ gpu;\ \ \}}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keyword}{static}\ SDL\_Surface*\ project\_uv\_normals(\mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}}\ \textcolor{keywordtype}{object},\ \ \textcolor{keywordtype}{int}\ width\ ,\ \textcolor{keywordtype}{int}\ height\ ,\ \textcolor{keywordtype}{bool}\ tangent\_space);\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ smooth\_image(SDL\_Surface*\ surf\ ,\ FILTER\ filter,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ smooth\_iterations);\ }
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ sharpen\_image(SDL\_Surface*\ surf\ ,\ FILTER\ filter\ ,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ sharpen\_iterations);\ }
+\DoxyCodeLine{00077\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1ImageManager}{ImageManager}}();}
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1ImageManager}{\string~ImageManager}}();}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ gpu;}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \ \};}
+\DoxyCodeLine{00086\ \ \ \ \ }
+\DoxyCodeLine{00087\ \ \ \ \ }
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \}}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

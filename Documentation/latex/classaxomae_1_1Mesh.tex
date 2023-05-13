@@ -1,0 +1,116 @@
+\hypertarget{classaxomae_1_1Mesh}{}\doxysection{axomae\+::Mesh Class Reference}
+\label{classaxomae_1_1Mesh}\index{axomae::Mesh@{axomae::Mesh}}
+Inheritance diagram for axomae\+::Mesh\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classaxomae_1_1Mesh}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_addbf715595bf6a1b5d994732d10834eb}\label{classaxomae_1_1Mesh_addbf715595bf6a1b5d994732d10834eb}} 
+enum {\bfseries DEPTHFUNC} \+: GLenum \{ \newline
+{\bfseries NEVER} = GL\+\_\+\+NEVER
+, {\bfseries LESS} = GL\+\_\+\+LESS
+, {\bfseries EQUAL} = GL\+\_\+\+EQUAL
+, {\bfseries LESS\+\_\+\+OR\+\_\+\+EQUAL} = GL\+\_\+\+LEQUAL
+, \newline
+{\bfseries GREATER} = GL\+\_\+\+GREATER
+, {\bfseries GREATER\+\_\+\+OR\+\_\+\+EQUAL} = GL\+\_\+\+GEQUAL
+, {\bfseries NOT\+\_\+\+EQUAL} = GL\+\_\+\+NOTEQUAL
+, {\bfseries ALWAYS} = GL\+\_\+\+ALWAYS
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_af60885e207709da3a30ff07711ebc28b}\label{classaxomae_1_1Mesh_af60885e207709da3a30ff07711ebc28b}} 
+{\bfseries Mesh} (const \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} \&copy)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_aa4da45ed1cdd2025946d4f8f6c5ac85b}\label{classaxomae_1_1Mesh_aa4da45ed1cdd2025946d4f8f6c5ac85b}} 
+{\bfseries Mesh} (\mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}} const \&obj, \mbox{\hyperlink{classMaterial}{Material}} const \&mat)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_ad3d65d626340310c06300c1774d6a328}\label{classaxomae_1_1Mesh_ad3d65d626340310c06300c1774d6a328}} 
+{\bfseries Mesh} (std\+::string name, \mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}} const \&obj, \mbox{\hyperlink{classMaterial}{Material}} const \&mat)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a77fa7a9e140d218871d80838b15b7ade}\label{classaxomae_1_1Mesh_a77fa7a9e140d218871d80838b15b7ade}} 
+virtual void {\bfseries bind\+Materials} ()
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_ab32fd163f57cd40a85b0eb7b5948908e}\label{classaxomae_1_1Mesh_ab32fd163f57cd40a85b0eb7b5948908e}} 
+virtual void {\bfseries bind\+Shaders} ()
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a34a4c92d18adedb64258462ef9fac300}\label{classaxomae_1_1Mesh_a34a4c92d18adedb64258462ef9fac300}} 
+virtual void {\bfseries release\+Shaders} ()
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a772b5cf069b059476e37b1944433105b}\label{classaxomae_1_1Mesh_a772b5cf069b059476e37b1944433105b}} 
+virtual void {\bfseries clean} ()
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a05297d810fac6b40209184ced7b69077}\label{classaxomae_1_1Mesh_a05297d810fac6b40209184ced7b69077}} 
+virtual bool {\bfseries is\+Initialized} ()
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_ac1163e88a24c3e53ee3b7fc5c733ed4a}\label{classaxomae_1_1Mesh_ac1163e88a24c3e53ee3b7fc5c733ed4a}} 
+virtual void {\bfseries initialize\+Gl\+Data} ()
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a6ce8c8edc69e122e9888540202b5eeeb}\label{classaxomae_1_1Mesh_a6ce8c8edc69e122e9888540202b5eeeb}} 
+virtual void {\bfseries set\+Scene\+Camera\+Pointer} (\mbox{\hyperlink{classCamera}{Camera}} $\ast$camera)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_af65900d1cfaac8346319485aaffcee4e}\label{classaxomae_1_1Mesh_af65900d1cfaac8346319485aaffcee4e}} 
+virtual void {\bfseries set\+Rotation\+Matrix} (glm\+::mat4 \&rot)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_aa18f5c7cd2bca2705c6826eeccae3c6c}\label{classaxomae_1_1Mesh_aa18f5c7cd2bca2705c6826eeccae3c6c}} 
+void {\bfseries cull\+Back\+Face} ()
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a2ba2b91ebb6538c2e16660567d8838fc}\label{classaxomae_1_1Mesh_a2ba2b91ebb6538c2e16660567d8838fc}} 
+void {\bfseries cull\+Front\+Face} ()
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a9c9465f37942ce139f7f379308923967}\label{classaxomae_1_1Mesh_a9c9465f37942ce139f7f379308923967}} 
+void {\bfseries cull\+Front\+And\+Back\+Face} ()
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a655bac84acc8d8ad1792f77dd0f490c2}\label{classaxomae_1_1Mesh_a655bac84acc8d8ad1792f77dd0f490c2}} 
+void {\bfseries set\+Face\+Culling} (bool value)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_af1765b06f95c55cc6bba54d714bc38fc}\label{classaxomae_1_1Mesh_af1765b06f95c55cc6bba54d714bc38fc}} 
+void {\bfseries set\+Depth\+Mask} (bool value)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a68efedbc9dad4a9f9b53f61ac898cb82}\label{classaxomae_1_1Mesh_a68efedbc9dad4a9f9b53f61ac898cb82}} 
+void {\bfseries set\+Depth\+Func} (DEPTHFUNC func)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a27040fb7c30a2559436826ad517da63a}\label{classaxomae_1_1Mesh_a27040fb7c30a2559436826ad517da63a}} 
+\mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}} {\bfseries geometry}
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a747e8ef6bb7e5eb10d3a971536f1d359}\label{classaxomae_1_1Mesh_a747e8ef6bb7e5eb10d3a971536f1d359}} 
+\mbox{\hyperlink{classShader}{Shader}} $\ast$ {\bfseries shader\+\_\+program}
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a4b3ebd501f92e8392699bf378ec9ff93}\label{classaxomae_1_1Mesh_a4b3ebd501f92e8392699bf378ec9ff93}} 
+\mbox{\hyperlink{classMaterial}{Material}} {\bfseries material}
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a6f165e415046a0e95860004de83a0fd8}\label{classaxomae_1_1Mesh_a6f165e415046a0e95860004de83a0fd8}} 
+std\+::string {\bfseries name}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_aa7ea9c0fd2db8171dce931f947aa9a11}\label{classaxomae_1_1Mesh_aa7ea9c0fd2db8171dce931f947aa9a11}} 
+bool {\bfseries mesh\+\_\+initialized}
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a70785ab851d1d8f29f63f85cd6bcd27f}\label{classaxomae_1_1Mesh_a70785ab851d1d8f29f63f85cd6bcd27f}} 
+\mbox{\hyperlink{classCamera}{Camera}} $\ast$ {\bfseries camera}
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a30b0319654587c506ab0c573f21735b1}\label{classaxomae_1_1Mesh_a30b0319654587c506ab0c573f21735b1}} 
+glm\+::mat4 {\bfseries model\+\_\+matrix}
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a6b096611caabc90e5a0d193658e4ea2f}\label{classaxomae_1_1Mesh_a6b096611caabc90e5a0d193658e4ea2f}} 
+bool {\bfseries face\+\_\+culling\+\_\+enabled}
+\item 
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a7248ef3308ee239cee9c88dcde4f464b}\label{classaxomae_1_1Mesh_a7248ef3308ee239cee9c88dcde4f464b}} 
+bool {\bfseries depth\+\_\+mask\+\_\+enabled}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/Mesh.\+h\end{DoxyCompactItemize}

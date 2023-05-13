@@ -1,0 +1,84 @@
+\hypertarget{classaxomae_1_1ImageManager}{}\doxysection{axomae\+::Image\+Manager Class Reference}
+\label{classaxomae_1_1ImageManager}\index{axomae::ImageManager@{axomae::ImageManager}}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a56346531140575343bb60ef39c335b05}\label{classaxomae_1_1ImageManager_a56346531140575343bb60ef39c335b05}} 
+enum {\bfseries FILTER} \{ \newline
+{\bfseries FILTER\+\_\+\+NULL} = 0
+, {\bfseries GAUSSIAN\+\_\+\+SMOOTH\+\_\+3\+\_\+3} = 0x01
+, {\bfseries GAUSSIAN\+\_\+\+SMOOTH\+\_\+5\+\_\+5} = 0x02
+, {\bfseries BOX\+\_\+\+BLUR} = 0x03
+, \newline
+{\bfseries SHARPEN} = 0x04
+, {\bfseries UNSHARP\+\_\+\+MASKING} = 0x05
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a34202054212e5cf2037926aff609215a}\label{classaxomae_1_1ImageManager_a34202054212e5cf2037926aff609215a}} 
+static max\+\_\+colors $\ast$ {\bfseries get\+\_\+colors\+\_\+max\+\_\+variation} (SDL\+\_\+\+Surface $\ast$image)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a6e74cb35c6c0f64d683e4bb0e42225f1}\label{classaxomae_1_1ImageManager_a6e74cb35c6c0f64d683e4bb0e42225f1}} 
+static void {\bfseries compute\+\_\+edge} (SDL\+\_\+\+Surface $\ast$greyscale\+\_\+surface, uint8\+\_\+t flag, uint8\+\_\+t border\+\_\+behaviour)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_ad8a47496cf93f777072659e3e4d25602}\label{classaxomae_1_1ImageManager_ad8a47496cf93f777072659e3e4d25602}} 
+static \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}} {\bfseries get\+\_\+pixel\+\_\+color} (SDL\+\_\+\+Surface $\ast$surface, int x, int y)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_afe7d5f751ea46fc434588ed726ed58a9}\label{classaxomae_1_1ImageManager_afe7d5f751ea46fc434588ed726ed58a9}} 
+static void {\bfseries print\+\_\+pixel} (uint32\+\_\+t color)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a82ebec7939c9da833db024c647ed5867}\label{classaxomae_1_1ImageManager_a82ebec7939c9da833db024c647ed5867}} 
+static void {\bfseries display\+\_\+info\+\_\+surface} (SDL\+\_\+\+Surface $\ast$image)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a9e44f544a10e897240d072fbfc467cb6}\label{classaxomae_1_1ImageManager_a9e44f544a10e897240d072fbfc467cb6}} 
+static void {\bfseries set\+\_\+pixel\+\_\+color} (SDL\+\_\+\+Surface $\ast$image, int x, int y, uint32\+\_\+t color)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a2a737d415a2723048aa5db259def35b6}\label{classaxomae_1_1ImageManager_a2a737d415a2723048aa5db259def35b6}} 
+static void {\bfseries set\+\_\+pixel\+\_\+color} (SDL\+\_\+\+Surface $\ast$image, \mbox{\hyperlink{classaxomae_1_1RGB}{RGB}} $\ast$$\ast$pixel\+\_\+array, int w, int h)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a40aaaa0fee4bc0fece9879e299ce0abf}\label{classaxomae_1_1ImageManager_a40aaaa0fee4bc0fece9879e299ce0abf}} 
+static void {\bfseries set\+\_\+greyscale\+\_\+average} (SDL\+\_\+\+Surface $\ast$image, uint8\+\_\+t factor)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a3e42fc7d616c909d8a745ed4a4bce25a}\label{classaxomae_1_1ImageManager_a3e42fc7d616c909d8a745ed4a4bce25a}} 
+static void {\bfseries set\+\_\+greyscale\+\_\+luminance} (SDL\+\_\+\+Surface $\ast$image)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a1efe254d052e19db56a2c9680463b257}\label{classaxomae_1_1ImageManager_a1efe254d052e19db56a2c9680463b257}} 
+static void {\bfseries set\+\_\+contrast} (SDL\+\_\+\+Surface $\ast$image, int level)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a0f88d03f56e4a5549e1326bab99a0f2a}\label{classaxomae_1_1ImageManager_a0f88d03f56e4a5549e1326bab99a0f2a}} 
+static void {\bfseries set\+\_\+contrast} (SDL\+\_\+\+Surface $\ast$image)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_ade2d7740e45c9979e6f1845d489bc8fd}\label{classaxomae_1_1ImageManager_ade2d7740e45c9979e6f1845d489bc8fd}} 
+static void {\bfseries set\+\_\+contrast\+\_\+sigmoid} (SDL\+\_\+\+Surface $\ast$image, int treshold)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_ab4ac09bade033272837eecb542106e8b}\label{classaxomae_1_1ImageManager_ab4ac09bade033272837eecb542106e8b}} 
+static void {\bfseries compute\+\_\+normal\+\_\+map} (SDL\+\_\+\+Surface $\ast$surface, double strength, float attenuation)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_ae765420c59cf31fae283e8e8a904e043}\label{classaxomae_1_1ImageManager_ae765420c59cf31fae283e8e8a904e043}} 
+static void {\bfseries compute\+\_\+dudv} (SDL\+\_\+\+Surface $\ast$surface, double factor)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_aa20b0b1a2a846f933bfed81477c476d4}\label{classaxomae_1_1ImageManager_aa20b0b1a2a846f933bfed81477c476d4}} 
+static void {\bfseries USE\+\_\+\+GPU\+\_\+\+COMPUTING} ()
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a48d26da9d17cbe47e1447f4345b00d25}\label{classaxomae_1_1ImageManager_a48d26da9d17cbe47e1447f4345b00d25}} 
+static void {\bfseries USE\+\_\+\+CPU\+\_\+\+COMPUTING} ()
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a928d402553053a922278869207b8355a}\label{classaxomae_1_1ImageManager_a928d402553053a922278869207b8355a}} 
+static bool {\bfseries USING\+\_\+\+GPU} ()
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a91dddba27ae08797be41d90f23b93b83}\label{classaxomae_1_1ImageManager_a91dddba27ae08797be41d90f23b93b83}} 
+static SDL\+\_\+\+Surface $\ast$ {\bfseries project\+\_\+uv\+\_\+normals} (\mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}} object, int width, int height, bool tangent\+\_\+space)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_a99bb535333737c5b14dc3dfb7b5fb5ca}\label{classaxomae_1_1ImageManager_a99bb535333737c5b14dc3dfb7b5fb5ca}} 
+static void {\bfseries smooth\+\_\+image} (SDL\+\_\+\+Surface $\ast$surf, FILTER filter, const unsigned int smooth\+\_\+iterations)
+\item 
+\mbox{\Hypertarget{classaxomae_1_1ImageManager_ab254deabfb2b3309413a9a653ff32e1e}\label{classaxomae_1_1ImageManager_ab254deabfb2b3309413a9a653ff32e1e}} 
+static void {\bfseries sharpen\+\_\+image} (SDL\+\_\+\+Surface $\ast$surf, FILTER filter, const unsigned int sharpen\+\_\+iterations)
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/Image\+Manager.\+h\end{DoxyCompactItemize}

@@ -1,0 +1,30 @@
+\hypertarget{TextureGroup_8h_source}{}\doxysection{Texture\+Group.\+h}
+\label{TextureGroup_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/TextureGroup.h@{/home/hamilcar/Desktop/projects/Axomae/includes/TextureGroup.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ TEXTUREGROUP\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ TEXTUREGROUP\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}Texture.h"{}}\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}TextureDatabase.h"{}}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classTextureGroup}{TextureGroup}}\ \{}
+\DoxyCodeLine{00008\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00009\ \ \ \ \ \mbox{\hyperlink{classTextureGroup}{TextureGroup}}();\ }
+\DoxyCodeLine{00010\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classTextureGroup}{\string~TextureGroup}}();\ }
+\DoxyCodeLine{00011\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ addTexture(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ index\ ,\ Texture::TYPE\ type);}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ initializeGlTextureData();}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ clean();\ }
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ bind();\ }
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ unbind();}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keywordtype}{bool}\ isInitialized()\{\textcolor{keywordflow}{return}\ initialized;\};\ }
+\DoxyCodeLine{00017\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00018\ \ \ \ \ std::vector<Texture*>\ texture\_collection;\ \textcolor{comment}{//Array\ of\ Pointers\ to\ textures\ in\ the\ texture\ database\ }}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordtype}{bool}\ initialized;\ }
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{classTextureDatabase}{TextureDatabase}}*\ texture\_database\ ;\ }
+\DoxyCodeLine{00021\ \};}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}
