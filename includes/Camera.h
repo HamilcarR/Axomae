@@ -6,11 +6,7 @@
 /**
  * @file Camera.h
  * 
- * @brief Interface for the Camera classes
- * The camera system in the case of the Arcball is particular : 
- * The camera is in fact static : only the scene moves. A model matrix simulating the camera's rotation and
- * panning is computed in the Arcball class . 
- * There are multiple methods providing the View , projection , and model matrices , as well as translation and rotation matrices. 
+ * @brief Interface for the Camera classes 
  * 
  */
 
@@ -185,7 +181,8 @@ protected:
 
 /**
  * @brief Arcball Camera class 
- * 
+ * The Arcball camera is a static camera , that computes a rotation , and a translation that will be applied to the scene , instead of the camera. 
+ * This gives the illusion that the camera is moving around the scene. 
  */
 class ArcballCamera : public Camera
 {

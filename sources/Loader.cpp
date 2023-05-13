@@ -7,7 +7,11 @@
 #include <QByteArray>
 
 
-
+/**
+ * @file Loader.cpp
+ * Loader implementation 
+ * 
+ */
 
 namespace axomae{
 
@@ -23,7 +27,12 @@ Loader* Loader::getInstance(){
 	return instance ; 
 }
 
-/* copy texture data from GLB , to ARGB8888 buffer*/
+/**
+ * The function copies texture data from a GLB file to an ARGB8888 buffer.
+ * 
+ * @param totexture A pointer to a TextureData struct that will hold the copied texture data.
+ * @param fromtexture The aiTexture object containing the texture data to be copied.
+ */
 static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 	if(totexture != nullptr){
 		if(fromtexture->mHeight != 0){ //checking if texture is uncompressed
@@ -55,7 +64,15 @@ static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 	}
 }
 
-
+/**
+ * This function loads a texture from an aiScene and adds it to a Material object.
+ * 
+ * @param scene A pointer to the aiScene object which contains the loaded 3D model data.
+ * @param material A pointer to a Material object that the texture will be added to.
+ * @param texture The variable that stores the loaded texture data.
+ * @param texture_string The name or index of the texture file to be loaded, stored as an aiString.
+ * @param type The type of texture being loaded, which is of the enum type Texture::TYPE.
+ */
 static void loadTexture(const aiScene* scene , Material *material ,TextureData &texture ,aiString texture_string ,Texture::TYPE type ){
 	TextureDatabase* texture_database = TextureDatabase::getInstance(); 
 	std::string texture_index_string = texture_string.C_Str();
@@ -76,7 +93,15 @@ static void loadTexture(const aiScene* scene , Material *material ,TextureData &
 		 std::cout << "Loader can't load texture\n" ;  
 }
 
-//TODO : optimize in case different meshes use a same texture
+/**
+ * The function loads textures and creates a material object for a given aiMaterial from an aiScene.
+ * 
+ * @param scene A pointer to the aiScene object which contains the imported scene data.
+ * @param material The aiMaterial object that contains the material properties and textures for a mesh
+ * in the aiScene.
+ * 
+ * @return a Material object.
+ */
 static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	Material mesh_material; 
 	TextureData diffuse , metallic , roughness , normal , ambiantocclusion , emissive , specular ;
@@ -92,7 +117,6 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	material->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE , &color_texture) ; 
 	material->GetTexture(AI_MATKEY_METALLIC_TEXTURE , &metallic_texture) ; 
 	material->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE , &roughness_texture) ;	
-
 	loadTexture(scene , &mesh_material , diffuse , color_texture , Texture::DIFFUSE); 
 	loadTexture(scene , &mesh_material , metallic , metallic_texture , Texture::METALLIC); 
 	loadTexture(scene , &mesh_material , roughness , roughness_texture , Texture::ROUGHNESS); 
@@ -115,6 +139,10 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	return mesh_material ; 
 }
 
+
+/**
+ * The function loads shader files and adds them to a shader database.
+ */
 void Loader::loadShaderDatabase(){	
 	ShaderDatabase* shader_database = ShaderDatabase::getInstance(); 
 	std::string vertex_shader = loadShader("../shaders/phong.vert") ; 
@@ -125,6 +153,16 @@ void Loader::loadShaderDatabase(){
 	shader_database->addShader(vertex_shader_cubemap , fragment_shader_cubemap , Shader::CUBEMAP) ; 
 }
 
+/**
+ * The function loads GLB objects and returns a pair containing the
+ * number of textures and a vector of Mesh objects.
+ * 
+ * @param file The file path of the 3D model to be loaded.
+ * 
+ * @return A std::pair containing an unsigned int and a vector of Mesh pointers. The unsigned int
+ * represents the number of textures in the loaded scene, and the vector contains pointers to the
+ * loaded Mesh objects.
+ */
 std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* file){
 	TextureDatabase *texture_database = TextureDatabase::getInstance() ; 	
 	ShaderDatabase *shader_database = ShaderDatabase::getInstance(); 
@@ -183,20 +221,23 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
 		std::cout << "Problem loading scene" << std::endl ; 
 		return std::pair<unsigned int , std::vector<Mesh*>> (0 , std::vector<Mesh*>()) ; 
 	}
-
-
 }
 
 
 
+/**
+ * The function loads a file and generates a vector of meshes, including a cube map if applicable.
+ * 
+ * @param file A pointer to a character array representing the file path of the 3D model to be loaded.
+ * 
+ * @return A vector of Mesh pointers.
+ */
 std::vector<Mesh*> Loader::load(const char* file){
 	std::pair<unsigned int , std::vector<Mesh*>> scene = loadObjects(file); 
 	Mesh* cube_map = generateCubeMap(scene.first , false) ; 	
 	if(cube_map != nullptr)
 		scene.second.push_back(cube_map); 
 	return scene.second ; 
-
-
 }
 
 void Loader::close(){
@@ -205,6 +246,14 @@ void Loader::close(){
 	instance = nullptr; 
 }
 
+/**
+ * The function loads a shader from a file and returns it as a string.
+ * 
+ * @param filename String representing the name of the file to be loaded.
+ * 
+ * @return The function `loadShader` returns a `std::string` which contains the text read from the file
+ * specified by the `filename` parameter.
+ */
 
 std::string Loader::loadShader(const char* filename){
 	std::ifstream stream(filename) ; 
@@ -217,8 +266,16 @@ std::string Loader::loadShader(const char* filename){
 
 }
 
-
-
+/**
+ * This function generates a cube map mesh with textures loaded from a specified folder.
+ * 
+ * @param num_textures The number of textures currently loaded in the texture database before adding
+ * the cubemap texture.
+ * @param is_glb The parameter "is_glb" is not used in the function and therefore has no effect on the
+ * generated cube map.
+ * 
+ * @return A pointer to a Mesh object representing a cube map.
+ */
 Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
 	Mesh *cube_map = new CubeMapMesh(); 
 	ShaderDatabase *shader_database = ShaderDatabase::getInstance(); 
@@ -252,13 +309,11 @@ Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
 				k++ ;		
 			}
 		}
-	
 	Material material ; 
 	texture_database->addTexture(num_textures + 1 , &cubemap , Texture::CUBEMAP ) ; 
 	material.addTexture(num_textures + 1 , Texture::CUBEMAP); 
 	cube_map->material = material ; 	
 	return cube_map; 		
-
 }
 
 
