@@ -15,6 +15,7 @@ Camera::Camera() : world_up(glm::vec3(0,1,0)){
 	type = EMPTY ; 
 }
 
+
 Camera::Camera(float rad , ScreenSize *screen, float near , float far , MouseState* pointer) :world_up(glm::vec3(0,1,0)){
 	type = EMPTY ; 
 	position = glm::vec3(0,0,-1.f); 
@@ -36,9 +37,6 @@ Camera::~Camera(){
 
 }
 
-glm::mat4 Camera::getProjection(){
-	return projection; 
-}
 void Camera::reset(){
 	projection = glm::mat4(1.f); 
 	view = glm::mat4(1.f) ; 
@@ -60,10 +58,6 @@ void Camera::computeViewProjection(){
 	view_projection =  projection * view ; 
 }
 
-glm::mat4 Camera::getViewProjection(){
-	return view_projection  ; 
-}
-
 void Camera::computeViewSpace(){	
 	direction = glm::normalize(position - target) ; 
 	right = glm::normalize(glm::cross(world_up , direction)); 
@@ -75,6 +69,27 @@ ArcballCamera::ArcballCamera(){
 	reset(); 
 }
 
+/**
+ * This is a constructor for an ArcballCamera object that sets its properties and initializes its
+ * radius.
+ * 
+ * @param radians The field of view angle in radians for the camera.
+ * @param screen The `screen` parameter is a pointer to an object of the `ScreenSize` class, which
+ * contains information about the size of the screen or window in which the camera will be used. This
+ * information is typically used to calculate the aspect ratio of the screen, which is important for
+ * rendering the scene correctly
+ * @param near The distance to the near clipping plane of the camera's frustum. Any objects closer than
+ * this distance will not be rendered.
+ * @param far The "far" parameter in this context refers to the distance from the camera beyond which
+ * objects will not be rendered. It is a part of the perspective projection matrix used in 3D graphics
+ * rendering.
+ * @param radius The distance between the camera and the center of rotation in an arcball camera. It
+ * determines how far the camera is from the object being viewed.
+ * @param pointer The "pointer" parameter is a pointer to a MouseState object, which likely contains
+ * information about the current state of the mouse (e.g. position, button presses, etc.). This is
+ * likely used by the ArcballCamera class to track user input and update the camera's
+ * position/orientation accordingly
+ */
 ArcballCamera::ArcballCamera(float radians , ScreenSize* screen  , float near , float far , float radius , MouseState* pointer): Camera(radians ,screen, near , far , pointer) {
 	reset() ; 	
 	default_radius = radius ; 
@@ -102,6 +117,11 @@ void ArcballCamera::reset(){
 	translation = last_translation = scene_translation_matrix = scene_rotation_matrix = scene_model_matrix = glm::mat4(1.f) ; 
 }
 
+/**
+ * Calculates a rotation of the scene based on the mouse movement .
+ * The rotation isn't applied to the camera here , the camera stays static. 
+ * The scene is instead rotated , giving the illusion of a camera rotation.
+ */
 void ArcballCamera::rotate(){
 	axis = glm::normalize(glm::cross(ndc_mouse_start_position , ndc_mouse_position + glm::vec3(VECTOR_EPSILON))); 
 	float temp_angle  = glm::acos(glm::dot(ndc_mouse_position , ndc_mouse_start_position)) ; 
@@ -110,6 +130,11 @@ void ArcballCamera::rotate(){
 	rotation =  rotation * last_rotation; 
 }
 	
+/**
+ * This function translates the scene based on the difference between the current and starting mouse
+ * positions in normalized device coordinates.
+ * 
+ */
 void ArcballCamera::translate(){
 	delta_position = ndc_mouse_position - ndc_mouse_start_position ;
 	auto new_delta = glm::vec3(glm::inverse(scene_rotation_matrix) * (glm::vec4(delta_position , 1.f)))  ; 
@@ -117,6 +142,10 @@ void ArcballCamera::translate(){
 	ndc_mouse_start_position = ndc_mouse_position ;
 }
 
+/**
+ * This function computes the view , and model matrices based on the rotation and translation of the scene.
+ * 
+ */
 void ArcballCamera::computeViewSpace(){
 	cursor_position = glm::vec2(mouse_state_pointer->pos_x , mouse_state_pointer->pos_y) ; 
 	if(mouse_state_pointer -> left_button_clicked){
@@ -155,12 +184,26 @@ const glm::mat4& ArcballCamera::getSceneModelMatrix() const {
 	return scene_model_matrix ; 
 }
 
+/**
+ * The function calculates the z-axis value for a given x and y coordinate within a specified radius.
+ * 
+ * @param x The x-coordinate in NDC.
+ * @param y The y-coordinate in NDC.
+ * @param radius The radius of the Arcball orbit.
+ * 
+ * @return A float value which represents the projected z coordinate of an NDC (x,y) point on the sphere .
+ */
 static float get_z_axis(float x , float y , float radius) {
 	if( ((x * x) + (y * y)) <= (radius * radius / 2) )
 		return (float) sqrt((radius * radius) - (x * x) - (y * y)) ; 
 	else
 		return (float) ((radius * radius)/2)/sqrt((x * x) + (y * y)) ; 
 }
+
+/**
+ * The function computes the position of the mouse in normalized device coordinates based on the cursor
+ * position.
+ */
 
 void ArcballCamera::movePosition(){
 	if(mouse_state_pointer->left_button_clicked){
@@ -176,6 +219,10 @@ void ArcballCamera::movePosition(){
 	}
 }
 
+/**
+ * This function calculates the starting position of the mouse in normalized device coordinates for an
+ * Arcball camera when the left mouse button is clicked.
+ */
 void ArcballCamera::onLeftClick(){
 	ndc_mouse_start_position.x = ((cursor_position.x - (gl_widget_screen_size->width/2)) / (gl_widget_screen_size->width/2)) * radius; 
 	ndc_mouse_start_position.y = (((gl_widget_screen_size->height/2) - cursor_position.y) / (gl_widget_screen_size->height/2)) * radius; 
@@ -183,12 +230,20 @@ void ArcballCamera::onLeftClick(){
 	ndc_mouse_start_position = glm::normalize(ndc_mouse_start_position); 
 }
 
+/**
+ * This function updates the camera's rotation and position based on the last mouse click release
+ * event.
+ */
 void ArcballCamera::onLeftClickRelease(){
 	last_rotation =  rotation  ; 
 	rotation = glm::quat(1.f , 0.f , 0.f , 0.f); 
 	ndc_mouse_last_position = position ;
 }
 
+/**
+ * This function sets the starting position of the mouse in normalized device coordinates when the
+ * right mouse button is clicked.
+ */
 void ArcballCamera::onRightClick(){
 	ndc_mouse_start_position.x = ((cursor_position.x - (gl_widget_screen_size->width/2)) / (gl_widget_screen_size->width/2)) ; 
 	ndc_mouse_start_position.y = (((gl_widget_screen_size->height/2) - cursor_position.y) / (gl_widget_screen_size->height/2)) ; 
