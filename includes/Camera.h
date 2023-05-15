@@ -14,8 +14,7 @@
 
 
 /**
- * @brief
- * Base Camera class
+ * @brief Base Camera class
  *
  *
  */
@@ -32,7 +31,9 @@ public:
 		ARCBALL = 0,     /**<Arcball camera type*/
 		PERSPECTIVE = 1  /**<Free camera type*/
 	};
+	
 	Camera();
+	
 	/**
 	 * @brief Constructor for the Camera class , which initializes various properties of the
 	 * camera.
@@ -48,103 +49,117 @@ public:
 	 * track the state of the mouse (e.g. position, button clicks) for camera movement and control.
 	 */
 	Camera(float radians, ScreenSize *screen, float clip_near, float clip_far, MouseState *pointer);
+	
 	/**
-	 * @brief Destroy the Camera object
-	 * 
+	 * @brief Destroy the Camera object 
 	 */
 	virtual ~Camera();
 	
 	/**
-	 * @brief Calculates the view matrix  
-	 * 
+	 * @brief Calculates the view matrix   
 	 */
 	virtual void computeViewSpace();
+	
 	/**
 	 * @brief Calculates the projection matrix
-	 * 
 	 */
 	virtual void computeProjectionSpace();
+	
 	/**
 	 * @brief Calculates the product of the two matrices : Projection x View
-	 * 
 	 */
 	virtual void computeViewProjection();
+	
 	/**
 	 * @brief Get the View matrix
 	 * 
 	 * @return * glm::mat4 
 	 */
 	virtual glm::mat4 getView() const { return view; }
+	
 	/**
 	 * @brief Get the product of (Projection x View) matrix
 	 * 
 	 * @return glm::mat4 
 	 */
 	virtual glm::mat4 getViewProjection() const {return view_projection;}
+	
 	/**
 	 * @brief Get the Projection matrix
 	 * 
 	 * @return glm::mat4 
 	 */
 	virtual glm::mat4 getProjection() const {return projection;}
+	
 	/**
 	 * @brief On left click event
 	 * 
 	 */
 	virtual void onLeftClick() = 0;
+	
 	/**
 	 * @brief On right click event 
 	 * 
 	 */
 	virtual void onRightClick() = 0;
+	
 	/**
 	 * @brief On left click release event 
 	 * 
 	 */
 	virtual void onLeftClickRelease() = 0;
+	
 	/**
 	 * @brief On right click release event
 	 * 
 	 */
 	virtual void onRightClickRelease() = 0;
+	
 	/**
 	 * @brief On move mouse event
 	 * 
 	 */
 	virtual void movePosition() = 0;
+	
 	/**
 	 * @brief On mouse wheel up event
 	 * 
 	 */
 	virtual void zoomIn() = 0;
+	
 	/**
 	 * @brief On mouse wheel down event
 	 * 
 	 */
 	virtual void zoomOut() = 0;
+	
 	/**
 	 * @brief Camera states reset
 	 * 
 	 */
 	virtual void reset();
+	
 	/**
 	 * @brief Get the camera position vector
 	 * 
 	 * @return const glm::vec3& 
 	 */
 	virtual const glm::vec3& getPosition() const { return position; }
+	
 	/**
 	 * @brief Get the rotation matrix of the scene
 	 * 
 	 * @return const glm::mat4& 
 	 */
 	virtual const glm::mat4& getSceneRotationMatrix() const = 0;
+	
 	/**
 	 * @brief Get the translation matrix of the scene
 	 * 
 	 * @return const glm::mat4& 
 	 */
 	virtual const glm::mat4& getSceneTranslationMatrix() const = 0;
+	
 	/**
 	 * @brief Get the product rotation x translation matrix of the scene
 	 * Note that this method is valid only in the case where the camera computes a part or totality of the scene's transformation
@@ -153,10 +168,11 @@ public:
 	 * @return const glm::mat4& 
 	 */
 	virtual const glm::mat4 &getSceneModelMatrix() const = 0;
+	
 	/**
 	 * @brief Returns the type of the camera
 	 * 
-	 * @return TYPE 
+	 * @return Camera::TYPE 
 	 */
 	TYPE getType() const { return type; }
 

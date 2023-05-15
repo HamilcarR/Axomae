@@ -4,25 +4,64 @@
 #include "constants.h" 
 #include "utils_3D.h" 
 
+/**
+ * @file Texture.h
+ * Implementation of the texture classes 
+ * 
+ */
+
+/**
+ * @brief Class for raw binary data of textures
+ * 
+ */
 class TextureData{
 public:
-
-	enum CHANNELS : unsigned { RGB = 0 , RGBA = 1} ; 		
+	/**
+	 * @brief Rgb channels types 
+	 * 
+	 */
+	enum CHANNELS : unsigned 
+	{ 
+		RGB = 0 , 
+		RGBA = 1
+	} ; 		
+	/**
+	 * @brief Construct a new Texture Data object
+	 * 
+	 */
 	TextureData(){
 		width = 0 ; 
 		height = 0 ; 
 		data = nullptr ; 
 	}
+
+	/**
+	 * @brief Destroy the Texture Data object
+	 * 
+	 */
 	~TextureData(){}
-	/*provides deep copy of the object , but doesn't do the cleanup for the copied object*/
+
+	/**
+	 * @brief Copy a texture
+	 * 
+	 * Provides deep copy of the object , but doesn't do the cleanup for the copied object
+	 * 
+	 * @param from The texture to be copied 
+	 * @return * TextureData& Deep copy of the original TextureData object
+	 */
 	TextureData& operator=(const TextureData& from){ 
 		width = from.width ;
 		height = from.height ; 
 		data = new uint32_t [from.width * from.height] ; 
 		memcpy((void*) data , (void*) from.data , from.width * from.height * sizeof(uint32_t));		
 		name = from.name ; 
-		return *this ; 
+		return *this ;
 	}
+
+	/**
+	 * @brief Free the object
+	 *  
+	 */
 	void clean(){
 		if(data != nullptr)
 			delete data ; 
@@ -33,161 +72,599 @@ public:
 	}
 
 public:
-	unsigned int width ; 
-	unsigned int height ; 
-	std::string name ; 
-	uint32_t *data ; 
-
+	unsigned int width ;	/**<Width of the texture*/ 
+	unsigned int height ; 	/**<Height of the texture*/
+	std::string name ; 		/**<Name of the texture*/
+	uint32_t *data ; 		/*<1D array raw data of the texture*/
 };
 
-
+/**
+ * @brief Texture class
+ * 
+ */
 class Texture{
 public:
-	enum TYPE : signed {EMPTY = -1 , DIFFUSE = 0 , NORMAL = 1 , METALLIC = 2 , ROUGHNESS = 3 , AMBIANTOCCLUSION = 4 , SPECULAR = 5, EMISSIVE = 6 , CUBEMAP = 7 , GENERIC = 8} ; 	
 
+	/**
+	 * @brief Type of the texture
+	 * 
+	 */
+	enum TYPE : signed 
+	{
+		EMPTY = -1 , 
+		DIFFUSE = 0 , 
+		NORMAL = 1 , 
+		METALLIC = 2 , 
+		ROUGHNESS = 3 , 
+		AMBIANTOCCLUSION = 4 , 
+		SPECULAR = 5, 
+		EMISSIVE = 6 , 
+		CUBEMAP = 7 , 
+		GENERIC = 8
+	} ; 	
+	/**
+	 * @brief Construct a new empty Texture object
+	 * 
+	 */
 	Texture(); 
+	
+	/**
+	 * @brief Construct a new Texture object from texture data
+	 * 
+	 * @param tex 
+	 */
 	Texture(TextureData *tex); 
+	
+	/**
+	 * @brief Destroy the Texture object
+	 * 
+	 */
 	virtual ~Texture();
+	
+	/**
+	 * @brief Sets the raw data 
+	 * @param texture A pointer to a TextureData object that contains information about the texture,
+	 * including its width, height, and pixel data.
+	 */	
 	void set(TextureData *texture); 
+	
+	/**
+	 * @brief Cleans the texture
+	 * 
+	 */
 	void clean();
+	
+	/**
+	 * @brief Set the Texture Type object
+	 * 
+	 * @param type Type of the texture
+	 * @see Texture::TYPE
+	 */
 	void setTextureType(TYPE type){name = type;} 	
+	
+	/**
+	 * @brief Get the Texture Type 
+	 * 
+	 * @return TYPE Type of the texture
+	 * @see Texture::TYPE
+	 */
 	TYPE getTextureType(){return name;} ;  
+	
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
 	virtual void bindTexture() = 0 ; 
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
 	virtual void unbindTexture() = 0;
-	virtual void setGlData() = 0 ; 
+	
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData() = 0 ;
+
+	/**
+	 * @brief Release Opengl data 
+	 * 
+	 */
 	void cleanGlData(); 
 
 protected:
+
+	/**
+	 * @brief Initialize texture filters , mipmaps and glTexImage2D
+	 * 
+	 */
 	virtual void initializeTexture2D(); 
 
-
-
 protected:
-	TYPE name ;
-	unsigned int width ; 
-	unsigned int height ; 
-	uint32_t *data ; 
-	unsigned int sampler2D ; 
-
-
+	TYPE name ;					/**<Type of the texture*/
+	unsigned int width ; 		/**<Width of the texture*/
+	unsigned int height ; 		/**<Height of the texture*/
+	uint32_t *data ; 			/**<Raw data of the texture*/
+	unsigned int sampler2D ; 	/**<ID of the texture*/
 	
 };
 
-//Albedo texture
+/**
+ * @brief Diffuse Texture implementation
+ * 
+ */
 class DiffuseTexture : public Texture{
 public:
+
+	/**
+	 * @brief Construct a new Diffuse Texture object
+	 * 
+	 */
 	DiffuseTexture();
+	
+	/**
+	 * @brief Construct a new Diffuse Texture object from a TextureData object
+	 * 
+	 * @param data Pointer on a TextureData object
+	 */
 	DiffuseTexture(TextureData *data); 
-	virtual ~DiffuseTexture(); 
-	virtual void setGlData() ;
+	
+	/**
+	 * @brief Destroy the Diffuse Texture object
+	 * 
+	 */
+	virtual ~DiffuseTexture();
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
 	virtual void bindTexture() ; 
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
 	virtual void unbindTexture() ;
+	
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData()  ;
+
+	/**
+	 * @brief Get the texture string description
+	 * 
+	 * @return C string 
+	 */
 	static const char* getTextureTypeCStr()   ; 	
 }; 
 
 
 class NormalTexture : public Texture{
 public:
+	
+	/**
+	 * @brief Construct a new Normal Texture object
+	 * 
+	 */
 	NormalTexture();
+	
+	/**
+	 * @brief Construct a new Normal Texture object
+	 * 
+	 * @param data Raw texture data
+	 * @see TextureData
+	 */
 	NormalTexture(TextureData* data) ; 
+	
+	/**
+	 * @brief Destroy the Normal Texture object
+	 * 
+	 */
 	virtual ~NormalTexture(); 
-	virtual void setGlData() ;
-	virtual void bindTexture() ; 
+	
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
+	virtual void bindTexture(); 
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
 	virtual void unbindTexture() ;
-	static const char* getTextureTypeCStr()  ; 	
+	
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData()  ;
+	
+	/**
+	 * @brief Get the texture string description
+	 * 
+	 * @return C string 
+	 */
+	static const char* getTextureTypeCStr()   ; 
 };
 
 class MetallicTexture : public Texture{
 public:
+
+	/**
+	 * @brief Construct a new Metallic Texture object
+	 * 
+	 */
 	MetallicTexture();
+	
+	/**
+	 * @brief Construct a new Metallic Texture object
+	 * 
+	 * @param data Raw texture data
+	 * @see TextureData 
+	 */
 	MetallicTexture(TextureData* data); 
+	
+	/**
+	 * @brief Destroy the Metallic Texture object
+	 * 
+	 */
 	virtual ~MetallicTexture(); 
-	virtual void setGlData() ;
+	
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
 	virtual void bindTexture() ; 
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
 	virtual void unbindTexture();
-	static const char* getTextureTypeCStr()  ; 	
+	
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData()  ;
+	
+	/**
+	 * @brief Get the texture string description
+	 * 
+	 * @return C string 
+	 */
+	static const char* getTextureTypeCStr()   ; 
 };
 
 class RoughnessTexture : public Texture{
 public:
+
+	/**
+	 * @brief Construct a new Roughness Texture object
+	 * 
+	 */
 	RoughnessTexture();
+	
+	/**
+	 * @brief Construct a new Roughness Texture object
+	 * 
+	 * @param data Raw texture data
+	 * @see TextureData
+	 */
 	RoughnessTexture(TextureData *data); 
+	
+	/**
+	 * @brief Destroy the Roughness Texture object
+	 * 
+	 */
 	virtual ~RoughnessTexture(); 
-	virtual void setGlData() ;
+	
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
 	virtual void bindTexture()  ; 
-	virtual void unbindTexture() ;
-	static const char* getTextureTypeCStr() ; 	
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
+	virtual void unbindTexture();
+	
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData()  ;
+	
+	/**
+	 * @brief Get the texture string description
+	 * 
+	 * @return C string 
+	 */
+	static const char* getTextureTypeCStr() ; 
 };
 
 class AmbiantOcclusionTexture : public Texture{
 public:
+	
+	/**
+	 * @brief Construct a new Ambiant Occlusion Texture object
+	 * 
+	 */
 	AmbiantOcclusionTexture();
+	
+	/**
+	 * @brief Construct a new Ambiant Occlusion Texture object
+	 * 
+	 * @param data Raw texture data
+	 * @see TextureData
+	 */
 	AmbiantOcclusionTexture(TextureData *data); 
+	
+	/**
+	 * @brief Destroy the Ambiant Occlusion Texture object
+	 * 
+	 */
 	virtual ~AmbiantOcclusionTexture(); 
-	virtual void setGlData() ;
-	virtual void bindTexture()  ; 
+	
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
+	virtual void bindTexture() ; 
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
 	virtual void unbindTexture();
-	static  const char* getTextureTypeCStr() ; 	
+	
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData()  ;
+	
+	/**
+	 * @brief Get the texture string description
+	 * 
+	 * @return C string 
+	 */
+	static const char* getTextureTypeCStr() ; 	
 };
 class SpecularTexture : public Texture{
 public:
+	
+	/**
+	 * @brief Construct a new Specular Texture object
+	 * 
+	 */
 	SpecularTexture(); 
+	
+	/**
+	 * @brief Construct a new Specular Texture object
+	 * 
+	 * @param data Raw texture data
+	 * @see TextureData
+	 */
 	SpecularTexture(TextureData *data);
+	
+	/**
+	 * @brief Destroy the Specular Texture object
+	 * 
+	 */
 	virtual ~SpecularTexture(); 
-	virtual void setGlData(); 
-	virtual void bindTexture(); 
-	virtual void unbindTexture(); 
-	static const char* getTextureTypeCStr(); 
-}; 
+	
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
+	virtual void bindTexture()  ; 
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
+	virtual void unbindTexture() ;
+	
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData()  ;
+	
+	/**
+	 * @brief Get the texture string description
+	 * 
+	 * @return C string 
+	 */
+	static const char* getTextureTypeCStr() ; 	
+};
 
 class EmissiveTexture : public Texture{
 public:
+	
+	/**
+	 * @brief Construct a new Emissive Texture object
+	 * 
+	 */
 	EmissiveTexture(); 
+	
+	/**
+	 * @brief Construct a new Emissive Texture object
+	 * 
+	 * @param data Raw texture data
+	 * @see TextureData
+	 */
 	EmissiveTexture(TextureData *data);
+	
+	/**
+	 * @brief Destroy the Emissive Texture object
+	 * 
+	 */
 	virtual ~EmissiveTexture(); 
-	virtual void setGlData(); 
-	virtual void bindTexture(); 
-	virtual void unbindTexture(); 
-	static const char* getTextureTypeCStr(); 
+	
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
+	virtual void bindTexture() ; 
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
+	virtual void unbindTexture();
+	
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData() ;
+	
+	/**
+	 * @brief Get the texture string description
+	 * 
+	 * @return C string 
+	 */
+	static const char* getTextureTypeCStr() ; 	
 }; 
 
 
 class GenericTexture : public Texture{
 public:
+	
+	/**
+	 * @brief Construct a new Generic Texture object
+	 * 
+	 */
 	GenericTexture();
+	
+	/**
+	 * @brief Construct a new Generic Texture object
+	 * 
+	 * @param data Raw texture data 
+	 * @see TextureData
+	 */
 	GenericTexture(TextureData* data);  
+	
+	/**
+	 * @brief Destroy the Generic Texture object
+	 * 
+	 */
 	virtual ~GenericTexture(); 
-	virtual void setGlData(); 
+	
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
 	virtual void bindTexture()  ; 
-	virtual void unbindTexture() ;
-	static  const char* getTextureTypeCStr() ; 	
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
+	virtual void unbindTexture();
+	
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData()  ;
+	
+	/**
+	 * @brief Get the texture string description
+	 * 
+	 * @return C string 
+	 */
+	static const char* getTextureTypeCStr() ; 		
 }; 
 
 
-/*
- * We will use width * height as being the size of one single face. The total size of the cubemap will be hence : 
- * 6 * width * height * sizeof(uint32_t) bytes , with height = width .
+
+
+/**
+ * @brief Cubemap texture implementation
  * 
- *     width² = RIGHT /  GL_TEXTURE_CUBE_MAP_POSITIVE_X
- * 2 * width² = LEFT / GL_TEXTURE_CUBE_MAP_NEGATIVE_X
- * 3 * width² = TOP / GL_TEXTURE_CUBE_MAP_POSITIVE_Y
- * 4 * width² = BOTTOM / GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
- * 5 * width² = BACK / GL_TEXTURE_CUBE_MAP_POSITIVE_Z
- * 6 * width² = FRONT / GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
- *
- * Data array is still 1D 
  */
 class CubeMapTexture : public Texture{
 public:
+	
+	/**
+	 * @brief Construct a new Cube Map Texture object
+	 * 
+	 */
 	CubeMapTexture();
+	
+	/**
+	 * @brief Construct a new Cube Map Texture object
+	 * 
+	 * @param data Texture raw data 
+	 * @see TextureData
+	 */
 	CubeMapTexture(TextureData* data);  
+	
+	/**
+	 * @brief Destroy the Cube Map Texture object
+	 * 
+	 */
 	virtual ~CubeMapTexture();
-	virtual void initializeCubeMapTexture(); 
-	virtual void setGlData(); 
+	
+	/**
+	* @brief Initialize cubemap data
+	* 
+	* width * height is the size of one single face. The total size of the cubemap will be :
+	*
+	* 	6 x width x height x sizeof(uint32_t) bytes 
+	* with height = width .
+ 	* Here is the layout for mapping the texture : 
+	* 
+ 	*     	  width² = RIGHT => GL_TEXTURE_CUBE_MAP_POSITIVE_X
+	* 	  2 x width² = LEFT => GL_TEXTURE_CUBE_MAP_NEGATIVE_X
+ 	* 	  3 x width² = TOP => GL_TEXTURE_CUBE_MAP_POSITIVE_Y
+ 	* 	  4 x width² = BOTTOM => GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
+ 	* 	  5 x width² = BACK => GL_TEXTURE_CUBE_MAP_POSITIVE_Z
+ 	* 	  6 x width² = FRONT => GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+	 */
+	virtual void initializeCubeMapTexture(); 	
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
 	virtual void bindTexture()  ; 
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
 	virtual void unbindTexture() ;
-	static  const char* getTextureTypeCStr() ; 	
+	
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData() ;
+	
+	/**
+	 * @brief Get the texture string description
+	 * 
+	 * @return C string 
+	 */
+	static const char* getTextureTypeCStr() ;
+
 protected:
+
+	/**
+	 * @brief Initialize the cubemap texture data
+	 * 
+	 * @param texture 
+	 */
 	virtual void setCubeMapTextureData(TextureData* texture); 
 
 }; 

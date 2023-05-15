@@ -27,6 +27,7 @@ void ShaderDatabase::clean(){
 }
 
 
+
 Shader*  ShaderDatabase::addShader(const std::string vertex_code ,const std::string fragment_code ,const Shader::TYPE type){
 	if(!contains(type))
 		shader_database[type] = ShaderFactory::constructShader(vertex_code , fragment_code , type) ; 
@@ -37,6 +38,7 @@ Shader*  ShaderDatabase::addShader(const std::string vertex_code ,const std::str
 bool ShaderDatabase::contains(const Shader::TYPE type){
 	return shader_database.find(type) != shader_database.end(); 
 }
+
 
 Shader* ShaderDatabase::get(const Shader::TYPE type) const {
 	auto it = shader_database.find(type);

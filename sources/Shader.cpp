@@ -5,10 +5,24 @@
 
 #define SHADER_ERROR_LOG_SIZE 512
 
+
+/**
+ * @file Shader.cpp
+ * Implements functions and methods relative to the shading 
+ * 
+ */
+
+
 static int success  ; 
 static char infoLog[SHADER_ERROR_LOG_SIZE] ; 
 
 
+/**
+ * This function checks for compilation errors in a shader and prints an error message if there are
+ * any.
+ * 
+ * @param shader_id The ID of the shader object that needs to be checked for compilation errors.
+ */
 inline void shaderCompilationErrorCheck(unsigned int shader_id){
 	success = 0; 
 	memset(infoLog , 0 , SHADER_ERROR_LOG_SIZE) ; 
@@ -19,6 +33,12 @@ inline void shaderCompilationErrorCheck(unsigned int shader_id){
 	}
 }
 
+/**
+ * This function checks for errors in shader program linking and prints an error message if there is a
+ * failure.
+ * 
+ * @param program_id The ID of the shader program that needs to be checked for linking errors.
+ */
 inline void programLinkingErrorCheck(unsigned int program_id){
 	success = 0; 
 	memset(infoLog , 0 , SHADER_ERROR_LOG_SIZE) ; 
@@ -32,6 +52,7 @@ inline void programLinkingErrorCheck(unsigned int program_id){
 Shader::Shader(){
 	type = GENERIC ; 
 }
+
 
 Shader::Shader(const std::string vertex_code , const std::string fragment_code){
 	type = GENERIC; 
