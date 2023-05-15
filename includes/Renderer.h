@@ -73,7 +73,7 @@ public:
 	 * 
 	 * @return MouseState* Pointer on the mouse_state variable , informations about the mouse positions , button clicked etc
 	 * @see MouseState
-	 * /
+	 */
 	MouseState* getMouseStatePointer(){ return &mouse_state;} ;  
 	
 	/**
