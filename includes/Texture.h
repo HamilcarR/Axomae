@@ -24,7 +24,8 @@ public:
 	{ 
 		RGB = 0 , 
 		RGBA = 1
-	} ; 		
+	} ; 	 
+
 	/**
 	 * @brief Construct a new Texture Data object
 	 * 
@@ -101,7 +102,8 @@ public:
 		EMISSIVE = 6 , 
 		CUBEMAP = 7 , 
 		GENERIC = 8
-	} ; 	
+	} ;
+
 	/**
 	 * @brief Construct a new empty Texture object
 	 * 
@@ -216,6 +218,7 @@ public:
 	 * 
 	 */
 	virtual ~DiffuseTexture();
+	
 	/**
 	 * @brief Bind the texture using glBindTexture
 	 * 
@@ -242,7 +245,10 @@ public:
 	static const char* getTextureTypeCStr()   ; 	
 }; 
 
-
+/**
+ * @brief Normal texture class definition
+ * 
+ */
 class NormalTexture : public Texture{
 public:
 	
@@ -292,6 +298,10 @@ public:
 	static const char* getTextureTypeCStr()   ; 
 };
 
+/**
+ * @brief Metallic texture class definition 
+ * 
+ */
 class MetallicTexture : public Texture{
 public:
 
@@ -341,6 +351,10 @@ public:
 	static const char* getTextureTypeCStr()   ; 
 };
 
+/**
+ * @brief Roughness texture class definition
+ * 
+ */
 class RoughnessTexture : public Texture{
 public:
 
@@ -390,6 +404,11 @@ public:
 	static const char* getTextureTypeCStr() ; 
 };
 
+
+/**
+ * @brief Ambiant occlusion texture class definition
+ * 
+ */
 class AmbiantOcclusionTexture : public Texture{
 public:
 	
@@ -438,6 +457,11 @@ public:
 	 */
 	static const char* getTextureTypeCStr() ; 	
 };
+
+/**
+ * @brief Specular texture class definition
+ * 
+ */
 class SpecularTexture : public Texture{
 public:
 	
@@ -487,6 +511,10 @@ public:
 	static const char* getTextureTypeCStr() ; 	
 };
 
+/**
+ * @brief Emissive texture class definition
+ * 
+ */
 class EmissiveTexture : public Texture{
 public:
 	
@@ -536,7 +564,10 @@ public:
 	static const char* getTextureTypeCStr() ; 	
 }; 
 
-
+/**
+ * @brief Generic texture class definition
+ * 
+ */
 class GenericTexture : public Texture{
 public:
 	
@@ -586,11 +617,8 @@ public:
 	static const char* getTextureTypeCStr() ; 		
 }; 
 
-
-
-
 /**
- * @brief Cubemap texture implementation
+ * @brief Cubemap texture class definition
  * 
  */
 class CubeMapTexture : public Texture{
@@ -633,6 +661,7 @@ public:
  	* 	  6 x width² = FRONT => GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 	 */
 	virtual void initializeCubeMapTexture(); 	
+	
 	/**
 	 * @brief Bind the texture using glBindTexture
 	 * 
@@ -659,7 +688,6 @@ public:
 	static const char* getTextureTypeCStr() ;
 
 protected:
-
 	/**
 	 * @brief Initialize the cubemap texture data
 	 * 

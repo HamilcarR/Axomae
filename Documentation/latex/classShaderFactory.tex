@@ -1,13 +1,86 @@
 \hypertarget{classShaderFactory}{}\doxysection{Shader\+Factory Class Reference}
 \label{classShaderFactory}\index{ShaderFactory@{ShaderFactory}}
+
+
+\mbox{\hyperlink{classShader}{Shader}} factory class definition.  
+
+
+
+
+{\ttfamily \#include $<$Shader\+Factory.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classShaderFactory_afb7dddffa132654b2a6c7b4b1dfd7fb5}{Shader\+Factory}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{classShaderFactory}{Shader\+Factory}} object. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classShaderFactory_ad92f26d51b31d97028e3de1117bfdf32}{$\sim$\+Shader\+Factory}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the \mbox{\hyperlink{classShader}{Shader}} Factory object. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
+static \mbox{\hyperlink{classShader}{Shader}} $\ast$ \mbox{\hyperlink{classShaderFactory_a01742e91e6d42822f4b90976ccb85dd3}{construct\+Shader}} (std\+::string vertex\+\_\+code, std\+::string fragment\+\_\+code, \mbox{\hyperlink{classShader_a0203e846cef6779a4b2935b50f671358}{Shader\+::\+TYPE}} type)
+\begin{DoxyCompactList}\small\item\em Constructs a shader of type \char`\"{}type\char`\"{} , using vertex\+\_\+code and fragment\+\_\+code. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classShader}{Shader}} factory class definition. 
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classShaderFactory_afb7dddffa132654b2a6c7b4b1dfd7fb5}\label{classShaderFactory_afb7dddffa132654b2a6c7b4b1dfd7fb5}} 
+\index{ShaderFactory@{ShaderFactory}!ShaderFactory@{ShaderFactory}}
+\index{ShaderFactory@{ShaderFactory}!ShaderFactory@{ShaderFactory}}
+\doxysubsubsection{\texorpdfstring{ShaderFactory()}{ShaderFactory()}}
+{\footnotesize\ttfamily Shader\+Factory\+::\+Shader\+Factory (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Construct a new \mbox{\hyperlink{classShaderFactory}{Shader\+Factory}} object. 
+
+\mbox{\Hypertarget{classShaderFactory_ad92f26d51b31d97028e3de1117bfdf32}\label{classShaderFactory_ad92f26d51b31d97028e3de1117bfdf32}} 
+\index{ShaderFactory@{ShaderFactory}!````~ShaderFactory@{$\sim$ShaderFactory}}
+\index{````~ShaderFactory@{$\sim$ShaderFactory}!ShaderFactory@{ShaderFactory}}
+\doxysubsubsection{\texorpdfstring{$\sim$ShaderFactory()}{~ShaderFactory()}}
+{\footnotesize\ttfamily virtual Shader\+Factory\+::$\sim$\+Shader\+Factory (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Destroy the \mbox{\hyperlink{classShader}{Shader}} Factory object. 
+
+
+
+\doxysubsection{Member Function Documentation}
 \mbox{\Hypertarget{classShaderFactory_a01742e91e6d42822f4b90976ccb85dd3}\label{classShaderFactory_a01742e91e6d42822f4b90976ccb85dd3}} 
-static \mbox{\hyperlink{classShader}{Shader}} $\ast$ {\bfseries construct\+Shader} (std\+::string vertex\+\_\+code, std\+::string fragment\+\_\+code, \mbox{\hyperlink{classShader_a0203e846cef6779a4b2935b50f671358}{Shader\+::\+TYPE}} type)
-\end{DoxyCompactItemize}
+\index{ShaderFactory@{ShaderFactory}!constructShader@{constructShader}}
+\index{constructShader@{constructShader}!ShaderFactory@{ShaderFactory}}
+\doxysubsubsection{\texorpdfstring{constructShader()}{constructShader()}}
+{\footnotesize\ttfamily static \mbox{\hyperlink{classShader}{Shader}} $\ast$ Shader\+Factory\+::construct\+Shader (\begin{DoxyParamCaption}\item[{std\+::string}]{vertex\+\_\+code,  }\item[{std\+::string}]{fragment\+\_\+code,  }\item[{\mbox{\hyperlink{classShader_a0203e846cef6779a4b2935b50f671358}{Shader\+::\+TYPE}}}]{type }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Constructs a shader of type \char`\"{}type\char`\"{} , using vertex\+\_\+code and fragment\+\_\+code. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em vertex\+\_\+code} & Source code of the vertex shader \\
+\hline
+{\em fragment\+\_\+code} & Source code of the fragment shader \\
+\hline
+{\em type} & Type of the shader we want to create \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Shader$\ast$ Created shader 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{classShader_a0203e846cef6779a4b2935b50f671358}{Shader\+::\+TYPE}} 
+
+\mbox{\hyperlink{classShader}{Shader}} 
+\end{DoxySeeAlso}
 
 
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/home/hamilcar/\+Desktop/projects/\+Axomae/includes/Shader\+Factory.\+h\end{DoxyCompactItemize}
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/\mbox{\hyperlink{ShaderFactory_8h}{Shader\+Factory.\+h}}\end{DoxyCompactItemize}

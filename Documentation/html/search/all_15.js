@@ -17,7 +17,9 @@ var searchData=
   ['_7erenderer_14',['~Renderer',['../classRenderer.html#aba42b60392775e4a492c4d14d4fff29f',1,'Renderer']]],
   ['_7eroughnesstexture_15',['~RoughnessTexture',['../classRoughnessTexture.html#acf8df51400fccb438a46bcd798177bf9',1,'RoughnessTexture']]],
   ['_7eshader_16',['~Shader',['../classShader.html#a08345855be88781faf704487119af9a8',1,'Shader']]],
-  ['_7especulartexture_17',['~SpecularTexture',['../classSpecularTexture.html#a8ecd8e245efc6f78e9d46fa6842f99b8',1,'SpecularTexture']]],
-  ['_7etexture_18',['~Texture',['../classTexture.html#a4eaff28a38f061c3ed1a21ef210e7030',1,'Texture']]],
-  ['_7etexturedata_19',['~TextureData',['../classTextureData.html#ab5ba8c4b65adf5f919450fbd8374001e',1,'TextureData']]]
+  ['_7eshaderfactory_17',['~ShaderFactory',['../classShaderFactory.html#ad92f26d51b31d97028e3de1117bfdf32',1,'ShaderFactory']]],
+  ['_7especulartexture_18',['~SpecularTexture',['../classSpecularTexture.html#a8ecd8e245efc6f78e9d46fa6842f99b8',1,'SpecularTexture']]],
+  ['_7etexture_19',['~Texture',['../classTexture.html#a4eaff28a38f061c3ed1a21ef210e7030',1,'Texture']]],
+  ['_7etexturedata_20',['~TextureData',['../classTextureData.html#ab5ba8c4b65adf5f919450fbd8374001e',1,'TextureData']]],
+  ['_7etexturefactory_21',['~TextureFactory',['../classTextureFactory.html#a1af95fcbad091cab0c7b4d1d94ed5ead',1,'TextureFactory']]]
 ];

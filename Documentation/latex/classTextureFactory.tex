@@ -1,13 +1,84 @@
 \hypertarget{classTextureFactory}{}\doxysection{Texture\+Factory Class Reference}
 \label{classTextureFactory}\index{TextureFactory@{TextureFactory}}
+
+
+Provides a way to easily create textures from raw data.  
+
+
+
+
+{\ttfamily \#include $<$Texture\+Factory.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classTextureFactory_a8f929f76381d8b9790188b0ceb1bce62}{Texture\+Factory}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{classTexture}{Texture}} Factory object. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classTextureFactory_a1af95fcbad091cab0c7b4d1d94ed5ead}{$\sim$\+Texture\+Factory}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the \mbox{\hyperlink{classTexture}{Texture}} Factory object. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
+static \mbox{\hyperlink{classTexture}{Texture}} $\ast$ \mbox{\hyperlink{classTextureFactory_a16ac5b35ce568d432d596b715f56259c}{construct\+Texture}} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$data, \mbox{\hyperlink{classTexture_ac1974514d0c1fc17c0f422a63f349376}{Texture\+::\+TYPE}} type)
+\begin{DoxyCompactList}\small\item\em Construct a new Texture$\ast$ object from raw texture data , and a type. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Provides a way to easily create textures from raw data. 
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classTextureFactory_a8f929f76381d8b9790188b0ceb1bce62}\label{classTextureFactory_a8f929f76381d8b9790188b0ceb1bce62}} 
+\index{TextureFactory@{TextureFactory}!TextureFactory@{TextureFactory}}
+\index{TextureFactory@{TextureFactory}!TextureFactory@{TextureFactory}}
+\doxysubsubsection{\texorpdfstring{TextureFactory()}{TextureFactory()}}
+{\footnotesize\ttfamily Texture\+Factory\+::\+Texture\+Factory (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Construct a new \mbox{\hyperlink{classTexture}{Texture}} Factory object. 
+
+\mbox{\Hypertarget{classTextureFactory_a1af95fcbad091cab0c7b4d1d94ed5ead}\label{classTextureFactory_a1af95fcbad091cab0c7b4d1d94ed5ead}} 
+\index{TextureFactory@{TextureFactory}!````~TextureFactory@{$\sim$TextureFactory}}
+\index{````~TextureFactory@{$\sim$TextureFactory}!TextureFactory@{TextureFactory}}
+\doxysubsubsection{\texorpdfstring{$\sim$TextureFactory()}{~TextureFactory()}}
+{\footnotesize\ttfamily virtual Texture\+Factory\+::$\sim$\+Texture\+Factory (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Destroy the \mbox{\hyperlink{classTexture}{Texture}} Factory object. 
+
+
+
+\doxysubsection{Member Function Documentation}
 \mbox{\Hypertarget{classTextureFactory_a16ac5b35ce568d432d596b715f56259c}\label{classTextureFactory_a16ac5b35ce568d432d596b715f56259c}} 
-static \mbox{\hyperlink{classTexture}{Texture}} $\ast$ {\bfseries construct\+Texture} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$data, \mbox{\hyperlink{classTexture_ac1974514d0c1fc17c0f422a63f349376}{Texture\+::\+TYPE}} type)
-\end{DoxyCompactItemize}
+\index{TextureFactory@{TextureFactory}!constructTexture@{constructTexture}}
+\index{constructTexture@{constructTexture}!TextureFactory@{TextureFactory}}
+\doxysubsubsection{\texorpdfstring{constructTexture()}{constructTexture()}}
+{\footnotesize\ttfamily static \mbox{\hyperlink{classTexture}{Texture}} $\ast$ Texture\+Factory\+::construct\+Texture (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$}]{data,  }\item[{\mbox{\hyperlink{classTexture_ac1974514d0c1fc17c0f422a63f349376}{Texture\+::\+TYPE}}}]{type }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Construct a new Texture$\ast$ object from raw texture data , and a type. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & \mbox{\hyperlink{classTextureData}{Texture\+Data}} object , contains raw data about the texture \\
+\hline
+{\em type} & Type of the texture we want to create \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Texture$\ast$ The created texture object 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{classTexture}{Texture}} 
+
+\mbox{\hyperlink{classTexture_ac1974514d0c1fc17c0f422a63f349376}{Texture\+::\+TYPE}} 
+\end{DoxySeeAlso}
 
 
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/home/hamilcar/\+Desktop/projects/\+Axomae/includes/Texture\+Factory.\+h\end{DoxyCompactItemize}
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/\mbox{\hyperlink{TextureFactory_8h}{Texture\+Factory.\+h}}\end{DoxyCompactItemize}

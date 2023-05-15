@@ -3,7 +3,7 @@ var searchData=
   ['data_0',['data',['../classTexture.html#adfe232cc4d823d873b2e2eb35d11af2a',1,'Texture']]],
   ['depth_5fmask_5fenabled_1',['depth_mask_enabled',['../classaxomae_1_1Mesh.html#a7248ef3308ee239cee9c88dcde4f464b',1,'axomae::Mesh']]],
   ['depthfunc_2',['DEPTHFUNC',['../classaxomae_1_1Mesh.html#addbf715595bf6a1b5d994732d10834eb',1,'axomae::Mesh']]],
-  ['destroy_3',['destroy',['../classShaderDatabase.html#ad0c4f150170761334704d82258f72a9e',1,'ShaderDatabase']]],
+  ['destroy_3',['destroy',['../classShaderDatabase.html#ad0c4f150170761334704d82258f72a9e',1,'ShaderDatabase::destroy()'],['../classTextureDatabase.html#a4242ec591a42811019e664d7cc9b687b',1,'TextureDatabase::destroy()']]],
   ['diffusetexture_4',['DiffuseTexture',['../classDiffuseTexture.html',1,'DiffuseTexture'],['../classDiffuseTexture.html#a8e108a0d24cf7b73eb6fab7fcb614f58',1,'DiffuseTexture::DiffuseTexture()'],['../classDiffuseTexture.html#a6e0f39376a6800a4f8db2ffa1e5820b7',1,'DiffuseTexture::DiffuseTexture(TextureData *data)']]],
   ['direction_5',['direction',['../classCamera.html#aa91491698db51f70c62199d8c2213514',1,'Camera']]],
   ['draw_6',['draw',['../classRenderer.html#a9a0a5f207e3d9f60c6372a9c79b25df9',1,'Renderer']]],

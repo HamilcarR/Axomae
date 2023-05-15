@@ -37,6 +37,8 @@ Texture::~Texture(){
 
 }
 
+
+
 void Texture::set(TextureData *texture){
 	clean(); 
 	width = texture->width ; 

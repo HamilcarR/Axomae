@@ -41,8 +41,8 @@ public:
 
 
 /***
- * \class ImageManager
- * \brief provides algorithms for image processing , like edge detection , greyscale conversion etc. 
+ * @class ImageManager
+ * @brief provides algorithms for image processing , like edge detection , greyscale conversion etc. 
  * 
  */
 class ImageManager{		

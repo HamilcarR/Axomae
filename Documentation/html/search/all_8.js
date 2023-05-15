@@ -13,6 +13,6 @@ var searchData=
   ['initializeshader_10',['initializeShader',['../classShader.html#a427606203c305a04668131570dc9e102',1,'Shader']]],
   ['initializetexture2d_11',['initializeTexture2D',['../classTexture.html#a14df145286d1b1114c4db94685dd368c',1,'Texture']]],
   ['isinitialized_12',['isInitialized',['../classaxomae_1_1Mesh.html#a05297d810fac6b40209184ced7b69077',1,'axomae::Mesh']]],
-  ['isinstanced_13',['isInstanced',['../classShaderDatabase.html#a85675db5892a47f6d317619ec00b4f95',1,'ShaderDatabase']]],
+  ['isinstanced_13',['isInstanced',['../classShaderDatabase.html#a85675db5892a47f6d317619ec00b4f95',1,'ShaderDatabase::isInstanced()'],['../classTextureDatabase.html#a49d49448a6e20ed9c878f22865f5b14b',1,'TextureDatabase::isInstanced()']]],
   ['isready_14',['isReady',['../classGLBuffers.html#a9155d747890787354f67269ba76e6056',1,'GLBuffers']]]
 ];
