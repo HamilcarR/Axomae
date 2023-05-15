@@ -70,7 +70,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>axomae</b></li><li class="navelem"><a class="el" href="classaxomae_1_1Mesh.html">Mesh</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespaceaxomae.html">axomae</a></li><li class="navelem"><a class="el" href="classaxomae_1_1Mesh.html">Mesh</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -83,19 +83,24 @@ $(function() {
   <div class="headertitle"><div class="title">axomae::Mesh Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p><a class="el" href="classaxomae_1_1Mesh.html" title="Mesh class.">Mesh</a> class.  
+ <a href="classaxomae_1_1Mesh.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="Mesh_8h_source.html">Mesh.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for axomae::Mesh:</div>
 <div class="dyncontent">
  <div class="center">
   <img src="classaxomae_1_1Mesh.png" usemap="#axomae::Mesh_map" alt=""/>
   <map id="axomae::Mesh_map" name="axomae::Mesh_map">
-<area href="classaxomae_1_1CubeMapMesh.html" alt="axomae::CubeMapMesh" shape="rect" coords="0,56,147,80"/>
+<area href="classaxomae_1_1CubeMapMesh.html" title="Cubemap Mesh class." alt="axomae::CubeMapMesh" shape="rect" coords="0,56,147,80"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:addbf715595bf6a1b5d994732d10834eb"><td class="memItemLeft" align="right" valign="top"><a id="addbf715595bf6a1b5d994732d10834eb" name="addbf715595bf6a1b5d994732d10834eb"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>DEPTHFUNC</b> : GLenum { <br />
+<tr class="memitem:addbf715595bf6a1b5d994732d10834eb"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#addbf715595bf6a1b5d994732d10834eb">DEPTHFUNC</a> : GLenum { <br />
 &#160;&#160;<b>NEVER</b> = GL_NEVER
 , <b>LESS</b> = GL_LESS
 , <b>EQUAL</b> = GL_EQUAL
@@ -107,95 +112,812 @@ Public Types</h2></td></tr>
 , <b>ALWAYS</b> = GL_ALWAYS
 <br />
  }</td></tr>
+<tr class="memdesc:addbf715595bf6a1b5d994732d10834eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Behavior of the depth function for the mesh.  <a href="classaxomae_1_1Mesh.html#addbf715595bf6a1b5d994732d10834eb">More...</a><br /></td></tr>
 <tr class="separator:addbf715595bf6a1b5d994732d10834eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af60885e207709da3a30ff07711ebc28b"><td class="memItemLeft" align="right" valign="top"><a id="af60885e207709da3a30ff07711ebc28b" name="af60885e207709da3a30ff07711ebc28b"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Mesh</b> (const <a class="el" href="classaxomae_1_1Mesh.html">Mesh</a> &amp;copy)</td></tr>
+<tr class="memitem:ae893327a29ff40aa19aedab398bdeab3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#ae893327a29ff40aa19aedab398bdeab3">Mesh</a> ()</td></tr>
+<tr class="memdesc:ae893327a29ff40aa19aedab398bdeab3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classaxomae_1_1Mesh.html" title="Mesh class.">Mesh</a> object.  <br /></td></tr>
+<tr class="separator:ae893327a29ff40aa19aedab398bdeab3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af60885e207709da3a30ff07711ebc28b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#af60885e207709da3a30ff07711ebc28b">Mesh</a> (const <a class="el" href="classaxomae_1_1Mesh.html">Mesh</a> &amp;copy)</td></tr>
+<tr class="memdesc:af60885e207709da3a30ff07711ebc28b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor.  <br /></td></tr>
 <tr class="separator:af60885e207709da3a30ff07711ebc28b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4da45ed1cdd2025946d4f8f6c5ac85b"><td class="memItemLeft" align="right" valign="top"><a id="aa4da45ed1cdd2025946d4f8f6c5ac85b" name="aa4da45ed1cdd2025946d4f8f6c5ac85b"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Mesh</b> (<a class="el" href="structaxomae_1_1Object3D.html">Object3D</a> const &amp;obj, <a class="el" href="classMaterial.html">Material</a> const &amp;mat)</td></tr>
+<tr class="memitem:aa4da45ed1cdd2025946d4f8f6c5ac85b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#aa4da45ed1cdd2025946d4f8f6c5ac85b">Mesh</a> (<a class="el" href="structaxomae_1_1Object3D.html">Object3D</a> const &amp;obj, <a class="el" href="classMaterial.html">Material</a> const &amp;mat)</td></tr>
+<tr class="memdesc:aa4da45ed1cdd2025946d4f8f6c5ac85b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classaxomae_1_1Mesh.html" title="Mesh class.">Mesh</a> object from geometry and material.  <br /></td></tr>
 <tr class="separator:aa4da45ed1cdd2025946d4f8f6c5ac85b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3d65d626340310c06300c1774d6a328"><td class="memItemLeft" align="right" valign="top"><a id="ad3d65d626340310c06300c1774d6a328" name="ad3d65d626340310c06300c1774d6a328"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Mesh</b> (std::string name, <a class="el" href="structaxomae_1_1Object3D.html">Object3D</a> const &amp;obj, <a class="el" href="classMaterial.html">Material</a> const &amp;mat)</td></tr>
+<tr class="memitem:ad3d65d626340310c06300c1774d6a328"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#ad3d65d626340310c06300c1774d6a328">Mesh</a> (std::string <a class="el" href="classaxomae_1_1Mesh.html#a6f165e415046a0e95860004de83a0fd8">name</a>, <a class="el" href="structaxomae_1_1Object3D.html">Object3D</a> const &amp;obj, <a class="el" href="classMaterial.html">Material</a> const &amp;mat)</td></tr>
+<tr class="memdesc:ad3d65d626340310c06300c1774d6a328"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classaxomae_1_1Mesh.html" title="Mesh class.">Mesh</a> object with a name , geometry , and material.  <br /></td></tr>
 <tr class="separator:ad3d65d626340310c06300c1774d6a328"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77fa7a9e140d218871d80838b15b7ade"><td class="memItemLeft" align="right" valign="top"><a id="a77fa7a9e140d218871d80838b15b7ade" name="a77fa7a9e140d218871d80838b15b7ade"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>bindMaterials</b> ()</td></tr>
+<tr class="memitem:adfb6497815a75570a5766cf2d63b97a5"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#adfb6497815a75570a5766cf2d63b97a5">~Mesh</a> ()</td></tr>
+<tr class="memdesc:adfb6497815a75570a5766cf2d63b97a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the <a class="el" href="classaxomae_1_1Mesh.html" title="Mesh class.">Mesh</a> object.  <br /></td></tr>
+<tr class="separator:adfb6497815a75570a5766cf2d63b97a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77fa7a9e140d218871d80838b15b7ade"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a77fa7a9e140d218871d80838b15b7ade">bindMaterials</a> ()</td></tr>
+<tr class="memdesc:a77fa7a9e140d218871d80838b15b7ade"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable the mesh's material to render.  <br /></td></tr>
 <tr class="separator:a77fa7a9e140d218871d80838b15b7ade"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab32fd163f57cd40a85b0eb7b5948908e"><td class="memItemLeft" align="right" valign="top"><a id="ab32fd163f57cd40a85b0eb7b5948908e" name="ab32fd163f57cd40a85b0eb7b5948908e"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>bindShaders</b> ()</td></tr>
+<tr class="memitem:ab32fd163f57cd40a85b0eb7b5948908e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#ab32fd163f57cd40a85b0eb7b5948908e">bindShaders</a> ()</td></tr>
+<tr class="memdesc:ab32fd163f57cd40a85b0eb7b5948908e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Activates the current mesh's shader.  <br /></td></tr>
 <tr class="separator:ab32fd163f57cd40a85b0eb7b5948908e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34a4c92d18adedb64258462ef9fac300"><td class="memItemLeft" align="right" valign="top"><a id="a34a4c92d18adedb64258462ef9fac300" name="a34a4c92d18adedb64258462ef9fac300"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>releaseShaders</b> ()</td></tr>
+<tr class="memitem:a34a4c92d18adedb64258462ef9fac300"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a34a4c92d18adedb64258462ef9fac300">releaseShaders</a> ()</td></tr>
+<tr class="memdesc:a34a4c92d18adedb64258462ef9fac300"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases the mesh's shader.  <br /></td></tr>
 <tr class="separator:a34a4c92d18adedb64258462ef9fac300"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a772b5cf069b059476e37b1944433105b"><td class="memItemLeft" align="right" valign="top"><a id="a772b5cf069b059476e37b1944433105b" name="a772b5cf069b059476e37b1944433105b"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>clean</b> ()</td></tr>
+<tr class="memitem:a772b5cf069b059476e37b1944433105b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a772b5cf069b059476e37b1944433105b">clean</a> ()</td></tr>
+<tr class="memdesc:a772b5cf069b059476e37b1944433105b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans all data of the mesh.  <br /></td></tr>
 <tr class="separator:a772b5cf069b059476e37b1944433105b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05297d810fac6b40209184ced7b69077"><td class="memItemLeft" align="right" valign="top"><a id="a05297d810fac6b40209184ced7b69077" name="a05297d810fac6b40209184ced7b69077"></a>
-virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>isInitialized</b> ()</td></tr>
+<tr class="memitem:a05297d810fac6b40209184ced7b69077"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a05297d810fac6b40209184ced7b69077">isInitialized</a> ()</td></tr>
+<tr class="memdesc:a05297d810fac6b40209184ced7b69077"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if mesh is initialized and ready to be rendererd.  <br /></td></tr>
 <tr class="separator:a05297d810fac6b40209184ced7b69077"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1163e88a24c3e53ee3b7fc5c733ed4a"><td class="memItemLeft" align="right" valign="top"><a id="ac1163e88a24c3e53ee3b7fc5c733ed4a" name="ac1163e88a24c3e53ee3b7fc5c733ed4a"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>initializeGlData</b> ()</td></tr>
+<tr class="memitem:ac1163e88a24c3e53ee3b7fc5c733ed4a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#ac1163e88a24c3e53ee3b7fc5c733ed4a">initializeGlData</a> ()</td></tr>
+<tr class="memdesc:ac1163e88a24c3e53ee3b7fc5c733ed4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize OpenGL related data in the material and shaders of the mesh.  <br /></td></tr>
 <tr class="separator:ac1163e88a24c3e53ee3b7fc5c733ed4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ce8c8edc69e122e9888540202b5eeeb"><td class="memItemLeft" align="right" valign="top"><a id="a6ce8c8edc69e122e9888540202b5eeeb" name="a6ce8c8edc69e122e9888540202b5eeeb"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setSceneCameraPointer</b> (<a class="el" href="classCamera.html">Camera</a> *camera)</td></tr>
+<tr class="memitem:a6ce8c8edc69e122e9888540202b5eeeb"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a6ce8c8edc69e122e9888540202b5eeeb">setSceneCameraPointer</a> (<a class="el" href="classCamera.html">Camera</a> *<a class="el" href="classaxomae_1_1Mesh.html#a70785ab851d1d8f29f63f85cd6bcd27f">camera</a>)</td></tr>
+<tr class="memdesc:a6ce8c8edc69e122e9888540202b5eeeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Scene <a class="el" href="classCamera.html" title="Base Camera class.">Camera</a> Pointer.  <br /></td></tr>
 <tr class="separator:a6ce8c8edc69e122e9888540202b5eeeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af65900d1cfaac8346319485aaffcee4e"><td class="memItemLeft" align="right" valign="top"><a id="af65900d1cfaac8346319485aaffcee4e" name="af65900d1cfaac8346319485aaffcee4e"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setRotationMatrix</b> (glm::mat4 &amp;rot)</td></tr>
+<tr class="memitem:af65900d1cfaac8346319485aaffcee4e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#af65900d1cfaac8346319485aaffcee4e">setRotationMatrix</a> (glm::mat4 &amp;rot)</td></tr>
+<tr class="memdesc:af65900d1cfaac8346319485aaffcee4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Rotation Matrix.  <br /></td></tr>
 <tr class="separator:af65900d1cfaac8346319485aaffcee4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa18f5c7cd2bca2705c6826eeccae3c6c"><td class="memItemLeft" align="right" valign="top"><a id="aa18f5c7cd2bca2705c6826eeccae3c6c" name="aa18f5c7cd2bca2705c6826eeccae3c6c"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>cullBackFace</b> ()</td></tr>
+<tr class="memitem:aa18f5c7cd2bca2705c6826eeccae3c6c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#aa18f5c7cd2bca2705c6826eeccae3c6c">cullBackFace</a> ()</td></tr>
+<tr class="memdesc:aa18f5c7cd2bca2705c6826eeccae3c6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable the rendering of the back face of the mesh.  <br /></td></tr>
 <tr class="separator:aa18f5c7cd2bca2705c6826eeccae3c6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ba2b91ebb6538c2e16660567d8838fc"><td class="memItemLeft" align="right" valign="top"><a id="a2ba2b91ebb6538c2e16660567d8838fc" name="a2ba2b91ebb6538c2e16660567d8838fc"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>cullFrontFace</b> ()</td></tr>
+<tr class="memitem:a2ba2b91ebb6538c2e16660567d8838fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a2ba2b91ebb6538c2e16660567d8838fc">cullFrontFace</a> ()</td></tr>
+<tr class="memdesc:a2ba2b91ebb6538c2e16660567d8838fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable the rendering of the front face.  <br /></td></tr>
 <tr class="separator:a2ba2b91ebb6538c2e16660567d8838fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c9465f37942ce139f7f379308923967"><td class="memItemLeft" align="right" valign="top"><a id="a9c9465f37942ce139f7f379308923967" name="a9c9465f37942ce139f7f379308923967"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>cullFrontAndBackFace</b> ()</td></tr>
+<tr class="memitem:a9c9465f37942ce139f7f379308923967"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a9c9465f37942ce139f7f379308923967">cullFrontAndBackFace</a> ()</td></tr>
+<tr class="memdesc:a9c9465f37942ce139f7f379308923967"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable both front and back face for rendering.  <br /></td></tr>
 <tr class="separator:a9c9465f37942ce139f7f379308923967"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a655bac84acc8d8ad1792f77dd0f490c2"><td class="memItemLeft" align="right" valign="top"><a id="a655bac84acc8d8ad1792f77dd0f490c2" name="a655bac84acc8d8ad1792f77dd0f490c2"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setFaceCulling</b> (bool value)</td></tr>
+<tr class="memitem:a655bac84acc8d8ad1792f77dd0f490c2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a655bac84acc8d8ad1792f77dd0f490c2">setFaceCulling</a> (bool value)</td></tr>
+<tr class="memdesc:a655bac84acc8d8ad1792f77dd0f490c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable face culling for this mesh.  <br /></td></tr>
 <tr class="separator:a655bac84acc8d8ad1792f77dd0f490c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1765b06f95c55cc6bba54d714bc38fc"><td class="memItemLeft" align="right" valign="top"><a id="af1765b06f95c55cc6bba54d714bc38fc" name="af1765b06f95c55cc6bba54d714bc38fc"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setDepthMask</b> (bool value)</td></tr>
+<tr class="memitem:af1765b06f95c55cc6bba54d714bc38fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#af1765b06f95c55cc6bba54d714bc38fc">setDepthMask</a> (bool value)</td></tr>
+<tr class="memdesc:af1765b06f95c55cc6bba54d714bc38fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Depth behavior of the mesh.  <br /></td></tr>
 <tr class="separator:af1765b06f95c55cc6bba54d714bc38fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68efedbc9dad4a9f9b53f61ac898cb82"><td class="memItemLeft" align="right" valign="top"><a id="a68efedbc9dad4a9f9b53f61ac898cb82" name="a68efedbc9dad4a9f9b53f61ac898cb82"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setDepthFunc</b> (DEPTHFUNC func)</td></tr>
+<tr class="memitem:a68efedbc9dad4a9f9b53f61ac898cb82"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a68efedbc9dad4a9f9b53f61ac898cb82">setDepthFunc</a> (<a class="el" href="classaxomae_1_1Mesh.html#addbf715595bf6a1b5d994732d10834eb">DEPTHFUNC</a> func)</td></tr>
+<tr class="memdesc:a68efedbc9dad4a9f9b53f61ac898cb82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Depth function to func.  <br /></td></tr>
 <tr class="separator:a68efedbc9dad4a9f9b53f61ac898cb82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a27040fb7c30a2559436826ad517da63a"><td class="memItemLeft" align="right" valign="top"><a id="a27040fb7c30a2559436826ad517da63a" name="a27040fb7c30a2559436826ad517da63a"></a>
-<a class="el" href="structaxomae_1_1Object3D.html">Object3D</a>&#160;</td><td class="memItemRight" valign="bottom"><b>geometry</b></td></tr>
+<tr class="memitem:a27040fb7c30a2559436826ad517da63a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structaxomae_1_1Object3D.html">Object3D</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a27040fb7c30a2559436826ad517da63a">geometry</a></td></tr>
 <tr class="separator:a27040fb7c30a2559436826ad517da63a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a747e8ef6bb7e5eb10d3a971536f1d359"><td class="memItemLeft" align="right" valign="top"><a id="a747e8ef6bb7e5eb10d3a971536f1d359" name="a747e8ef6bb7e5eb10d3a971536f1d359"></a>
-<a class="el" href="classShader.html">Shader</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>shader_program</b></td></tr>
+<tr class="memitem:a747e8ef6bb7e5eb10d3a971536f1d359"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classShader.html">Shader</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a747e8ef6bb7e5eb10d3a971536f1d359">shader_program</a></td></tr>
 <tr class="separator:a747e8ef6bb7e5eb10d3a971536f1d359"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b3ebd501f92e8392699bf378ec9ff93"><td class="memItemLeft" align="right" valign="top"><a id="a4b3ebd501f92e8392699bf378ec9ff93" name="a4b3ebd501f92e8392699bf378ec9ff93"></a>
-<a class="el" href="classMaterial.html">Material</a>&#160;</td><td class="memItemRight" valign="bottom"><b>material</b></td></tr>
+<tr class="memitem:a4b3ebd501f92e8392699bf378ec9ff93"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classMaterial.html">Material</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a4b3ebd501f92e8392699bf378ec9ff93">material</a></td></tr>
 <tr class="separator:a4b3ebd501f92e8392699bf378ec9ff93"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f165e415046a0e95860004de83a0fd8"><td class="memItemLeft" align="right" valign="top"><a id="a6f165e415046a0e95860004de83a0fd8" name="a6f165e415046a0e95860004de83a0fd8"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>name</b></td></tr>
+<tr class="memitem:a6f165e415046a0e95860004de83a0fd8"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a6f165e415046a0e95860004de83a0fd8">name</a></td></tr>
 <tr class="separator:a6f165e415046a0e95860004de83a0fd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:aa7ea9c0fd2db8171dce931f947aa9a11"><td class="memItemLeft" align="right" valign="top"><a id="aa7ea9c0fd2db8171dce931f947aa9a11" name="aa7ea9c0fd2db8171dce931f947aa9a11"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>mesh_initialized</b></td></tr>
+<tr class="memitem:aa7ea9c0fd2db8171dce931f947aa9a11"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#aa7ea9c0fd2db8171dce931f947aa9a11">mesh_initialized</a></td></tr>
 <tr class="separator:aa7ea9c0fd2db8171dce931f947aa9a11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70785ab851d1d8f29f63f85cd6bcd27f"><td class="memItemLeft" align="right" valign="top"><a id="a70785ab851d1d8f29f63f85cd6bcd27f" name="a70785ab851d1d8f29f63f85cd6bcd27f"></a>
-<a class="el" href="classCamera.html">Camera</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>camera</b></td></tr>
+<tr class="memitem:a70785ab851d1d8f29f63f85cd6bcd27f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCamera.html">Camera</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a70785ab851d1d8f29f63f85cd6bcd27f">camera</a></td></tr>
 <tr class="separator:a70785ab851d1d8f29f63f85cd6bcd27f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30b0319654587c506ab0c573f21735b1"><td class="memItemLeft" align="right" valign="top"><a id="a30b0319654587c506ab0c573f21735b1" name="a30b0319654587c506ab0c573f21735b1"></a>
-glm::mat4&#160;</td><td class="memItemRight" valign="bottom"><b>model_matrix</b></td></tr>
+<tr class="memitem:a30b0319654587c506ab0c573f21735b1"><td class="memItemLeft" align="right" valign="top">glm::mat4&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a30b0319654587c506ab0c573f21735b1">model_matrix</a></td></tr>
 <tr class="separator:a30b0319654587c506ab0c573f21735b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b096611caabc90e5a0d193658e4ea2f"><td class="memItemLeft" align="right" valign="top"><a id="a6b096611caabc90e5a0d193658e4ea2f" name="a6b096611caabc90e5a0d193658e4ea2f"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>face_culling_enabled</b></td></tr>
+<tr class="memitem:a6b096611caabc90e5a0d193658e4ea2f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a6b096611caabc90e5a0d193658e4ea2f">face_culling_enabled</a></td></tr>
 <tr class="separator:a6b096611caabc90e5a0d193658e4ea2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7248ef3308ee239cee9c88dcde4f464b"><td class="memItemLeft" align="right" valign="top"><a id="a7248ef3308ee239cee9c88dcde4f464b" name="a7248ef3308ee239cee9c88dcde4f464b"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>depth_mask_enabled</b></td></tr>
+<tr class="memitem:a7248ef3308ee239cee9c88dcde4f464b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Mesh.html#a7248ef3308ee239cee9c88dcde4f464b">depth_mask_enabled</a></td></tr>
 <tr class="separator:a7248ef3308ee239cee9c88dcde4f464b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p><a class="el" href="classaxomae_1_1Mesh.html" title="Mesh class.">Mesh</a> class. </p>
+</div><h2 class="groupheader">Member Enumeration Documentation</h2>
+<a id="addbf715595bf6a1b5d994732d10834eb" name="addbf715595bf6a1b5d994732d10834eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#addbf715595bf6a1b5d994732d10834eb">&#9670;&#160;</a></span>DEPTHFUNC</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classaxomae_1_1Mesh.html#addbf715595bf6a1b5d994732d10834eb">axomae::Mesh::DEPTHFUNC</a> : GLenum</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Behavior of the depth function for the mesh. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="ae893327a29ff40aa19aedab398bdeab3" name="ae893327a29ff40aa19aedab398bdeab3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae893327a29ff40aa19aedab398bdeab3">&#9670;&#160;</a></span>Mesh() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">axomae::Mesh::Mesh </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Construct a new <a class="el" href="classaxomae_1_1Mesh.html" title="Mesh class.">Mesh</a> object. </p>
+
+</div>
+</div>
+<a id="af60885e207709da3a30ff07711ebc28b" name="af60885e207709da3a30ff07711ebc28b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af60885e207709da3a30ff07711ebc28b">&#9670;&#160;</a></span>Mesh() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">axomae::Mesh::Mesh </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classaxomae_1_1Mesh.html">Mesh</a> &amp;&#160;</td>
+          <td class="paramname"><em>copy</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Copy constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">copy</td><td>To be copied </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa4da45ed1cdd2025946d4f8f6c5ac85b" name="aa4da45ed1cdd2025946d4f8f6c5ac85b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4da45ed1cdd2025946d4f8f6c5ac85b">&#9670;&#160;</a></span>Mesh() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">axomae::Mesh::Mesh </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structaxomae_1_1Object3D.html">Object3D</a> const &amp;&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classMaterial.html">Material</a> const &amp;&#160;</td>
+          <td class="paramname"><em>mat</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Construct a new <a class="el" href="classaxomae_1_1Mesh.html" title="Mesh class.">Mesh</a> object from geometry and material. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">obj</td><td>Geometry data </td></tr>
+    <tr><td class="paramname">mat</td><td><a class="el" href="classMaterial.html" title="Material class implementation.">Material</a> data </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad3d65d626340310c06300c1774d6a328" name="ad3d65d626340310c06300c1774d6a328"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3d65d626340310c06300c1774d6a328">&#9670;&#160;</a></span>Mesh() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">axomae::Mesh::Mesh </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structaxomae_1_1Object3D.html">Object3D</a> const &amp;&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classMaterial.html">Material</a> const &amp;&#160;</td>
+          <td class="paramname"><em>mat</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Construct a new <a class="el" href="classaxomae_1_1Mesh.html" title="Mesh class.">Mesh</a> object with a name , geometry , and material. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>String name </td></tr>
+    <tr><td class="paramname">obj</td><td>Geometry data </td></tr>
+    <tr><td class="paramname">mat</td><td><a class="el" href="classMaterial.html" title="Material class implementation.">Material</a> data </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="adfb6497815a75570a5766cf2d63b97a5" name="adfb6497815a75570a5766cf2d63b97a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfb6497815a75570a5766cf2d63b97a5">&#9670;&#160;</a></span>~Mesh()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual axomae::Mesh::~Mesh </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Destroy the <a class="el" href="classaxomae_1_1Mesh.html" title="Mesh class.">Mesh</a> object. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a77fa7a9e140d218871d80838b15b7ade" name="a77fa7a9e140d218871d80838b15b7ade"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77fa7a9e140d218871d80838b15b7ade">&#9670;&#160;</a></span>bindMaterials()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void axomae::Mesh::bindMaterials </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Enable the mesh's material to render. </p>
+
+</div>
+</div>
+<a id="ab32fd163f57cd40a85b0eb7b5948908e" name="ab32fd163f57cd40a85b0eb7b5948908e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab32fd163f57cd40a85b0eb7b5948908e">&#9670;&#160;</a></span>bindShaders()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void axomae::Mesh::bindShaders </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Activates the current mesh's shader. </p>
+
+<p>Reimplemented in <a class="el" href="classaxomae_1_1CubeMapMesh.html#a8c7071e97f80c7a41b752bc0ec2c42ff">axomae::CubeMapMesh</a>.</p>
+
+</div>
+</div>
+<a id="a772b5cf069b059476e37b1944433105b" name="a772b5cf069b059476e37b1944433105b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a772b5cf069b059476e37b1944433105b">&#9670;&#160;</a></span>clean()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void axomae::Mesh::clean </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cleans all data of the mesh. </p>
+
+</div>
+</div>
+<a id="aa18f5c7cd2bca2705c6826eeccae3c6c" name="aa18f5c7cd2bca2705c6826eeccae3c6c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa18f5c7cd2bca2705c6826eeccae3c6c">&#9670;&#160;</a></span>cullBackFace()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void axomae::Mesh::cullBackFace </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Disable the rendering of the back face of the mesh. </p>
+
+</div>
+</div>
+<a id="a9c9465f37942ce139f7f379308923967" name="a9c9465f37942ce139f7f379308923967"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c9465f37942ce139f7f379308923967">&#9670;&#160;</a></span>cullFrontAndBackFace()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void axomae::Mesh::cullFrontAndBackFace </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Disable both front and back face for rendering. </p>
+
+</div>
+</div>
+<a id="a2ba2b91ebb6538c2e16660567d8838fc" name="a2ba2b91ebb6538c2e16660567d8838fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ba2b91ebb6538c2e16660567d8838fc">&#9670;&#160;</a></span>cullFrontFace()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void axomae::Mesh::cullFrontFace </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Disable the rendering of the front face. </p>
+
+</div>
+</div>
+<a id="ac1163e88a24c3e53ee3b7fc5c733ed4a" name="ac1163e88a24c3e53ee3b7fc5c733ed4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1163e88a24c3e53ee3b7fc5c733ed4a">&#9670;&#160;</a></span>initializeGlData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void axomae::Mesh::initializeGlData </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialize OpenGL related data in the material and shaders of the mesh. </p>
+
+</div>
+</div>
+<a id="a05297d810fac6b40209184ced7b69077" name="a05297d810fac6b40209184ced7b69077"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05297d810fac6b40209184ced7b69077">&#9670;&#160;</a></span>isInitialized()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool axomae::Mesh::isInitialized </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check if mesh is initialized and ready to be rendererd. </p>
+<dl class="section return"><dt>Returns</dt><dd>true </dd></dl>
+
+</div>
+</div>
+<a id="a34a4c92d18adedb64258462ef9fac300" name="a34a4c92d18adedb64258462ef9fac300"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a34a4c92d18adedb64258462ef9fac300">&#9670;&#160;</a></span>releaseShaders()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void axomae::Mesh::releaseShaders </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Releases the mesh's shader. </p>
+
+</div>
+</div>
+<a id="a68efedbc9dad4a9f9b53f61ac898cb82" name="a68efedbc9dad4a9f9b53f61ac898cb82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68efedbc9dad4a9f9b53f61ac898cb82">&#9670;&#160;</a></span>setDepthFunc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void axomae::Mesh::setDepthFunc </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classaxomae_1_1Mesh.html#addbf715595bf6a1b5d994732d10834eb">DEPTHFUNC</a>&#160;</td>
+          <td class="paramname"><em>func</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the Depth function to func. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">func</td><td>Depth function to use. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classaxomae_1_1Mesh.html#addbf715595bf6a1b5d994732d10834eb" title="Behavior of the depth function for the mesh.">DEPTHFUNC</a> </dd></dl>
+
+</div>
+</div>
+<a id="af1765b06f95c55cc6bba54d714bc38fc" name="af1765b06f95c55cc6bba54d714bc38fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1765b06f95c55cc6bba54d714bc38fc">&#9670;&#160;</a></span>setDepthMask()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void axomae::Mesh::setDepthMask </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the Depth behavior of the mesh. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value</td><td>True if we want to enable depth functions </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a655bac84acc8d8ad1792f77dd0f490c2" name="a655bac84acc8d8ad1792f77dd0f490c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a655bac84acc8d8ad1792f77dd0f490c2">&#9670;&#160;</a></span>setFaceCulling()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void axomae::Mesh::setFaceCulling </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enable face culling for this mesh. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value</td><td>True if we want to enable face culling </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="af65900d1cfaac8346319485aaffcee4e" name="af65900d1cfaac8346319485aaffcee4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af65900d1cfaac8346319485aaffcee4e">&#9670;&#160;</a></span>setRotationMatrix()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void axomae::Mesh::setRotationMatrix </td>
+          <td>(</td>
+          <td class="paramtype">glm::mat4 &amp;&#160;</td>
+          <td class="paramname"><em>rot</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the Rotation Matrix. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rot</td><td>Rotation matrix </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6ce8c8edc69e122e9888540202b5eeeb" name="a6ce8c8edc69e122e9888540202b5eeeb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6ce8c8edc69e122e9888540202b5eeeb">&#9670;&#160;</a></span>setSceneCameraPointer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void axomae::Mesh::setSceneCameraPointer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classCamera.html">Camera</a> *&#160;</td>
+          <td class="paramname"><em>camera</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the Scene <a class="el" href="classCamera.html" title="Base Camera class.">Camera</a> Pointer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">camera</td><td>Pointer on the scene camera </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a70785ab851d1d8f29f63f85cd6bcd27f" name="a70785ab851d1d8f29f63f85cd6bcd27f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70785ab851d1d8f29f63f85cd6bcd27f">&#9670;&#160;</a></span>camera</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classCamera.html">Camera</a>* axomae::Mesh::camera</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Pointer on the scene camera </p>
+
+</div>
+</div>
+<a id="a7248ef3308ee239cee9c88dcde4f464b" name="a7248ef3308ee239cee9c88dcde4f464b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7248ef3308ee239cee9c88dcde4f464b">&#9670;&#160;</a></span>depth_mask_enabled</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool axomae::Mesh::depth_mask_enabled</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Is depth enabled </p>
+
+</div>
+</div>
+<a id="a6b096611caabc90e5a0d193658e4ea2f" name="a6b096611caabc90e5a0d193658e4ea2f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b096611caabc90e5a0d193658e4ea2f">&#9670;&#160;</a></span>face_culling_enabled</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool axomae::Mesh::face_culling_enabled</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Is culling enabled </p>
+
+</div>
+</div>
+<a id="a27040fb7c30a2559436826ad517da63a" name="a27040fb7c30a2559436826ad517da63a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27040fb7c30a2559436826ad517da63a">&#9670;&#160;</a></span>geometry</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structaxomae_1_1Object3D.html">Object3D</a> axomae::Mesh::geometry</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>3D Geometry of the mesh , vertex positions , UVs etc </p>
+
+</div>
+</div>
+<a id="a4b3ebd501f92e8392699bf378ec9ff93" name="a4b3ebd501f92e8392699bf378ec9ff93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b3ebd501f92e8392699bf378ec9ff93">&#9670;&#160;</a></span>material</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classMaterial.html">Material</a> axomae::Mesh::material</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p><a class="el" href="classMaterial.html" title="Material class implementation.">Material</a> to be used for the mesh </p>
+
+</div>
+</div>
+<a id="aa7ea9c0fd2db8171dce931f947aa9a11" name="aa7ea9c0fd2db8171dce931f947aa9a11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7ea9c0fd2db8171dce931f947aa9a11">&#9670;&#160;</a></span>mesh_initialized</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool axomae::Mesh::mesh_initialized</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Is the mesh ready to render </p>
+
+</div>
+</div>
+<a id="a30b0319654587c506ab0c573f21735b1" name="a30b0319654587c506ab0c573f21735b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30b0319654587c506ab0c573f21735b1">&#9670;&#160;</a></span>model_matrix</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">glm::mat4 axomae::Mesh::model_matrix</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p><a class="el" href="classaxomae_1_1Mesh.html" title="Mesh class.">Mesh</a>'s model matrix </p>
+
+</div>
+</div>
+<a id="a6f165e415046a0e95860004de83a0fd8" name="a6f165e415046a0e95860004de83a0fd8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f165e415046a0e95860004de83a0fd8">&#9670;&#160;</a></span>name</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string axomae::Mesh::name</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Name of the mesh </p>
+
+</div>
+</div>
+<a id="a747e8ef6bb7e5eb10d3a971536f1d359" name="a747e8ef6bb7e5eb10d3a971536f1d359"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a747e8ef6bb7e5eb10d3a971536f1d359">&#9670;&#160;</a></span>shader_program</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classShader.html">Shader</a>* axomae::Mesh::shader_program</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p><a class="el" href="classShader.html" title="shaders classes implementation">Shader</a> to be used for the mesh </p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/hamilcar/Desktop/projects/Axomae/includes/<a class="el" href="Mesh_8h_source.html">Mesh.h</a></li>
 </ul>

@@ -1,25 +1,104 @@
 \hypertarget{classaxomae_1_1Loader}{}\doxysection{axomae\+::Loader Class Reference}
 \label{classaxomae_1_1Loader}\index{axomae::Loader@{axomae::Loader}}
+
+
+3D \mbox{\hyperlink{classaxomae_1_1Loader}{Loader}} class , implemented as a singleton  
+
+
+
+
+{\ttfamily \#include $<$Loader.\+h$>$}
+
 \doxysubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classaxomae_1_1Loader_ac500e3ae4b603f59d41ed4750a6ac407}\label{classaxomae_1_1Loader_ac500e3ae4b603f59d41ed4750a6ac407}} 
-static \mbox{\hyperlink{classaxomae_1_1Loader}{Loader}} $\ast$ {\bfseries get\+Instance} ()
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Loader_a5483d67328502539d4536bcb558860d5}\label{classaxomae_1_1Loader_a5483d67328502539d4536bcb558860d5}} 
-static std\+::vector$<$ \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} $\ast$ $>$ {\bfseries load} (const char $\ast$file)
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Loader_a9a382102a6e90caf3ee2073eb976b0ab}\label{classaxomae_1_1Loader_a9a382102a6e90caf3ee2073eb976b0ab}} 
-static std\+::string {\bfseries load\+Shader} (const char $\ast$filename)
-\item 
+static \mbox{\hyperlink{classaxomae_1_1Loader}{Loader}} $\ast$ \mbox{\hyperlink{classaxomae_1_1Loader_ac500e3ae4b603f59d41ed4750a6ac407}{get\+Instance}} ()
+\begin{DoxyCompactList}\small\item\em Get the Instance \mbox{\hyperlink{classaxomae_1_1Loader}{Loader}} pointer. \end{DoxyCompactList}\item 
+static std\+::vector$<$ \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} $\ast$ $>$ \mbox{\hyperlink{classaxomae_1_1Loader_a5483d67328502539d4536bcb558860d5}{load}} (const char $\ast$file)
+\begin{DoxyCompactList}\small\item\em Load a .glb file. \end{DoxyCompactList}\item 
+static std\+::string \mbox{\hyperlink{classaxomae_1_1Loader_a9a382102a6e90caf3ee2073eb976b0ab}{load\+Shader}} (const char $\ast$filename)
+\begin{DoxyCompactList}\small\item\em Loads a shader file into an std\+::string. \end{DoxyCompactList}\item 
+static void \mbox{\hyperlink{classaxomae_1_1Loader_aed4b4f09a72bb3c1114518346074f848}{close}} ()
+\begin{DoxyCompactList}\small\item\em Delete instance. \end{DoxyCompactList}\item 
+static void \mbox{\hyperlink{classaxomae_1_1Loader_aa3a36f2b3cc4cf842a1b4f6ee2a0cefb}{load\+Shader\+Database}} ()
+\begin{DoxyCompactList}\small\item\em Build the shaders and put them into the shader database. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+3D \mbox{\hyperlink{classaxomae_1_1Loader}{Loader}} class , implemented as a singleton 
+
+\doxysubsection{Member Function Documentation}
 \mbox{\Hypertarget{classaxomae_1_1Loader_aed4b4f09a72bb3c1114518346074f848}\label{classaxomae_1_1Loader_aed4b4f09a72bb3c1114518346074f848}} 
-static void {\bfseries close} ()
-\item 
+\index{axomae::Loader@{axomae::Loader}!close@{close}}
+\index{close@{close}!axomae::Loader@{axomae::Loader}}
+\doxysubsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily static void axomae\+::\+Loader\+::close (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Delete instance. 
+
+\mbox{\Hypertarget{classaxomae_1_1Loader_ac500e3ae4b603f59d41ed4750a6ac407}\label{classaxomae_1_1Loader_ac500e3ae4b603f59d41ed4750a6ac407}} 
+\index{axomae::Loader@{axomae::Loader}!getInstance@{getInstance}}
+\index{getInstance@{getInstance}!axomae::Loader@{axomae::Loader}}
+\doxysubsubsection{\texorpdfstring{getInstance()}{getInstance()}}
+{\footnotesize\ttfamily static \mbox{\hyperlink{classaxomae_1_1Loader}{Loader}} $\ast$ axomae\+::\+Loader\+::get\+Instance (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Get the Instance \mbox{\hyperlink{classaxomae_1_1Loader}{Loader}} pointer. 
+
+\begin{DoxyReturn}{Returns}
+Loader$\ast$ 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaxomae_1_1Loader_a5483d67328502539d4536bcb558860d5}\label{classaxomae_1_1Loader_a5483d67328502539d4536bcb558860d5}} 
+\index{axomae::Loader@{axomae::Loader}!load@{load}}
+\index{load@{load}!axomae::Loader@{axomae::Loader}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily static std\+::vector$<$ \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} $\ast$ $>$ axomae\+::\+Loader\+::load (\begin{DoxyParamCaption}\item[{const char $\ast$}]{file }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Load a .glb file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file} & Path of the 3D glb model \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+std\+::vector$<$\+Mesh$\ast$$>$ 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaxomae_1_1Loader_a9a382102a6e90caf3ee2073eb976b0ab}\label{classaxomae_1_1Loader_a9a382102a6e90caf3ee2073eb976b0ab}} 
+\index{axomae::Loader@{axomae::Loader}!loadShader@{loadShader}}
+\index{loadShader@{loadShader}!axomae::Loader@{axomae::Loader}}
+\doxysubsubsection{\texorpdfstring{loadShader()}{loadShader()}}
+{\footnotesize\ttfamily static std\+::string axomae\+::\+Loader\+::load\+Shader (\begin{DoxyParamCaption}\item[{const char $\ast$}]{filename }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Loads a shader file into an std\+::string. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & Path of the shader \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+std\+::string 
+\end{DoxyReturn}
 \mbox{\Hypertarget{classaxomae_1_1Loader_aa3a36f2b3cc4cf842a1b4f6ee2a0cefb}\label{classaxomae_1_1Loader_aa3a36f2b3cc4cf842a1b4f6ee2a0cefb}} 
-static void {\bfseries load\+Shader\+Database} ()
-\end{DoxyCompactItemize}
+\index{axomae::Loader@{axomae::Loader}!loadShaderDatabase@{loadShaderDatabase}}
+\index{loadShaderDatabase@{loadShaderDatabase}!axomae::Loader@{axomae::Loader}}
+\doxysubsubsection{\texorpdfstring{loadShaderDatabase()}{loadShaderDatabase()}}
+{\footnotesize\ttfamily static void axomae\+::\+Loader\+::load\+Shader\+Database (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Build the shaders and put them into the shader database. 
+
 
 
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/home/hamilcar/\+Desktop/projects/\+Axomae/includes/Loader.\+h\end{DoxyCompactItemize}
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/\mbox{\hyperlink{Loader_8h}{Loader.\+h}}\end{DoxyCompactItemize}

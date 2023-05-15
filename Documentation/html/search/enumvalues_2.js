@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['perspective_0',['PERSPECTIVE',['../classCamera.html#a638f501aee229ba7e0cdda399e67e5d6a34783417054408fd9e024048b1cefa47',1,'Camera']]]
+  ['cubemap_0',['CUBEMAP',['../classShader.html#a0203e846cef6779a4b2935b50f671358acac6be8b92db1b809167082321a8c66b',1,'Shader']]]
 ];

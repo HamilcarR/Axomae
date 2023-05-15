@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['zoomin_0',['zoomIn',['../classCamera.html#af3a9db730e2e289d54d3e70c5e2909ec',1,'Camera::zoomIn()'],['../classArcballCamera.html#a6621030ecc8e0f435a6df453cb27f3c4',1,'ArcballCamera::zoomIn()'],['../classFreePerspectiveCamera.html#a09043f59b49b8a22e23037dc623d0955',1,'FreePerspectiveCamera::zoomIn()']]],
-  ['zoomout_1',['zoomOut',['../classCamera.html#a3d97ef6777746139fd34622c84f834a6',1,'Camera::zoomOut()'],['../classArcballCamera.html#aee855202ec1d6bbfc20da3b14527d194',1,'ArcballCamera::zoomOut()'],['../classFreePerspectiveCamera.html#a299d5603e297b211ff037df38fcccee0',1,'FreePerspectiveCamera::zoomOut()']]]
+  ['load_0',['load',['../classaxomae_1_1Loader.html#a5483d67328502539d4536bcb558860d5',1,'axomae::Loader']]],
+  ['loadshader_1',['loadShader',['../classaxomae_1_1Loader.html#a9a382102a6e90caf3ee2073eb976b0ab',1,'axomae::Loader']]],
+  ['loadshaderdatabase_2',['loadShaderDatabase',['../classaxomae_1_1Loader.html#aa3a36f2b3cc4cf842a1b4f6ee2a0cefb',1,'axomae::Loader']]]
 ];

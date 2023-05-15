@@ -28,14 +28,17 @@ enum \mbox{\hyperlink{classCamera_a638f501aee229ba7e0cdda399e67e5d6}{TYPE}} \+: 
 \item 
 \mbox{\hyperlink{classCamera_a31d3b3c6d2f9f16617c241bbf23142a5}{Camera}} (float radians, \mbox{\hyperlink{structScreenSize}{Screen\+Size}} $\ast$screen, float clip\+\_\+near, float clip\+\_\+far, \mbox{\hyperlink{structMouseState}{Mouse\+State}} $\ast$pointer)
 \begin{DoxyCompactList}\small\item\em Constructor for the \mbox{\hyperlink{classCamera}{Camera}} class , which initializes various properties of the camera. \end{DoxyCompactList}\item 
-virtual \mbox{\hyperlink{classCamera_ac9ed2a1433c5afdfb9cdf5b282fbc350}{$\sim$\+Camera}} ()
+\mbox{\Hypertarget{classCamera_ac9ed2a1433c5afdfb9cdf5b282fbc350}\label{classCamera_ac9ed2a1433c5afdfb9cdf5b282fbc350}} 
+virtual {\bfseries $\sim$\+Camera} ()
 \begin{DoxyCompactList}\small\item\em Destroy the \mbox{\hyperlink{classCamera}{Camera}} object. \end{DoxyCompactList}\item 
 virtual void \mbox{\hyperlink{classCamera_a195bc2e7ebbd068bbc7d8515fc7c3e66}{compute\+View\+Space}} ()
 \begin{DoxyCompactList}\small\item\em Calculates the view matrix ~\newline
  \end{DoxyCompactList}\item 
-virtual void \mbox{\hyperlink{classCamera_ab3101f19c8e834f780c548742783dd2d}{compute\+Projection\+Space}} ()
+\mbox{\Hypertarget{classCamera_ab3101f19c8e834f780c548742783dd2d}\label{classCamera_ab3101f19c8e834f780c548742783dd2d}} 
+virtual void {\bfseries compute\+Projection\+Space} ()
 \begin{DoxyCompactList}\small\item\em Calculates the projection matrix. \end{DoxyCompactList}\item 
-virtual void \mbox{\hyperlink{classCamera_a56019c7b441412c25d6e29decdcdfdb4}{compute\+View\+Projection}} ()
+\mbox{\Hypertarget{classCamera_a56019c7b441412c25d6e29decdcdfdb4}\label{classCamera_a56019c7b441412c25d6e29decdcdfdb4}} 
+virtual void {\bfseries compute\+View\+Projection} ()
 \begin{DoxyCompactList}\small\item\em Calculates the product of the two matrices \+: Projection x View. \end{DoxyCompactList}\item 
 virtual glm\+::mat4 \mbox{\hyperlink{classCamera_a3aff62b103e1741034824e53a262442b}{get\+View}} () const
 \begin{DoxyCompactList}\small\item\em Get the View matrix. \end{DoxyCompactList}\item 
@@ -160,39 +163,9 @@ Constructor for the \mbox{\hyperlink{classCamera}{Camera}} class , which initial
 {\em pointer} & The \char`\"{}pointer\char`\"{} parameter is a pointer to a \mbox{\hyperlink{structMouseState}{Mouse\+State}} object, which is used to track the state of the mouse (e.\+g. position, button clicks) for camera movement and control. \\
 \hline
 \end{DoxyParams}
-\mbox{\Hypertarget{classCamera_ac9ed2a1433c5afdfb9cdf5b282fbc350}\label{classCamera_ac9ed2a1433c5afdfb9cdf5b282fbc350}} 
-\index{Camera@{Camera}!````~Camera@{$\sim$Camera}}
-\index{````~Camera@{$\sim$Camera}!Camera@{Camera}}
-\doxysubsubsection{\texorpdfstring{$\sim$Camera()}{~Camera()}}
-{\footnotesize\ttfamily virtual Camera\+::$\sim$\+Camera (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
-
-
-
-Destroy the \mbox{\hyperlink{classCamera}{Camera}} object. 
-
 
 
 \doxysubsection{Member Function Documentation}
-\mbox{\Hypertarget{classCamera_ab3101f19c8e834f780c548742783dd2d}\label{classCamera_ab3101f19c8e834f780c548742783dd2d}} 
-\index{Camera@{Camera}!computeProjectionSpace@{computeProjectionSpace}}
-\index{computeProjectionSpace@{computeProjectionSpace}!Camera@{Camera}}
-\doxysubsubsection{\texorpdfstring{computeProjectionSpace()}{computeProjectionSpace()}}
-{\footnotesize\ttfamily virtual void Camera\+::compute\+Projection\+Space (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
-
-
-
-Calculates the projection matrix. 
-
-\mbox{\Hypertarget{classCamera_a56019c7b441412c25d6e29decdcdfdb4}\label{classCamera_a56019c7b441412c25d6e29decdcdfdb4}} 
-\index{Camera@{Camera}!computeViewProjection@{computeViewProjection}}
-\index{computeViewProjection@{computeViewProjection}!Camera@{Camera}}
-\doxysubsubsection{\texorpdfstring{computeViewProjection()}{computeViewProjection()}}
-{\footnotesize\ttfamily virtual void Camera\+::compute\+View\+Projection (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
-
-
-
-Calculates the product of the two matrices \+: Projection x View. 
-
 \mbox{\Hypertarget{classCamera_a195bc2e7ebbd068bbc7d8515fc7c3e66}\label{classCamera_a195bc2e7ebbd068bbc7d8515fc7c3e66}} 
 \index{Camera@{Camera}!computeViewSpace@{computeViewSpace}}
 \index{computeViewSpace@{computeViewSpace}!Camera@{Camera}}
@@ -301,7 +274,7 @@ Implemented in \mbox{\hyperlink{classArcballCamera_a91d695a9764b8972f32385c10edd
 Returns the type of the camera. 
 
 \begin{DoxyReturn}{Returns}
-TYPE 
+\mbox{\hyperlink{classCamera_a638f501aee229ba7e0cdda399e67e5d6}{Camera\+::\+TYPE}} 
 \end{DoxyReturn}
 \mbox{\Hypertarget{classCamera_a3aff62b103e1741034824e53a262442b}\label{classCamera_a3aff62b103e1741034824e53a262442b}} 
 \index{Camera@{Camera}!getView@{getView}}

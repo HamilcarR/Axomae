@@ -1,6 +1,6 @@
 \hypertarget{Loader_8h_source}{}\doxysection{Loader.\+h}
 \label{Loader_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/Loader.h@{/home/hamilcar/Desktop/projects/Axomae/includes/Loader.h}}
-
+\mbox{\hyperlink{Loader_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ LOADER\_H}}
 \DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ LOADER\_H}}
@@ -19,44 +19,44 @@
 \DoxyCodeLine{00015\ \textcolor{preprocessor}{\#include\ "{}utils\_3D.h"{}}\ }
 \DoxyCodeLine{00016\ \textcolor{preprocessor}{\#include\ "{}Mesh.h"{}}}
 \DoxyCodeLine{00017\ \textcolor{preprocessor}{\#include\ "{}TextureDatabase.h"{}}}
-\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ "{}ShaderDatabase.h"{}}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ShaderDatabase_8h}{ShaderDatabase.h}}"{}}}
 \DoxyCodeLine{00019\ }
-\DoxyCodeLine{00020\ \textcolor{comment}{/*3D\ loader\ :\ Will\ import\ ,\ construct\ ,\ and\ load\ meshes\ into\ the\ program\ .\ Additionnally\ ,\ loads\ textures*/}}
-\DoxyCodeLine{00021\ \textcolor{keyword}{namespace\ }axomae\{}
-\DoxyCodeLine{00022\ }
-\DoxyCodeLine{00023\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classaxomae_1_1Loader}{Loader}}\{}
-\DoxyCodeLine{00024\ \textcolor{keyword}{public}:}
-\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classaxomae_1_1Loader}{Loader}}*\ getInstance();\ \ \ \ \ }
-\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keyword}{static}\ std::vector<Mesh*>\ load(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
-\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keyword}{static}\ std::string\ loadShader(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ filename);\ }
-\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ close();\ \ \ \ }
-\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ loadShaderDatabase();\ }
-\DoxyCodeLine{00030\ \textcolor{keyword}{private}:\ }
-\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1Loader}{Loader}}();\ }
-\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1Loader}{\string~Loader}}();}
-\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}}*\ generateCubeMap(\textcolor{keywordtype}{unsigned}\ num\_textures\ ,\ \textcolor{keywordtype}{bool}\ is\_glb\_model)\ ;\ }
-\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keyword}{static}\ std::pair<unsigned\ int\ ,\ std::vector<Mesh*>>\ loadObjects(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ filename)\ ;\ }
-\DoxyCodeLine{00035\ \ \ \ \ }
-\DoxyCodeLine{00036\ \textcolor{keyword}{private}:}
-\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classaxomae_1_1Loader}{Loader}}*\ instance;\ }
-\DoxyCodeLine{00038\ \};}
-\DoxyCodeLine{00039\ }
-\DoxyCodeLine{00040\ }
-\DoxyCodeLine{00041\ }
-\DoxyCodeLine{00042\ }
-\DoxyCodeLine{00043\ }
-\DoxyCodeLine{00044\ }
-\DoxyCodeLine{00045\ }
-\DoxyCodeLine{00046\ \}}
-\DoxyCodeLine{00047\ }
-\DoxyCodeLine{00048\ }
-\DoxyCodeLine{00049\ }
-\DoxyCodeLine{00050\ }
-\DoxyCodeLine{00051\ }
-\DoxyCodeLine{00052\ }
-\DoxyCodeLine{00053\ }
-\DoxyCodeLine{00054\ }
-\DoxyCodeLine{00055\ }
-\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00027\ \textcolor{comment}{/*3D\ loader\ :\ Will\ import\ ,\ construct\ ,\ and\ load\ meshes\ into\ the\ program\ .\ Additionnally\ ,\ loads\ textures*/}}
+\DoxyCodeLine{00028\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceaxomae}{axomae}}\{}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00033\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classaxomae_1_1Loader}{Loader}}\{}
+\DoxyCodeLine{00034\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classaxomae_1_1Loader}{Loader}}*\ \mbox{\hyperlink{classaxomae_1_1Loader_ac500e3ae4b603f59d41ed4750a6ac407}{getInstance}}();\ \ }
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keyword}{static}\ std::vector<Mesh*>\ \mbox{\hyperlink{classaxomae_1_1Loader_a5483d67328502539d4536bcb558860d5}{load}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keyword}{static}\ std::string\ \mbox{\hyperlink{classaxomae_1_1Loader_a9a382102a6e90caf3ee2073eb976b0ab}{loadShader}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ filename);\ }
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classaxomae_1_1Loader_aed4b4f09a72bb3c1114518346074f848}{close}}();\ \ \ }
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classaxomae_1_1Loader_aa3a36f2b3cc4cf842a1b4f6ee2a0cefb}{loadShaderDatabase}}();\ }
+\DoxyCodeLine{00065\ \textcolor{keyword}{private}:\ }
+\DoxyCodeLine{00070\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1Loader}{Loader}}();\ }
+\DoxyCodeLine{00075\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1Loader}{\string~Loader}}();}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}}*\ generateCubeMap(\textcolor{keywordtype}{unsigned}\ num\_textures\ ,\ \textcolor{keywordtype}{bool}\ is\_glb\_model)\ ;\ }
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keyword}{static}\ std::pair<unsigned\ int\ ,\ std::vector<Mesh*>>\ loadObjects(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ filename)\ ;\ }
+\DoxyCodeLine{00091\ \ \ \ \ }
+\DoxyCodeLine{00092\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classaxomae_1_1Loader}{Loader}}*\ instance;\ }
+\DoxyCodeLine{00094\ \};}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \}}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \textcolor{preprocessor}{\#endif}}
 
 \end{DoxyCode}

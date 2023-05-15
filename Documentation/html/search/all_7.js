@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['image_5ftype_0',['image_type',['../structaxomae_1_1image__type.html',1,'axomae']]],
-  ['imageimporter_1',['ImageImporter',['../classaxomae_1_1ImageImporter.html',1,'axomae']]],
-  ['imagemanager_2',['ImageManager',['../classaxomae_1_1ImageManager.html',1,'axomae']]]
+  ['height_0',['height',['../classTextureData.html#a3af738270c0b5fa18ebf359e90f07eaf',1,'TextureData::height()'],['../classTexture.html#ab4b01ae73439cbcc210a5977e227a880',1,'Texture::height()']]]
 ];

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['target_0',['target',['../classCamera.html#a6d091a64fbeaf78315a902a3ad9b1010',1,'Camera']]],
-  ['translation_1',['translation',['../classArcballCamera.html#a60eae66183df1a0360cec1c2230063ef',1,'ArcballCamera']]],
-  ['type_2',['type',['../classCamera.html#a4987b65b658a44951eb8ea5349210166',1,'Camera']]]
+  ['radius_0',['radius',['../classArcballCamera.html#afbe6a2fd703a716613a92fd32d113963',1,'ArcballCamera']]],
+  ['right_1',['right',['../classCamera.html#aebffcc6289dd99df7554b18d00a81161',1,'Camera']]],
+  ['rotation_2',['rotation',['../classArcballCamera.html#af2a77c6ee9b6fa2b2b33ccba295c5098',1,'ArcballCamera']]]
 ];

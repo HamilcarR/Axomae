@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['type_0',['TYPE',['../classCamera.html#a638f501aee229ba7e0cdda399e67e5d6',1,'Camera']]]
+  ['channels_0',['CHANNELS',['../classTextureData.html#ab11e51fff4b5bfe7861a4f4232ee13dd',1,'TextureData']]]
 ];

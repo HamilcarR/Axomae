@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['empty_0',['EMPTY',['../classCamera.html#a638f501aee229ba7e0cdda399e67e5d6a921d9dc8318d5968d983d3868af2858d',1,'Camera']]]
+  ['blinn_0',['BLINN',['../classShader.html#a0203e846cef6779a4b2935b50f671358a9f0e34f3edcf925286f480dce9f65dc8',1,'Shader']]]
 ];

@@ -77,34 +77,232 @@ $(function() {
   <div class="headertitle"><div class="title">ShaderDatabase Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p><a class="el" href="classShaderDatabase.html" title="ShaderDatabase class implementation.">ShaderDatabase</a> class implementation.  
+ <a href="classShaderDatabase.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="ShaderDatabase_8h_source.html">ShaderDatabase.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8381bbd6be7c847303d2f054725298a0"><td class="memItemLeft" align="right" valign="top"><a id="a8381bbd6be7c847303d2f054725298a0" name="a8381bbd6be7c847303d2f054725298a0"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>clean</b> ()</td></tr>
+<tr class="memitem:a8381bbd6be7c847303d2f054725298a0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classShaderDatabase.html#a8381bbd6be7c847303d2f054725298a0">clean</a> ()</td></tr>
+<tr class="memdesc:a8381bbd6be7c847303d2f054725298a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans the whole database , Deletes all shaders .  <br /></td></tr>
 <tr class="separator:a8381bbd6be7c847303d2f054725298a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad0c4f150170761334704d82258f72a9e"><td class="memItemLeft" align="right" valign="top"><a id="ad0c4f150170761334704d82258f72a9e" name="ad0c4f150170761334704d82258f72a9e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>destroy</b> ()</td></tr>
+<tr class="memitem:ad0c4f150170761334704d82258f72a9e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classShaderDatabase.html#ad0c4f150170761334704d82258f72a9e">destroy</a> ()</td></tr>
+<tr class="memdesc:ad0c4f150170761334704d82258f72a9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the database instance pointer.  <br /></td></tr>
 <tr class="separator:ad0c4f150170761334704d82258f72a9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18d1ea32ba357966c9c8af6308928b18"><td class="memItemLeft" align="right" valign="top"><a id="a18d1ea32ba357966c9c8af6308928b18" name="a18d1ea32ba357966c9c8af6308928b18"></a>
-<a class="el" href="classShader.html">Shader</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>addShader</b> (const std::string vertex_code, const std::string fragment_code, const Shader::TYPE type)</td></tr>
+<tr class="memitem:a18d1ea32ba357966c9c8af6308928b18"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classShader.html">Shader</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classShaderDatabase.html#a18d1ea32ba357966c9c8af6308928b18">addShader</a> (const std::string vertex_code, const std::string fragment_code, const <a class="el" href="classShader.html#a0203e846cef6779a4b2935b50f671358">Shader::TYPE</a> type)</td></tr>
+<tr class="memdesc:a18d1ea32ba357966c9c8af6308928b18"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function constructs a shader to the shader database if it does not already exist and returns the shader.  <br /></td></tr>
 <tr class="separator:a18d1ea32ba357966c9c8af6308928b18"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe8d473cdd1adcd396b578443170e97b"><td class="memItemLeft" align="right" valign="top"><a id="afe8d473cdd1adcd396b578443170e97b" name="afe8d473cdd1adcd396b578443170e97b"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>contains</b> (const Shader::TYPE type)</td></tr>
+<tr class="memitem:afe8d473cdd1adcd396b578443170e97b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classShaderDatabase.html#afe8d473cdd1adcd396b578443170e97b">contains</a> (const <a class="el" href="classShader.html#a0203e846cef6779a4b2935b50f671358">Shader::TYPE</a> type)</td></tr>
 <tr class="separator:afe8d473cdd1adcd396b578443170e97b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a00d763c30b47afb2142d2ab5717fafd1"><td class="memItemLeft" align="right" valign="top"><a id="a00d763c30b47afb2142d2ab5717fafd1" name="a00d763c30b47afb2142d2ab5717fafd1"></a>
-<a class="el" href="classShader.html">Shader</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>get</b> (Shader::TYPE type) const</td></tr>
+<tr class="memitem:a00d763c30b47afb2142d2ab5717fafd1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classShader.html">Shader</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classShaderDatabase.html#a00d763c30b47afb2142d2ab5717fafd1">get</a> (<a class="el" href="classShader.html#a0203e846cef6779a4b2935b50f671358">Shader::TYPE</a> type) const</td></tr>
 <tr class="separator:a00d763c30b47afb2142d2ab5717fafd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a38587edf289d89d7313325b5875f5586"><td class="memItemLeft" align="right" valign="top"><a id="a38587edf289d89d7313325b5875f5586" name="a38587edf289d89d7313325b5875f5586"></a>
-static <a class="el" href="classShaderDatabase.html">ShaderDatabase</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getInstance</b> ()</td></tr>
+<tr class="memitem:a38587edf289d89d7313325b5875f5586"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classShaderDatabase.html">ShaderDatabase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classShaderDatabase.html#a38587edf289d89d7313325b5875f5586">getInstance</a> ()</td></tr>
+<tr class="memdesc:a38587edf289d89d7313325b5875f5586"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the database unique instance.  <br /></td></tr>
 <tr class="separator:a38587edf289d89d7313325b5875f5586"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a85675db5892a47f6d317619ec00b4f95"><td class="memItemLeft" align="right" valign="top"><a id="a85675db5892a47f6d317619ec00b4f95" name="a85675db5892a47f6d317619ec00b4f95"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><b>isInstanced</b> ()</td></tr>
+<tr class="memitem:a85675db5892a47f6d317619ec00b4f95"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classShaderDatabase.html#a85675db5892a47f6d317619ec00b4f95">isInstanced</a> ()</td></tr>
+<tr class="memdesc:a85675db5892a47f6d317619ec00b4f95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if database is initialized.  <br /></td></tr>
 <tr class="separator:a85675db5892a47f6d317619ec00b4f95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p><a class="el" href="classShaderDatabase.html" title="ShaderDatabase class implementation.">ShaderDatabase</a> class implementation. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a18d1ea32ba357966c9c8af6308928b18" name="a18d1ea32ba357966c9c8af6308928b18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a18d1ea32ba357966c9c8af6308928b18">&#9670;&#160;</a></span>addShader()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classShader.html">Shader</a> * ShaderDatabase::addShader </td>
+          <td>(</td>
+          <td class="paramtype">const std::string&#160;</td>
+          <td class="paramname"><em>vertex_code</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string&#160;</td>
+          <td class="paramname"><em>fragment_code</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classShader.html#a0203e846cef6779a4b2935b50f671358">Shader::TYPE</a>&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>This function constructs a shader to the shader database if it does not already exist and returns the shader. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vertex_code</td><td>A string containing the source code for the vertex shader. </td></tr>
+    <tr><td class="paramname">fragment_code</td><td>A string containing the source code for the fragment shader. </td></tr>
+    <tr><td class="paramname">type</td><td>The type of shader being added to the shader database.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The function <code>addShader</code> returns a pointer to the constructed shader , or the existing one</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classShader.html#a0203e846cef6779a4b2935b50f671358" title="Shader types enumeration.">Shader::TYPE</a> </dd></dl>
+
+</div>
+</div>
+<a id="a8381bbd6be7c847303d2f054725298a0" name="a8381bbd6be7c847303d2f054725298a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8381bbd6be7c847303d2f054725298a0">&#9670;&#160;</a></span>clean()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ShaderDatabase::clean </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Cleans the whole database , Deletes all shaders . </p>
+
+</div>
+</div>
+<a id="afe8d473cdd1adcd396b578443170e97b" name="afe8d473cdd1adcd396b578443170e97b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe8d473cdd1adcd396b578443170e97b">&#9670;&#160;</a></span>contains()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool ShaderDatabase::contains </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classShader.html#a0203e846cef6779a4b2935b50f671358">Shader::TYPE</a>&#160;</td>
+          <td class="paramname"><em>type</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The function checks if a shader type exists in a shader database.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">type</td><td>The parameter "type" is of type <a class="el" href="classShader.html#a0203e846cef6779a4b2935b50f671358" title="Shader types enumeration.">Shader::TYPE</a>, which is an enumerated type representing different types of shaders (e.g. vertex shader, fragment shader, geometry shader, etc.). It is used to look up a shader in the shader_database map.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The function <code>contains</code> returns a boolean value indicating whether the <code>shader_database</code> contains a shader of the specified <code>type</code>. </dd></dl>
+
+</div>
+</div>
+<a id="ad0c4f150170761334704d82258f72a9e" name="ad0c4f150170761334704d82258f72a9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0c4f150170761334704d82258f72a9e">&#9670;&#160;</a></span>destroy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ShaderDatabase::destroy </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Removes the database instance pointer. </p>
+
+</div>
+</div>
+<a id="a00d763c30b47afb2142d2ab5717fafd1" name="a00d763c30b47afb2142d2ab5717fafd1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00d763c30b47afb2142d2ab5717fafd1">&#9670;&#160;</a></span>get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classShader.html">Shader</a> * ShaderDatabase::get </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classShader.html#a0203e846cef6779a4b2935b50f671358">Shader::TYPE</a>&#160;</td>
+          <td class="paramname"><em>type</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This function returns a pointer to a shader object of a given type from a shader database, or nullptr if it does not exist.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">type</td><td>The parameter "type" is of type <a class="el" href="classShader.html#a0203e846cef6779a4b2935b50f671358" title="Shader types enumeration.">Shader::TYPE</a>, which is an enumerated type representing different types of shaders (e.g. vertex shader, fragment shader, geometry shader, etc.). It is used to look up a shader in the shader_database map.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to a <a class="el" href="classShader.html" title="shaders classes implementation">Shader</a> object of the specified type if it exists in the shader_database map. If the shader of the specified type does not exist in the map, the function returns a null pointer. </dd></dl>
+
+</div>
+</div>
+<a id="a38587edf289d89d7313325b5875f5586" name="a38587edf289d89d7313325b5875f5586"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38587edf289d89d7313325b5875f5586">&#9670;&#160;</a></span>getInstance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classShaderDatabase.html">ShaderDatabase</a> * ShaderDatabase::getInstance </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the database unique instance. </p>
+<dl class="section return"><dt>Returns</dt><dd>ShaderDatabase* The unique instance of the <a class="el" href="classShaderDatabase.html" title="ShaderDatabase class implementation.">ShaderDatabase</a> </dd></dl>
+
+</div>
+</div>
+<a id="a85675db5892a47f6d317619ec00b4f95" name="a85675db5892a47f6d317619ec00b4f95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85675db5892a47f6d317619ec00b4f95">&#9670;&#160;</a></span>isInstanced()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool ShaderDatabase::isInstanced </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if database is initialized. </p>
+<dl class="section return"><dt>Returns</dt><dd>true If the database is initialized </dd></dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/hamilcar/Desktop/projects/Axomae/includes/<a class="el" href="ShaderDatabase_8h_source.html">ShaderDatabase.h</a></li>
 </ul>

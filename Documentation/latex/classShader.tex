@@ -1,5 +1,14 @@
 \hypertarget{classShader}{}\doxysection{Shader Class Reference}
 \label{classShader}\index{Shader@{Shader}}
+
+
+shaders classes implementation  
+
+
+
+
+{\ttfamily \#include $<$Shader.\+h$>$}
+
 Inheritance diagram for Shader\+:\begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -9,126 +18,620 @@ Inheritance diagram for Shader\+:\begin{figure}[H]
 \doxysubsection*{Public Types}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classShader_a0203e846cef6779a4b2935b50f671358}\label{classShader_a0203e846cef6779a4b2935b50f671358}} 
-enum {\bfseries TYPE} \+: signed \{ {\bfseries GENERIC} = 0
-, {\bfseries BLINN} = 1
-, {\bfseries CUBEMAP} = 2
-, {\bfseries PBR} = 3
+enum \mbox{\hyperlink{classShader_a0203e846cef6779a4b2935b50f671358}{TYPE}} \+: signed \{ \mbox{\hyperlink{classShader_a0203e846cef6779a4b2935b50f671358aef916f95a8dacfd179e97c1bbf7c17f9}{GENERIC}} = 0
+, \mbox{\hyperlink{classShader_a0203e846cef6779a4b2935b50f671358a9f0e34f3edcf925286f480dce9f65dc8}{BLINN}} = 1
+, \mbox{\hyperlink{classShader_a0203e846cef6779a4b2935b50f671358acac6be8b92db1b809167082321a8c66b}{CUBEMAP}} = 2
+, \mbox{\hyperlink{classShader_a0203e846cef6779a4b2935b50f671358ad35b1a25e4d351a3ac783884d9183b57}{PBR}} = 3
  \}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em \mbox{\hyperlink{classShader}{Shader}} types enumeration. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classShader_a15f39315b0f86f9605fb0ce2f9e7eca8}\label{classShader_a15f39315b0f86f9605fb0ce2f9e7eca8}} 
-{\bfseries Shader} (const std\+::string vertex\+\_\+code, const std\+::string fragment\+\_\+code)
-\item 
-\mbox{\Hypertarget{classShader_a427606203c305a04668131570dc9e102}\label{classShader_a427606203c305a04668131570dc9e102}} 
-virtual void {\bfseries initialize\+Shader} ()
-\item 
-\mbox{\Hypertarget{classShader_aa54f63c5d63fa62e81adf12f3f91f5d3}\label{classShader_aa54f63c5d63fa62e81adf12f3f91f5d3}} 
-virtual void {\bfseries bind} ()
-\item 
-\mbox{\Hypertarget{classShader_aa3f910dc8083dfce96cc3a673aebdd4f}\label{classShader_aa3f910dc8083dfce96cc3a673aebdd4f}} 
-virtual void {\bfseries release} ()
-\item 
-\mbox{\Hypertarget{classShader_a36744fb7217617758377f1c8925ab7d8}\label{classShader_a36744fb7217617758377f1c8925ab7d8}} 
-virtual void {\bfseries clean} ()
-\item 
-\mbox{\Hypertarget{classShader_a3b3609068c7e1cdc3bdd880c4487e0a5}\label{classShader_a3b3609068c7e1cdc3bdd880c4487e0a5}} 
-virtual void {\bfseries set\+Shaders\+Raw\+Text} (std\+::string vs, std\+::string fs)
-\item 
-\mbox{\Hypertarget{classShader_ad6c075a3526bbeca0cf6d370aef7ca3f}\label{classShader_ad6c075a3526bbeca0cf6d370aef7ca3f}} 
-void {\bfseries set\+Scene\+Camera\+Pointer} (\mbox{\hyperlink{classCamera}{Camera}} $\ast$camera)
-\item 
-\mbox{\Hypertarget{classShader_afc9540c313934df4a91d3058c938a114}\label{classShader_afc9540c313934df4a91d3058c938a114}} 
-virtual void {\bfseries update\+Camera} ()
-\item 
-\mbox{\Hypertarget{classShader_a2945c569c5a473e6d5b93444488c2ff7}\label{classShader_a2945c569c5a473e6d5b93444488c2ff7}} 
-void {\bfseries set\+Camera\+Position\+Uniform} ()
-\item 
-\mbox{\Hypertarget{classShader_a5f73993ba11c8822ca6651ba0b88b37c}\label{classShader_a5f73993ba11c8822ca6651ba0b88b37c}} 
-void {\bfseries set\+All\+Matrices\+Uniforms} (const glm\+::mat4 \&model)
-\item 
-\mbox{\Hypertarget{classShader_adb7e1c5e26bcfe855c95025fab210eb6}\label{classShader_adb7e1c5e26bcfe855c95025fab210eb6}} 
-void {\bfseries set\+All\+Matrices\+Uniforms} (const glm\+::mat4 \&projection, const glm\+::mat4 \&view, const glm\+::mat4 \&model)
-\item 
-\mbox{\Hypertarget{classShader_a42099342f3dc8f1c2a95989410943093}\label{classShader_a42099342f3dc8f1c2a95989410943093}} 
-void {\bfseries set\+Normal\+Matrix\+Uniform} (const glm\+::mat4 \&model)
-\item 
-\mbox{\Hypertarget{classShader_a53edc9982f9f737d7d7a5e1072661736}\label{classShader_a53edc9982f9f737d7d7a5e1072661736}} 
-void {\bfseries set\+Inverse\+Model\+Matrix\+Uniform} (const glm\+::mat4 \&model)
-\item 
-\mbox{\Hypertarget{classShader_a97798a0124e96b35eef077e744acee6c}\label{classShader_a97798a0124e96b35eef077e744acee6c}} 
-void {\bfseries set\+Inverse\+Model\+View\+Matrix\+Uniform} (const glm\+::mat4 \&view, const glm\+::mat4 \&model)
-\item 
-\mbox{\Hypertarget{classShader_a1bbde57221f13534243c9b9b5f00186c}\label{classShader_a1bbde57221f13534243c9b9b5f00186c}} 
-void {\bfseries set\+Model\+Matrix\+Uniform} (const glm\+::mat4 \&matrix)
-\item 
-\mbox{\Hypertarget{classShader_a0512463666d499f9ce155fa283cc040e}\label{classShader_a0512463666d499f9ce155fa283cc040e}} 
-void {\bfseries set\+Model\+View\+Projection} (const glm\+::mat4 \&model)
-\item 
-\mbox{\Hypertarget{classShader_a96f300d70220ffd4d583963ebe963faa}\label{classShader_a96f300d70220ffd4d583963ebe963faa}} 
-void {\bfseries set\+Model\+View\+Projection} (const glm\+::mat4 \&projection, const glm\+::mat4 \&view, const glm\+::mat4 \&model)
-\item 
-\mbox{\Hypertarget{classShader_ac0d0921d8d7f0dad2c22bb356016ad22}\label{classShader_ac0d0921d8d7f0dad2c22bb356016ad22}} 
-void {\bfseries enable\+Attribute\+Array} (GLuint att)
-\item 
-\mbox{\Hypertarget{classShader_ac5e050fdb23fd00a5d8163f74886cfd1}\label{classShader_ac5e050fdb23fd00a5d8163f74886cfd1}} 
-void {\bfseries set\+Attribute\+Buffer} (GLuint location, GLenum type, int offset, int tuplesize, int stride=0)
-\item 
-\mbox{\Hypertarget{classShader_a260a02013baf685878645cd8dc331510}\label{classShader_a260a02013baf685878645cd8dc331510}} 
-{\footnotesize template$<$typename T $>$ }\\void {\bfseries set\+Uniform} (const char $\ast$name, const T value)
-\end{DoxyCompactItemize}
+\mbox{\hyperlink{classShader_a0d654ebaca4e0555197c0724c6d30610}{Shader}} ()
+\begin{DoxyCompactList}\small\item\em This is a constructor for a \mbox{\hyperlink{classShader}{Shader}} class that sets the type to GENERIC. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classShader_a15f39315b0f86f9605fb0ce2f9e7eca8}{Shader}} (const std\+::string vertex\+\_\+code, const std\+::string fragment\+\_\+code)
+\begin{DoxyCompactList}\small\item\em This is a constructor function for a \mbox{\hyperlink{classShader}{Shader}} class that takes in vertex and fragment shader code as input. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classShader_a08345855be88781faf704487119af9a8}{$\sim$\+Shader}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the \mbox{\hyperlink{classShader}{Shader}} object. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classShader_a427606203c305a04668131570dc9e102}{initialize\+Shader}} ()
+\begin{DoxyCompactList}\small\item\em This function initializes a shader program by compiling and linking vertex and fragment shaders. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classShader_aa54f63c5d63fa62e81adf12f3f91f5d3}{bind}} ()
+\begin{DoxyCompactList}\small\item\em Binds the shader. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classShader_aa3f910dc8083dfce96cc3a673aebdd4f}{release}} ()
+\begin{DoxyCompactList}\small\item\em Releases the shader by setting gl\+Use\+Program to 0. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classShader_a36744fb7217617758377f1c8925ab7d8}{clean}} ()
+\begin{DoxyCompactList}\small\item\em Cleans up the shader. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classShader_a3b3609068c7e1cdc3bdd880c4487e0a5}{set\+Shaders\+Raw\+Text}} (std\+::string vs, std\+::string fs)
+\begin{DoxyCompactList}\small\item\em Set the Shaders source code for compilation. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_ad6c075a3526bbeca0cf6d370aef7ca3f}{set\+Scene\+Camera\+Pointer}} (\mbox{\hyperlink{classCamera}{Camera}} $\ast$camera)
+\begin{DoxyCompactList}\small\item\em Set the Scene \mbox{\hyperlink{classCamera}{Camera}} Pointer. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classShader_afc9540c313934df4a91d3058c938a114}{update\+Camera}} ()
+\begin{DoxyCompactList}\small\item\em Updates the camera computations. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_a2945c569c5a473e6d5b93444488c2ff7}{set\+Camera\+Position\+Uniform}} ()
+\begin{DoxyCompactList}\small\item\em Set the \mbox{\hyperlink{classCamera}{Camera}} Position vector uniforms in the shader. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_a5f73993ba11c8822ca6651ba0b88b37c}{set\+All\+Matrices\+Uniforms}} (const glm\+::mat4 \&model)
+\begin{DoxyCompactList}\small\item\em Set all matrices uniforms in the shader, like projection , view , model etc. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_adb7e1c5e26bcfe855c95025fab210eb6}{set\+All\+Matrices\+Uniforms}} (const glm\+::mat4 \&projection, const glm\+::mat4 \&view, const glm\+::mat4 \&model)
+\begin{DoxyCompactList}\small\item\em Set all necessary matrices uniforms in the shader. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_a42099342f3dc8f1c2a95989410943093}{set\+Normal\+Matrix\+Uniform}} (const glm\+::mat4 \&model)
+\begin{DoxyCompactList}\small\item\em Normal Matrix for transforming normal vectors alongside the model\+: computed from the invert modelview matrix and set from here automatically. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_a53edc9982f9f737d7d7a5e1072661736}{set\+Inverse\+Model\+Matrix\+Uniform}} (const glm\+::mat4 \&model)
+\begin{DoxyCompactList}\small\item\em Set the Inverse Model Matrix Uniform object. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_a97798a0124e96b35eef077e744acee6c}{set\+Inverse\+Model\+View\+Matrix\+Uniform}} (const glm\+::mat4 \&view, const glm\+::mat4 \&model)
+\begin{DoxyCompactList}\small\item\em Set the inverse Model\+View matrix uniform. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_ace11a78545bbcd093dbef70a84faa19a}{set\+Model\+Matrix\+Uniform}} (const glm\+::mat4 \&model)
+\begin{DoxyCompactList}\small\item\em Set the Model Matrix Uniform object. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_a0512463666d499f9ce155fa283cc040e}{set\+Model\+View\+Projection}} (const glm\+::mat4 \&model)
+\begin{DoxyCompactList}\small\item\em Set the Model\+View\+Projection Matrix uniforms. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_a96f300d70220ffd4d583963ebe963faa}{set\+Model\+View\+Projection}} (const glm\+::mat4 \&projection, const glm\+::mat4 \&view, const glm\+::mat4 \&model)
+\begin{DoxyCompactList}\small\item\em Set the Model View Projection uniforms. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_ac0d0921d8d7f0dad2c22bb356016ad22}{enable\+Attribute\+Array}} (GLuint att)
+\begin{DoxyCompactList}\small\item\em GL API function wrapper for Enable\+Vertex\+Attrib\+Array. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_ac5e050fdb23fd00a5d8163f74886cfd1}{set\+Attribute\+Buffer}} (GLuint location, GLenum \mbox{\hyperlink{classShader_a7bc3617135171404f98f4f61952c002d}{type}}, int offset, int tuplesize, int stride=0)
+\begin{DoxyCompactList}\small\item\em GL API wrapper for gl\+Vertex\+Attrib\+Pointer. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\void \mbox{\hyperlink{classShader_a260a02013baf685878645cd8dc331510}{set\+Uniform}} (const char $\ast$name, const T value)
+\begin{DoxyCompactList}\small\item\em Set a generic uniform in the shader. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Protected Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classShader_ac23427f5f357cfe1a711f67121757ef7}\label{classShader_ac23427f5f357cfe1a711f67121757ef7}} 
-virtual void {\bfseries set\+Texture\+Uniforms} ()
-\item 
-\mbox{\Hypertarget{classShader_a95d72666599e5f9497864d0b1ee02f6c}\label{classShader_a95d72666599e5f9497864d0b1ee02f6c}} 
-void {\bfseries set\+Uniform\+Value} (int location, const int value)
-\item 
-\mbox{\Hypertarget{classShader_aeaa1ef5885e87ebd73bcd2486e7982d1}\label{classShader_aeaa1ef5885e87ebd73bcd2486e7982d1}} 
-void {\bfseries set\+Uniform\+Value} (int location, const glm\+::mat4 \&value)
-\item 
-\mbox{\Hypertarget{classShader_aac86a80383693e87bcd70dec4375a4ce}\label{classShader_aac86a80383693e87bcd70dec4375a4ce}} 
-void {\bfseries set\+Uniform\+Value} (int location, const glm\+::mat3 \&value)
-\item 
-\mbox{\Hypertarget{classShader_a7c33165988921bf7f0c5817b936a0238}\label{classShader_a7c33165988921bf7f0c5817b936a0238}} 
-void {\bfseries set\+Uniform\+Value} (int location, const glm\+::vec4 \&value)
-\item 
-\mbox{\Hypertarget{classShader_a31ca33afc8ddb0e7e4d350685b5e59d3}\label{classShader_a31ca33afc8ddb0e7e4d350685b5e59d3}} 
-void {\bfseries set\+Uniform\+Value} (int location, const glm\+::vec3 \&value)
-\item 
-\mbox{\Hypertarget{classShader_ab14e5295156f4531deaa9b4b1b56fa10}\label{classShader_ab14e5295156f4531deaa9b4b1b56fa10}} 
-void {\bfseries set\+Uniform\+Value} (int location, const glm\+::vec2 \&value)
-\end{DoxyCompactItemize}
+virtual void \mbox{\hyperlink{classShader_ac23427f5f357cfe1a711f67121757ef7}{set\+Texture\+Uniforms}} ()
+\begin{DoxyCompactList}\small\item\em Set all the \mbox{\hyperlink{classTexture}{Texture}} Uniforms. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_a95d72666599e5f9497864d0b1ee02f6c}{set\+Uniform\+Value}} (int location, const int value)
+\begin{DoxyCompactList}\small\item\em Set the Uniform Value for an int. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_aeaa1ef5885e87ebd73bcd2486e7982d1}{set\+Uniform\+Value}} (int location, const glm\+::mat4 \&value)
+\begin{DoxyCompactList}\small\item\em Set the Uniform Value for a 4x4 matrix. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_aac86a80383693e87bcd70dec4375a4ce}{set\+Uniform\+Value}} (int location, const glm\+::mat3 \&value)
+\begin{DoxyCompactList}\small\item\em Set the Uniform Value for 3x3 matrix. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_a7c33165988921bf7f0c5817b936a0238}{set\+Uniform\+Value}} (int location, const glm\+::vec4 \&value)
+\begin{DoxyCompactList}\small\item\em Set the Uniform Value for a vec4. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_a31ca33afc8ddb0e7e4d350685b5e59d3}{set\+Uniform\+Value}} (int location, const glm\+::vec3 \&value)
+\begin{DoxyCompactList}\small\item\em Set the Uniform Value for a vec3. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classShader_ab14e5295156f4531deaa9b4b1b56fa10}{set\+Uniform\+Value}} (int location, const glm\+::vec2 \&value)
+\begin{DoxyCompactList}\small\item\em Set the Uniform Value for a vec2. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classShader_a7bc3617135171404f98f4f61952c002d}\label{classShader_a7bc3617135171404f98f4f61952c002d}} 
-TYPE {\bfseries type}
+\mbox{\hyperlink{classShader_a0203e846cef6779a4b2935b50f671358}{TYPE}} \mbox{\hyperlink{classShader_a7bc3617135171404f98f4f61952c002d}{type}}
 \item 
-\mbox{\Hypertarget{classShader_a6ee6ac3b6b630eb4b0c2cb784cdcef11}\label{classShader_a6ee6ac3b6b630eb4b0c2cb784cdcef11}} 
-unsigned int {\bfseries shader\+\_\+program}
+unsigned int \mbox{\hyperlink{classShader_a6ee6ac3b6b630eb4b0c2cb784cdcef11}{shader\+\_\+program}}
 \item 
-\mbox{\Hypertarget{classShader_a48c43c0b53f034ed45f26a7ecbbc81cd}\label{classShader_a48c43c0b53f034ed45f26a7ecbbc81cd}} 
-unsigned int {\bfseries fragment\+\_\+shader}
+unsigned int \mbox{\hyperlink{classShader_a48c43c0b53f034ed45f26a7ecbbc81cd}{fragment\+\_\+shader}}
 \item 
-\mbox{\Hypertarget{classShader_a24d37cdd3f7dcd63aea0caf30c820055}\label{classShader_a24d37cdd3f7dcd63aea0caf30c820055}} 
-unsigned int {\bfseries vertex\+\_\+shader}
+unsigned int \mbox{\hyperlink{classShader_a24d37cdd3f7dcd63aea0caf30c820055}{vertex\+\_\+shader}}
 \item 
-\mbox{\Hypertarget{classShader_aa273218863d3dce5f4c0dd7559737f52}\label{classShader_aa273218863d3dce5f4c0dd7559737f52}} 
-std\+::string {\bfseries fragment\+\_\+shader\+\_\+txt}
+std\+::string \mbox{\hyperlink{classShader_aa273218863d3dce5f4c0dd7559737f52}{fragment\+\_\+shader\+\_\+txt}}
 \item 
-\mbox{\Hypertarget{classShader_a8da7f581286760c5ed17069c45673d7b}\label{classShader_a8da7f581286760c5ed17069c45673d7b}} 
-std\+::string {\bfseries vertex\+\_\+shader\+\_\+txt}
+std\+::string \mbox{\hyperlink{classShader_a8da7f581286760c5ed17069c45673d7b}{vertex\+\_\+shader\+\_\+txt}}
 \item 
-\mbox{\Hypertarget{classShader_a8e1532d7ee62d57d53482b8742ea7695}\label{classShader_a8e1532d7ee62d57d53482b8742ea7695}} 
-\mbox{\hyperlink{classCamera}{Camera}} $\ast$ {\bfseries camera\+\_\+pointer}
+\mbox{\hyperlink{classCamera}{Camera}} $\ast$ \mbox{\hyperlink{classShader_a8e1532d7ee62d57d53482b8742ea7695}{camera\+\_\+pointer}}
 \end{DoxyCompactItemize}
 
 
+\doxysubsection{Detailed Description}
+shaders classes implementation 
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\mbox{\Hypertarget{classShader_a0203e846cef6779a4b2935b50f671358}\label{classShader_a0203e846cef6779a4b2935b50f671358}} 
+\index{Shader@{Shader}!TYPE@{TYPE}}
+\index{TYPE@{TYPE}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{TYPE}{TYPE}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{classShader_a0203e846cef6779a4b2935b50f671358}{Shader\+::\+TYPE}} \+: signed}
+
+
+
+\mbox{\hyperlink{classShader}{Shader}} types enumeration. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{GENERIC@{GENERIC}!Shader@{Shader}}\index{Shader@{Shader}!GENERIC@{GENERIC}}}\mbox{\Hypertarget{classShader_a0203e846cef6779a4b2935b50f671358aef916f95a8dacfd179e97c1bbf7c17f9}\label{classShader_a0203e846cef6779a4b2935b50f671358aef916f95a8dacfd179e97c1bbf7c17f9}} 
+GENERIC&Undefined shader type \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BLINN@{BLINN}!Shader@{Shader}}\index{Shader@{Shader}!BLINN@{BLINN}}}\mbox{\Hypertarget{classShader_a0203e846cef6779a4b2935b50f671358a9f0e34f3edcf925286f480dce9f65dc8}\label{classShader_a0203e846cef6779a4b2935b50f671358a9f0e34f3edcf925286f480dce9f65dc8}} 
+BLINN&Blinn-\/\+Phong shader \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CUBEMAP@{CUBEMAP}!Shader@{Shader}}\index{Shader@{Shader}!CUBEMAP@{CUBEMAP}}}\mbox{\Hypertarget{classShader_a0203e846cef6779a4b2935b50f671358acac6be8b92db1b809167082321a8c66b}\label{classShader_a0203e846cef6779a4b2935b50f671358acac6be8b92db1b809167082321a8c66b}} 
+CUBEMAP&shader used for displaying the environment map \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PBR@{PBR}!Shader@{Shader}}\index{Shader@{Shader}!PBR@{PBR}}}\mbox{\Hypertarget{classShader_a0203e846cef6779a4b2935b50f671358ad35b1a25e4d351a3ac783884d9183b57}\label{classShader_a0203e846cef6779a4b2935b50f671358ad35b1a25e4d351a3ac783884d9183b57}} 
+PBR&PBR shader type \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classShader_a0d654ebaca4e0555197c0724c6d30610}\label{classShader_a0d654ebaca4e0555197c0724c6d30610}} 
+\index{Shader@{Shader}!Shader@{Shader}}
+\index{Shader@{Shader}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{Shader()}{Shader()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Shader\+::\+Shader (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+This is a constructor for a \mbox{\hyperlink{classShader}{Shader}} class that sets the type to GENERIC. 
+
+\mbox{\Hypertarget{classShader_a15f39315b0f86f9605fb0ce2f9e7eca8}\label{classShader_a15f39315b0f86f9605fb0ce2f9e7eca8}} 
+\index{Shader@{Shader}!Shader@{Shader}}
+\index{Shader@{Shader}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{Shader()}{Shader()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Shader\+::\+Shader (\begin{DoxyParamCaption}\item[{const std\+::string}]{vertex\+\_\+code,  }\item[{const std\+::string}]{fragment\+\_\+code }\end{DoxyParamCaption})}
+
+
+
+This is a constructor function for a \mbox{\hyperlink{classShader}{Shader}} class that takes in vertex and fragment shader code as input. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em vertex\+\_\+code} & A string containing the source code for the vertex shader of the shader program. \\
+\hline
+{\em fragment\+\_\+code} & The fragment shader code as a string. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_a08345855be88781faf704487119af9a8}\label{classShader_a08345855be88781faf704487119af9a8}} 
+\index{Shader@{Shader}!````~Shader@{$\sim$Shader}}
+\index{````~Shader@{$\sim$Shader}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{$\sim$Shader()}{~Shader()}}
+{\footnotesize\ttfamily virtual Shader\+::$\sim$\+Shader (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Destroy the \mbox{\hyperlink{classShader}{Shader}} object. 
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classShader_aa54f63c5d63fa62e81adf12f3f91f5d3}\label{classShader_aa54f63c5d63fa62e81adf12f3f91f5d3}} 
+\index{Shader@{Shader}!bind@{bind}}
+\index{bind@{bind}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{bind()}{bind()}}
+{\footnotesize\ttfamily virtual void Shader\+::bind (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Binds the shader. 
+
+\mbox{\Hypertarget{classShader_a36744fb7217617758377f1c8925ab7d8}\label{classShader_a36744fb7217617758377f1c8925ab7d8}} 
+\index{Shader@{Shader}!clean@{clean}}
+\index{clean@{clean}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{clean()}{clean()}}
+{\footnotesize\ttfamily virtual void Shader\+::clean (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Cleans up the shader. 
+
+\mbox{\Hypertarget{classShader_ac0d0921d8d7f0dad2c22bb356016ad22}\label{classShader_ac0d0921d8d7f0dad2c22bb356016ad22}} 
+\index{Shader@{Shader}!enableAttributeArray@{enableAttributeArray}}
+\index{enableAttributeArray@{enableAttributeArray}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{enableAttributeArray()}{enableAttributeArray()}}
+{\footnotesize\ttfamily void Shader\+::enable\+Attribute\+Array (\begin{DoxyParamCaption}\item[{GLuint}]{att }\end{DoxyParamCaption})}
+
+
+
+GL API function wrapper for Enable\+Vertex\+Attrib\+Array. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em att} & ID of the position enabled in the shader \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_a427606203c305a04668131570dc9e102}\label{classShader_a427606203c305a04668131570dc9e102}} 
+\index{Shader@{Shader}!initializeShader@{initializeShader}}
+\index{initializeShader@{initializeShader}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{initializeShader()}{initializeShader()}}
+{\footnotesize\ttfamily virtual void Shader\+::initialize\+Shader (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+This function initializes a shader program by compiling and linking vertex and fragment shaders. 
+
+\mbox{\Hypertarget{classShader_aa3f910dc8083dfce96cc3a673aebdd4f}\label{classShader_aa3f910dc8083dfce96cc3a673aebdd4f}} 
+\index{Shader@{Shader}!release@{release}}
+\index{release@{release}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{release()}{release()}}
+{\footnotesize\ttfamily virtual void Shader\+::release (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Releases the shader by setting gl\+Use\+Program to 0. 
+
+\mbox{\Hypertarget{classShader_a5f73993ba11c8822ca6651ba0b88b37c}\label{classShader_a5f73993ba11c8822ca6651ba0b88b37c}} 
+\index{Shader@{Shader}!setAllMatricesUniforms@{setAllMatricesUniforms}}
+\index{setAllMatricesUniforms@{setAllMatricesUniforms}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setAllMatricesUniforms()}{setAllMatricesUniforms()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Shader\+::set\+All\+Matrices\+Uniforms (\begin{DoxyParamCaption}\item[{const glm\+::mat4 \&}]{model }\end{DoxyParamCaption})}
+
+
+
+Set all matrices uniforms in the shader, like projection , view , model etc. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em model} & The model of the mesh using the shader \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{classShader_adb7e1c5e26bcfe855c95025fab210eb6}{set\+All\+Matrices\+Uniforms(const glm\+::mat4\& projection , const glm\+::mat4\& view , const glm\+::mat4\& model)}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{classShader_adb7e1c5e26bcfe855c95025fab210eb6}\label{classShader_adb7e1c5e26bcfe855c95025fab210eb6}} 
+\index{Shader@{Shader}!setAllMatricesUniforms@{setAllMatricesUniforms}}
+\index{setAllMatricesUniforms@{setAllMatricesUniforms}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setAllMatricesUniforms()}{setAllMatricesUniforms()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Shader\+::set\+All\+Matrices\+Uniforms (\begin{DoxyParamCaption}\item[{const glm\+::mat4 \&}]{projection,  }\item[{const glm\+::mat4 \&}]{view,  }\item[{const glm\+::mat4 \&}]{model }\end{DoxyParamCaption})}
+
+
+
+Set all necessary matrices uniforms in the shader. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em projection} & Projection matrix \\
+\hline
+{\em view} & View matrix \\
+\hline
+{\em model} & Model matrix of the mesh \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{classShader_a5f73993ba11c8822ca6651ba0b88b37c}{set\+All\+Matrices\+Uniforms(const glm\+::mat4\& model)}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{classShader_ac5e050fdb23fd00a5d8163f74886cfd1}\label{classShader_ac5e050fdb23fd00a5d8163f74886cfd1}} 
+\index{Shader@{Shader}!setAttributeBuffer@{setAttributeBuffer}}
+\index{setAttributeBuffer@{setAttributeBuffer}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setAttributeBuffer()}{setAttributeBuffer()}}
+{\footnotesize\ttfamily void Shader\+::set\+Attribute\+Buffer (\begin{DoxyParamCaption}\item[{GLuint}]{location,  }\item[{GLenum}]{type,  }\item[{int}]{offset,  }\item[{int}]{tuplesize,  }\item[{int}]{stride = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+
+
+GL API wrapper for gl\+Vertex\+Attrib\+Pointer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em location} & Location ID \\
+\hline
+{\em type} & GLenum type of each component in the array \\
+\hline
+{\em offset} & Unused \\
+\hline
+{\em tuplesize} & Number of component per vertex attribute \\
+\hline
+{\em stride} & Byte offset between attributes \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_a2945c569c5a473e6d5b93444488c2ff7}\label{classShader_a2945c569c5a473e6d5b93444488c2ff7}} 
+\index{Shader@{Shader}!setCameraPositionUniform@{setCameraPositionUniform}}
+\index{setCameraPositionUniform@{setCameraPositionUniform}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setCameraPositionUniform()}{setCameraPositionUniform()}}
+{\footnotesize\ttfamily void Shader\+::set\+Camera\+Position\+Uniform (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Set the \mbox{\hyperlink{classCamera}{Camera}} Position vector uniforms in the shader. 
+
+\mbox{\Hypertarget{classShader_a53edc9982f9f737d7d7a5e1072661736}\label{classShader_a53edc9982f9f737d7d7a5e1072661736}} 
+\index{Shader@{Shader}!setInverseModelMatrixUniform@{setInverseModelMatrixUniform}}
+\index{setInverseModelMatrixUniform@{setInverseModelMatrixUniform}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setInverseModelMatrixUniform()}{setInverseModelMatrixUniform()}}
+{\footnotesize\ttfamily void Shader\+::set\+Inverse\+Model\+Matrix\+Uniform (\begin{DoxyParamCaption}\item[{const glm\+::mat4 \&}]{model }\end{DoxyParamCaption})}
+
+
+
+Set the Inverse Model Matrix Uniform object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em model} & Model matrix of the mesh \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_a97798a0124e96b35eef077e744acee6c}\label{classShader_a97798a0124e96b35eef077e744acee6c}} 
+\index{Shader@{Shader}!setInverseModelViewMatrixUniform@{setInverseModelViewMatrixUniform}}
+\index{setInverseModelViewMatrixUniform@{setInverseModelViewMatrixUniform}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setInverseModelViewMatrixUniform()}{setInverseModelViewMatrixUniform()}}
+{\footnotesize\ttfamily void Shader\+::set\+Inverse\+Model\+View\+Matrix\+Uniform (\begin{DoxyParamCaption}\item[{const glm\+::mat4 \&}]{view,  }\item[{const glm\+::mat4 \&}]{model }\end{DoxyParamCaption})}
+
+
+
+Set the inverse Model\+View matrix uniform. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em view} & View matrix of the camera \\
+\hline
+{\em model} & Model matrix of the mesh \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_ace11a78545bbcd093dbef70a84faa19a}\label{classShader_ace11a78545bbcd093dbef70a84faa19a}} 
+\index{Shader@{Shader}!setModelMatrixUniform@{setModelMatrixUniform}}
+\index{setModelMatrixUniform@{setModelMatrixUniform}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setModelMatrixUniform()}{setModelMatrixUniform()}}
+{\footnotesize\ttfamily void Shader\+::set\+Model\+Matrix\+Uniform (\begin{DoxyParamCaption}\item[{const glm\+::mat4 \&}]{model }\end{DoxyParamCaption})}
+
+
+
+Set the Model Matrix Uniform object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em model} & Model matrix \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_a0512463666d499f9ce155fa283cc040e}\label{classShader_a0512463666d499f9ce155fa283cc040e}} 
+\index{Shader@{Shader}!setModelViewProjection@{setModelViewProjection}}
+\index{setModelViewProjection@{setModelViewProjection}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setModelViewProjection()}{setModelViewProjection()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Shader\+::set\+Model\+View\+Projection (\begin{DoxyParamCaption}\item[{const glm\+::mat4 \&}]{model }\end{DoxyParamCaption})}
+
+
+
+Set the Model\+View\+Projection Matrix uniforms. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em model} & Model matrix \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_a96f300d70220ffd4d583963ebe963faa}\label{classShader_a96f300d70220ffd4d583963ebe963faa}} 
+\index{Shader@{Shader}!setModelViewProjection@{setModelViewProjection}}
+\index{setModelViewProjection@{setModelViewProjection}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setModelViewProjection()}{setModelViewProjection()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Shader\+::set\+Model\+View\+Projection (\begin{DoxyParamCaption}\item[{const glm\+::mat4 \&}]{projection,  }\item[{const glm\+::mat4 \&}]{view,  }\item[{const glm\+::mat4 \&}]{model }\end{DoxyParamCaption})}
+
+
+
+Set the Model View Projection uniforms. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em projection} & Projection matrix \\
+\hline
+{\em view} & View matrix \\
+\hline
+{\em model} & Model matrix \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_a42099342f3dc8f1c2a95989410943093}\label{classShader_a42099342f3dc8f1c2a95989410943093}} 
+\index{Shader@{Shader}!setNormalMatrixUniform@{setNormalMatrixUniform}}
+\index{setNormalMatrixUniform@{setNormalMatrixUniform}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setNormalMatrixUniform()}{setNormalMatrixUniform()}}
+{\footnotesize\ttfamily void Shader\+::set\+Normal\+Matrix\+Uniform (\begin{DoxyParamCaption}\item[{const glm\+::mat4 \&}]{model }\end{DoxyParamCaption})}
+
+
+
+Normal Matrix for transforming normal vectors alongside the model\+: computed from the invert modelview matrix and set from here automatically. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em model} & Modelview matrix of the mesh \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_ad6c075a3526bbeca0cf6d370aef7ca3f}\label{classShader_ad6c075a3526bbeca0cf6d370aef7ca3f}} 
+\index{Shader@{Shader}!setSceneCameraPointer@{setSceneCameraPointer}}
+\index{setSceneCameraPointer@{setSceneCameraPointer}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setSceneCameraPointer()}{setSceneCameraPointer()}}
+{\footnotesize\ttfamily void Shader\+::set\+Scene\+Camera\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classCamera}{Camera}} $\ast$}]{camera }\end{DoxyParamCaption})}
+
+
+
+Set the Scene \mbox{\hyperlink{classCamera}{Camera}} Pointer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em camera} & Pointer on the main camera \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_a3b3609068c7e1cdc3bdd880c4487e0a5}\label{classShader_a3b3609068c7e1cdc3bdd880c4487e0a5}} 
+\index{Shader@{Shader}!setShadersRawText@{setShadersRawText}}
+\index{setShadersRawText@{setShadersRawText}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setShadersRawText()}{setShadersRawText()}}
+{\footnotesize\ttfamily virtual void Shader\+::set\+Shaders\+Raw\+Text (\begin{DoxyParamCaption}\item[{std\+::string}]{vs,  }\item[{std\+::string}]{fs }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Set the Shaders source code for compilation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em vs} & Vertex shader source code \\
+\hline
+{\em fs} & Fragment shader source code \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_ac23427f5f357cfe1a711f67121757ef7}\label{classShader_ac23427f5f357cfe1a711f67121757ef7}} 
+\index{Shader@{Shader}!setTextureUniforms@{setTextureUniforms}}
+\index{setTextureUniforms@{setTextureUniforms}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setTextureUniforms()}{setTextureUniforms()}}
+{\footnotesize\ttfamily virtual void Shader\+::set\+Texture\+Uniforms (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Set all the \mbox{\hyperlink{classTexture}{Texture}} Uniforms. 
+
+\mbox{\Hypertarget{classShader_a260a02013baf685878645cd8dc331510}\label{classShader_a260a02013baf685878645cd8dc331510}} 
+\index{Shader@{Shader}!setUniform@{setUniform}}
+\index{setUniform@{setUniform}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setUniform()}{setUniform()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void Shader\+::set\+Uniform (\begin{DoxyParamCaption}\item[{const char $\ast$}]{name,  }\item[{const T}]{value }\end{DoxyParamCaption})}
+
+
+
+Set a generic uniform in the shader. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & Type of the data \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em name} & \mbox{\hyperlink{classShader}{Shader}} uniform location name \\
+\hline
+{\em value} & Value to save \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_aac86a80383693e87bcd70dec4375a4ce}\label{classShader_aac86a80383693e87bcd70dec4375a4ce}} 
+\index{Shader@{Shader}!setUniformValue@{setUniformValue}}
+\index{setUniformValue@{setUniformValue}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setUniformValue()}{setUniformValue()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily void Shader\+::set\+Uniform\+Value (\begin{DoxyParamCaption}\item[{int}]{location,  }\item[{const glm\+::mat3 \&}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Set the Uniform Value for 3x3 matrix. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em location} & Uniform location \\
+\hline
+{\em value} & Value to be set \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_aeaa1ef5885e87ebd73bcd2486e7982d1}\label{classShader_aeaa1ef5885e87ebd73bcd2486e7982d1}} 
+\index{Shader@{Shader}!setUniformValue@{setUniformValue}}
+\index{setUniformValue@{setUniformValue}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setUniformValue()}{setUniformValue()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily void Shader\+::set\+Uniform\+Value (\begin{DoxyParamCaption}\item[{int}]{location,  }\item[{const glm\+::mat4 \&}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Set the Uniform Value for a 4x4 matrix. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em location} & Uniform location \\
+\hline
+{\em value} & Value to be set \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_ab14e5295156f4531deaa9b4b1b56fa10}\label{classShader_ab14e5295156f4531deaa9b4b1b56fa10}} 
+\index{Shader@{Shader}!setUniformValue@{setUniformValue}}
+\index{setUniformValue@{setUniformValue}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setUniformValue()}{setUniformValue()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily void Shader\+::set\+Uniform\+Value (\begin{DoxyParamCaption}\item[{int}]{location,  }\item[{const glm\+::vec2 \&}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Set the Uniform Value for a vec2. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em location} & Uniform location \\
+\hline
+{\em value} & Value to be set \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_a31ca33afc8ddb0e7e4d350685b5e59d3}\label{classShader_a31ca33afc8ddb0e7e4d350685b5e59d3}} 
+\index{Shader@{Shader}!setUniformValue@{setUniformValue}}
+\index{setUniformValue@{setUniformValue}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setUniformValue()}{setUniformValue()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily void Shader\+::set\+Uniform\+Value (\begin{DoxyParamCaption}\item[{int}]{location,  }\item[{const glm\+::vec3 \&}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Set the Uniform Value for a vec3. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em location} & Uniform location \\
+\hline
+{\em value} & Value to be set \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_a7c33165988921bf7f0c5817b936a0238}\label{classShader_a7c33165988921bf7f0c5817b936a0238}} 
+\index{Shader@{Shader}!setUniformValue@{setUniformValue}}
+\index{setUniformValue@{setUniformValue}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setUniformValue()}{setUniformValue()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily void Shader\+::set\+Uniform\+Value (\begin{DoxyParamCaption}\item[{int}]{location,  }\item[{const glm\+::vec4 \&}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Set the Uniform Value for a vec4. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em location} & Uniform location \\
+\hline
+{\em value} & Value to be set \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_a95d72666599e5f9497864d0b1ee02f6c}\label{classShader_a95d72666599e5f9497864d0b1ee02f6c}} 
+\index{Shader@{Shader}!setUniformValue@{setUniformValue}}
+\index{setUniformValue@{setUniformValue}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{setUniformValue()}{setUniformValue()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily void Shader\+::set\+Uniform\+Value (\begin{DoxyParamCaption}\item[{int}]{location,  }\item[{const int}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Set the Uniform Value for an int. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em location} & Uniform location \\
+\hline
+{\em value} & Value to be set \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classShader_afc9540c313934df4a91d3058c938a114}\label{classShader_afc9540c313934df4a91d3058c938a114}} 
+\index{Shader@{Shader}!updateCamera@{updateCamera}}
+\index{updateCamera@{updateCamera}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{updateCamera()}{updateCamera()}}
+{\footnotesize\ttfamily virtual void Shader\+::update\+Camera (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Updates the camera computations. 
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classShader_a8e1532d7ee62d57d53482b8742ea7695}\label{classShader_a8e1532d7ee62d57d53482b8742ea7695}} 
+\index{Shader@{Shader}!camera\_pointer@{camera\_pointer}}
+\index{camera\_pointer@{camera\_pointer}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{camera\_pointer}{camera\_pointer}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classCamera}{Camera}}$\ast$ Shader\+::camera\+\_\+pointer\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\hyperlink{classCamera}{Camera}} pointer \mbox{\Hypertarget{classShader_a48c43c0b53f034ed45f26a7ecbbc81cd}\label{classShader_a48c43c0b53f034ed45f26a7ecbbc81cd}} 
+\index{Shader@{Shader}!fragment\_shader@{fragment\_shader}}
+\index{fragment\_shader@{fragment\_shader}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{fragment\_shader}{fragment\_shader}}
+{\footnotesize\ttfamily unsigned int Shader\+::fragment\+\_\+shader\hspace{0.3cm}{\ttfamily [protected]}}
+
+Fragment shader ID \mbox{\Hypertarget{classShader_aa273218863d3dce5f4c0dd7559737f52}\label{classShader_aa273218863d3dce5f4c0dd7559737f52}} 
+\index{Shader@{Shader}!fragment\_shader\_txt@{fragment\_shader\_txt}}
+\index{fragment\_shader\_txt@{fragment\_shader\_txt}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{fragment\_shader\_txt}{fragment\_shader\_txt}}
+{\footnotesize\ttfamily std\+::string Shader\+::fragment\+\_\+shader\+\_\+txt\hspace{0.3cm}{\ttfamily [protected]}}
+
+Fragment shader source code \mbox{\Hypertarget{classShader_a6ee6ac3b6b630eb4b0c2cb784cdcef11}\label{classShader_a6ee6ac3b6b630eb4b0c2cb784cdcef11}} 
+\index{Shader@{Shader}!shader\_program@{shader\_program}}
+\index{shader\_program@{shader\_program}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{shader\_program}{shader\_program}}
+{\footnotesize\ttfamily unsigned int Shader\+::shader\+\_\+program\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\hyperlink{classShader}{Shader}} program ID \mbox{\Hypertarget{classShader_a7bc3617135171404f98f4f61952c002d}\label{classShader_a7bc3617135171404f98f4f61952c002d}} 
+\index{Shader@{Shader}!type@{type}}
+\index{type@{type}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classShader_a0203e846cef6779a4b2935b50f671358}{TYPE}} Shader\+::type\hspace{0.3cm}{\ttfamily [protected]}}
+
+Type of the shader \mbox{\Hypertarget{classShader_a24d37cdd3f7dcd63aea0caf30c820055}\label{classShader_a24d37cdd3f7dcd63aea0caf30c820055}} 
+\index{Shader@{Shader}!vertex\_shader@{vertex\_shader}}
+\index{vertex\_shader@{vertex\_shader}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{vertex\_shader}{vertex\_shader}}
+{\footnotesize\ttfamily unsigned int Shader\+::vertex\+\_\+shader\hspace{0.3cm}{\ttfamily [protected]}}
+
+Vertex shader ID \mbox{\Hypertarget{classShader_a8da7f581286760c5ed17069c45673d7b}\label{classShader_a8da7f581286760c5ed17069c45673d7b}} 
+\index{Shader@{Shader}!vertex\_shader\_txt@{vertex\_shader\_txt}}
+\index{vertex\_shader\_txt@{vertex\_shader\_txt}!Shader@{Shader}}
+\doxysubsubsection{\texorpdfstring{vertex\_shader\_txt}{vertex\_shader\_txt}}
+{\footnotesize\ttfamily std\+::string Shader\+::vertex\+\_\+shader\+\_\+txt\hspace{0.3cm}{\ttfamily [protected]}}
+
+Vertex shader source code 
+
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/home/hamilcar/\+Desktop/projects/\+Axomae/includes/Shader.\+h\end{DoxyCompactItemize}
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/\mbox{\hyperlink{Shader_8h}{Shader.\+h}}\end{DoxyCompactItemize}

@@ -70,7 +70,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>axomae</b></li><li class="navelem"><a class="el" href="classaxomae_1_1Loader.html">Loader</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespaceaxomae.html">axomae</a></li><li class="navelem"><a class="el" href="classaxomae_1_1Loader.html">Loader</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -80,25 +80,185 @@ $(function() {
   <div class="headertitle"><div class="title">axomae::Loader Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>3D <a class="el" href="classaxomae_1_1Loader.html" title="3D Loader class , implemented as a singleton">Loader</a> class , implemented as a singleton  
+ <a href="classaxomae_1_1Loader.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="Loader_8h_source.html">Loader.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ac500e3ae4b603f59d41ed4750a6ac407"><td class="memItemLeft" align="right" valign="top"><a id="ac500e3ae4b603f59d41ed4750a6ac407" name="ac500e3ae4b603f59d41ed4750a6ac407"></a>
-static <a class="el" href="classaxomae_1_1Loader.html">Loader</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getInstance</b> ()</td></tr>
+<tr class="memitem:ac500e3ae4b603f59d41ed4750a6ac407"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classaxomae_1_1Loader.html">Loader</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Loader.html#ac500e3ae4b603f59d41ed4750a6ac407">getInstance</a> ()</td></tr>
+<tr class="memdesc:ac500e3ae4b603f59d41ed4750a6ac407"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Instance <a class="el" href="classaxomae_1_1Loader.html" title="3D Loader class , implemented as a singleton">Loader</a> pointer.  <br /></td></tr>
 <tr class="separator:ac500e3ae4b603f59d41ed4750a6ac407"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5483d67328502539d4536bcb558860d5"><td class="memItemLeft" align="right" valign="top"><a id="a5483d67328502539d4536bcb558860d5" name="a5483d67328502539d4536bcb558860d5"></a>
-static std::vector&lt; <a class="el" href="classaxomae_1_1Mesh.html">Mesh</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>load</b> (const char *file)</td></tr>
+<tr class="memitem:a5483d67328502539d4536bcb558860d5"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="classaxomae_1_1Mesh.html">Mesh</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Loader.html#a5483d67328502539d4536bcb558860d5">load</a> (const char *file)</td></tr>
+<tr class="memdesc:a5483d67328502539d4536bcb558860d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a .glb file.  <br /></td></tr>
 <tr class="separator:a5483d67328502539d4536bcb558860d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a382102a6e90caf3ee2073eb976b0ab"><td class="memItemLeft" align="right" valign="top"><a id="a9a382102a6e90caf3ee2073eb976b0ab" name="a9a382102a6e90caf3ee2073eb976b0ab"></a>
-static std::string&#160;</td><td class="memItemRight" valign="bottom"><b>loadShader</b> (const char *filename)</td></tr>
+<tr class="memitem:a9a382102a6e90caf3ee2073eb976b0ab"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Loader.html#a9a382102a6e90caf3ee2073eb976b0ab">loadShader</a> (const char *filename)</td></tr>
+<tr class="memdesc:a9a382102a6e90caf3ee2073eb976b0ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads a shader file into an std::string.  <br /></td></tr>
 <tr class="separator:a9a382102a6e90caf3ee2073eb976b0ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed4b4f09a72bb3c1114518346074f848"><td class="memItemLeft" align="right" valign="top"><a id="aed4b4f09a72bb3c1114518346074f848" name="aed4b4f09a72bb3c1114518346074f848"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>close</b> ()</td></tr>
+<tr class="memitem:aed4b4f09a72bb3c1114518346074f848"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Loader.html#aed4b4f09a72bb3c1114518346074f848">close</a> ()</td></tr>
+<tr class="memdesc:aed4b4f09a72bb3c1114518346074f848"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete instance.  <br /></td></tr>
 <tr class="separator:aed4b4f09a72bb3c1114518346074f848"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3a36f2b3cc4cf842a1b4f6ee2a0cefb"><td class="memItemLeft" align="right" valign="top"><a id="aa3a36f2b3cc4cf842a1b4f6ee2a0cefb" name="aa3a36f2b3cc4cf842a1b4f6ee2a0cefb"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>loadShaderDatabase</b> ()</td></tr>
+<tr class="memitem:aa3a36f2b3cc4cf842a1b4f6ee2a0cefb"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaxomae_1_1Loader.html#aa3a36f2b3cc4cf842a1b4f6ee2a0cefb">loadShaderDatabase</a> ()</td></tr>
+<tr class="memdesc:aa3a36f2b3cc4cf842a1b4f6ee2a0cefb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build the shaders and put them into the shader database.  <br /></td></tr>
 <tr class="separator:aa3a36f2b3cc4cf842a1b4f6ee2a0cefb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>3D <a class="el" href="classaxomae_1_1Loader.html" title="3D Loader class , implemented as a singleton">Loader</a> class , implemented as a singleton </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aed4b4f09a72bb3c1114518346074f848" name="aed4b4f09a72bb3c1114518346074f848"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed4b4f09a72bb3c1114518346074f848">&#9670;&#160;</a></span>close()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void axomae::Loader::close </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Delete instance. </p>
+
+</div>
+</div>
+<a id="ac500e3ae4b603f59d41ed4750a6ac407" name="ac500e3ae4b603f59d41ed4750a6ac407"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac500e3ae4b603f59d41ed4750a6ac407">&#9670;&#160;</a></span>getInstance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classaxomae_1_1Loader.html">Loader</a> * axomae::Loader::getInstance </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the Instance <a class="el" href="classaxomae_1_1Loader.html" title="3D Loader class , implemented as a singleton">Loader</a> pointer. </p>
+<dl class="section return"><dt>Returns</dt><dd>Loader* </dd></dl>
+
+</div>
+</div>
+<a id="a5483d67328502539d4536bcb558860d5" name="a5483d67328502539d4536bcb558860d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5483d67328502539d4536bcb558860d5">&#9670;&#160;</a></span>load()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::vector&lt; <a class="el" href="classaxomae_1_1Mesh.html">Mesh</a> * &gt; axomae::Loader::load </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>file</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Load a .glb file. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">file</td><td>Path of the 3D glb model </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::vector&lt;Mesh*&gt; </dd></dl>
+
+</div>
+</div>
+<a id="a9a382102a6e90caf3ee2073eb976b0ab" name="a9a382102a6e90caf3ee2073eb976b0ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a382102a6e90caf3ee2073eb976b0ab">&#9670;&#160;</a></span>loadShader()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::string axomae::Loader::loadShader </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Loads a shader file into an std::string. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>Path of the shader </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::string </dd></dl>
+
+</div>
+</div>
+<a id="aa3a36f2b3cc4cf842a1b4f6ee2a0cefb" name="aa3a36f2b3cc4cf842a1b4f6ee2a0cefb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3a36f2b3cc4cf842a1b4f6ee2a0cefb">&#9670;&#160;</a></span>loadShaderDatabase()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void axomae::Loader::loadShaderDatabase </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Build the shaders and put them into the shader database. </p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/hamilcar/Desktop/projects/Axomae/includes/<a class="el" href="Loader_8h_source.html">Loader.h</a></li>
 </ul>

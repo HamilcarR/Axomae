@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['last_5frotation_0',['last_rotation',['../classArcballCamera.html#a282f5e2dc1993e0561403becbdab8eba',1,'ArcballCamera']]],
-  ['last_5ftranslation_1',['last_translation',['../classArcballCamera.html#a1fd9131f922c3d0efb757de924d48b0f',1,'ArcballCamera']]]
+  ['height_0',['height',['../classTextureData.html#a3af738270c0b5fa18ebf359e90f07eaf',1,'TextureData::height()'],['../classTexture.html#ab4b01ae73439cbcc210a5977e227a880',1,'Texture::height()']]]
 ];

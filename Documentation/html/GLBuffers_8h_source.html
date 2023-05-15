@@ -77,50 +77,79 @@ $(function() {
   <div class="headertitle"><div class="title">GLBuffers.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef GLBUFFERS_H</span></div>
+<a href="GLBuffers_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef GLBUFFERS_H</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define GLBUFFERS_H</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;utils_3D.h&quot;</span> </div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno"><a class="line" href="classGLBuffers.html">    6</a></span><span class="keyword">class </span><a class="code hl_class" href="classGLBuffers.html">GLBuffers</a>{</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>    <a class="code hl_class" href="classGLBuffers.html">GLBuffers</a>();</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    <a class="code hl_class" href="classGLBuffers.html">GLBuffers</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structaxomae_1_1Object3D.html">axomae::Object3D</a> *geometry) ; </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    <span class="keyword">virtual</span> <a class="code hl_class" href="classGLBuffers.html">~GLBuffers</a>();</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    <span class="keywordtype">void</span> setGeometryPointer(<span class="keyword">const</span> <a class="code hl_struct" href="structaxomae_1_1Object3D.html">axomae::Object3D</a> *geo){geometry = geo;} ; </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    <span class="keywordtype">void</span> initializeBuffers();</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    <span class="keywordtype">bool</span> isReady(); </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="keywordtype">void</span> clean(); </div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    <span class="keywordtype">void</span> bindVao();</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    <span class="keywordtype">void</span> unbindVao(); </div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    <span class="keywordtype">void</span> bindVertexBuffer(); </div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    <span class="keywordtype">void</span> bindNormalBuffer(); </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <span class="keywordtype">void</span> bindTextureBuffer(); </div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <span class="keywordtype">void</span> bindColorBuffer(); </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keywordtype">void</span> bindIndexBuffer();</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordtype">void</span> bindTangentBuffer();</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="keywordtype">void</span> fillBuffers(); </div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    GLuint vao ; </div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    GLuint vertex_buffer ; </div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    GLuint normal_buffer ; </div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    GLuint index_buffer ; </div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    GLuint texture_buffer ;</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    GLuint color_buffer ;</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    GLuint tangent_buffer ; </div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keyword">const</span> <a class="code hl_struct" href="structaxomae_1_1Object3D.html">axomae::Object3D</a> *geometry; </div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>}; </div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="aclassGLBuffers_html"><div class="ttname"><a href="classGLBuffers.html">GLBuffers</a></div><div class="ttdef"><b>Definition:</b> GLBuffers.h:6</div></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;utils_3D.h&quot;</span> </div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="classGLBuffers.html">   16</a></span><span class="keyword">class </span><a class="code hl_class" href="classGLBuffers.html">GLBuffers</a>{</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classGLBuffers.html#a01dfa0c99b30695b12a4dc056dfb2526">   23</a></span>    <a class="code hl_function" href="classGLBuffers.html#a01dfa0c99b30695b12a4dc056dfb2526">GLBuffers</a>();</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classGLBuffers.html#afed4464808e226eeac74392308b1d26e">   31</a></span>    <a class="code hl_function" href="classGLBuffers.html#afed4464808e226eeac74392308b1d26e">GLBuffers</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structaxomae_1_1Object3D.html">axomae::Object3D</a> *geometry) ; </div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    </div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="classGLBuffers.html#a6b92a57f8285a73484762703500e48fe">   37</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classGLBuffers.html#a6b92a57f8285a73484762703500e48fe">~GLBuffers</a>();</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classGLBuffers.html#a7d118bae65ebe3164cd9d594be3acb2f">   44</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classGLBuffers.html#a7d118bae65ebe3164cd9d594be3acb2f">setGeometryPointer</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structaxomae_1_1Object3D.html">axomae::Object3D</a> *geo){geometry = geo;} ; </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="classGLBuffers.html#a5d928bfea9a7b91621a9cf0feb1800df">   50</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classGLBuffers.html#a5d928bfea9a7b91621a9cf0feb1800df">initializeBuffers</a>();</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="classGLBuffers.html#a9155d747890787354f67269ba76e6056">   57</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classGLBuffers.html#a9155d747890787354f67269ba76e6056">isReady</a>(); </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno"><a class="line" href="classGLBuffers.html#a759438b91c2317f50a7103d97d91c388">   63</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classGLBuffers.html#a759438b91c2317f50a7103d97d91c388">clean</a>(); </div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    </div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="classGLBuffers.html#a61784a2399c9885ef2fafee582cceaf2">   69</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classGLBuffers.html#a61784a2399c9885ef2fafee582cceaf2">bindVao</a>();</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    </div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="classGLBuffers.html#a6af23c09da24f706d2a223885a474449">   75</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classGLBuffers.html#a6af23c09da24f706d2a223885a474449">unbindVao</a>(); </div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno"><a class="line" href="classGLBuffers.html#aafec50e57bc1dd90c6f478710b576ae0">   81</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classGLBuffers.html#aafec50e57bc1dd90c6f478710b576ae0">bindVertexBuffer</a>(); </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    </div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno"><a class="line" href="classGLBuffers.html#a87187f75a49f8929bc13f9950e943d42">   87</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classGLBuffers.html#a87187f75a49f8929bc13f9950e943d42">bindNormalBuffer</a>(); </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    </div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="classGLBuffers.html#acccbf59a8be0eb947fed1ba50d4b3813">   93</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classGLBuffers.html#acccbf59a8be0eb947fed1ba50d4b3813">bindTextureBuffer</a>(); </div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    </div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno"><a class="line" href="classGLBuffers.html#a393ebcd9be750437e6434c2ba0e6ddf9">   99</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classGLBuffers.html#a393ebcd9be750437e6434c2ba0e6ddf9">bindColorBuffer</a>(); </div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    </div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno"><a class="line" href="classGLBuffers.html#a36c26e5e8944c7e407413d8a8b729526">  105</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classGLBuffers.html#a36c26e5e8944c7e407413d8a8b729526">bindIndexBuffer</a>();</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    </div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno"><a class="line" href="classGLBuffers.html#af368e5539a43947849c871d5f5280e66">  111</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classGLBuffers.html#af368e5539a43947849c871d5f5280e66">bindTangentBuffer</a>();</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno"><a class="line" href="classGLBuffers.html#a7c9505637157d270c5014dba2bdbc9d6">  117</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classGLBuffers.html#a7c9505637157d270c5014dba2bdbc9d6">fillBuffers</a>(); </div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    GLuint vao ;                        </div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    GLuint vertex_buffer ;              </div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    GLuint normal_buffer ;              </div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    GLuint index_buffer ;               </div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    GLuint texture_buffer ;             </div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    GLuint color_buffer ;               </div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>    GLuint tangent_buffer ;             </div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    <span class="keyword">const</span> <a class="code hl_struct" href="structaxomae_1_1Object3D.html">axomae::Object3D</a> *geometry;   </div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>}; </div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span> </div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span> </div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span> </div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aclassGLBuffers_html"><div class="ttname"><a href="classGLBuffers.html">GLBuffers</a></div><div class="ttdoc">Wrapper class for Opengl buffer functions.</div><div class="ttdef"><b>Definition:</b> GLBuffers.h:16</div></div>
+<div class="ttc" id="aclassGLBuffers_html_a01dfa0c99b30695b12a4dc056dfb2526"><div class="ttname"><a href="classGLBuffers.html#a01dfa0c99b30695b12a4dc056dfb2526">GLBuffers::GLBuffers</a></div><div class="ttdeci">GLBuffers()</div><div class="ttdoc">Construct a new GLBuffers object.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_a36c26e5e8944c7e407413d8a8b729526"><div class="ttname"><a href="classGLBuffers.html#a36c26e5e8944c7e407413d8a8b729526">GLBuffers::bindIndexBuffer</a></div><div class="ttdeci">void bindIndexBuffer()</div><div class="ttdoc">Binds the index buffer object.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_a393ebcd9be750437e6434c2ba0e6ddf9"><div class="ttname"><a href="classGLBuffers.html#a393ebcd9be750437e6434c2ba0e6ddf9">GLBuffers::bindColorBuffer</a></div><div class="ttdeci">void bindColorBuffer()</div><div class="ttdoc">Binds the color buffer object.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_a5d928bfea9a7b91621a9cf0feb1800df"><div class="ttname"><a href="classGLBuffers.html#a5d928bfea9a7b91621a9cf0feb1800df">GLBuffers::initializeBuffers</a></div><div class="ttdeci">void initializeBuffers()</div><div class="ttdoc">Initialize glGenBuffers for all vertex attributes.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_a61784a2399c9885ef2fafee582cceaf2"><div class="ttname"><a href="classGLBuffers.html#a61784a2399c9885ef2fafee582cceaf2">GLBuffers::bindVao</a></div><div class="ttdeci">void bindVao()</div><div class="ttdoc">Binds the vertex array object of the mesh.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_a6af23c09da24f706d2a223885a474449"><div class="ttname"><a href="classGLBuffers.html#a6af23c09da24f706d2a223885a474449">GLBuffers::unbindVao</a></div><div class="ttdeci">void unbindVao()</div><div class="ttdoc">Unbind the vertex array object.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_a6b92a57f8285a73484762703500e48fe"><div class="ttname"><a href="classGLBuffers.html#a6b92a57f8285a73484762703500e48fe">GLBuffers::~GLBuffers</a></div><div class="ttdeci">virtual ~GLBuffers()</div><div class="ttdoc">Destroy the GLBuffers object.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_a759438b91c2317f50a7103d97d91c388"><div class="ttname"><a href="classGLBuffers.html#a759438b91c2317f50a7103d97d91c388">GLBuffers::clean</a></div><div class="ttdeci">void clean()</div><div class="ttdoc">Delete GL buffers and VAOs of the mesh.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_a7c9505637157d270c5014dba2bdbc9d6"><div class="ttname"><a href="classGLBuffers.html#a7c9505637157d270c5014dba2bdbc9d6">GLBuffers::fillBuffers</a></div><div class="ttdeci">void fillBuffers()</div><div class="ttdoc">Transfers data to GPU using glBufferData on all vertex buffers.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_a7d118bae65ebe3164cd9d594be3acb2f"><div class="ttname"><a href="classGLBuffers.html#a7d118bae65ebe3164cd9d594be3acb2f">GLBuffers::setGeometryPointer</a></div><div class="ttdeci">void setGeometryPointer(const axomae::Object3D *geo)</div><div class="ttdoc">Sets the current geometry pointer.</div><div class="ttdef"><b>Definition:</b> GLBuffers.h:44</div></div>
+<div class="ttc" id="aclassGLBuffers_html_a87187f75a49f8929bc13f9950e943d42"><div class="ttname"><a href="classGLBuffers.html#a87187f75a49f8929bc13f9950e943d42">GLBuffers::bindNormalBuffer</a></div><div class="ttdeci">void bindNormalBuffer()</div><div class="ttdoc">Binds the normal buffer object.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_a9155d747890787354f67269ba76e6056"><div class="ttname"><a href="classGLBuffers.html#a9155d747890787354f67269ba76e6056">GLBuffers::isReady</a></div><div class="ttdeci">bool isReady()</div><div class="ttdoc">Checks if VAOs and VBOs are initialized.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_aafec50e57bc1dd90c6f478710b576ae0"><div class="ttname"><a href="classGLBuffers.html#aafec50e57bc1dd90c6f478710b576ae0">GLBuffers::bindVertexBuffer</a></div><div class="ttdeci">void bindVertexBuffer()</div><div class="ttdoc">Binds the vertex buffer object.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_acccbf59a8be0eb947fed1ba50d4b3813"><div class="ttname"><a href="classGLBuffers.html#acccbf59a8be0eb947fed1ba50d4b3813">GLBuffers::bindTextureBuffer</a></div><div class="ttdeci">void bindTextureBuffer()</div><div class="ttdoc">Binds the texture buffer object.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_af368e5539a43947849c871d5f5280e66"><div class="ttname"><a href="classGLBuffers.html#af368e5539a43947849c871d5f5280e66">GLBuffers::bindTangentBuffer</a></div><div class="ttdeci">void bindTangentBuffer()</div><div class="ttdoc">Binds the tangent buffer object.</div></div>
+<div class="ttc" id="aclassGLBuffers_html_afed4464808e226eeac74392308b1d26e"><div class="ttname"><a href="classGLBuffers.html#afed4464808e226eeac74392308b1d26e">GLBuffers::GLBuffers</a></div><div class="ttdeci">GLBuffers(const axomae::Object3D *geometry)</div><div class="ttdoc">Construct a new GLBuffers object.</div></div>
 <div class="ttc" id="astructaxomae_1_1Object3D_html"><div class="ttname"><a href="structaxomae_1_1Object3D.html">axomae::Object3D</a></div><div class="ttdef"><b>Definition:</b> utils_3D.h:41</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

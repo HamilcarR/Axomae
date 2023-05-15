@@ -1,8 +1,10 @@
 var searchData=
 [
-  ['object3d_0',['Object3D',['../structaxomae_1_1Object3D.html',1,'axomae']]],
-  ['onleftclick_1',['onLeftClick',['../classCamera.html#afb1720a64dfbddc9da333541faad09df',1,'Camera::onLeftClick()'],['../classArcballCamera.html#ad0b2db990013b3775a7700462859e8ee',1,'ArcballCamera::onLeftClick()'],['../classFreePerspectiveCamera.html#a9f8e71d9ca6730e406e9b71ccdabefe9',1,'FreePerspectiveCamera::onLeftClick()']]],
-  ['onleftclickrelease_2',['onLeftClickRelease',['../classCamera.html#abe39a6cea50dd8d3217f35f11fbbae5e',1,'Camera::onLeftClickRelease()'],['../classArcballCamera.html#ab99d0b1e02d222c9b24f99dbe36cdf0e',1,'ArcballCamera::onLeftClickRelease()'],['../classFreePerspectiveCamera.html#a311e0e0f642e177e1c3f7f93ab1c62ef',1,'FreePerspectiveCamera::onLeftClickRelease()']]],
-  ['onrightclick_3',['onRightClick',['../classCamera.html#a15653d76e5e3d61cac2cd3252ab904db',1,'Camera::onRightClick()'],['../classArcballCamera.html#a9b09410b4758ff34a3afddbee7c9cbc6',1,'ArcballCamera::onRightClick()'],['../classFreePerspectiveCamera.html#a91397eaa20d59ae3a82428d5eb194be2',1,'FreePerspectiveCamera::onRightClick()']]],
-  ['onrightclickrelease_4',['onRightClickRelease',['../classCamera.html#ae2bb9a4bcf77818eeee5689c3d5ee2e8',1,'Camera::onRightClickRelease()'],['../classArcballCamera.html#ab901a104ed5359b8341838e3f9eb05d2',1,'ArcballCamera::onRightClickRelease()'],['../classFreePerspectiveCamera.html#aaabdc68a90778782f978f7e786170f3c',1,'FreePerspectiveCamera::onRightClickRelease()']]]
+  ['name_0',['name',['../classaxomae_1_1Mesh.html#a6f165e415046a0e95860004de83a0fd8',1,'axomae::Mesh::name()'],['../classTextureData.html#a4f726a08fe49420f5b74fb438bbea396',1,'TextureData::name()'],['../classTexture.html#a89ca5996442a334121098ebaa3f9f959',1,'Texture::name()']]],
+  ['ndc_5fmouse_5flast_5fposition_1',['ndc_mouse_last_position',['../classArcballCamera.html#af6dd15b8b61c0aa3d1ca62f1cf65c0a1',1,'ArcballCamera']]],
+  ['ndc_5fmouse_5fposition_2',['ndc_mouse_position',['../classArcballCamera.html#a7097860b9e8bcfb92c9092fe9c843811',1,'ArcballCamera']]],
+  ['ndc_5fmouse_5fstart_5fposition_3',['ndc_mouse_start_position',['../classArcballCamera.html#a0a1f3f0d78060998a22e392b042bc4c8',1,'ArcballCamera']]],
+  ['near_4',['near',['../classCamera.html#ad96efd3e1e4ec33dddb1d25f05d02ff2',1,'Camera']]],
+  ['next_5fmesh_5',['next_mesh',['../classaxomae_1_1GUIWindow.html#a018495a752777db7b1a60eab3869b23b',1,'axomae::GUIWindow']]],
+  ['normaltexture_6',['NormalTexture',['../classNormalTexture.html',1,'NormalTexture'],['../classNormalTexture.html#ab670f05e1278f1050c18f44794b1c9f4',1,'NormalTexture::NormalTexture()'],['../classNormalTexture.html#a0673ffb1647b43c3daf6cd2ef2d5b179',1,'NormalTexture::NormalTexture(TextureData *data)']]]
 ];

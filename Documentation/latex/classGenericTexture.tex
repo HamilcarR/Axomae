@@ -9,57 +9,53 @@ Inheritance diagram for Generic\+Texture\+:\begin{figure}[H]
 \doxysubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classGenericTexture_a2b01e63f32862e164d07a01569616b2c}\label{classGenericTexture_a2b01e63f32862e164d07a01569616b2c}} 
-{\bfseries Generic\+Texture} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$data)
-\item 
-virtual void \mbox{\hyperlink{classGenericTexture_a887e450fdd6ff54a888a946ffc03ccd0}{set\+Gl\+Data}} ()
-\item 
+\mbox{\hyperlink{classGenericTexture_a8595ad48a985941038e07fa8150d8b8f}{Generic\+Texture}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new Generic \mbox{\hyperlink{classTexture}{Texture}} object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classGenericTexture_a2b01e63f32862e164d07a01569616b2c}{Generic\+Texture}} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$\mbox{\hyperlink{classTexture_adfe232cc4d823d873b2e2eb35d11af2a}{data}})
+\begin{DoxyCompactList}\small\item\em Construct a new Generic \mbox{\hyperlink{classTexture}{Texture}} object. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classGenericTexture_ac8720a0b012033d7821dda1c48b60dd0}{$\sim$\+Generic\+Texture}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the Generic \mbox{\hyperlink{classTexture}{Texture}} object. \end{DoxyCompactList}\item 
 virtual void \mbox{\hyperlink{classGenericTexture_a899c394962f17577ca66d767a89b8cf7}{bind\+Texture}} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Bind the texture using gl\+Bind\+Texture. \end{DoxyCompactList}\item 
 virtual void \mbox{\hyperlink{classGenericTexture_afe40cd1b4f49fd2a1eb34e190214d75e}{unbind\+Texture}} ()
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Unbind texture. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classGenericTexture_a887e450fdd6ff54a888a946ffc03ccd0}{set\+Gl\+Data}} ()
+\begin{DoxyCompactList}\small\item\em Set the Open\+GL texture data infos. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsubsection*{Public Member Functions inherited from \mbox{\hyperlink{classTexture}{Texture}}}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classTexture_ab2d871f55dfd7f278914ea5dfef3c12a}\label{classTexture_ab2d871f55dfd7f278914ea5dfef3c12a}} 
-{\bfseries Texture} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$tex)
-\item 
-\mbox{\Hypertarget{classTexture_a65f98c2bc79bc91c8aeed02eb0695fd0}\label{classTexture_a65f98c2bc79bc91c8aeed02eb0695fd0}} 
-void {\bfseries set} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$texture)
-\item 
-\mbox{\Hypertarget{classTexture_a2d0283525256389a133f23d0933e207e}\label{classTexture_a2d0283525256389a133f23d0933e207e}} 
-void {\bfseries clean} ()
-\item 
-\mbox{\Hypertarget{classTexture_a3d146627c648426c0f3096451483ce3c}\label{classTexture_a3d146627c648426c0f3096451483ce3c}} 
-void {\bfseries set\+Texture\+Type} (TYPE type)
-\item 
-\mbox{\Hypertarget{classTexture_aa7f1bffe6fe55d92799aebff9bc1919a}\label{classTexture_aa7f1bffe6fe55d92799aebff9bc1919a}} 
-TYPE {\bfseries get\+Texture\+Type} ()
-\item 
-\mbox{\Hypertarget{classTexture_a297a48c11cf62a12ad6a23395e1dd46c}\label{classTexture_a297a48c11cf62a12ad6a23395e1dd46c}} 
-virtual void {\bfseries bind\+Texture} ()=0
-\item 
-\mbox{\Hypertarget{classTexture_a7bef4a5acc61f41c2bb958fdd6b910d1}\label{classTexture_a7bef4a5acc61f41c2bb958fdd6b910d1}} 
-virtual void {\bfseries unbind\+Texture} ()=0
-\item 
-\mbox{\Hypertarget{classTexture_a4a21bebd62df4e91826ed21d23b89165}\label{classTexture_a4a21bebd62df4e91826ed21d23b89165}} 
-virtual void {\bfseries set\+Gl\+Data} ()=0
-\item 
-\mbox{\Hypertarget{classTexture_ae127c522ca6a943775101dc9e8039d8f}\label{classTexture_ae127c522ca6a943775101dc9e8039d8f}} 
-void {\bfseries clean\+Gl\+Data} ()
-\end{DoxyCompactItemize}
+\mbox{\hyperlink{classTexture_a6c275e3f186675ff6ed73ccf970e552f}{Texture}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new empty \mbox{\hyperlink{classTexture}{Texture}} object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classTexture_ab2d871f55dfd7f278914ea5dfef3c12a}{Texture}} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$tex)
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{classTexture}{Texture}} object from texture data. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classTexture_a4eaff28a38f061c3ed1a21ef210e7030}{$\sim$\+Texture}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the \mbox{\hyperlink{classTexture}{Texture}} object. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classTexture_a65f98c2bc79bc91c8aeed02eb0695fd0}{set}} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$texture)
+\begin{DoxyCompactList}\small\item\em Sets the raw data. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classTexture_a2d0283525256389a133f23d0933e207e}{clean}} ()
+\begin{DoxyCompactList}\small\item\em Cleans the texture. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classTexture_a3d146627c648426c0f3096451483ce3c}{set\+Texture\+Type}} (\mbox{\hyperlink{classTexture_ac1974514d0c1fc17c0f422a63f349376}{TYPE}} type)
+\begin{DoxyCompactList}\small\item\em Set the \mbox{\hyperlink{classTexture}{Texture}} Type object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classTexture_ac1974514d0c1fc17c0f422a63f349376}{TYPE}} \mbox{\hyperlink{classTexture_aa7f1bffe6fe55d92799aebff9bc1919a}{get\+Texture\+Type}} ()
+\begin{DoxyCompactList}\small\item\em Get the \mbox{\hyperlink{classTexture}{Texture}} Type. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classTexture_a297a48c11cf62a12ad6a23395e1dd46c}{bind\+Texture}} ()=0
+\begin{DoxyCompactList}\small\item\em Bind the texture using gl\+Bind\+Texture. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classTexture_a7bef4a5acc61f41c2bb958fdd6b910d1}{unbind\+Texture}} ()=0
+\begin{DoxyCompactList}\small\item\em Unbind texture. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classTexture_a4a21bebd62df4e91826ed21d23b89165}{set\+Gl\+Data}} ()=0
+\begin{DoxyCompactList}\small\item\em Set the Open\+GL texture data infos. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classTexture_ae127c522ca6a943775101dc9e8039d8f}{clean\+Gl\+Data}} ()
+\begin{DoxyCompactList}\small\item\em Release Opengl data. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classGenericTexture_a4ede0e76203c76ee3361fc8a65c4aae6}\label{classGenericTexture_a4ede0e76203c76ee3361fc8a65c4aae6}} 
-static const char $\ast$ {\bfseries get\+Texture\+Type\+CStr} ()
-\end{DoxyCompactItemize}
+static const char $\ast$ \mbox{\hyperlink{classGenericTexture_a4ede0e76203c76ee3361fc8a65c4aae6}{get\+Texture\+Type\+CStr}} ()
+\begin{DoxyCompactList}\small\item\em Get the texture string description. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Additional Inherited Members}
 \doxysubsubsection*{Public Types inherited from \mbox{\hyperlink{classTexture}{Texture}}}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classTexture_ac1974514d0c1fc17c0f422a63f349376}\label{classTexture_ac1974514d0c1fc17c0f422a63f349376}} 
-enum {\bfseries TYPE} \+: signed \{ \newline
+enum \mbox{\hyperlink{classTexture_ac1974514d0c1fc17c0f422a63f349376}{TYPE}} \+: signed \{ \newline
 {\bfseries EMPTY} = -\/1
 , {\bfseries DIFFUSE} = 0
 , {\bfseries NORMAL} = 1
@@ -73,31 +69,66 @@ enum {\bfseries TYPE} \+: signed \{ \newline
 {\bfseries CUBEMAP} = 7
 , {\bfseries GENERIC} = 8
  \}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Type of the texture. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classTexture}{Texture}}}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classTexture_a14df145286d1b1114c4db94685dd368c}\label{classTexture_a14df145286d1b1114c4db94685dd368c}} 
-virtual void {\bfseries initialize\+Texture2D} ()
-\end{DoxyCompactItemize}
+virtual void \mbox{\hyperlink{classTexture_a14df145286d1b1114c4db94685dd368c}{initialize\+Texture2D}} ()
+\begin{DoxyCompactList}\small\item\em Initialize texture filters , mipmaps and gl\+Tex\+Image2D. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsubsection*{Protected Attributes inherited from \mbox{\hyperlink{classTexture}{Texture}}}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classTexture_a89ca5996442a334121098ebaa3f9f959}\label{classTexture_a89ca5996442a334121098ebaa3f9f959}} 
-TYPE {\bfseries name}
+\mbox{\hyperlink{classTexture_ac1974514d0c1fc17c0f422a63f349376}{TYPE}} \mbox{\hyperlink{classTexture_a89ca5996442a334121098ebaa3f9f959}{name}}
 \item 
-\mbox{\Hypertarget{classTexture_a5d81cb05821b158ded3d5a46a4cd8f5a}\label{classTexture_a5d81cb05821b158ded3d5a46a4cd8f5a}} 
-unsigned int {\bfseries width}
+unsigned int \mbox{\hyperlink{classTexture_a5d81cb05821b158ded3d5a46a4cd8f5a}{width}}
 \item 
-\mbox{\Hypertarget{classTexture_ab4b01ae73439cbcc210a5977e227a880}\label{classTexture_ab4b01ae73439cbcc210a5977e227a880}} 
-unsigned int {\bfseries height}
+unsigned int \mbox{\hyperlink{classTexture_ab4b01ae73439cbcc210a5977e227a880}{height}}
 \item 
-\mbox{\Hypertarget{classTexture_adfe232cc4d823d873b2e2eb35d11af2a}\label{classTexture_adfe232cc4d823d873b2e2eb35d11af2a}} 
-uint32\+\_\+t $\ast$ {\bfseries data}
+uint32\+\_\+t $\ast$ \mbox{\hyperlink{classTexture_adfe232cc4d823d873b2e2eb35d11af2a}{data}}
 \item 
-\mbox{\Hypertarget{classTexture_a557c44467fc0a8f66a579a2d6bb708cd}\label{classTexture_a557c44467fc0a8f66a579a2d6bb708cd}} 
-unsigned int {\bfseries sampler2D}
+unsigned int \mbox{\hyperlink{classTexture_a557c44467fc0a8f66a579a2d6bb708cd}{sampler2D}}
 \end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classGenericTexture_a8595ad48a985941038e07fa8150d8b8f}\label{classGenericTexture_a8595ad48a985941038e07fa8150d8b8f}} 
+\index{GenericTexture@{GenericTexture}!GenericTexture@{GenericTexture}}
+\index{GenericTexture@{GenericTexture}!GenericTexture@{GenericTexture}}
+\doxysubsubsection{\texorpdfstring{GenericTexture()}{GenericTexture()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Generic\+Texture\+::\+Generic\+Texture (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Construct a new Generic \mbox{\hyperlink{classTexture}{Texture}} object. 
+
+\mbox{\Hypertarget{classGenericTexture_a2b01e63f32862e164d07a01569616b2c}\label{classGenericTexture_a2b01e63f32862e164d07a01569616b2c}} 
+\index{GenericTexture@{GenericTexture}!GenericTexture@{GenericTexture}}
+\index{GenericTexture@{GenericTexture}!GenericTexture@{GenericTexture}}
+\doxysubsubsection{\texorpdfstring{GenericTexture()}{GenericTexture()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Generic\+Texture\+::\+Generic\+Texture (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$}]{data }\end{DoxyParamCaption})}
+
+
+
+Construct a new Generic \mbox{\hyperlink{classTexture}{Texture}} object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Raw texture data \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{classTextureData}{Texture\+Data}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{classGenericTexture_ac8720a0b012033d7821dda1c48b60dd0}\label{classGenericTexture_ac8720a0b012033d7821dda1c48b60dd0}} 
+\index{GenericTexture@{GenericTexture}!````~GenericTexture@{$\sim$GenericTexture}}
+\index{````~GenericTexture@{$\sim$GenericTexture}!GenericTexture@{GenericTexture}}
+\doxysubsubsection{\texorpdfstring{$\sim$GenericTexture()}{~GenericTexture()}}
+{\footnotesize\ttfamily virtual Generic\+Texture\+::$\sim$\+Generic\+Texture (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Destroy the Generic \mbox{\hyperlink{classTexture}{Texture}} object. 
+
 
 
 \doxysubsection{Member Function Documentation}
@@ -109,8 +140,25 @@ unsigned int {\bfseries sampler2D}
 
 
 
-Implements \mbox{\hyperlink{classTexture}{Texture}}.
+Bind the texture using gl\+Bind\+Texture. 
 
+
+
+Implements \mbox{\hyperlink{classTexture_a297a48c11cf62a12ad6a23395e1dd46c}{Texture}}.
+
+\mbox{\Hypertarget{classGenericTexture_a4ede0e76203c76ee3361fc8a65c4aae6}\label{classGenericTexture_a4ede0e76203c76ee3361fc8a65c4aae6}} 
+\index{GenericTexture@{GenericTexture}!getTextureTypeCStr@{getTextureTypeCStr}}
+\index{getTextureTypeCStr@{getTextureTypeCStr}!GenericTexture@{GenericTexture}}
+\doxysubsubsection{\texorpdfstring{getTextureTypeCStr()}{getTextureTypeCStr()}}
+{\footnotesize\ttfamily static const char $\ast$ Generic\+Texture\+::get\+Texture\+Type\+CStr (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Get the texture string description. 
+
+\begin{DoxyReturn}{Returns}
+C string 
+\end{DoxyReturn}
 \mbox{\Hypertarget{classGenericTexture_a887e450fdd6ff54a888a946ffc03ccd0}\label{classGenericTexture_a887e450fdd6ff54a888a946ffc03ccd0}} 
 \index{GenericTexture@{GenericTexture}!setGlData@{setGlData}}
 \index{setGlData@{setGlData}!GenericTexture@{GenericTexture}}
@@ -119,7 +167,11 @@ Implements \mbox{\hyperlink{classTexture}{Texture}}.
 
 
 
-Implements \mbox{\hyperlink{classTexture}{Texture}}.
+Set the Open\+GL texture data infos. 
+
+
+
+Implements \mbox{\hyperlink{classTexture_a4a21bebd62df4e91826ed21d23b89165}{Texture}}.
 
 \mbox{\Hypertarget{classGenericTexture_afe40cd1b4f49fd2a1eb34e190214d75e}\label{classGenericTexture_afe40cd1b4f49fd2a1eb34e190214d75e}} 
 \index{GenericTexture@{GenericTexture}!unbindTexture@{unbindTexture}}
@@ -129,10 +181,14 @@ Implements \mbox{\hyperlink{classTexture}{Texture}}.
 
 
 
-Implements \mbox{\hyperlink{classTexture}{Texture}}.
+Unbind texture. 
+
+
+
+Implements \mbox{\hyperlink{classTexture_a7bef4a5acc61f41c2bb958fdd6b910d1}{Texture}}.
 
 
 
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/home/hamilcar/\+Desktop/projects/\+Axomae/includes/Texture.\+h\end{DoxyCompactItemize}
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/\mbox{\hyperlink{Texture_8h}{Texture.\+h}}\end{DoxyCompactItemize}

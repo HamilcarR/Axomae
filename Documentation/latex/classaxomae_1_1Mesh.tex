@@ -1,5 +1,14 @@
 \hypertarget{classaxomae_1_1Mesh}{}\doxysection{axomae\+::Mesh Class Reference}
 \label{classaxomae_1_1Mesh}\index{axomae::Mesh@{axomae::Mesh}}
+
+
+\mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} class.  
+
+
+
+
+{\ttfamily \#include $<$Mesh.\+h$>$}
+
 Inheritance diagram for axomae\+::Mesh\+:\begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -9,8 +18,7 @@ Inheritance diagram for axomae\+::Mesh\+:\begin{figure}[H]
 \doxysubsection*{Public Types}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_addbf715595bf6a1b5d994732d10834eb}\label{classaxomae_1_1Mesh_addbf715595bf6a1b5d994732d10834eb}} 
-enum {\bfseries DEPTHFUNC} \+: GLenum \{ \newline
+enum \mbox{\hyperlink{classaxomae_1_1Mesh_addbf715595bf6a1b5d994732d10834eb}{DEPTHFUNC}} \+: GLenum \{ \newline
 {\bfseries NEVER} = GL\+\_\+\+NEVER
 , {\bfseries LESS} = GL\+\_\+\+LESS
 , {\bfseries EQUAL} = GL\+\_\+\+EQUAL
@@ -21,95 +29,400 @@ enum {\bfseries DEPTHFUNC} \+: GLenum \{ \newline
 , {\bfseries NOT\+\_\+\+EQUAL} = GL\+\_\+\+NOTEQUAL
 , {\bfseries ALWAYS} = GL\+\_\+\+ALWAYS
  \}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Behavior of the depth function for the mesh. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_af60885e207709da3a30ff07711ebc28b}\label{classaxomae_1_1Mesh_af60885e207709da3a30ff07711ebc28b}} 
-{\bfseries Mesh} (const \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} \&copy)
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_aa4da45ed1cdd2025946d4f8f6c5ac85b}\label{classaxomae_1_1Mesh_aa4da45ed1cdd2025946d4f8f6c5ac85b}} 
-{\bfseries Mesh} (\mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}} const \&obj, \mbox{\hyperlink{classMaterial}{Material}} const \&mat)
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_ad3d65d626340310c06300c1774d6a328}\label{classaxomae_1_1Mesh_ad3d65d626340310c06300c1774d6a328}} 
-{\bfseries Mesh} (std\+::string name, \mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}} const \&obj, \mbox{\hyperlink{classMaterial}{Material}} const \&mat)
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a77fa7a9e140d218871d80838b15b7ade}\label{classaxomae_1_1Mesh_a77fa7a9e140d218871d80838b15b7ade}} 
-virtual void {\bfseries bind\+Materials} ()
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_ab32fd163f57cd40a85b0eb7b5948908e}\label{classaxomae_1_1Mesh_ab32fd163f57cd40a85b0eb7b5948908e}} 
-virtual void {\bfseries bind\+Shaders} ()
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a34a4c92d18adedb64258462ef9fac300}\label{classaxomae_1_1Mesh_a34a4c92d18adedb64258462ef9fac300}} 
-virtual void {\bfseries release\+Shaders} ()
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a772b5cf069b059476e37b1944433105b}\label{classaxomae_1_1Mesh_a772b5cf069b059476e37b1944433105b}} 
-virtual void {\bfseries clean} ()
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a05297d810fac6b40209184ced7b69077}\label{classaxomae_1_1Mesh_a05297d810fac6b40209184ced7b69077}} 
-virtual bool {\bfseries is\+Initialized} ()
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_ac1163e88a24c3e53ee3b7fc5c733ed4a}\label{classaxomae_1_1Mesh_ac1163e88a24c3e53ee3b7fc5c733ed4a}} 
-virtual void {\bfseries initialize\+Gl\+Data} ()
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a6ce8c8edc69e122e9888540202b5eeeb}\label{classaxomae_1_1Mesh_a6ce8c8edc69e122e9888540202b5eeeb}} 
-virtual void {\bfseries set\+Scene\+Camera\+Pointer} (\mbox{\hyperlink{classCamera}{Camera}} $\ast$camera)
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_af65900d1cfaac8346319485aaffcee4e}\label{classaxomae_1_1Mesh_af65900d1cfaac8346319485aaffcee4e}} 
-virtual void {\bfseries set\+Rotation\+Matrix} (glm\+::mat4 \&rot)
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_aa18f5c7cd2bca2705c6826eeccae3c6c}\label{classaxomae_1_1Mesh_aa18f5c7cd2bca2705c6826eeccae3c6c}} 
-void {\bfseries cull\+Back\+Face} ()
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a2ba2b91ebb6538c2e16660567d8838fc}\label{classaxomae_1_1Mesh_a2ba2b91ebb6538c2e16660567d8838fc}} 
-void {\bfseries cull\+Front\+Face} ()
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a9c9465f37942ce139f7f379308923967}\label{classaxomae_1_1Mesh_a9c9465f37942ce139f7f379308923967}} 
-void {\bfseries cull\+Front\+And\+Back\+Face} ()
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a655bac84acc8d8ad1792f77dd0f490c2}\label{classaxomae_1_1Mesh_a655bac84acc8d8ad1792f77dd0f490c2}} 
-void {\bfseries set\+Face\+Culling} (bool value)
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_af1765b06f95c55cc6bba54d714bc38fc}\label{classaxomae_1_1Mesh_af1765b06f95c55cc6bba54d714bc38fc}} 
-void {\bfseries set\+Depth\+Mask} (bool value)
-\item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a68efedbc9dad4a9f9b53f61ac898cb82}\label{classaxomae_1_1Mesh_a68efedbc9dad4a9f9b53f61ac898cb82}} 
-void {\bfseries set\+Depth\+Func} (DEPTHFUNC func)
-\end{DoxyCompactItemize}
+\mbox{\hyperlink{classaxomae_1_1Mesh_ae893327a29ff40aa19aedab398bdeab3}{Mesh}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaxomae_1_1Mesh_af60885e207709da3a30ff07711ebc28b}{Mesh}} (const \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} \&copy)
+\begin{DoxyCompactList}\small\item\em Copy constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaxomae_1_1Mesh_aa4da45ed1cdd2025946d4f8f6c5ac85b}{Mesh}} (\mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}} const \&obj, \mbox{\hyperlink{classMaterial}{Material}} const \&mat)
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} object from geometry and material. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaxomae_1_1Mesh_ad3d65d626340310c06300c1774d6a328}{Mesh}} (std\+::string \mbox{\hyperlink{classaxomae_1_1Mesh_a6f165e415046a0e95860004de83a0fd8}{name}}, \mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}} const \&obj, \mbox{\hyperlink{classMaterial}{Material}} const \&mat)
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} object with a name , geometry , and material. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classaxomae_1_1Mesh_adfb6497815a75570a5766cf2d63b97a5}{$\sim$\+Mesh}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} object. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classaxomae_1_1Mesh_a77fa7a9e140d218871d80838b15b7ade}{bind\+Materials}} ()
+\begin{DoxyCompactList}\small\item\em Enable the mesh\textquotesingle{}s material to render. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classaxomae_1_1Mesh_ab32fd163f57cd40a85b0eb7b5948908e}{bind\+Shaders}} ()
+\begin{DoxyCompactList}\small\item\em Activates the current mesh\textquotesingle{}s shader. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classaxomae_1_1Mesh_a34a4c92d18adedb64258462ef9fac300}{release\+Shaders}} ()
+\begin{DoxyCompactList}\small\item\em Releases the mesh\textquotesingle{}s shader. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classaxomae_1_1Mesh_a772b5cf069b059476e37b1944433105b}{clean}} ()
+\begin{DoxyCompactList}\small\item\em Cleans all data of the mesh. \end{DoxyCompactList}\item 
+virtual bool \mbox{\hyperlink{classaxomae_1_1Mesh_a05297d810fac6b40209184ced7b69077}{is\+Initialized}} ()
+\begin{DoxyCompactList}\small\item\em Check if mesh is initialized and ready to be rendererd. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classaxomae_1_1Mesh_ac1163e88a24c3e53ee3b7fc5c733ed4a}{initialize\+Gl\+Data}} ()
+\begin{DoxyCompactList}\small\item\em Initialize Open\+GL related data in the material and shaders of the mesh. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classaxomae_1_1Mesh_a6ce8c8edc69e122e9888540202b5eeeb}{set\+Scene\+Camera\+Pointer}} (\mbox{\hyperlink{classCamera}{Camera}} $\ast$\mbox{\hyperlink{classaxomae_1_1Mesh_a70785ab851d1d8f29f63f85cd6bcd27f}{camera}})
+\begin{DoxyCompactList}\small\item\em Set the Scene \mbox{\hyperlink{classCamera}{Camera}} Pointer. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classaxomae_1_1Mesh_af65900d1cfaac8346319485aaffcee4e}{set\+Rotation\+Matrix}} (glm\+::mat4 \&rot)
+\begin{DoxyCompactList}\small\item\em Set the Rotation Matrix. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaxomae_1_1Mesh_aa18f5c7cd2bca2705c6826eeccae3c6c}{cull\+Back\+Face}} ()
+\begin{DoxyCompactList}\small\item\em Disable the rendering of the back face of the mesh. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaxomae_1_1Mesh_a2ba2b91ebb6538c2e16660567d8838fc}{cull\+Front\+Face}} ()
+\begin{DoxyCompactList}\small\item\em Disable the rendering of the front face. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaxomae_1_1Mesh_a9c9465f37942ce139f7f379308923967}{cull\+Front\+And\+Back\+Face}} ()
+\begin{DoxyCompactList}\small\item\em Disable both front and back face for rendering. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaxomae_1_1Mesh_a655bac84acc8d8ad1792f77dd0f490c2}{set\+Face\+Culling}} (bool value)
+\begin{DoxyCompactList}\small\item\em Enable face culling for this mesh. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaxomae_1_1Mesh_af1765b06f95c55cc6bba54d714bc38fc}{set\+Depth\+Mask}} (bool value)
+\begin{DoxyCompactList}\small\item\em Set the Depth behavior of the mesh. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaxomae_1_1Mesh_a68efedbc9dad4a9f9b53f61ac898cb82}{set\+Depth\+Func}} (\mbox{\hyperlink{classaxomae_1_1Mesh_addbf715595bf6a1b5d994732d10834eb}{DEPTHFUNC}} func)
+\begin{DoxyCompactList}\small\item\em Set the Depth function to func. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a27040fb7c30a2559436826ad517da63a}\label{classaxomae_1_1Mesh_a27040fb7c30a2559436826ad517da63a}} 
-\mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}} {\bfseries geometry}
+\mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}} \mbox{\hyperlink{classaxomae_1_1Mesh_a27040fb7c30a2559436826ad517da63a}{geometry}}
 \item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a747e8ef6bb7e5eb10d3a971536f1d359}\label{classaxomae_1_1Mesh_a747e8ef6bb7e5eb10d3a971536f1d359}} 
-\mbox{\hyperlink{classShader}{Shader}} $\ast$ {\bfseries shader\+\_\+program}
+\mbox{\hyperlink{classShader}{Shader}} $\ast$ \mbox{\hyperlink{classaxomae_1_1Mesh_a747e8ef6bb7e5eb10d3a971536f1d359}{shader\+\_\+program}}
 \item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a4b3ebd501f92e8392699bf378ec9ff93}\label{classaxomae_1_1Mesh_a4b3ebd501f92e8392699bf378ec9ff93}} 
-\mbox{\hyperlink{classMaterial}{Material}} {\bfseries material}
+\mbox{\hyperlink{classMaterial}{Material}} \mbox{\hyperlink{classaxomae_1_1Mesh_a4b3ebd501f92e8392699bf378ec9ff93}{material}}
 \item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a6f165e415046a0e95860004de83a0fd8}\label{classaxomae_1_1Mesh_a6f165e415046a0e95860004de83a0fd8}} 
-std\+::string {\bfseries name}
+std\+::string \mbox{\hyperlink{classaxomae_1_1Mesh_a6f165e415046a0e95860004de83a0fd8}{name}}
 \end{DoxyCompactItemize}
 \doxysubsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_aa7ea9c0fd2db8171dce931f947aa9a11}\label{classaxomae_1_1Mesh_aa7ea9c0fd2db8171dce931f947aa9a11}} 
-bool {\bfseries mesh\+\_\+initialized}
+bool \mbox{\hyperlink{classaxomae_1_1Mesh_aa7ea9c0fd2db8171dce931f947aa9a11}{mesh\+\_\+initialized}}
 \item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a70785ab851d1d8f29f63f85cd6bcd27f}\label{classaxomae_1_1Mesh_a70785ab851d1d8f29f63f85cd6bcd27f}} 
-\mbox{\hyperlink{classCamera}{Camera}} $\ast$ {\bfseries camera}
+\mbox{\hyperlink{classCamera}{Camera}} $\ast$ \mbox{\hyperlink{classaxomae_1_1Mesh_a70785ab851d1d8f29f63f85cd6bcd27f}{camera}}
 \item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a30b0319654587c506ab0c573f21735b1}\label{classaxomae_1_1Mesh_a30b0319654587c506ab0c573f21735b1}} 
-glm\+::mat4 {\bfseries model\+\_\+matrix}
+glm\+::mat4 \mbox{\hyperlink{classaxomae_1_1Mesh_a30b0319654587c506ab0c573f21735b1}{model\+\_\+matrix}}
 \item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a6b096611caabc90e5a0d193658e4ea2f}\label{classaxomae_1_1Mesh_a6b096611caabc90e5a0d193658e4ea2f}} 
-bool {\bfseries face\+\_\+culling\+\_\+enabled}
+bool \mbox{\hyperlink{classaxomae_1_1Mesh_a6b096611caabc90e5a0d193658e4ea2f}{face\+\_\+culling\+\_\+enabled}}
 \item 
-\mbox{\Hypertarget{classaxomae_1_1Mesh_a7248ef3308ee239cee9c88dcde4f464b}\label{classaxomae_1_1Mesh_a7248ef3308ee239cee9c88dcde4f464b}} 
-bool {\bfseries depth\+\_\+mask\+\_\+enabled}
+bool \mbox{\hyperlink{classaxomae_1_1Mesh_a7248ef3308ee239cee9c88dcde4f464b}{depth\+\_\+mask\+\_\+enabled}}
 \end{DoxyCompactItemize}
 
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} class. 
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\mbox{\Hypertarget{classaxomae_1_1Mesh_addbf715595bf6a1b5d994732d10834eb}\label{classaxomae_1_1Mesh_addbf715595bf6a1b5d994732d10834eb}} 
+\index{axomae::Mesh@{axomae::Mesh}!DEPTHFUNC@{DEPTHFUNC}}
+\index{DEPTHFUNC@{DEPTHFUNC}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{DEPTHFUNC}{DEPTHFUNC}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{classaxomae_1_1Mesh_addbf715595bf6a1b5d994732d10834eb}{axomae\+::\+Mesh\+::\+DEPTHFUNC}} \+: GLenum}
+
+
+
+Behavior of the depth function for the mesh. 
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classaxomae_1_1Mesh_ae893327a29ff40aa19aedab398bdeab3}\label{classaxomae_1_1Mesh_ae893327a29ff40aa19aedab398bdeab3}} 
+\index{axomae::Mesh@{axomae::Mesh}!Mesh@{Mesh}}
+\index{Mesh@{Mesh}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{Mesh()}{Mesh()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily axomae\+::\+Mesh\+::\+Mesh (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Construct a new \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} object. 
+
+\mbox{\Hypertarget{classaxomae_1_1Mesh_af60885e207709da3a30ff07711ebc28b}\label{classaxomae_1_1Mesh_af60885e207709da3a30ff07711ebc28b}} 
+\index{axomae::Mesh@{axomae::Mesh}!Mesh@{Mesh}}
+\index{Mesh@{Mesh}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{Mesh()}{Mesh()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily axomae\+::\+Mesh\+::\+Mesh (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} \&}]{copy }\end{DoxyParamCaption})}
+
+
+
+Copy constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em copy} & To be copied \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaxomae_1_1Mesh_aa4da45ed1cdd2025946d4f8f6c5ac85b}\label{classaxomae_1_1Mesh_aa4da45ed1cdd2025946d4f8f6c5ac85b}} 
+\index{axomae::Mesh@{axomae::Mesh}!Mesh@{Mesh}}
+\index{Mesh@{Mesh}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{Mesh()}{Mesh()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily axomae\+::\+Mesh\+::\+Mesh (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}} const \&}]{obj,  }\item[{\mbox{\hyperlink{classMaterial}{Material}} const \&}]{mat }\end{DoxyParamCaption})}
+
+
+
+Construct a new \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} object from geometry and material. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em obj} & Geometry data \\
+\hline
+{\em mat} & \mbox{\hyperlink{classMaterial}{Material}} data \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaxomae_1_1Mesh_ad3d65d626340310c06300c1774d6a328}\label{classaxomae_1_1Mesh_ad3d65d626340310c06300c1774d6a328}} 
+\index{axomae::Mesh@{axomae::Mesh}!Mesh@{Mesh}}
+\index{Mesh@{Mesh}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{Mesh()}{Mesh()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily axomae\+::\+Mesh\+::\+Mesh (\begin{DoxyParamCaption}\item[{std\+::string}]{name,  }\item[{\mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}} const \&}]{obj,  }\item[{\mbox{\hyperlink{classMaterial}{Material}} const \&}]{mat }\end{DoxyParamCaption})}
+
+
+
+Construct a new \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} object with a name , geometry , and material. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & String name \\
+\hline
+{\em obj} & Geometry data \\
+\hline
+{\em mat} & \mbox{\hyperlink{classMaterial}{Material}} data \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaxomae_1_1Mesh_adfb6497815a75570a5766cf2d63b97a5}\label{classaxomae_1_1Mesh_adfb6497815a75570a5766cf2d63b97a5}} 
+\index{axomae::Mesh@{axomae::Mesh}!````~Mesh@{$\sim$Mesh}}
+\index{````~Mesh@{$\sim$Mesh}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{$\sim$Mesh()}{~Mesh()}}
+{\footnotesize\ttfamily virtual axomae\+::\+Mesh\+::$\sim$\+Mesh (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Destroy the \mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}} object. 
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a77fa7a9e140d218871d80838b15b7ade}\label{classaxomae_1_1Mesh_a77fa7a9e140d218871d80838b15b7ade}} 
+\index{axomae::Mesh@{axomae::Mesh}!bindMaterials@{bindMaterials}}
+\index{bindMaterials@{bindMaterials}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{bindMaterials()}{bindMaterials()}}
+{\footnotesize\ttfamily virtual void axomae\+::\+Mesh\+::bind\+Materials (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Enable the mesh\textquotesingle{}s material to render. 
+
+\mbox{\Hypertarget{classaxomae_1_1Mesh_ab32fd163f57cd40a85b0eb7b5948908e}\label{classaxomae_1_1Mesh_ab32fd163f57cd40a85b0eb7b5948908e}} 
+\index{axomae::Mesh@{axomae::Mesh}!bindShaders@{bindShaders}}
+\index{bindShaders@{bindShaders}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{bindShaders()}{bindShaders()}}
+{\footnotesize\ttfamily virtual void axomae\+::\+Mesh\+::bind\+Shaders (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Activates the current mesh\textquotesingle{}s shader. 
+
+
+
+Reimplemented in \mbox{\hyperlink{classaxomae_1_1CubeMapMesh_a8c7071e97f80c7a41b752bc0ec2c42ff}{axomae\+::\+Cube\+Map\+Mesh}}.
+
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a772b5cf069b059476e37b1944433105b}\label{classaxomae_1_1Mesh_a772b5cf069b059476e37b1944433105b}} 
+\index{axomae::Mesh@{axomae::Mesh}!clean@{clean}}
+\index{clean@{clean}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{clean()}{clean()}}
+{\footnotesize\ttfamily virtual void axomae\+::\+Mesh\+::clean (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Cleans all data of the mesh. 
+
+\mbox{\Hypertarget{classaxomae_1_1Mesh_aa18f5c7cd2bca2705c6826eeccae3c6c}\label{classaxomae_1_1Mesh_aa18f5c7cd2bca2705c6826eeccae3c6c}} 
+\index{axomae::Mesh@{axomae::Mesh}!cullBackFace@{cullBackFace}}
+\index{cullBackFace@{cullBackFace}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{cullBackFace()}{cullBackFace()}}
+{\footnotesize\ttfamily void axomae\+::\+Mesh\+::cull\+Back\+Face (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Disable the rendering of the back face of the mesh. 
+
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a9c9465f37942ce139f7f379308923967}\label{classaxomae_1_1Mesh_a9c9465f37942ce139f7f379308923967}} 
+\index{axomae::Mesh@{axomae::Mesh}!cullFrontAndBackFace@{cullFrontAndBackFace}}
+\index{cullFrontAndBackFace@{cullFrontAndBackFace}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{cullFrontAndBackFace()}{cullFrontAndBackFace()}}
+{\footnotesize\ttfamily void axomae\+::\+Mesh\+::cull\+Front\+And\+Back\+Face (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Disable both front and back face for rendering. 
+
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a2ba2b91ebb6538c2e16660567d8838fc}\label{classaxomae_1_1Mesh_a2ba2b91ebb6538c2e16660567d8838fc}} 
+\index{axomae::Mesh@{axomae::Mesh}!cullFrontFace@{cullFrontFace}}
+\index{cullFrontFace@{cullFrontFace}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{cullFrontFace()}{cullFrontFace()}}
+{\footnotesize\ttfamily void axomae\+::\+Mesh\+::cull\+Front\+Face (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Disable the rendering of the front face. 
+
+\mbox{\Hypertarget{classaxomae_1_1Mesh_ac1163e88a24c3e53ee3b7fc5c733ed4a}\label{classaxomae_1_1Mesh_ac1163e88a24c3e53ee3b7fc5c733ed4a}} 
+\index{axomae::Mesh@{axomae::Mesh}!initializeGlData@{initializeGlData}}
+\index{initializeGlData@{initializeGlData}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{initializeGlData()}{initializeGlData()}}
+{\footnotesize\ttfamily virtual void axomae\+::\+Mesh\+::initialize\+Gl\+Data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Initialize Open\+GL related data in the material and shaders of the mesh. 
+
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a05297d810fac6b40209184ced7b69077}\label{classaxomae_1_1Mesh_a05297d810fac6b40209184ced7b69077}} 
+\index{axomae::Mesh@{axomae::Mesh}!isInitialized@{isInitialized}}
+\index{isInitialized@{isInitialized}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{isInitialized()}{isInitialized()}}
+{\footnotesize\ttfamily virtual bool axomae\+::\+Mesh\+::is\+Initialized (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Check if mesh is initialized and ready to be rendererd. 
+
+\begin{DoxyReturn}{Returns}
+true 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a34a4c92d18adedb64258462ef9fac300}\label{classaxomae_1_1Mesh_a34a4c92d18adedb64258462ef9fac300}} 
+\index{axomae::Mesh@{axomae::Mesh}!releaseShaders@{releaseShaders}}
+\index{releaseShaders@{releaseShaders}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{releaseShaders()}{releaseShaders()}}
+{\footnotesize\ttfamily virtual void axomae\+::\+Mesh\+::release\+Shaders (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Releases the mesh\textquotesingle{}s shader. 
+
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a68efedbc9dad4a9f9b53f61ac898cb82}\label{classaxomae_1_1Mesh_a68efedbc9dad4a9f9b53f61ac898cb82}} 
+\index{axomae::Mesh@{axomae::Mesh}!setDepthFunc@{setDepthFunc}}
+\index{setDepthFunc@{setDepthFunc}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{setDepthFunc()}{setDepthFunc()}}
+{\footnotesize\ttfamily void axomae\+::\+Mesh\+::set\+Depth\+Func (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaxomae_1_1Mesh_addbf715595bf6a1b5d994732d10834eb}{DEPTHFUNC}}}]{func }\end{DoxyParamCaption})}
+
+
+
+Set the Depth function to func. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em func} & Depth function to use. \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{classaxomae_1_1Mesh_addbf715595bf6a1b5d994732d10834eb}{DEPTHFUNC}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{classaxomae_1_1Mesh_af1765b06f95c55cc6bba54d714bc38fc}\label{classaxomae_1_1Mesh_af1765b06f95c55cc6bba54d714bc38fc}} 
+\index{axomae::Mesh@{axomae::Mesh}!setDepthMask@{setDepthMask}}
+\index{setDepthMask@{setDepthMask}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{setDepthMask()}{setDepthMask()}}
+{\footnotesize\ttfamily void axomae\+::\+Mesh\+::set\+Depth\+Mask (\begin{DoxyParamCaption}\item[{bool}]{value }\end{DoxyParamCaption})}
+
+
+
+Set the Depth behavior of the mesh. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em value} & True if we want to enable depth functions \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a655bac84acc8d8ad1792f77dd0f490c2}\label{classaxomae_1_1Mesh_a655bac84acc8d8ad1792f77dd0f490c2}} 
+\index{axomae::Mesh@{axomae::Mesh}!setFaceCulling@{setFaceCulling}}
+\index{setFaceCulling@{setFaceCulling}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{setFaceCulling()}{setFaceCulling()}}
+{\footnotesize\ttfamily void axomae\+::\+Mesh\+::set\+Face\+Culling (\begin{DoxyParamCaption}\item[{bool}]{value }\end{DoxyParamCaption})}
+
+
+
+Enable face culling for this mesh. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em value} & True if we want to enable face culling \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaxomae_1_1Mesh_af65900d1cfaac8346319485aaffcee4e}\label{classaxomae_1_1Mesh_af65900d1cfaac8346319485aaffcee4e}} 
+\index{axomae::Mesh@{axomae::Mesh}!setRotationMatrix@{setRotationMatrix}}
+\index{setRotationMatrix@{setRotationMatrix}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{setRotationMatrix()}{setRotationMatrix()}}
+{\footnotesize\ttfamily virtual void axomae\+::\+Mesh\+::set\+Rotation\+Matrix (\begin{DoxyParamCaption}\item[{glm\+::mat4 \&}]{rot }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Set the Rotation Matrix. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em rot} & Rotation matrix \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a6ce8c8edc69e122e9888540202b5eeeb}\label{classaxomae_1_1Mesh_a6ce8c8edc69e122e9888540202b5eeeb}} 
+\index{axomae::Mesh@{axomae::Mesh}!setSceneCameraPointer@{setSceneCameraPointer}}
+\index{setSceneCameraPointer@{setSceneCameraPointer}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{setSceneCameraPointer()}{setSceneCameraPointer()}}
+{\footnotesize\ttfamily virtual void axomae\+::\+Mesh\+::set\+Scene\+Camera\+Pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classCamera}{Camera}} $\ast$}]{camera }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set the Scene \mbox{\hyperlink{classCamera}{Camera}} Pointer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em camera} & Pointer on the scene camera \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classaxomae_1_1Mesh_a70785ab851d1d8f29f63f85cd6bcd27f}\label{classaxomae_1_1Mesh_a70785ab851d1d8f29f63f85cd6bcd27f}} 
+\index{axomae::Mesh@{axomae::Mesh}!camera@{camera}}
+\index{camera@{camera}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{camera}{camera}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classCamera}{Camera}}$\ast$ axomae\+::\+Mesh\+::camera\hspace{0.3cm}{\ttfamily [protected]}}
+
+Pointer on the scene camera \mbox{\Hypertarget{classaxomae_1_1Mesh_a7248ef3308ee239cee9c88dcde4f464b}\label{classaxomae_1_1Mesh_a7248ef3308ee239cee9c88dcde4f464b}} 
+\index{axomae::Mesh@{axomae::Mesh}!depth\_mask\_enabled@{depth\_mask\_enabled}}
+\index{depth\_mask\_enabled@{depth\_mask\_enabled}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{depth\_mask\_enabled}{depth\_mask\_enabled}}
+{\footnotesize\ttfamily bool axomae\+::\+Mesh\+::depth\+\_\+mask\+\_\+enabled\hspace{0.3cm}{\ttfamily [protected]}}
+
+Is depth enabled \mbox{\Hypertarget{classaxomae_1_1Mesh_a6b096611caabc90e5a0d193658e4ea2f}\label{classaxomae_1_1Mesh_a6b096611caabc90e5a0d193658e4ea2f}} 
+\index{axomae::Mesh@{axomae::Mesh}!face\_culling\_enabled@{face\_culling\_enabled}}
+\index{face\_culling\_enabled@{face\_culling\_enabled}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{face\_culling\_enabled}{face\_culling\_enabled}}
+{\footnotesize\ttfamily bool axomae\+::\+Mesh\+::face\+\_\+culling\+\_\+enabled\hspace{0.3cm}{\ttfamily [protected]}}
+
+Is culling enabled \mbox{\Hypertarget{classaxomae_1_1Mesh_a27040fb7c30a2559436826ad517da63a}\label{classaxomae_1_1Mesh_a27040fb7c30a2559436826ad517da63a}} 
+\index{axomae::Mesh@{axomae::Mesh}!geometry@{geometry}}
+\index{geometry@{geometry}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{geometry}{geometry}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structaxomae_1_1Object3D}{Object3D}} axomae\+::\+Mesh\+::geometry}
+
+3D Geometry of the mesh , vertex positions , UVs etc \mbox{\Hypertarget{classaxomae_1_1Mesh_a4b3ebd501f92e8392699bf378ec9ff93}\label{classaxomae_1_1Mesh_a4b3ebd501f92e8392699bf378ec9ff93}} 
+\index{axomae::Mesh@{axomae::Mesh}!material@{material}}
+\index{material@{material}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{material}{material}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classMaterial}{Material}} axomae\+::\+Mesh\+::material}
+
+\mbox{\hyperlink{classMaterial}{Material}} to be used for the mesh \mbox{\Hypertarget{classaxomae_1_1Mesh_aa7ea9c0fd2db8171dce931f947aa9a11}\label{classaxomae_1_1Mesh_aa7ea9c0fd2db8171dce931f947aa9a11}} 
+\index{axomae::Mesh@{axomae::Mesh}!mesh\_initialized@{mesh\_initialized}}
+\index{mesh\_initialized@{mesh\_initialized}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{mesh\_initialized}{mesh\_initialized}}
+{\footnotesize\ttfamily bool axomae\+::\+Mesh\+::mesh\+\_\+initialized\hspace{0.3cm}{\ttfamily [protected]}}
+
+Is the mesh ready to render \mbox{\Hypertarget{classaxomae_1_1Mesh_a30b0319654587c506ab0c573f21735b1}\label{classaxomae_1_1Mesh_a30b0319654587c506ab0c573f21735b1}} 
+\index{axomae::Mesh@{axomae::Mesh}!model\_matrix@{model\_matrix}}
+\index{model\_matrix@{model\_matrix}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{model\_matrix}{model\_matrix}}
+{\footnotesize\ttfamily glm\+::mat4 axomae\+::\+Mesh\+::model\+\_\+matrix\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\hyperlink{classaxomae_1_1Mesh}{Mesh}}\textquotesingle{}s model matrix \mbox{\Hypertarget{classaxomae_1_1Mesh_a6f165e415046a0e95860004de83a0fd8}\label{classaxomae_1_1Mesh_a6f165e415046a0e95860004de83a0fd8}} 
+\index{axomae::Mesh@{axomae::Mesh}!name@{name}}
+\index{name@{name}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily std\+::string axomae\+::\+Mesh\+::name}
+
+Name of the mesh \mbox{\Hypertarget{classaxomae_1_1Mesh_a747e8ef6bb7e5eb10d3a971536f1d359}\label{classaxomae_1_1Mesh_a747e8ef6bb7e5eb10d3a971536f1d359}} 
+\index{axomae::Mesh@{axomae::Mesh}!shader\_program@{shader\_program}}
+\index{shader\_program@{shader\_program}!axomae::Mesh@{axomae::Mesh}}
+\doxysubsubsection{\texorpdfstring{shader\_program}{shader\_program}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classShader}{Shader}}$\ast$ axomae\+::\+Mesh\+::shader\+\_\+program}
+
+\mbox{\hyperlink{classShader}{Shader}} to be used for the mesh 
 
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 

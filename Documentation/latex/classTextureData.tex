@@ -1,39 +1,141 @@
 \hypertarget{classTextureData}{}\doxysection{Texture\+Data Class Reference}
 \label{classTextureData}\index{TextureData@{TextureData}}
+
+
+Class for raw binary data of textures.  
+
+
+
+
+{\ttfamily \#include $<$Texture.\+h$>$}
+
 \doxysubsection*{Public Types}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classTextureData_ab11e51fff4b5bfe7861a4f4232ee13dd}\label{classTextureData_ab11e51fff4b5bfe7861a4f4232ee13dd}} 
-enum {\bfseries CHANNELS} \+: unsigned \{ {\bfseries RGB} = 0
+enum \mbox{\hyperlink{classTextureData_ab11e51fff4b5bfe7861a4f4232ee13dd}{CHANNELS}} \+: unsigned \{ {\bfseries RGB} = 0
 , {\bfseries RGBA} = 1
  \}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Rgb channels types. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classTextureData_a91cf60b48d0e3dda42580c855f025058}\label{classTextureData_a91cf60b48d0e3dda42580c855f025058}} 
-\mbox{\hyperlink{classTextureData}{Texture\+Data}} \& {\bfseries operator=} (const \mbox{\hyperlink{classTextureData}{Texture\+Data}} \&from)
-\item 
-\mbox{\Hypertarget{classTextureData_a605c9e66afd66c0475e444b0594a7cb3}\label{classTextureData_a605c9e66afd66c0475e444b0594a7cb3}} 
-void {\bfseries clean} ()
-\end{DoxyCompactItemize}
+\mbox{\hyperlink{classTextureData_a3ddb180b141d41ffdc5ebd73df3c6c10}{Texture\+Data}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{classTexture}{Texture}} Data object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classTextureData_ab5ba8c4b65adf5f919450fbd8374001e}{$\sim$\+Texture\+Data}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the \mbox{\hyperlink{classTexture}{Texture}} Data object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classTextureData}{Texture\+Data}} \& \mbox{\hyperlink{classTextureData_a91cf60b48d0e3dda42580c855f025058}{operator=}} (const \mbox{\hyperlink{classTextureData}{Texture\+Data}} \&from)
+\begin{DoxyCompactList}\small\item\em Copy a texture. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classTextureData_a605c9e66afd66c0475e444b0594a7cb3}{clean}} ()
+\begin{DoxyCompactList}\small\item\em Free the object. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classTextureData_a28210413a66b998e0bd168dbe332037d}\label{classTextureData_a28210413a66b998e0bd168dbe332037d}} 
-unsigned int {\bfseries width}
+unsigned int \mbox{\hyperlink{classTextureData_a28210413a66b998e0bd168dbe332037d}{width}}
 \item 
-\mbox{\Hypertarget{classTextureData_a3af738270c0b5fa18ebf359e90f07eaf}\label{classTextureData_a3af738270c0b5fa18ebf359e90f07eaf}} 
-unsigned int {\bfseries height}
+unsigned int \mbox{\hyperlink{classTextureData_a3af738270c0b5fa18ebf359e90f07eaf}{height}}
 \item 
-\mbox{\Hypertarget{classTextureData_a4f726a08fe49420f5b74fb438bbea396}\label{classTextureData_a4f726a08fe49420f5b74fb438bbea396}} 
-std\+::string {\bfseries name}
+std\+::string \mbox{\hyperlink{classTextureData_a4f726a08fe49420f5b74fb438bbea396}{name}}
 \item 
 \mbox{\Hypertarget{classTextureData_a3c47ce1bbafdd39482c12f83b38bd40b}\label{classTextureData_a3c47ce1bbafdd39482c12f83b38bd40b}} 
 uint32\+\_\+t $\ast$ {\bfseries data}
 \end{DoxyCompactItemize}
 
 
+\doxysubsection{Detailed Description}
+Class for raw binary data of textures. 
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\mbox{\Hypertarget{classTextureData_ab11e51fff4b5bfe7861a4f4232ee13dd}\label{classTextureData_ab11e51fff4b5bfe7861a4f4232ee13dd}} 
+\index{TextureData@{TextureData}!CHANNELS@{CHANNELS}}
+\index{CHANNELS@{CHANNELS}!TextureData@{TextureData}}
+\doxysubsubsection{\texorpdfstring{CHANNELS}{CHANNELS}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{classTextureData_ab11e51fff4b5bfe7861a4f4232ee13dd}{Texture\+Data\+::\+CHANNELS}} \+: unsigned}
+
+
+
+Rgb channels types. 
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classTextureData_a3ddb180b141d41ffdc5ebd73df3c6c10}\label{classTextureData_a3ddb180b141d41ffdc5ebd73df3c6c10}} 
+\index{TextureData@{TextureData}!TextureData@{TextureData}}
+\index{TextureData@{TextureData}!TextureData@{TextureData}}
+\doxysubsubsection{\texorpdfstring{TextureData()}{TextureData()}}
+{\footnotesize\ttfamily Texture\+Data\+::\+Texture\+Data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Construct a new \mbox{\hyperlink{classTexture}{Texture}} Data object. 
+
+\mbox{\Hypertarget{classTextureData_ab5ba8c4b65adf5f919450fbd8374001e}\label{classTextureData_ab5ba8c4b65adf5f919450fbd8374001e}} 
+\index{TextureData@{TextureData}!````~TextureData@{$\sim$TextureData}}
+\index{````~TextureData@{$\sim$TextureData}!TextureData@{TextureData}}
+\doxysubsubsection{\texorpdfstring{$\sim$TextureData()}{~TextureData()}}
+{\footnotesize\ttfamily Texture\+Data\+::$\sim$\+Texture\+Data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Destroy the \mbox{\hyperlink{classTexture}{Texture}} Data object. 
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classTextureData_a605c9e66afd66c0475e444b0594a7cb3}\label{classTextureData_a605c9e66afd66c0475e444b0594a7cb3}} 
+\index{TextureData@{TextureData}!clean@{clean}}
+\index{clean@{clean}!TextureData@{TextureData}}
+\doxysubsubsection{\texorpdfstring{clean()}{clean()}}
+{\footnotesize\ttfamily void Texture\+Data\+::clean (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Free the object. 
+
+\mbox{\Hypertarget{classTextureData_a91cf60b48d0e3dda42580c855f025058}\label{classTextureData_a91cf60b48d0e3dda42580c855f025058}} 
+\index{TextureData@{TextureData}!operator=@{operator=}}
+\index{operator=@{operator=}!TextureData@{TextureData}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classTextureData}{Texture\+Data}} \& Texture\+Data\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classTextureData}{Texture\+Data}} \&}]{from }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Copy a texture. 
+
+Provides deep copy of the object , but doesn\textquotesingle{}t do the cleanup for the copied object
+
+
+\begin{DoxyParams}{Parameters}
+{\em from} & The texture to be copied \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$\ast$ \mbox{\hyperlink{classTextureData}{Texture\+Data}}\& Deep copy of the original \mbox{\hyperlink{classTextureData}{Texture\+Data}} object 
+\end{DoxyReturn}
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classTextureData_a3af738270c0b5fa18ebf359e90f07eaf}\label{classTextureData_a3af738270c0b5fa18ebf359e90f07eaf}} 
+\index{TextureData@{TextureData}!height@{height}}
+\index{height@{height}!TextureData@{TextureData}}
+\doxysubsubsection{\texorpdfstring{height}{height}}
+{\footnotesize\ttfamily unsigned int Texture\+Data\+::height}
+
+Height of the texture \mbox{\Hypertarget{classTextureData_a4f726a08fe49420f5b74fb438bbea396}\label{classTextureData_a4f726a08fe49420f5b74fb438bbea396}} 
+\index{TextureData@{TextureData}!name@{name}}
+\index{name@{name}!TextureData@{TextureData}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily std\+::string Texture\+Data\+::name}
+
+Name of the texture \mbox{\Hypertarget{classTextureData_a28210413a66b998e0bd168dbe332037d}\label{classTextureData_a28210413a66b998e0bd168dbe332037d}} 
+\index{TextureData@{TextureData}!width@{width}}
+\index{width@{width}!TextureData@{TextureData}}
+\doxysubsubsection{\texorpdfstring{width}{width}}
+{\footnotesize\ttfamily unsigned int Texture\+Data\+::width}
+
+Width of the texture 
+
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/home/hamilcar/\+Desktop/projects/\+Axomae/includes/Texture.\+h\end{DoxyCompactItemize}
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/\mbox{\hyperlink{Texture_8h}{Texture.\+h}}\end{DoxyCompactItemize}

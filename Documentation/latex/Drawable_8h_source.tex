@@ -1,6 +1,6 @@
 \hypertarget{Drawable_8h_source}{}\doxysection{Drawable.\+h}
 \label{Drawable_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/Drawable.h@{/home/hamilcar/Desktop/projects/Axomae/includes/Drawable.h}}
-
+\mbox{\hyperlink{Drawable_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ DRAWABLE\_H}}
 \DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ DRAWABLE\_H}}
@@ -9,50 +9,56 @@
 \DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}Mesh.h"{}}}
 \DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}TextureGroup.h"{}}\ }
 \DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Camera_8h}{Camera.h}}"{}}}
-\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}GLBuffers.h"{}}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{GLBuffers_8h}{GLBuffers.h}}"{}}}
 \DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <QOpenGLWidget>}}
 \DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <QDebug>}}
 \DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <QString>}\ }
 \DoxyCodeLine{00012\ }
-\DoxyCodeLine{00013\ }
-\DoxyCodeLine{00014\ }
-\DoxyCodeLine{00015\ }
-\DoxyCodeLine{00016\ \textcolor{comment}{/***}}
-\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ \(\backslash\)brief\ OpenGL\ structures\ relative\ to\ drawing\ one\ mesh}}
-\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ Manages\ API\ calls}}
-\DoxyCodeLine{00019\ \textcolor{comment}{\ */}}
-\DoxyCodeLine{00020\ }
-\DoxyCodeLine{00021\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classDrawable}{Drawable}}\{}
-\DoxyCodeLine{00022\ \textcolor{keyword}{public}:}
-\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{classDrawable}{Drawable}}();}
-\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{classDrawable}{Drawable}}(\mbox{\hyperlink{classaxomae_1_1Mesh}{axomae::Mesh}}\ \&mesh);\ }
-\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{classDrawable}{Drawable}}(\mbox{\hyperlink{classaxomae_1_1Mesh}{axomae::Mesh}}\ *mesh);\ }
-\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classDrawable}{\string~Drawable}}();\ }
-\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordtype}{bool}\ initialize();}
-\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordtype}{void}\ start\_draw();\ }
-\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordtype}{void}\ clean();}
-\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordtype}{void}\ bind();}
-\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordtype}{void}\ unbind();}
-\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordtype}{bool}\ ready();}
-\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordtype}{void}\ setSceneCameraPointer(\mbox{\hyperlink{classCamera}{Camera}}*\ camera);\ }
-\DoxyCodeLine{00034\ \textcolor{keyword}{public}:}
-\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1Mesh}{axomae::Mesh}}\ *mesh\_object\ ;}
-\DoxyCodeLine{00036\ }
-\DoxyCodeLine{00037\ \textcolor{keyword}{private}:\ \ \ \ }
-\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{classCamera}{Camera}}\ *camera\_pointer\ ;\ }
-\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{classGLBuffers}{GLBuffers}}\ gl\_buffers\ ;\ }
-\DoxyCodeLine{00040\ \};}
-\DoxyCodeLine{00041\ }
-\DoxyCodeLine{00042\ }
-\DoxyCodeLine{00043\ }
-\DoxyCodeLine{00044\ }
-\DoxyCodeLine{00045\ }
-\DoxyCodeLine{00046\ }
-\DoxyCodeLine{00047\ }
-\DoxyCodeLine{00048\ }
-\DoxyCodeLine{00049\ }
-\DoxyCodeLine{00050\ }
-\DoxyCodeLine{00051\ }
-\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#endif\ }}
+\DoxyCodeLine{00020\ \textcolor{comment}{/***}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ *\ @brief\ OpenGL\ structures\ relative\ to\ drawing\ one\ mesh}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ *\ Manages\ API\ calls}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00024\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classDrawable}{Drawable}}\{}
+\DoxyCodeLine{00025\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{classDrawable_aac88608db6081da479c772c96636acb1}{Drawable}}();}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{classDrawable_a086c5edc307f86fe97a87fd52d937940}{Drawable}}(\mbox{\hyperlink{classaxomae_1_1Mesh}{axomae::Mesh}}\ \&mesh);\ }
+\DoxyCodeLine{00039\ \ \ \ \ }
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{classDrawable_a73b9996cd8175e33e8f3d07ecc7d354b}{Drawable}}(\mbox{\hyperlink{classaxomae_1_1Mesh}{axomae::Mesh}}\ *mesh);\ }
+\DoxyCodeLine{00046\ \ \ \ \ }
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classDrawable_abdc2e2d82c51c1703656a2dfba0feabd}{\string~Drawable}}();\ }
+\DoxyCodeLine{00052\ \ \ \ \ }
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classDrawable_a5305f8666650a4ae58c96f2c905d571b}{initialize}}();}
+\DoxyCodeLine{00059\ \ \ \ \ }
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classDrawable_af4391182ceb2b99b695ad70b29f1721b}{start\_draw}}();\ }
+\DoxyCodeLine{00065\ \ \ \ \ }
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classDrawable_afa519d9664a7d88b7b0fc24adbc0d437}{clean}}();}
+\DoxyCodeLine{00071\ \ \ \ \ }
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classDrawable_a8d95ea849ada6a9ae136818f403c25e4}{bind}}();}
+\DoxyCodeLine{00077\ \ \ \ \ }
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classDrawable_a06738717faacc2babe5b9e929e76cb07}{unbind}}();}
+\DoxyCodeLine{00083\ \ \ \ \ }
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classDrawable_acc659ff7ee6dd50aac70fd287993990b}{ready}}();}
+\DoxyCodeLine{00090\ \ \ \ \ }
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classDrawable_a6d34c9a2f0bbfab554806e69e3270b25}{setSceneCameraPointer}}(\mbox{\hyperlink{classCamera}{Camera}}*\ camera);\ }
+\DoxyCodeLine{00097\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00098\ \ \ \ \ \mbox{\hyperlink{classaxomae_1_1Mesh}{axomae::Mesh}}\ *\mbox{\hyperlink{classDrawable_ac48a644ab0fab2b2102f31c0f70e4d49}{mesh\_object}}\ ;\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00099\ \textcolor{keyword}{private}:\ \ \ \ }
+\DoxyCodeLine{00100\ \ \ \ \ \mbox{\hyperlink{classCamera}{Camera}}\ *camera\_pointer\ ;\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00101\ \ \ \ \ \mbox{\hyperlink{classGLBuffers}{GLBuffers}}\ gl\_buffers\ ;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00102\ \};}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{\#endif\ }}
 
 \end{DoxyCode}

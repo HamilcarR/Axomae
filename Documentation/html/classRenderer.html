@@ -77,73 +77,491 @@ $(function() {
   <div class="headertitle"><div class="title">Renderer Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p><a class="el" href="classRenderer.html" title="Renderer class definition.">Renderer</a> class definition.  
+ <a href="classRenderer.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="Renderer_8h_source.html">Renderer.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af0cf13596dfb5e7c40f58b5dbad6e74c"><td class="memItemLeft" align="right" valign="top"><a id="af0cf13596dfb5e7c40f58b5dbad6e74c" name="af0cf13596dfb5e7c40f58b5dbad6e74c"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>initialize</b> ()</td></tr>
+<tr class="memitem:a7ebf46f54dab9905f79b80f7fddb76a6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#a7ebf46f54dab9905f79b80f7fddb76a6">Renderer</a> ()</td></tr>
+<tr class="memdesc:a7ebf46f54dab9905f79b80f7fddb76a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classRenderer.html" title="Renderer class definition.">Renderer</a> object.  <br /></td></tr>
+<tr class="separator:a7ebf46f54dab9905f79b80f7fddb76a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba42b60392775e4a492c4d14d4fff29f"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#aba42b60392775e4a492c4d14d4fff29f">~Renderer</a> ()</td></tr>
+<tr class="memdesc:aba42b60392775e4a492c4d14d4fff29f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the <a class="el" href="classRenderer.html" title="Renderer class definition.">Renderer</a> object.  <br /></td></tr>
+<tr class="separator:aba42b60392775e4a492c4d14d4fff29f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0cf13596dfb5e7c40f58b5dbad6e74c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#af0cf13596dfb5e7c40f58b5dbad6e74c">initialize</a> ()</td></tr>
+<tr class="memdesc:af0cf13596dfb5e7c40f58b5dbad6e74c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the renderer's basic characteristics , like depth , background colors etc.  <br /></td></tr>
 <tr class="separator:af0cf13596dfb5e7c40f58b5dbad6e74c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe0d3204823fd4c16c0b6d780d780cff"><td class="memItemLeft" align="right" valign="top"><a id="afe0d3204823fd4c16c0b6d780d780cff" name="afe0d3204823fd4c16c0b6d780d780cff"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>prep_draw</b> ()</td></tr>
+<tr class="memitem:afe0d3204823fd4c16c0b6d780d780cff"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#afe0d3204823fd4c16c0b6d780d780cff">prep_draw</a> ()</td></tr>
+<tr class="memdesc:afe0d3204823fd4c16c0b6d780d780cff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method setting up the meshes , and the scene camera.  <br /></td></tr>
 <tr class="separator:afe0d3204823fd4c16c0b6d780d780cff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a0a5f207e3d9f60c6372a9c79b25df9"><td class="memItemLeft" align="right" valign="top"><a id="a9a0a5f207e3d9f60c6372a9c79b25df9" name="a9a0a5f207e3d9f60c6372a9c79b25df9"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>draw</b> ()</td></tr>
+<tr class="memitem:a9a0a5f207e3d9f60c6372a9c79b25df9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#a9a0a5f207e3d9f60c6372a9c79b25df9">draw</a> ()</td></tr>
+<tr class="memdesc:a9a0a5f207e3d9f60c6372a9c79b25df9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initiates the draw calls for all objects in the scene.  <br /></td></tr>
 <tr class="separator:a9a0a5f207e3d9f60c6372a9c79b25df9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcf7dda67ee482de40bb4f6da9fa999a"><td class="memItemLeft" align="right" valign="top"><a id="adcf7dda67ee482de40bb4f6da9fa999a" name="adcf7dda67ee482de40bb4f6da9fa999a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_new_scene</b> (std::vector&lt; <a class="el" href="classaxomae_1_1Mesh.html">axomae::Mesh</a> * &gt; &amp;new_scene)</td></tr>
+<tr class="memitem:adcf7dda67ee482de40bb4f6da9fa999a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#adcf7dda67ee482de40bb4f6da9fa999a">set_new_scene</a> (std::vector&lt; <a class="el" href="classaxomae_1_1Mesh.html">axomae::Mesh</a> * &gt; &amp;new_scene)</td></tr>
+<tr class="memdesc:adcf7dda67ee482de40bb4f6da9fa999a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up the former scene and replaces it with a new.  <br /></td></tr>
 <tr class="separator:adcf7dda67ee482de40bb4f6da9fa999a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6e385b09710d4bb27b432ad894ec616"><td class="memItemLeft" align="right" valign="top"><a id="ae6e385b09710d4bb27b432ad894ec616" name="ae6e385b09710d4bb27b432ad894ec616"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>scene_ready</b> ()</td></tr>
+<tr class="memitem:ae6e385b09710d4bb27b432ad894ec616"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#ae6e385b09710d4bb27b432ad894ec616">scene_ready</a> ()</td></tr>
+<tr class="memdesc:ae6e385b09710d4bb27b432ad894ec616"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if all <a class="el" href="classDrawable.html">Drawable</a> objects in the scene have been initialized.  <br /></td></tr>
 <tr class="separator:ae6e385b09710d4bb27b432ad894ec616"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2843abeca78d7c4de24a3a11099167b8"><td class="memItemLeft" align="right" valign="top"><a id="a2843abeca78d7c4de24a3a11099167b8" name="a2843abeca78d7c4de24a3a11099167b8"></a>
-<a class="el" href="structMouseState.html">MouseState</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getMouseStatePointer</b> ()</td></tr>
-<tr class="separator:a2843abeca78d7c4de24a3a11099167b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57bf9871fe67b6f0e1478f475b933cce"><td class="memItemLeft" align="right" valign="top"><a id="a57bf9871fe67b6f0e1478f475b933cce" name="a57bf9871fe67b6f0e1478f475b933cce"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>onLeftClick</b> ()</td></tr>
+<tr class="memitem:a57bf9871fe67b6f0e1478f475b933cce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#a57bf9871fe67b6f0e1478f475b933cce">onLeftClick</a> ()</td></tr>
+<tr class="memdesc:a57bf9871fe67b6f0e1478f475b933cce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the pointer to the <a class="el" href="structMouseState.html">MouseState</a> structure.  <br /></td></tr>
 <tr class="separator:a57bf9871fe67b6f0e1478f475b933cce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae3076dfaa69b9fb35654d6eea2bf1f17"><td class="memItemLeft" align="right" valign="top"><a id="ae3076dfaa69b9fb35654d6eea2bf1f17" name="ae3076dfaa69b9fb35654d6eea2bf1f17"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>onRightClick</b> ()</td></tr>
+<tr class="memitem:ae3076dfaa69b9fb35654d6eea2bf1f17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#ae3076dfaa69b9fb35654d6eea2bf1f17">onRightClick</a> ()</td></tr>
+<tr class="memdesc:ae3076dfaa69b9fb35654d6eea2bf1f17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Right click event behavior.  <br /></td></tr>
 <tr class="separator:ae3076dfaa69b9fb35654d6eea2bf1f17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a467c8419c608a3da7babe626068f165d"><td class="memItemLeft" align="right" valign="top"><a id="a467c8419c608a3da7babe626068f165d" name="a467c8419c608a3da7babe626068f165d"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>onLeftClickRelease</b> ()</td></tr>
+<tr class="memitem:a467c8419c608a3da7babe626068f165d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#a467c8419c608a3da7babe626068f165d">onLeftClickRelease</a> ()</td></tr>
+<tr class="memdesc:a467c8419c608a3da7babe626068f165d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Left click release event behavior.  <br /></td></tr>
 <tr class="separator:a467c8419c608a3da7babe626068f165d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9419f32e888a1f81335f891644045c35"><td class="memItemLeft" align="right" valign="top"><a id="a9419f32e888a1f81335f891644045c35" name="a9419f32e888a1f81335f891644045c35"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>onRightClickRelease</b> ()</td></tr>
+<tr class="memitem:a9419f32e888a1f81335f891644045c35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#a9419f32e888a1f81335f891644045c35">onRightClickRelease</a> ()</td></tr>
+<tr class="memdesc:a9419f32e888a1f81335f891644045c35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Right click release event behavior.  <br /></td></tr>
 <tr class="separator:a9419f32e888a1f81335f891644045c35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae99c04c0397fe69084c052bbfb16841d"><td class="memItemLeft" align="right" valign="top"><a id="ae99c04c0397fe69084c052bbfb16841d" name="ae99c04c0397fe69084c052bbfb16841d"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>onScrollDown</b> ()</td></tr>
+<tr class="memitem:ae99c04c0397fe69084c052bbfb16841d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#ae99c04c0397fe69084c052bbfb16841d">onScrollDown</a> ()</td></tr>
+<tr class="memdesc:ae99c04c0397fe69084c052bbfb16841d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scroll down event behavior.  <br /></td></tr>
 <tr class="separator:ae99c04c0397fe69084c052bbfb16841d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae3a39066e9aced50ba2abb82a0d27be6"><td class="memItemLeft" align="right" valign="top"><a id="ae3a39066e9aced50ba2abb82a0d27be6" name="ae3a39066e9aced50ba2abb82a0d27be6"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>onScrollUp</b> ()</td></tr>
+<tr class="memitem:ae3a39066e9aced50ba2abb82a0d27be6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#ae3a39066e9aced50ba2abb82a0d27be6">onScrollUp</a> ()</td></tr>
+<tr class="memdesc:ae3a39066e9aced50ba2abb82a0d27be6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scroll up event behavior.  <br /></td></tr>
 <tr class="separator:ae3a39066e9aced50ba2abb82a0d27be6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d01b9955f6ca3585b8b66c735e53b26"><td class="memItemLeft" align="right" valign="top"><a id="a9d01b9955f6ca3585b8b66c735e53b26" name="a9d01b9955f6ca3585b8b66c735e53b26"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setScreenSize</b> (unsigned int width, unsigned int height)</td></tr>
+<tr class="memitem:a9d01b9955f6ca3585b8b66c735e53b26"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#a9d01b9955f6ca3585b8b66c735e53b26">setScreenSize</a> (unsigned int width, unsigned int height)</td></tr>
+<tr class="memdesc:a9d01b9955f6ca3585b8b66c735e53b26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the new screen dimensions.  <br /></td></tr>
 <tr class="separator:a9d01b9955f6ca3585b8b66c735e53b26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:ae043488e26024eee4dc61c22f2371216"><td class="memItemLeft" align="right" valign="top"><a id="ae043488e26024eee4dc61c22f2371216" name="ae043488e26024eee4dc61c22f2371216"></a>
-std::vector&lt; <a class="el" href="classDrawable.html">Drawable</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>scene</b></td></tr>
+<tr class="memitem:ae043488e26024eee4dc61c22f2371216"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classDrawable.html">Drawable</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#ae043488e26024eee4dc61c22f2371216">scene</a></td></tr>
 <tr class="separator:ae043488e26024eee4dc61c22f2371216"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4a8ee266ecd71f53198cb508738c94f2"><td class="memItemLeft" align="right" valign="top"><a id="a4a8ee266ecd71f53198cb508738c94f2" name="a4a8ee266ecd71f53198cb508738c94f2"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>start_draw</b></td></tr>
+<tr class="memitem:a4a8ee266ecd71f53198cb508738c94f2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#a4a8ee266ecd71f53198cb508738c94f2">start_draw</a></td></tr>
 <tr class="separator:a4a8ee266ecd71f53198cb508738c94f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:accaa2bc85cfcffce05f7f84b67557422"><td class="memItemLeft" align="right" valign="top"><a id="accaa2bc85cfcffce05f7f84b67557422" name="accaa2bc85cfcffce05f7f84b67557422"></a>
-<a class="el" href="classTextureDatabase.html">TextureDatabase</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>texture_database</b></td></tr>
+<tr class="memitem:accaa2bc85cfcffce05f7f84b67557422"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTextureDatabase.html">TextureDatabase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#accaa2bc85cfcffce05f7f84b67557422">texture_database</a></td></tr>
 <tr class="separator:accaa2bc85cfcffce05f7f84b67557422"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad0a08676b861c4e8ed155eed4f1c6871"><td class="memItemLeft" align="right" valign="top"><a id="ad0a08676b861c4e8ed155eed4f1c6871" name="ad0a08676b861c4e8ed155eed4f1c6871"></a>
-<a class="el" href="classShaderDatabase.html">ShaderDatabase</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>shader_database</b></td></tr>
+<tr class="memitem:ad0a08676b861c4e8ed155eed4f1c6871"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classShaderDatabase.html">ShaderDatabase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#ad0a08676b861c4e8ed155eed4f1c6871">shader_database</a></td></tr>
 <tr class="separator:ad0a08676b861c4e8ed155eed4f1c6871"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae92ff9d0c9718a8693e98f10756eb280"><td class="memItemLeft" align="right" valign="top"><a id="ae92ff9d0c9718a8693e98f10756eb280" name="ae92ff9d0c9718a8693e98f10756eb280"></a>
-<a class="el" href="classCamera.html">Camera</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>scene_camera</b></td></tr>
+<tr class="memitem:ae92ff9d0c9718a8693e98f10756eb280"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCamera.html">Camera</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#ae92ff9d0c9718a8693e98f10756eb280">scene_camera</a></td></tr>
 <tr class="separator:ae92ff9d0c9718a8693e98f10756eb280"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42ebad5956a3cfc1465fc6c1b3f74252"><td class="memItemLeft" align="right" valign="top"><a id="a42ebad5956a3cfc1465fc6c1b3f74252" name="a42ebad5956a3cfc1465fc6c1b3f74252"></a>
-<a class="el" href="structMouseState.html">MouseState</a>&#160;</td><td class="memItemRight" valign="bottom"><b>mouse_state</b></td></tr>
+<tr class="memitem:a42ebad5956a3cfc1465fc6c1b3f74252"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structMouseState.html">MouseState</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#a42ebad5956a3cfc1465fc6c1b3f74252">mouse_state</a></td></tr>
 <tr class="separator:a42ebad5956a3cfc1465fc6c1b3f74252"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03b15b6f79e421bafa2ba8265be581b6"><td class="memItemLeft" align="right" valign="top"><a id="a03b15b6f79e421bafa2ba8265be581b6" name="a03b15b6f79e421bafa2ba8265be581b6"></a>
-<a class="el" href="structScreenSize.html">ScreenSize</a>&#160;</td><td class="memItemRight" valign="bottom"><b>screen_size</b></td></tr>
+<tr class="memitem:a03b15b6f79e421bafa2ba8265be581b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structScreenSize.html">ScreenSize</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRenderer.html#a03b15b6f79e421bafa2ba8265be581b6">screen_size</a></td></tr>
 <tr class="separator:a03b15b6f79e421bafa2ba8265be581b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p><a class="el" href="classRenderer.html" title="Renderer class definition.">Renderer</a> class definition. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a7ebf46f54dab9905f79b80f7fddb76a6" name="a7ebf46f54dab9905f79b80f7fddb76a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ebf46f54dab9905f79b80f7fddb76a6">&#9670;&#160;</a></span>Renderer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Renderer::Renderer </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Construct a new <a class="el" href="classRenderer.html" title="Renderer class definition.">Renderer</a> object. </p>
+
+</div>
+</div>
+<a id="aba42b60392775e4a492c4d14d4fff29f" name="aba42b60392775e4a492c4d14d4fff29f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba42b60392775e4a492c4d14d4fff29f">&#9670;&#160;</a></span>~Renderer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual Renderer::~Renderer </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Destroy the <a class="el" href="classRenderer.html" title="Renderer class definition.">Renderer</a> object. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a9a0a5f207e3d9f60c6372a9c79b25df9" name="a9a0a5f207e3d9f60c6372a9c79b25df9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a0a5f207e3d9f60c6372a9c79b25df9">&#9670;&#160;</a></span>draw()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Renderer::draw </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initiates the draw calls for all objects in the scene. </p>
+
+</div>
+</div>
+<a id="af0cf13596dfb5e7c40f58b5dbad6e74c" name="af0cf13596dfb5e7c40f58b5dbad6e74c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0cf13596dfb5e7c40f58b5dbad6e74c">&#9670;&#160;</a></span>initialize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Renderer::initialize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize the renderer's basic characteristics , like depth , background colors etc. </p>
+
+</div>
+</div>
+<a id="a57bf9871fe67b6f0e1478f475b933cce" name="a57bf9871fe67b6f0e1478f475b933cce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57bf9871fe67b6f0e1478f475b933cce">&#9670;&#160;</a></span>onLeftClick()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Renderer::onLeftClick </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the pointer to the <a class="el" href="structMouseState.html">MouseState</a> structure. </p>
+<dl class="section return"><dt>Returns</dt><dd>MouseState* Pointer on the mouse_state variable , informations about the mouse positions , button clicked etc </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structMouseState.html">MouseState</a> / MouseState* getMouseStatePointer(){ return &amp;mouse_state;} ; <br  />
+</dd></dl>
+<p>/**</p>
+<p>Left click event behavior </p>
+
+</div>
+</div>
+<a id="a467c8419c608a3da7babe626068f165d" name="a467c8419c608a3da7babe626068f165d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a467c8419c608a3da7babe626068f165d">&#9670;&#160;</a></span>onLeftClickRelease()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Renderer::onLeftClickRelease </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Left click release event behavior. </p>
+
+</div>
+</div>
+<a id="ae3076dfaa69b9fb35654d6eea2bf1f17" name="ae3076dfaa69b9fb35654d6eea2bf1f17"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3076dfaa69b9fb35654d6eea2bf1f17">&#9670;&#160;</a></span>onRightClick()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Renderer::onRightClick </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Right click event behavior. </p>
+
+</div>
+</div>
+<a id="a9419f32e888a1f81335f891644045c35" name="a9419f32e888a1f81335f891644045c35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9419f32e888a1f81335f891644045c35">&#9670;&#160;</a></span>onRightClickRelease()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Renderer::onRightClickRelease </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Right click release event behavior. </p>
+
+</div>
+</div>
+<a id="ae99c04c0397fe69084c052bbfb16841d" name="ae99c04c0397fe69084c052bbfb16841d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae99c04c0397fe69084c052bbfb16841d">&#9670;&#160;</a></span>onScrollDown()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Renderer::onScrollDown </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Scroll down event behavior. </p>
+
+</div>
+</div>
+<a id="ae3a39066e9aced50ba2abb82a0d27be6" name="ae3a39066e9aced50ba2abb82a0d27be6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3a39066e9aced50ba2abb82a0d27be6">&#9670;&#160;</a></span>onScrollUp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Renderer::onScrollUp </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Scroll up event behavior. </p>
+
+</div>
+</div>
+<a id="afe0d3204823fd4c16c0b6d780d780cff" name="afe0d3204823fd4c16c0b6d780d780cff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe0d3204823fd4c16c0b6d780d780cff">&#9670;&#160;</a></span>prep_draw()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Renderer::prep_draw </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Method setting up the meshes , and the scene camera. </p>
+<dl class="section return"><dt>Returns</dt><dd>true If operation succeeded </dd></dl>
+
+</div>
+</div>
+<a id="ae6e385b09710d4bb27b432ad894ec616" name="ae6e385b09710d4bb27b432ad894ec616"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae6e385b09710d4bb27b432ad894ec616">&#9670;&#160;</a></span>scene_ready()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Renderer::scene_ready </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Checks if all <a class="el" href="classDrawable.html">Drawable</a> objects in the scene have been initialized. </p>
+<dl class="section return"><dt>Returns</dt><dd>true If the scene is initialized and ready </dd></dl>
+
+</div>
+</div>
+<a id="adcf7dda67ee482de40bb4f6da9fa999a" name="adcf7dda67ee482de40bb4f6da9fa999a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcf7dda67ee482de40bb4f6da9fa999a">&#9670;&#160;</a></span>set_new_scene()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Renderer::set_new_scene </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="classaxomae_1_1Mesh.html">axomae::Mesh</a> * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>new_scene</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Cleans up the former scene and replaces it with a new. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">new_scene</td><td>New scene to be rendererd </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9d01b9955f6ca3585b8b66c735e53b26" name="a9d01b9955f6ca3585b8b66c735e53b26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d01b9955f6ca3585b8b66c735e53b26">&#9670;&#160;</a></span>setScreenSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Renderer::setScreenSize </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>width</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>height</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the new screen dimensions. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">width</td><td>Width of the screen <br  />
+ </td></tr>
+    <tr><td class="paramname">height</td><td>Height of the screen </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a42ebad5956a3cfc1465fc6c1b3f74252" name="a42ebad5956a3cfc1465fc6c1b3f74252"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42ebad5956a3cfc1465fc6c1b3f74252">&#9670;&#160;</a></span>mouse_state</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structMouseState.html">MouseState</a> Renderer::mouse_state</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Pointer on the <a class="el" href="structMouseState.html">MouseState</a> structure </p>
+
+</div>
+</div>
+<a id="ae043488e26024eee4dc61c22f2371216" name="ae043488e26024eee4dc61c22f2371216"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae043488e26024eee4dc61c22f2371216">&#9670;&#160;</a></span>scene</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="classDrawable.html">Drawable</a>*&gt; Renderer::scene</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The scene to be rendered </p>
+
+</div>
+</div>
+<a id="ae92ff9d0c9718a8693e98f10756eb280" name="ae92ff9d0c9718a8693e98f10756eb280"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae92ff9d0c9718a8693e98f10756eb280">&#9670;&#160;</a></span>scene_camera</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classCamera.html">Camera</a>* Renderer::scene_camera</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Pointer on the scene camera </p>
+
+</div>
+</div>
+<a id="a03b15b6f79e421bafa2ba8265be581b6" name="a03b15b6f79e421bafa2ba8265be581b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03b15b6f79e421bafa2ba8265be581b6">&#9670;&#160;</a></span>screen_size</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structScreenSize.html">ScreenSize</a> Renderer::screen_size</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Dimensions of the renderer windows </p>
+
+</div>
+</div>
+<a id="ad0a08676b861c4e8ed155eed4f1c6871" name="ad0a08676b861c4e8ed155eed4f1c6871"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0a08676b861c4e8ed155eed4f1c6871">&#9670;&#160;</a></span>shader_database</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classShaderDatabase.html">ShaderDatabase</a>* Renderer::shader_database</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Pointer on the shader database </p>
+
+</div>
+</div>
+<a id="a4a8ee266ecd71f53198cb508738c94f2" name="a4a8ee266ecd71f53198cb508738c94f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a8ee266ecd71f53198cb508738c94f2">&#9670;&#160;</a></span>start_draw</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Renderer::start_draw</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>If the renderer is ready to draw </p>
+
+</div>
+</div>
+<a id="accaa2bc85cfcffce05f7f84b67557422" name="accaa2bc85cfcffce05f7f84b67557422"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#accaa2bc85cfcffce05f7f84b67557422">&#9670;&#160;</a></span>texture_database</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classTextureDatabase.html">TextureDatabase</a>* Renderer::texture_database</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Pointer on the texture database </p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/hamilcar/Desktop/projects/Axomae/includes/<a class="el" href="Renderer_8h_source.html">Renderer.h</a></li>
 </ul>

@@ -1,73 +1,288 @@
 \hypertarget{classRenderer}{}\doxysection{Renderer Class Reference}
 \label{classRenderer}\index{Renderer@{Renderer}}
+
+
+\mbox{\hyperlink{classRenderer}{Renderer}} class definition.  
+
+
+
+
+{\ttfamily \#include $<$Renderer.\+h$>$}
+
 \doxysubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classRenderer_af0cf13596dfb5e7c40f58b5dbad6e74c}\label{classRenderer_af0cf13596dfb5e7c40f58b5dbad6e74c}} 
-void {\bfseries initialize} ()
-\item 
-\mbox{\Hypertarget{classRenderer_afe0d3204823fd4c16c0b6d780d780cff}\label{classRenderer_afe0d3204823fd4c16c0b6d780d780cff}} 
-bool {\bfseries prep\+\_\+draw} ()
-\item 
-\mbox{\Hypertarget{classRenderer_a9a0a5f207e3d9f60c6372a9c79b25df9}\label{classRenderer_a9a0a5f207e3d9f60c6372a9c79b25df9}} 
-void {\bfseries draw} ()
-\item 
-\mbox{\Hypertarget{classRenderer_adcf7dda67ee482de40bb4f6da9fa999a}\label{classRenderer_adcf7dda67ee482de40bb4f6da9fa999a}} 
-void {\bfseries set\+\_\+new\+\_\+scene} (std\+::vector$<$ \mbox{\hyperlink{classaxomae_1_1Mesh}{axomae\+::\+Mesh}} $\ast$ $>$ \&new\+\_\+scene)
-\item 
-\mbox{\Hypertarget{classRenderer_ae6e385b09710d4bb27b432ad894ec616}\label{classRenderer_ae6e385b09710d4bb27b432ad894ec616}} 
-bool {\bfseries scene\+\_\+ready} ()
-\item 
-\mbox{\Hypertarget{classRenderer_a2843abeca78d7c4de24a3a11099167b8}\label{classRenderer_a2843abeca78d7c4de24a3a11099167b8}} 
-\mbox{\hyperlink{structMouseState}{Mouse\+State}} $\ast$ {\bfseries get\+Mouse\+State\+Pointer} ()
-\item 
-\mbox{\Hypertarget{classRenderer_a57bf9871fe67b6f0e1478f475b933cce}\label{classRenderer_a57bf9871fe67b6f0e1478f475b933cce}} 
-void {\bfseries on\+Left\+Click} ()
-\item 
-\mbox{\Hypertarget{classRenderer_ae3076dfaa69b9fb35654d6eea2bf1f17}\label{classRenderer_ae3076dfaa69b9fb35654d6eea2bf1f17}} 
-void {\bfseries on\+Right\+Click} ()
-\item 
-\mbox{\Hypertarget{classRenderer_a467c8419c608a3da7babe626068f165d}\label{classRenderer_a467c8419c608a3da7babe626068f165d}} 
-void {\bfseries on\+Left\+Click\+Release} ()
-\item 
-\mbox{\Hypertarget{classRenderer_a9419f32e888a1f81335f891644045c35}\label{classRenderer_a9419f32e888a1f81335f891644045c35}} 
-void {\bfseries on\+Right\+Click\+Release} ()
-\item 
-\mbox{\Hypertarget{classRenderer_ae99c04c0397fe69084c052bbfb16841d}\label{classRenderer_ae99c04c0397fe69084c052bbfb16841d}} 
-void {\bfseries on\+Scroll\+Down} ()
-\item 
-\mbox{\Hypertarget{classRenderer_ae3a39066e9aced50ba2abb82a0d27be6}\label{classRenderer_ae3a39066e9aced50ba2abb82a0d27be6}} 
-void {\bfseries on\+Scroll\+Up} ()
-\item 
-\mbox{\Hypertarget{classRenderer_a9d01b9955f6ca3585b8b66c735e53b26}\label{classRenderer_a9d01b9955f6ca3585b8b66c735e53b26}} 
-void {\bfseries set\+Screen\+Size} (unsigned int width, unsigned int height)
-\end{DoxyCompactItemize}
+\mbox{\hyperlink{classRenderer_a7ebf46f54dab9905f79b80f7fddb76a6}{Renderer}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{classRenderer}{Renderer}} object. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classRenderer_aba42b60392775e4a492c4d14d4fff29f}{$\sim$\+Renderer}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the \mbox{\hyperlink{classRenderer}{Renderer}} object. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRenderer_af0cf13596dfb5e7c40f58b5dbad6e74c}{initialize}} ()
+\begin{DoxyCompactList}\small\item\em Initialize the renderer\textquotesingle{}s basic characteristics , like depth , background colors etc. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classRenderer_afe0d3204823fd4c16c0b6d780d780cff}{prep\+\_\+draw}} ()
+\begin{DoxyCompactList}\small\item\em Method setting up the meshes , and the scene camera. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRenderer_a9a0a5f207e3d9f60c6372a9c79b25df9}{draw}} ()
+\begin{DoxyCompactList}\small\item\em Initiates the draw calls for all objects in the scene. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRenderer_adcf7dda67ee482de40bb4f6da9fa999a}{set\+\_\+new\+\_\+scene}} (std\+::vector$<$ \mbox{\hyperlink{classaxomae_1_1Mesh}{axomae\+::\+Mesh}} $\ast$ $>$ \&new\+\_\+scene)
+\begin{DoxyCompactList}\small\item\em Cleans up the former scene and replaces it with a new. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classRenderer_ae6e385b09710d4bb27b432ad894ec616}{scene\+\_\+ready}} ()
+\begin{DoxyCompactList}\small\item\em Checks if all \mbox{\hyperlink{classDrawable}{Drawable}} objects in the scene have been initialized. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRenderer_a57bf9871fe67b6f0e1478f475b933cce}{on\+Left\+Click}} ()
+\begin{DoxyCompactList}\small\item\em Get the pointer to the \mbox{\hyperlink{structMouseState}{Mouse\+State}} structure. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRenderer_ae3076dfaa69b9fb35654d6eea2bf1f17}{on\+Right\+Click}} ()
+\begin{DoxyCompactList}\small\item\em Right click event behavior. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRenderer_a467c8419c608a3da7babe626068f165d}{on\+Left\+Click\+Release}} ()
+\begin{DoxyCompactList}\small\item\em Left click release event behavior. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRenderer_a9419f32e888a1f81335f891644045c35}{on\+Right\+Click\+Release}} ()
+\begin{DoxyCompactList}\small\item\em Right click release event behavior. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRenderer_ae99c04c0397fe69084c052bbfb16841d}{on\+Scroll\+Down}} ()
+\begin{DoxyCompactList}\small\item\em Scroll down event behavior. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRenderer_ae3a39066e9aced50ba2abb82a0d27be6}{on\+Scroll\+Up}} ()
+\begin{DoxyCompactList}\small\item\em Scroll up event behavior. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classRenderer_a9d01b9955f6ca3585b8b66c735e53b26}{set\+Screen\+Size}} (unsigned int width, unsigned int height)
+\begin{DoxyCompactList}\small\item\em Set the new screen dimensions. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{classRenderer_ae043488e26024eee4dc61c22f2371216}\label{classRenderer_ae043488e26024eee4dc61c22f2371216}} 
-std\+::vector$<$ \mbox{\hyperlink{classDrawable}{Drawable}} $\ast$ $>$ {\bfseries scene}
+std\+::vector$<$ \mbox{\hyperlink{classDrawable}{Drawable}} $\ast$ $>$ \mbox{\hyperlink{classRenderer_ae043488e26024eee4dc61c22f2371216}{scene}}
 \item 
-\mbox{\Hypertarget{classRenderer_a4a8ee266ecd71f53198cb508738c94f2}\label{classRenderer_a4a8ee266ecd71f53198cb508738c94f2}} 
-bool {\bfseries start\+\_\+draw}
+bool \mbox{\hyperlink{classRenderer_a4a8ee266ecd71f53198cb508738c94f2}{start\+\_\+draw}}
 \item 
-\mbox{\Hypertarget{classRenderer_accaa2bc85cfcffce05f7f84b67557422}\label{classRenderer_accaa2bc85cfcffce05f7f84b67557422}} 
-\mbox{\hyperlink{classTextureDatabase}{Texture\+Database}} $\ast$ {\bfseries texture\+\_\+database}
+\mbox{\hyperlink{classTextureDatabase}{Texture\+Database}} $\ast$ \mbox{\hyperlink{classRenderer_accaa2bc85cfcffce05f7f84b67557422}{texture\+\_\+database}}
 \item 
-\mbox{\Hypertarget{classRenderer_ad0a08676b861c4e8ed155eed4f1c6871}\label{classRenderer_ad0a08676b861c4e8ed155eed4f1c6871}} 
-\mbox{\hyperlink{classShaderDatabase}{Shader\+Database}} $\ast$ {\bfseries shader\+\_\+database}
+\mbox{\hyperlink{classShaderDatabase}{Shader\+Database}} $\ast$ \mbox{\hyperlink{classRenderer_ad0a08676b861c4e8ed155eed4f1c6871}{shader\+\_\+database}}
 \item 
-\mbox{\Hypertarget{classRenderer_ae92ff9d0c9718a8693e98f10756eb280}\label{classRenderer_ae92ff9d0c9718a8693e98f10756eb280}} 
-\mbox{\hyperlink{classCamera}{Camera}} $\ast$ {\bfseries scene\+\_\+camera}
+\mbox{\hyperlink{classCamera}{Camera}} $\ast$ \mbox{\hyperlink{classRenderer_ae92ff9d0c9718a8693e98f10756eb280}{scene\+\_\+camera}}
 \item 
-\mbox{\Hypertarget{classRenderer_a42ebad5956a3cfc1465fc6c1b3f74252}\label{classRenderer_a42ebad5956a3cfc1465fc6c1b3f74252}} 
-\mbox{\hyperlink{structMouseState}{Mouse\+State}} {\bfseries mouse\+\_\+state}
+\mbox{\hyperlink{structMouseState}{Mouse\+State}} \mbox{\hyperlink{classRenderer_a42ebad5956a3cfc1465fc6c1b3f74252}{mouse\+\_\+state}}
 \item 
-\mbox{\Hypertarget{classRenderer_a03b15b6f79e421bafa2ba8265be581b6}\label{classRenderer_a03b15b6f79e421bafa2ba8265be581b6}} 
-\mbox{\hyperlink{structScreenSize}{Screen\+Size}} {\bfseries screen\+\_\+size}
+\mbox{\hyperlink{structScreenSize}{Screen\+Size}} \mbox{\hyperlink{classRenderer_a03b15b6f79e421bafa2ba8265be581b6}{screen\+\_\+size}}
 \end{DoxyCompactItemize}
 
 
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classRenderer}{Renderer}} class definition. 
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classRenderer_a7ebf46f54dab9905f79b80f7fddb76a6}\label{classRenderer_a7ebf46f54dab9905f79b80f7fddb76a6}} 
+\index{Renderer@{Renderer}!Renderer@{Renderer}}
+\index{Renderer@{Renderer}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{Renderer()}{Renderer()}}
+{\footnotesize\ttfamily Renderer\+::\+Renderer (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Construct a new \mbox{\hyperlink{classRenderer}{Renderer}} object. 
+
+\mbox{\Hypertarget{classRenderer_aba42b60392775e4a492c4d14d4fff29f}\label{classRenderer_aba42b60392775e4a492c4d14d4fff29f}} 
+\index{Renderer@{Renderer}!````~Renderer@{$\sim$Renderer}}
+\index{````~Renderer@{$\sim$Renderer}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{$\sim$Renderer()}{~Renderer()}}
+{\footnotesize\ttfamily virtual Renderer\+::$\sim$\+Renderer (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Destroy the \mbox{\hyperlink{classRenderer}{Renderer}} object. 
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classRenderer_a9a0a5f207e3d9f60c6372a9c79b25df9}\label{classRenderer_a9a0a5f207e3d9f60c6372a9c79b25df9}} 
+\index{Renderer@{Renderer}!draw@{draw}}
+\index{draw@{draw}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{draw()}{draw()}}
+{\footnotesize\ttfamily void Renderer\+::draw (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Initiates the draw calls for all objects in the scene. 
+
+\mbox{\Hypertarget{classRenderer_af0cf13596dfb5e7c40f58b5dbad6e74c}\label{classRenderer_af0cf13596dfb5e7c40f58b5dbad6e74c}} 
+\index{Renderer@{Renderer}!initialize@{initialize}}
+\index{initialize@{initialize}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily void Renderer\+::initialize (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Initialize the renderer\textquotesingle{}s basic characteristics , like depth , background colors etc. 
+
+\mbox{\Hypertarget{classRenderer_a57bf9871fe67b6f0e1478f475b933cce}\label{classRenderer_a57bf9871fe67b6f0e1478f475b933cce}} 
+\index{Renderer@{Renderer}!onLeftClick@{onLeftClick}}
+\index{onLeftClick@{onLeftClick}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{onLeftClick()}{onLeftClick()}}
+{\footnotesize\ttfamily void Renderer\+::on\+Left\+Click (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the pointer to the \mbox{\hyperlink{structMouseState}{Mouse\+State}} structure. 
+
+\begin{DoxyReturn}{Returns}
+Mouse\+State$\ast$ Pointer on the mouse\+\_\+state variable , informations about the mouse positions , button clicked etc 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{structMouseState}{Mouse\+State}} / Mouse\+State$\ast$ get\+Mouse\+State\+Pointer()\{ return \&mouse\+\_\+state;\} ; ~\newline
+
+\end{DoxySeeAlso}
+/$\ast$$\ast$
+
+Left click event behavior \mbox{\Hypertarget{classRenderer_a467c8419c608a3da7babe626068f165d}\label{classRenderer_a467c8419c608a3da7babe626068f165d}} 
+\index{Renderer@{Renderer}!onLeftClickRelease@{onLeftClickRelease}}
+\index{onLeftClickRelease@{onLeftClickRelease}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{onLeftClickRelease()}{onLeftClickRelease()}}
+{\footnotesize\ttfamily void Renderer\+::on\+Left\+Click\+Release (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Left click release event behavior. 
+
+\mbox{\Hypertarget{classRenderer_ae3076dfaa69b9fb35654d6eea2bf1f17}\label{classRenderer_ae3076dfaa69b9fb35654d6eea2bf1f17}} 
+\index{Renderer@{Renderer}!onRightClick@{onRightClick}}
+\index{onRightClick@{onRightClick}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{onRightClick()}{onRightClick()}}
+{\footnotesize\ttfamily void Renderer\+::on\+Right\+Click (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Right click event behavior. 
+
+\mbox{\Hypertarget{classRenderer_a9419f32e888a1f81335f891644045c35}\label{classRenderer_a9419f32e888a1f81335f891644045c35}} 
+\index{Renderer@{Renderer}!onRightClickRelease@{onRightClickRelease}}
+\index{onRightClickRelease@{onRightClickRelease}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{onRightClickRelease()}{onRightClickRelease()}}
+{\footnotesize\ttfamily void Renderer\+::on\+Right\+Click\+Release (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Right click release event behavior. 
+
+\mbox{\Hypertarget{classRenderer_ae99c04c0397fe69084c052bbfb16841d}\label{classRenderer_ae99c04c0397fe69084c052bbfb16841d}} 
+\index{Renderer@{Renderer}!onScrollDown@{onScrollDown}}
+\index{onScrollDown@{onScrollDown}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{onScrollDown()}{onScrollDown()}}
+{\footnotesize\ttfamily void Renderer\+::on\+Scroll\+Down (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Scroll down event behavior. 
+
+\mbox{\Hypertarget{classRenderer_ae3a39066e9aced50ba2abb82a0d27be6}\label{classRenderer_ae3a39066e9aced50ba2abb82a0d27be6}} 
+\index{Renderer@{Renderer}!onScrollUp@{onScrollUp}}
+\index{onScrollUp@{onScrollUp}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{onScrollUp()}{onScrollUp()}}
+{\footnotesize\ttfamily void Renderer\+::on\+Scroll\+Up (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Scroll up event behavior. 
+
+\mbox{\Hypertarget{classRenderer_afe0d3204823fd4c16c0b6d780d780cff}\label{classRenderer_afe0d3204823fd4c16c0b6d780d780cff}} 
+\index{Renderer@{Renderer}!prep\_draw@{prep\_draw}}
+\index{prep\_draw@{prep\_draw}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{prep\_draw()}{prep\_draw()}}
+{\footnotesize\ttfamily bool Renderer\+::prep\+\_\+draw (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Method setting up the meshes , and the scene camera. 
+
+\begin{DoxyReturn}{Returns}
+true If operation succeeded 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classRenderer_ae6e385b09710d4bb27b432ad894ec616}\label{classRenderer_ae6e385b09710d4bb27b432ad894ec616}} 
+\index{Renderer@{Renderer}!scene\_ready@{scene\_ready}}
+\index{scene\_ready@{scene\_ready}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{scene\_ready()}{scene\_ready()}}
+{\footnotesize\ttfamily bool Renderer\+::scene\+\_\+ready (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Checks if all \mbox{\hyperlink{classDrawable}{Drawable}} objects in the scene have been initialized. 
+
+\begin{DoxyReturn}{Returns}
+true If the scene is initialized and ready 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classRenderer_adcf7dda67ee482de40bb4f6da9fa999a}\label{classRenderer_adcf7dda67ee482de40bb4f6da9fa999a}} 
+\index{Renderer@{Renderer}!set\_new\_scene@{set\_new\_scene}}
+\index{set\_new\_scene@{set\_new\_scene}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{set\_new\_scene()}{set\_new\_scene()}}
+{\footnotesize\ttfamily void Renderer\+::set\+\_\+new\+\_\+scene (\begin{DoxyParamCaption}\item[{std\+::vector$<$ \mbox{\hyperlink{classaxomae_1_1Mesh}{axomae\+::\+Mesh}} $\ast$ $>$ \&}]{new\+\_\+scene }\end{DoxyParamCaption})}
+
+
+
+Cleans up the former scene and replaces it with a new. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em new\+\_\+scene} & New scene to be rendererd \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classRenderer_a9d01b9955f6ca3585b8b66c735e53b26}\label{classRenderer_a9d01b9955f6ca3585b8b66c735e53b26}} 
+\index{Renderer@{Renderer}!setScreenSize@{setScreenSize}}
+\index{setScreenSize@{setScreenSize}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{setScreenSize()}{setScreenSize()}}
+{\footnotesize\ttfamily void Renderer\+::set\+Screen\+Size (\begin{DoxyParamCaption}\item[{unsigned int}]{width,  }\item[{unsigned int}]{height }\end{DoxyParamCaption})}
+
+
+
+Set the new screen dimensions. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em width} & Width of the screen ~\newline
+ \\
+\hline
+{\em height} & Height of the screen \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classRenderer_a42ebad5956a3cfc1465fc6c1b3f74252}\label{classRenderer_a42ebad5956a3cfc1465fc6c1b3f74252}} 
+\index{Renderer@{Renderer}!mouse\_state@{mouse\_state}}
+\index{mouse\_state@{mouse\_state}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{mouse\_state}{mouse\_state}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structMouseState}{Mouse\+State}} Renderer\+::mouse\+\_\+state}
+
+Pointer on the \mbox{\hyperlink{structMouseState}{Mouse\+State}} structure \mbox{\Hypertarget{classRenderer_ae043488e26024eee4dc61c22f2371216}\label{classRenderer_ae043488e26024eee4dc61c22f2371216}} 
+\index{Renderer@{Renderer}!scene@{scene}}
+\index{scene@{scene}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{scene}{scene}}
+{\footnotesize\ttfamily std\+::vector$<$\mbox{\hyperlink{classDrawable}{Drawable}}$\ast$$>$ Renderer\+::scene}
+
+The scene to be rendered \mbox{\Hypertarget{classRenderer_ae92ff9d0c9718a8693e98f10756eb280}\label{classRenderer_ae92ff9d0c9718a8693e98f10756eb280}} 
+\index{Renderer@{Renderer}!scene\_camera@{scene\_camera}}
+\index{scene\_camera@{scene\_camera}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{scene\_camera}{scene\_camera}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classCamera}{Camera}}$\ast$ Renderer\+::scene\+\_\+camera}
+
+Pointer on the scene camera \mbox{\Hypertarget{classRenderer_a03b15b6f79e421bafa2ba8265be581b6}\label{classRenderer_a03b15b6f79e421bafa2ba8265be581b6}} 
+\index{Renderer@{Renderer}!screen\_size@{screen\_size}}
+\index{screen\_size@{screen\_size}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{screen\_size}{screen\_size}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structScreenSize}{Screen\+Size}} Renderer\+::screen\+\_\+size}
+
+Dimensions of the renderer windows \mbox{\Hypertarget{classRenderer_ad0a08676b861c4e8ed155eed4f1c6871}\label{classRenderer_ad0a08676b861c4e8ed155eed4f1c6871}} 
+\index{Renderer@{Renderer}!shader\_database@{shader\_database}}
+\index{shader\_database@{shader\_database}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{shader\_database}{shader\_database}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classShaderDatabase}{Shader\+Database}}$\ast$ Renderer\+::shader\+\_\+database}
+
+Pointer on the shader database \mbox{\Hypertarget{classRenderer_a4a8ee266ecd71f53198cb508738c94f2}\label{classRenderer_a4a8ee266ecd71f53198cb508738c94f2}} 
+\index{Renderer@{Renderer}!start\_draw@{start\_draw}}
+\index{start\_draw@{start\_draw}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{start\_draw}{start\_draw}}
+{\footnotesize\ttfamily bool Renderer\+::start\+\_\+draw}
+
+If the renderer is ready to draw \mbox{\Hypertarget{classRenderer_accaa2bc85cfcffce05f7f84b67557422}\label{classRenderer_accaa2bc85cfcffce05f7f84b67557422}} 
+\index{Renderer@{Renderer}!texture\_database@{texture\_database}}
+\index{texture\_database@{texture\_database}!Renderer@{Renderer}}
+\doxysubsubsection{\texorpdfstring{texture\_database}{texture\_database}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classTextureDatabase}{Texture\+Database}}$\ast$ Renderer\+::texture\+\_\+database}
+
+Pointer on the texture database 
+
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/home/hamilcar/\+Desktop/projects/\+Axomae/includes/Renderer.\+h\end{DoxyCompactItemize}
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/\mbox{\hyperlink{Renderer_8h}{Renderer.\+h}}\end{DoxyCompactItemize}

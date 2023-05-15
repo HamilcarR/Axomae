@@ -1,11 +1,13 @@
 var searchData=
 [
-  ['radius_0',['radius',['../classArcballCamera.html#afbe6a2fd703a716613a92fd32d113963',1,'ArcballCamera']]],
-  ['renderer_1',['Renderer',['../classRenderer.html',1,'']]],
-  ['reset_2',['reset',['../classCamera.html#ab07ef9e7e572d5bc9a67061aba393d83',1,'Camera::reset()'],['../classArcballCamera.html#a93400f23c27300e4de5aea2c4d89c7bb',1,'ArcballCamera::reset()']]],
-  ['rgb_3',['RGB',['../classaxomae_1_1RGB.html',1,'axomae']]],
-  ['right_4',['right',['../classCamera.html#aebffcc6289dd99df7554b18d00a81161',1,'Camera']]],
-  ['rotate_5',['rotate',['../classArcballCamera.html#acaef7aba1cf92f979406101dd9537f10',1,'ArcballCamera']]],
-  ['rotation_6',['rotation',['../classArcballCamera.html#af2a77c6ee9b6fa2b2b33ccba295c5098',1,'ArcballCamera']]],
-  ['roughnesstexture_7',['RoughnessTexture',['../classRoughnessTexture.html',1,'']]]
+  ['panning_5foffset_0',['panning_offset',['../classArcballCamera.html#a42387957840f3e05bbe38efc18cb762d',1,'ArcballCamera']]],
+  ['pbr_1',['PBR',['../classShader.html#a0203e846cef6779a4b2935b50f671358ad35b1a25e4d351a3ac783884d9183b57',1,'Shader']]],
+  ['perspective_2',['PERSPECTIVE',['../classCamera.html#a638f501aee229ba7e0cdda399e67e5d6a34783417054408fd9e024048b1cefa47',1,'Camera']]],
+  ['point2d_3',['Point2D',['../structaxomae_1_1Point2D.html',1,'axomae']]],
+  ['position_4',['position',['../classCamera.html#a04b5db2c530d8630660e8cfb93a4b3b5',1,'Camera']]],
+  ['prep_5fdraw_5',['prep_draw',['../classRenderer.html#afe0d3204823fd4c16c0b6d780d780cff',1,'Renderer']]],
+  ['previous_5fmesh_6',['previous_mesh',['../classaxomae_1_1GUIWindow.html#aa169d907c53984a113934d404cae4cd7',1,'axomae::GUIWindow']]],
+  ['programstatus_7',['ProgramStatus',['../classaxomae_1_1ProgramStatus.html',1,'axomae']]],
+  ['project_5fuv_5fnormals_8',['project_uv_normals',['../classaxomae_1_1GUIWindow.html#afbed0e40e508ba6572addb5021ea18c7',1,'axomae::GUIWindow']]],
+  ['projection_9',['projection',['../classCamera.html#a43555a0ae83f9ec696ee257e5fd48cf2',1,'Camera']]]
 ];
