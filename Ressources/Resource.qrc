@@ -19,6 +19,14 @@
     	<file alias="posy.jpg">Skybox_Textures/Sky/posy.jpg</file>
     	<file alias="posz.jpg">Skybox_Textures/Sky/posz.jpg</file>
 	</qresource>
+	<qresource prefix="/chapel">
+    	<file alias="negx.jpg">Skybox_Textures/Chapel/negx.jpg</file>
+    	<file alias="negy.jpg">Skybox_Textures/Chapel/negy.jpg</file>
+    	<file alias="negz.jpg">Skybox_Textures/Chapel/negz.jpg</file>
+    	<file alias="posx.jpg">Skybox_Textures/Chapel/posx.jpg</file>
+    	<file alias="posy.jpg">Skybox_Textures/Chapel/posy.jpg</file>
+    	<file alias="posz.jpg">Skybox_Textures/Chapel/posz.jpg</file>
+	</qresource>
 
 
 
