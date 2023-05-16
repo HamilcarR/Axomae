@@ -2,7 +2,6 @@
 #define SHADER_H
 
 #include "utils_3D.h" 
-#include "Material.h" 
 #include "Texture.h"
 #include "DebugGL.h" 
 #include "Camera.h" 
@@ -187,7 +186,11 @@ public:
 	 * @param value Value to save
 	 */
 	template<typename T> 
-	void setUniform(const char* name , const T value) ; 
+	void setUniform(const char* name , const T value){
+		glUseProgram(shader_program) ; 
+		int location = glGetUniformLocation(shader_program , name);
+		setUniformValue(location , value);
+	}
 	
 protected:
 	/**

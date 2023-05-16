@@ -95,7 +95,7 @@ void Shader::updateCamera(){
 
 void Shader::setCameraPositionUniform(){
 	if(camera_pointer != nullptr)
-		setUniform(uniform_name_vector_camera_position , camera_pointer->getPosition()); 	
+		setUniform(uniform_name_vec3_camera_position , camera_pointer->getPosition()); 	
 }
 
 void Shader::setAllMatricesUniforms(const glm::mat4& model){
@@ -154,14 +154,6 @@ void Shader::setModelViewProjection(const glm::mat4& model){
 void Shader::setModelViewProjection(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model) {
 		updateCamera();
 		setModelViewProjectionMatricesUniforms(projection , view , model); 
-}
-
-
-template<typename T> 
-void Shader::setUniform(const char* name , const T value){
-	glUseProgram(shader_program) ; 
-	int location = glGetUniformLocation(shader_program , name);
-	setUniformValue(location , value);
 }
 
 void Shader::setUniformValue(int location , const int value) {
