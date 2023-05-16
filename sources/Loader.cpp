@@ -207,12 +207,9 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
 				object.indices.push_back(static_cast<unsigned int> (mesh->mFaces[ind].mIndices[1]));
 				object.indices.push_back(static_cast<unsigned int> (mesh->mFaces[ind].mIndices[2]));
 			}
-			std::cout << "object loaded : " << mesh->mName.C_Str()<< "\n" ; 
-			Mesh *loaded_mesh = new Mesh() ; 
-			loaded_mesh->geometry = object ; 
-			loaded_mesh->material = mesh_material ;
-			loaded_mesh->name = name ; 
-			loaded_mesh->shader_program = shader_database->get(Shader::GENERIC) ;  //TODO : change for PBR and other nice shaders when needed 		
+			std::cout << "object loaded : " << mesh->mName.C_Str()<< "\n" ; 	
+			Shader* shader_program = shader_database->get(Shader::GENERIC) ;  //TODO : change for PBR and other nice shaders when needed 		
+			Mesh *loaded_mesh = new Mesh(std::string(mesh->mName.C_Str()) , object , mesh_material , shader_program) ;	
 			objects.push_back(loaded_mesh);
 		}
 		return std::pair<unsigned int , std::vector<Mesh*>> (modelScene->mNumTextures , objects) ; 
@@ -282,7 +279,7 @@ Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
 	TextureDatabase* texture_database = TextureDatabase::getInstance(); 	
 	cube_map->shader_program = shader_database->get(Shader::CUBEMAP) ; 
 	TextureData cubemap ; 
-	QString skybox_folder = "castle" ;
+	QString skybox_folder = "chapel" ;
 	auto format = "jpg"; 
 	QImage left(":/"+skybox_folder+"/negx.jpg" , format); 		
 	QImage bot(":/"+skybox_folder+"/negy.jpg" , format); 		
