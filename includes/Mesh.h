@@ -63,7 +63,17 @@ public:
 	 * @param mat Material data
 	 */
 	Mesh(std::string name , Object3D const& obj , Material const& mat); 
-	
+
+	/**
+	 * @brief Construct a new Mesh object
+	 * 
+	 * @param name Mesh name
+	 * @param obj Mesh geometry
+	 * @param mat Mesh material
+	 * @param shader Shader used
+	 */
+	Mesh(std::string name , Object3D const& obj , Material const& mat , Shader* shader);
+
 	/**
 	 * @brief Destroy the Mesh object
 	 * 

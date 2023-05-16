@@ -30,6 +30,14 @@ Mesh::Mesh(std::string n , Object3D const& geo , Material const& mat){
 	shader_program = nullptr ; 
 }
 
+Mesh::Mesh(std::string n , Object3D const& geo , Material const& mat , Shader* shader) {
+	geometry = geo ; 
+	material = mat ; 
+	name = n ; 
+	shader_program = shader; 
+	material.setShaderPointer(shader); 
+}
+
 Mesh::~Mesh(){}
 
 void Mesh::initializeGlData(){
