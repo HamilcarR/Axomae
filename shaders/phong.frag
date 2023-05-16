@@ -20,7 +20,8 @@ uniform mat4 MAT_MODEL;
 uniform mat4 MAT_MODELVIEW ; 
 uniform mat4 MAT_INV_MODEL ;
 uniform mat4 MAT_INV_MODELVIEW ;  
-uniform mat3 MAT_NORMAL ; 
+uniform mat3 MAT_NORMAL ;
+uniform vec2 refractive_index ;  
 /*****************************************/
 
 /* Samplers and textures */
@@ -42,8 +43,6 @@ out vec4 fragment ;
 /*Constants*/
 const float specular_intensity = 1.8f; 
 const float shininess = 10; 
-const float n1 = 1.f ; 
-const float n2 = 2.42f ;  
 const vec3 camera_position = vec3(0.f);
 /******************************************/
 
@@ -81,15 +80,17 @@ vec4 computeReflectionCubeMap(){
 }
 
 vec4 computeRefractionCubeMap(){
-    float refractive_index_ratio = n1 / n2 ; 
+    float refractive_index_ratio = refractive_index.x / refractive_index.y ; 
     vec3 view_direction = normalize(vertex_fragment_fragment_position - camera_position) ; 
     vec3 normal_vector = normalize(vertex_fragment_normals); 
     vec3 cubemap_sample_vector = vec3(inverse(MAT_NORMAL) * refract(view_direction , normal_vector , refractive_index_ratio)); 
     vec4 sampled_value = texture(cubemap , cubemap_sample_vector); 
     return sampled_value; 
-
 }
+
 vec2 computeFresnelCoefficients(){
+    float n1 = refractive_index.x ; 
+    float n2 = refractive_index.y ; 
     float refractive_index_ratio = n1 / n2 ; 
     vec3 incident_vector = normalize(vertex_fragment_fragment_position - camera_position) ; 
     vec3 normal_vector = normalize(vertex_fragment_normals); 
