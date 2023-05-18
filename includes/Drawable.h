@@ -1,7 +1,7 @@
 #ifndef DRAWABLE_H
 #define DRAWABLE_H
 
-
+#include "LightingDatabase.h"
 #include "Mesh.h"
 #include "TextureGroup.h" 
 #include "Camera.h"
@@ -94,9 +94,27 @@ public:
 	 * @param camera Camera pointer
 	 */
 	void setSceneCameraPointer(Camera* camera); 
-public:
+
+	/**
+	 * @brief Returns the mesh  
+	 * 
+	 */
+	axomae::Mesh* getMeshPointer(){return mesh_object;}
+
+	/**
+	 * @brief Get the Mesh's Shader
+	 * 
+	 * @return Shader* Shader pointer , or nullptr if mesh empty 
+	 */
+	Shader* getMeshShader(){
+		if(mesh_object) 
+			return mesh_object->getShader();
+		else
+			return nullptr;		
+	}
+
+protected:
 	axomae::Mesh *mesh_object ;			/**<Pointer to the mesh */
-private:	
 	Camera *camera_pointer ; 			/**<Pointer to the camera*/
 	GLBuffers gl_buffers ; 				/**<OpenGL buffers*/
 };

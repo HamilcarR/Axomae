@@ -64,7 +64,8 @@ void Mesh::bindShaders(){
 		shader_program->bind(); 	
 		shader_program->setSceneCameraPointer(camera); 
 		if(camera->getType() == Camera::ARCBALL) 
-			model_matrix = camera->getSceneModelMatrix() ;  
+			model_matrix = camera->getSceneModelMatrix() ; 
+		modelview_matrix = camera->getView() * model_matrix ;  
 		shader_program->setAllMatricesUniforms(model_matrix) ; 
 	}
 }

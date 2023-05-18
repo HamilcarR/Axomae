@@ -125,11 +125,26 @@ public:
 	virtual void setSceneCameraPointer(Camera *camera); 
 	
 	/**
-	 * @brief Set the Rotation Matrix 
+	 * @brief Set the Model Matrix 
 	 * 
-	 * @param rot Rotation matrix
+	 * @param matrix mat4 representing the model matrix 
 	 */
-	virtual void setRotationMatrix(glm::mat4 &rot){ model_matrix = rot ; } //TODO : replace with setModelMatrix()
+	virtual void setModelMatrix(glm::mat4 &matrix){ model_matrix = matrix ; }
+	
+	/**
+	 * @brief Get the Model Matrix object
+	 * 
+	 */
+	virtual glm::mat4& getModelMatrix() {return model_matrix;}
+
+	/**
+	 * @brief Get the ModelView matrix
+	 * 
+	 * @return glm::mat4 
+	 */
+	virtual glm::mat4& getModelViewMatrix(){
+		return model_matrix ; 
+	}	
 	
 	/**
 	 * @brief Disable the rendering of the back face of the mesh
@@ -169,10 +184,23 @@ public:
 	 * @param func Depth function to use. 
 	 * @see DEPTHFUNC
 	 */
-	void setDepthFunc(DEPTHFUNC func); 
+	void setDepthFunc(DEPTHFUNC func);
+
+	/**
+	 * @brief Get the Shader object
+	 * 
+	 * @return Shader* 
+	 */
+	Shader* getShader(){return shader_program;}
+
+	/**
+	 * @brief Set the Shader pointer
+	 * 
+	 * @param shader 
+	 */
+	void setShader(Shader* shader){shader_program = shader;} 
 public:
-	Object3D geometry;					/**<3D Geometry of the mesh , vertex positions , UVs etc*/
-	Shader* shader_program; 			/**<Shader to be used for the mesh*/
+	Object3D geometry;					/**<3D Geometry of the mesh , vertex positions , UVs etc*/	
 	Material material; 					/**<Material to be used for the mesh*/
 	std::string name; 					/**<Name of the mesh*/
 
@@ -180,8 +208,10 @@ protected:
 	bool mesh_initialized ; 			/**<Is the mesh ready to render*/
 	Camera* camera; 					/**<Pointer on the scene camera*/
 	glm::mat4 model_matrix;				/**<Mesh's model matrix*/
+	glm::mat4 modelview_matrix;			/**<Mesh's view x model matrix*/ 
 	bool face_culling_enabled ;			/**<Is culling enabled*/
 	bool depth_mask_enabled ; 			/**<Is depth enabled*/
+	Shader* shader_program; 			/**<Shader to be used for the mesh*/
 };
 
 /**

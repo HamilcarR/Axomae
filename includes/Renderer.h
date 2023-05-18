@@ -8,6 +8,7 @@
 #include "Drawable.h" 
 #include "TextureDatabase.h" 
 #include "Camera.h"
+#include "LightingDatabase.h"
 
 /**
  * @file Renderer.h
@@ -125,6 +126,7 @@ public:
 	bool start_draw ; 							/**<If the renderer is ready to draw*/
 	TextureDatabase* texture_database; 			/**<Pointer on the texture database*/
 	ShaderDatabase* shader_database; 			/**<Pointer on the shader database*/
+	LightingDatabase* light_database;			/**<Light database object*/ 
 	Camera *scene_camera ;						/**<Pointer on the scene camera*/
 	MouseState mouse_state ;					/**<Pointer on the MouseState structure*/
 	ScreenSize screen_size ; 					/**<Dimensions of the renderer windows*/

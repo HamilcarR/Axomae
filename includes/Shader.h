@@ -192,6 +192,19 @@ public:
 		setUniformValue(location , value);
 	}
 	
+	/**
+	 * @brief Convenience method for setUniform
+	 * 
+	 * @tparam T Type of data
+	 * @param name Shader uniform location name string
+	 * @param value Value to save
+	 * @see template<typename T> void setUniform(const char* name , const T value)
+	 */
+	template<typename T>
+	void setUniform (std::string name , const T value){
+		setUniform(name.c_str() , value); 
+	}	
+
 protected:
 	/**
 	 * @brief Set all the Texture Uniforms 
@@ -205,6 +218,22 @@ protected:
 	 * @param value Value to be set
 	 */
 	void setUniformValue(int location , const int value);
+
+	/**
+	 * @brief Set the Uniform Value for a float
+	 * 
+	 * @param location Uniform location
+	 * @param value Value to be set
+	 */
+	void setUniformValue(int location , const float value);
+
+	/**
+	 * @brief Set the Uniform Value for an unsigned int
+	 * 
+	 * @param location Uniform location 
+	 * @param value Value to be set 
+	 */
+	void setUniformValue(int location , const unsigned int value);  
 	
 	/**
 	 * @brief Set the Uniform Value for a 4x4 matrix

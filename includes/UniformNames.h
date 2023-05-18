@@ -12,12 +12,47 @@ constexpr const char uniform_name_matrix_normal[] = "MAT_NORMAL" ;
 constexpr const char uniform_name_matrix_inverse_model[] = "MAT_INV_MODEL" ;
 constexpr const char uniform_name_matrix_inverse_modelview[] = "MAT_INV_MODELVIEW" ;  
 
-/*Shader variables uniforms*/
+/**************Shader variables uniforms*********************/
+
+/*Camera*/
 constexpr const char uniform_name_vec3_camera_position[] = "camera_position" ; 
+
+
+/*Materials*/
 constexpr const char uniform_name_vec2_material_refractive_index[] = "refractive_index";
 constexpr const char uniform_name_float_material_dielectric_factor[] = "dielectric_factor" ; 
 constexpr const char uniform_name_float_material_roughness_factor[] = "roughness_factor" ; 
 constexpr const char uniform_name_float_material_transmission_factor[] = "transmission_factor" ; 
 constexpr const char uniform_name_float_material_emissive_factor[] = "emissive_factor" ; 
+
+
+/*Lighting variables*/
+constexpr const char uniform_name_float_lighting_intensity[] = "intensity";
+constexpr const char uniform_name_vec3_lighting_position[] = "position"; 
+constexpr const char uniform_name_vec3_lighting_specular_color[] = "specularColor"; 
+constexpr const char uniform_name_vec3_lighting_ambient_color[] = "ambientColor" ; 
+constexpr const char uniform_name_vec3_lighting_diffuse_color[] = "diffuseColor" ; 
+
+/*Light structures*/
+constexpr const char uniform_name_str_lighting_directional_struct_name[] = "directional_light_struct" ;
+
+/*Light arrays*/
+constexpr const char uniform_name_int_lighting_directional_number_name[] = "directional_light_number" ; 
+constexpr const char uniform_name_int_lighting_point_number_name[] = "point_light_number" ; 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif

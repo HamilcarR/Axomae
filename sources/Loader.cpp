@@ -277,7 +277,7 @@ Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
 	Mesh *cube_map = new CubeMapMesh(); 
 	ShaderDatabase *shader_database = ShaderDatabase::getInstance(); 
 	TextureDatabase* texture_database = TextureDatabase::getInstance(); 	
-	cube_map->shader_program = shader_database->get(Shader::CUBEMAP) ; 
+	cube_map->setShader(shader_database->get(Shader::CUBEMAP)) ; 
 	TextureData cubemap ; 
 	QString skybox_folder = "chapel" ;
 	auto format = "jpg"; 

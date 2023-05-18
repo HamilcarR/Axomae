@@ -53,7 +53,6 @@ Shader::Shader(){
 	type = GENERIC ; 
 }
 
-
 Shader::Shader(const std::string vertex_code , const std::string fragment_code){
 	type = GENERIC; 
 	fragment_shader_txt = fragment_code ; 
@@ -160,6 +159,14 @@ void Shader::setUniformValue(int location , const int value) {
 	glUniform1i(location , value); 
 }
 
+void Shader::setUniformValue(int location , const float value){
+	glUniform1f(location , value); 
+}
+
+void Shader::setUniformValue(int location , const unsigned int value){
+	glUniform1ui(location , value); 
+}
+
 void Shader::setUniformValue(int location , const glm::mat4 &matrix){
 	glUniformMatrix4fv(location ,1 , GL_FALSE , glm::value_ptr(matrix)); 
 }
@@ -171,9 +178,11 @@ void Shader::setUniformValue(int location , const glm::mat3 &matrix){
 void Shader::setUniformValue(int location , const glm::vec4& value){
 	glUniform4f(location , value.x , value.y , value.z , value.w); 
 }
+
 void Shader::setUniformValue(int location , const glm::vec3& value){
 	glUniform3f(location , value.x , value.y , value.z); 
 }
+
 void Shader::setUniformValue(int location , const glm::vec2& value){	
 	glUniform2f(location , value.x , value.y); 
 }

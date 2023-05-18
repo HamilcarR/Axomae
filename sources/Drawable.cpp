@@ -63,24 +63,24 @@ void Drawable::start_draw(){
 		gl_buffers.fillBuffers() ; 	
 		
 		gl_buffers.bindVertexBuffer(); 
-		mesh_object->shader_program->enableAttributeArray(0);
-		mesh_object->shader_program->setAttributeBuffer(0 , GL_FLOAT , 0 , 3 , 0 ) ;
+		mesh_object->getShader()->enableAttributeArray(0);
+		mesh_object->getShader()->setAttributeBuffer(0 , GL_FLOAT , 0 , 3 , 0 ) ;
 		
 		gl_buffers.bindColorBuffer() ;
-		mesh_object->shader_program->enableAttributeArray(1);
-		mesh_object->shader_program->setAttributeBuffer(1 , GL_FLOAT , 0 , 3 , 0 ) ; 
+		mesh_object->getShader()->enableAttributeArray(1);
+		mesh_object->getShader()->setAttributeBuffer(1 , GL_FLOAT , 0 , 3 , 0 ) ; 
 	
 		gl_buffers.bindNormalBuffer() ;
-		mesh_object->shader_program->enableAttributeArray(2);
-		mesh_object->shader_program->setAttributeBuffer(2 , GL_FLOAT , 0 , 3 , 0 ) ; 
+		mesh_object->getShader()->enableAttributeArray(2);
+		mesh_object->getShader()->setAttributeBuffer(2 , GL_FLOAT , 0 , 3 , 0 ) ; 
 		
 		gl_buffers.bindTextureBuffer() ;
-		mesh_object->shader_program->enableAttributeArray(3);
-		mesh_object->shader_program->setAttributeBuffer(3 , GL_FLOAT , 0 , 2 , 0 ) ; 
+		mesh_object->getShader()->enableAttributeArray(3);
+		mesh_object->getShader()->setAttributeBuffer(3 , GL_FLOAT , 0 , 2 , 0 ) ; 
 
 		gl_buffers.bindTangentBuffer() ;
-		mesh_object->shader_program->enableAttributeArray(4);
-		mesh_object->shader_program->setAttributeBuffer(4 , GL_FLOAT , 0 , 3 , 0 ) ; 
+		mesh_object->getShader()->enableAttributeArray(4);
+		mesh_object->getShader()->setAttributeBuffer(4 , GL_FLOAT , 0 , 3 , 0 ) ; 
 	
 		gl_buffers.unbindVao() ; 
 	}

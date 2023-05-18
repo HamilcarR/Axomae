@@ -7,7 +7,8 @@ using namespace axomae ;
 Renderer::Renderer(){
 	start_draw = false ;
 	texture_database = TextureDatabase::getInstance();
-	shader_database = ShaderDatabase::getInstance(); 
+	shader_database = ShaderDatabase::getInstance();
+	light_database = new LightingDatabase(); 
 	mouse_state.pos_x = 0 ;  
 	mouse_state.pos_y = 0 ; 
 	mouse_state.left_button_clicked = false ;
@@ -20,12 +21,11 @@ Renderer::Renderer(){
 }
 
 Renderer::~Renderer(){
-	for(unsigned int i = 0 ; i < scene.size() ; i++){
+	for(unsigned int i = 0 ; i < scene.size() ; i++)
 		if(scene[i] != nullptr){
 			scene[i]->clean();
 			delete scene[i]; 
-		}
-	}
+		}	
 	scene.clear(); 
 	if(TextureDatabase::isInstanced()){
 		texture_database->clean();
@@ -36,7 +36,10 @@ Renderer::~Renderer(){
 		shader_database->clean();
 		shader_database->destroy();
 		shader_database = nullptr ; 
-
+	}
+	if(light_database){
+		light_database->clearDatabase(); 
+		delete light_database;
 	}
 	delete scene_camera ; 
 	scene_camera = nullptr ; 
@@ -45,7 +48,6 @@ Renderer::~Renderer(){
 void Renderer::initialize(){
 	glEnable(GL_DEPTH_TEST); 
 }
-
 
 bool Renderer::scene_ready(){
 	for(Drawable *object : scene)
@@ -56,7 +58,6 @@ bool Renderer::scene_ready(){
 
 bool Renderer::prep_draw(){
 	if(start_draw && scene_ready()){
-		/*Bind buffers*/
 		for(Drawable *A : scene){
 			A->setSceneCameraPointer(scene_camera); 
 			A->start_draw(); 
@@ -65,7 +66,6 @@ bool Renderer::prep_draw(){
 		return true; 				
 	}
 	else{
-
 		glClearColor(0 , 0 , 0, 1.f);
 		return false ;	
 	}
@@ -75,7 +75,8 @@ void Renderer::draw(){
 	scene_camera->computeViewProjection(); 
 	for (Drawable *A : scene){
 		A->bind();
-		glDrawElements(GL_TRIANGLES , A->mesh_object->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
+		light_database->updateShadersData(A->getMeshShader() , A->getMeshPointer()->getModelViewMatrix()); 
+		glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
 		A->unbind();
 	}
 
