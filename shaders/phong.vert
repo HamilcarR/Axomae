@@ -27,7 +27,6 @@ out vec2 vertex_fragment_uv ;
 out vec3 vertex_fragment_normals; 
 out vec3 vertex_fragment_positions ; 
 out vec3 vertex_fragment_fragment_position ; 
-out vec3 vertex_fragment_light_position; 
 out vec3 vertex_fragment_camera_position ;
 /******************************************/
 
@@ -37,7 +36,7 @@ out vec3 vertex_fragment_camera_position ;
 /******************************************/
 
 /* Constants */
-const vec3 light_pos = vec3(0 , 0 , 2); 
+const vec3 light_pos = vec3(1000 , 1000 , -1000); 
 
 
 /******************************************/
@@ -47,6 +46,5 @@ void main(){
 	vertex_fragment_uv = uv ; 
 	vertex_fragment_normals = MAT_NORMAL * normals;
 	vertex_fragment_fragment_position = vec3(MAT_MODELVIEW * vec4(positions , 1.f)) ; 
-    vertex_fragment_light_position = vec3(MAT_MODELVIEW * vec4(light_pos , 1.f)) ; 
 	gl_Position = MAT_MVP * vec4(positions , 1.f) ; 
 }

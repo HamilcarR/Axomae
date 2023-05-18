@@ -1,4 +1,5 @@
 #version 460 core
+#define MAX_LIGHTS 20
 
 /* Interpolated data from vertex shader */
 in vec4 vertex_fragment_colors ; 
@@ -6,7 +7,6 @@ in vec2 vertex_fragment_uv ;
 in vec3 vertex_fragment_normals; 
 in vec3 vertex_fragment_positions ; 
 in vec3 vertex_fragment_fragment_position ; 
-in vec3 vertex_fragment_light_position; 
 in vec3 vertex_fragment_camera_position; 
 /*****************************************/
 
@@ -21,7 +21,19 @@ uniform mat4 MAT_MODELVIEW ;
 uniform mat4 MAT_INV_MODEL ;
 uniform mat4 MAT_INV_MODELVIEW ;  
 uniform mat3 MAT_NORMAL ;
-uniform vec2 refractive_index ;  
+uniform vec2 refractive_index ;
+uniform unsigned int directional_light_number;  
+
+/*Uniforms structs*/
+
+struct DIRECTIONAL_LIGHT_STRUCT {
+    vec3 position ; 
+    vec3 specularColor ; 
+    vec3 ambientColor ; 
+    vec3 diffuseColor ; 
+    float intensity ; 
+};
+uniform DIRECTIONAL_LIGHT_STRUCT directional_light_struct[MAX_LIGHTS] ; 
 /*****************************************/
 
 /* Samplers and textures */
@@ -42,32 +54,43 @@ out vec4 fragment ;
 
 /*Constants*/
 const float specular_intensity = 1.8f; 
-const float shininess = 10; 
+const float shininess = 200; 
 const vec3 camera_position = vec3(0.f);
+const float ambient_factor = 0.2f ;
 /******************************************/
 
 vec3 getViewDirection(){
     return normalize(camera_position - vertex_fragment_fragment_position); 
 }
 
-vec3 getLightDirection(){
-    return normalize(vertex_fragment_light_position - vertex_fragment_fragment_position); 
+vec3 getLightDirection(unsigned int i){
+    return normalize(directional_light_struct[i].position - vertex_fragment_fragment_position); 
 }
 
-float computeDiffuseLight(){
+vec3 computeDiffuseLight(){
     vec3 n = normalize(vertex_fragment_normals);
-    float diffuse_light = max(dot(getLightDirection() , n) , 0.f); 
-    return diffuse_light ; 
+    int i = 0 ; 
+    vec3 total_diffuse = vec3(0.f); 
+    for(i = 0 ; i < directional_light_number ; i++){
+        vec3 dir = getLightDirection(i); 
+        float diffuse_light = max(dot(dir , n) , 0.f) * directional_light_struct[i].intensity ; 
+        total_diffuse += diffuse_light * directional_light_struct[i].diffuseColor ;
+    }
+    return total_diffuse;  
 }
 
-float computeSpecularLight(){
-    vec3 light_direction = getLightDirection(); 
+vec3 computeSpecularLight(){
     vec3 view_direction = getViewDirection(); 
-    vec3 normal_vector = vertex_fragment_normals; 
-    vec3 specular_reflection = reflect(-light_direction , normal_vector); 
-    float angle_reflection_view_direction = dot(view_direction , specular_reflection);     
-    float specular = pow(max(angle_reflection_view_direction , 0.f) , shininess) ; 
-    float computed_total_specular = specular * specular_intensity ;   
+    vec3 normal_vector = normalize(vertex_fragment_normals); 
+    vec3 computed_total_specular = vec3(0.f); 
+    int i = 0 ; 
+    for(i = 0 ; i < directional_light_number ; i++){
+        vec3 light_direction = getLightDirection(i); 
+        vec3 specular_reflection = reflect(-light_direction , normal_vector); 
+        float angle_reflection_view_direction = dot(view_direction , specular_reflection);     
+        float specular = pow(max(angle_reflection_view_direction , 0.f) , shininess) * specular_intensity;  
+        computed_total_specular += specular * directional_light_struct[i].specularColor * directional_light_struct[i].intensity;   
+    }
     return computed_total_specular ; 
 }
 
@@ -106,7 +129,12 @@ vec2 computeFresnelCoefficients(){
     return vec2(FR , 1 - FR);  
 }
 
+
+
 void main(){	
     vec2 fresnel = computeFresnelCoefficients() ; 
-    fragment = (fresnel.y * computeRefractionCubeMap() + fresnel.x * computeReflectionCubeMap()) ; //* texture(diffuse  , vertex_fragment_uv) ; //* (computeDiffuseLight() + computeSpecularLight()) ; 
+    vec4 R = computeReflectionCubeMap() * fresnel.x ; 
+    vec4 Rf = computeRefractionCubeMap() * fresnel.y ; 
+    vec4 C = texture(diffuse , vertex_fragment_uv); 
+    fragment = vec4(computeDiffuseLight() + computeSpecularLight() , 1.f) * C * (R + Rf); 
 }
