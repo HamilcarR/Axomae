@@ -143,7 +143,7 @@ public:
 	 * @return glm::mat4 
 	 */
 	virtual glm::mat4& getModelViewMatrix(){
-		return model_matrix ; 
+		return modelview_matrix ; 
 	}	
 	
 	/**
