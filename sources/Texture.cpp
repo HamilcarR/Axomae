@@ -2,15 +2,15 @@
 #include <map>
 
 static std::map<Texture::TYPE , const char*> texture_type_c_str = {
-	{Texture::DIFFUSE , "diffuse"}, 
-	{Texture::NORMAL , "normal"}, 
-	{Texture::METALLIC , "metallic"}, 
-	{Texture::ROUGHNESS , "roughness"}, 
-	{Texture::AMBIANTOCCLUSION , "ambiantocclusion"}, 
-	{Texture::SPECULAR , "specular"},
-	{Texture::EMISSIVE , "emissive"},
+	{Texture::DIFFUSE , "diffuse_map"}, 
+	{Texture::NORMAL , "normal_map"}, 
+	{Texture::METALLIC , "metallic_map"}, 
+	{Texture::ROUGHNESS , "roughness_map"}, 
+	{Texture::AMBIANTOCCLUSION , "ambiantocclusion_map"}, 
+	{Texture::SPECULAR , "specular_map"},
+	{Texture::EMISSIVE , "emissive_map"},
 	{Texture::CUBEMAP , "cubemap"}, 
-	{Texture::GENERIC , "generic"}
+	{Texture::GENERIC , "generic_map"}
 
 };
 
