@@ -111,7 +111,7 @@ public:
      * @param modelview Modelview matrix for light transformations
      * @param index Index position in the array corresponding on the type of the light in the database 
      */
-    virtual void updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) const ; 
+    virtual void updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) ; 
 
     /**
      * @brief Get the type of the light
@@ -119,7 +119,7 @@ public:
      * @return TYPE 
      * @see AbstractClass::TYPE
      */
-    virtual TYPE getType() const = 0 ;
+    virtual TYPE getType() {return type;}
 
     /**
      * @brief Returns the ID of the light
@@ -129,14 +129,14 @@ public:
     virtual unsigned int getID() {return id ; } 
 
 protected:
-    AbstractLight(){}
-protected:
     TYPE type; 
     unsigned int id ;  
-    glm::vec3 position ; 
+    glm::vec3 position ;
+    glm::vec3 viewspace_position;  
     glm::vec3 specularColor; 
     glm::vec3 ambientColor; 
-    glm::vec3 diffuseColor; 
+    glm::vec3 diffuseColor;
+    std::string light_struct_name ;  
     float intensity ; 
 };
 /*****************************************************************************************************************/
@@ -157,48 +157,139 @@ public:
     /**
      * @brief Construct a new Directional Light object
      * 
-     * @param _position Position of the light
+     * @param position Position of the light
      * @param color General color of the light 
-     * @see Shader
+     * @param intensity Intensity of the light
      */
-    DirectionalLight(glm::vec3 _position , glm::vec3 color , float _intensity);
+    DirectionalLight(glm::vec3 position , glm::vec3 color , float intensity);
 
+    /**
+     * @brief Construct a new Directional Light 
+     * 
+     * @param position Position of the light in world space
+     * @param ambientColor Ambient color
+     * @param diffuseColor Diffuse color 
+     * @param specularColor Specular color 
+     * @param intensity Intensity of the light
+     */
+    DirectionalLight(glm::vec3 position , glm::vec3 ambientColor , glm::vec3 diffuseColor , glm::vec3 specularColor , float intensity);  
+ 
     /**
      * @brief Destroy the Directional Light object
      * 
      */
     virtual ~DirectionalLight();
-
+ 
     /**
-     * @brief Get the Type of the light
-     * 
-     * @return TYPE 
+     * @brief Computes the directional light direction and stores it into the viewspace_position property , then calls AbstractLight::updateShaderData() which updates uniforms accordingly
+     * @overload void AbstractLight::updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) const ; 
      */
-    virtual TYPE getType() const {return type;}
-
-    
+    virtual void updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) ; 
 
 protected:
-
-
 };
+
 /*****************************************************************************************************************/
 
+/**
+ * @class PointLight
+ * @brief Point light declaration
+ * 
+ */
+class PointLight : public AbstractLight{
+public:
+    /**
+     * @brief Construct a new Point Light object
+     * 
+     */
+    PointLight(); 
+    
+    /**
+     * @brief Construct a new Point Light object
+     * 
+     * @param position Position of the light
+     * @param color Color of the light
+     * @param attenuation_components glm::vec3 representing the 3 attenuation components of a point light , attenuation_components.x being the constant component , attenuation_components.y the linear , and the last one is the quadratic.
+     * @param intensity Intensity of the light
+     */
+    PointLight(glm::vec3 position , glm::vec3 color , glm::vec3 attenuation_components , float intensity); 
+    
+    /**
+     * @brief Construct a new Point Light object
+     * 
+     * @param position Position of the light 
+     * @param ambientColor The ambient color
+     * @param diffuseColor The diffuse color
+     * @param specularColor The specular color
+     * @param attenuation_components glm::vec3 representing the 3 attenuation components of a point light , attenuation_components.x being the constant component , attenuation_components.y the linear , and the last one is the quadratic.
+     * @param intensity Intensity of the light 
+     */
+    PointLight(glm::vec3 position , glm::vec3 ambientColor , glm::vec3 diffuseColor , glm::vec3 specularColor , glm::vec3 attenuation_compnents , float intensity); 
+    
+    /**
+     * @brief Destroy the Point Light object
+     * 
+     */
+    virtual ~PointLight(); 
 
+    /**
+     * @brief Enable point light values in shader's uniforms
+     *
+     * @overload void AbstractLight::updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) const ;
+     */
+    virtual void updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) override ; 
+protected:
+    glm::vec3 attenuation ;         /**<Constant, linear, and quadratic attenuation values*/
+};
 
+/*****************************************************************************************************************/
 
+class SpotLight : public AbstractLight{
+public:
+    
+    /**
+     * @brief Construct a new Spot Light object
+     * 
+     */
+    SpotLight(); 
+    
+    /**
+     * @brief Construct a new Spot Light object
+     * 
+     * @param position 
+     * @param direction 
+     * @param color 
+     * @param cutoff_angle 
+     * @param intensity 
+     */
+    SpotLight(glm::vec3 position , glm::vec3 direction , glm::vec3 color , float cutoff_angle , float intensity); 
+    
+    /**
+     * @brief Construct a new Spot Light object
+     * 
+     * @param position 
+     * @param direction 
+     * @param ambient 
+     * @param diffuse 
+     * @param specular 
+     * @param cutoff_angle 
+     * @param intensity 
+     */
+    SpotLight( glm::vec3 position , glm::vec3 direction , glm::vec3 ambient , glm::vec3 diffuse , glm::vec3 specular , float cutoff_angle ,  float intensity);
 
+    /**
+     * @brief 
+     * 
+     * @overload void AbstractLight::updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) const ;  
+     */
+    virtual void updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) ; 
 
+protected:
+    glm::vec3 direction ;           /**<Direction of the light cone*/
+    glm::vec3 viewspace_direction;  /**<Direction in modelview space*/
+    float theta;                    /**<Angle of the light cone , in degrees*/
 
-
-
-
-
-
-
-
-
-
+};
 
 
 

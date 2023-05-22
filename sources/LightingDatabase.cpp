@@ -4,18 +4,22 @@
 
 
 LightingDatabase::LightingDatabase(){
-    AbstractLight *L1 = new DirectionalLight(glm::vec3(200 , 0 , 0) , glm::vec3(0.5f , 0 , 0) , 1.f); 
-    AbstractLight *L2 = new DirectionalLight(glm::vec3(-200 , 0 , 0) , glm::vec3(0.f , 0 , 0.5f) , 1.f); 
-    AbstractLight *L3 = new DirectionalLight(glm::vec3(0 , 200 , 0) , glm::vec3(0.f , 0.5f , 0.f) , 1.f);
-    AbstractLight *L4 = new DirectionalLight(glm::vec3(0 , 0 , -200) , glm::vec3(0 , 0.5f , 0.5f) , 1.f); 
-    AbstractLight *L5 = new DirectionalLight(glm::vec3(0 , 0 , 200) , glm::vec3(0.7f , 0.5f , 0.4f) , 5.f) ;  
-    AbstractLight *L6 = new DirectionalLight(glm::vec3(0 , -200 , 0) , glm::vec3(0.5f , 0.5f , 0) , 1.f) ;
+   /* AbstractLight *L1 = new PointLight(glm::vec3(200 , 500 , 0) , glm::vec3(1.f , 1.f , 1.f), glm::vec3(1.f , 0.045 , 0.0075) , 3000.f); 
+    AbstractLight *L2 = new PointLight(glm::vec3(0 , -500 , 0) , glm::vec3(0.3f , 0.5f , 0.1f) , glm::vec3(1.f , 0.045 , 0.0075), 3000.f) ; 
+    AbstractLight *L3 = new PointLight(glm::vec3(0 , 0 , 500) , glm::vec3(0.8f , 0.1f , 0.2f) , glm::vec3(1.f , 0.045 , 0.0075), 5000.f) ;
+    AbstractLight *L4 = new PointLight(glm::vec3(0 , 0 , -500) , glm::vec3(0.f , 0.5f , 0.1f) , glm::vec3(1.f , 0.045 , 0.0075), 7000.f) ;
+    AbstractLight *L5 = new PointLight(glm::vec3(500, 0 , 0) , glm::vec3(0.f , 1.f , 1.f) , glm::vec3(1.f , 0.045 , 0.0075), 2000.f) ; 
+    AbstractLight *L6 = new PointLight(glm::vec3(-500, 0 , 0) , glm::vec3(1.f , 0.5f , 0.1f) , glm::vec3(1.f , 0.045 , 0.075), 5000.f) ;
     addLight(L1); 
-    addLight(L2); 
-    addLight(L3);
-    addLight(L4); 
-    addLight(L5); 
-    addLight(L6);  
+    addLight(L2);
+    addLight(L3);  
+    addLight(L4);  
+    addLight(L5);  
+    addLight(L6); */
+
+    
+    AbstractLight* L1 = new SpotLight(glm::vec3(500.f , 0.f , 0) , glm::vec3(0.f , 0.f , 0), glm::vec3(1.f , 1.f , 1.f) , 15.f , 0.5f); 
+    addLight(L1);  
 }
 
 LightingDatabase::~LightingDatabase(){
@@ -59,8 +63,15 @@ void LightingDatabase::updateShadersData(Shader* shader , glm::mat4& modelview){
         unsigned int light_num = it->second.size(); 
         switch(it->first){
             case AbstractLight::DIRECTIONAL:
-                shader->setUniform(std::string(uniform_name_int_lighting_directional_number_name) , light_num);
+                shader->setUniform(std::string(uniform_name_uint_lighting_directional_number_name) , light_num);
             break;
+            case AbstractLight::POINT:
+                shader->setUniform(std::string(uniform_name_uint_lighting_point_number_name) , light_num); 
+            break;
+            case AbstractLight::SPOT:
+                shader->setUniform(std::string(uniform_name_uint_lighting_spot_number_name) , light_num);
+            break;
+
         }
         updateShadersData(it->first , shader , modelview); 
     }

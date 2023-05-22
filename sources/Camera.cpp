@@ -204,7 +204,6 @@ static float get_z_axis(float x , float y , float radius) {
  * The function computes the position of the mouse in normalized device coordinates based on the cursor
  * position.
  */
-
 void ArcballCamera::movePosition(){
 	if(mouse_state_pointer->left_button_clicked){
 		ndc_mouse_position.x = ((cursor_position.x - (gl_widget_screen_size->width/2)) / (gl_widget_screen_size->width/2)) * radius; 
