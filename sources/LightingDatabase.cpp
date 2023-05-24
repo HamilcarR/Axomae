@@ -3,23 +3,18 @@
 
 
 
-LightingDatabase::LightingDatabase(){
-   /* AbstractLight *L1 = new PointLight(glm::vec3(200 , 500 , 0) , glm::vec3(1.f , 1.f , 1.f), glm::vec3(1.f , 0.045 , 0.0075) , 3000.f); 
-    AbstractLight *L2 = new PointLight(glm::vec3(0 , -500 , 0) , glm::vec3(0.3f , 0.5f , 0.1f) , glm::vec3(1.f , 0.045 , 0.0075), 3000.f) ; 
-    AbstractLight *L3 = new PointLight(glm::vec3(0 , 0 , 500) , glm::vec3(0.8f , 0.1f , 0.2f) , glm::vec3(1.f , 0.045 , 0.0075), 5000.f) ;
-    AbstractLight *L4 = new PointLight(glm::vec3(0 , 0 , -500) , glm::vec3(0.f , 0.5f , 0.1f) , glm::vec3(1.f , 0.045 , 0.0075), 7000.f) ;
-    AbstractLight *L5 = new PointLight(glm::vec3(500, 0 , 0) , glm::vec3(0.f , 1.f , 1.f) , glm::vec3(1.f , 0.045 , 0.0075), 2000.f) ; 
-    AbstractLight *L6 = new PointLight(glm::vec3(-500, 0 , 0) , glm::vec3(1.f , 0.5f , 0.1f) , glm::vec3(1.f , 0.045 , 0.075), 5000.f) ;
-    addLight(L1); 
-    addLight(L2);
-    addLight(L3);  
-    addLight(L4);  
-    addLight(L5);  
-    addLight(L6); */
-
+LightingDatabase::LightingDatabase(){ 
+    AbstractLight *L1 = new SpotLight(glm::vec3(100 , 0 , 0) , glm::vec3(0.f) , glm::vec3(0.9f , 0.8f , 0.85f), 20.f , 1.1f); 
+    AbstractLight *L2 = new PointLight(glm::vec3(0 , 10 , 0) , glm::vec3(1.f , 1.f , 1.f), glm::vec3(1.f , 0.045 , 0.0075) , 1.f); 
+    AbstractLight *L3 = new PointLight(glm::vec3(80 , -60 , 70) , glm::vec3(1.f , 0.3f , 0.2f), glm::vec3(1.f , 0.045 , 0.0075) , 5.f); 
+    AbstractLight *L4 = new PointLight(glm::vec3(80 , 60 , -70) , glm::vec3(0.f , 0.f , 0.9f), glm::vec3(1.f , 0.045 , 0.0075) , 5.f);  
+    AbstractLight *L5 = new DirectionalLight(glm::vec3(-100 , 0 , 0) , glm::vec3(1.0f , 1.f , 0.3f) , 1.f); 
     
-    AbstractLight* L1 = new SpotLight(glm::vec3(500.f , 0.f , 0) , glm::vec3(0.f , 0.f , 0), glm::vec3(1.f , 1.f , 1.f) , 15.f , 0.5f); 
-    addLight(L1);  
+    addLight(L1); 
+    addLight(L2); 
+    addLight(L3); 
+    addLight(L4);
+    addLight(L5);  
 }
 
 LightingDatabase::~LightingDatabase(){

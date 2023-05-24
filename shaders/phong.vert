@@ -29,14 +29,11 @@ out vec3 vertex_fragment_positions ;
 out vec3 vertex_fragment_fragment_position ; 
 out vec3 vertex_fragment_camera_position ;
 /******************************************/
-
-
 /* Flat Shader Output*/
-
+out mat3 MAT_TBN;
 /******************************************/
 
 /* Constants */
-const vec3 light_pos = vec3(1000 , 1000 , -1000); 
 
 
 /******************************************/
@@ -45,6 +42,13 @@ void main(){
 	vertex_fragment_colors = vec4(colors , 1.f) ; 
 	vertex_fragment_uv = uv ; 
 	vertex_fragment_normals = MAT_NORMAL * normals;
-	vertex_fragment_fragment_position = vec3(MAT_MODELVIEW * vec4(positions , 1.f)) ; 
+	vertex_fragment_fragment_position = vec3(MAT_MODELVIEW * vec4(positions , 1.f)) ;
+	vec3 T = normalize(tangents); 
+	vec3 N = normalize(normals); 
+	vec3 B = normalize(cross(N , T)); 
+	T = MAT_NORMAL * T ; 
+	N = MAT_NORMAL * N ; 
+	B = MAT_NORMAL * B ;
+	MAT_TBN = mat3(T , B , N); 
 	gl_Position = MAT_MVP * vec4(positions , 1.f) ; 
 }

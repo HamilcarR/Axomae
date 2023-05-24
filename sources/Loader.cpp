@@ -279,7 +279,7 @@ Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
 	TextureDatabase* texture_database = TextureDatabase::getInstance(); 	
 	cube_map->setShader(shader_database->get(Shader::CUBEMAP)) ; 
 	TextureData cubemap ; 
-	QString skybox_folder = "chapel" ;
+	QString skybox_folder = "castle" ;
 	auto format = "jpg"; 
 	QImage left(":/"+skybox_folder+"/negx.jpg" , format); 		
 	QImage bot(":/"+skybox_folder+"/negy.jpg" , format); 		

@@ -11,7 +11,7 @@ in vec3 vertex_fragment_camera_position;
 /*****************************************/
 
 /* Flat data from vertex shader */
-//
+in mat3 MAT_TBN;  
 /*****************************************/
 
 
@@ -25,6 +25,17 @@ uniform vec2 refractive_index ;
 uniform uint directional_light_number;  
 uniform uint point_light_number;
 uniform uint spot_light_number;
+
+
+struct MATERIAL {
+    vec2 refractive_index;
+    float dielectric_factor; 
+    float roughness_factor; 
+    float transmission_factor; 
+    float emissive_factor;  
+    float shininess;  
+};
+uniform MATERIAL material ; 
 
 /* Point lights */
 struct POINT_LIGHT_STRUCT{
@@ -77,8 +88,6 @@ layout(binding=8) uniform sampler2D generic_map ;
 
 
 /*Constants*/
-const float specular_intensity = 10.8f ; 
-const float shininess = 1.f ; 
 const vec3 camera_position = vec3(0.f) ;
 const float ambient_factor = 0.2f ;
 /******************************************/
@@ -97,7 +106,11 @@ out vec4 fragment ;
 vec3 getViewDirection(){
     return normalize(camera_position - vertex_fragment_fragment_position); 
 }
-
+vec3 getSurfaceNormal(){
+    vec3 N = normalize(MAT_TBN * (texture(normal_map , vertex_fragment_uv).rgb * 2.f - 1.f));     
+  //  N = normalize(vertex_fragment_normals); 
+    return N ; 
+}
 /**************************************************************************************************************/
 float computePointLightAttenuation(uint point_light_index){
     float dist = length(vertex_fragment_fragment_position - point_light_struct[point_light_index].position);  
@@ -145,18 +158,16 @@ vec3 computeAmbientPointLight(uint i){
 
 /**************************************************************************************************************/
 vec3 computeSpecularPointLight(vec3 surface_normal , vec3 light_direction , vec3 view_direction , uint i){
-    vec3 halfway_vec = normalize(view_direction + light_direction); 
     vec3 specular_reflection = reflect(-light_direction , surface_normal); 
-    float angle_reflection_view_direction = dot(surface_normal , halfway_vec);     
-    float specular = pow(max(angle_reflection_view_direction , 0.f) , shininess) * specular_intensity; //TODO replace shininess by material.shininess  
+    float angle_reflection_view_direction = dot(specular_reflection , view_direction);     
+    float specular = pow(max(angle_reflection_view_direction , 0.f) , material.shininess) ; 
     return specular * point_light_struct[i].specularColor * point_light_struct[i].intensity;   
 }
 
 vec3 computeSpecularDirectionalLight(vec3 surface_normal ,vec3 light_direction , vec3 view_direction , uint i){
-    vec3 halfway_vec = normalize(view_direction + light_direction); 
     vec3 specular_reflection = reflect(-light_direction , surface_normal); 
-    float angle_reflection_view_direction = dot(surface_normal , halfway_vec);     
-    float specular = pow(max(angle_reflection_view_direction , 0.f) , shininess) * specular_intensity; //TODO replace shininess by material.shininess  
+    float angle_reflection_view_direction = dot(specular_reflection , view_direction); 
+    float specular = pow(max(angle_reflection_view_direction , 0.f) , material.shininess) ; 
     return specular * directional_light_struct[i].specularColor * directional_light_struct[i].intensity;   
 }
 
@@ -166,9 +177,8 @@ vec3 computeSpecularSpotLight(vec3 surface_normal , vec3 light_direction , vec3 
     angle = acos(angle); 
     if(angle < spot_light_struct[i].theta){
         vec3 specular_reflection = reflect(-light_direction , surface_normal); 
-        vec3 halfway_vec = normalize(view_direction + light_direction); 
-        float angle_reflection_view_direction = dot(surface_normal , halfway_vec);     
-        float specular = pow(max(angle_reflection_view_direction , 0.f) , shininess); //TODO replace shininess by material.shininess  
+        float angle_reflection_view_direction = dot(specular_reflection , view_direction); 
+        float specular = pow(max(angle_reflection_view_direction , 0.f) , material.shininess); 
         return specular * spot_light_struct[i].specularColor * spot_light_struct[i].intensity;
     }
     return vec3(0.f); 
@@ -179,7 +189,7 @@ vec3 computeSpecularSpotLight(vec3 surface_normal , vec3 light_direction , vec3 
 LIGHT_COMPONENTS computeDirectionalLightsContrib(){
     LIGHT_COMPONENTS light; 
     uint i = 0 ; 
-    vec3 n = normalize(vertex_fragment_normals);
+    vec3 n = getSurfaceNormal();
     vec3 view_direction = getViewDirection(); 
     for(i = 0 ; i < directional_light_number ; i++){
         vec3 light_direction = normalize(directional_light_struct[i].position - vertex_fragment_fragment_position); 
@@ -192,8 +202,8 @@ LIGHT_COMPONENTS computeDirectionalLightsContrib(){
 
 /**************************************************************************************************************/
 LIGHT_COMPONENTS computePointLightsContrib(){
-    LIGHT_COMPONENTS light; 
-    vec3 n = normalize(vertex_fragment_normals);
+    LIGHT_COMPONENTS light;  
+    vec3 n = getSurfaceNormal();
     vec3 view_direction = getViewDirection(); 
     uint i = 0 ; 
     for(i = 0 ; i < point_light_number ; i++){
@@ -209,14 +219,14 @@ LIGHT_COMPONENTS computePointLightsContrib(){
 /**************************************************************************************************************/
 LIGHT_COMPONENTS computeSpotLightsContrib(){
     LIGHT_COMPONENTS light ; 
-    vec3 fragment_normal = normalize(vertex_fragment_normals); 
+    vec3 n = getSurfaceNormal();
     vec3 view_direction = getViewDirection(); 
     int i = 0 ; 
     for(i = 0 ; i < spot_light_number ; i++){
         vec3 light_direction = normalize(spot_light_struct[i].position - vertex_fragment_fragment_position); 
-        light.diffuse += computeDiffuseSpotLight(fragment_normal , light_direction , i); 
+        light.diffuse += computeDiffuseSpotLight(n , light_direction , i); 
         light.ambient += computeAmbientSpotLight(i); 
-        light.specular += computeSpecularSpotLight(fragment_normal , light_direction , view_direction , i);     
+        light.specular += computeSpecularSpotLight(n , light_direction , view_direction , i);     
     }
     return light; 
 }
@@ -232,7 +242,7 @@ vec4 computeReflectionCubeMap(){
 
 /**************************************************************************************************************/
 vec4 computeRefractionCubeMap(){
-    float refractive_index_ratio = refractive_index.x / refractive_index.y ; 
+    float refractive_index_ratio = material.refractive_index.x / material.refractive_index.y ; 
     vec3 view_direction = normalize(vertex_fragment_fragment_position - camera_position) ; 
     vec3 normal_vector = normalize(vertex_fragment_normals); 
     vec3 cubemap_sample_vector = vec3(inverse(MAT_NORMAL) * refract(view_direction , normal_vector , refractive_index_ratio)); 
@@ -242,9 +252,9 @@ vec4 computeRefractionCubeMap(){
 
 /**************************************************************************************************************/
 vec2 computeFresnelCoefficients(){
-    float n1 = refractive_index.x ; 
-    float n2 = refractive_index.y ; 
-    float refractive_index_ratio = n1 / n2 ; 
+    float n1 = material.refractive_index.x ; 
+    float n2 = material.refractive_index.y ; 
+    float refractive_index_ratio = n1 / n2  ; 
     vec3 incident_vector = normalize(vertex_fragment_fragment_position - camera_position) ; 
     vec3 normal_vector = normalize(vertex_fragment_normals); 
     float cos_theta1 =  dot(-incident_vector , normal_vector);
@@ -260,10 +270,23 @@ vec2 computeFresnelCoefficients(){
 }
 
 /**************************************************************************************************************/
+vec4 computeEmissiveValue(){
+    return texture(emissive_map , vertex_fragment_uv); 
+}
+
+vec4 computeMetallicValue(){
+    return texture(metallic_map , vertex_fragment_uv); 
+}
+
+/**************************************************************************************************************/
 void main(){	
     vec2 fresnel = computeFresnelCoefficients() ; 
-    vec4 R = computeReflectionCubeMap() * fresnel.x ; 
-    vec4 Rf = computeRefractionCubeMap() * fresnel.y ; 
+    vec4 reflection = computeReflectionCubeMap() ; 
+    vec4 refraction = computeRefractionCubeMap() ; 
+    vec4 metallic = computeMetallicValue(); 
+    vec4 R = reflection * fresnel.x ; 
+    vec4 Rf = refraction * fresnel.y ; 
+    vec4 E = computeEmissiveValue() ; 
     vec4 C = texture(diffuse_map , vertex_fragment_uv);
     LIGHT_COMPONENTS directional = computeDirectionalLightsContrib() ; 
     LIGHT_COMPONENTS point = computePointLightsContrib();
@@ -271,5 +294,6 @@ void main(){
     vec3 ambient = directional.ambient + point.ambient + spot.ambient ; 
     vec3 diffuse = directional.diffuse + point.diffuse + spot.diffuse ; 
     vec3 specular = directional.specular + point.specular + spot.specular ; 
-    fragment = vec4(diffuse + specular + ambient * ambient_factor  , 1.f) * C ;//* (R + Rf); 
+    E = E == vec4(0.f) ? vec4(1.f) : E ; 
+    fragment = vec4(specular + diffuse + ambient * ambient_factor, 1.f) * C + ( R + Rf) + E * material.emissive_factor ; 
 }

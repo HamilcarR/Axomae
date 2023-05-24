@@ -18,11 +18,13 @@ constexpr const char uniform_name_matrix_inverse_modelview[] = "MAT_INV_MODELVIE
 constexpr const char uniform_name_vec3_camera_position[] = "camera_position" ; 
 
 /*Materials*/
+constexpr const char uniform_name_str_material_struct_name[] = "material"; 
 constexpr const char uniform_name_vec2_material_refractive_index[] = "refractive_index";
 constexpr const char uniform_name_float_material_dielectric_factor[] = "dielectric_factor" ; 
 constexpr const char uniform_name_float_material_roughness_factor[] = "roughness_factor" ; 
 constexpr const char uniform_name_float_material_transmission_factor[] = "transmission_factor" ; 
 constexpr const char uniform_name_float_material_emissive_factor[] = "emissive_factor" ; 
+constexpr const char uniform_name_float_material_shininess_factor[] = "shininess";
 
 /*Lighting variables*/
 constexpr const char uniform_name_vec3_lighting_position[] = "position";
