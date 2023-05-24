@@ -101,7 +101,8 @@ public:
 		SPECULAR = 5, 
 		EMISSIVE = 6 , 
 		CUBEMAP = 7 , 
-		GENERIC = 8
+		GENERIC = 8 , 
+		FRAMEBUFFER = 9
 	} ;
 
 	/**
@@ -182,7 +183,13 @@ protected:
 	 * @brief Initialize texture filters , mipmaps and glTexImage2D
 	 * 
 	 */
-	virtual void initializeTexture2D(); 
+	virtual void initializeTexture2D();
+
+	/**
+	 * @brief Set the Texture Parameters Options object
+	 * 
+	 */
+	virtual void setTextureParametersOptions(); 
 
 protected:
 	TYPE name ;					/**<Type of the texture*/
@@ -660,7 +667,7 @@ public:
  	* 	  5 x width² = BACK => GL_TEXTURE_CUBE_MAP_POSITIVE_Z
  	* 	  6 x width² = FRONT => GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 	 */
-	virtual void initializeCubeMapTexture(); 	
+	virtual void initializeTexture2D() override; 	
 	
 	/**
 	 * @brief Bind the texture using glBindTexture
@@ -693,8 +700,77 @@ protected:
 	 * 
 	 * @param texture 
 	 */
-	virtual void setCubeMapTextureData(TextureData* texture); 
+	virtual void setCubeMapTextureData(TextureData* texture);
+
 
 }; 
+
+/**
+ * @brief 
+ * 
+ */
+class FrameBufferTexture : public Texture {
+public:
+	
+	/**
+	 * @brief Construct a new Frame Buffer Texure object
+	 * 
+	 */
+	FrameBufferTexture(); 
+	
+	/**
+	 * @brief Destroy the Frame Buffer Texure object
+	 * 
+	 */
+	virtual ~FrameBufferTexture(); 
+	
+	/**
+	 * @brief 
+	 * 
+	 */
+	virtual void bindTexture() ;
+	
+	/**
+	 * @brief 
+	 * 
+	 */
+	virtual void unbindTexture();
+	
+	/**
+	 * @brief Set the Gl Data object
+	 * 
+	 */
+	virtual void setGlData(); 
+	
+	/**
+	 * @brief Get the Texture string name
+	 * 
+	 * @return const char* 
+	 */
+	const char* getTextureTypeCStr();  
+}; 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif 

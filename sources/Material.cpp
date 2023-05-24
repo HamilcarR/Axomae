@@ -4,10 +4,11 @@
 
 
 Material::Material(){
-	dielectric_factor = 0.f ; 
+	dielectric_factor = 0.f ;
+	shininess = 2.f ;  
 	roughness_factor = 0.f ; 
 	transmission_factor = 0.f ; 
-	emissive_factor = 0.f ; 
+	emissive_factor = 1.f ; 
 	refractive_index = glm::vec2(1.f , 1.5f) ; 
 	shader_program = nullptr; 
 }
@@ -34,12 +35,13 @@ void Material::bind(){
 void Material::initializeMaterial(){
 	textures_group.initializeGlTextureData();
 	if(shader_program){
-		shader_program->setUniform(uniform_name_vec2_material_refractive_index , refractive_index) ; 
-		shader_program->setUniform(uniform_name_float_material_dielectric_factor , dielectric_factor) ; 
-		shader_program->setUniform(uniform_name_float_material_roughness_factor , roughness_factor) ; 
-		shader_program->setUniform(uniform_name_float_material_transmission_factor , transmission_factor) ; 
-		shader_program->setUniform(uniform_name_float_material_emissive_factor , emissive_factor) ; 
-
+		std::string material = std::string(uniform_name_str_material_struct_name) + std::string("."); 
+		shader_program->setUniform(material+uniform_name_vec2_material_refractive_index , refractive_index) ; 
+		shader_program->setUniform(material+uniform_name_float_material_dielectric_factor , dielectric_factor) ; 
+		shader_program->setUniform(material+uniform_name_float_material_roughness_factor , roughness_factor) ; 
+		shader_program->setUniform(material+uniform_name_float_material_transmission_factor , transmission_factor) ; 
+		shader_program->setUniform(material+uniform_name_float_material_emissive_factor , emissive_factor) ; 
+		shader_program->setUniform(material+uniform_name_float_material_shininess_factor , shininess); 
 	}
 }
 

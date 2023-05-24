@@ -10,7 +10,8 @@ static std::map<Texture::TYPE , const char*> texture_type_c_str = {
 	{Texture::SPECULAR , "specular_map"},
 	{Texture::EMISSIVE , "emissive_map"},
 	{Texture::CUBEMAP , "cubemap"}, 
-	{Texture::GENERIC , "generic_map"}
+	{Texture::GENERIC , "generic_map"}, 
+	{Texture::FRAMEBUFFER , "framebuffer_map"}
 
 };
 
@@ -60,14 +61,19 @@ void Texture::clean(){
 
 }
 
-void Texture::initializeTexture2D(){
-	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA , width , height , 0 , GL_BGRA , GL_UNSIGNED_BYTE , data); 
+void Texture::setTextureParametersOptions(){
 	glGenerateMipmap(GL_TEXTURE_2D); 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER , GL_LINEAR_MIPMAP_LINEAR); 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	errorCheck(); 	
+
+}
+
+void Texture::initializeTexture2D(){
+	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA , width , height , 0 , GL_BGRA , GL_UNSIGNED_BYTE , data); 
+	setTextureParametersOptions(); 
 }
 
 
@@ -397,7 +403,7 @@ CubeMapTexture::CubeMapTexture(TextureData* data){
 	setCubeMapTextureData(data) ; 
 }
 
-void CubeMapTexture::initializeCubeMapTexture(){
+void CubeMapTexture::initializeTexture2D(){
 	for( unsigned int i = 1 ; i <= 6 ; i++){
 		uint32_t* pointer_to_data = data + (i - 1) * width * height ;
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (i - 1)  , 0 , GL_RGBA , width , height , 0 , GL_RGBA , GL_UNSIGNED_BYTE , pointer_to_data); 
@@ -415,7 +421,7 @@ void CubeMapTexture::setGlData(){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + CUBEMAP); 
 	glBindTexture(GL_TEXTURE_CUBE_MAP , sampler2D); 
-	initializeCubeMapTexture(); 
+	CubeMapTexture::initializeTexture2D(); 
 }
 
 void CubeMapTexture::bindTexture(){
@@ -433,18 +439,36 @@ const char* CubeMapTexture::getTextureTypeCStr() {
 	return texture_type_c_str[CUBEMAP] ; 		
 }
 
+/****************************************************************************************************************************/
 
+FrameBufferTexture::FrameBufferTexture(){
+	name = FRAMEBUFFER ; 
+}
 
+FrameBufferTexture::~FrameBufferTexture(){
 
+}
 
+void FrameBufferTexture::setGlData(){
+	glGenTextures(1 , &sampler2D); 
+	glActiveTexture(GL_TEXTURE0 + FRAMEBUFFER);
+	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA , width , height , 0 , GL_BGRA , GL_UNSIGNED_BYTE , data);// TODO complete 
+	Texture::setTextureParametersOptions(); 
+}
 
+void FrameBufferTexture::bindTexture(){
+	glActiveTexture(GL_TEXTURE0 + FRAMEBUFFER); 
+	glBindTexture(GL_TEXTURE_2D , sampler2D); 
+}
 
+void FrameBufferTexture::unbindTexture(){
+	glActiveTexture(GL_TEXTURE0 + FRAMEBUFFER); 
+	glBindTexture(GL_TEXTURE_2D , 0); 
+}
 
-
-
-
-
-
+const char* FrameBufferTexture::getTextureTypeCStr(){
+	return texture_type_c_str[FRAMEBUFFER]; 
+}
 
 
 
