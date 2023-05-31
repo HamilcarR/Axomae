@@ -45,14 +45,13 @@ public:
 	static bool isInstanced(){return instance != nullptr;}		
 	
 	/**
-	 * @brief This function constructs a shader to the shader database if it does not already exist and returns the
-	 * shader.
+	 * @brief This function constructs a shader and stores it in the shader database if it does not already exist and returns it. 
 	 * 
 	 * @param vertex_code A string containing the source code for the vertex shader.
 	 * @param fragment_code A string containing the source code for the fragment shader. 
 	 * @param type The type of shader being added to the shader database. 
 	 * 
-	 * @return The function `addShader` returns a pointer to the constructed shader , or the existing one
+	 * @return Shader* Pointer to the constructed shader , or the existing one
 	 *
 	 * @see Shader::TYPE
 	 */
@@ -99,7 +98,7 @@ private:
 
 private:
 	static ShaderDatabase* instance; 			/**<Singleton pointer instance*/ 
-	std::map<int, Shader*> shader_database ; 	/**<std::map with unique shaders associated with their type*/
+	std::map<Shader::TYPE, Shader*> shader_database ; 	/**<std::map with unique shaders associated with their type*/
 
 
 }; 
