@@ -9,6 +9,7 @@
 #include "TextureDatabase.h" 
 #include "Camera.h"
 #include "LightingDatabase.h"
+#include "CameraFrameBuffer.h"
 
 /**
  * @file Renderer.h
@@ -29,7 +30,15 @@ public:
 	 * 
 	 */
 	Renderer();
-	
+
+	/**
+	 * @brief Construct a new Renderer object
+	 * 
+	 * @param width Width of the window
+	 * @param height Height of the window
+	 */
+	Renderer(unsigned width , unsigned height); 
+
 	/**
 	 * @brief Destroy the Renderer object
 	 * 
@@ -119,7 +128,16 @@ public:
 	 * @param width Width of the screen  
 	 * @param height Height of the screen
 	 */
-	void setScreenSize(unsigned int width , unsigned int height);
+	void onResize(unsigned int width , unsigned int height);
+
+	/**
+	 * @brief Set the Default Framebuffer ID 
+	 * 
+	 * @param id ID of the default framebuffer
+	 */
+	void setDefaultFrameBufferId(unsigned id){default_framebuffer_id = id ; }
+
+	
 
 public:
 	std::vector<Drawable*> scene ; 				/**<The scene to be rendered*/ 
@@ -130,6 +148,8 @@ public:
 	Camera *scene_camera ;						/**<Pointer on the scene camera*/
 	MouseState mouse_state ;					/**<Pointer on the MouseState structure*/
 	ScreenSize screen_size ; 					/**<Dimensions of the renderer windows*/
+	CameraFrameBuffer *camera_framebuffer ;		/**<Main framebuffer attached to the view*/ 
+	unsigned int default_framebuffer_id ;		/**<In the case the GUI uses other contexts and other framebuffers , we use this variable to reset the rendering to the default framebuffer*/ 
 };
 
 #endif
