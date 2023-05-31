@@ -214,6 +214,8 @@ protected:
 	Shader* shader_program; 			/**<Shader to be used for the mesh*/
 };
 
+/*****************************************************************************************************************/
+
 /**
  * @brief Cubemap Mesh class
  * 
@@ -240,11 +242,43 @@ public:
 	virtual void bindShaders(); 	
 };
 
+/*****************************************************************************************************************/
 
+/**
+ * @class FrameBufferMesh
+ * @brief Mesh with an FBO or/and RBO attached to it  
+ * 
+ */
+class FrameBufferMesh : public Mesh{
+public:
+	
+	/**
+	 * @brief Construct a new FrameBufferMesh 
+	 * 
+	 */
+	FrameBufferMesh(); 
 
+	/**
+	 * @brief Construct a new Frame Buffer Mesh 
+	 * 
+	 * @param database_texture_index The index of the framebuffer texture in the database
+	 */
+	FrameBufferMesh(int database_texture_index , Shader* shader); 
 
+	/**
+	 * @brief 
+	 * 
+	 */
+	virtual void bindShaders(); 
 
+	/**
+	 * @brief Destroy the Frame Buffer Mesh object
+	 * 
+	 */
+	virtual ~FrameBufferMesh(); 
 
+	
+};
 
 }
 #endif

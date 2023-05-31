@@ -79,7 +79,8 @@ void Shader::setTextureUniforms(){
 	setUniform(AmbiantOcclusionTexture::getTextureTypeCStr() , static_cast<int> (Texture::AMBIANTOCCLUSION)) ; 	
 	setUniform(SpecularTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::SPECULAR)) ; 
 	setUniform(EmissiveTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::EMISSIVE)) ; 
-	setUniform(CubeMapTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::CUBEMAP)) ; 
+	setUniform(CubeMapTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::CUBEMAP)) ;
+	setUniform(FrameBufferTexture::getTextureTypeCStr() , static_cast<int>(Texture::FRAMEBUFFER)); 
 	setUniform(GenericTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::GENERIC)) ; 
 }
 
@@ -252,4 +253,23 @@ CubeMapShader::CubeMapShader(const std::string vertex , const std::string frag) 
 
 CubeMapShader::~CubeMapShader(){
 
+}
+
+/***********************************************************************************************************************************************************/
+
+ScreenFrameBufferShader::ScreenFrameBufferShader() : Shader() {
+	type = SCREEN_FRAMEBUFFER ; 
+}
+
+ScreenFrameBufferShader::ScreenFrameBufferShader(const std::string vertex , const std::string frag) : Shader(vertex , frag) {
+	type = SCREEN_FRAMEBUFFER ; 
+}
+
+ScreenFrameBufferShader::~ScreenFrameBufferShader(){
+
+}
+
+void ScreenFrameBufferShader::setTextureUniforms(){
+	bind(); 
+	setUniform(FrameBufferTexture::getTextureTypeCStr() , static_cast<int>(Texture::FRAMEBUFFER)); 
 }

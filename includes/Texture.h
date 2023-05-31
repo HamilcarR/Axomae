@@ -1,7 +1,7 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include "constants.h" 
+#include "constants.h"
 #include "utils_3D.h" 
 
 /**
@@ -86,6 +86,13 @@ public:
 class Texture{
 public:
 
+	enum FORMAT : signed {
+		RGBA = GL_RGBA , 
+		BGRA = GL_BGRA , 
+		RGB = GL_RGB , 
+		BGR = GL_BGR 
+	};
+
 	/**
 	 * @brief Type of the texture
 	 * 
@@ -136,7 +143,14 @@ public:
 	 * 
 	 */
 	void clean();
-	
+
+	/**
+	 * @brief Get the Texture ID
+	 * 
+	 * @return unsigned int 
+	 */
+	unsigned int getSamplerID(){return sampler2D;}
+
 	/**
 	 * @brief Set the Texture Type object
 	 * 
@@ -177,6 +191,8 @@ public:
 	 */
 	void cleanGlData(); 
 
+	virtual void setNewSize(unsigned width , unsigned height) ;
+
 protected:
 
 	/**
@@ -193,6 +209,8 @@ protected:
 
 protected:
 	TYPE name ;					/**<Type of the texture*/
+	FORMAT internal_format ;	/**<Data layout format on the GPU*/ 
+	FORMAT data_format ; 		/**<Raw texture data format*/
 	unsigned int width ; 		/**<Width of the texture*/
 	unsigned int height ; 		/**<Height of the texture*/
 	uint32_t *data ; 			/**<Raw data of the texture*/
@@ -219,7 +237,7 @@ public:
 	 * @param data Pointer on a TextureData object
 	 */
 	DiffuseTexture(TextureData *data); 
-	
+
 	/**
 	 * @brief Destroy the Diffuse Texture object
 	 * 
@@ -716,7 +734,23 @@ public:
 	 * @brief Construct a new Frame Buffer Texure object
 	 * 
 	 */
-	FrameBufferTexture(); 
+	FrameBufferTexture();
+
+	/**
+	 * @brief Construct a new Frame Buffer Texture
+	 * Contains only width , and height... The rest of the TextureData parameter is not used,
+	 * @param data TextureData parameter 
+	 * 
+	 */
+	FrameBufferTexture(TextureData* data ); 
+
+	/**
+	 * @brief Construct a new Frame Buffer Texture 
+	 * 
+	 * @param width Width of the texture
+	 * @param height Height of the texture
+	 */
+	FrameBufferTexture(unsigned width , unsigned height);  
 	
 	/**
 	 * @brief Destroy the Frame Buffer Texure object
@@ -741,13 +775,23 @@ public:
 	 * 
 	 */
 	virtual void setGlData(); 
-	
+
+	/**
+	 * @brief 
+	 * 
+	 * @return * void 
+	 */
+	virtual void initializeTexture2D() override ;
+
 	/**
 	 * @brief Get the Texture string name
 	 * 
 	 * @return const char* 
 	 */
-	const char* getTextureTypeCStr();  
+	static const char* getTextureTypeCStr(); 
+
+protected:
+
 }; 
 
 

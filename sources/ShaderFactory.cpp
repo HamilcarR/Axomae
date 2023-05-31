@@ -15,6 +15,9 @@ Shader* ShaderFactory::constructShader(std::string v , std::string f , Shader::T
 		break; 
 		case Shader::CUBEMAP:
 			constructed_shader = new CubeMapShader(v , f) ;
+		break;
+		case Shader::SCREEN_FRAMEBUFFER:
+			constructed_shader = new ScreenFrameBufferShader(v , f); 
 		break; 
 		default:
 			constructed_shader = nullptr ; 

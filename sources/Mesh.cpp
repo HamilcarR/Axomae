@@ -101,11 +101,14 @@ void Mesh::cullFrontAndBackFace(){
 
 
 void Mesh::setFaceCulling(bool value){
-	if(value)
+	if(value){
 		glEnable(GL_CULL_FACE); 
-	else
+		face_culling_enabled = true; 
+	}
+	else{
 		glDisable(GL_CULL_FACE);
-
+		face_culling_enabled = false; 
+	}
 }
 
 void Mesh::setDepthMask(bool val){
@@ -116,9 +119,12 @@ void Mesh::setDepthMask(bool val){
 void Mesh::setDepthFunc(DEPTHFUNC func){
 	glDepthFunc(func) ; 
 }
-/*********************************************************************************************/
+
+/*****************************************************************************************************************/
+
 CubeMapMesh::CubeMapMesh() : Mesh() {
-	std::vector<float> vertices = { -1 , -1 , -1 ,  // 0
+	std::vector<float> vertices = { 
+					-1 , -1 , -1 ,  // 0
 					 1 , -1 , -1 ,  // 1
 					-1 , 1 , -1 ,   // 2
 				 	 1 , 1 , -1 ,   // 3
@@ -127,20 +133,22 @@ CubeMapMesh::CubeMapMesh() : Mesh() {
 					-1 , 1 , 1 ,    // 6
 				 	 1 , 1 , 1 };   // 7
 
-	std::vector<unsigned int> indices = { 0 , 1 , 2 , //Front face
+	std::vector<unsigned int> indices = { 
+						  0 , 1 , 2 , //Front face
 					      1 , 3 , 2 , //
 					      5 , 4 , 6 , //Back face
 					      6 , 7 , 5 , //
-				              0 , 2 , 6	, //Left face
+				          0 , 2 , 6	, //Left face
 					      0 , 6 , 4	, //
 					      1 , 5 , 7	, //Right face
 					      7 , 3 , 1	, //
 					      3 , 7 , 6 , //Up face
 					      2 , 3 , 6 , //
 					      0 , 4 , 5 , //Down face
-					      0 , 5 , 1  //
-					      };
-	std::vector<float> textures = { 0 , 0 , 
+					      0 , 5 , 1   };
+
+	std::vector<float> textures = { 
+					0 , 0 , 
 					1 , 0 , 
 					0 , 1 , 
 					1 , 1 , 
@@ -149,7 +157,8 @@ CubeMapMesh::CubeMapMesh() : Mesh() {
 					0 , 1 , 
 					1 , 1 };
 
-	std::vector<float> colors = { 1 , 0 , 0 ,
+	std::vector<float> colors = { 
+					  1 , 0 , 0 ,
 				      1 , 0 , 0 , 	
 				      1 , 0 , 0 , 
 				      1 , 0 , 0 ,
@@ -157,6 +166,7 @@ CubeMapMesh::CubeMapMesh() : Mesh() {
 				      1 , 0 , 0 , 
 				      1 , 0 , 0 , 
 				      1 , 0 , 0 };
+	
 	geometry.indices = indices ; 
 	geometry.vertices = vertices ;
 	geometry.uv = textures ; 
@@ -184,6 +194,93 @@ void CubeMapMesh::bindShaders(){
 		shader_program->setAllMatricesUniforms(projection , view , model_matrix) ; 
 	}
 }
+
+
+
+/*****************************************************************************************************************/
+
+FrameBufferMesh::FrameBufferMesh():Mesh(){
+
+	std::vector<float> vertices = {  
+ 	   -1.0f, -1.0f, 0.f, 
+ 	   -1.0f, 1.0f, 0.f ,  
+ 	    1.0f, 1.0f, 0.f ,  
+ 	    1.0f, -1.0f, 0.f 
+	};
+	std::vector<unsigned int> indices = {
+		2 , 1 , 0 , 
+		3 , 2 , 0
+	};
+	std::vector<float> textures = {
+		0 , 0 , 
+		0 , 1 , 
+		1 , 1 ,
+		1 , 0  
+	};
+	geometry.indices = indices; 
+	geometry.vertices = vertices ; 
+	geometry.uv = textures ;
+	name = "Custom screen framebuffer";
+	model_matrix = glm::mat4(1.f);   
+}
+
+FrameBufferMesh::FrameBufferMesh(int texture_index , Shader* _shader): FrameBufferMesh(){
+	material.addTexture(texture_index , Texture::FRAMEBUFFER);
+	shader_program = _shader; 	 
+}
+
+FrameBufferMesh::~FrameBufferMesh(){
+
+}
+
+void FrameBufferMesh::bindShaders(){
+	if(shader_program != nullptr){
+		shader_program->bind();
+		if(face_culling_enabled){
+			setFaceCulling(false);
+			face_culling_enabled = false;
+		}
+		setDepthFunc(ALWAYS); 
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

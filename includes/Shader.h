@@ -27,7 +27,8 @@ public:
 		GENERIC = 0 , /**<Undefined shader type*/
 		BLINN = 1 ,   /**<Blinn-Phong shader*/
 		CUBEMAP = 2 , /**<shader used for displaying the environment map*/
-		PBR = 3		  /**<PBR shader type*/
+		PBR = 3	, 	  /**<PBR shader type*/
+		SCREEN_FRAMEBUFFER = 4	/**<Used for post processing*/
 	};
 public: 
 	
@@ -315,8 +316,15 @@ public:
 
 };
 
+/***********************************************************************************************************************************************************/
 
-
+class ScreenFrameBufferShader : public Shader{
+public:
+	ScreenFrameBufferShader(); 
+	ScreenFrameBufferShader(const std::string vertex_code , const std::string fragment_code);
+	void setTextureUniforms() ;  
+	virtual ~ScreenFrameBufferShader(); 
+};
 
 
 

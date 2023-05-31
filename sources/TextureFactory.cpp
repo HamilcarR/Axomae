@@ -37,6 +37,9 @@ Texture* TextureFactory::constructTexture(TextureData *data , Texture::TYPE type
 		case Texture::CUBEMAP:
 			constructed_texture =  new CubeMapTexture(data); 
 		break ;
+		case Texture::FRAMEBUFFER:
+			constructed_texture = new FrameBufferTexture(data);
+		break; 
 		case Texture::GENERIC: 
 			constructed_texture =  new GenericTexture(data); 
 		break ; 
