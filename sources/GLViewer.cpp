@@ -9,11 +9,10 @@ GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent){
 	QSurfaceFormat format;
 	format.setVersion(4, 6);
 	format.setProfile(QSurfaceFormat::CoreProfile);
-	format.setSwapBehavior(QSurfaceFormat::TripleBuffer);
+	format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
 	format.setSwapInterval(1);
 	setFormat(format);
-	renderer = new Renderer();
-	renderer->setScreenSize(width(), height());
+	renderer = new Renderer(width() , height());
 	glew_initialized = false;
 }
 
@@ -37,19 +36,20 @@ void GLViewer::initializeGL(){
 		else
 			glew_initialized = true;
 	}
-	renderer->setScreenSize(width(), height());
+	renderer->onResize(width(), height());
 	renderer->initialize();
 	errorCheck();
 }
 
 void GLViewer::paintGL(){
-	if (renderer->prep_draw())
-		renderer->draw();
-	
+	if (renderer->prep_draw()){
+		renderer->setDefaultFrameBufferId(defaultFramebufferObject()); 
+		renderer->draw();	
+	}	
 }
 
 void GLViewer::resizeGL(int w, int h){
-	renderer->setScreenSize(width(), height());
+	renderer->onResize(width(), height());
 }
 
 void GLViewer::printInfo(){

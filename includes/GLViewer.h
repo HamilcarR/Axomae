@@ -7,7 +7,7 @@
 #include "utils_3D.h" 
 #include "Renderer.h" 
 #include "Mesh.h"
-
+#include <QOpenGLWidget>
 
 
 
