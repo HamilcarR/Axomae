@@ -33,10 +33,10 @@ public:
 	/**
 	 * @brief Adds a texture to the collection 
 	 * 
-	 * @param index Index of the texture
+	 * @param texture_database_index Database index of the texture
 	 * @param type Type of the texture
 	 */
-	virtual void addTexture(unsigned int index , Texture::TYPE type);
+	virtual void addTexture(int texture_database_index , Texture::TYPE type);
 	
 	/**
 	 * @brief Initialize texture related GL functions

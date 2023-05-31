@@ -21,24 +21,17 @@ Texture::Texture(){
 	height = 0 ; 
 	data = nullptr ; 
 	sampler2D = 0 ; 
+	internal_format = RGBA; 
+	data_format = BGRA ; 
 }
 
-Texture::Texture(TextureData* tex){
-	name = EMPTY ; 
-	width = 0 ; 
-	height = 0 ; 
-	data = nullptr ; 
-	sampler2D = 0 ; 
+Texture::Texture(TextureData* tex):Texture(){	
 	set(tex) ; 
 }
 
-
 Texture::~Texture(){
-	
 
 }
-
-
 
 void Texture::set(TextureData *texture){
 	clean(); 
@@ -47,7 +40,6 @@ void Texture::set(TextureData *texture){
 	data = new uint32_t [ width * height ] ; 
 	for(unsigned int i = 0 ; i < width * height ; i++)
 		data[i] = texture->data[i] ; 
-
 }
 
 void Texture::clean(){
@@ -57,8 +49,8 @@ void Texture::clean(){
 	data = nullptr ; 
 	width = 0 ; 
 	height = 0 ; 
-	name = EMPTY ; 
-
+	name = EMPTY ;
+	 
 }
 
 void Texture::setTextureParametersOptions(){
@@ -68,21 +60,25 @@ void Texture::setTextureParametersOptions(){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER , GL_LINEAR_MIPMAP_LINEAR); 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	errorCheck(); 	
-
 }
 
 void Texture::initializeTexture2D(){
-	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA , width , height , 0 , GL_BGRA , GL_UNSIGNED_BYTE , data); 
+	glTexImage2D(GL_TEXTURE_2D , 0 , internal_format, width , height , 0 , data_format , GL_UNSIGNED_BYTE , data); 
 	setTextureParametersOptions(); 
 }
 
+void Texture::setNewSize(unsigned _width , unsigned _height){
+	width = _width ; 
+	height = _height; 
+	bindTexture(); 
+	glTexImage2D(GL_TEXTURE_2D , 0 , internal_format , _width , _height , 0 , data_format , GL_UNSIGNED_BYTE , nullptr); 
+	unbindTexture(); 
+}
 
 void Texture::cleanGlData(){
 	if(sampler2D != 0)
 		glDeleteTextures(1 , &sampler2D); 
 }
-
-	
 
 /****************************************************************************************************************************/
 DiffuseTexture::DiffuseTexture(){
@@ -398,7 +394,7 @@ void CubeMapTexture::setCubeMapTextureData(TextureData *texture){
 		data[i] = texture->data[i] ; 
 }
 
-CubeMapTexture::CubeMapTexture(TextureData* data){
+CubeMapTexture::CubeMapTexture(TextureData* data):Texture(){
 	name = CUBEMAP ; 
 	setCubeMapTextureData(data) ; 
 }
@@ -406,7 +402,7 @@ CubeMapTexture::CubeMapTexture(TextureData* data){
 void CubeMapTexture::initializeTexture2D(){
 	for( unsigned int i = 1 ; i <= 6 ; i++){
 		uint32_t* pointer_to_data = data + (i - 1) * width * height ;
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (i - 1)  , 0 , GL_RGBA , width , height , 0 , GL_RGBA , GL_UNSIGNED_BYTE , pointer_to_data); 
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (i - 1)  , 0 , internal_format , width , height , 0 , data_format , GL_UNSIGNED_BYTE , pointer_to_data); 
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);  
@@ -434,26 +430,48 @@ void CubeMapTexture::unbindTexture(){
 	glBindTexture(GL_TEXTURE_CUBE_MAP , 0); 
 }
 
-
 const char* CubeMapTexture::getTextureTypeCStr() {
 	return texture_type_c_str[CUBEMAP] ; 		
 }
 
 /****************************************************************************************************************************/
 
-FrameBufferTexture::FrameBufferTexture(){
-	name = FRAMEBUFFER ; 
+FrameBufferTexture::FrameBufferTexture():Texture(){
+	name = FRAMEBUFFER ;
+	internal_format = RGB ; 
+	data_format = RGB ;  
 }
 
 FrameBufferTexture::~FrameBufferTexture(){
 
 }
 
+FrameBufferTexture::FrameBufferTexture(TextureData *_data):FrameBufferTexture(){
+	if(_data != nullptr){
+		width = _data->width; 
+		height = _data->height;
+		this->data = nullptr; 
+	}
+}
+
+FrameBufferTexture::FrameBufferTexture(unsigned _width , unsigned _height):FrameBufferTexture(){
+	width = _width ; 
+	height = _height ; 
+}
+
+void FrameBufferTexture::initializeTexture2D(){
+	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGB , width , height , 0 , GL_RGB , GL_UNSIGNED_BYTE , nullptr);
+	glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_MIN_FILTER , GL_LINEAR); 
+	glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_MAG_FILTER , GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_WRAP_S , GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_WRAP_T , GL_CLAMP_TO_EDGE); 
+}
+
 void FrameBufferTexture::setGlData(){
 	glGenTextures(1 , &sampler2D); 
-	glActiveTexture(GL_TEXTURE0 + FRAMEBUFFER);
-	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA , width , height , 0 , GL_BGRA , GL_UNSIGNED_BYTE , data);// TODO complete 
-	Texture::setTextureParametersOptions(); 
+	glActiveTexture(GL_TEXTURE0 + FRAMEBUFFER); 
+	glBindTexture(GL_TEXTURE_2D , sampler2D);
+	FrameBufferTexture::initializeTexture2D();  
 }
 
 void FrameBufferTexture::bindTexture(){

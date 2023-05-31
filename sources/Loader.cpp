@@ -79,11 +79,11 @@ static void loadTexture(const aiScene* scene , Material *material ,TextureData &
 	std::cout << "Texture type loaded : " << texture.name << " / GLB index is: " << texture_index_string <<  "\n" ; 
 	 if(texture_index_string.size() != 0){
 		texture_index_string = texture_index_string.substr(1) ; 
-		unsigned int texture_index_int = stoi(texture_index_string);
+		unsigned int texture_index_int = stoi(texture_index_string);  
 		if(!texture_database->contains(texture_index_int)){
 			copyTexels(&texture , &*scene->mTextures[texture_index_int]) ; 
-			texture_database->addTexture(texture_index_int , &texture , type); 
-			material->addTexture(texture_index_int , type);
+			int index = texture_database->addTexture(&texture , type , false); 
+			material->addTexture(index , type);
 			texture.clean(); 
 		}
 		else
@@ -148,9 +148,12 @@ void Loader::loadShaderDatabase(){
 	std::string vertex_shader = loadShader("../shaders/phong.vert") ; 
 	std::string fragment_shader = loadShader("../shaders/phong.frag"); 
 	std::string vertex_shader_cubemap = loadShader("../shaders/cubemap.vert"); 
-	std::string fragment_shader_cubemap = loadShader("../shaders/cubemap.frag"); 
+	std::string fragment_shader_cubemap = loadShader("../shaders/cubemap.frag");
+	std::string vertex_shader_screen_fbo = loadShader("../shaders/screen_fbo.vert"); 
+	std::string fragment_shader_screen_fbo = loadShader("../shaders/screen_fbo.frag");  
 	shader_database->addShader(vertex_shader , fragment_shader , Shader::GENERIC) ; 
 	shader_database->addShader(vertex_shader_cubemap , fragment_shader_cubemap , Shader::CUBEMAP) ; 
+	shader_database->addShader(vertex_shader_screen_fbo , fragment_shader_screen_fbo , Shader::SCREEN_FRAMEBUFFER); 
 }
 
 /**
@@ -169,7 +172,6 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
 	std::vector<Mesh*> objects; 
 	Assimp::Importer importer ;	
 	const aiScene *modelScene = importer.ReadFile(file , aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs ) ;
-	loadShaderDatabase(); 	
 	if(modelScene != nullptr){
 		const aiMaterial* ai_material ;
 		for(unsigned int i = 0 ; i < modelScene->mNumMeshes ; i++){
@@ -307,8 +309,8 @@ Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
 			}
 		}
 	Material material ; 
-	texture_database->addTexture(num_textures + 1 , &cubemap , Texture::CUBEMAP ) ; 
-	material.addTexture(num_textures + 1 , Texture::CUBEMAP); 
+	unsigned index = texture_database->addTexture(&cubemap , Texture::CUBEMAP , false) ; 
+	material.addTexture(index , Texture::CUBEMAP); 
 	cube_map->material = material ; 	
 	return cube_map; 		
 }

@@ -5,7 +5,7 @@
 
 Material::Material(){
 	dielectric_factor = 0.f ;
-	shininess = 2.f ;  
+	shininess = 100.f ;  
 	roughness_factor = 0.f ; 
 	transmission_factor = 0.f ; 
 	emissive_factor = 1.f ; 
@@ -23,7 +23,7 @@ void Material::setRefractiveIndexValue(float n1 , float n2){
 		shader_program->setUniform(uniform_name_vec2_material_refractive_index, refractive_index);  
 }
 
-void Material::addTexture(unsigned int index , Texture::TYPE type){
+void Material::addTexture(int index , Texture::TYPE type){
 	textures_group.addTexture(index , type) ;
 }
 
@@ -32,6 +32,10 @@ void Material::bind(){
 
 }
 
+/**
+ * Initializes the material properties and sets the corresponding uniform values in the
+ * shader program.
+ */
 void Material::initializeMaterial(){
 	textures_group.initializeGlTextureData();
 	if(shader_program){

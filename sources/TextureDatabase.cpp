@@ -1,5 +1,6 @@
 #include "../includes/TextureDatabase.h"
 #include <utility> 
+#include <algorithm>
 
 TextureDatabase* TextureDatabase::instance = nullptr ; 
 
@@ -19,14 +20,22 @@ void TextureDatabase::destroy(){
 }
 
 
-void TextureDatabase::clean(){
-	for(std::pair<const unsigned int , Texture*>& A : texture_database){
+void TextureDatabase::hardCleanse(){
+	for(std::pair<const int , Texture*>& A : texture_database){
 		A.second->clean(); 
 		delete A.second ; 
 		A.second = nullptr ; 
 	}
-	texture_database.clear();
-	
+	texture_database.clear();	
+}
+
+void TextureDatabase::softCleanse(){
+	for(std::pair<const int , Texture*>  &A : texture_database)
+		if(A.first >= 0){
+			A.second->clean();
+			delete A.second ; 
+			texture_database.erase(A.first); 
+		}
 }
 
 TextureDatabase::TextureDatabase(){
@@ -36,25 +45,34 @@ TextureDatabase::~TextureDatabase(){
 
 }
 
-
-void TextureDatabase::addTexture(unsigned int index , TextureData *texture , Texture::TYPE type){
-	texture_database[index] = TextureFactory::constructTexture(texture , type) ; 
+int TextureDatabase::addTexture(TextureData *texture , Texture::TYPE type , bool keep){
+	int index = 0;
+	if(keep){
+		index = -1 ; 
+		while(texture_database[index] != nullptr)
+			index -- ; 
+	}
+	else
+		while(texture_database[index] != nullptr)
+			index ++ ; 
+	Texture* tex = TextureFactory::constructTexture(texture , type) ; 
+	texture_database[index] = tex ; 	
+	return index ; 
 }
 
-Texture* TextureDatabase::get(unsigned int index){
+Texture* TextureDatabase::get(int index){
 	if(texture_database.find(index) == texture_database.end())
 		return nullptr ; 
 	else
 		return texture_database[index] ; 
 }
 
-bool TextureDatabase::contains(unsigned int index){
+bool TextureDatabase::contains(int index){
 	return texture_database.find(index) != texture_database.end() ; 
-
 }
 
-std::vector<std::pair<unsigned int, Texture*>>  TextureDatabase::getTexturesByType(Texture::TYPE type) const {
-	std::vector <std::pair<unsigned int , Texture*>> type_collection ;  
+std::vector<std::pair<int, Texture*>>  TextureDatabase::getTexturesByType(Texture::TYPE type) const {
+	std::vector <std::pair<int , Texture*>> type_collection ;  
 	for(auto &A : texture_database){
 		if(A.second->getTextureType() == type) 
 			type_collection.push_back(A); 

@@ -8,7 +8,7 @@ TextureGroup::TextureGroup(){
 TextureGroup::~TextureGroup(){
 }
 
-void TextureGroup::addTexture(unsigned int index , Texture::TYPE type){
+void TextureGroup::addTexture(int index , Texture::TYPE type){
 	texture_collection.push_back(texture_database->get(index)); 
 	
 }

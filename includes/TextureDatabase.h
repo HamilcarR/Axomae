@@ -34,21 +34,27 @@ public:
  	void destroy(); 
 	
 	/**
-	 * @brief Removes all elements in the database , destroy them , and free their GL ID 
+	 * @brief Removes all elements from the database , except those marked "keep"
+	 *  
+	 */
+	void softCleanse();
+
+	/**
+	 * @brief Deletes everything in the database 
 	 * 
 	 */
-	void clean();
+	void hardCleanse(); 
 	
 	/**
-	 * @brief Construct a new texture if index doesn't exist in the map
+	 * @brief Construct a new texture and adds it to the database with a unique index
 	 *  
-	 * @param index Unique index of the texture
 	 * @param texture Raw texture data 
 	 * @param type Type of the texture
+	 * @param keep_texture_after_clean Some textures could benefit from not being deleted after each scene change, like framebuffer textures
 	 * @see TextureData
 	 * @see Texture::TYPE
 	 */
-	void addTexture(unsigned int index , TextureData* texture , Texture::TYPE type); 
+	int addTexture(TextureData* texture , Texture::TYPE type , bool keep_texture_after_clean); 
 	
 	/**
 	 * @brief Get the texture at index
@@ -56,7 +62,7 @@ public:
 	 * @param index Index we want to retrieve
 	 * @return Texture* nullptr if nothing found , Texture at "index" else 
 	 */
-	Texture* get(unsigned int index);
+	Texture* get(int index);
 	
 	/**
 	 * @brief Checks if database contains this index
@@ -64,7 +70,7 @@ public:
 	 * @param index Index to check
 	 * @return true If database contains "index"
 	 */
-	bool contains(unsigned int index);
+	bool contains(int index);
 	
 	/**
 	 * @brief Retrieve all textures of type "texture_type"
@@ -74,7 +80,7 @@ public:
 	 * @see Texture
 	 * @see Texture::TYPE
 	 */
-	std::vector<std::pair<unsigned int , Texture*>> getTexturesByType(Texture::TYPE texture_type) const ; 
+	std::vector<std::pair<int , Texture*>> getTexturesByType(Texture::TYPE texture_type) const ; 
 	
 	/**
 	 * @brief Check if database is initialized
@@ -101,8 +107,7 @@ private:
 
 private:
 	static TextureDatabase* instance ;						/**<Unique instance pointer of the database*/			
-	std::map<unsigned int , Texture*> texture_database;		/**<Database of textures*/ 
-
+	std::map<int , Texture*> texture_database;				/**<Database of textures*/ 
 }; 
 
 
