@@ -32,16 +32,14 @@ Drawable::Drawable(Mesh *mesh){
 	}
 }
 
-
 Drawable::~Drawable(){
+	delete mesh_object;  
 }
 
 void Drawable::clean(){
 	gl_buffers.clean() ; 
 	mesh_object->clean(); 	
-
 }
-
 
 bool Drawable::ready(){
 	return gl_buffers.isReady() ; 
@@ -56,7 +54,7 @@ bool Drawable::initialize(){
 	return gl_buffers.isReady();  ; 
 }
 
-void Drawable::start_draw(){
+void Drawable::startDraw(){
 	if(mesh_object != nullptr){		
 		mesh_object->bindShaders();
 		gl_buffers.bindVao() ;  
@@ -82,22 +80,20 @@ void Drawable::start_draw(){
 		mesh_object->getShader()->enableAttributeArray(4);
 		mesh_object->getShader()->setAttributeBuffer(4 , GL_FLOAT , 0 , 3 , 0 ) ; 
 	
-		gl_buffers.unbindVao() ; 
+		gl_buffers.unbindVao() ;
+		mesh_object->releaseShaders(); 
 	}
 
 }
 
-
-
 void Drawable::bind(){
 	mesh_object->bindShaders(); 
 	mesh_object->bindMaterials(); 
-	gl_buffers.bindVao(); 
-
+	gl_buffers.bind(); 
 }
 
 void Drawable::unbind(){
-	gl_buffers.unbindVao(); 
+	gl_buffers.unbind(); 
 	mesh_object->releaseShaders();
 }
 
@@ -106,7 +102,11 @@ void Drawable::setSceneCameraPointer(Camera* camera){
 	mesh_object->setSceneCameraPointer(camera); 
 }
 
-
-
+Shader* Drawable::getMeshShaderPointer(){
+	if(mesh_object)
+		return mesh_object->getShader(); 
+	else
+		return nullptr;
+}
 
 

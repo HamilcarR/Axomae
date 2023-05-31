@@ -5,10 +5,7 @@
 #include "Mesh.h"
 #include "TextureGroup.h" 
 #include "Camera.h"
-#include "GLBuffers.h"
-#include <QOpenGLWidget>
-#include <QDebug>
-#include <QString> 
+#include "GLGeometryBuffer.h"
 
 /**
  * @file Drawable.h
@@ -61,7 +58,7 @@ public:
 	 * @brief Binds shaders ,and buffers
 	 * 
 	 */
-	void start_draw(); 
+	void startDraw(); 
 	
 	/**
 	 * @brief Cleans buffers , and mesh data
@@ -102,21 +99,15 @@ public:
 	axomae::Mesh* getMeshPointer(){return mesh_object;}
 
 	/**
-	 * @brief Get the Mesh's Shader
+	 * @brief Get the Mesh's Shader pointer
 	 * 
 	 * @return Shader* Shader pointer , or nullptr if mesh empty 
 	 */
-	Shader* getMeshShader(){
-		if(mesh_object) 
-			return mesh_object->getShader();
-		else
-			return nullptr;		
-	}
-
+	Shader* getMeshShaderPointer(); 
 protected:
 	axomae::Mesh *mesh_object ;			/**<Pointer to the mesh */
 	Camera *camera_pointer ; 			/**<Pointer to the camera*/
-	GLBuffers gl_buffers ; 				/**<OpenGL buffers*/
+	GLGeometryBuffer gl_buffers ; 		/**<OpenGL buffers*/
 };
 
 
