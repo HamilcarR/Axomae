@@ -106,11 +106,27 @@ out vec4 fragment ;
 vec3 getViewDirection(){
     return normalize(camera_position - vertex_fragment_fragment_position); 
 }
+
+/* Texture sampling functions*/
+/**************************************************************************************************************/
 vec3 getSurfaceNormal(){
     vec3 N = normalize(MAT_TBN * (texture(normal_map , vertex_fragment_uv).rgb * 2.f - 1.f));     
   //  N = normalize(vertex_fragment_normals); 
     return N ; 
 }
+
+vec4 computeEmissiveValue(){
+    return texture(emissive_map , vertex_fragment_uv); 
+}
+
+vec4 computeMetallicValue(){
+    return texture(metallic_map , vertex_fragment_uv); 
+}
+
+vec4 computeDiffuseValue(){
+    return texture(diffuse_map , vertex_fragment_uv);
+}
+
 /**************************************************************************************************************/
 float computePointLightAttenuation(uint point_light_index){
     float dist = length(vertex_fragment_fragment_position - point_light_struct[point_light_index].position);  
@@ -270,24 +286,15 @@ vec2 computeFresnelCoefficients(){
 }
 
 /**************************************************************************************************************/
-vec4 computeEmissiveValue(){
-    return texture(emissive_map , vertex_fragment_uv); 
-}
-
-vec4 computeMetallicValue(){
-    return texture(metallic_map , vertex_fragment_uv); 
-}
-
-/**************************************************************************************************************/
 void main(){	
     vec2 fresnel = computeFresnelCoefficients() ; 
     vec4 reflection = computeReflectionCubeMap() ; 
     vec4 refraction = computeRefractionCubeMap() ; 
-    vec4 metallic = computeMetallicValue(); 
     vec4 R = reflection * fresnel.x ; 
-    vec4 Rf = refraction * fresnel.y ; 
+    vec4 Rf = refraction * fresnel.y ;
+    vec4 metallic = computeMetallicValue(); 
     vec4 E = computeEmissiveValue() ; 
-    vec4 C = texture(diffuse_map , vertex_fragment_uv);
+    vec4 C = computeDiffuseValue() ;
     LIGHT_COMPONENTS directional = computeDirectionalLightsContrib() ; 
     LIGHT_COMPONENTS point = computePointLightsContrib();
     LIGHT_COMPONENTS spot = computeSpotLightsContrib();  
@@ -295,5 +302,5 @@ void main(){
     vec3 diffuse = directional.diffuse + point.diffuse + spot.diffuse ; 
     vec3 specular = directional.specular + point.specular + spot.specular ; 
     E = E == vec4(0.f) ? vec4(1.f) : E ; 
-    fragment = vec4(specular + diffuse + ambient * ambient_factor, 1.f) * C + ( R + Rf) + E * material.emissive_factor ; 
+    fragment = vec4(specular + diffuse + ambient * ambient_factor, 1.f) * C + (R) + E * material.emissive_factor ; 
 }
