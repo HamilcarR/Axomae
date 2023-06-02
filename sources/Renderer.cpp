@@ -70,7 +70,7 @@ bool Renderer::scene_ready(){
 	for(Drawable *object : scene)
 		if(!object->ready())
 			return false;
-	if(!camera_framebuffer->getDrawable()->ready())
+	if(camera_framebuffer && !camera_framebuffer->getDrawable()->ready())
 		return false; 
 	return true ; 
 }
@@ -94,10 +94,8 @@ bool Renderer::prep_draw(){
 void Renderer::draw(){
 	
 	scene_camera->computeViewProjection();		
-	camera_framebuffer->bindFrameBuffer();
-	
+	camera_framebuffer->bindFrameBuffer();	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glViewport(0 , 0 , screen_size.width , screen_size.height); 
 	for (Drawable *A : scene){
 		A->bind();
 		light_database->updateShadersData(A->getMeshShaderPointer() , A->getMeshPointer()->getModelViewMatrix()); 

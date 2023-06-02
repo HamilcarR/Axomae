@@ -46,6 +46,11 @@ Shader* ShaderDatabase::get(const Shader::TYPE type) const {
 		return nullptr;
 }
 
+void ShaderDatabase::recompile(){
+	for(auto A : shader_database){
+		A.second->recompile(); 
+	}
+}
 
 ShaderDatabase::ShaderDatabase(){
 

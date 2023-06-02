@@ -1,5 +1,5 @@
 #include "../includes/TextureGroup.h"
-
+#include "../includes/Shader.h"
 
 TextureGroup::TextureGroup(){
 	texture_database = TextureDatabase::getInstance(); 
@@ -14,15 +14,18 @@ void TextureGroup::addTexture(int index , Texture::TYPE type){
 }
 
 
-void TextureGroup::initializeGlTextureData(){
-	for(Texture* A : texture_collection)
-		A->setGlData(); 
+void TextureGroup::initializeGlTextureData(Shader* shader){
+	for(Texture* A : texture_collection){	
+		A->setGlData(shader); 
+	}
+		
 	initialized = true ; 
 }
 
 
 void TextureGroup::clean(){
-	initialized = false ; 
+	initialized = false ;
+	texture_collection.clear();  
 }
 
 void TextureGroup::bind(){

@@ -17,7 +17,8 @@ namespace axomae{
 
 Loader* Loader::instance = nullptr;
 
-Loader::Loader(){}
+Loader::Loader(){
+}
 
 Loader::~Loader(){}
 
@@ -64,6 +65,14 @@ static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 	}
 }
 
+
+static void loadTextureDummy(Material* material , Texture::TYPE type){
+	TextureDatabase* texture_database = TextureDatabase::getInstance();
+	std::cout << "Loading dummy texture : " << type << std::endl;  
+	int index = texture_database->addTexture(nullptr, type , false);
+	material->addTexture(index , type); 
+}
+
 /**
  * This function loads a texture from an aiScene and adds it to a Material object.
  * 
@@ -104,6 +113,7 @@ static void loadTexture(const aiScene* scene , Material *material ,TextureData &
  */
 static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	Material mesh_material; 
+	std::vector<Texture::TYPE> dummy_textures_type; 
 	TextureData diffuse , metallic , roughness , normal , ambiantocclusion , emissive , specular ;
 	diffuse.name = "diffuse" ; 
 	metallic.name = "metallic" ; 
@@ -114,28 +124,52 @@ static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
 	emissive.name = "emissive" ; 
 	unsigned int color_index = 0, metallic_index = 0 , roughness_index = 0; 
 	aiString color_texture , normal_texture , metallic_texture , roughness_texture , emissive_texture , specular_texture , occlusion_texture ; //we get indexes of embedded textures , since we will use GLB format  
-	material->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE , &color_texture) ; 
-	material->GetTexture(AI_MATKEY_METALLIC_TEXTURE , &metallic_texture) ; 
-	material->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE , &roughness_texture) ;	
-	loadTexture(scene , &mesh_material , diffuse , color_texture , Texture::DIFFUSE); 
-	loadTexture(scene , &mesh_material , metallic , metallic_texture , Texture::METALLIC); 
-	loadTexture(scene , &mesh_material , roughness , roughness_texture , Texture::ROUGHNESS); 
+	
+	if(material->GetTextureCount(aiTextureType_BASE_COLOR) > 0){
+		material->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE , &color_texture) ;
+		loadTexture(scene , &mesh_material , diffuse , color_texture , Texture::DIFFUSE); 
+	}
+	else
+		dummy_textures_type.push_back(Texture::DIFFUSE);	
+	if(material->GetTextureCount(aiTextureType_METALNESS) > 0){
+		material->GetTexture(AI_MATKEY_METALLIC_TEXTURE , &metallic_texture) ; 
+		loadTexture(scene , &mesh_material , metallic , metallic_texture , Texture::METALLIC); 
+	}
+	else
+		dummy_textures_type.push_back(Texture::METALLIC); 
+	if(material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS) > 0){
+		material->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE , &roughness_texture) ;	
+		loadTexture(scene , &mesh_material , roughness , roughness_texture , Texture::ROUGHNESS);
+	}
+	else
+		dummy_textures_type.push_back(Texture::ROUGHNESS); 
 	if(material->GetTextureCount(aiTextureType_NORMALS) > 0){
 		material->GetTexture(aiTextureType_NORMALS , 0 , &normal_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
 		loadTexture(scene , &mesh_material , normal , normal_texture , Texture::NORMAL); 
-	}	
+	}
+	else
+		dummy_textures_type.push_back(Texture::NORMAL); 
 	if(material->GetTextureCount(aiTextureType_LIGHTMAP) > 0){
 		material->GetTexture(aiTextureType_LIGHTMAP , 0 , &occlusion_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
 		loadTexture(scene , &mesh_material , ambiantocclusion , occlusion_texture , Texture::AMBIANTOCCLUSION); 
 	}
+	else
+		dummy_textures_type.push_back(Texture::AMBIANTOCCLUSION); 
 	if(material->GetTextureCount(aiTextureType_SHEEN) > 0){
 		material-> GetTexture(aiTextureType_SHEEN , 0 , &specular_texture , nullptr , nullptr , nullptr , nullptr , nullptr);
 		loadTexture(scene , &mesh_material , specular , specular_texture , Texture::SPECULAR); 
 	}
+	else
+		dummy_textures_type.push_back(Texture::SPECULAR); 	
 	if(material->GetTextureCount(aiTextureType_EMISSIVE) > 0){
 		material->GetTexture(aiTextureType_EMISSIVE , 0 , &emissive_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
 		loadTexture(scene , &mesh_material , emissive , emissive_texture , Texture::EMISSIVE); 
 	}
+	else
+		dummy_textures_type.push_back(Texture::EMISSIVE);
+	for(auto it = dummy_textures_type.begin(); it != dummy_textures_type.end() ; it ++)
+		loadTextureDummy(&mesh_material , *it);
+	
 	return mesh_material ; 
 }
 
@@ -211,7 +245,7 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
 			}
 			std::cout << "object loaded : " << mesh->mName.C_Str()<< "\n" ; 	
 			Shader* shader_program = shader_database->get(Shader::GENERIC) ;  //TODO : change for PBR and other nice shaders when needed 		
-			Mesh *loaded_mesh = new Mesh(std::string(mesh->mName.C_Str()) , object , mesh_material , shader_program) ;	
+			Mesh *loaded_mesh = new Mesh(std::string(mesh->mName.C_Str()) , object , mesh_material , shader_program) ; //TODO : change shader_program with pointer to pair<shader::type , shader*> 	
 			objects.push_back(loaded_mesh);
 		}
 		return std::pair<unsigned int , std::vector<Mesh*>> (modelScene->mNumTextures , objects) ; 
@@ -232,6 +266,10 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
  * @return A vector of Mesh pointers.
  */
 std::vector<Mesh*> Loader::load(const char* file){
+	TextureDatabase *texture_database = TextureDatabase::getInstance(); 	
+	ShaderDatabase *shader_database = ShaderDatabase::getInstance(); 
+	texture_database->softCleanse(); 
+	shader_database->recompile(); 
 	std::pair<unsigned int , std::vector<Mesh*>> scene = loadObjects(file); 
 	Mesh* cube_map = generateCubeMap(scene.first , false) ; 	
 	if(cube_map != nullptr)
@@ -310,8 +348,10 @@ Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
 		}
 	Material material ; 
 	unsigned index = texture_database->addTexture(&cubemap , Texture::CUBEMAP , false) ; 
-	material.addTexture(index , Texture::CUBEMAP); 
-	cube_map->material = material ; 	
+	material.addTexture(index , Texture::CUBEMAP);
+	material.setShaderPointer(shader_database->get(Shader::CUBEMAP));  
+	cube_map->material = material ; 
+	cubemap.clean(); 	
 	return cube_map; 		
 }
 

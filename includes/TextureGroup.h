@@ -39,11 +39,11 @@ public:
 	virtual void addTexture(int texture_database_index , Texture::TYPE type);
 	
 	/**
-	 * @brief Initialize texture related GL functions
+	 * @brief Initialize texture related GL functions and sets up corresponding uniforms
 	 * 
 	 */
-	virtual void initializeGlTextureData();
-	
+	virtual void initializeGlTextureData(Shader* shader);
+
 	/**
 	 * @brief Sets the "initialized" variable to false . 
 	 * The cleaning of the textures is done by the TextureDatabase class

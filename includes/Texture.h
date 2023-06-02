@@ -10,6 +10,9 @@
  * 
  */
 
+
+
+class Shader; 
 /**
  * @brief Class for raw binary data of textures
  * 
@@ -166,7 +169,7 @@ public:
 	 * @see Texture::TYPE
 	 */
 	TYPE getTextureType(){return name;} ;  
-	
+
 	/**
 	 * @brief Bind the texture using glBindTexture
 	 * 
@@ -183,7 +186,7 @@ public:
 	 * @brief Set the OpenGL texture data infos
 	 * 
 	 */
-	virtual void setGlData() = 0 ;
+	virtual void setGlData(Shader* shader) = 0 ;
 
 	/**
 	 * @brief Release Opengl data 
@@ -260,7 +263,7 @@ public:
 	 * @brief Set the OpenGL texture data infos
 	 * 
 	 */
-	virtual void setGlData()  ;
+	virtual void setGlData(Shader* shader)  ;
 
 	/**
 	 * @brief Get the texture string description
@@ -313,7 +316,7 @@ public:
 	 * @brief Set the OpenGL texture data infos
 	 * 
 	 */
-	virtual void setGlData()  ;
+	virtual void setGlData(Shader* shader)  ;
 	
 	/**
 	 * @brief Get the texture string description
@@ -366,7 +369,7 @@ public:
 	 * @brief Set the OpenGL texture data infos
 	 * 
 	 */
-	virtual void setGlData()  ;
+	virtual void setGlData(Shader* shader)  ;
 	
 	/**
 	 * @brief Get the texture string description
@@ -419,7 +422,7 @@ public:
 	 * @brief Set the OpenGL texture data infos
 	 * 
 	 */
-	virtual void setGlData()  ;
+	virtual void setGlData(Shader* shader)  ;
 	
 	/**
 	 * @brief Get the texture string description
@@ -473,7 +476,7 @@ public:
 	 * @brief Set the OpenGL texture data infos
 	 * 
 	 */
-	virtual void setGlData()  ;
+	virtual void setGlData(Shader* shader)  ;
 	
 	/**
 	 * @brief Get the texture string description
@@ -526,7 +529,7 @@ public:
 	 * @brief Set the OpenGL texture data infos
 	 * 
 	 */
-	virtual void setGlData()  ;
+	virtual void setGlData(Shader* shader)  ;
 	
 	/**
 	 * @brief Get the texture string description
@@ -579,7 +582,7 @@ public:
 	 * @brief Set the OpenGL texture data infos
 	 * 
 	 */
-	virtual void setGlData() ;
+	virtual void setGlData(Shader* shader) ;
 	
 	/**
 	 * @brief Get the texture string description
@@ -632,7 +635,7 @@ public:
 	 * @brief Set the OpenGL texture data infos
 	 * 
 	 */
-	virtual void setGlData()  ;
+	virtual void setGlData(Shader* shader)  ;
 	
 	/**
 	 * @brief Get the texture string description
@@ -703,7 +706,7 @@ public:
 	 * @brief Set the OpenGL texture data infos
 	 * 
 	 */
-	virtual void setGlData() ;
+	virtual void setGlData(Shader* shader) ;
 	
 	/**
 	 * @brief Get the texture string description
@@ -774,7 +777,7 @@ public:
 	 * @brief Set the Gl Data object
 	 * 
 	 */
-	virtual void setGlData(); 
+	virtual void setGlData(Shader* shader); 
 
 	/**
 	 * @brief 

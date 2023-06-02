@@ -80,7 +80,10 @@ public:
 	 * @return a pointer to a Shader object of the specified type if it exists in the shader_database map.
 	 * If the shader of the specified type does not exist in the map, the function returns a null pointer.
 	 */
-	Shader* get(Shader::TYPE type) const ; 
+	Shader* get(Shader::TYPE type) const ;
+
+
+	virtual void recompile() ;  
 private:
 	
 	/**

@@ -194,11 +194,11 @@ public:
 	Shader* getShader(){return shader_program;}
 
 	/**
-	 * @brief Set the Shader pointer
+	 * @brief Set the Shader pointer in the mesh , and material
 	 * 
 	 * @param shader 
 	 */
-	void setShader(Shader* shader){shader_program = shader;} 
+	void setShader(Shader* shader){shader_program = shader; material.setShaderPointer(shader); } 
 public:
 	Object3D geometry;					/**<3D Geometry of the mesh , vertex positions , UVs etc*/	
 	Material material; 					/**<Material to be used for the mesh*/

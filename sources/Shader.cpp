@@ -70,18 +70,9 @@ void Shader::setAttributeBuffer(GLuint location , GLenum type , int offset , int
 	glVertexAttribPointer(location , tuplesize , type , GL_FALSE , stride , (void*) 0); 
 }
 
-void Shader::setTextureUniforms(){
+void Shader::setTextureUniforms(std::string texture_name , Texture::TYPE type){
 	glUseProgram(shader_program) ; 
-	setUniform(DiffuseTexture::getTextureTypeCStr() , static_cast<int> (Texture::DIFFUSE)) ; 
-	setUniform(NormalTexture::getTextureTypeCStr() , static_cast<int> (Texture::NORMAL)) ; 
-	setUniform(MetallicTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::METALLIC)) ; 
-	setUniform(RoughnessTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::ROUGHNESS)) ; 
-	setUniform(AmbiantOcclusionTexture::getTextureTypeCStr() , static_cast<int> (Texture::AMBIANTOCCLUSION)) ; 	
-	setUniform(SpecularTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::SPECULAR)) ; 
-	setUniform(EmissiveTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::EMISSIVE)) ; 
-	setUniform(CubeMapTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::CUBEMAP)) ;
-	setUniform(FrameBufferTexture::getTextureTypeCStr() , static_cast<int>(Texture::FRAMEBUFFER)); 
-	setUniform(GenericTexture::getTextureTypeCStr() ,  static_cast<int> (Texture::GENERIC)) ; 
+	setUniform(texture_name , static_cast<int>(type)); 
 }
 
 void Shader::setSceneCameraPointer(Camera* camera){
@@ -204,8 +195,11 @@ void Shader::initializeShader(){
 	glAttachShader(shader_program , fragment_shader);
 	glLinkProgram(shader_program) ; 
 	programLinkingErrorCheck(shader_program) ; 
-	setTextureUniforms();
 	errorCheck(); 
+}
+void Shader::recompile(){
+	clean(); 
+	initializeShader(); 
 }
 
 void Shader::bind(){
@@ -268,8 +262,9 @@ ScreenFrameBufferShader::ScreenFrameBufferShader(const std::string vertex , cons
 ScreenFrameBufferShader::~ScreenFrameBufferShader(){
 
 }
-
+/*
 void ScreenFrameBufferShader::setTextureUniforms(){
 	bind(); 
 	setUniform(FrameBufferTexture::getTextureTypeCStr() , static_cast<int>(Texture::FRAMEBUFFER)); 
 }
+*/

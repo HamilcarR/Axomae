@@ -30,10 +30,11 @@ void TextureDatabase::hardCleanse(){
 }
 
 void TextureDatabase::softCleanse(){
-	for(std::pair<const int , Texture*>  &A : texture_database)
+	for(std::pair<const int , Texture*>  A : texture_database)
 		if(A.first >= 0){
 			A.second->clean();
-			delete A.second ; 
+			delete A.second ;
+			A.second = nullptr ; 
 			texture_database.erase(A.first); 
 		}
 }

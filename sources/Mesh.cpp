@@ -224,9 +224,11 @@ FrameBufferMesh::FrameBufferMesh():Mesh(){
 	model_matrix = glm::mat4(1.f);   
 }
 
-FrameBufferMesh::FrameBufferMesh(int texture_index , Shader* _shader): FrameBufferMesh(){
-	material.addTexture(texture_index , Texture::FRAMEBUFFER);
+FrameBufferMesh::FrameBufferMesh(int texture_index , Shader* _shader): FrameBufferMesh(){	
 	shader_program = _shader; 	 
+	material.setShaderPointer(shader_program);
+	material.addTexture(texture_index , Texture::FRAMEBUFFER);
+	
 }
 
 FrameBufferMesh::~FrameBufferMesh(){

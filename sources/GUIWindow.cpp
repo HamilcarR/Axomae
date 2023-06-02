@@ -625,8 +625,7 @@ void GUIWindow::project_uv_normals(){
 bool GUIWindow::import_3DOBJ(){
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
 	if(!filename.isEmpty()){
-		TextureDatabase *texture_database = TextureDatabase::getInstance(); 
-		texture_database->softCleanse(); 
+
 		std::vector<Mesh*> scene = Loader::load(filename.toStdString().c_str()) ;
 		SceneSelector *instance = SceneSelector::getInstance(); 	
 		_UI.renderer_view->setNewScene(scene);

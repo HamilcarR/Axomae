@@ -1,5 +1,8 @@
 #include "../includes/Texture.h"
+#include "../includes/Shader.h"
 #include <map>
+
+constexpr unsigned int DUMMY_TEXTURE_DIM = 1 ;
 
 static std::map<Texture::TYPE , const char*> texture_type_c_str = {
 	{Texture::DIFFUSE , "diffuse_map"}, 
@@ -25,8 +28,20 @@ Texture::Texture(){
 	data_format = BGRA ; 
 }
 
-Texture::Texture(TextureData* tex):Texture(){	
-	set(tex) ; 
+Texture::Texture(TextureData* tex):Texture(){
+	if(tex != nullptr)	
+		set(tex) ;
+	else{
+		TextureData dummy ; 
+		dummy.width = DUMMY_TEXTURE_DIM; 
+		dummy.height = DUMMY_TEXTURE_DIM ; 
+		uint32_t temp[DUMMY_TEXTURE_DIM * DUMMY_TEXTURE_DIM] ;  
+		for(unsigned i = 0 ; i < dummy.width * dummy.height ; i++){
+			temp[i] = 0xFF000000 ; 
+		}
+		dummy.data = temp ; 
+		set(&dummy) ; 
+	}
 }
 
 Texture::~Texture(){
@@ -76,8 +91,10 @@ void Texture::setNewSize(unsigned _width , unsigned _height){
 }
 
 void Texture::cleanGlData(){
-	if(sampler2D != 0)
-		glDeleteTextures(1 , &sampler2D); 
+	if(sampler2D != 0){
+		glDeleteTextures(1 , &sampler2D);
+		sampler2D = 0 ;  
+	}
 }
 
 /****************************************************************************************************************************/
@@ -93,11 +110,13 @@ DiffuseTexture::DiffuseTexture(TextureData* data):Texture(data){
 	name = DIFFUSE ; 
 }
 
-void DiffuseTexture::setGlData(){
+void DiffuseTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + DIFFUSE); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	Texture::initializeTexture2D(); 
+	Texture::initializeTexture2D();
+
+	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
 
@@ -125,15 +144,22 @@ NormalTexture::~NormalTexture(){
 
 }
 
-NormalTexture::NormalTexture(TextureData* data):Texture(data){
-	name = NORMAL ; 
+NormalTexture::NormalTexture(TextureData* texture):Texture(texture){
+	name = NORMAL ;
+	if(!texture){	
+		uint32_t rgba = 0x007F7FFF;
+		for(unsigned i = 0 ; i < DUMMY_TEXTURE_DIM * DUMMY_TEXTURE_DIM; i++)
+			data[i] = rgba ;  
+	}
 }
 
-void NormalTexture::setGlData(){
+void NormalTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + NORMAL); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	Texture::initializeTexture2D(); 
+	Texture::initializeTexture2D();
+
+	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 
 }
 
@@ -169,11 +195,13 @@ MetallicTexture::MetallicTexture(TextureData* data):Texture(data){
 	name = METALLIC ; 
 }
 
-void MetallicTexture::setGlData(){
+void MetallicTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + METALLIC); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	Texture::initializeTexture2D(); 
+	Texture::initializeTexture2D();
+
+	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
 
@@ -207,11 +235,13 @@ RoughnessTexture::RoughnessTexture(TextureData* data):Texture(data){
 	name = ROUGHNESS ; 
 }
 
-void RoughnessTexture::setGlData(){
+void RoughnessTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + ROUGHNESS); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	Texture::initializeTexture2D(); 
+	Texture::initializeTexture2D();
+
+	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
 void RoughnessTexture::bindTexture(){
@@ -244,11 +274,13 @@ AmbiantOcclusionTexture::AmbiantOcclusionTexture(TextureData* data):Texture(data
 	name = AMBIANTOCCLUSION ; 
 }
 
-void AmbiantOcclusionTexture::setGlData(){
+void AmbiantOcclusionTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + AMBIANTOCCLUSION); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	Texture::initializeTexture2D(); 
+	Texture::initializeTexture2D();
+
+	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
 void AmbiantOcclusionTexture::bindTexture(){
@@ -280,11 +312,13 @@ SpecularTexture::SpecularTexture(TextureData* data):Texture(data){
 	name = SPECULAR ; 
 }
 
-void SpecularTexture::setGlData(){
+void SpecularTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + SPECULAR); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	Texture::initializeTexture2D(); 
+	Texture::initializeTexture2D();
+	 
+	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
 void SpecularTexture::bindTexture(){
@@ -315,11 +349,13 @@ EmissiveTexture::EmissiveTexture(TextureData* data):Texture(data){
 	name = EMISSIVE ; 
 }
 
-void EmissiveTexture::setGlData(){
+void EmissiveTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + EMISSIVE); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	Texture::initializeTexture2D(); 
+	Texture::initializeTexture2D();
+
+	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
 void EmissiveTexture::bindTexture(){
@@ -353,11 +389,13 @@ GenericTexture::GenericTexture(TextureData* data):Texture(data){
 }
 
 
-void GenericTexture::setGlData(){
+void GenericTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + GENERIC); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
 	Texture::initializeTexture2D(); 
+
+	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
 void GenericTexture::bindTexture(){
@@ -402,7 +440,7 @@ CubeMapTexture::CubeMapTexture(TextureData* data):Texture(){
 void CubeMapTexture::initializeTexture2D(){
 	for( unsigned int i = 1 ; i <= 6 ; i++){
 		uint32_t* pointer_to_data = data + (i - 1) * width * height ;
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (i - 1)  , 0 , internal_format , width , height , 0 , data_format , GL_UNSIGNED_BYTE , pointer_to_data); 
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (i - 1)  , 0 , GL_RGBA , width , height , 0 , GL_RGBA , GL_UNSIGNED_BYTE , pointer_to_data); 
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);  
@@ -413,11 +451,12 @@ void CubeMapTexture::initializeTexture2D(){
 
 }
 
-void CubeMapTexture::setGlData(){
+void CubeMapTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + CUBEMAP); 
 	glBindTexture(GL_TEXTURE_CUBE_MAP , sampler2D); 
 	CubeMapTexture::initializeTexture2D(); 
+	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
 void CubeMapTexture::bindTexture(){
@@ -438,8 +477,8 @@ const char* CubeMapTexture::getTextureTypeCStr() {
 
 FrameBufferTexture::FrameBufferTexture():Texture(){
 	name = FRAMEBUFFER ;
-	internal_format = RGB ; 
-	data_format = RGB ;  
+	internal_format = RGBA ; 
+	data_format = BGRA ;  
 }
 
 FrameBufferTexture::~FrameBufferTexture(){
@@ -460,18 +499,19 @@ FrameBufferTexture::FrameBufferTexture(unsigned _width , unsigned _height):Frame
 }
 
 void FrameBufferTexture::initializeTexture2D(){
-	glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGB , width , height , 0 , GL_RGB , GL_UNSIGNED_BYTE , nullptr);
+	glTexImage2D(GL_TEXTURE_2D , 0 , internal_format , width , height , 0 , data_format , GL_UNSIGNED_BYTE , nullptr);
 	glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_MIN_FILTER , GL_LINEAR); 
 	glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_MAG_FILTER , GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_WRAP_S , GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_WRAP_T , GL_CLAMP_TO_EDGE); 
 }
 
-void FrameBufferTexture::setGlData(){
+void FrameBufferTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 
 	glActiveTexture(GL_TEXTURE0 + FRAMEBUFFER); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D);
-	FrameBufferTexture::initializeTexture2D();  
+	FrameBufferTexture::initializeTexture2D(); 
+	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
 void FrameBufferTexture::bindTexture(){

@@ -59,6 +59,12 @@ public:
 	virtual void initializeShader();
 
 	/**
+	 * @brief Recompiles the shader program
+	 * 
+	 */
+	virtual void recompile() ; 
+
+	/**
 	 * @brief Binds the shader
 	 * 
 	 */
@@ -204,14 +210,18 @@ public:
 	template<typename T>
 	void setUniform (std::string name , const T value){
 		setUniform(name.c_str() , value); 
-	}	
+	}
 
-protected:
 	/**
 	 * @brief Set all the Texture Uniforms 
-	 * 
+	 * @param texture_name Texture's name in the shader
+	 * @param texture_type Texture type bound as uniform location
+	 * @see Texture::TYPE 
 	 */
-	virtual void setTextureUniforms();
+	virtual void setTextureUniforms(std::string texture_name , Texture::TYPE texture_type);
+
+protected:
+	
 	/**
 	 * @brief Set the Uniform Value for an int
 	 * 
@@ -322,7 +332,6 @@ class ScreenFrameBufferShader : public Shader{
 public:
 	ScreenFrameBufferShader(); 
 	ScreenFrameBufferShader(const std::string vertex_code , const std::string fragment_code);
-	void setTextureUniforms() ;  
 	virtual ~ScreenFrameBufferShader(); 
 };
 
