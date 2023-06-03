@@ -49,9 +49,8 @@ constexpr const char uniform_name_uint_lighting_directional_number_name[] = "dir
 constexpr const char uniform_name_uint_lighting_point_number_name[] = "point_light_number" ;
 constexpr const char uniform_name_uint_lighting_spot_number_name[] = "spot_light_number" ;  
 
-
-
-
+/*Some other parameters*/
+constexpr const char uniform_name_float_gamma_name[] = "gamma"; 
 
 
 

@@ -1,4 +1,5 @@
 #include "../includes/CameraFrameBuffer.h"
+#include "../includes/UniformNames.h"
 
 
 using namespace axomae ; 
@@ -17,6 +18,7 @@ CameraFrameBuffer::CameraFrameBuffer(TextureDatabase* _texture_database , Shader
     default_framebuffer_pointer = default_fbo_pointer;  
     texture_database = _texture_database ;
     shader_database = _shader_database ;
+    gamma = 1.2f; 
     screen_texture_database_id = 0 ; 
     gl_framebuffer_object = nullptr ; 
     drawable_screen_quad = nullptr; 
@@ -62,6 +64,9 @@ void CameraFrameBuffer::unbindFrameBuffer(){
 }
 
 void CameraFrameBuffer::startDraw(){
+    if(shader_framebuffer){
+        shader_framebuffer->setUniform(uniform_name_float_gamma_name , gamma); 
+    }
     if(drawable_screen_quad)
         drawable_screen_quad->startDraw(); 
 }

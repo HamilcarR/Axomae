@@ -60,15 +60,15 @@ private:
 protected: 
     Drawable *drawable_screen_quad; 
     GLFrameBuffer *gl_framebuffer_object;  
-    ScreenSize *screen_dim ; 
-private:
+    ScreenSize *screen_dim ;
     axomae::Mesh *mesh_screen_quad;
     TextureDatabase* texture_database;
     Texture* fbo_texture_pointer; 
     ShaderDatabase* shader_database;  
-    int screen_texture_database_id ;            /**<ID of the framebuffer texture in the Texture database*/
     Shader* shader_framebuffer;
-    unsigned int *default_framebuffer_pointer;  
+    unsigned int *default_framebuffer_pointer;
+    float gamma ; 
+    int screen_texture_database_id ;            /**<ID of the framebuffer texture in the Texture database*/
 }; 
 
 
