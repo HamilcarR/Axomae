@@ -14,25 +14,25 @@ Texture* TextureFactory::constructTexture(TextureData *data , Texture::TYPE type
 	Texture* constructed_texture = nullptr ; 
 	switch(type){
 		case Texture::DIFFUSE:
-			constructed_texture =  new DiffuseTexture(data); 
+			constructed_texture =  data == nullptr ? new DummyDiffuseTexture() : new DiffuseTexture(data); 
 		break; 
 		case Texture::NORMAL:
-			constructed_texture =  new NormalTexture(data);
+			constructed_texture =  data == nullptr ? new DummyNormalTexture() : new NormalTexture(data);
 		break ; 
 		case Texture::METALLIC:
-			constructed_texture =  new MetallicTexture(data); 
+			constructed_texture = data == nullptr ? new DummyMetallicTexture() : new MetallicTexture(data); 
 		break ; 
 		case Texture::ROUGHNESS:
-			constructed_texture =  new RoughnessTexture(data); 
+			constructed_texture =  data == nullptr ? new DummyRoughnessTexture() : new RoughnessTexture(data); 
 		break ; 
 		case Texture::AMBIANTOCCLUSION:
-			constructed_texture =  new AmbiantOcclusionTexture(data); 
+			constructed_texture =  data == nullptr ? new DummyAmbiantOcclusionTexture()  : new AmbiantOcclusionTexture(data); 
 		break ;
 		case Texture::SPECULAR:
-			constructed_texture =  new SpecularTexture(data); 
+			constructed_texture = data == nullptr ? new DummySpecularTexture() : new SpecularTexture(data); 
 		break ;
 		case Texture::EMISSIVE: 
-			constructed_texture =  new EmissiveTexture(data);
+			constructed_texture = data == nullptr ? new DummyEmissiveTexture() : new EmissiveTexture(data);
 		break ; 
 		case Texture::CUBEMAP:
 			constructed_texture =  new CubeMapTexture(data); 

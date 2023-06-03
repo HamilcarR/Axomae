@@ -18,6 +18,34 @@ static std::map<Texture::TYPE , const char*> texture_type_c_str = {
 
 };
 
+/**
+ * The function sets the data of a dummy texture to a solid black color.
+ * 
+ * @param dummy The parameter "dummy" is a pointer to a struct of type "TextureData". The function sets
+ * the width, height, and data of the TextureData struct pointed to by "dummy" to create a dummy
+ * texture with a solid black color.
+ */
+
+static void set_dummy_TextureData(TextureData* dummy){
+	dummy->width = DUMMY_TEXTURE_DIM; 
+	dummy->height = DUMMY_TEXTURE_DIM ;
+	dummy->data = new uint32_t[dummy->width * dummy->height];  
+	for(unsigned i = 0 ; i < dummy->width * dummy->height ; i++){
+		dummy->data[i] = 0xFF000000 ; 
+	}
+	
+}
+
+static void set_dummy_TextureData_normals(TextureData* dummy){
+	dummy->width = DUMMY_TEXTURE_DIM; 
+	dummy->height = DUMMY_TEXTURE_DIM ; 
+	dummy->data = new uint32_t[dummy->width * dummy->height];  
+	uint32_t rgba = 0x007F7FFF;
+	for(unsigned i = 0 ; i < DUMMY_TEXTURE_DIM * DUMMY_TEXTURE_DIM; i++)
+		dummy->data[i] = rgba ; 
+}
+
+
 Texture::Texture(){
 	name = EMPTY ; 
 	width = 0 ; 
@@ -31,17 +59,6 @@ Texture::Texture(){
 Texture::Texture(TextureData* tex):Texture(){
 	if(tex != nullptr)	
 		set(tex) ;
-	else{
-		TextureData dummy ; 
-		dummy.width = DUMMY_TEXTURE_DIM; 
-		dummy.height = DUMMY_TEXTURE_DIM ; 
-		uint32_t temp[DUMMY_TEXTURE_DIM * DUMMY_TEXTURE_DIM] ;  
-		for(unsigned i = 0 ; i < dummy.width * dummy.height ; i++){
-			temp[i] = 0xFF000000 ; 
-		}
-		dummy.data = temp ; 
-		set(&dummy) ; 
-	}
 }
 
 Texture::~Texture(){
@@ -146,11 +163,7 @@ NormalTexture::~NormalTexture(){
 
 NormalTexture::NormalTexture(TextureData* texture):Texture(texture){
 	name = NORMAL ;
-	if(!texture){	
-		uint32_t rgba = 0x007F7FFF;
-		for(unsigned i = 0 ; i < DUMMY_TEXTURE_DIM * DUMMY_TEXTURE_DIM; i++)
-			data[i] = rgba ;  
-	}
+	
 }
 
 void NormalTexture::setGlData(Shader* shader){
@@ -527,6 +540,129 @@ void FrameBufferTexture::unbindTexture(){
 const char* FrameBufferTexture::getTextureTypeCStr(){
 	return texture_type_c_str[FRAMEBUFFER]; 
 }
+
+/****************************************************************************************************************************/
+DummyDiffuseTexture::DummyDiffuseTexture(){
+	name = DIFFUSE ;
+	TextureData dummy ; 
+	set_dummy_TextureData(&dummy); 	
+	set(&dummy) ;
+	dummy.clean();
+}
+
+DummyDiffuseTexture::~DummyDiffuseTexture(){
+
+}
+/****************************************************************************************************************************/
+DummyNormalTexture::DummyNormalTexture(){
+	name = NORMAL;
+	TextureData dummy ; 
+	set_dummy_TextureData_normals(&dummy); 
+	set(&dummy);  
+	dummy.clean() ;
+}
+
+DummyNormalTexture::~DummyNormalTexture(){
+
+}
+
+/****************************************************************************************************************************/
+DummyMetallicTexture::DummyMetallicTexture(){
+	name = METALLIC ;
+	TextureData dummy ; 
+	set_dummy_TextureData(&dummy); 	
+	set(&dummy) ; 
+	dummy.clean() ;
+}
+
+DummyMetallicTexture::~DummyMetallicTexture(){
+
+}
+
+/****************************************************************************************************************************/
+DummyRoughnessTexture::DummyRoughnessTexture(){
+	name = ROUGHNESS ; 
+	TextureData dummy ; 
+	set_dummy_TextureData(&dummy); 	
+	set(&dummy) ; 
+	dummy.clean() ;
+}
+
+DummyRoughnessTexture::~DummyRoughnessTexture(){
+
+}
+
+/****************************************************************************************************************************/
+DummySpecularTexture::DummySpecularTexture(){
+	name = SPECULAR ; 
+	TextureData dummy ; 
+	set_dummy_TextureData(&dummy); 	
+	set(&dummy) ; 
+	dummy.clean(); 
+}
+
+DummySpecularTexture::~DummySpecularTexture(){
+
+}
+
+/****************************************************************************************************************************/
+DummyAmbiantOcclusionTexture::DummyAmbiantOcclusionTexture(){
+	name = AMBIANTOCCLUSION ; 
+	TextureData dummy ; 
+	set_dummy_TextureData(&dummy); 	
+	set(&dummy) ; 
+	dummy.clean() ;
+}
+
+DummyAmbiantOcclusionTexture::~DummyAmbiantOcclusionTexture(){
+
+}
+
+/****************************************************************************************************************************/
+DummyEmissiveTexture::DummyEmissiveTexture(){
+	name = EMISSIVE ; 
+	TextureData dummy ; 
+	set_dummy_TextureData(&dummy); 	
+	set(&dummy) ; 
+	dummy.clean() ;
+}
+
+DummyEmissiveTexture::~DummyEmissiveTexture(){
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
