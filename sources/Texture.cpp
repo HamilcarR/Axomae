@@ -490,7 +490,7 @@ const char* CubeMapTexture::getTextureTypeCStr() {
 
 FrameBufferTexture::FrameBufferTexture():Texture(){
 	name = FRAMEBUFFER ;
-	internal_format = RGBA ; 
+	internal_format = RGBA16F ; 
 	data_format = BGRA ;  
 }
 

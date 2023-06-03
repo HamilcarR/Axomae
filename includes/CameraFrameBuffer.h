@@ -67,7 +67,8 @@ protected:
     ShaderDatabase* shader_database;  
     Shader* shader_framebuffer;
     unsigned int *default_framebuffer_pointer;
-    float gamma ; 
+    float gamma ;
+    float exposure ;  
     int screen_texture_database_id ;            /**<ID of the framebuffer texture in the Texture database*/
 }; 
 

@@ -89,12 +89,20 @@ public:
  */
 class Texture{
 public:
-
+	
+	/**
+	 * @brief Internal format of textures
+	 * 
+	 */
 	enum FORMAT : signed {
-		RGBA = GL_RGBA , 
-		BGRA = GL_BGRA , 
-		RGB = GL_RGB , 
-		BGR = GL_BGR 
+		RGBA = GL_RGBA , 				/**<RGBA with 8 bits per channel*/
+		BGRA = GL_BGRA , 				/**<BGRA with 8 bits per channel*/
+		RGB = GL_RGB , 					/**<RGB with 8 bits per channel*/
+		BGR = GL_BGR , 					/**<BGR with 8 bits per channel*/
+		RGBA16F = GL_RGBA16F , 			/**<RGBA with 16 bits floating point per channel*/
+		RGBA32F = GL_RGBA32F , 			/**<RGBA with 32 bits floating point per channel*/
+		RGB16F = GL_RGB16F , 			/**<RGB with 16 bits floating point per channel*/
+		RGB32F = GL_RGB32F				/**<RGB with 32 bits floating point per channel*/ 
 	};
 
 	/**
