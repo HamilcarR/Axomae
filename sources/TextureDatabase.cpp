@@ -30,13 +30,16 @@ void TextureDatabase::hardCleanse(){
 }
 
 void TextureDatabase::softCleanse(){
-	for(std::pair<const int , Texture*>  A : texture_database)
-		if(A.first >= 0){
-			A.second->clean();
-			delete A.second ;
-			A.second = nullptr ; 
-			texture_database.erase(A.first); 
+	std::vector <std::map<const int , Texture*>::iterator> to_destroy; 
+	for(auto it = texture_database.begin() ; it != texture_database.end() ; it++)
+		if(it->first >= 0){
+			it->second->clean();
+			delete it->second ;
+			it->second = nullptr ; 
+			to_destroy.push_back(it); 
 		}
+	for(auto it : to_destroy)
+		texture_database.erase(it); 
 }
 
 TextureDatabase::TextureDatabase(){
@@ -46,17 +49,25 @@ TextureDatabase::~TextureDatabase(){
 
 }
 
-int TextureDatabase::addTexture(TextureData *texture , Texture::TYPE type , bool keep){
+
+int TextureDatabase::addTexture(TextureData *texture , Texture::TYPE type , bool keep , bool is_dummy){
 	int index = 0;
-	if(keep){
+	Texture* tex = nullptr; 
+	if(keep || is_dummy){
 		index = -1 ; 
-		while(texture_database[index] != nullptr)
+		while(texture_database[index] != nullptr){
+			if(is_dummy && texture_database[index]->getTextureType() == type)
+				return index ;
 			index -- ; 
+		}
 	}
 	else
 		while(texture_database[index] != nullptr)
-			index ++ ; 
-	Texture* tex = TextureFactory::constructTexture(texture , type) ; 
+			index ++ ;
+	if(is_dummy)
+		tex = TextureFactory::constructTexture(nullptr , type);
+	else 
+		tex = TextureFactory::constructTexture(texture , type) ; 
 	texture_database[index] = tex ; 	
 	return index ; 
 }
