@@ -93,7 +93,8 @@ void Drawable::bind(){
 }
 
 void Drawable::unbind(){
-	gl_buffers.unbind(); 
+	gl_buffers.unbind();
+	mesh_object->unbindMaterials();  
 	mesh_object->releaseShaders();
 }
 
@@ -102,11 +103,16 @@ void Drawable::setSceneCameraPointer(Camera* camera){
 	mesh_object->setSceneCameraPointer(camera); 
 }
 
-Shader* Drawable::getMeshShaderPointer(){
+Shader* Drawable::getMeshShaderPointer() const {
 	if(mesh_object)
 		return mesh_object->getShader(); 
 	else
 		return nullptr;
 }
 
-
+Material* Drawable::getMaterialPointer() const {
+	if(mesh_object)
+		return mesh_object->getMaterial(); 
+	else
+		return nullptr; 	
+}

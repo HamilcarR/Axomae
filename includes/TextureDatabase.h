@@ -44,18 +44,10 @@ public:
 	 * 
 	 */
 	void hardCleanse(); 
-	
-	/**
-	 * @brief Construct a new texture and adds it to the database with a unique index
-	 *  
-	 * @param texture Raw texture data 
-	 * @param type Type of the texture
-	 * @param keep_texture_after_clean Some textures could benefit from not being deleted after each scene change, like framebuffer textures
-	 * @see TextureData
-	 * @see Texture::TYPE
-	 */
-	int addTexture(TextureData* texture , Texture::TYPE type , bool keep_texture_after_clean); 
-	
+
+
+	int addTexture(TextureData* texture , Texture::TYPE type , bool keep_texture_after_clean = false , bool is_dummy = false); 
+
 	/**
 	 * @brief Get the texture at index
 	 * 

@@ -119,9 +119,10 @@ public:
 		AMBIANTOCCLUSION = 4 , 
 		SPECULAR = 5, 
 		EMISSIVE = 6 , 
-		CUBEMAP = 7 , 
-		GENERIC = 8 , 
-		FRAMEBUFFER = 9
+		OPACITY = 7 ,  
+		CUBEMAP = 8 ,
+		GENERIC = 9 , 
+		FRAMEBUFFER = 10
 	} ;
 
 	/**
@@ -203,7 +204,19 @@ public:
 	 */
 	void cleanGlData(); 
 
+	/**
+	 * @brief Set the New Size of the texture
+	 * 
+	 * @param width 
+	 * @param height 
+	 */
 	virtual void setNewSize(unsigned width , unsigned height) ;
+
+	/**
+	 * @brief Checks if the texture is a dummy 
+	 * @return True if texture is dummy 
+	 */
+	virtual bool isDummyTexture(){return is_dummy ; }
 
 protected:
 
@@ -227,7 +240,7 @@ protected:
 	unsigned int height ; 		/**<Height of the texture*/
 	uint32_t *data ; 			/**<Raw data of the texture*/
 	unsigned int sampler2D ; 	/**<ID of the texture*/
-	
+	bool is_dummy; 	
 };
 
 /******************************************************************************************************************************************************************************************************************/
@@ -610,6 +623,60 @@ public:
 
 /******************************************************************************************************************************************************************************************************************/
 /**
+ * @brief Opacity texture class definition
+ * 
+ */
+class OpacityTexture : public Texture{
+public:
+	
+	/**
+	 * @brief Construct a new Opacity Texture object
+	 * 
+	 */
+	OpacityTexture(); 
+	
+	/**
+	 * @brief Construct a new Opacity Texture object
+	 * 
+	 * @param data Raw texture data
+	 * @see TextureData
+	 */
+	OpacityTexture(TextureData *data);
+	
+	/**
+	 * @brief Destroy the Opacity Texture object
+	 * 
+	 */
+	virtual ~OpacityTexture(); 
+	
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
+	virtual void bindTexture() ; 
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
+	virtual void unbindTexture();
+	
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData(Shader* shader) ;
+	
+	/**
+	 * @brief Get the texture string description
+	 * 
+	 * @return C string 
+	 */
+	static const char* getTextureTypeCStr() ; 	
+}; 
+
+/******************************************************************************************************************************************************************************************************************/
+/**
  * @brief Generic texture class definition
  * 
  */
@@ -910,6 +977,20 @@ class DummyEmissiveTexture:public EmissiveTexture{
 public:
 	DummyEmissiveTexture(); 
 	virtual ~DummyEmissiveTexture(); 
+
+}; 
+
+/******************************************************************************************************************************************************************************************************************/
+
+/**
+ * @class DummyOpacityTexture
+ * @brief Class implementing an empty Opacity texture
+ * 
+ */
+class DummyOpacityTexture:public OpacityTexture{
+public:
+	DummyOpacityTexture(); 
+	virtual ~DummyOpacityTexture(); 
 
 }; 
 

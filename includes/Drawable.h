@@ -103,7 +103,15 @@ public:
 	 * 
 	 * @return Shader* Shader pointer , or nullptr if mesh empty 
 	 */
-	Shader* getMeshShaderPointer(); 
+	Shader* getMeshShaderPointer() const;
+
+	/**
+	 * @brief Get the mesh material pointer
+	 * 
+	 * @return Material* 
+	 */
+	Material* getMaterialPointer() const ; 
+
 protected:
 	axomae::Mesh *mesh_object ;			/**<Pointer to the mesh */
 	Camera *camera_pointer ; 			/**<Pointer to the camera*/

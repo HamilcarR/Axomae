@@ -34,6 +34,9 @@ Texture* TextureFactory::constructTexture(TextureData *data , Texture::TYPE type
 		case Texture::EMISSIVE: 
 			constructed_texture = data == nullptr ? new DummyEmissiveTexture() : new EmissiveTexture(data);
 		break ; 
+		case Texture::OPACITY:
+			constructed_texture = data == nullptr ? new DummyOpacityTexture() : new OpacityTexture(data);
+		break; 
 		case Texture::CUBEMAP:
 			constructed_texture =  new CubeMapTexture(data); 
 		break ;

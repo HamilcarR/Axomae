@@ -33,7 +33,8 @@ struct MATERIAL {
     float roughness_factor; 
     float transmission_factor; 
     float emissive_factor;  
-    float shininess;  
+    float shininess; 
+    float alpha_factor;  
 };
 uniform MATERIAL material ; 
 
@@ -81,9 +82,10 @@ layout(binding=2) uniform sampler2D metallic_map ;
 layout(binding=3) uniform sampler2D roughness_map ; 
 layout(binding=4) uniform sampler2D ambiantocclusion_map ;
 layout(binding=5) uniform sampler2D specular_map;
-layout(binding=6) uniform sampler2D emissive_map; 
-layout(binding=7) uniform samplerCube cubemap; 
-layout(binding=8) uniform sampler2D generic_map ;
+layout(binding=6) uniform sampler2D emissive_map;
+layout(binding=7) uniform sampler2D opacity_map ;  
+layout(binding=8) uniform samplerCube cubemap; 
+layout(binding=9) uniform sampler2D generic_map ;
 /******************************************/
 
 
@@ -248,22 +250,22 @@ LIGHT_COMPONENTS computeSpotLightsContrib(){
 }
 
 /**************************************************************************************************************/
-vec4 computeReflectionCubeMap(){
+vec4 computeReflectionCubeMap(float fresnel){
     vec3 view_direction = normalize(vertex_fragment_fragment_position - camera_position); 
     vec3 normal_vector = normalize(vertex_fragment_normals); 
     vec3 cubemap_sample_vector = vec3(inverse(MAT_NORMAL) * reflect(view_direction , normal_vector)); 
-    vec4 sampled_value = texture(cubemap , cubemap_sample_vector , 1.f); 
-    return sampled_value; 
+    vec4 sampled_value = texture(cubemap , cubemap_sample_vector); 
+    return vec4(sampled_value.rgb * fresnel, 1.f); 
 }
 
 /**************************************************************************************************************/
-vec4 computeRefractionCubeMap(){
+vec4 computeRefractionCubeMap(float fresnel){
     float refractive_index_ratio = material.refractive_index.x / material.refractive_index.y ; 
     vec3 view_direction = normalize(vertex_fragment_fragment_position - camera_position) ; 
     vec3 normal_vector = normalize(vertex_fragment_normals); 
     vec3 cubemap_sample_vector = vec3(inverse(MAT_NORMAL) * refract(view_direction , normal_vector , refractive_index_ratio)); 
     vec4 sampled_value = texture(cubemap , cubemap_sample_vector); 
-    return sampled_value; 
+    return vec4(sampled_value.rgb * fresnel, 1.f); 
 }
 
 /**************************************************************************************************************/
@@ -288,10 +290,8 @@ vec2 computeFresnelCoefficients(){
 /**************************************************************************************************************/
 void main(){	
     vec2 fresnel = computeFresnelCoefficients() ; 
-    vec4 reflection = computeReflectionCubeMap() ; 
-    vec4 refraction = computeRefractionCubeMap() ; 
-    vec4 R = reflection * fresnel.x ; 
-    vec4 Rf = refraction * fresnel.y ;
+    vec4 R = computeReflectionCubeMap(fresnel.x) ; 
+    vec4 Rf = computeRefractionCubeMap(fresnel.y) ; 
     vec4 metallic = computeMetallicValue(); 
     vec4 E = computeEmissiveValue() ; 
     vec4 C = computeDiffuseValue() ;
@@ -301,6 +301,11 @@ void main(){
     vec3 ambient = directional.ambient + point.ambient + spot.ambient ; 
     vec3 diffuse = directional.diffuse + point.diffuse + spot.diffuse ; 
     vec3 specular = directional.specular + point.specular + spot.specular ; 
-    E = E == vec4(0.f) ? vec4(1.f) : E ; 
-    fragment = vec4(specular + diffuse + ambient * ambient_factor, 1.f) * C + (R) + E * material.emissive_factor ; 
+    E = E == vec4(0.f) ? vec4(1.f) : E ;
+    int refract_active = 0 ; 
+    if(material.alpha_factor < 1.f)
+        refract_active = 1 ; 
+    vec4 final_computed_fragment = vec4(specular + diffuse + ambient * 0.4f, 1.f) * C + (Rf * refract_active) + E * material.emissive_factor ; 
+    final_computed_fragment.a = material.alpha_factor; 
+    fragment = final_computed_fragment; 
 }

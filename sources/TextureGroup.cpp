@@ -13,12 +13,24 @@ void TextureGroup::addTexture(int index , Texture::TYPE type){
 	
 }
 
+Texture* TextureGroup::getTexturePointer(Texture::TYPE type){
+	for(auto A : texture_collection)
+		if(A->getTextureType() == type)
+			return A ;
+	return nullptr; 
+}
+
+bool TextureGroup::containsType(Texture::TYPE type){
+	for(auto A : texture_collection)
+		if(A->getTextureType() == type)
+			return true; 
+	return false;
+}
 
 void TextureGroup::initializeGlTextureData(Shader* shader){
 	for(Texture* A : texture_collection){	
 		A->setGlData(shader); 
-	}
-		
+	}	
 	initialized = true ; 
 }
 

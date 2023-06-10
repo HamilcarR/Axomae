@@ -3,7 +3,8 @@
 #include <map>
 
 constexpr unsigned int DUMMY_TEXTURE_DIM = 1 ;
-
+constexpr uint32_t DEFAULT_NORMAL_DUMMY_PIXEL_RGBA = 0x007F7FFF; 
+constexpr uint32_t DEFAULT_OPACITY_DUMMY_PIXEL_RGBA = 0xFF010101; 
 static std::map<Texture::TYPE , const char*> texture_type_c_str = {
 	{Texture::DIFFUSE , "diffuse_map"}, 
 	{Texture::NORMAL , "normal_map"}, 
@@ -12,6 +13,7 @@ static std::map<Texture::TYPE , const char*> texture_type_c_str = {
 	{Texture::AMBIANTOCCLUSION , "ambiantocclusion_map"}, 
 	{Texture::SPECULAR , "specular_map"},
 	{Texture::EMISSIVE , "emissive_map"},
+	{Texture::OPACITY , "opacity_map"}, 
 	{Texture::CUBEMAP , "cubemap"}, 
 	{Texture::GENERIC , "generic_map"}, 
 	{Texture::FRAMEBUFFER , "framebuffer_map"}
@@ -25,29 +27,34 @@ static std::map<Texture::TYPE , const char*> texture_type_c_str = {
  * the width, height, and data of the TextureData struct pointed to by "dummy" to create a dummy
  * texture with a solid black color.
  */
-
 static void set_dummy_TextureData(TextureData* dummy){
 	dummy->width = DUMMY_TEXTURE_DIM; 
 	dummy->height = DUMMY_TEXTURE_DIM ;
 	dummy->data = new uint32_t[dummy->width * dummy->height];  
 	for(unsigned i = 0 ; i < dummy->width * dummy->height ; i++){
-		dummy->data[i] = 0xFF000000 ; 
-	}
-	
+		dummy->data[i] = DEFAULT_OPACITY_DUMMY_PIXEL_RGBA ; 
+	}	
 }
+
+/**
+ * The function sets the width, height, and data of a dummy texture with a constant blue color , 
+ * indicating a uniform vector (0 , 0 , 1) representing the normal. 
+ * 
+ * @param dummy A pointer to a TextureData struct that will be filled with one only pixel having the value (128 , 128 , 255).
+ */
 
 static void set_dummy_TextureData_normals(TextureData* dummy){
 	dummy->width = DUMMY_TEXTURE_DIM; 
 	dummy->height = DUMMY_TEXTURE_DIM ; 
 	dummy->data = new uint32_t[dummy->width * dummy->height];  
-	uint32_t rgba = 0x007F7FFF;
 	for(unsigned i = 0 ; i < DUMMY_TEXTURE_DIM * DUMMY_TEXTURE_DIM; i++)
-		dummy->data[i] = rgba ; 
+		dummy->data[i] = DEFAULT_NORMAL_DUMMY_PIXEL_RGBA ; 
 }
 
 
 Texture::Texture(){
-	name = EMPTY ; 
+	name = EMPTY ;
+	is_dummy = false ;  
 	width = 0 ; 
 	height = 0 ; 
 	data = nullptr ; 
@@ -329,8 +336,7 @@ void SpecularTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + SPECULAR); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
-	Texture::initializeTexture2D();
-	 
+	Texture::initializeTexture2D(); 
 	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
@@ -367,7 +373,6 @@ void EmissiveTexture::setGlData(Shader* shader){
 	glActiveTexture(GL_TEXTURE0 + EMISSIVE); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
 	Texture::initializeTexture2D();
-
 	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
@@ -386,9 +391,45 @@ const char* EmissiveTexture::getTextureTypeCStr() {
 	return texture_type_c_str[EMISSIVE] ; 		
 }
 
+/****************************************************************************************************************************/
+OpacityTexture::OpacityTexture(){
+	name = OPACITY ; 
+}
 
+OpacityTexture::~OpacityTexture(){
+
+}
+
+OpacityTexture::OpacityTexture(TextureData* data):Texture(data){
+	name = OPACITY ; 
+}
+
+void OpacityTexture::setGlData(Shader* shader){
+	glGenTextures(1 , &sampler2D); 	
+	glActiveTexture(GL_TEXTURE0 + OPACITY); 
+	glBindTexture(GL_TEXTURE_2D , sampler2D); 
+	Texture::initializeTexture2D();
+	shader->setTextureUniforms(texture_type_c_str[name] , name);  
+}
+
+void OpacityTexture::bindTexture(){
+	glActiveTexture(GL_TEXTURE0 + OPACITY); 
+	glBindTexture(GL_TEXTURE_2D , sampler2D);
+}
+
+void OpacityTexture::unbindTexture(){
+	glActiveTexture(GL_TEXTURE0 + OPACITY); 
+	glBindTexture(GL_TEXTURE_2D , 0); 
+}
+
+
+const char* OpacityTexture::getTextureTypeCStr() {
+	return texture_type_c_str[OPACITY] ; 		
+}
 
 /****************************************************************************************************************************/
+
+
 GenericTexture::GenericTexture(){
 	name = GENERIC ; 
 }
@@ -407,7 +448,6 @@ void GenericTexture::setGlData(Shader* shader){
 	glActiveTexture(GL_TEXTURE0 + GENERIC); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
 	Texture::initializeTexture2D(); 
-
 	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
@@ -490,7 +530,7 @@ const char* CubeMapTexture::getTextureTypeCStr() {
 
 FrameBufferTexture::FrameBufferTexture():Texture(){
 	name = FRAMEBUFFER ;
-	internal_format = RGBA16F ; 
+	internal_format = RGBA32F ; 
 	data_format = BGRA ;  
 }
 
@@ -548,6 +588,7 @@ DummyDiffuseTexture::DummyDiffuseTexture(){
 	set_dummy_TextureData(&dummy); 	
 	set(&dummy) ;
 	dummy.clean();
+	is_dummy = true ; 
 }
 
 DummyDiffuseTexture::~DummyDiffuseTexture(){
@@ -560,6 +601,7 @@ DummyNormalTexture::DummyNormalTexture(){
 	set_dummy_TextureData_normals(&dummy); 
 	set(&dummy);  
 	dummy.clean() ;
+	is_dummy = true ; 
 }
 
 DummyNormalTexture::~DummyNormalTexture(){
@@ -573,6 +615,7 @@ DummyMetallicTexture::DummyMetallicTexture(){
 	set_dummy_TextureData(&dummy); 	
 	set(&dummy) ; 
 	dummy.clean() ;
+	is_dummy = true ; 
 }
 
 DummyMetallicTexture::~DummyMetallicTexture(){
@@ -586,6 +629,7 @@ DummyRoughnessTexture::DummyRoughnessTexture(){
 	set_dummy_TextureData(&dummy); 	
 	set(&dummy) ; 
 	dummy.clean() ;
+	is_dummy = true ; 
 }
 
 DummyRoughnessTexture::~DummyRoughnessTexture(){
@@ -599,6 +643,7 @@ DummySpecularTexture::DummySpecularTexture(){
 	set_dummy_TextureData(&dummy); 	
 	set(&dummy) ; 
 	dummy.clean(); 
+	is_dummy = true ; 
 }
 
 DummySpecularTexture::~DummySpecularTexture(){
@@ -612,6 +657,7 @@ DummyAmbiantOcclusionTexture::DummyAmbiantOcclusionTexture(){
 	set_dummy_TextureData(&dummy); 	
 	set(&dummy) ; 
 	dummy.clean() ;
+	is_dummy = true ; 
 }
 
 DummyAmbiantOcclusionTexture::~DummyAmbiantOcclusionTexture(){
@@ -625,12 +671,26 @@ DummyEmissiveTexture::DummyEmissiveTexture(){
 	set_dummy_TextureData(&dummy); 	
 	set(&dummy) ; 
 	dummy.clean() ;
+	is_dummy = true ; 
 }
 
 DummyEmissiveTexture::~DummyEmissiveTexture(){
 
 }
 
+/****************************************************************************************************************************/
+DummyOpacityTexture::DummyOpacityTexture(){
+	name = OPACITY ; 
+	TextureData dummy ; 
+	set_dummy_TextureData(&dummy); 	
+	set(&dummy) ; 
+	dummy.clean() ;
+	is_dummy = true ; 
+}
+
+DummyOpacityTexture::~DummyOpacityTexture(){
+
+}
 
 
 

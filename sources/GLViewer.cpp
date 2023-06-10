@@ -7,9 +7,12 @@ using namespace axomae;
 
 GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent){
 	QSurfaceFormat format;
-	format.setVersion(4, 6);
+	
+	format.setRenderableType(QSurfaceFormat::OpenGL); 
+	format.setVersion(4, 6);	
 	format.setProfile(QSurfaceFormat::CoreProfile);
 	format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+	format.setAlphaBufferSize(8); 
 	format.setSwapInterval(1);
 	setFormat(format);
 	renderer = new Renderer(width() , height());
@@ -44,7 +47,7 @@ void GLViewer::initializeGL(){
 void GLViewer::paintGL(){
 	if (renderer->prep_draw()){
 		renderer->setDefaultFrameBufferId(defaultFramebufferObject()); 
-		renderer->draw();	
+		renderer->draw();		
 	}	
 }
 

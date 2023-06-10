@@ -10,6 +10,7 @@
 #include "Camera.h"
 #include "LightingDatabase.h"
 #include "CameraFrameBuffer.h"
+#include "Scene.h"
 
 /**
  * @file Renderer.h
@@ -140,7 +141,7 @@ public:
 	
 
 public:
-	std::vector<Drawable*> scene ; 				/**<The scene to be rendered*/ 
+	Scene *scene ; 								/**<The scene to be rendered*/ 
 	bool start_draw ; 							/**<If the renderer is ready to draw*/
 	TextureDatabase* texture_database; 			/**<Pointer on the texture database*/
 	ShaderDatabase* shader_database; 			/**<Pointer on the shader database*/

@@ -85,7 +85,13 @@ public:
 	 * 
 	 */
 	virtual void bindMaterials();
-	
+
+	/**
+	 * @brief Disable the mesh's material to render
+	 * 
+	 */
+	virtual void unbindMaterials(); 
+
 	/**
 	 * @brief Activates the current mesh's shader
 	 * 
@@ -198,7 +204,15 @@ public:
 	 * 
 	 * @param shader 
 	 */
-	void setShader(Shader* shader){shader_program = shader; material.setShaderPointer(shader); } 
+	void setShader(Shader* shader){shader_program = shader; material.setShaderPointer(shader); }
+
+	/**
+	 * @brief Get the pointer on the current material properties
+	 * 
+	 * @return Material* 
+	 */
+	Material* getMaterial(){return &material;} 
+
 public:
 	Object3D geometry;					/**<3D Geometry of the mesh , vertex positions , UVs etc*/	
 	Material material; 					/**<Material to be used for the mesh*/

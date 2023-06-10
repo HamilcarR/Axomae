@@ -8,13 +8,23 @@ Material::Material(){
 	shininess = 100.f ;  
 	roughness_factor = 0.f ; 
 	transmission_factor = 0.f ; 
-	emissive_factor = 1.f ; 
-	refractive_index = glm::vec2(1.f , 1.5f) ; 
+	emissive_factor = 1.f ;
+	alpha_factor = 1.f ; 
+	refractive_index = glm::vec2(1.f , 1.1f) ; 
 	shader_program = nullptr; 
+	is_transparent = false; 
 }
 
 Material::~Material(){
 
+}
+
+bool Material::isTransparent(){
+	Texture* tex_opacity = textures_group.getTexturePointer(Texture::OPACITY); 
+	if(alpha_factor < 1.f || (tex_opacity && !tex_opacity->isDummyTexture()))
+		return true ;
+	else
+		return false; 
 }
 
 void Material::setRefractiveIndexValue(float n1 , float n2){
@@ -28,8 +38,17 @@ void Material::addTexture(int index , Texture::TYPE type){
 }
 
 void Material::bind(){
+	if(is_transparent){
+		enableBlend(); 
+		setBlendFunc(SOURCE_ALPHA , ONE_MINUS_SOURCE_ALPHA);
+	}
+	std::string material = std::string(uniform_name_str_material_struct_name) + std::string("."); 
+	shader_program->setUniform(material+uniform_name_float_material_transparency_factor , alpha_factor);
 	textures_group.bind(); 
+}
 
+void Material::unbind(){
+	disableBlend(); 
 }
 
 /**
@@ -37,6 +56,7 @@ void Material::bind(){
  * shader program.
  */
 void Material::initializeMaterial(){
+	is_transparent = isTransparent();
 	if(shader_program){	
 		textures_group.initializeGlTextureData(shader_program);
 		std::string material = std::string(uniform_name_str_material_struct_name) + std::string("."); 
@@ -46,9 +66,28 @@ void Material::initializeMaterial(){
 		shader_program->setUniform(material+uniform_name_float_material_transmission_factor , transmission_factor) ; 
 		shader_program->setUniform(material+uniform_name_float_material_emissive_factor , emissive_factor) ; 
 		shader_program->setUniform(material+uniform_name_float_material_shininess_factor , shininess); 
+		
 	}
 }
 
 void Material::clean(){
 	textures_group.clean(); 
 }
+
+void Material::enableBlend(){
+	glEnable(GL_BLEND);
+}
+
+void Material::disableBlend(){
+	glDisable(GL_BLEND); 
+}
+
+void Material::setBlendFunc(BLENDFUNC source_factor , BLENDFUNC dest_factor){
+	glBlendFunc(source_factor , dest_factor); 	
+}
+
+
+
+
+
+

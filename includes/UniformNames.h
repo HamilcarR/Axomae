@@ -25,6 +25,7 @@ constexpr const char uniform_name_float_material_roughness_factor[] = "roughness
 constexpr const char uniform_name_float_material_transmission_factor[] = "transmission_factor" ; 
 constexpr const char uniform_name_float_material_emissive_factor[] = "emissive_factor" ; 
 constexpr const char uniform_name_float_material_shininess_factor[] = "shininess";
+constexpr const char uniform_name_float_material_transparency_factor[] = "alpha_factor"; 
 
 /*Lighting variables*/
 constexpr const char uniform_name_vec3_lighting_position[] = "position";

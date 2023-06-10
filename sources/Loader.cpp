@@ -55,9 +55,12 @@ static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 			QImage image ;
 			uint8_t *buffer = new uint8_t[fromtexture->mWidth] ; 
 			memcpy(buffer , fromtexture->pcData , fromtexture->mWidth); 
-		 	image.loadFromData((const unsigned char*) buffer , fromtexture->mWidth ) ; 
-			totexture->data = new uint32_t[image.width() * image.height()]; 
-			memcpy((void*) totexture->data , (void*) image.bits() , image.width() * image.height() * sizeof(uint32_t)) ; 
+		 	image.loadFromData((const unsigned char*) buffer , fromtexture->mWidth ) ;
+			image = image.convertToFormat(QImage::Format_ARGB32); 	
+			totexture->data = new uint32_t[image.width() * image.height()];
+			uint8_t * pointer_to_bits = image.bits(); 
+			for(unsigned i = 0 ; i < image.width() * image.height() * sizeof(uint32_t); i++)
+				((uint8_t*) totexture->data)[i] = image.bits()[i] ; 
 			totexture->width = image.width() ; 
 			totexture->height = image.height() ; 
 			std::cout << "image of size " << totexture->width << " x " << totexture->height << " uncompressed " << std::endl ; 
@@ -68,8 +71,8 @@ static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 
 static void loadTextureDummy(Material* material , Texture::TYPE type){
 	TextureDatabase* texture_database = TextureDatabase::getInstance();
-	std::cout << "Loading dummy texture : " << type << std::endl;  
-	int index = texture_database->addTexture(nullptr, type , false);
+	int index = texture_database->addTexture(nullptr , type , true , true); 	
+	std::cout << "Loading dummy texture at index : " << index << std::endl;  
 	material->addTexture(index , type); 
 }
 
@@ -102,74 +105,115 @@ static void loadTexture(const aiScene* scene , Material *material ,TextureData &
 		 std::cout << "Loader can't load texture\n" ;  
 }
 
+
+
 /**
- * The function loads textures and creates a material object for a given aiMaterial from an aiScene.
+ * The function loads textures for a given material in a 3D model scene.
  * 
- * @param scene A pointer to the aiScene object which contains the imported scene data.
- * @param material The aiMaterial object that contains the material properties and textures for a mesh
- * in the aiScene.
+ * @param scene a pointer to the aiScene object which contains the loaded 3D model data.
+ * @param material The aiMaterial object that contains information about the material properties of a
+ * 3D model.
  * 
  * @return a Material object.
  */
-static Material loadMaterial(const aiScene* scene , const aiMaterial* material){
-	Material mesh_material; 
+
+static Material loadAllTextures(const aiScene* scene , const aiMaterial* material ){
+	Material mesh_material ; 	
 	std::vector<Texture::TYPE> dummy_textures_type; 
-	TextureData diffuse , metallic , roughness , normal , ambiantocclusion , emissive , specular ;
+	TextureData diffuse , metallic , roughness , normal , ambiantocclusion , emissive , specular , opacity;
 	diffuse.name = "diffuse" ; 
 	metallic.name = "metallic" ; 
-	roughness.name = "roughness" ; 
+	roughness.name = "roughness" ;
+	opacity.name = "opacity" ;  
 	normal.name = "normal" ; 
 	ambiantocclusion.name= "occlusion" ; 
 	specular.name = "specular" ; 
 	emissive.name = "emissive" ; 
 	unsigned int color_index = 0, metallic_index = 0 , roughness_index = 0; 
-	aiString color_texture , normal_texture , metallic_texture , roughness_texture , emissive_texture , specular_texture , occlusion_texture ; //we get indexes of embedded textures , since we will use GLB format  
-	
+	aiString color_texture , opacity_texture ,  normal_texture , metallic_texture , roughness_texture , emissive_texture , specular_texture , occlusion_texture ; //we get indexes of embedded textures , since we will use GLB format  
+
 	if(material->GetTextureCount(aiTextureType_BASE_COLOR) > 0){
 		material->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE , &color_texture) ;
 		loadTexture(scene , &mesh_material , diffuse , color_texture , Texture::DIFFUSE); 
 	}
 	else
-		dummy_textures_type.push_back(Texture::DIFFUSE);	
+		dummy_textures_type.push_back(Texture::DIFFUSE);
+
+	if(material->GetTextureCount(aiTextureType_OPACITY) > 0){
+		mesh_material.setTransparency(true) ;
+		material->GetTexture(aiTextureType_OPACITY , 0 ,  &opacity_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
+		loadTexture(scene , &mesh_material , opacity , opacity_texture , Texture::OPACITY); 
+	}
+	else
+		dummy_textures_type.push_back(Texture::OPACITY); 
+	
 	if(material->GetTextureCount(aiTextureType_METALNESS) > 0){
 		material->GetTexture(AI_MATKEY_METALLIC_TEXTURE , &metallic_texture) ; 
 		loadTexture(scene , &mesh_material , metallic , metallic_texture , Texture::METALLIC); 
 	}
 	else
 		dummy_textures_type.push_back(Texture::METALLIC); 
+	
 	if(material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS) > 0){
 		material->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE , &roughness_texture) ;	
 		loadTexture(scene , &mesh_material , roughness , roughness_texture , Texture::ROUGHNESS);
 	}
 	else
 		dummy_textures_type.push_back(Texture::ROUGHNESS); 
+	
 	if(material->GetTextureCount(aiTextureType_NORMALS) > 0){
 		material->GetTexture(aiTextureType_NORMALS , 0 , &normal_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
 		loadTexture(scene , &mesh_material , normal , normal_texture , Texture::NORMAL); 
 	}
 	else
 		dummy_textures_type.push_back(Texture::NORMAL); 
+	
 	if(material->GetTextureCount(aiTextureType_LIGHTMAP) > 0){
 		material->GetTexture(aiTextureType_LIGHTMAP , 0 , &occlusion_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
 		loadTexture(scene , &mesh_material , ambiantocclusion , occlusion_texture , Texture::AMBIANTOCCLUSION); 
 	}
 	else
 		dummy_textures_type.push_back(Texture::AMBIANTOCCLUSION); 
+	
 	if(material->GetTextureCount(aiTextureType_SHEEN) > 0){
-		material-> GetTexture(aiTextureType_SHEEN , 0 , &specular_texture , nullptr , nullptr , nullptr , nullptr , nullptr);
+		material->GetTexture(aiTextureType_SHEEN , 0 , &specular_texture , nullptr , nullptr , nullptr , nullptr , nullptr);
 		loadTexture(scene , &mesh_material , specular , specular_texture , Texture::SPECULAR); 
 	}
 	else
 		dummy_textures_type.push_back(Texture::SPECULAR); 	
+	
 	if(material->GetTextureCount(aiTextureType_EMISSIVE) > 0){
 		material->GetTexture(aiTextureType_EMISSIVE , 0 , &emissive_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
 		loadTexture(scene , &mesh_material , emissive , emissive_texture , Texture::EMISSIVE); 
 	}
 	else
 		dummy_textures_type.push_back(Texture::EMISSIVE);
+	
 	for(auto it = dummy_textures_type.begin(); it != dummy_textures_type.end() ; it ++)
 		loadTextureDummy(&mesh_material , *it);
 	
+	return mesh_material ; 
+}
+
+
+
+static float loadTransparencyValue(const aiMaterial* material){
+	float transparency = 1.f ;
+	float opacity = 1.f;  
+	aiColor4D col ; 
+	if (material->Get(AI_MATKEY_COLOR_TRANSPARENT, col) == AI_SUCCESS)
+		transparency = col.a ; 
+	else
+		if (material->Get(AI_MATKEY_OPACITY , opacity) == AI_SUCCESS)
+			transparency = 1.f - opacity ; 
+	return transparency ; 
+}
+
+
+static Material loadMaterials(const aiScene* scene , const aiMaterial* material){
+	Material mesh_material = loadAllTextures(scene , material);
+	float transparency_factor = loadTransparencyValue(material);  	
+	mesh_material.setTransparency(transparency_factor);
 	return mesh_material ; 
 }
 
@@ -215,7 +259,7 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
 			Object3D object ;
 			assert(mesh->HasTextureCoords(0) ) ; 
 			ai_material = modelScene->mMaterials[modelScene->mMeshes[i]->mMaterialIndex]; 
-			Material mesh_material = loadMaterial(modelScene , ai_material);  	
+			Material mesh_material = loadMaterials(modelScene , ai_material);  	
 			for(unsigned int f = 0 ; f < mesh->mNumVertices ; f++){
 				const aiVector3D* vert = &(mesh->mVertices[f]) ; 
 				const aiVector3D* norm = &(mesh->mNormals[f]) ; 

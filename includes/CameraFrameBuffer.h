@@ -1,13 +1,9 @@
 #ifndef CAMERAFRAMEBUFFER_H
 #define CAMERAFRAMEBUFFER_H
 
-#include "Texture.h"
-#include "ShaderDatabase.h"
-#include "Drawable.h"
-#include "GLFrameBuffer.h"
-#include "Mesh.h"
+#include "FrameBufferInterface.h"
 
-class CameraFrameBuffer {
+class CameraFrameBuffer : public FrameBufferInterface{
 public:
    
     /**
@@ -25,51 +21,28 @@ public:
      * 
      */
     virtual ~CameraFrameBuffer(); 
-    
-    /**
-     * @brief Set the Screen Dimensions
-     * 
-     * @param width 
-     * @param height 
-     */
-    virtual void setScreenDimensions(ScreenSize* pointer_on_screen_size){screen_dim = pointer_on_screen_size;;}
-
-    virtual void resize();
-
-    /**
-     * @brief 
-     * 
-     */
-    virtual void bindFrameBuffer() ; 
-
-    virtual void unbindFrameBuffer() ; 
-
+     
     virtual void renderFrameBufferMesh(); 
 
     Drawable* getDrawable(){return drawable_screen_quad;}
+    
+    virtual void initializeFrameBuffer() override; 
 
     virtual void startDraw();
 
-    virtual void initializeFrameBuffer(); 
-
-    virtual void clean(); 
+    virtual void clean() override; 
 private:
     CameraFrameBuffer(); 
 
 
 protected: 
     Drawable *drawable_screen_quad; 
-    GLFrameBuffer *gl_framebuffer_object;  
-    ScreenSize *screen_dim ;
     axomae::Mesh *mesh_screen_quad;
-    TextureDatabase* texture_database;
-    Texture* fbo_texture_pointer; 
     ShaderDatabase* shader_database;  
     Shader* shader_framebuffer;
-    unsigned int *default_framebuffer_pointer;
     float gamma ;
     float exposure ;  
-    int screen_texture_database_id ;            /**<ID of the framebuffer texture in the Texture database*/
+    
 }; 
 
 

@@ -51,6 +51,10 @@ void Mesh::bindMaterials(){
 	material.bind(); 
 }
 
+void Mesh::unbindMaterials(){
+	material.unbind(); 
+}
+
 void Mesh::bindShaders(){
 	if(shader_program != nullptr){
 		if(!face_culling_enabled){ 
@@ -226,9 +230,8 @@ FrameBufferMesh::FrameBufferMesh():Mesh(){
 
 FrameBufferMesh::FrameBufferMesh(int texture_index , Shader* _shader): FrameBufferMesh(){	
 	shader_program = _shader; 	 
-	material.setShaderPointer(shader_program);
-	material.addTexture(texture_index , Texture::FRAMEBUFFER);
-	
+	material.setShaderPointer(shader_program); //TODO ? replace 
+	material.addTexture(texture_index , Texture::FRAMEBUFFER);	
 }
 
 FrameBufferMesh::~FrameBufferMesh(){
