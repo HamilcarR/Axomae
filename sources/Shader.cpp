@@ -50,10 +50,11 @@ inline void programLinkingErrorCheck(unsigned int program_id){
 }
 
 Shader::Shader(){
-	type = GENERIC ; 
+	type = GENERIC ;
+	is_initialized = false;  
 }
 
-Shader::Shader(const std::string vertex_code , const std::string fragment_code){
+Shader::Shader(const std::string vertex_code , const std::string fragment_code):Shader(){
 	type = GENERIC; 
 	fragment_shader_txt = fragment_code ; 
 	vertex_shader_txt = vertex_code ; 
@@ -71,8 +72,9 @@ void Shader::setAttributeBuffer(GLuint location , GLenum type , int offset , int
 }
 
 void Shader::setTextureUniforms(std::string texture_name , Texture::TYPE type){
-	glUseProgram(shader_program) ; 
-	setUniform(texture_name , static_cast<int>(type)); 
+	bind(); 
+	setUniform(texture_name , static_cast<int>(type));
+	release(); 
 }
 
 void Shader::setSceneCameraPointer(Camera* camera){
@@ -180,22 +182,25 @@ void Shader::setUniformValue(int location , const glm::vec2& value){
 }
 
 void Shader::initializeShader(){
-	const char* vertex_shader_source = (const char*) vertex_shader_txt.c_str() ; 
-	const char* fragment_shader_source = (const char*) fragment_shader_txt.c_str(); 
-	vertex_shader = glCreateShader(GL_VERTEX_SHADER) ; 
-	glShaderSource(vertex_shader , 1 , &vertex_shader_source , nullptr) ; 
-	glCompileShader(vertex_shader); 
-	shaderCompilationErrorCheck(vertex_shader) ; 
-	fragment_shader = glCreateShader(GL_FRAGMENT_SHADER) ; 
-	glShaderSource(fragment_shader , 1 , &fragment_shader_source , nullptr) ; 
-	glCompileShader(fragment_shader); 
-	shaderCompilationErrorCheck(fragment_shader) ; 
-	shader_program = glCreateProgram();
-	glAttachShader(shader_program , vertex_shader); 
-	glAttachShader(shader_program , fragment_shader);
-	glLinkProgram(shader_program) ; 
-	programLinkingErrorCheck(shader_program) ; 
-	errorCheck(); 
+	if(!is_initialized){
+		const char* vertex_shader_source = (const char*) vertex_shader_txt.c_str() ; 
+		const char* fragment_shader_source = (const char*) fragment_shader_txt.c_str(); 
+		vertex_shader = glCreateShader(GL_VERTEX_SHADER) ; 
+		glShaderSource(vertex_shader , 1 , &vertex_shader_source , nullptr) ; 
+		glCompileShader(vertex_shader); 
+		shaderCompilationErrorCheck(vertex_shader) ; 
+		fragment_shader = glCreateShader(GL_FRAGMENT_SHADER) ; 
+		glShaderSource(fragment_shader , 1 , &fragment_shader_source , nullptr) ; 
+		glCompileShader(fragment_shader); 
+		shaderCompilationErrorCheck(fragment_shader) ; 
+		shader_program = glCreateProgram();
+		glAttachShader(shader_program , vertex_shader); 
+		glAttachShader(shader_program , fragment_shader);
+		glLinkProgram(shader_program) ; 
+		programLinkingErrorCheck(shader_program) ; 
+		errorCheck();
+		is_initialized = true;  
+	}
 }
 void Shader::recompile(){
 	clean(); 
@@ -203,7 +208,7 @@ void Shader::recompile(){
 }
 
 void Shader::bind(){
-	glUseProgram(shader_program);  
+	glUseProgram(shader_program); 
 }
 
 void Shader::release(){
@@ -217,6 +222,7 @@ void Shader::clean(){
 		glDeleteShader(fragment_shader) ; 
 		glDeleteProgram(shader_program) ; 
 		shader_program = 0 ; 
+		is_initialized = false; 
 	}
 }
 
@@ -262,9 +268,3 @@ ScreenFrameBufferShader::ScreenFrameBufferShader(const std::string vertex , cons
 ScreenFrameBufferShader::~ScreenFrameBufferShader(){
 
 }
-/*
-void ScreenFrameBufferShader::setTextureUniforms(){
-	bind(); 
-	setUniform(FrameBufferTexture::getTextureTypeCStr() , static_cast<int>(Texture::FRAMEBUFFER)); 
-}
-*/

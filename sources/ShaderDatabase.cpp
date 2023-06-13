@@ -32,6 +32,10 @@ Shader* ShaderDatabase::addShader(const std::string vertex_code ,const std::stri
 	return shader_database[type] ; 
 }
 
+void ShaderDatabase::initializeShaders(){
+	for(auto A : shader_database)
+		A.second->initializeShader();
+}
 
 bool ShaderDatabase::contains(const Shader::TYPE type){
 	return shader_database.find(type) != shader_database.end(); 

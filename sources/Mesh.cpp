@@ -57,20 +57,18 @@ void Mesh::unbindMaterials(){
 
 void Mesh::bindShaders(){
 	if(shader_program != nullptr){
-		if(!face_culling_enabled){ 
-			setFaceCulling(true); 
-			cullBackFace();
-			face_culling_enabled = true ; 
-		}
+		setFaceCulling(true); 
+		cullBackFace();
+		face_culling_enabled = true ; 
 		setDepthMask(true); 
 		setDepthFunc(LESS); 	
 		depth_mask_enabled = true ;
-		shader_program->bind(); 	
 		shader_program->setSceneCameraPointer(camera); 
 		if(camera->getType() == Camera::ARCBALL) 
 			model_matrix = camera->getSceneModelMatrix() ; 
 		modelview_matrix = camera->getView() * model_matrix ;  
-		shader_program->setAllMatricesUniforms(model_matrix) ; 
+		shader_program->setAllMatricesUniforms(model_matrix) ; 	
+		shader_program->bind(); 	
 	}
 }
 
@@ -128,48 +126,48 @@ void Mesh::setDepthFunc(DEPTHFUNC func){
 
 CubeMapMesh::CubeMapMesh() : Mesh() {
 	std::vector<float> vertices = { 
-					-1 , -1 , -1 ,  // 0
-					 1 , -1 , -1 ,  // 1
-					-1 , 1 , -1 ,   // 2
-				 	 1 , 1 , -1 ,   // 3
-					-1 , -1 , 1 ,   // 4
-					 1 , -1 , 1 ,   // 5
-					-1 , 1 , 1 ,    // 6
-				 	 1 , 1 , 1 };   // 7
+		-1 , -1 , -1 	,  // 0
+		1 , -1 , -1 	,  // 1
+		-1 , 1 , -1 	,   // 2
+		1 , 1 , -1 		,   // 3
+		-1 , -1 , 1 	,   // 4
+		1 , -1 , 1 		,   // 5
+		-1 , 1 , 1 		,    // 6
+		1 , 1 , 1 		};   // 7
 
 	std::vector<unsigned int> indices = { 
-						  0 , 1 , 2 , //Front face
-					      1 , 3 , 2 , //
-					      5 , 4 , 6 , //Back face
-					      6 , 7 , 5 , //
-				          0 , 2 , 6	, //Left face
-					      0 , 6 , 4	, //
-					      1 , 5 , 7	, //Right face
-					      7 , 3 , 1	, //
-					      3 , 7 , 6 , //Up face
-					      2 , 3 , 6 , //
-					      0 , 4 , 5 , //Down face
-					      0 , 5 , 1   };
+		0 , 1 , 2 	, //Front face
+		1 , 3 , 2 	, //
+		5 , 4 , 6 	, //Back face
+		6 , 7 , 5 	, //
+		0 , 2 , 6 	, //Left face
+		0 , 6 , 4	, //
+		1 , 5 , 7	, //Right face
+		7 , 3 , 1	, //
+		3 , 7 , 6 	, //Up face
+		2 , 3 , 6 	, //
+		0 , 4 , 5 	, //Down face
+		0 , 5 , 1   };
 
 	std::vector<float> textures = { 
-					0 , 0 , 
-					1 , 0 , 
-					0 , 1 , 
-					1 , 1 , 
-					0 , 0 , 
-					1 , 0 , 
-					0 , 1 , 
-					1 , 1 };
+		0 , 0 		, 
+		1 , 0 		, 
+		0 , 1 		, 
+		1 , 1 		, 
+		0 , 0 		, 
+		1 , 0 		, 
+		0 , 1 		, 
+		1 , 1 		};
 
 	std::vector<float> colors = { 
-					  1 , 0 , 0 ,
-				      1 , 0 , 0 , 	
-				      1 , 0 , 0 , 
-				      1 , 0 , 0 ,
-				      1 , 0 , 0 , 	
-				      1 , 0 , 0 , 
-				      1 , 0 , 0 , 
-				      1 , 0 , 0 };
+		1 , 0 , 0 	,
+		1 , 0 , 0 	, 	
+		1 , 0 , 0 	, 
+		1 , 0 , 0 	,
+		1 , 0 , 0 	, 	
+		1 , 0 , 0 	, 
+		1 , 0 , 0 	, 
+		1 , 0 , 0 	};
 	
 	geometry.indices = indices ; 
 	geometry.vertices = vertices ;
@@ -184,18 +182,15 @@ CubeMapMesh::~CubeMapMesh(){
 
 void CubeMapMesh::bindShaders(){
 	if(shader_program != nullptr){
-		if(face_culling_enabled){
-			setFaceCulling(false);
-			face_culling_enabled = false;
-		}
+		setFaceCulling(false);
 		setDepthFunc(LESS_OR_EQUAL); 	
-		shader_program->bind(); 	
 		shader_program->setSceneCameraPointer(camera); 	
 		glm::mat4 view = glm::mat4(glm::mat3(camera->getView()));
 		glm::mat4 projection = camera->getProjection() ; 
 		if(camera->getType() == Camera::ARCBALL)
 			model_matrix = camera->getSceneRotationMatrix() ;  			
 		shader_program->setAllMatricesUniforms(projection , view , model_matrix) ; 
+		shader_program->bind(); 	
 	}
 }
 
@@ -206,10 +201,10 @@ void CubeMapMesh::bindShaders(){
 FrameBufferMesh::FrameBufferMesh():Mesh(){
 
 	std::vector<float> vertices = {  
- 	   -1.0f, -1.0f, 0.f, 
- 	   -1.0f, 1.0f, 0.f ,  
- 	    1.0f, 1.0f, 0.f ,  
- 	    1.0f, -1.0f, 0.f 
+		-1.0f, -1.0f, 0.f, 
+		-1.0f, 1.0f, 0.f ,  
+		1.0f, 1.0f, 0.f ,  
+		1.0f, -1.0f, 0.f 
 	};
 	std::vector<unsigned int> indices = {
 		2 , 1 , 0 , 

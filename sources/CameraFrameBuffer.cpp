@@ -27,14 +27,19 @@ CameraFrameBuffer::~CameraFrameBuffer(){
     
 }
 
+
+void CameraFrameBuffer::updateFrameBufferShader(){
+    shader_framebuffer = shader_database->get(Shader::SCREEN_FRAMEBUFFER); 
+    assert(mesh_screen_quad); 
+    mesh_screen_quad->setShader(shader_framebuffer); 
+}
+
 void CameraFrameBuffer::initializeFrameBuffer(){  
     initializeFrameBufferTexture(); 
     shader_framebuffer = shader_database->get(Shader::SCREEN_FRAMEBUFFER);
     mesh_screen_quad = new FrameBufferMesh(texture_id , shader_framebuffer) ;
     drawable_screen_quad = new Drawable(mesh_screen_quad) ; 
     FrameBufferInterface::initializeFrameBuffer();  
-   
-
 }
 
 void CameraFrameBuffer::clean(){

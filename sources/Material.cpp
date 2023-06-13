@@ -57,8 +57,9 @@ void Material::unbind(){
  */
 void Material::initializeMaterial(){
 	is_transparent = isTransparent();
-	if(shader_program){	
+	if(shader_program){
 		textures_group.initializeGlTextureData(shader_program);
+		errorCheck(); 
 		std::string material = std::string(uniform_name_str_material_struct_name) + std::string("."); 
 		shader_program->setUniform(material+uniform_name_vec2_material_refractive_index , refractive_index) ; 
 		shader_program->setUniform(material+uniform_name_float_material_dielectric_factor , dielectric_factor) ; 
@@ -66,7 +67,7 @@ void Material::initializeMaterial(){
 		shader_program->setUniform(material+uniform_name_float_material_transmission_factor , transmission_factor) ; 
 		shader_program->setUniform(material+uniform_name_float_material_emissive_factor , emissive_factor) ; 
 		shader_program->setUniform(material+uniform_name_float_material_shininess_factor , shininess); 
-		
+		errorCheck(); 
 	}
 }
 

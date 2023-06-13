@@ -194,9 +194,10 @@ public:
 	 */
 	template<typename T> 
 	void setUniform(const char* name , const T value){
-		glUseProgram(shader_program) ; 
+		bind(); 
 		int location = glGetUniformLocation(shader_program , name);
 		setUniformValue(location , value);
+		release(); 
 	}
 	
 	/**
@@ -303,6 +304,7 @@ protected:
 	std::string fragment_shader_txt ; 	/**<Fragment shader source code*/
 	std::string vertex_shader_txt ; 	/**<Vertex shader source code*/
 	Camera* camera_pointer; 			/**<Camera pointer*/
+	bool is_initialized; 
 
 
 };

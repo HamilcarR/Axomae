@@ -13,10 +13,7 @@ Drawable::Drawable(Mesh &mesh){
 	mesh_object = new Mesh(mesh);
 	camera_pointer = nullptr ;
 	gl_buffers.setGeometryPointer(&mesh_object->geometry) ; 
-	if(!initialize()){
-		std::cerr << "failed initializing Drawable data" << "\n" ; 
-		exit(EXIT_FAILURE); 
-	}
+	initialize();  
 }
 
 Drawable::Drawable(Mesh *mesh){
@@ -25,12 +22,10 @@ Drawable::Drawable(Mesh *mesh){
 		mesh_object = mesh;  
 		camera_pointer = nullptr ; 
 		gl_buffers.setGeometryPointer(&mesh_object->geometry); 
-		if(!initialize()){
-			std::cerr << "failed initializing Drawable data" << "\n" ; 
-			exit(EXIT_FAILURE); 
-		}
+		initialize();
 	}
 }
+
 
 Drawable::~Drawable(){
 	delete mesh_object;  
@@ -42,13 +37,14 @@ void Drawable::clean(){
 }
 
 bool Drawable::ready(){
-	return gl_buffers.isReady() ; 
+	return gl_buffers.isReady(); 
 }
 
 bool Drawable::initialize(){
 	if(mesh_object == nullptr)
 		return false ;
 	mesh_object->initializeGlData(); 
+	errorCheck(); 
 	gl_buffers.initializeBuffers(); 
 	errorCheck(); 
 	return gl_buffers.isReady();  ; 
@@ -87,9 +83,9 @@ void Drawable::startDraw(){
 }
 
 void Drawable::bind(){
-	mesh_object->bindShaders(); 
 	mesh_object->bindMaterials(); 
 	gl_buffers.bind(); 
+	mesh_object->bindShaders(); 
 }
 
 void Drawable::unbind(){

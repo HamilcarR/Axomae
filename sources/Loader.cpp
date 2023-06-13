@@ -229,7 +229,7 @@ void Loader::loadShaderDatabase(){
 	std::string fragment_shader_cubemap = loadShader("../shaders/cubemap.frag");
 	std::string vertex_shader_screen_fbo = loadShader("../shaders/screen_fbo.vert"); 
 	std::string fragment_shader_screen_fbo = loadShader("../shaders/screen_fbo.frag");  
-	shader_database->addShader(vertex_shader , fragment_shader , Shader::GENERIC) ; 
+	shader_database->addShader(vertex_shader , fragment_shader , Shader::BLINN) ; 
 	shader_database->addShader(vertex_shader_cubemap , fragment_shader_cubemap , Shader::CUBEMAP) ; 
 	shader_database->addShader(vertex_shader_screen_fbo , fragment_shader_screen_fbo , Shader::SCREEN_FRAMEBUFFER); 
 }
@@ -288,7 +288,7 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
 				object.indices.push_back(static_cast<unsigned int> (mesh->mFaces[ind].mIndices[2]));
 			}
 			std::cout << "object loaded : " << mesh->mName.C_Str()<< "\n" ; 	
-			Shader* shader_program = shader_database->get(Shader::GENERIC) ;  //TODO : change for PBR and other nice shaders when needed 		
+			Shader* shader_program = shader_database->get(Shader::BLINN) ;  //TODO : change for PBR and other nice shaders when needed 		
 			Mesh *loaded_mesh = new Mesh(std::string(mesh->mName.C_Str()) , object , mesh_material , shader_program) ; //TODO : change shader_program with pointer to pair<shader::type , shader*> 	
 			objects.push_back(loaded_mesh);
 		}
@@ -312,8 +312,9 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
 std::vector<Mesh*> Loader::load(const char* file){
 	TextureDatabase *texture_database = TextureDatabase::getInstance(); 	
 	ShaderDatabase *shader_database = ShaderDatabase::getInstance(); 
-	texture_database->softCleanse(); 
-	shader_database->recompile(); 
+	texture_database->softCleanse();
+	shader_database->clean(); 
+	loadShaderDatabase();  
 	std::pair<unsigned int , std::vector<Mesh*>> scene = loadObjects(file); 
 	Mesh* cube_map = generateCubeMap(scene.first , false) ; 	
 	if(cube_map != nullptr)
@@ -361,7 +362,6 @@ Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
 	Mesh *cube_map = new CubeMapMesh(); 
 	ShaderDatabase *shader_database = ShaderDatabase::getInstance(); 
 	TextureDatabase* texture_database = TextureDatabase::getInstance(); 	
-	cube_map->setShader(shader_database->get(Shader::CUBEMAP)) ; 
 	TextureData cubemap ; 
 	QString skybox_folder = "castle" ;
 	auto format = "jpg"; 
@@ -393,8 +393,8 @@ Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
 	Material material ; 
 	unsigned index = texture_database->addTexture(&cubemap , Texture::CUBEMAP , false) ; 
 	material.addTexture(index , Texture::CUBEMAP);
-	material.setShaderPointer(shader_database->get(Shader::CUBEMAP));  
 	cube_map->material = material ; 
+	cube_map->setShader(shader_database->get(Shader::CUBEMAP)) ; 
 	cubemap.clean(); 	
 	return cube_map; 		
 }

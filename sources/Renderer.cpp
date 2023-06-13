@@ -21,8 +21,6 @@ Renderer::Renderer(){
 	shader_database = ShaderDatabase::getInstance();	
 	Loader::loadShaderDatabase();
 	scene_camera = new ArcballCamera(45.f , &screen_size ,  0.1f , 10000.f , 100.f, &mouse_state);
-	camera_framebuffer = new CameraFrameBuffer(texture_database , shader_database , &screen_size , &default_framebuffer_id);  
-	scene = new Scene(); 
 }
 
 Renderer::Renderer(unsigned width , unsigned height):Renderer(){
@@ -60,8 +58,12 @@ Renderer::~Renderer(){
 }
 
 void Renderer::initialize(){
-	glEnable(GL_DEPTH_TEST);	
+	glEnable(GL_DEPTH_TEST);		
+	shader_database->initializeShaders(); 		
+	camera_framebuffer = new CameraFrameBuffer(texture_database , shader_database , &screen_size , &default_framebuffer_id);  
 	camera_framebuffer->initializeFrameBuffer(); 	
+	scene = new Scene(); 
+	
 }
 
 bool Renderer::scene_ready(){
@@ -72,8 +74,9 @@ bool Renderer::scene_ready(){
 	return true ; 
 }
 
+/*This function is executed each frame*/
 bool Renderer::prep_draw(){	
-	if(start_draw && scene_ready()){	
+	if(start_draw && scene_ready()){ //TODO ! scene_ready() executes shader initialization + binding without unbinding ... follow the track down the stack . 	
 		camera_framebuffer->startDraw();
 		scene->prepare_draw(scene_camera); 			
 		return true; 				
@@ -90,15 +93,15 @@ void Renderer::draw(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	std::vector<Drawable*> transparent_meshes = scene->getSortedTransparentElements();  
 	std::vector<Drawable*> opaque_meshes = scene->getOpaqueElements();
-	for(Drawable *A : opaque_meshes){
-		A->bind(); 
+	for(Drawable *A : opaque_meshes){	
 		light_database->updateShadersData(A->getMeshShaderPointer() , A->getMeshPointer()->getModelViewMatrix()); 
+		A->bind(); 	
 		glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
 		A->unbind();
 	}
 	for(Drawable *A : transparent_meshes){
-		A->bind();	
 		light_database->updateShadersData(A->getMeshShaderPointer() , A->getMeshPointer()->getModelViewMatrix()); 
+		A->bind();		
 		glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
 		A->unbind();
 	}
@@ -112,6 +115,8 @@ void Renderer::set_new_scene(std::vector<Mesh*> &new_scene){
 	scene->setScene(new_scene);  	
 	start_draw = true ;
 	scene_camera->reset() ;
+	shader_database->initializeShaders(); 
+	camera_framebuffer->updateFrameBufferShader(); 
 }
 
 void Renderer::onLeftClick(){

@@ -30,7 +30,10 @@ public:
 
     virtual void startDraw();
 
-    virtual void clean() override; 
+    virtual void clean() override;
+
+    virtual void updateFrameBufferShader();
+
 private:
     CameraFrameBuffer(); 
 

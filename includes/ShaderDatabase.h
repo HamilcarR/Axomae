@@ -83,7 +83,9 @@ public:
 	Shader* get(Shader::TYPE type) const ;
 
 
-	virtual void recompile() ;  
+	virtual void recompile() ; 
+
+	virtual void initializeShaders();  
 private:
 	
 	/**
