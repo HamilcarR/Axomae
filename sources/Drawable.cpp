@@ -42,17 +42,18 @@ bool Drawable::ready(){
 
 bool Drawable::initialize(){
 	if(mesh_object == nullptr)
-		return false ;
+		return false;
 	mesh_object->initializeGlData(); 
-	errorCheck(); 
+	errorCheck(__FILE__ , __LINE__); 
 	gl_buffers.initializeBuffers(); 
-	errorCheck(); 
+	errorCheck(__FILE__ , __LINE__); 
 	return gl_buffers.isReady();  ; 
 }
 
 void Drawable::startDraw(){
 	if(mesh_object != nullptr){		
 		mesh_object->bindShaders();
+		errorCheck(__FILE__ , __LINE__); 
 		gl_buffers.bindVao() ;  
 		gl_buffers.fillBuffers() ; 	
 		
@@ -79,18 +80,19 @@ void Drawable::startDraw(){
 		gl_buffers.unbindVao() ;
 		mesh_object->releaseShaders(); 
 	}
-
 }
 
-void Drawable::bind(){
-	mesh_object->bindMaterials(); 
+void Drawable::bind(){	
 	gl_buffers.bind(); 
-	mesh_object->bindShaders(); 
+	mesh_object->setupAndBind(); 
+	mesh_object->bindMaterials(); 
+	
 }
 
 void Drawable::unbind(){
 	gl_buffers.unbind();
-	mesh_object->unbindMaterials();  
+	mesh_object->unbindMaterials(); 
+	mesh_object->afterRenderSetup();  
 	mesh_object->releaseShaders();
 }
 

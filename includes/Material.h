@@ -4,12 +4,18 @@
 #include "TextureGroup.h" 
 #include "Shader.h" 
 
+
+
+
+
+
 /**
  * @file Material.h
  * Material implementation 
  * 
  */
 
+//TODO : Hierarchy materials 
 /**
  * @brief Material class implementation 
  * 

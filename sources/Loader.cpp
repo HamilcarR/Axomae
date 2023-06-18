@@ -228,7 +228,10 @@ void Loader::loadShaderDatabase(){
 	std::string vertex_shader_cubemap = loadShader("../shaders/cubemap.vert"); 
 	std::string fragment_shader_cubemap = loadShader("../shaders/cubemap.frag");
 	std::string vertex_shader_screen_fbo = loadShader("../shaders/screen_fbo.vert"); 
-	std::string fragment_shader_screen_fbo = loadShader("../shaders/screen_fbo.frag");  
+	std::string fragment_shader_screen_fbo = loadShader("../shaders/screen_fbo.frag"); 
+	std::string vertex_shader_bouding_box = loadShader("../shaders/bbox.vert"); 
+	std::string fragment_shader_bounding_box = loadShader("../shaders/bbox.frag"); 
+	shader_database->addShader(vertex_shader_bouding_box , fragment_shader_bounding_box , Shader::BOUNDING_BOX);  
 	shader_database->addShader(vertex_shader , fragment_shader , Shader::BLINN) ; 
 	shader_database->addShader(vertex_shader_cubemap , fragment_shader_cubemap , Shader::CUBEMAP) ; 
 	shader_database->addShader(vertex_shader_screen_fbo , fragment_shader_screen_fbo , Shader::SCREEN_FRAMEBUFFER); 

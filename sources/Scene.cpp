@@ -17,7 +17,15 @@ void Scene::setScene(std::vector<Mesh*> &to_copy){
         mesh.aabb = BoundingBox(A->geometry.vertices);
         mesh.drawable = new Drawable(A) ; 
         scene.push_back(mesh);  
+    }
+}
 
+void Scene::generateBoundingBoxes(Shader* box_shader){
+    for(Scene::AABB scene_drawable : scene){
+        Mesh* mesh = scene_drawable.drawable->getMeshPointer();
+        BoundingBoxMesh* bbox_mesh = new BoundingBoxMesh(mesh , box_shader);
+        Drawable* bbox_drawable = new Drawable(bbox_mesh);
+        bounding_boxes_array.push_back(bbox_drawable); 
     }
 }
 
@@ -54,13 +62,24 @@ std::vector<Drawable*> Scene::getSortedTransparentElements(){
     return transparent_meshes; 
 }
 
+std::vector<Drawable*> Scene::getBoundingBoxElements(){
+    return bounding_boxes_array; 
+}
+
 void Scene::clear(){
     for(unsigned int i = 0 ; i < scene.size() ; i++)
 		if(scene[i].drawable != nullptr){
 			scene[i].drawable->clean();
 			delete scene[i].drawable; 
 		}	
-    scene.clear(); 
+    scene.clear();
+    for(auto A : bounding_boxes_array){
+        if(A){
+            A->clean(); 
+            delete A; 
+        }
+    } 
+    bounding_boxes_array.clear(); 
     sorted_transparent_meshes.clear(); 
 }
 
@@ -76,4 +95,8 @@ void Scene::prepare_draw(Camera* scene_camera){
 		aabb.drawable->setSceneCameraPointer(scene_camera); 
 		aabb.drawable->startDraw(); 
 	}
+    for(auto A : bounding_boxes_array){
+        A->setSceneCameraPointer(scene_camera); 
+        A->startDraw(); 
+    }
 }

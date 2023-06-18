@@ -51,7 +51,13 @@ inline void programLinkingErrorCheck(unsigned int program_id){
 
 Shader::Shader(){
 	type = GENERIC ;
-	is_initialized = false;  
+	is_initialized = false; 
+	camera_pointer = nullptr;
+	is_initialized = false; 
+	vertex_shader_txt = "" ; 
+	fragment_shader_txt = "" ; 
+	shader_program = 0 ;
+	fragment_shader = vertex_shader = 0 ;   
 }
 
 Shader::Shader(const std::string vertex_code , const std::string fragment_code):Shader(){
@@ -72,9 +78,7 @@ void Shader::setAttributeBuffer(GLuint location , GLenum type , int offset , int
 }
 
 void Shader::setTextureUniforms(std::string texture_name , Texture::TYPE type){
-	bind(); 
 	setUniform(texture_name , static_cast<int>(type));
-	release(); 
 }
 
 void Shader::setSceneCameraPointer(Camera* camera){
@@ -87,7 +91,7 @@ void Shader::updateCamera(){
 }
 
 void Shader::setCameraPositionUniform(){
-	if(camera_pointer != nullptr)
+	if(camera_pointer)
 		setUniform(uniform_name_vec3_camera_position , camera_pointer->getPosition()); 	
 }
 
@@ -198,7 +202,7 @@ void Shader::initializeShader(){
 		glAttachShader(shader_program , fragment_shader);
 		glLinkProgram(shader_program) ; 
 		programLinkingErrorCheck(shader_program) ; 
-		errorCheck();
+		errorCheck(__FILE__ , __LINE__);
 		is_initialized = true;  
 	}
 }
@@ -208,7 +212,7 @@ void Shader::recompile(){
 }
 
 void Shader::bind(){
-	glUseProgram(shader_program); 
+	glUseProgram(shader_program);	
 }
 
 void Shader::release(){
@@ -266,5 +270,19 @@ ScreenFrameBufferShader::ScreenFrameBufferShader(const std::string vertex , cons
 }
 
 ScreenFrameBufferShader::~ScreenFrameBufferShader(){
+
+}
+
+/***********************************************************************************************************************************************************/
+
+BoundingBoxShader::BoundingBoxShader() : Shader(){
+	type = BOUNDING_BOX ; 
+}
+
+BoundingBoxShader::BoundingBoxShader(const std::string vertex , const std::string fragment) : Shader(vertex , fragment){
+	type = BOUNDING_BOX ; 
+}
+
+BoundingBoxShader::~BoundingBoxShader(){
 
 }

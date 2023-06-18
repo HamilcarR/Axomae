@@ -6,7 +6,8 @@ namespace axomae {
 Mesh::Mesh(){
 	mesh_initialized = false ;
 	shader_program = nullptr ; 
-	name = "uninitialized mesh"  ;
+	name = "uninitialized mesh" ;
+	is_drawn = true; 
 }
 
 Mesh::Mesh(const Mesh& copy){
@@ -41,10 +42,13 @@ Mesh::Mesh(std::string n , Object3D const& geo , Material const& mat , Shader* s
 Mesh::~Mesh(){}
 
 void Mesh::initializeGlData(){
-	if(shader_program != nullptr)
+	if(shader_program != nullptr){
 		shader_program->initializeShader();
+	shader_program->bind(); 
 	material.initializeMaterial();
+	shader_program->release(); 
 	mesh_initialized = true ; 
+	}
 }
 
 void Mesh::bindMaterials(){
@@ -55,25 +59,38 @@ void Mesh::unbindMaterials(){
 	material.unbind(); 
 }
 
-void Mesh::bindShaders(){
-	if(shader_program != nullptr){
-		setFaceCulling(true); 
-		cullBackFace();
-		face_culling_enabled = true ; 
-		setDepthMask(true); 
-		setDepthFunc(LESS); 	
-		depth_mask_enabled = true ;
+void Mesh::preRenderSetup(){
+	setFaceCulling(true); 
+	cullBackFace();
+	face_culling_enabled = true ; 
+	setDepthMask(true); 
+	setDepthFunc(LESS); 	
+	depth_mask_enabled = true ;
+	if(camera->getType() == Camera::ARCBALL) //TODO replace with proper polymorphism 
+		model_matrix = camera->getSceneModelMatrix() ; 
+	modelview_matrix = camera->getView() * model_matrix ;  
+	if(shader_program){	
 		shader_program->setSceneCameraPointer(camera); 
-		if(camera->getType() == Camera::ARCBALL) 
-			model_matrix = camera->getSceneModelMatrix() ; 
-		modelview_matrix = camera->getView() * model_matrix ;  
 		shader_program->setAllMatricesUniforms(model_matrix) ; 	
-		shader_program->bind(); 	
 	}
 }
 
+void Mesh::setupAndBind(){
+	if(shader_program){
+		bindShaders();
+		errorCheck(__FILE__ , __LINE__); 
+		preRenderSetup(); 
+		errorCheck(__FILE__ , __LINE__); 
+	}
+}
+
+void Mesh::bindShaders(){
+	if(shader_program)
+		shader_program->bind(); 	
+}
+
 void Mesh::releaseShaders(){
-	if(shader_program != nullptr)
+	if(shader_program)
 		shader_program->release(); 
 }
 void Mesh::clean(){
@@ -101,6 +118,13 @@ void Mesh::cullFrontAndBackFace(){
 	glCullFace(GL_FRONT_AND_BACK); 
 }	
 
+void Mesh::afterRenderSetup(){
+	return ; 
+}
+
+void Mesh::setPolygonDrawMode(RASTERMODE mode){
+	glPolygonMode(GL_FRONT_AND_BACK , mode); 
+}
 
 void Mesh::setFaceCulling(bool value){
 	if(value){
@@ -180,21 +204,18 @@ CubeMapMesh::CubeMapMesh() : Mesh() {
 CubeMapMesh::~CubeMapMesh(){
 }
 
-void CubeMapMesh::bindShaders(){
+void CubeMapMesh::preRenderSetup(){
+	setFaceCulling(false);
+	setDepthFunc(LESS_OR_EQUAL); 	
+	glm::mat4 view = glm::mat4(glm::mat3(camera->getView()));
+	glm::mat4 projection = camera->getProjection() ; 
+	if(camera->getType() == Camera::ARCBALL)
+		model_matrix = camera->getSceneRotationMatrix() ;  				
 	if(shader_program != nullptr){
-		setFaceCulling(false);
-		setDepthFunc(LESS_OR_EQUAL); 	
 		shader_program->setSceneCameraPointer(camera); 	
-		glm::mat4 view = glm::mat4(glm::mat3(camera->getView()));
-		glm::mat4 projection = camera->getProjection() ; 
-		if(camera->getType() == Camera::ARCBALL)
-			model_matrix = camera->getSceneRotationMatrix() ;  			
 		shader_program->setAllMatricesUniforms(projection , view , model_matrix) ; 
-		shader_program->bind(); 	
 	}
 }
-
-
 
 /*****************************************************************************************************************/
 
@@ -233,24 +254,57 @@ FrameBufferMesh::~FrameBufferMesh(){
 
 }
 
-void FrameBufferMesh::bindShaders(){
-	if(shader_program != nullptr){
-		shader_program->bind();
-		if(face_culling_enabled){
-			setFaceCulling(false);
-			face_culling_enabled = false;
-		}
-		setDepthFunc(ALWAYS); 
+void FrameBufferMesh::preRenderSetup(){
+	setFaceCulling(false);
+	face_culling_enabled = false;
+	setDepthFunc(ALWAYS); 
+}
+
+
+/*****************************************************************************************************************/
+
+BoundingBoxMesh::BoundingBoxMesh() : Mesh(){
+
+}
+
+BoundingBoxMesh::BoundingBoxMesh(Mesh* m , Shader* s) : BoundingBoxMesh(){
+	bound_mesh = m ; 
+	shader_program = s ;
+	assert(bound_mesh != nullptr); 
+	name = std::string("Boundingbox-") + m->getMeshName(); 
+	std::vector<float> vertices = m->getGeometry().vertices; 
+	bounding_box = BoundingBox(vertices);
+	material.setShaderPointer(s);
+	std::pair<std::vector<float> , std::vector<unsigned>> geom = bounding_box.getVertexArray(); 
+	geometry.vertices = geom.first; 
+	geometry.indices = geom.second;  
+}
+
+BoundingBoxMesh::~BoundingBoxMesh(){
+
+}
+
+void BoundingBoxMesh::preRenderSetup(){
+	setFaceCulling(true); 
+	face_culling_enabled = true;
+	setDepthMask(true); 
+	setDepthFunc(LESS);
+	setPolygonDrawMode(LINE); 
+	depth_mask_enabled = true;
+	assert(bound_mesh != nullptr); 
+	model_matrix = bound_mesh->getModelMatrix(); 
+	modelview_matrix = bound_mesh->getModelViewMatrix();
+	bounding_box = modelview_matrix * bounding_box ;  
+	if(shader_program){	
+		shader_program->setSceneCameraPointer(camera); 
+		shader_program->setAllMatricesUniforms(model_matrix) ; 	
 	}
 }
 
 
-
-
-
-
-
-
+void BoundingBoxMesh::afterRenderSetup(){
+	setPolygonDrawMode(FILL); 
+}
 
 
 

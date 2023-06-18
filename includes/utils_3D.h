@@ -20,21 +20,6 @@
 
 
 
-
-inline void errorCheck(){
-	GLenum error = GL_NO_ERROR;
-    	error = glGetError();
-    	if (error != GL_NO_ERROR) 
-        	std::cout << "Error:" << error << std::endl ; 
-
-}
-
-
-
-
-
-
-
 /*TODO : Create classes , implement clean up */
 namespace axomae {
 

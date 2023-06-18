@@ -4,6 +4,7 @@
 #include "utils_3D.h" 
 #include "Material.h" 
 #include "Camera.h"
+#include "BoundingBox.h"
 
 /**
  * @brief Mesh.h
@@ -33,6 +34,13 @@ public:
 		NOT_EQUAL = GL_NOTEQUAL , 
 		ALWAYS = GL_ALWAYS
 	} ;  
+
+	enum RASTERMODE : GLenum 
+	{
+		POINT = GL_POINT , 
+		LINE = GL_LINE , 
+		FILL = GL_FILL
+	};
 
 	/**
 	 * @brief Construct a new Mesh object
@@ -91,6 +99,24 @@ public:
 	 * 
 	 */
 	virtual void unbindMaterials(); 
+
+	/**
+	 * @brief Computes relevant matrices , and sets up the culling + depth states
+	 * 
+	 */
+	virtual void preRenderSetup();
+
+	/**
+	 * @brief This method returns the GPU to the default rendering state.
+	 * 
+	 */
+	virtual void afterRenderSetup(); 
+	
+	/**
+	 * @brief This method does the shader data setup + binding 
+	 * 
+	 */
+	virtual void setupAndBind();
 
 	/**
 	 * @brief Activates the current mesh's shader
@@ -153,6 +179,12 @@ public:
 	}	
 	
 	/**
+	 * @brief Control the rasterization mode
+	 * 
+	 */
+	void setPolygonDrawMode(RASTERMODE mode); 
+
+	/**
 	 * @brief Disable the rendering of the back face of the mesh
 	 * 
 	 */
@@ -213,18 +245,50 @@ public:
 	 */
 	Material* getMaterial(){return &material;} 
 
+	/**
+	 * @brief Get the Mesh Name 
+	 * 
+	 * @return std::string 
+	 */
+	std::string getMeshName(){return name;}
+
+	/**
+	 * @brief Set the Mesh Name 
+	 * 
+	 * @param new_name 
+	 */
+	void setMeshName(std::string new_name){name = new_name;}
+
+	/**
+	 * @brief Get the geometry data of the mesh
+	 * 
+	 * @return Object3D 
+	 */
+	Object3D getGeometry(){return geometry;}
+
+	/**
+	 * @brief Set the Geometry object
+	 * 
+	 * @param _geometry 
+	 */
+	void setGeometry(Object3D _geometry){geometry = _geometry;}
+
+	void setDrawState(bool draw){is_drawn = draw;}
+
+	bool isDrawn(){return is_drawn;}
+
 public:
 	Object3D geometry;					/**<3D Geometry of the mesh , vertex positions , UVs etc*/	
 	Material material; 					/**<Material to be used for the mesh*/
-	std::string name; 					/**<Name of the mesh*/
-
 protected:
+	std::string name; 					/**<Name of the mesh*/
 	bool mesh_initialized ; 			/**<Is the mesh ready to render*/
 	Camera* camera; 					/**<Pointer on the scene camera*/
 	glm::mat4 model_matrix;				/**<Mesh's model matrix*/
 	glm::mat4 modelview_matrix;			/**<Mesh's view x model matrix*/ 
 	bool face_culling_enabled ;			/**<Is culling enabled*/
-	bool depth_mask_enabled ; 			/**<Is depth enabled*/
+	bool depth_mask_enabled ; 			/**<Is depth enabled*/ 
+	bool is_drawn;						/**<Is the mesh */
 	Shader* shader_program; 			/**<Shader to be used for the mesh*/
 };
 
@@ -236,24 +300,25 @@ protected:
  */
 class CubeMapMesh : public Mesh{
 public:
-	
+
 	/**
 	 * @brief Construct a new Cube Map Mesh object
 	 * 
 	 */
 	CubeMapMesh(); 
-	
+
 	/**
 	 * @brief Destroy the Cube Map Mesh object
 	 * 
 	 */
-	virtual ~CubeMapMesh(); 
-	
+	virtual ~CubeMapMesh();
+
 	/**
-	 * @brief Bind the cubemap's shader
+	 * @brief Computes relevant matrices , and sets up the culling + depth states
 	 * 
 	 */
-	virtual void bindShaders(); 	
+	virtual void preRenderSetup();
+	
 };
 
 /*****************************************************************************************************************/
@@ -280,10 +345,10 @@ public:
 	FrameBufferMesh(int database_texture_index , Shader* shader); 
 
 	/**
-	 * @brief 
+	 * @brief Computes relevant matrices , and sets up the culling + depth states
 	 * 
 	 */
-	virtual void bindShaders(); 
+	virtual void preRenderSetup();
 
 	/**
 	 * @brief Destroy the Frame Buffer Mesh object
@@ -293,6 +358,64 @@ public:
 
 	
 };
+
+
+/*****************************************************************************************************************/
+
+class BoundingBoxMesh : public Mesh{
+public:
+	
+	/**
+	 * @brief Construct a new Bounding Box Mesh object
+	 * 
+	 */
+	BoundingBoxMesh(); 
+	
+	/**
+	 * @brief Construct a new Bounding Box Mesh object
+	 * 
+	 * @param bound_mesh 
+	 * @param display_shader 
+	 */
+	BoundingBoxMesh(Mesh* bound_mesh , Shader* display_shader);
+
+	/**
+	 * @see Mesh::afterRenderSetup()
+	 */
+	virtual void afterRenderSetup() override ; 
+	/**
+	 * 
+	 * @see Mesh::preRenderSetup()
+	 */
+	virtual void preRenderSetup(); 
+	
+	/**
+	 * @brief Destroy the Bounding Box Mesh object
+	 * 
+	 */
+	virtual ~BoundingBoxMesh();
+
+	virtual BoundingBox getBoundingBoxObject(){return bounding_box;}
+protected:
+	Mesh* bound_mesh;
+	BoundingBox bounding_box;  
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 #endif

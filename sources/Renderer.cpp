@@ -93,17 +93,23 @@ void Renderer::draw(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	std::vector<Drawable*> transparent_meshes = scene->getSortedTransparentElements();  
 	std::vector<Drawable*> opaque_meshes = scene->getOpaqueElements();
+	std::vector<Drawable*> bounding_boxes = scene->getBoundingBoxElements(); 
 	for(Drawable *A : opaque_meshes){	
+		A->bind(); 		
 		light_database->updateShadersData(A->getMeshShaderPointer() , A->getMeshPointer()->getModelViewMatrix()); 
-		A->bind(); 	
 		glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
 		A->unbind();
 	}
 	for(Drawable *A : transparent_meshes){
+		A->bind();			
 		light_database->updateShadersData(A->getMeshShaderPointer() , A->getMeshPointer()->getModelViewMatrix()); 
-		A->bind();		
 		glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
 		A->unbind();
+	}
+	for(Drawable* A : bounding_boxes){
+		A->bind();
+		glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
+		A->unbind(); 
 	}
 
 	camera_framebuffer->unbindFrameBuffer();	
@@ -112,7 +118,8 @@ void Renderer::draw(){
 
 void Renderer::set_new_scene(std::vector<Mesh*> &new_scene){
 	scene->clear(); 
-	scene->setScene(new_scene);  	
+	scene->setScene(new_scene);  
+	scene->generateBoundingBoxes(shader_database->get(Shader::BOUNDING_BOX)); 	
 	start_draw = true ;
 	scene_camera->reset() ;
 	shader_database->initializeShaders(); 

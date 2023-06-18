@@ -136,7 +136,7 @@ private:
 	GLuint color_buffer ;				/**<Color buffer ID*/
 	GLuint tangent_buffer ; 			/**<Tangent buffer ID*/
 	const axomae::Object3D *geometry; 	/**<Pointer to the meshe's geometry*/
-
+	bool buffers_filled ; 
 
 }; 
 

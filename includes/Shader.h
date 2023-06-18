@@ -24,11 +24,12 @@ public:
 	 */
 	enum TYPE : signed 
 	{
-		GENERIC = 0 , /**<Undefined shader type*/
-		BLINN = 1 ,   /**<Blinn-Phong shader*/
-		CUBEMAP = 2 , /**<shader used for displaying the environment map*/
-		PBR = 3	, 	  /**<PBR shader type*/
-		SCREEN_FRAMEBUFFER = 4	/**<Used for post processing*/
+		GENERIC = 0 , 				/**<Undefined shader type*/
+		BLINN = 1 ,   				/**<Blinn-Phong shader*/
+		CUBEMAP = 2 , 				/**<Shader used for displaying the environment map*/
+		PBR = 3	, 	  				/**<PBR shader type*/
+		SCREEN_FRAMEBUFFER = 4 ,	/**<Used for post processing*/
+		BOUNDING_BOX = 5			/**<Shader used for displaying bounding boxes of meshes*/
 	};
 public: 
 	
@@ -118,12 +119,13 @@ public:
 	void setAllMatricesUniforms(const glm::mat4& model);
 	
 	/**
-	 * @brief Set all necessary matrices uniforms in the shader. 
-	 * 
+	 * @brief Set all necessary matrices uniforms in the shader.  
+	 * Requires a valid pointer on a Camera set beforehand using setSceneCameraPointer(Camera*). 
 	 * @param projection Projection matrix
 	 * @param view View matrix
 	 * @param model Model matrix of the mesh
 	 * @see setAllMatricesUniforms(const glm::mat4& model)
+	 * @see setSceneCameraPointer(Camera*)
 	 */
 	void setAllMatricesUniforms(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model); 
 	/**
@@ -194,10 +196,8 @@ public:
 	 */
 	template<typename T> 
 	void setUniform(const char* name , const T value){
-		bind(); 
 		int location = glGetUniformLocation(shader_program , name);
 		setUniformValue(location , value);
-		release(); 
 	}
 	
 	/**
@@ -320,6 +320,7 @@ public:
 
 
 /***********************************************************************************************************************************************************/
+
 class CubeMapShader : public Shader {
 public:
 	CubeMapShader(); 
@@ -337,10 +338,14 @@ public:
 	virtual ~ScreenFrameBufferShader(); 
 };
 
+/***********************************************************************************************************************************************************/
 
-
-
-
+class BoundingBoxShader : public Shader{
+public:
+	BoundingBoxShader(); 
+	BoundingBoxShader(const std::string vertex_code , const std::string fragment_code); 
+	virtual ~BoundingBoxShader(); 
+};
 
 
 

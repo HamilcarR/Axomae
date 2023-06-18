@@ -12,24 +12,15 @@ GLGeometryBuffer::GLGeometryBuffer(){
 	texture_buffer = 0 ; 
 	color_buffer = 0 ; 
 	tangent_buffer = 0 ; 
-
+	buffers_filled = false; 
 }
 
-GLGeometryBuffer::GLGeometryBuffer(const axomae::Object3D *geometry){
+GLGeometryBuffer::GLGeometryBuffer(const axomae::Object3D *geometry):GLGeometryBuffer(){
 	this->geometry = geometry ; 
-	vao = 0 ; 
-	vertex_buffer = 0 ; 
-	normal_buffer = 0 ; 
-	index_buffer = 0 ; 
-	texture_buffer = 0 ; 
-	color_buffer = 0 ; 
-	tangent_buffer = 0 ; 
-
 }
 
 
 GLGeometryBuffer::~GLGeometryBuffer(){
-
 
 }
 
@@ -106,20 +97,23 @@ void GLGeometryBuffer::unbindVao(){
 }
 
 void GLGeometryBuffer::fillBuffers(){
-	bindVao(); 
-	bindVertexBuffer(); 
-	glBufferData(GL_ARRAY_BUFFER , geometry->vertices.size() * sizeof(float) , geometry->vertices.data() , GL_STATIC_DRAW) ;  
-	bindColorBuffer(); 
-	glBufferData(GL_ARRAY_BUFFER , geometry->colors.size() * sizeof(float) , geometry->colors.data() , GL_STATIC_DRAW) ;  
-	bindNormalBuffer(); 
-	glBufferData(GL_ARRAY_BUFFER , geometry->normals.size() * sizeof(float) , geometry->normals.data() , GL_STATIC_DRAW) ;  
-	bindTextureBuffer() ; 
-	glBufferData(GL_ARRAY_BUFFER , geometry->uv.size() * sizeof(float) , geometry->uv.data() , GL_STATIC_DRAW) ;  
-	bindTangentBuffer(); 
-	glBufferData(GL_ARRAY_BUFFER , geometry->tangents.size() * sizeof(float) , geometry->tangents.data() , GL_STATIC_DRAW) ;  
-	bindIndexBuffer(); 
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER , geometry->indices.size() * sizeof(unsigned int) , geometry->indices.data() , GL_STATIC_DRAW); 
-	errorCheck(); 
+	if(!buffers_filled){
+    	bindVao(); 
+    	bindVertexBuffer(); 
+    	glBufferData(GL_ARRAY_BUFFER , geometry->vertices.size() * sizeof(float) , geometry->vertices.data() , GL_STATIC_DRAW) ;  
+    	bindColorBuffer(); 
+    	glBufferData(GL_ARRAY_BUFFER , geometry->colors.size() * sizeof(float) , geometry->colors.data() , GL_STATIC_DRAW) ;  
+    	bindNormalBuffer(); 
+    	glBufferData(GL_ARRAY_BUFFER , geometry->normals.size() * sizeof(float) , geometry->normals.data() , GL_STATIC_DRAW) ;  
+    	bindTextureBuffer() ; 
+    	glBufferData(GL_ARRAY_BUFFER , geometry->uv.size() * sizeof(float) , geometry->uv.data() , GL_STATIC_DRAW) ;  
+    	bindTangentBuffer(); 
+    	glBufferData(GL_ARRAY_BUFFER , geometry->tangents.size() * sizeof(float) , geometry->tangents.data() , GL_STATIC_DRAW) ;  
+    	bindIndexBuffer(); 
+    	glBufferData(GL_ELEMENT_ARRAY_BUFFER , geometry->indices.size() * sizeof(unsigned int) , geometry->indices.data() , GL_STATIC_DRAW); 
+    	errorCheck(__FILE__ , __LINE__); 
+		buffers_filled = true; 
+	}
 }
 
 

@@ -49,13 +49,27 @@ public:
     virtual std::vector<Drawable*> getOpaqueElements() const ; 
      
     /**
-    * This function returns a vector of transparent meshes sorted in reverse order based on their
+    * @brief This method returns a vector of transparent meshes sorted in reverse order based on their
     * distance from the camera.
     * 
     * @return A vector of pointers to Drawable objects, representing the sorted transparent elements in
     * the Scene.
     */
     virtual std::vector<Drawable*> getSortedTransparentElements();
+
+    /**
+     * @brief This method returns an array of bounding boxes of each mesh in the scene. 
+     * Note that special meshes like the screen framebuffer , the cubemap , light sprites are not concerned by this method.
+     * 
+     * @return std::vector<Drawable*> Array of all meshes bounding boxes in the scene
+     */
+    virtual std::vector<Drawable*> getBoundingBoxElements();
+
+    /**
+     * @brief This method will add bounding boxes meshes to the scene. 
+     * @param box_shader Shader responsible for displaying bounding boxes
+     */
+    virtual void generateBoundingBoxes(Shader* box_shader); 
 
     /**
     * The function clears the scene by deleting all drawables and clearing the scene and
@@ -71,7 +85,13 @@ public:
     */
     bool isReady();
 
+    /**
+     * @brief Set up the scene camera , and prep drawables for the next draw. 
+     * 
+     * @param camera Pointer on the scene camera
+     */
     void prepare_draw(Camera* camera);  
+
 
 private:
 
@@ -82,7 +102,8 @@ private:
     void sortTransparentElements(); 
 protected:
     std::map<float , Drawable*> sorted_transparent_meshes ; 
-    std::vector<AABB> scene ; 
+    std::vector<AABB> scene ;
+    std::vector<Drawable*> bounding_boxes_array;
 
 };
 

@@ -18,6 +18,9 @@ Shader* ShaderFactory::constructShader(std::string v , std::string f , Shader::T
 		break;
 		case Shader::SCREEN_FRAMEBUFFER:
 			constructed_shader = new ScreenFrameBufferShader(v , f); 
+		break;
+		case Shader::BOUNDING_BOX:
+			constructed_shader = new BoundingBoxShader(v , f); 
 		break; 
 		default:
 			constructed_shader = nullptr ; 

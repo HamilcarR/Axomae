@@ -41,7 +41,7 @@ void GLViewer::initializeGL(){
 	}
 	renderer->onResize(width(), height());
 	renderer->initialize();
-	errorCheck();
+	errorCheck(__FILE__ , __LINE__);
 }
 
 void GLViewer::paintGL(){

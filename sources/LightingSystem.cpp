@@ -55,7 +55,7 @@ DirectionalLight::~DirectionalLight(){
 }
 
 void DirectionalLight::updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) {
-    viewspace_position = glm::vec3(modelview * glm::vec4(position , 0.f)); 
+    viewspace_position = glm::vec3(modelview * glm::vec4(position , 0.f));
     AbstractLight::updateShaderData(shader , modelview , index); 
 }
 

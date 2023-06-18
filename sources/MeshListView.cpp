@@ -26,5 +26,5 @@ void MeshListView::remove(){
 void MeshListView::setList(const std::vector<Mesh*> &meshes){
 	remove(); 
 	for(Mesh *A : meshes)
-		mesh_names_list.push_back(new QListWidgetItem(QString(A->name.c_str()) , this , 0)); 
+		mesh_names_list.push_back(new QListWidgetItem(QString(A->getMeshName().c_str()) , this , 0)); 
 }

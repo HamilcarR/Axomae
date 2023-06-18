@@ -51,8 +51,10 @@ void CameraFrameBuffer::clean(){
 
 void CameraFrameBuffer::startDraw(){
     if(shader_framebuffer){
+        shader_framebuffer->bind(); 
         shader_framebuffer->setUniform(uniform_name_float_gamma_name , gamma);
         shader_framebuffer->setUniform(uniform_name_float_exposure_name , exposure);  
+        shader_framebuffer->release(); 
     }
     if(drawable_screen_quad)
         drawable_screen_quad->startDraw(); 

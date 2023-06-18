@@ -48,7 +48,7 @@ void LightingDatabase::clearDatabase(){
 
 void LightingDatabase::updateShadersData(AbstractLight::TYPE type , Shader* shader , glm::mat4& modelview){
     std::vector<AbstractLight*> array = light_database[type] ; 
-    unsigned int index = 0 ; 
+    unsigned int index = 0 ;
     for(auto it = array.begin() ; it != array.end() ; it++ , index ++  )    
         (*it)->updateShaderData(shader , modelview , index);    
 }
