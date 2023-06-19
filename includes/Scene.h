@@ -92,9 +92,40 @@ public:
      */
     void prepare_draw(Camera* camera);  
 
+    /**
+     * @brief This method sorts the scene according to the meshes transparency ... opaque objects are first , and transparent objects are sorted according to distance. 
+     * 
+     * @return std::vector<Drawable*> 
+     */
+    std::vector<Drawable*> getSortedSceneByTransparency();
+
+    /**
+     * @brief This method is responsible for drawing the scene using forward rendering , and transparent objects
+     */
+    void drawForwardTransparencyMode(); 
+
+    /**
+     * @brief This method draw bounding boxes on the scene meshes.
+     * !Note : must be used after every other mesh has been drawn , except the screen framebuffer , 
+     * as BoundingBoxMesh uses the bound mesh's matrixes for it's own transformations.
+     */
+    void drawBoundingBoxes();
+
+    /**
+     * @brief Saves the light database pointer.
+     * !This method does not clear nor free this object. 
+     * @param database The pointer on the scene's lighting database. 
+     */
+    void setLightDatabasePointer(LightingDatabase* database){light_database = database;}
+
+    /**
+     * @brief Set the pointer on the camera used for the next render pass
+     * 
+     * @param _scene_camera 
+     */
+    void setCameraPointer(Camera* _scene_camera){scene_camera = _scene_camera;}
 
 private:
-
     /**
      * @brief Sort transparent elements by distance and store their position in sorted_transparent_meshes
      * 
@@ -104,7 +135,8 @@ protected:
     std::map<float , Drawable*> sorted_transparent_meshes ; 
     std::vector<AABB> scene ;
     std::vector<Drawable*> bounding_boxes_array;
-
+    LightingDatabase* light_database;
+    Camera* scene_camera; 
 };
 
 

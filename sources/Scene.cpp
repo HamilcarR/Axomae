@@ -41,6 +41,28 @@ std::vector<Drawable*> Scene::getOpaqueElements() const {
     return to_return; 
 }
 
+std::vector<Drawable*> Scene::getSortedSceneByTransparency(){
+    std::vector<Drawable*> to_return ;
+    Drawable* cubemap ; 
+    sorted_transparent_meshes.clear();  
+    for(auto aabb : scene){
+        Drawable *A = aabb.drawable; 
+        Material *mat = A->getMaterialPointer();
+        if(!mat->isTransparent()) 
+            to_return.push_back(A); 
+        else{
+            glm::mat4 modelview_matrix = A->getMeshPointer()->getModelViewMatrix(); 
+            glm::vec3 updated_aabb_center = aabb.aabb.computeModelViewPosition(modelview_matrix);
+            float dist_to_camera = glm::length(updated_aabb_center);
+            sorted_transparent_meshes[dist_to_camera] = A; 
+        }
+    }
+    for(std::map<float , Drawable*>::reverse_iterator it = sorted_transparent_meshes.rbegin() ; it != sorted_transparent_meshes.rend() ; it++)
+        to_return.push_back(it->second);
+    return to_return ; 
+
+}
+
 void Scene::sortTransparentElements(){
     for(auto bbox : scene){
         Material *A = bbox.drawable->getMaterialPointer(); 
@@ -100,3 +122,38 @@ void Scene::prepare_draw(Camera* scene_camera){
         A->startDraw(); 
     }
 }
+
+void Scene::drawForwardTransparencyMode(){
+    std::vector<Drawable*> meshes = getSortedSceneByTransparency();  	
+    scene_camera->computeViewProjection();
+    glm::mat4 default_modelview_matrix = scene_camera->getView() * scene_camera->getSceneModelMatrix();
+    for(Drawable *A : meshes){	
+		A->bind(); 		 
+        light_database->updateShadersData(A->getMeshShaderPointer() , default_modelview_matrix); 
+        glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
+		A->unbind();
+	}	
+
+}
+
+void Scene::drawBoundingBoxes(){
+    std::vector<Drawable*> bounding_boxes = getBoundingBoxElements(); 
+    for(Drawable* A : bounding_boxes){
+		A->bind();
+		glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
+		A->unbind(); 
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

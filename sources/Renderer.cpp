@@ -76,7 +76,7 @@ bool Renderer::scene_ready(){
 
 /*This function is executed each frame*/
 bool Renderer::prep_draw(){	
-	if(start_draw && scene_ready()){ //TODO ! scene_ready() executes shader initialization + binding without unbinding ... follow the track down the stack . 	
+	if(start_draw && scene_ready()){ 	
 		camera_framebuffer->startDraw();
 		scene->prepare_draw(scene_camera); 			
 		return true; 				
@@ -87,39 +87,22 @@ bool Renderer::prep_draw(){
 	}
 }
 
+//TODO: [AX-6] move rendering to scene.cpp
 void Renderer::draw(){	
-	scene_camera->computeViewProjection();		
 	camera_framebuffer->bindFrameBuffer();	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
-	std::vector<Drawable*> transparent_meshes = scene->getSortedTransparentElements();  
-	std::vector<Drawable*> opaque_meshes = scene->getOpaqueElements();
-	std::vector<Drawable*> bounding_boxes = scene->getBoundingBoxElements(); 
-	for(Drawable *A : opaque_meshes){	
-		A->bind(); 		
-		light_database->updateShadersData(A->getMeshShaderPointer() , A->getMeshPointer()->getModelViewMatrix()); 
-		glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
-		A->unbind();
-	}
-	for(Drawable *A : transparent_meshes){
-		A->bind();			
-		light_database->updateShadersData(A->getMeshShaderPointer() , A->getMeshPointer()->getModelViewMatrix()); 
-		glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
-		A->unbind();
-	}
-	for(Drawable* A : bounding_boxes){
-		A->bind();
-		glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
-		A->unbind(); 
-	}
-
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		
+	scene->drawForwardTransparencyMode(); 
+	scene->drawBoundingBoxes();	
 	camera_framebuffer->unbindFrameBuffer();	
 	camera_framebuffer->renderFrameBufferMesh();	
 }
 
 void Renderer::set_new_scene(std::vector<Mesh*> &new_scene){
 	scene->clear(); 
-	scene->setScene(new_scene);  
+	scene->setScene(new_scene);
+	scene->setLightDatabasePointer(light_database);   
 	scene->generateBoundingBoxes(shader_database->get(Shader::BOUNDING_BOX)); 	
+	scene->setCameraPointer(scene_camera); 
 	start_draw = true ;
 	scene_camera->reset() ;
 	shader_database->initializeShaders(); 
