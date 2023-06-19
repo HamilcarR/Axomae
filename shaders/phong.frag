@@ -252,7 +252,7 @@ LIGHT_COMPONENTS computeSpotLightsContrib(){
 /**************************************************************************************************************/
 vec4 computeReflectionCubeMap(float fresnel){
     vec3 view_direction = normalize(vertex_fragment_fragment_position - camera_position); 
-    vec3 normal_vector = normalize(vertex_fragment_normals); 
+    vec3 normal_vector = getSurfaceNormal(); 
     vec3 cubemap_sample_vector = vec3(inverse(MAT_NORMAL) * reflect(view_direction , normal_vector)); 
     vec4 sampled_value = texture(cubemap , cubemap_sample_vector); 
     return vec4(sampled_value.rgb * fresnel, 1.f); 
@@ -262,7 +262,7 @@ vec4 computeReflectionCubeMap(float fresnel){
 vec4 computeRefractionCubeMap(float fresnel){
     float refractive_index_ratio = material.refractive_index.x / material.refractive_index.y ; 
     vec3 view_direction = normalize(vertex_fragment_fragment_position - camera_position) ; 
-    vec3 normal_vector = normalize(vertex_fragment_normals); 
+    vec3 normal_vector = getSurfaceNormal(); 
     vec3 cubemap_sample_vector = vec3(inverse(MAT_NORMAL) * refract(view_direction , normal_vector , refractive_index_ratio)); 
     vec4 sampled_value = texture(cubemap , cubemap_sample_vector); 
     return vec4(sampled_value.rgb * fresnel, 1.f); 
