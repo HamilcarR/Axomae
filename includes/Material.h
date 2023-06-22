@@ -7,7 +7,7 @@
 
 
 
-
+//TODO: [AX-7] Add polymorphic material hierarchy
 
 /**
  * @file Material.h
@@ -15,7 +15,6 @@
  * 
  */
 
-//TODO : Hierarchy materials 
 /**
  * @brief Material class implementation 
  * 

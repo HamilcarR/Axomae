@@ -76,11 +76,10 @@ private:
 	/**
 	 * @brief Build an environment map Mesh.  
 	 * 
-	 * @param num_textures Used to assign a unique ID to the texture database
 	 * @param is_glb_model Used to load a glb mesh as cubemap 
 	 * @return Mesh* 
 	 */
-	static Mesh* generateCubeMap(unsigned num_textures , bool is_glb_model) ; 
+	static Mesh* generateCubeMap(bool is_glb_model) ; 
 	/**
 	 * @brief Loads all meshes in the GLB file. 
 	 * Returns and std::pair<A , std::vector<Mesh*>> , with A being the number of textures in the model

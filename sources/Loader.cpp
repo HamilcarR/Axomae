@@ -1,10 +1,11 @@
-#include "../includes/Loader.h"
 #include <fstream>
 #include <iostream>
 #include <unistd.h> 
 #include <QImage>
 #include <QBuffer>
 #include <QByteArray>
+#include "../includes/Loader.h"
+#include "../includes/PerformanceLogger.h"
 
 
 /**
@@ -28,15 +29,50 @@ Loader* Loader::getInstance(){
 	return instance ; 
 }
 
+//TODO: [AX-11] Parallelize resources loading
+//? use SIMD
+
+constexpr unsigned int THREAD_POOL_SIZE = 4 ; 
+
+
+
+void thread_copy_buffer(unsigned int start_index , unsigned int end_index , uint8_t* from , uint8_t* dest){
+	for(unsigned i = start_index ; i < end_index ; i++)
+		dest[i] = from[i] ; 
+}
+
+void async_copy_buffer(unsigned int width , unsigned int height , uint8_t* from , uint8_t* dest){
+	size_t total_buffer_size = width * height * sizeof(uint32_t); 
+	size_t thread_buffer_size = total_buffer_size / THREAD_POOL_SIZE ; 
+	uint8_t work_remainder = total_buffer_size % THREAD_POOL_SIZE ; 
+	size_t last_thread_job_size = thread_buffer_size + work_remainder ; 
+	size_t range_min = 0 ; 
+	size_t range_max = 0 ;
+	std::vector<std::future<void>> future_results ; 
+	unsigned i = 0 ;  
+	for(i ; i < THREAD_POOL_SIZE  ; i++){
+		range_min = i * thread_buffer_size; 
+		range_max = i * thread_buffer_size + thread_buffer_size ; 
+		if(i == THREAD_POOL_SIZE - 1)
+			range_max = i * thread_buffer_size + last_thread_job_size ; 
+		future_results.push_back(
+			std::async(std::launch::deferred , thread_copy_buffer , range_min , range_max , from , dest)
+		);	
+	}
+	for(std::vector<std::future<void>>::iterator it = future_results.begin() ; it != future_results.end() ; it++)
+		it->get(); 
+}
+
 /**
  * The function copies texture data from a GLB file to an ARGB8888 buffer.
  * 
  * @param totexture A pointer to a TextureData struct that will hold the copied texture data.
  * @param fromtexture The aiTexture object containing the texture data to be copied.
  */
-static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
+static void copyTexels(TextureData *totexture , aiTexture *fromtexture){ 
 	if(totexture != nullptr){
-		if(fromtexture->mHeight != 0){ //checking if texture is uncompressed
+		/* If mHeight != 0 , the texture is uncompressed , and we read it as is */
+		if(fromtexture->mHeight != 0){
 			unsigned int width = 0 ; 
 			unsigned int height = 0 ; 	
 			totexture->width = width = fromtexture->mWidth ; 
@@ -51,18 +87,22 @@ static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 				totexture->data[i] = rgba ; 
 			}	
 		}
+		/* If mHeight = 0 , the texture is compressed , and we need to uncompress and convert it to ARGB32 */
 		else{
 			QImage image ;
 			uint8_t *buffer = new uint8_t[fromtexture->mWidth] ; 
-			memcpy(buffer , fromtexture->pcData , fromtexture->mWidth); 
-		 	image.loadFromData((const unsigned char*) buffer , fromtexture->mWidth ) ;
+			memcpy(buffer , fromtexture->pcData , fromtexture->mWidth);
+			image.loadFromData((const unsigned char*) buffer , fromtexture->mWidth ) ;
 			image = image.convertToFormat(QImage::Format_ARGB32); 	
-			totexture->data = new uint32_t[image.width() * image.height()];
-			uint8_t * pointer_to_bits = image.bits(); 
-			for(unsigned i = 0 ; i < image.width() * image.height() * sizeof(uint32_t); i++)
-				((uint8_t*) totexture->data)[i] = image.bits()[i] ; 
-			totexture->width = image.width() ; 
-			totexture->height = image.height() ; 
+			unsigned image_width = image.width(); 
+			unsigned image_height = image.height();
+			totexture->data = new uint32_t[image_width * image_height];
+			memset(totexture->data , 0 , image_width * image_height * sizeof(uint32_t));
+			uint8_t* dest_buffer = (uint8_t*) totexture->data ; 
+			uint8_t* from_buffer = image.bits() ;
+			async_copy_buffer(image_width , image_height , from_buffer , dest_buffer); 
+			totexture->width = image_width ; 
+			totexture->height = image_height ; 
 			std::cout << "image of size " << totexture->width << " x " << totexture->height << " uncompressed " << std::endl ; 
 		}
 	}
@@ -291,8 +331,8 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
 				object.indices.push_back(static_cast<unsigned int> (mesh->mFaces[ind].mIndices[2]));
 			}
 			std::cout << "object loaded : " << mesh->mName.C_Str()<< "\n" ; 	
-			Shader* shader_program = shader_database->get(Shader::BLINN) ;  //TODO : change for PBR and other nice shaders when needed 		
-			Mesh *loaded_mesh = new Mesh(std::string(mesh->mName.C_Str()) , object , mesh_material , shader_program) ; //TODO : change shader_program with pointer to pair<shader::type , shader*> 	
+			Shader* shader_program = shader_database->get(Shader::BLINN) ; 		
+			Mesh *loaded_mesh = new Mesh(std::string(mesh->mName.C_Str()) , object , mesh_material , shader_program) ;
 			objects.push_back(loaded_mesh);
 		}
 		return std::pair<unsigned int , std::vector<Mesh*>> (modelScene->mNumTextures , objects) ; 
@@ -317,11 +357,11 @@ std::vector<Mesh*> Loader::load(const char* file){
 	ShaderDatabase *shader_database = ShaderDatabase::getInstance(); 
 	texture_database->softCleanse();
 	shader_database->clean(); 
-	loadShaderDatabase();  
+	loadShaderDatabase(); 
 	std::pair<unsigned int , std::vector<Mesh*>> scene = loadObjects(file); 
-	Mesh* cube_map = generateCubeMap(scene.first , false) ; 	
+	Mesh* cube_map = generateCubeMap(false) ; 		
 	if(cube_map != nullptr)
-		scene.second.push_back(cube_map); 
+		scene.second.push_back(cube_map);	
 	return scene.second ; 
 }
 
@@ -351,8 +391,22 @@ std::string Loader::loadShader(const char* filename){
 
 }
 
+
+
+
+void test_thread(unsigned width , unsigned height){
+	for(unsigned y = 0 ; y < height ; y++)
+		for(unsigned x = 0 ; x < width ; x++){
+
+		}
+	return ; 
+}
+
+
+
+//TODO: [AX-21] Provide a way to choose the skybox texture on the UI
 /**
- * This function generates a cube map mesh with textures loaded from a specified folder.
+ * This function generates a cube map mesh with textures loaded from the skybox folder.
  * 
  * @param num_textures The number of textures currently loaded in the texture database before adding
  * the cubemap texture.
@@ -361,14 +415,16 @@ std::string Loader::loadShader(const char* filename){
  * 
  * @return A pointer to a Mesh object representing a cube map.
  */
-Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
+Mesh* Loader::generateCubeMap(bool is_glb){ 
 	Mesh *cube_map = new CubeMapMesh(); 
+	Material material ; 
 	ShaderDatabase *shader_database = ShaderDatabase::getInstance(); 
 	TextureDatabase* texture_database = TextureDatabase::getInstance(); 	
 	TextureData cubemap ; 
 	QString skybox_folder = "castle" ;
-	auto format = "jpg"; 
-	QImage left(":/"+skybox_folder+"/negx.jpg" , format); 		
+	auto format = "jpg";
+	PerformanceLogger log ; 
+	QImage left(":/"+skybox_folder+"/negx.jpg" , format); 	
 	QImage bot(":/"+skybox_folder+"/negy.jpg" , format); 		
 	QImage front(":/"+skybox_folder+"/negz.jpg" , format); 		
 	QImage right(":/"+skybox_folder+"/posx.jpg" , format); 		
@@ -377,23 +433,33 @@ Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
 	std::vector<QImage> array = { right , left , top , bot , back , front} ; 
 	cubemap.width = left.width() ; 
 	cubemap.height = left.height(); 	
-	cubemap.data = new uint32_t [cubemap.width * cubemap.height * 6] ;
+	cubemap.data = new uint32_t [cubemap.width * cubemap.height * 6] ;	
 	unsigned int k = 0 ; 
-	for(unsigned i = 0 ; i < array.size() ; i++)
-		for(unsigned y = 0 ; y < array[i].height() ; y++){		
-			QRgb *line = reinterpret_cast<QRgb*>(array[i].scanLine(y)) ; 
-			for(unsigned x = 0 ; x < array[i].width() ; x++){
-				QRgb rgba = line[x] ; 
-				int r = qRed(rgba) ; 
-				int g = qGreen(rgba) ; 
-				int b = qBlue(rgba) ; 
-				int a = qAlpha(rgba) ; 
+	uint32_t *pointer_on_cubemap_data = cubemap.data ; 	
+	std::vector<std::future<void>> threads_future ;
+	auto thread_lambda_func = [&array](unsigned i , uint32_t* pointer_on_cubemap_data, unsigned width , unsigned height) -> void {
+		unsigned k = i * width * height ;  
+		for(unsigned y = 0 ; y < height ; y++){		
+			const QRgb *line = reinterpret_cast<const QRgb*>(array[i].scanLine(y)) ; //Since the cubemaps don't have alpha channel , we interpret the data as RGB  
+			for(unsigned x = 0 ; x < width ; x++){
+				uint32_t rgba = line[x] ; 
+				int a = rgba >> 24 ;
+				int r = (rgba >> 16) & 0xFF ; 
+				int g = (rgba >> 8) & 0xFF ; 
+				int b =  rgba ;	
 				uint32_t rgba_final = (a << 24) | (b << 16) | (g << 8) | r ; 
-				cubemap.data[k] = rgba_final ; 
+				pointer_on_cubemap_data[k] = rgba_final ; 
 				k++ ;		
 			}
 		}
-	Material material ; 
+	};
+	for(unsigned i = 0 ; i < array.size() ; i ++)	
+		threads_future.push_back(
+			std::async(thread_lambda_func , i , pointer_on_cubemap_data , cubemap.width , cubemap.height) 
+		);
+	std::for_each(threads_future.begin() , threads_future.end() , [](std::future<void> &it){
+		it.get(); 
+	});
 	unsigned index = texture_database->addTexture(&cubemap , Texture::CUBEMAP , false) ; 
 	material.addTexture(index , Texture::CUBEMAP);
 	cube_map->material = material ; 
@@ -409,4 +475,15 @@ Mesh* Loader::generateCubeMap(unsigned int num_textures , bool is_glb){
 
 
 
+
+
+
+
+
+
+
+
+
 }
+
+

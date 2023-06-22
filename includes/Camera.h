@@ -190,9 +190,11 @@ protected:
 	glm::vec3 right;			/**<Right vector computed */
 	glm::vec3 direction;		/**<Direction vector of the camera */
 	glm::vec3 camera_up;		/**<Up vector of the camera */
+	glm::mat4 scene_model_matrix;			/**<Computed model matrix , product of (rotation x translation)*/
 	const glm::vec3 world_up;	/**<World space up vector */
 	MouseState *mouse_state_pointer;  /**<Pointer on a MouseState structure keeping track of the mouse data*/
 	ScreenSize *gl_widget_screen_size; /**<Pointer on ScreeSize structure keeping track of the size of the gl widget*/
+
 };
 
 /**
@@ -321,15 +323,14 @@ protected:
 	glm::vec3 axis;							/**<Axis of rotation according to the direction of the mouse sweep*/
 	glm::vec3 panning_offset;				/**<Variable representing the new world position of the scene after translation */
 	bool radius_updated;
-
-private:
 	glm::mat4 scene_rotation_matrix;		/**<Computed rotation matrix of the scene if the camera is an Arcball*/
 	glm::mat4 scene_translation_matrix;		/**<Computed translation matrix of the scene*/
-	glm::mat4 scene_model_matrix;			/**<Computed model matrix , product of (rotation x translation)*/
+private:
 	glm::vec3 delta_position;				/**<NDC coordinates difference of the cursor , between two frames*/
 	float default_radius;
 };
 
+//TODO: [AX-10] Implement free perspective camera
 class FreePerspectiveCamera : public Camera
 {
 public:
@@ -343,6 +344,7 @@ public:
 	virtual void movePosition() override;
 	virtual void zoomIn() override;
 	virtual void zoomOut() override;
+	virtual const glm::mat4& getSceneModelMatrix() const override; 
 };
 
 #endif

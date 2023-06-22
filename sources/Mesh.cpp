@@ -64,10 +64,9 @@ void Mesh::preRenderSetup(){
 	cullBackFace();
 	face_culling_enabled = true ; 
 	setDepthMask(true); 
-	setDepthFunc(LESS); 	
+	setDepthFunc(LESS); 
 	depth_mask_enabled = true ;
-	if(camera->getType() == Camera::ARCBALL) //TODO replace with proper polymorphism 
-		model_matrix = camera->getSceneModelMatrix() ; 
+	model_matrix = camera->getSceneModelMatrix() ; 
 	modelview_matrix = camera->getView() * model_matrix ;  
 	if(shader_program){	
 		shader_program->setSceneCameraPointer(camera); 
@@ -119,7 +118,7 @@ void Mesh::cullFrontAndBackFace(){
 }	
 
 void Mesh::afterRenderSetup(){
-	return ; 
+	return ;
 }
 
 void Mesh::setPolygonDrawMode(RASTERMODE mode){
@@ -267,6 +266,7 @@ BoundingBoxMesh::BoundingBoxMesh() : Mesh(){
 
 }
 
+//TODO: [AX-19] Fix cubemap bounding box computation 
 BoundingBoxMesh::BoundingBoxMesh(Mesh* m , Shader* s) : BoundingBoxMesh(){
 	bound_mesh = m ; 
 	shader_program = s ;

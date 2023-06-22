@@ -53,6 +53,7 @@ void LightingDatabase::updateShadersData(AbstractLight::TYPE type , Shader* shad
         (*it)->updateShaderData(shader , modelview , index);    
 }
 
+// First loop is to set up the max number of lights of each type. 
 void LightingDatabase::updateShadersData(Shader* shader , glm::mat4& modelview){
     for(auto it = light_database.begin() ; it != light_database.end() ; it++){
         unsigned int light_num = it->second.size(); 

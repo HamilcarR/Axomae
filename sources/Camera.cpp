@@ -12,11 +12,12 @@ Camera::Camera() : world_up(glm::vec3(0,1,0)){
 	target = glm::vec3(0,0,0);
 	direction = glm::vec3(0,0,0);
 	right = glm::vec3(0,0,0);
+	scene_model_matrix = glm::mat4(1.f); 
 	type = EMPTY ; 
 }
 
 
-Camera::Camera(float rad , ScreenSize *screen, float near , float far , MouseState* pointer) :world_up(glm::vec3(0,1,0)){
+Camera::Camera(float rad , ScreenSize *screen, float near , float far , MouseState* pointer): Camera() {
 	type = EMPTY ; 
 	position = glm::vec3(0,0,-1.f); 
 	target = glm::vec3(0,0,0);
@@ -266,12 +267,12 @@ void ArcballCamera::zoomOut(){
 }
 
 /**********************************************************************************************************************************************/
-FreePerspectiveCamera::FreePerspectiveCamera(){
+FreePerspectiveCamera::FreePerspectiveCamera() : Camera(){
 	type = PERSPECTIVE ; 
 }
 
 FreePerspectiveCamera::FreePerspectiveCamera(float radians , ScreenSize* screen , float near , float far , float radius , MouseState* pointer): Camera(radians , screen ,  near , far , pointer) {
-
+	type = PERSPECTIVE ; 
 }
 
 FreePerspectiveCamera::~FreePerspectiveCamera(){
@@ -304,7 +305,9 @@ void FreePerspectiveCamera::zoomOut(){
 
 }
 
-
+const glm::mat4& FreePerspectiveCamera::getSceneModelMatrix() const {
+	return scene_model_matrix; 
+}
 
 
 

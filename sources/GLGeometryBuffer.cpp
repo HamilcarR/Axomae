@@ -96,6 +96,7 @@ void GLGeometryBuffer::unbindVao(){
 	glBindVertexArray(0) ; 
 }
 
+//TODO: [AX-20] Provide methods to fill individual buffer , or to modify them
 void GLGeometryBuffer::fillBuffers(){
 	if(!buffers_filled){
     	bindVao(); 

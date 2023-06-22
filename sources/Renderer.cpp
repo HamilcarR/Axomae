@@ -87,7 +87,6 @@ bool Renderer::prep_draw(){
 	}
 }
 
-//TODO: [AX-6] move rendering to scene.cpp
 void Renderer::draw(){	
 	camera_framebuffer->bindFrameBuffer();	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		
@@ -98,8 +97,8 @@ void Renderer::draw(){
 }
 
 void Renderer::set_new_scene(std::vector<Mesh*> &new_scene){
-	scene->clear(); 
-	scene->setScene(new_scene);
+	scene->clear();
+	scene->setScene(new_scene);	
 	scene->setLightDatabasePointer(light_database);   
 	scene->generateBoundingBoxes(shader_database->get(Shader::BOUNDING_BOX)); 	
 	scene->setCameraPointer(scene_camera); 

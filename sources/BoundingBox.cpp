@@ -24,18 +24,18 @@ glm::vec3 update_max(glm::vec3 max_vec, glm::vec3 compared){
     return max_vec ;  
 }
 
-
 BoundingBox::BoundingBox(){
     center = glm::vec3(0.f); 
     max_coords = glm::vec3(0.f); 
     min_coords = glm::vec3(0.f); 
 }
 
+//TODO: [AX-12] Parallelize bounding box computation
 BoundingBox::BoundingBox(const std::vector<float> &vertices):BoundingBox(){
     center = glm::vec3(0 , 0 , 0); 
     max_coords = glm::vec3(-INT_MAX); 
     min_coords = glm::vec3(INT_MAX); 
-    for(unsigned i = 0 ; i < vertices.size(); i+=3){
+    for(unsigned i = 0 ; i < vertices.size(); i+=3){        
         glm::vec3 compare = glm::vec3(vertices[i] , vertices[i+1] , vertices[i+2]);  
         max_coords = update_max(max_coords , compare);
         min_coords = update_min(min_coords , compare);  
