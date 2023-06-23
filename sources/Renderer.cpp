@@ -17,9 +17,9 @@ Renderer::Renderer(){
 	mouse_state.previous_pos_y = 0 ;  	
 	default_framebuffer_id = 0 ; 
 	light_database = new LightingDatabase(); 
-	texture_database = TextureDatabase::getInstance();
-	shader_database = ShaderDatabase::getInstance();	
-	Loader::loadShaderDatabase();
+	resource_database = ResourceDatabaseManager::getInstance();
+	Loader loader ; 
+	loader.loadShaderDatabase();
 	scene_camera = new ArcballCamera(45.f , &screen_size ,  0.1f , 10000.f , 100.f, &mouse_state);
 }
 
@@ -34,15 +34,9 @@ Renderer::~Renderer(){
 		scene->clear(); 
 		delete scene ; 
 	}
-	if(TextureDatabase::isInstanced()){
-		texture_database->hardCleanse();
-		texture_database->destroy();   
-		texture_database = nullptr ; 
-	}
-	if(ShaderDatabase::isInstanced()){
-		shader_database->clean();
-		shader_database->destroy();
-		shader_database = nullptr ; 
+	if(resource_database){
+		resource_database->purge();
+		resource_database->destroyInstance(); 
 	}
 	if(light_database){
 		light_database->clearDatabase(); 
@@ -59,8 +53,8 @@ Renderer::~Renderer(){
 
 void Renderer::initialize(){
 	glEnable(GL_DEPTH_TEST);		
-	shader_database->initializeShaders(); 		
-	camera_framebuffer = new CameraFrameBuffer(texture_database , shader_database , &screen_size , &default_framebuffer_id);  
+	resource_database->getShaderDatabase()->initializeShaders(); 		
+	camera_framebuffer = new CameraFrameBuffer(resource_database->getTextureDatabase() , resource_database->getShaderDatabase() , &screen_size , &default_framebuffer_id);  
 	camera_framebuffer->initializeFrameBuffer(); 	
 	scene = new Scene(); 
 	
@@ -100,11 +94,11 @@ void Renderer::set_new_scene(std::vector<Mesh*> &new_scene){
 	scene->clear();
 	scene->setScene(new_scene);	
 	scene->setLightDatabasePointer(light_database);   
-	scene->generateBoundingBoxes(shader_database->get(Shader::BOUNDING_BOX)); 	
+	scene->generateBoundingBoxes(resource_database->getShaderDatabase()->get(Shader::BOUNDING_BOX)); 	
 	scene->setCameraPointer(scene_camera); 
 	start_draw = true ;
 	scene_camera->reset() ;
-	shader_database->initializeShaders(); 
+	resource_database->getShaderDatabase()->initializeShaders(); 
 	camera_framebuffer->updateFrameBufferShader(); 
 }
 

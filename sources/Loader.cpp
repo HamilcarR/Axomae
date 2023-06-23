@@ -15,27 +15,14 @@
  */
 
 namespace axomae{
-
-Loader* Loader::instance = nullptr;
-
 Loader::Loader(){
+	resource_database = ResourceDatabaseManager::getInstance();
 }
-
 Loader::~Loader(){}
-
-Loader* Loader::getInstance(){
-	if(instance == nullptr)
-		instance = new Loader() ; 
-	return instance ; 
-}
 
 //TODO: [AX-11] Parallelize resources loading
 //? use SIMD
-
 constexpr unsigned int THREAD_POOL_SIZE = 4 ; 
-
-
-
 void thread_copy_buffer(unsigned int start_index , unsigned int end_index , uint8_t* from , uint8_t* dest){
 	for(unsigned i = start_index ; i < end_index ; i++)
 		dest[i] = from[i] ; 
@@ -109,8 +96,7 @@ static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 }
 
 
-static void loadTextureDummy(Material* material , Texture::TYPE type){
-	TextureDatabase* texture_database = TextureDatabase::getInstance();
+static void loadTextureDummy(Material* material , Texture::TYPE type , TextureDatabase* texture_database){
 	int index = texture_database->addTexture(nullptr , type , true , true); 	
 	std::cout << "Loading dummy texture at index : " << index << std::endl;  
 	material->addTexture(index , type); 
@@ -125,8 +111,7 @@ static void loadTextureDummy(Material* material , Texture::TYPE type){
  * @param texture_string The name or index of the texture file to be loaded, stored as an aiString.
  * @param type The type of texture being loaded, which is of the enum type Texture::TYPE.
  */
-static void loadTexture(const aiScene* scene , Material *material ,TextureData &texture ,aiString texture_string ,Texture::TYPE type ){
-	TextureDatabase* texture_database = TextureDatabase::getInstance(); 
+static void loadTexture(const aiScene* scene , Material *material ,TextureData &texture ,aiString texture_string ,Texture::TYPE type , TextureDatabase* texture_database){
 	std::string texture_index_string = texture_string.C_Str();
 	std::cout << "Texture type loaded : " << texture.name << " / GLB index is: " << texture_index_string <<  "\n" ; 
 	 if(texture_index_string.size() != 0){
@@ -157,7 +142,7 @@ static void loadTexture(const aiScene* scene , Material *material ,TextureData &
  * @return a Material object.
  */
 
-static Material loadAllTextures(const aiScene* scene , const aiMaterial* material ){
+static Material loadAllTextures(const aiScene* scene , const aiMaterial* material , TextureDatabase* texture_database){
 	Material mesh_material ; 	
 	std::vector<Texture::TYPE> dummy_textures_type; 
 	TextureData diffuse , metallic , roughness , normal , ambiantocclusion , emissive , specular , opacity;
@@ -174,7 +159,7 @@ static Material loadAllTextures(const aiScene* scene , const aiMaterial* materia
 
 	if(material->GetTextureCount(aiTextureType_BASE_COLOR) > 0){
 		material->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE , &color_texture) ;
-		loadTexture(scene , &mesh_material , diffuse , color_texture , Texture::DIFFUSE); 
+		loadTexture(scene , &mesh_material , diffuse , color_texture , Texture::DIFFUSE , texture_database); 
 	}
 	else
 		dummy_textures_type.push_back(Texture::DIFFUSE);
@@ -182,55 +167,55 @@ static Material loadAllTextures(const aiScene* scene , const aiMaterial* materia
 	if(material->GetTextureCount(aiTextureType_OPACITY) > 0){
 		mesh_material.setTransparency(true) ;
 		material->GetTexture(aiTextureType_OPACITY , 0 ,  &opacity_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
-		loadTexture(scene , &mesh_material , opacity , opacity_texture , Texture::OPACITY); 
+		loadTexture(scene , &mesh_material , opacity , opacity_texture , Texture::OPACITY , texture_database ); 
 	}
 	else
 		dummy_textures_type.push_back(Texture::OPACITY); 
 	
 	if(material->GetTextureCount(aiTextureType_METALNESS) > 0){
 		material->GetTexture(AI_MATKEY_METALLIC_TEXTURE , &metallic_texture) ; 
-		loadTexture(scene , &mesh_material , metallic , metallic_texture , Texture::METALLIC); 
+		loadTexture(scene , &mesh_material , metallic , metallic_texture , Texture::METALLIC , texture_database); 
 	}
 	else
 		dummy_textures_type.push_back(Texture::METALLIC); 
 	
 	if(material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS) > 0){
 		material->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE , &roughness_texture) ;	
-		loadTexture(scene , &mesh_material , roughness , roughness_texture , Texture::ROUGHNESS);
+		loadTexture(scene , &mesh_material , roughness , roughness_texture , Texture::ROUGHNESS , texture_database);
 	}
 	else
 		dummy_textures_type.push_back(Texture::ROUGHNESS); 
 	
 	if(material->GetTextureCount(aiTextureType_NORMALS) > 0){
 		material->GetTexture(aiTextureType_NORMALS , 0 , &normal_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
-		loadTexture(scene , &mesh_material , normal , normal_texture , Texture::NORMAL); 
+		loadTexture(scene , &mesh_material , normal , normal_texture , Texture::NORMAL , texture_database); 
 	}
 	else
 		dummy_textures_type.push_back(Texture::NORMAL); 
 	
 	if(material->GetTextureCount(aiTextureType_LIGHTMAP) > 0){
 		material->GetTexture(aiTextureType_LIGHTMAP , 0 , &occlusion_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
-		loadTexture(scene , &mesh_material , ambiantocclusion , occlusion_texture , Texture::AMBIANTOCCLUSION); 
+		loadTexture(scene , &mesh_material , ambiantocclusion , occlusion_texture , Texture::AMBIANTOCCLUSION , texture_database); 
 	}
 	else
 		dummy_textures_type.push_back(Texture::AMBIANTOCCLUSION); 
 	
 	if(material->GetTextureCount(aiTextureType_SHEEN) > 0){
 		material->GetTexture(aiTextureType_SHEEN , 0 , &specular_texture , nullptr , nullptr , nullptr , nullptr , nullptr);
-		loadTexture(scene , &mesh_material , specular , specular_texture , Texture::SPECULAR); 
+		loadTexture(scene , &mesh_material , specular , specular_texture , Texture::SPECULAR , texture_database); 
 	}
 	else
 		dummy_textures_type.push_back(Texture::SPECULAR); 	
 	
 	if(material->GetTextureCount(aiTextureType_EMISSIVE) > 0){
 		material->GetTexture(aiTextureType_EMISSIVE , 0 , &emissive_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
-		loadTexture(scene , &mesh_material , emissive , emissive_texture , Texture::EMISSIVE); 
+		loadTexture(scene , &mesh_material , emissive , emissive_texture , Texture::EMISSIVE , texture_database); 
 	}
 	else
 		dummy_textures_type.push_back(Texture::EMISSIVE);
 	
 	for(auto it = dummy_textures_type.begin(); it != dummy_textures_type.end() ; it ++)
-		loadTextureDummy(&mesh_material , *it);
+		loadTextureDummy(&mesh_material , *it , texture_database);
 	
 	return mesh_material ; 
 }
@@ -250,8 +235,8 @@ static float loadTransparencyValue(const aiMaterial* material){
 }
 
 
-static Material loadMaterials(const aiScene* scene , const aiMaterial* material){
-	Material mesh_material = loadAllTextures(scene , material);
+static Material loadMaterials(const aiScene* scene , const aiMaterial* material , TextureDatabase* texture_database){
+	Material mesh_material = loadAllTextures(scene , material , texture_database);
 	float transparency_factor = loadTransparencyValue(material);  	
 	mesh_material.setTransparency(transparency_factor);
 	return mesh_material ; 
@@ -262,7 +247,7 @@ static Material loadMaterials(const aiScene* scene , const aiMaterial* material)
  * The function loads shader files and adds them to a shader database.
  */
 void Loader::loadShaderDatabase(){	
-	ShaderDatabase* shader_database = ShaderDatabase::getInstance(); 
+	ShaderDatabase* shader_database = resource_database->getShaderDatabase(); 
 	std::string vertex_shader = loadShader("../shaders/phong.vert") ; 
 	std::string fragment_shader = loadShader("../shaders/phong.frag"); 
 	std::string vertex_shader_cubemap = loadShader("../shaders/cubemap.vert"); 
@@ -277,6 +262,8 @@ void Loader::loadShaderDatabase(){
 	shader_database->addShader(vertex_shader_screen_fbo , fragment_shader_screen_fbo , Shader::SCREEN_FRAMEBUFFER); 
 }
 
+
+//TODO: [AX-25] parallelize mesh geometry loading
 /**
  * The function loads GLB objects and returns a pair containing the
  * number of textures and a vector of Mesh objects.
@@ -288,28 +275,38 @@ void Loader::loadShaderDatabase(){
  * loaded Mesh objects.
  */
 std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* file){
-	TextureDatabase *texture_database = TextureDatabase::getInstance() ; 	
-	ShaderDatabase *shader_database = ShaderDatabase::getInstance(); 
+	TextureDatabase *texture_database = resource_database->getTextureDatabase() ; 	
+	ShaderDatabase *shader_database = resource_database->getShaderDatabase(); 
 	std::vector<Mesh*> objects; 
+	PerformanceLogger log ; 
 	Assimp::Importer importer ;	
-	const aiScene *modelScene = importer.ReadFile(file , aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs ) ;
-	if(modelScene != nullptr){
+	const aiScene *modelScene = importer.ReadFile(file , aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs ) ;	
+	if(modelScene != nullptr){	
 		const aiMaterial* ai_material ;
-		for(unsigned int i = 0 ; i < modelScene->mNumMeshes ; i++){
+		for(unsigned int i = 0 ; i < modelScene->mNumMeshes ; i++){ //? choice 1 : multithread this 
 			const aiMesh* mesh = modelScene->mMeshes[i] ; 
 			const char* mesh_name = mesh->mName.C_Str(); 
 			std::string name(mesh_name); 
 			Object3D object ;
+			auto size_dim3 = mesh->mNumVertices * 3; 
+			auto size_dim2 = mesh->mNumVertices * 2; 
+			auto size_dim3_indices = mesh->mNumFaces * 3; 
+			object.vertices.reserve(size_dim3);
+			object.normals.reserve(size_dim3); 
+			object.tangents.reserve(size_dim3); 
+			object.bitangents.reserve(size_dim3);	
+			object.indices.reserve(size_dim3_indices); 
+			object.uv.reserve(size_dim2) ; 
 			assert(mesh->HasTextureCoords(0) ) ; 
 			ai_material = modelScene->mMaterials[modelScene->mMeshes[i]->mMaterialIndex]; 
-			Material mesh_material = loadMaterials(modelScene , ai_material);  	
+			Material mesh_material = loadMaterials(modelScene , ai_material , texture_database);  //? choice 2 : multithread this 	
 			for(unsigned int f = 0 ; f < mesh->mNumVertices ; f++){
 				const aiVector3D* vert = &(mesh->mVertices[f]) ; 
 				const aiVector3D* norm = &(mesh->mNormals[f]) ; 
 				const aiVector3D* tex = &(mesh->mTextureCoords[0][f]) ; 
 				const aiVector3D* tang = &(mesh->mTangents[f]); 
 				const aiVector3D* bitang = &(mesh->mBitangents[f]) ; 
-				object.vertices.push_back(vert->x); 
+				object.vertices.push_back(vert->x);
 				object.vertices.push_back(vert->y); 
 				object.vertices.push_back(vert->z); 
 				object.uv.push_back(tex->x) ; 
@@ -335,12 +332,14 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
 			Mesh *loaded_mesh = new Mesh(std::string(mesh->mName.C_Str()) , object , mesh_material , shader_program) ;
 			objects.push_back(loaded_mesh);
 		}
+		 
 		return std::pair<unsigned int , std::vector<Mesh*>> (modelScene->mNumTextures , objects) ; 
 	}	
 	else{
 		std::cout << "Problem loading scene" << std::endl ; 
 		return std::pair<unsigned int , std::vector<Mesh*>> (0 , std::vector<Mesh*>()) ; 
 	}
+	
 }
 
 
@@ -353,9 +352,9 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
  * @return A vector of Mesh pointers.
  */
 std::vector<Mesh*> Loader::load(const char* file){
-	TextureDatabase *texture_database = TextureDatabase::getInstance(); 	
-	ShaderDatabase *shader_database = ShaderDatabase::getInstance(); 
-	texture_database->softCleanse();
+	TextureDatabase *texture_database = resource_database->getTextureDatabase(); 	
+	ShaderDatabase *shader_database = resource_database->getShaderDatabase(); 
+	texture_database->clean();
 	shader_database->clean(); 
 	loadShaderDatabase(); 
 	std::pair<unsigned int , std::vector<Mesh*>> scene = loadObjects(file); 
@@ -365,11 +364,6 @@ std::vector<Mesh*> Loader::load(const char* file){
 	return scene.second ; 
 }
 
-void Loader::close(){
-	if(instance != nullptr)
-		delete instance ; 
-	instance = nullptr; 
-}
 
 /**
  * The function loads a shader from a file and returns it as a string.
@@ -418,8 +412,8 @@ void test_thread(unsigned width , unsigned height){
 Mesh* Loader::generateCubeMap(bool is_glb){ 
 	Mesh *cube_map = new CubeMapMesh(); 
 	Material material ; 
-	ShaderDatabase *shader_database = ShaderDatabase::getInstance(); 
-	TextureDatabase* texture_database = TextureDatabase::getInstance(); 	
+	ShaderDatabase *shader_database = resource_database->getShaderDatabase(); 
+	TextureDatabase* texture_database = resource_database->getTextureDatabase(); 	
 	TextureData cubemap ; 
 	QString skybox_folder = "castle" ;
 	auto format = "jpg";

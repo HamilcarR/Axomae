@@ -6,7 +6,7 @@
 #include "Loader.h"
 #include "Mesh.h"
 #include "Drawable.h" 
-#include "TextureDatabase.h" 
+#include "ResourceDatabaseManager.h"
 #include "Camera.h"
 #include "LightingDatabase.h"
 #include "CameraFrameBuffer.h"
@@ -143,8 +143,7 @@ public:
 public:
 	Scene *scene ; 								/**<The scene to be rendered*/ 
 	bool start_draw ; 							/**<If the renderer is ready to draw*/
-	TextureDatabase* texture_database; 			/**<Pointer on the texture database*/
-	ShaderDatabase* shader_database; 			/**<Pointer on the shader database*/
+	ResourceDatabaseManager *resource_database; /**<The main database containing a texture database , and a shader database*/
 	LightingDatabase* light_database;			/**<Light database object*/ 
 	Camera *scene_camera ;						/**<Pointer on the scene camera*/
 	MouseState mouse_state ;					/**<Pointer on the MouseState structure*/

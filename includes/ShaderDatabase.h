@@ -3,6 +3,7 @@
 #include <map> 
 #include "utils_3D.h"
 #include "Shader.h"
+#include "RenderingDatabaseInterface.h"
 
 /**
  * @file ShaderDatabase.h
@@ -15,35 +16,32 @@
  * @brief ShaderDatabase class implementation
  * 
  */
-class ShaderDatabase{
+class ShaderDatabase : public RenderingDatabaseInterface<Shader>{
 public:
-
 	/**
-	 * @brief Get the database unique instance
+	 * @brief Construct a new Shader Database object
 	 * 
-	 * @return ShaderDatabase* The unique instance of the ShaderDatabase
 	 */
-	static ShaderDatabase* getInstance(); 
+	ShaderDatabase(); 
 	
+	/**
+	 * @brief Destroy the Shader Database object
+	 * 
+	 */
+	virtual ~ShaderDatabase() ;
+		
 	/**
 	 * @brief Cleans the whole database , Deletes all shaders . 
 	 * 
 	 */
-	void clean(); 
-	
+	void clean() override ; 
+
 	/**
-	 * @brief Removes the database instance pointer
+	 * @brief 
 	 * 
 	 */
-	void destroy(); 
-	
-	/**
-	 * @brief Checks if database is initialized
-	 * 
-	 * @return true If the database is initialized
-	 */
-	static bool isInstanced(){return instance != nullptr;}		
-	
+	void purge() override;	
+		
 	/**
 	 * @brief This function constructs a shader and stores it in the shader database if it does not already exist and returns it. 
 	 * 
@@ -67,7 +65,7 @@ public:
 	 * @return The function `contains` returns a boolean value indicating whether the `shader_database`
 	 * contains a shader of the specified `type`.
 	 */
-	bool contains(const Shader::TYPE type);
+	virtual bool contains(const int type) override ;
 	
 	/**
 	 * This function returns a pointer to a shader object of a given type from a shader database, or
@@ -80,29 +78,24 @@ public:
 	 * @return a pointer to a Shader object of the specified type if it exists in the shader_database map.
 	 * If the shader of the specified type does not exist in the map, the function returns a null pointer.
 	 */
-	Shader* get(Shader::TYPE type) const ;
+	Shader* get(const int type) override;
 
-
+	/**
+	 * @brief Recompile the database of shaders
+	 * 
+	 */
 	virtual void recompile() ; 
 
+	/**
+	 * @brief Initialize the shaders
+	 * 
+	 */
 	virtual void initializeShaders();  
 private:
 	
-	/**
-	 * @brief Construct a new Shader Database object
-	 * 
-	 */
-	ShaderDatabase(); 
-	
-	/**
-	 * @brief Destroy the Shader Database object
-	 * 
-	 */
-	virtual ~ShaderDatabase() ;
-	
+
 
 private:
-	static ShaderDatabase* instance; 			/**<Singleton pointer instance*/ 
 	std::map<Shader::TYPE, Shader*> shader_database ; 	/**<std::map with unique shaders associated with their type*/
 
 

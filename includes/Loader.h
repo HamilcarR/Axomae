@@ -14,82 +14,80 @@
 #include "constants.h"
 #include "utils_3D.h" 
 #include "Mesh.h"
-#include "TextureDatabase.h"
-#include "ShaderDatabase.h"
+#include "ResourceDatabaseManager.h"
 
 /**
  * @file Loader.h
- * 3D Loader class 
+ * Implements a Loader class that will read mesh data and textures from disk
  * 
  */
 
-
-/*3D loader : Will import , construct , and load meshes into the program . Additionnally , loads textures*/
 namespace axomae{
 
 /**
- * @brief 3D Loader class , implemented as a singleton
+ * @brief 3D Loader class
  */
 class Loader{
 public:
+	
 	/**
-	 * @brief Get the Instance Loader pointer
+	 * @brief Construct a new Loader object
 	 * 
-	 * @return Loader* 
 	 */
-	static Loader* getInstance(); 	
+	Loader();	
+	
+	/**
+	 * @brief Destroy the Loader object
+	 * 
+	 */
+	~Loader();
+	
 	/**
 	 * @brief Load a .glb file
 	 * 
 	 * @param file Path of the 3D glb model
 	 * @return std::vector<Mesh*> 
 	 */
-	static std::vector<Mesh*> load(const char* file);   				
+	std::vector<Mesh*> load(const char* file);   				
+	
 	/**
 	 * @brief Loads a shader file into an std::string
 	 * 
 	 * @param filename Path of the shader
 	 * @return std::string 
 	 */
-	static std::string loadShader(const char* filename); 
+	std::string loadShader(const char* filename); 
+	
 	/**
 	 * @brief Delete instance 
 	 * 
 	 */
-	static void close(); 	
+	void close(); 	
+	
 	/**
 	 * @brief Build the shaders and put them into the shader database
 	 * 
 	 */
-	static void loadShaderDatabase(); 
-private: 
-	/**
-	 * @brief Construct a new Loader object
-	 * 
-	 */
-	Loader();	
-	/**
-	 * @brief Destroy the Loader object
-	 * 
-	 */
-	~Loader();
+	void loadShaderDatabase(); 
+	
 	/**
 	 * @brief Build an environment map Mesh.  
 	 * 
 	 * @param is_glb_model Used to load a glb mesh as cubemap 
 	 * @return Mesh* 
 	 */
-	static Mesh* generateCubeMap(bool is_glb_model) ; 
+	Mesh* generateCubeMap(bool is_glb_model) ; 
 	/**
 	 * @brief Loads all meshes in the GLB file. 
 	 * Returns and std::pair<A , std::vector<Mesh*>> , with A being the number of textures in the model
 	 * @param filename GLB file path
 	 * @return std::pair<unsigned int , std::vector<Mesh*>> 
 	 */
-	static std::pair<unsigned int , std::vector<Mesh*>> loadObjects(const char* filename) ; 
+	std::pair<unsigned int , std::vector<Mesh*>> loadObjects(const char* filename) ; 
 	
-private:
-	static Loader* instance; /**<Loader instance*/
+
+protected:
+	ResourceDatabaseManager *resource_database;
 };
 
 

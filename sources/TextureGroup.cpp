@@ -1,8 +1,9 @@
 #include "../includes/TextureGroup.h"
 #include "../includes/Shader.h"
+#include "../includes/ResourceDatabaseManager.h"
 
 TextureGroup::TextureGroup(){
-	texture_database = TextureDatabase::getInstance(); 
+	texture_database = ResourceDatabaseManager::getInstance()->getTextureDatabase(); //TODO : change this finally to reference the texture database directly  
 }
 
 TextureGroup::~TextureGroup(){
