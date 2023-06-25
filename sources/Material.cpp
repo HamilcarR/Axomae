@@ -21,10 +21,14 @@ Material::~Material(){
 
 bool Material::isTransparent(){
 	Texture* tex_opacity = textures_group.getTexturePointer(Texture::OPACITY); 
-	if(alpha_factor < 1.f || (tex_opacity && !tex_opacity->isDummyTexture()))
+	if(alpha_factor < 1.f || (tex_opacity && !tex_opacity->isDummyTexture())){
+		is_transparent = true ;
 		return true ;
-	else
-		return false; 
+	}
+	else{
+		is_transparent = false; 
+		return false;
+	} 
 }
 
 void Material::setRefractiveIndexValue(float n1 , float n2){
@@ -86,7 +90,6 @@ void Material::disableBlend(){
 void Material::setBlendFunc(BLENDFUNC source_factor , BLENDFUNC dest_factor){
 	glBlendFunc(source_factor , dest_factor); 	
 }
-
 
 
 
