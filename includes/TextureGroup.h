@@ -22,8 +22,15 @@ public:
 	 * @brief Construct a new Texture Group object
 	 * 
 	 */
-	TextureGroup(); 
-	
+	TextureGroup();
+
+	/**
+	 * @brief Construct a new Texture Group object
+	 * 
+	 * @param texture_group 
+	 */
+	TextureGroup(const TextureGroup& texture_group); 
+
 	/**
 	 * @brief Destroy the Texture Group object
 	 * 
@@ -86,11 +93,37 @@ public:
 	 * @param type 
 	 * @return Texture* 
 	 */
-	Texture* getTexturePointer(Texture::TYPE type);  
+	Texture* getTexturePointer(Texture::TYPE type); 
+
+	/**
+	 * @brief Get the Texture Collection object
+	 * 
+	 * @return std::vector<Texture*> 
+	 */
+	const std::vector<Texture*>& getTextureCollection() const {return texture_collection;}
+
+	/**
+	 * @brief 
+	 * 
+	 * @return true 
+	 * @return false 
+	 */
+	bool isInitialized() const {return initialized;}
+
+	/**
+	 * @brief 
+	 * 
+	 * @param texture_group 
+	 * @return TextureGroup& 
+	 */
+	TextureGroup& operator=(const TextureGroup& texture_group); 
+
+public:
+	TextureDatabase* texture_database ; 	  /**<Pointer to the database texture*/
 private:
 	std::vector<Texture*> texture_collection; /**<Array of Pointers to textures in the texture database*/
 	bool initialized; 						  /**<State of the textures*/ 
-	TextureDatabase* texture_database ; 	  /**<Pointer to the database texture*/
+	
 };
 
 
