@@ -40,13 +40,13 @@ public:
 	 * 
 	 */
 	Material(); 
-	
+
 	/**
 	 * @brief Destroy the Material object
 	 * 
 	 */
 	virtual ~Material(); 
-	
+
 	/**
 	 * @brief Add a texture from the texture database to the material structure
 	 * 
@@ -135,6 +135,16 @@ public:
 	 * @return false If the alpha_factor == 1
 	 */
 	virtual bool isTransparent(); 
+
+	TextureGroup getTextureGroup() const {return textures_group;}
+	float getDielectricFactor() const {return dielectric_factor;} 
+	float getRoughnessFactor() const {return roughness_factor;}
+	float getTransmissionFactor() const{return transmission_factor;}
+	float getEmissiveFactor() const {return emissive_factor;} 
+	float getAlphaFactor() const {return alpha_factor;}
+	glm::vec2 getRefractiveIndex() const {return refractive_index;}
+	Shader* getShaderProgram() const {return shader_program;}
+	bool getTransparency() const {return is_transparent;} 	
 
 protected:
 	TextureGroup textures_group ;			/**<A structure of every type of texture to be bound*/
