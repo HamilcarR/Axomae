@@ -3,7 +3,13 @@
 #include "../includes/ResourceDatabaseManager.h"
 
 TextureGroup::TextureGroup(){
-	texture_database = ResourceDatabaseManager::getInstance()->getTextureDatabase(); //TODO : change this finally to reference the texture database directly  
+	texture_database = ResourceDatabaseManager::getInstance()->getTextureDatabase(); //TODO : change this finally to reference the texture database directly 
+	initialized = false;  
+}
+
+TextureGroup::TextureGroup(const TextureGroup& texture_group){
+	texture_collection = texture_group.getTextureCollection(); 
+	initialized = texture_group.isInitialized();
 }
 
 TextureGroup::~TextureGroup(){
@@ -50,9 +56,15 @@ void TextureGroup::bind(){
 void TextureGroup::unbind(){
 	for(Texture* A : texture_collection)
 		A->unbindTexture(); 
-
-
 }
 
 
 /****************************************************************************************************************************/
+
+TextureGroup& TextureGroup::operator=(const TextureGroup& texture_group){
+	if(this != &texture_group){
+		texture_collection = texture_group.getTextureCollection(); 
+		initialized = texture_group.isInitialized();
+	}
+	return *this;  
+}
