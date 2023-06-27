@@ -91,15 +91,15 @@ void Renderer::draw(){
 }
 
 void Renderer::set_new_scene(std::vector<Mesh*> &new_scene){
-	scene->clear();
-	scene->setScene(new_scene);	
-	scene->setLightDatabasePointer(light_database);   
+	scene->clear();	
+	scene->setScene(new_scene);
+	scene->setLightDatabasePointer(light_database);   	
 	scene->generateBoundingBoxes(resource_database->getShaderDatabase()->get(Shader::BOUNDING_BOX)); 	
 	scene->setCameraPointer(scene_camera); 
 	start_draw = true ;
 	scene_camera->reset() ;
 	resource_database->getShaderDatabase()->initializeShaders(); 
-	camera_framebuffer->updateFrameBufferShader(); 
+	camera_framebuffer->updateFrameBufferShader();
 }
 
 void Renderer::onLeftClick(){
