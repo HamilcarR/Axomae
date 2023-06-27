@@ -61,7 +61,7 @@ public:
 	 * @param obj Geometry data
 	 * @param mat Material data
 	 */
-	Mesh(Object3D const& obj , Material const& mat); 
+	Mesh(const Object3D& obj , const Material& mat); 
 	
 	/**
 	 * @brief Construct a new Mesh object with a name , geometry , and material
@@ -70,7 +70,7 @@ public:
 	 * @param obj Geometry data
 	 * @param mat Material data
 	 */
-	Mesh(std::string name , Object3D const& obj , Material const& mat); 
+	Mesh(std::string name , const Object3D& obj , const Material& mat); 
 
 	/**
 	 * @brief Construct a new Mesh object
@@ -80,8 +80,18 @@ public:
 	 * @param mat Mesh material
 	 * @param shader Shader used
 	 */
-	Mesh(std::string name , Object3D const& obj , Material const& mat , Shader* shader);
+	Mesh(std::string name , const Object3D& obj , const Material& mat , Shader* shader);
 
+	/**
+	 * @brief Construct a new Mesh object
+	 * 
+	 * @param name 
+	 * @param obj 
+	 * @param mat 
+	 * @param shader 
+	 */
+	Mesh(std::string name , Object3D&& obj , const Material& mat , Shader* shader); 
+	
 	/**
 	 * @brief Destroy the Mesh object
 	 * 
@@ -379,6 +389,14 @@ public:
 	 */
 	BoundingBoxMesh(Mesh* bound_mesh , Shader* display_shader);
 
+	/**
+	 * @brief Construct a new Bounding Box Mesh using pre-computed bounding boxes
+	 * 
+	 * @param bound_mesh The Mesh we want to wrap in an aabb
+	 * @param bounding_box The pre-computed bounding box 
+	 * @param display_shader 
+	 */
+	BoundingBoxMesh(Mesh* bound_mesh , const BoundingBox& bounding_box , Shader* display_shader); 
 	/**
 	 * @see Mesh::afterRenderSetup()
 	 */

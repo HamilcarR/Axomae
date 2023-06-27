@@ -1,5 +1,5 @@
 #include "../includes/Mesh.h"
-
+#include "../includes/PerformanceLogger.h"
 
 namespace axomae {
 
@@ -17,26 +17,34 @@ Mesh::Mesh(const Mesh& copy){
 	shader_program = copy.shader_program; 
 }
 
-Mesh::Mesh(Object3D const& geo , Material const& mat){
+Mesh::Mesh(const Object3D& geo , const Material& mat){
 	geometry = geo; 
 	material = mat;
 	name = "uninitialized mesh"  ;
 	shader_program = nullptr ; 
 }
 
-Mesh::Mesh(std::string n , Object3D const& geo , Material const& mat){
+Mesh::Mesh(std::string n , const Object3D& geo , const Material& mat){
 	geometry = geo; 
 	material = mat;
 	name = n ; 
 	shader_program = nullptr ; 
 }
 
-Mesh::Mesh(std::string n , Object3D const& geo , Material const& mat , Shader* shader) {
-	geometry = geo ; 
+Mesh::Mesh(std::string n , const Object3D& geo , const Material& mat , Shader* shader) {
+	geometry = geo ;
 	material = mat ; 
 	name = n ; 
 	shader_program = shader; 
 	material.setShaderPointer(shader); 
+}
+
+Mesh::Mesh(std::string n , Object3D&& geo ,const Material& mat , Shader* shader){   
+	geometry = std::move(geo); 
+	material = mat ; 
+	name = n ; 
+	shader_program = shader; 
+	material.setShaderPointer(shader);
 }
 
 Mesh::~Mesh(){}
@@ -278,6 +286,18 @@ BoundingBoxMesh::BoundingBoxMesh(Mesh* m , Shader* s) : BoundingBoxMesh(){
 	std::pair<std::vector<float> , std::vector<unsigned>> geom = bounding_box.getVertexArray(); 
 	geometry.vertices = geom.first; 
 	geometry.indices = geom.second;  
+}
+
+BoundingBoxMesh::BoundingBoxMesh(Mesh* m , const BoundingBox& bbox , Shader* s) : BoundingBoxMesh(){
+	bound_mesh = m ; 
+	shader_program = s ; 
+	assert(bound_mesh != nullptr); 
+	name = std::string("Boundingbox-") + m->getMeshName(); 
+	bounding_box = bbox ;
+	material.setShaderPointer(s); 
+	std::pair<std::vector<float> , std::vector<unsigned>> geom = bounding_box.getVertexArray(); 
+	geometry.vertices = geom.first ; 
+	geometry.indices = geom.second ;  
 }
 
 BoundingBoxMesh::~BoundingBoxMesh(){
