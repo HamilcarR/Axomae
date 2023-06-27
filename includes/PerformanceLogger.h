@@ -14,18 +14,19 @@ public:
     }
     virtual ~PerformanceLogger(){}
     
-    void startTimer(){
-        start = std::chrono::high_resolution_clock::now();
+    void startTimer(){ 
         std::cout << "Timer started!\n" ; 
+        start = std::chrono::high_resolution_clock::now();  
     } 
     
     void endTimer(){
-        end = std::chrono::high_resolution_clock::now(); 
+        end = std::chrono::high_resolution_clock::now();  
+        std::cout << "Timer end!\n"; 
     }
     
     void print(){
         duration = std::chrono::duration_cast<std::chrono::milliseconds> (end - start); 
-        std::cout << "Duration : " << duration.count() << "\n" ; 
+        std::cout << "Duration : " << duration.count() << "ms\n" ; 
     }
 protected:
     std::chrono::high_resolution_clock::time_point start; 

@@ -13,7 +13,12 @@
  */
 
 
-//TODO: [AX-14] Add mouse picking 
+//TODO: [AX-14] Add mouse picking
+
+/**
+ * @class This class manages all drawable meshes inside the scene and provides methods to sort them by types.
+ * 
+ */
 class Scene{
 public:
 
@@ -105,15 +110,15 @@ public:
     void drawForwardTransparencyMode(); 
 
     /**
-     * @brief This method draw bounding boxes on the scene meshes.
-     * !Note : must be used after every other mesh has been drawn , except the screen framebuffer , 
-     * as BoundingBoxMesh uses the bound mesh's matrixes for it's own transformations.
+     * @brief This method draws bounding boxes on the scene meshes.
+     * !Note : must be used after every other mesh has been drawn , except the screen framebuffer ,
+     * !as BoundingBoxMesh uses the bound mesh's matrixes for it's own transformations , and so , needs the updated transformation matrices.
      */
     void drawBoundingBoxes();
 
     /**
      * @brief Saves the light database pointer.
-     * !This method does not clear nor free this object. 
+     * !Note : The class does not take care about freeing the database pointer .  
      * @param database The pointer on the scene's lighting database. 
      */
     void setLightDatabasePointer(LightingDatabase* database){light_database = database;}

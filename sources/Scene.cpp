@@ -13,17 +13,19 @@ Scene::~Scene(){
 
 void Scene::setScene(std::vector<Mesh*> &to_copy){
     for(auto A : to_copy){
-        Scene::AABB mesh ; 
+        Scene::AABB mesh ;
         mesh.aabb = BoundingBox(A->geometry.vertices);
         mesh.drawable = new Drawable(A) ; 
         scene.push_back(mesh);  
     }
+    
+    
 }
 
 void Scene::generateBoundingBoxes(Shader* box_shader){
     for(Scene::AABB scene_drawable : scene){
         Mesh* mesh = scene_drawable.drawable->getMeshPointer();
-        BoundingBoxMesh* bbox_mesh = new BoundingBoxMesh(mesh , box_shader);
+        BoundingBoxMesh* bbox_mesh = new BoundingBoxMesh(mesh , scene_drawable.aabb , box_shader);
         Drawable* bbox_drawable = new Drawable(bbox_mesh);
         bounding_boxes_array.push_back(bbox_drawable); 
     }
@@ -133,7 +135,6 @@ void Scene::drawForwardTransparencyMode(){
         glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
 		A->unbind();
 	}	
-
 }
 
 void Scene::drawBoundingBoxes(){
