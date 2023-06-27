@@ -15,7 +15,7 @@ GLGeometryBuffer::GLGeometryBuffer(){
 	buffers_filled = false; 
 }
 
-GLGeometryBuffer::GLGeometryBuffer(const axomae::Object3D *geometry):GLGeometryBuffer(){
+GLGeometryBuffer::GLGeometryBuffer(const Object3D *geometry):GLGeometryBuffer(){
 	this->geometry = geometry ; 
 }
 

@@ -26,9 +26,9 @@ public:
 	 * @brief Construct a new GLGeometryBuffer object
 	 * 
 	 * @param geometry Mesh geometry data pointer
-	 * @see axomae::Object3D
+	 * @see Object3D
 	 */
-	GLGeometryBuffer(const axomae::Object3D *geometry) ; 
+	GLGeometryBuffer(const Object3D *geometry) ; 
 	
 	/**
 	 * @brief Destroy the GLGeometryBuffer object
@@ -41,7 +41,7 @@ public:
 	 * 
 	 * @param geo Pointer on the current mesh geometry 
 	 */
-	virtual void setGeometryPointer(const axomae::Object3D *geo){geometry = geo;} ; 
+	virtual void setGeometryPointer(const Object3D *geo){geometry = geo;} ; 
 	
 	/**
 	 * @brief Initialize glGenBuffers for all vertex attributes 
@@ -135,7 +135,7 @@ private:
 	GLuint texture_buffer ;				/**<Texture buffer ID*/
 	GLuint color_buffer ;				/**<Color buffer ID*/
 	GLuint tangent_buffer ; 			/**<Tangent buffer ID*/
-	const axomae::Object3D *geometry; 	/**<Pointer to the meshe's geometry*/
+	const Object3D *geometry; 	/**<Pointer to the meshe's geometry*/
 	bool buffers_filled ; 
 
 }; 
