@@ -1,8 +1,9 @@
 #ifndef UTILS_3D_H
 #define UTILS_3D_H
 
-#include "constants.h" 
-#include "DebugGL.h" 
+
+#include "DebugGL.h"
+#include "Object3D.h" 
 #include <map>
 #include <GL/glew.h>
 #include <GL/glu.h>
@@ -22,18 +23,6 @@
 
 /*TODO : Create classes , implement clean up */
 namespace axomae {
-
-
-struct Object3D{
-	std::vector<float> vertices; 
-	std::vector<float> uv ; 
-	std::vector<float> colors; 
-	std::vector<float> normals; 
-	std::vector<float> bitangents ; 
-	std::vector<float> tangents;
-	std::vector<unsigned int> indices;
-};
-
 
 struct Point2D{
 	float x ; 
