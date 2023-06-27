@@ -26,36 +26,27 @@ void SceneSelector::setScene(std::vector<Mesh*> &meshes){
 	mesh_index = 0 ; 
 }
 
-
-Mesh SceneSelector::toNext(){
+void SceneSelector::toNext(){
 	if(scene.size() > 0){
-		if((mesh_index + 1) >= scene.size()){
+		if((mesh_index + 1) >= scene.size())
 			mesh_index = 0 ; 
-			return scene[mesh_index] == nullptr ? Mesh() : *scene[mesh_index] ; 
-		}
 		else
-			return scene[mesh_index + 1] == nullptr ? Mesh() : *scene[mesh_index++] ;   
+			mesh_index++; 
 	}
-	else
-		return Mesh();
 }
 
-Mesh SceneSelector::toPrevious(){
+void SceneSelector::toPrevious(){
 	if(scene.size() > 0){	
-		if(mesh_index == 0){
+		if(mesh_index == 0)
 			mesh_index = scene.size() - 1 ; 
-			return scene[mesh_index] == nullptr ? Mesh() : *scene[mesh_index] ; 
-		}
 		else
-			return scene[mesh_index - 1] == nullptr ? Mesh() : *scene[mesh_index--]; 
+			mesh_index--; 
 	}
-	else 
-		return Mesh(); 
 }
 
-Mesh SceneSelector::getCurrent(){
+Mesh* SceneSelector::getCurrent(){
 	if(scene.size() > 0)
-		return scene[mesh_index] == nullptr ? Mesh() : *scene[mesh_index] ;
+		return scene[mesh_index] == nullptr ? nullptr : scene[mesh_index] ;
 	else
-		return Mesh(); 
+		return nullptr; 
 }

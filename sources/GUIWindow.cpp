@@ -618,10 +618,12 @@ void GUIWindow::compute_projection(){ //TODO : complete uv projection method , i
 
 //TODO: [AX-26] Optimize the normals projection on UVs in the UV tool 
 void GUIWindow::project_uv_normals(){	
-	SceneSelector* instance = SceneSelector::getInstance(); 
-	SDL_Surface* surf = ImageManager::project_uv_normals(instance->getCurrent().geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 	
-	display_image(surf , PROJECTED_NMAP , true); 
-
+	SceneSelector* instance = SceneSelector::getInstance();
+	Mesh* retrieved_mesh = instance->getCurrent() ; 
+	if(retrieved_mesh){
+		SDL_Surface* surf = ImageManager::project_uv_normals(retrieved_mesh->geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 	
+		display_image(surf , PROJECTED_NMAP , true);
+	} 
 }
 /**************************************************************************************************************/
 bool GUIWindow::import_3DOBJ(){
@@ -630,9 +632,9 @@ bool GUIWindow::import_3DOBJ(){
 		Loader loader ; 
 		std::vector<Mesh*> scene = loader.load(filename.toStdString().c_str()) ;
 		SceneSelector *instance = SceneSelector::getInstance(); 	
-		_UI.renderer_view->setNewScene(scene);
+		_UI.renderer_view->setNewScene(scene); 
 		instance->setScene(scene);
-		_UI.meshes_list->setList(scene) ; 
+		_UI.meshes_list->setList(scene) ; 	
 	//	std::thread(ImageManager::project_uv_normals, scene[0]->geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()).detach();  //TODO : optimize and re enable	
 		return true ; 
 	}
@@ -641,7 +643,7 @@ bool GUIWindow::import_3DOBJ(){
 /**************************************************************************************************************/
 void GUIWindow::next_mesh(){
 	SceneSelector::getInstance()->toNext();
-	 project_uv_normals(); 
+	project_uv_normals(); 
 }
 /**************************************************************************************************************/
 void GUIWindow::previous_mesh(){

@@ -13,9 +13,9 @@ public:
 	static SceneSelector* getInstance(); 
 	static void remove() ;
 	void setScene(std::vector<axomae::Mesh*> &meshes); 
-	axomae::Mesh toNext() ; 
-	axomae::Mesh toPrevious() ;
-	axomae::Mesh getCurrent() ; 
+	void toNext() ; 
+	void toPrevious() ;
+	axomae::Mesh* getCurrent() ; 
 
 
 private:
