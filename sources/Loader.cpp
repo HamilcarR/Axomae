@@ -22,7 +22,7 @@ Loader::~Loader(){}
 
 //TODO: [AX-11] Parallelize resources loading
 //? use SIMD
-constexpr unsigned int THREAD_POOL_SIZE = 4 ; 
+constexpr unsigned int THREAD_POOL_SIZE = 8 ; 
 void thread_copy_buffer(unsigned int start_index , unsigned int end_index , uint8_t* from , uint8_t* dest){
 	for(unsigned i = start_index ; i < end_index ; i++)
 		dest[i] = from[i] ; 
@@ -30,7 +30,7 @@ void thread_copy_buffer(unsigned int start_index , unsigned int end_index , uint
 
 void async_copy_buffer(unsigned int width , unsigned int height , uint8_t* from , uint8_t* dest){
 	size_t total_buffer_size = width * height * sizeof(uint32_t); 
-	size_t thread_buffer_size = total_buffer_size / THREAD_POOL_SIZE ; 
+	size_t thread_buffer_size = total_buffer_size / THREAD_POOL_SIZE ; //TODO : implement the case where total_buffer_sze < THREAD_POOL_SIZE 
 	uint8_t work_remainder = total_buffer_size % THREAD_POOL_SIZE ; 
 	size_t last_thread_job_size = thread_buffer_size + work_remainder ; 
 	size_t range_min = 0 ; 
@@ -114,7 +114,7 @@ static void loadTextureDummy(Material* material , Texture::TYPE type , TextureDa
 static void loadTexture(const aiScene* scene , Material *material ,TextureData &texture ,aiString texture_string ,Texture::TYPE type , TextureDatabase* texture_database){
 	std::string texture_index_string = texture_string.C_Str();
 	std::cout << "Texture type loaded : " << texture.name << " / GLB index is: " << texture_index_string <<  "\n" ; 
-	 if(texture_index_string.size() != 0){
+	if(texture_index_string.size() != 0){
 		texture_index_string = texture_index_string.substr(1) ; 
 		unsigned int texture_index_int = stoi(texture_index_string);  
 		if(!texture_database->contains(texture_index_int)){
@@ -125,9 +125,9 @@ static void loadTexture(const aiScene* scene , Material *material ,TextureData &
 		}
 		else
 			material->addTexture(texture_index_int , type); 
-	 }
-	 else
-		 std::cout << "Loader can't load texture\n" ;  
+	}
+	else
+		std::cout << "Loader can't load texture\n" ;  
 }
 
 
@@ -267,41 +267,46 @@ void Loader::loadShaderDatabase(){
 
 template<class T>
 void load_geometry_buffer(std::vector<T> &dest , const aiVector3D *from , int size , int dimension ){
-	for(int f = 0 ; f < size ; f++){	
+	for(int f = 0 , i = 0 ; f < size ; f++){	
 		const aiVector3D vect = from[f]; 
 		if(dimension == 3){
-			dest.push_back(vect.x); 
-			dest.push_back(vect.y); 
-			dest.push_back(vect.z);
+			dest[i] = vect.x; 
+			dest[i + 1] = vect.y; 
+			dest[i + 2] = vect.z;
+			i += 3 ; 
 		}
 		else {
-			dest.push_back(vect.x);
-			dest.push_back(vect.y); 
+			dest[i] = vect.x;
+			dest[i + 1] = vect.y;
+			i += 2;  
 		}	
 	} 
 }
 
 void load_indices_buffer(std::vector<unsigned> &dest , const aiFace *faces , int num_faces){
-	for(int i = 0 ; i < num_faces ; i++){
+	for(int i = 0 , f = 0 ; i < num_faces ; i++ , f += 3){
 		assert(faces[i].mNumIndices==3) ;  
-		dest.push_back(faces[i].mIndices[0]); 	
-		dest.push_back(faces[i].mIndices[1]); 	
-		dest.push_back(faces[i].mIndices[2]); 	
+		dest[f] = faces[i].mIndices[0]; 	
+		dest[f + 1] = faces[i].mIndices[1]; 	
+		dest[f + 2] = faces[i].mIndices[2]; 	
 	}
 }
 
 //TODO: [AX-25] parallelize mesh geometry loading
+
+
+
+
 /**
- * The function loads GLB objects and returns a pair containing the
- * number of textures and a vector of Mesh objects.
+ * The function loads 3D objects from a file using the Assimp library, creates meshes with their
+ * associated materials and shaders, and returns them as a vector.
  * 
  * @param file The file path of the 3D model to be loaded.
  * 
- * @return A std::pair containing an unsigned int and a vector of Mesh pointers. The unsigned int
- * represents the number of textures in the loaded scene, and the vector contains pointers to the
- * loaded Mesh objects.
+ * @return a vector of pointers to Mesh objects.
  */
-std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* file){
+
+std::vector<Mesh*> Loader::loadObjects(const char* file){
 	TextureDatabase *texture_database = resource_database->getTextureDatabase() ; 	
 	ShaderDatabase *shader_database = resource_database->getShaderDatabase(); 
 	std::vector<Mesh*> objects; 
@@ -309,20 +314,26 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
 	std::mutex mesh_load_mutex;	
 	const aiScene *modelScene = importer.ReadFile(file , aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs ) ;
 	if(modelScene != nullptr){	
-		Shader* shader_program = shader_database->get(Shader::BLINN) ; 		
-		auto lambda_create_mesh = [&](unsigned i) -> std::pair<unsigned , Object3D*> {			
+		Shader* shader_program = shader_database->get(Shader::BLINN) ; 	
+		/**************************************************************************************************/
+		/*
+		 * This lambda function fills the different geometry buffers
+		 * We use threads for each meshes , and each buffers.
+		 * It returns an std::pair<ID , Geometry*> 
+		 * */	
+		auto lambda_fill_buffers = [&](unsigned i) -> std::pair<unsigned , Object3D*> {			
 			PerformanceLogger log ; 
 			const aiMesh* mesh = modelScene->mMeshes[i] ; 
 			Object3D *object = new Object3D ;
 			auto size_dim3 = mesh->mNumVertices * 3; 
 			auto size_dim2 = mesh->mNumVertices * 2; 
 			auto size_dim3_indices = mesh->mNumFaces * 3; 
-			object->vertices.reserve(size_dim3);
-			object->normals.reserve(size_dim3); 
-			object->tangents.reserve(size_dim3); 
-			object->bitangents.reserve(size_dim3);	
-			object->indices.reserve(size_dim3_indices); 
-			object->uv.reserve(size_dim2) ; 	
+			object->vertices.resize(size_dim3);
+			object->normals.resize(size_dim3); 
+			object->tangents.resize(size_dim3); 
+			object->bitangents.resize(size_dim3);	
+			object->indices.resize(size_dim3_indices); 
+			object->uv.resize(size_dim2) ; 	
 			assert(mesh->HasTextureCoords(0)) ; 
 			std::future<void> f_vertices , f_normals , f_bitangents , f_tangents , f_uv ;
 			f_vertices = std::async(std::launch::async, [&](){
@@ -339,47 +350,51 @@ std::pair<unsigned int , std::vector<Mesh*>> Loader::loadObjects(const char* fil
 					}); 
 			f_uv = std::async(std::launch::async,[&](){
 					load_geometry_buffer(object->uv , mesh->mTextureCoords[0] , mesh->mNumVertices , 2);
-					}); 
-			load_indices_buffer(object->indices , mesh->mFaces , mesh->mNumFaces);
+					});	
+			
+			load_indices_buffer(object->indices , mesh->mFaces , mesh->mNumFaces);	
+			log.startTimer(); 
 			std::vector<std::shared_future<void>> shared_futures = {f_vertices.share() , f_normals.share() , f_bitangents.share() , f_tangents.share() , f_uv.share()};			
-			log.startTimer() ; 
 			std::for_each(shared_futures.begin() , shared_futures.end() , [](std::shared_future<void> &it) -> void{	
 				it.wait(); 
 			});
-			log.endTimer();
+			log.endTimer(); 
 			log.print(); 
 			return std::pair<unsigned , Object3D*>(i , object); 	
 		};
+		/**************************************************************************************************/
 		std::vector<std::future<std::pair<unsigned ,Object3D*>>> loaded_meshes_futures ; 	
 		std::vector<aiMaterial*> assimp_material_array;
 		std::vector<Material> material_array ;
-		assimp_material_array.resize(modelScene->mNumMeshes); 
-		material_array.resize(modelScene->mNumMeshes);
+		assimp_material_array.reserve(modelScene->mNumMeshes); 
+		material_array.reserve(modelScene->mNumMeshes);
+		//* Launching threads using lambda_fill_buffers
 		for(unsigned int i = 0 ; i < modelScene->mNumMeshes ; i++){ 
 			loaded_meshes_futures.push_back(
-				std::async(std::launch::async , lambda_create_mesh , i) 
+				std::async(std::launch::async , lambda_fill_buffers , i) //*We launch multiple threads loading the geometry , and the main thread loads the materials
 			);
-			assimp_material_array[i] = modelScene->mMaterials[modelScene->mMeshes[i]->mMaterialIndex]; 
-			Material M = loadMaterials(modelScene , assimp_material_array[i] , texture_database); 
-			material_array[i] = M ; 
+			assimp_material_array.push_back(modelScene->mMaterials[modelScene->mMeshes[i]->mMaterialIndex]); 
+			material_array.push_back(loadMaterials(modelScene , assimp_material_array[i] , texture_database)); //*we store the meshes that we reference according to the mesh ID 
 		}
-		for(auto it = loaded_meshes_futures.begin(); it != loaded_meshes_futures.end() ; it++){	
+		for(auto it = loaded_meshes_futures.begin(); it != loaded_meshes_futures.end() ; it++){		
 			std::pair<unsigned , Object3D*> geometry_loaded = it->get();	
 			unsigned mesh_index = geometry_loaded.first ;
-			Object3D* geometry = geometry_loaded.second ; 
+			Object3D* geometry = geometry_loaded.second ;
 			const aiMesh* mesh = modelScene->mMeshes[mesh_index] ; 
 			const char* mesh_name = mesh->mName.C_Str(); 
 			std::string name(mesh_name);	
-			Mesh *loaded_mesh = new Mesh(std::string(mesh->mName.C_Str()) , *geometry , material_array[mesh_index] , shader_program) ;	
+			Mesh *loaded_mesh = new Mesh(std::string(mesh->mName.C_Str()) , std::move(*geometry), material_array[mesh_index] , shader_program) ;	
 			std::cout << "object loaded : " << mesh->mName.C_Str()<< "\n" ; 	
 			objects.push_back(loaded_mesh);
 			delete geometry ; 	
 		}
-		return std::pair<unsigned int , std::vector<Mesh*>> (modelScene->mNumTextures , objects) ; 
+		
+		
+		return objects ; 
 	}	
 	else{
 		std::cout << "Problem loading scene" << std::endl ; 
-		return std::pair<unsigned int , std::vector<Mesh*>> (0 , std::vector<Mesh*>()) ; 
+		return std::vector<Mesh*>() ; 
 	}
 	
 }
@@ -399,11 +414,11 @@ std::vector<Mesh*> Loader::load(const char* file){
 	texture_database->clean();
 	shader_database->clean(); 
 	loadShaderDatabase(); 
-	std::pair<unsigned int , std::vector<Mesh*>> scene = loadObjects(file); 
+	std::vector<Mesh*> scene = loadObjects(file); 
 	Mesh* cube_map = generateCubeMap(false) ; 		
 	if(cube_map != nullptr)
-		scene.second.push_back(cube_map);	
-	return scene.second ; 
+		scene.push_back(cube_map);	
+	return scene ; 
 }
 
 

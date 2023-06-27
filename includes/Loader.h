@@ -78,12 +78,11 @@ public:
 	 */
 	Mesh* generateCubeMap(bool is_glb_model) ; 
 	/**
-	 * @brief Loads all meshes in the GLB file. 
-	 * Returns and std::pair<A , std::vector<Mesh*>> , with A being the number of textures in the model
+	 * @brief Loads all meshes from the GLB file. 
 	 * @param filename GLB file path
-	 * @return std::pair<unsigned int , std::vector<Mesh*>> 
+	 * @return std::vector<Mesh*>
 	 */
-	std::pair<unsigned int , std::vector<Mesh*>> loadObjects(const char* filename) ; 
+	std::vector<Mesh*> loadObjects(const char* filename) ; 
 	
 
 protected:

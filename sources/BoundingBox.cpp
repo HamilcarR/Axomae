@@ -2,9 +2,10 @@
 
 using namespace axomae ; 
 
+constexpr unsigned int THREAD_NUMBERS = 12 ; //TODO: [AX-27] Create a class reading/writing a config file
 glm::vec3 calculateCenter(glm::vec3 min_coords , glm::vec3 max_coords);
 
-glm::vec3 update_min(glm::vec3 min_vec, glm::vec3 compared){
+glm::vec3& update_min(glm::vec3 &min_vec, glm::vec3 &compared){
     if(compared.x <= min_vec.x)
         min_vec.x = compared.x ; 
     if(compared.y <= min_vec.y)
@@ -14,7 +15,7 @@ glm::vec3 update_min(glm::vec3 min_vec, glm::vec3 compared){
     return min_vec ;  
 }
 
-glm::vec3 update_max(glm::vec3 max_vec, glm::vec3 compared){
+glm::vec3& update_max(glm::vec3& max_vec, glm::vec3& compared){
     if(compared.x > max_vec.x)
         max_vec.x = compared.x ; 
     if(compared.y > max_vec.y)
@@ -30,15 +31,64 @@ BoundingBox::BoundingBox(){
     min_coords = glm::vec3(0.f); 
 }
 
+#include "../includes/PerformanceLogger.h"
 //TODO: [AX-12] Parallelize bounding box computation
 BoundingBox::BoundingBox(const std::vector<float> &vertices):BoundingBox(){
-    center = glm::vec3(0 , 0 , 0); 
-    max_coords = glm::vec3(-INT_MAX); 
-    min_coords = glm::vec3(INT_MAX); 
-    for(unsigned i = 0 ; i < vertices.size(); i+=3){        
-        glm::vec3 compare = glm::vec3(vertices[i] , vertices[i+1] , vertices[i+2]);  
-        max_coords = update_max(max_coords , compare);
-        min_coords = update_min(min_coords , compare);  
+    PerformanceLogger log; 
+    center = glm::vec3(0 , 0 , 0);
+    /*
+    * This lambda calculates asynchroneously the minimum/maximum coordinates of every meshes
+    */
+    auto lambda_parallel_compute_bbox = [](const std::vector<float> &vertices , unsigned min_index , unsigned max_index) -> std::pair<glm::vec3 , glm::vec3>{
+        float x_max , y_max , z_max ; 
+        float x_min , y_min , z_min ; 
+        x_max = y_max = z_max = -INT_MAX ;
+        x_min = y_min = z_min = INT_MAX ;  
+        for(unsigned i = min_index ; i < max_index; i+=3){        
+            float x_compare = vertices[i] , y_compare = vertices[i+1] , z_compare = vertices[i+2]; 
+            x_max = x_max <= x_compare ? x_compare : x_max ; 
+            y_max = y_max <= y_compare ? y_compare : y_max ; 
+            z_max = z_max <= z_compare ? z_compare : z_max ; 
+            x_min = x_compare <= x_min ? x_compare : x_min ; 
+            y_min = y_compare <= y_min ? y_compare : y_min ;
+            z_min = z_compare <= z_min ? z_compare : z_min ; 
+        }
+        return std::pair(glm::vec3(x_min , y_min , z_min) , glm::vec3(x_max , y_max , z_max)); 
+    }; 
+    size_t indiv_thread_array_size = (vertices.size() / 3) / THREAD_NUMBERS ; 
+    if(indiv_thread_array_size == 0){
+        max_coords = glm::vec3(-INT_MAX); 
+        min_coords = glm::vec3(INT_MAX); 
+        for(unsigned i = 0 ; i < vertices.size(); i+=3){        
+            glm::vec3 compare = glm::vec3(vertices[i] , vertices[i+1] , vertices[i+2]);  
+            max_coords = update_max(max_coords , compare);
+            min_coords = update_min(min_coords , compare);  
+        } 
+    }
+    else{
+        size_t remainder_vector_left = (vertices.size() / 3) % THREAD_NUMBERS ; 
+        size_t last_thread_job_left = indiv_thread_array_size + remainder_vector_left  ; 
+        last_thread_job_left *= 3 ; 
+        indiv_thread_array_size *= 3; 
+        std::vector<std::future<std::pair<glm::vec3 , glm::vec3>>> futures ; 
+        for(unsigned i = 0 ; i < THREAD_NUMBERS ; i++){
+            unsigned min_index = i * indiv_thread_array_size ; 
+            unsigned max_index = i * indiv_thread_array_size + indiv_thread_array_size ; 
+            if(i == THREAD_NUMBERS - 1)
+                max_index = i * indiv_thread_array_size + last_thread_job_left ; 
+            futures.push_back(
+                std::async(lambda_parallel_compute_bbox , vertices , min_index , max_index)
+            );
+        }
+        max_coords = glm::vec3(-INT_MAX); 
+        min_coords = glm::vec3(INT_MAX); 
+        for(auto it = futures.begin() ; it != futures.end() ; it++){
+            auto result = it->get();
+            glm::vec3 min_c = result.first ; 
+            glm::vec3 max_c = result.second ; 
+            max_coords = update_max(max_coords , max_c) ; 
+            min_coords = update_min(min_coords , min_c) ; 
+        }
     }
     center = calculateCenter(min_coords , max_coords);  
 }
