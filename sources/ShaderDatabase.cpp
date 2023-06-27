@@ -1,5 +1,6 @@
 #include "../includes/ShaderDatabase.h"
 #include "../includes/ShaderFactory.h"
+#include "../includes/Mutex.h"
 
 ShaderDatabase::ShaderDatabase(){
 }
@@ -21,7 +22,8 @@ void ShaderDatabase::clean(){
 }
 
 Shader *ShaderDatabase::addShader(const std::string vertex_code, const std::string fragment_code, const Shader::TYPE type){
-	const std::lock_guard lock(resource_mutex);
+	Mutex mutex ; 
+	Mutex::Lock lock(mutex); 
 	if (shader_database.find(type) == shader_database.end())
 		shader_database[type] = ShaderFactory::constructShader(vertex_code, fragment_code, type);
 	return shader_database[type];
@@ -33,13 +35,15 @@ void ShaderDatabase::initializeShaders(){
 }
 
 bool ShaderDatabase::contains(const int t) {
-	const std::lock_guard lock(resource_mutex); 
+	Mutex mutex; 
+	Mutex::Lock lock(mutex); 
 	const Shader::TYPE type = static_cast<Shader::TYPE>(t);
 	return shader_database.find(type) != shader_database.end();
 }
 
 Shader *ShaderDatabase::get(const int t) {
-	const std::lock_guard lock(resource_mutex); 
+	Mutex mutex; 
+	Mutex::Lock lock(mutex); 	
 	const Shader::TYPE type = static_cast<Shader::TYPE>(t);
 	auto it = shader_database.find(type);
 	if (it != shader_database.end())

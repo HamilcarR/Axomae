@@ -1,7 +1,7 @@
 #ifndef RENDERINGDATABASEINTERFACE_H
 #define RENDERINGDATABASEINTERFACE_H
 
-#include <mutex>
+
 
 //TODO: [AX-9] Finish the implementation of the Database interface
 template<class T>
@@ -12,7 +12,6 @@ public:
     virtual T* get(const int id)  = 0; 
     virtual bool contains(const int id) = 0;
 protected:
-    std::mutex resource_mutex;          /**<Individual mutex for each RenderingDatabaseInterface objects*/ 
 };
 
 
