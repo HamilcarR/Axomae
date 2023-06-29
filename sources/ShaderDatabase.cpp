@@ -13,6 +13,7 @@ void ShaderDatabase::purge(){
 }
 
 void ShaderDatabase::clean(){
+	Mutex::Lock lock(mutex);
 	for (auto A : shader_database){
 		A.second->clean();
 		delete A.second;
@@ -22,7 +23,6 @@ void ShaderDatabase::clean(){
 }
 
 Shader *ShaderDatabase::addShader(const std::string vertex_code, const std::string fragment_code, const Shader::TYPE type){
-	Mutex mutex ; 
 	Mutex::Lock lock(mutex); 
 	if (shader_database.find(type) == shader_database.end())
 		shader_database[type] = ShaderFactory::constructShader(vertex_code, fragment_code, type);
@@ -30,19 +30,18 @@ Shader *ShaderDatabase::addShader(const std::string vertex_code, const std::stri
 }
 
 void ShaderDatabase::initializeShaders(){
+	Mutex::Lock lock(mutex);
 	for (auto A : shader_database)
 		A.second->initializeShader();
 }
 
 bool ShaderDatabase::contains(const int t) {
-	Mutex mutex; 
 	Mutex::Lock lock(mutex); 
 	const Shader::TYPE type = static_cast<Shader::TYPE>(t);
 	return shader_database.find(type) != shader_database.end();
 }
 
 Shader *ShaderDatabase::get(const int t) {
-	Mutex mutex; 
 	Mutex::Lock lock(mutex); 	
 	const Shader::TYPE type = static_cast<Shader::TYPE>(t);
 	auto it = shader_database.find(type);
@@ -53,6 +52,7 @@ Shader *ShaderDatabase::get(const int t) {
 }
 
 void ShaderDatabase::recompile(){
+	Mutex::Lock lock(mutex);
 	for (auto A : shader_database)
 		A.second->recompile();	
 }

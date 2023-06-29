@@ -6,7 +6,7 @@
 #include <QByteArray>
 #include "../includes/Loader.h"
 #include "../includes/PerformanceLogger.h"
-
+#include "../includes/Mutex.h"
 
 /**
  * @file Loader.cpp
@@ -20,8 +20,8 @@ Loader::Loader(){
 }
 Loader::~Loader(){}
 
-//TODO: [AX-11] Parallelize resources loading
-//? use SIMD
+
+Mutex mutex; 
 constexpr unsigned int THREAD_POOL_SIZE = 8 ; 
 void thread_copy_buffer(unsigned int start_index , unsigned int end_index , uint8_t* from , uint8_t* dest){
 	for(unsigned i = start_index ; i < end_index ; i++)
@@ -118,7 +118,7 @@ static void loadTexture(const aiScene* scene , Material *material ,TextureData &
 		texture_index_string = texture_index_string.substr(1) ; 
 		unsigned int texture_index_int = stoi(texture_index_string);  
 		if(!texture_database->contains(texture_index_int)){
-			copyTexels(&texture , &*scene->mTextures[texture_index_int]) ; 
+			copyTexels(&texture , scene->mTextures[texture_index_int]) ; 
 			int index = texture_database->addTexture(&texture , type , false); 
 			material->addTexture(index , type);
 			texture.clean(); 
@@ -141,7 +141,6 @@ static void loadTexture(const aiScene* scene , Material *material ,TextureData &
  * 
  * @return a Material object.
  */
-
 static Material loadAllTextures(const aiScene* scene , const aiMaterial* material , TextureDatabase* texture_database){
 	Material mesh_material ; 	
 	std::vector<Texture::TYPE> dummy_textures_type; 
@@ -156,7 +155,6 @@ static Material loadAllTextures(const aiScene* scene , const aiMaterial* materia
 	emissive.name = "emissive" ; 
 	unsigned int color_index = 0, metallic_index = 0 , roughness_index = 0; 
 	aiString color_texture , opacity_texture ,  normal_texture , metallic_texture , roughness_texture , emissive_texture , specular_texture , occlusion_texture ; //we get indexes of embedded textures , since we will use GLB format  
-
 	if(material->GetTextureCount(aiTextureType_BASE_COLOR) > 0){
 		material->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE , &color_texture) ;
 		loadTexture(scene , &mesh_material , diffuse , color_texture , Texture::DIFFUSE , texture_database); 
@@ -220,8 +218,6 @@ static Material loadAllTextures(const aiScene* scene , const aiMaterial* materia
 	return mesh_material ; 
 }
 
-
-
 static float loadTransparencyValue(const aiMaterial* material){
 	float transparency = 1.f ;
 	float opacity = 1.f;  
@@ -234,14 +230,12 @@ static float loadTransparencyValue(const aiMaterial* material){
 	return transparency ; 
 }
 
-
-Material loadMaterials(const aiScene* scene , const aiMaterial* material , TextureDatabase* texture_database){
-	Material mesh_material = loadAllTextures(scene , material , texture_database);
+std::pair<unsigned , Material> loadMaterials(const aiScene* scene , const aiMaterial* material , TextureDatabase* texture_database , unsigned id){	
+	Material mesh_material = loadAllTextures(scene , material , texture_database);	
 	float transparency_factor = loadTransparencyValue(material);  	
 	mesh_material.setTransparency(transparency_factor);
-	return mesh_material ; 
+	return std::pair<unsigned , Material> (id , mesh_material) ; 
 }
-
 
 /**
  * The function loads shader files and adds them to a shader database.
@@ -261,9 +255,6 @@ void Loader::loadShaderDatabase(){
 	shader_database->addShader(vertex_shader_cubemap , fragment_shader_cubemap , Shader::CUBEMAP) ; 
 	shader_database->addShader(vertex_shader_screen_fbo , fragment_shader_screen_fbo , Shader::SCREEN_FRAMEBUFFER); 
 }
-
-
-
 
 template<class T>
 void load_geometry_buffer(std::vector<T> &dest , const aiVector3D *from , int size , int dimension ){
@@ -292,11 +283,6 @@ void load_indices_buffer(std::vector<unsigned> &dest , const aiFace *faces , int
 	}
 }
 
-//TODO: [AX-25] parallelize mesh geometry loading
-
-
-
-
 /**
  * The function loads 3D objects from a file using the Assimp library, creates meshes with their
  * associated materials and shaders, and returns them as a vector.
@@ -322,7 +308,6 @@ std::vector<Mesh*> Loader::loadObjects(const char* file){
 		 * It returns an std::pair<ID , Geometry*> 
 		 * */	
 		auto lambda_fill_buffers = [&](unsigned i) -> std::pair<unsigned , Object3D*> {			
-			PerformanceLogger log ; 
 			const aiMesh* mesh = modelScene->mMeshes[i] ; 
 			Object3D *object = new Object3D ;
 			auto size_dim3 = mesh->mNumVertices * 3; 
@@ -353,30 +338,26 @@ std::vector<Mesh*> Loader::loadObjects(const char* file){
 					});	
 			
 			load_indices_buffer(object->indices , mesh->mFaces , mesh->mNumFaces);	
-			log.startTimer(); 
 			std::vector<std::shared_future<void>> shared_futures = {f_vertices.share() , f_normals.share() , f_bitangents.share() , f_tangents.share() , f_uv.share()};			
 			std::for_each(shared_futures.begin() , shared_futures.end() , [](std::shared_future<void> &it) -> void{	
 				it.wait(); 
 			});
-			log.endTimer(); 
-			log.print(); 
 			return std::pair<unsigned , Object3D*>(i , object); 	
 		};
 		/**************************************************************************************************/
 		std::vector<std::future<std::pair<unsigned ,Object3D*>>> loaded_meshes_futures ; 	
-		std::vector<aiMaterial*> assimp_material_array;
 		std::vector<Material> material_array ;
-		assimp_material_array.reserve(modelScene->mNumMeshes); 
-		material_array.reserve(modelScene->mNumMeshes);
+		material_array.resize(modelScene->mNumMeshes);
+		std::vector<std::future<std::pair<unsigned , Material>>> materials_futures;
 		//* Launching threads using lambda_fill_buffers
 		for(unsigned int i = 0 ; i < modelScene->mNumMeshes ; i++){ 
 			loaded_meshes_futures.push_back(
 				std::async(std::launch::async , lambda_fill_buffers , i) //*We launch multiple threads loading the geometry , and the main thread loads the materials
 			);
-			assimp_material_array.push_back(modelScene->mMaterials[modelScene->mMeshes[i]->mMaterialIndex]); 
-			material_array.push_back(loadMaterials(modelScene , assimp_material_array[i] , texture_database)); //*we store the meshes that we reference according to the mesh ID 
-		}
-		for(auto it = loaded_meshes_futures.begin(); it != loaded_meshes_futures.end() ; it++){		
+			aiMaterial* ai_mat = modelScene->mMaterials[modelScene->mMeshes[i]->mMaterialIndex]; 	
+			material_array[i] = loadMaterials(modelScene , ai_mat , texture_database , i).second; 
+		}	
+		for(auto it = loaded_meshes_futures.begin(); it != loaded_meshes_futures.end() ; it++ ){		
 			std::pair<unsigned , Object3D*> geometry_loaded = it->get();	
 			unsigned mesh_index = geometry_loaded.first ;
 			Object3D* geometry = geometry_loaded.second ;
@@ -387,9 +368,7 @@ std::vector<Mesh*> Loader::loadObjects(const char* file){
 			std::cout << "object loaded : " << mesh->mName.C_Str()<< "\n" ; 	
 			objects.push_back(loaded_mesh);
 			delete geometry ; 	
-		}
-		
-		
+		}	
 		return objects ; 
 	}	
 	else{
