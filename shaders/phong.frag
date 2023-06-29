@@ -289,6 +289,7 @@ vec2 computeFresnelCoefficients(){
 
 /**************************************************************************************************************/
 void main(){	
+    vec4 final_computed_fragment ; 
     vec2 fresnel = computeFresnelCoefficients() ; 
     vec4 R = computeReflectionCubeMap(fresnel.x) ; 
     vec4 Rf = computeRefractionCubeMap(fresnel.y) ; 
@@ -301,11 +302,13 @@ void main(){
     vec3 ambient = directional.ambient + point.ambient + spot.ambient ; 
     vec3 diffuse = directional.diffuse + point.diffuse + spot.diffuse ; 
     vec3 specular = directional.specular + point.specular + spot.specular ; 
-    E = E == vec4(0.f) ? vec4(1.f) : E ;
     int refract_active = 0 ; 
     if(material.alpha_factor < 1.f)
         refract_active = 1 ;
-    vec4 final_computed_fragment = vec4(specular + diffuse + ambient * 0.4f, 1.f) * C + (Rf * 0.3f * refract_active + R * refract_active) + E * material.emissive_factor ; 
+    if(E.rgb != vec3(0))
+        final_computed_fragment = C + (Rf * 0.3f * refract_active + R * refract_active) + E * material.emissive_factor ; 
+    else
+        final_computed_fragment = vec4(specular + diffuse + ambient * 0.4f, 1.f) * C + (Rf * 0.3f * refract_active + R * refract_active); 
     final_computed_fragment.a = material.alpha_factor; 
     fragment = final_computed_fragment; 
 }

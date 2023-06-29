@@ -4,7 +4,7 @@
 
 constexpr unsigned int DUMMY_TEXTURE_DIM = 1 ;
 constexpr uint32_t DEFAULT_NORMAL_DUMMY_PIXEL_RGBA = 0x007F7FFF; 
-constexpr uint32_t DEFAULT_OPACITY_DUMMY_PIXEL_RGBA = 0xFF010101; 
+constexpr uint32_t DEFAULT_OPACITY_DUMMY_PIXEL_RGBA = 0xFF000000; 
 static std::map<Texture::TYPE , const char*> texture_type_c_str = {
 	{Texture::DIFFUSE , "diffuse_map"}, 
 	{Texture::NORMAL , "normal_map"}, 
