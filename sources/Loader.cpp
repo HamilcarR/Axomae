@@ -206,7 +206,8 @@ static Material loadAllTextures(const aiScene* scene , const aiMaterial* materia
 		dummy_textures_type.push_back(Texture::SPECULAR); 	
 	
 	if(material->GetTextureCount(aiTextureType_EMISSIVE) > 0){
-		material->GetTexture(aiTextureType_EMISSIVE , 0 , &emissive_texture , nullptr , nullptr , nullptr , nullptr , nullptr); 
+		material->GetTexture(aiTextureType_EMISSIVE , 0 , &emissive_texture , nullptr , nullptr , nullptr , nullptr , nullptr);
+		mesh_material.setEmissiveFactor(10.f); 
 		loadTexture(scene , &mesh_material , emissive , emissive_texture , Texture::EMISSIVE , texture_database); 
 	}
 	else
@@ -348,7 +349,6 @@ std::vector<Mesh*> Loader::loadObjects(const char* file){
 		std::vector<std::future<std::pair<unsigned ,Object3D*>>> loaded_meshes_futures ; 	
 		std::vector<Material> material_array ;
 		material_array.resize(modelScene->mNumMeshes);
-		std::vector<std::future<std::pair<unsigned , Material>>> materials_futures;
 		//* Launching threads using lambda_fill_buffers
 		for(unsigned int i = 0 ; i < modelScene->mNumMeshes ; i++){ 
 			loaded_meshes_futures.push_back(
@@ -377,8 +377,6 @@ std::vector<Mesh*> Loader::loadObjects(const char* file){
 	}
 	
 }
-
-
 
 /**
  * The function loads a file and generates a vector of meshes, including a cube map if applicable.
