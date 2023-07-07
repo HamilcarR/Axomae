@@ -44,7 +44,7 @@ cuda.dependency_type = TYPE_C
 cuda.input = CUDA_SRC
 cuda.output = ${QMAKE_FILE_BASE}.o
 QMAKE_EXTRA_COMPILERS+= cuda 
-QMAKE_CXXFLAGS += -std=c++17 -g -pg -O3 -Wall -pedantic -Wno-unused 
+QMAKE_CXXFLAGS += -std=c++17 -g -pg -Wall -pedantic -Wno-unused 
 }
 
 ########################################################################################
