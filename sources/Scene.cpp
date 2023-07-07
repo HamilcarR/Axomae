@@ -11,15 +11,24 @@ Scene::~Scene(){
     
 }
 
-void Scene::setScene(std::vector<Mesh*> &to_copy){
-    for(auto A : to_copy){
+void Scene::updateTree(){
+    scene_tree.updateOwner(); 
+    scene_tree.updateAccumulatedTransformations(); 
+}
+
+void Scene::setCameraPointer(Camera* _scene_camera){
+    scene_camera = _scene_camera;
+    scene_tree.pushNewRoot(scene_camera); 
+}
+
+void Scene::setScene(std::pair<std::vector<Mesh*> , SceneTree> &to_copy){
+    scene_tree = to_copy.second; 
+    for(auto A : to_copy.first){
         Scene::AABB mesh ;
         mesh.aabb = BoundingBox(A->geometry.vertices);
         mesh.drawable = new Drawable(A) ; 
         scene.push_back(mesh);  
     }
-    
-    
 }
 
 void Scene::generateBoundingBoxes(Shader* box_shader){
@@ -62,7 +71,6 @@ std::vector<Drawable*> Scene::getSortedSceneByTransparency(){
     for(std::map<float , Drawable*>::reverse_iterator it = sorted_transparent_meshes.rbegin() ; it != sorted_transparent_meshes.rend() ; it++)
         to_return.push_back(it->second);
     return to_return ; 
-
 }
 
 void Scene::sortTransparentElements(){
@@ -97,6 +105,7 @@ void Scene::clear(){
 			delete scene[i].drawable; 
 		}	
     scene.clear();
+    scene_tree.clear(); 
     for(auto A : bounding_boxes_array){
         if(A){
             A->clean(); 
@@ -128,10 +137,10 @@ void Scene::prepare_draw(Camera* scene_camera){
 void Scene::drawForwardTransparencyMode(){
     std::vector<Drawable*> meshes = getSortedSceneByTransparency();  	
     scene_camera->computeViewProjection();
-    glm::mat4 default_modelview_matrix = scene_camera->getView() * scene_camera->getSceneModelMatrix();
+    glm::mat4 view_matrix = scene_camera->getView(); 
     for(Drawable *A : meshes){	
 		A->bind(); 		 
-        light_database->updateShadersData(A->getMeshShaderPointer() , default_modelview_matrix); 
+        light_database->updateShadersData(A->getMeshShaderPointer() , view_matrix); 
         glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
 		A->unbind();
 	}	

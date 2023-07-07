@@ -118,7 +118,7 @@ void GLViewer::mouseReleaseEvent(QMouseEvent *event){
 	update();
 }
 
-void GLViewer::setNewScene(std::vector<Mesh *> &new_scene){
+void GLViewer::setNewScene(std::pair<std::vector<Mesh *> , SceneTree> &new_scene){
 	makeCurrent();
 	renderer->set_new_scene(new_scene);
 	doneCurrent();

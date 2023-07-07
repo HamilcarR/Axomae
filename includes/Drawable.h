@@ -32,14 +32,14 @@ public:
 	 * 
 	 * @param mesh Reference to a mesh
 	 */
-	Drawable(axomae::Mesh &mesh); 
+	Drawable(Mesh &mesh); 
 	
 	/**
 	 * @brief Construct a new Drawable object from a Mesh
 	 * 
 	 * @param mesh Pointer to a mesh
 	 */
-	Drawable(axomae::Mesh *mesh); 
+	Drawable(Mesh *mesh); 
 	
 	/**
 	 * @brief Destroy the Drawable object
@@ -96,7 +96,7 @@ public:
 	 * @brief Returns the mesh  
 	 * 
 	 */
-	axomae::Mesh* getMeshPointer(){return mesh_object;}
+	Mesh* getMeshPointer(){return mesh_object;}
 
 	/**
 	 * @brief Get the Mesh's Shader pointer
@@ -113,7 +113,7 @@ public:
 	Material* getMaterialPointer() const ; 
 
 protected:
-	axomae::Mesh *mesh_object ;			/**<Pointer to the mesh */
+	Mesh *mesh_object ;			/**<Pointer to the mesh */
 	Camera *camera_pointer ; 			/**<Pointer to the camera*/
 	GLGeometryBuffer gl_buffers ; 		/**<OpenGL buffers*/
 };

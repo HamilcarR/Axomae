@@ -629,10 +629,11 @@ void GUIWindow::project_uv_normals(){
 bool GUIWindow::import_3DOBJ(){
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
 	if(!filename.isEmpty()){
-		Loader loader ; 
-		std::vector<Mesh*> scene = loader.load(filename.toStdString().c_str()) ;
+		Loader loader ;
+		auto struct_holder =  loader.load(filename.toStdString().c_str());
+		std::vector<Mesh*> scene = struct_holder.first;
 		SceneSelector *instance = SceneSelector::getInstance(); 	
-		_UI.renderer_view->setNewScene(scene); 
+		_UI.renderer_view->setNewScene(struct_holder); 
 		instance->setScene(scene);
 		_UI.meshes_list->setList(scene) ; 	
 	//	std::thread(ImageManager::project_uv_normals, scene[0]->geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()).detach();  //TODO : optimize and re enable	

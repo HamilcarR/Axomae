@@ -1,37 +1,36 @@
 #include "../includes/Mesh.h"
 #include "../includes/PerformanceLogger.h"
 
-namespace axomae {
 
-Mesh::Mesh(){
-	mesh_initialized = false ;
-	shader_program = nullptr ; 
-	name = "uninitialized mesh" ;
+Mesh::Mesh(SceneNodeInterface* parent):SceneTreeNode(parent){
+	mesh_initialized = false;
+	shader_program = nullptr; 
+	name = "uninitialized mesh" ; 
 	is_drawn = true; 
 }
 
-Mesh::Mesh(const Mesh& copy){
+Mesh::Mesh(const Mesh& copy) : SceneTreeNode(copy){
 	geometry = copy.geometry ; 
 	material = copy.material ; 
 	name = copy.name ; 
 	shader_program = copy.shader_program; 
 }
 
-Mesh::Mesh(const Object3D& geo , const Material& mat){
+Mesh::Mesh(const Object3D& geo , const Material& mat , SceneNodeInterface* parent ) : Mesh(parent){
 	geometry = geo; 
 	material = mat;
 	name = "uninitialized mesh"  ;
 	shader_program = nullptr ; 
 }
 
-Mesh::Mesh(std::string n , const Object3D& geo , const Material& mat){
+Mesh::Mesh(const std::string& n , const Object3D& geo , const Material& mat  , SceneNodeInterface* parent ) : Mesh(parent){
 	geometry = geo; 
 	material = mat;
 	name = n ; 
 	shader_program = nullptr ; 
 }
 
-Mesh::Mesh(std::string n , const Object3D& geo , const Material& mat , Shader* shader) {
+Mesh::Mesh(const std::string& n , const Object3D& geo , const Material& mat , Shader* shader, SceneNodeInterface* parent ) : Mesh(parent){
 	geometry = geo ;
 	material = mat ; 
 	name = n ; 
@@ -39,7 +38,7 @@ Mesh::Mesh(std::string n , const Object3D& geo , const Material& mat , Shader* s
 	material.setShaderPointer(shader); 
 }
 
-Mesh::Mesh(std::string n , Object3D&& geo ,const Material& mat , Shader* shader){   
+Mesh::Mesh(const std::string& n , const Object3D&& geo , const Material& mat , Shader* shader, SceneNodeInterface* parent ) : Mesh(parent){  
 	geometry = std::move(geo); 
 	material = mat ; 
 	name = n ; 
@@ -74,11 +73,12 @@ void Mesh::preRenderSetup(){
 	setDepthMask(true); 
 	setDepthFunc(LESS); 
 	depth_mask_enabled = true ;
-	model_matrix = camera->getSceneModelMatrix() ; 
-	modelview_matrix = camera->getView() * model_matrix ;  
+	setParent(camera) ; 
+	glm::mat4 model_mat = getWorldSpaceModelMatrix();
+	modelview_matrix = camera->getView() * model_mat ;
 	if(shader_program){	
 		shader_program->setSceneCameraPointer(camera); 
-		shader_program->setAllMatricesUniforms(model_matrix) ; 	
+		shader_program->setAllMatricesUniforms(model_mat) ; 	
 	}
 }
 
@@ -155,7 +155,7 @@ void Mesh::setDepthFunc(DEPTHFUNC func){
 
 /*****************************************************************************************************************/
 
-CubeMapMesh::CubeMapMesh() : Mesh() {
+CubeMapMesh::CubeMapMesh(SceneNodeInterface* parent) : Mesh(parent) {
 	std::vector<float> vertices = { 
 		-1 , -1 , -1 	,  // 0
 		1 , -1 , -1 	,  // 1
@@ -204,7 +204,7 @@ CubeMapMesh::CubeMapMesh() : Mesh() {
 	geometry.vertices = vertices ;
 	geometry.uv = textures ; 
 	geometry.colors = colors ; 
-	model_matrix = glm::mat4(1.f);
+	local_modelmatrix = glm::mat4(1.f);
 	name="CubeMap" ;
 }
 
@@ -216,11 +216,10 @@ void CubeMapMesh::preRenderSetup(){
 	setDepthFunc(LESS_OR_EQUAL); 	
 	glm::mat4 view = glm::mat4(glm::mat3(camera->getView()));
 	glm::mat4 projection = camera->getProjection() ; 
-	if(camera->getType() == Camera::ARCBALL)
-		model_matrix = camera->getSceneRotationMatrix() ;  				
+	local_modelmatrix = camera->getSceneRotationMatrix() ;  				
 	if(shader_program != nullptr){
 		shader_program->setSceneCameraPointer(camera); 	
-		shader_program->setAllMatricesUniforms(projection , view , model_matrix) ; 
+		shader_program->setAllMatricesUniforms(projection , view , local_modelmatrix) ; 
 	}
 }
 
@@ -248,12 +247,12 @@ FrameBufferMesh::FrameBufferMesh():Mesh(){
 	geometry.vertices = vertices ; 
 	geometry.uv = textures ;
 	name = "Custom screen framebuffer";
-	model_matrix = glm::mat4(1.f);   
+	local_modelmatrix = glm::mat4(1.f);   
 }
 
 FrameBufferMesh::FrameBufferMesh(int texture_index , Shader* _shader): FrameBufferMesh(){	
 	shader_program = _shader; 	 
-	material.setShaderPointer(shader_program); //TODO ? replace 
+	material.setShaderPointer(shader_program);  
 	material.addTexture(texture_index , Texture::FRAMEBUFFER);	
 }
 
@@ -270,15 +269,13 @@ void FrameBufferMesh::preRenderSetup(){
 
 /*****************************************************************************************************************/
 
-BoundingBoxMesh::BoundingBoxMesh() : Mesh(){
+BoundingBoxMesh::BoundingBoxMesh(SceneNodeInterface* parent):Mesh(parent){
 
 }
 
 //TODO: [AX-19] Fix cubemap bounding box computation 
-BoundingBoxMesh::BoundingBoxMesh(Mesh* m , Shader* s) : BoundingBoxMesh(){
-	bound_mesh = m ; 
+BoundingBoxMesh::BoundingBoxMesh(Mesh* m , Shader* s) : BoundingBoxMesh(m){
 	shader_program = s ;
-	assert(bound_mesh != nullptr); 
 	name = std::string("Boundingbox-") + m->getMeshName(); 
 	std::vector<float> vertices = m->getGeometry().vertices; 
 	bounding_box = BoundingBox(vertices);
@@ -288,10 +285,8 @@ BoundingBoxMesh::BoundingBoxMesh(Mesh* m , Shader* s) : BoundingBoxMesh(){
 	geometry.indices = geom.second;  
 }
 
-BoundingBoxMesh::BoundingBoxMesh(Mesh* m , const BoundingBox& bbox , Shader* s) : BoundingBoxMesh(){
-	bound_mesh = m ; 
+BoundingBoxMesh::BoundingBoxMesh(Mesh* m , const BoundingBox& bbox , Shader* s) : BoundingBoxMesh(m){
 	shader_program = s ; 
-	assert(bound_mesh != nullptr); 
 	name = std::string("Boundingbox-") + m->getMeshName(); 
 	bounding_box = bbox ;
 	material.setShaderPointer(s); 
@@ -311,13 +306,12 @@ void BoundingBoxMesh::preRenderSetup(){
 	setDepthFunc(LESS);
 	setPolygonDrawMode(LINE); 
 	depth_mask_enabled = true;
-	assert(bound_mesh != nullptr); 
-	model_matrix = bound_mesh->getModelMatrix(); 
-	modelview_matrix = bound_mesh->getModelViewMatrix();
+	glm::mat4 model = getWorldSpaceModelMatrix(); 
+	modelview_matrix = camera->getView() * model ; 
 	bounding_box = modelview_matrix * bounding_box ;  
 	if(shader_program){	
 		shader_program->setSceneCameraPointer(camera); 
-		shader_program->setAllMatricesUniforms(model_matrix) ; 	
+		shader_program->setAllMatricesUniforms(model) ; 	
 	}
 }
 
@@ -360,4 +354,3 @@ void BoundingBoxMesh::afterRenderSetup(){
 
 
 
-}//end namespace

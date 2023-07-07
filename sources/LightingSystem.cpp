@@ -3,7 +3,9 @@
 
 
 
+AbstractLight::AbstractLight(SceneNodeInterface *parent) : SceneTreeNode(parent){
 
+} 
 
 
 void AbstractLight::updateShaderData(Shader* shader_program , glm::mat4& modelview , unsigned int index)  {
@@ -21,7 +23,7 @@ void AbstractLight::updateShaderData(Shader* shader_program , glm::mat4& modelvi
 
 /*****************************************************************************************************************/
 
-DirectionalLight::DirectionalLight(){
+DirectionalLight::DirectionalLight(SceneNodeInterface* parent) : AbstractLight(parent){
     position = glm::vec3(0.f); 
     type = DIRECTIONAL; 
     intensity = 0.f ; 
@@ -32,7 +34,7 @@ DirectionalLight::DirectionalLight(){
 }
 
 
-DirectionalLight::DirectionalLight(glm::vec3 _position , glm::vec3 _ambientColor , glm::vec3 _diffuseColor , glm::vec3 _specularColor , float _intensity):DirectionalLight(){
+DirectionalLight::DirectionalLight(glm::vec3 _position , glm::vec3 _ambientColor , glm::vec3 _diffuseColor , glm::vec3 _specularColor , float _intensity , SceneNodeInterface *parent):DirectionalLight(parent){
     specularColor = _specularColor ;
     ambientColor = _ambientColor ;  
     diffuseColor = _diffuseColor ; 
@@ -42,7 +44,7 @@ DirectionalLight::DirectionalLight(glm::vec3 _position , glm::vec3 _ambientColor
 
 }
 
-DirectionalLight::DirectionalLight(glm::vec3 _position , glm::vec3 color , float _intensity):DirectionalLight(){
+DirectionalLight::DirectionalLight(glm::vec3 _position , glm::vec3 color , float _intensity , SceneNodeInterface *parent):DirectionalLight(parent){
     position = _position ; 
     specularColor = color ; 
     diffuseColor = color ; 
@@ -54,14 +56,15 @@ DirectionalLight::~DirectionalLight(){
 
 }
 
-void DirectionalLight::updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) {
+void DirectionalLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) {
+    glm::mat4 modelview = view * getWorldSpaceModelMatrix();
     viewspace_position = glm::vec3(modelview * glm::vec4(position , 0.f));
     AbstractLight::updateShaderData(shader , modelview , index); 
 }
 
 /*****************************************************************************************************************/
 
-PointLight::PointLight(){
+PointLight::PointLight(SceneNodeInterface* parent) : AbstractLight(parent){
     position = glm::vec3(0.f); 
     type = POINT; 
     intensity = 0.f ; 
@@ -73,7 +76,7 @@ PointLight::PointLight(){
 }
 
 
-PointLight::PointLight(glm::vec3 _position , glm::vec3 _ambientColor , glm::vec3 _diffuseColor , glm::vec3 _specularColor , glm::vec3 _attenuation ,  float _intensity):PointLight(){
+PointLight::PointLight(glm::vec3 _position , glm::vec3 _ambientColor , glm::vec3 _diffuseColor , glm::vec3 _specularColor , glm::vec3 _attenuation ,  float _intensity , SceneNodeInterface *parent ):PointLight(parent){
     specularColor = _specularColor ;
     ambientColor = _ambientColor ;  
     diffuseColor = _diffuseColor ; 
@@ -84,7 +87,7 @@ PointLight::PointLight(glm::vec3 _position , glm::vec3 _ambientColor , glm::vec3
 
 }
 
-PointLight::PointLight(glm::vec3 _position , glm::vec3 color , glm::vec3 _attenuation , float _intensity):PointLight(){
+PointLight::PointLight(glm::vec3 _position , glm::vec3 color , glm::vec3 _attenuation , float _intensity , SceneNodeInterface* parent):PointLight(parent){
     position = _position ; 
     specularColor = color ; 
     diffuseColor = color ; 
@@ -97,7 +100,9 @@ PointLight::~PointLight(){
 
 }
 
-void PointLight::updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) {
+void PointLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) {
+    local_modelmatrix = glm::translate(glm::mat4(1.f) , position); 
+    glm::mat4 modelview = view * getWorldSpaceModelMatrix();
     viewspace_position = glm::vec3(modelview * glm::vec4(position , 1.f));
     if(shader){
         std::string struct_name = light_struct_name + std::string("[") + std::to_string(index) + std::string("]."); 
@@ -112,8 +117,8 @@ void PointLight::updateShaderData(Shader* shader , glm::mat4& modelview , unsign
 /*****************************************************************************************************************/
 
 
-SpotLight::SpotLight(){
-     position = glm::vec3(0.f); 
+SpotLight::SpotLight(SceneNodeInterface *parent):AbstractLight(parent){
+    position = glm::vec3(0.f); 
     type = SPOT;  
     theta = 0.f ; 
     intensity = 0.f ; 
@@ -124,7 +129,7 @@ SpotLight::SpotLight(){
     light_struct_name = std::string(uniform_name_str_lighting_spot_struct_name) ;  
 }
 
-SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _color , float _cutoff_angle , float _intensity):SpotLight(){
+SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _color , float _cutoff_angle , float _intensity , SceneNodeInterface *parent):SpotLight(parent){
     position = _position ; 
     specularColor = _color ; 
     diffuseColor = _color ; 
@@ -134,7 +139,7 @@ SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _col
     direction = _direction ;  
 }
 
-SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _ambient , glm::vec3 _diffuse , glm::vec3 _specular , float _angle , float _intensity):SpotLight(){
+SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _ambient , glm::vec3 _diffuse , glm::vec3 _specular , float _angle , float _intensity , SceneNodeInterface *parent):SpotLight(parent){
     specularColor = _specular ;
     ambientColor = _ambient ;  
     diffuseColor = _diffuse ; 
@@ -145,7 +150,9 @@ SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _amb
 
 }
 
-void SpotLight::updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) {
+void SpotLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) {
+    local_modelmatrix = glm::translate(glm::mat4(1.f) , position); 
+    glm::mat4 modelview = view * getWorldSpaceModelMatrix();
     viewspace_position = glm::vec3(modelview * glm::vec4(position , 1.f));  
     viewspace_direction = glm::vec3(modelview * glm::vec4(direction - position, 0.f) ); 
     float rad_theta = glm::radians(theta);  

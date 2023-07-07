@@ -81,7 +81,8 @@ bool Renderer::prep_draw(){
 	}
 }
 
-void Renderer::draw(){	
+void Renderer::draw(){
+	scene->updateTree(); 
 	camera_framebuffer->bindFrameBuffer();	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		
 	scene->drawForwardTransparencyMode(); 
@@ -90,12 +91,19 @@ void Renderer::draw(){
 	camera_framebuffer->renderFrameBufferMesh();	
 }
 
-void Renderer::set_new_scene(std::vector<Mesh*> &new_scene){
+void Renderer::set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scene){
 	scene->clear();	
-	scene->setScene(new_scene);
-	scene->setLightDatabasePointer(light_database);   	
-	scene->generateBoundingBoxes(resource_database->getShaderDatabase()->get(Shader::BOUNDING_BOX)); 	
+	scene->setScene(new_scene); 
+	scene->setLightDatabasePointer(light_database); 
 	scene->setCameraPointer(scene_camera); 
+	light_database->clearDatabase(); 
+	AbstractLight *L1 = new SpotLight(glm::vec3(-55 , 90 , 5) , glm::vec3(0.f) , glm::vec3(2.f , 1.8f , 0.8f), 10.f , 3.f , scene_camera); 
+    AbstractLight *L2 = new PointLight(glm::vec3(-5 , 0 , -20) , glm::vec3(0.875f , 0.557f , 0.184f), glm::vec3(1.f , 0.0045 , 0.0075) , 90.f , L1); 	
+    AbstractLight *L3 = new PointLight(glm::vec3(5 , 5 , 0) , glm::vec3(0.489f , 0.2f , 0.347f), glm::vec3(1.f , 0.045 , 0.075) , 200.f , L1); 
+	light_database->addLight(L1); 
+	light_database->addLight(L2);
+	light_database->addLight(L3);  
+	scene->generateBoundingBoxes(resource_database->getShaderDatabase()->get(Shader::BOUNDING_BOX)); 	
 	start_draw = true ;
 	scene_camera->reset() ;
 	resource_database->getShaderDatabase()->initializeShaders(); 

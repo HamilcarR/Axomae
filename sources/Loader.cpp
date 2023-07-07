@@ -7,6 +7,7 @@
 #include "../includes/Loader.h"
 #include "../includes/PerformanceLogger.h"
 #include "../includes/Mutex.h"
+#include "../includes/SceneNodeBuilder.h"
 
 /**
  * @file Loader.cpp
@@ -284,6 +285,58 @@ void load_indices_buffer(std::vector<unsigned> &dest , const aiFace *faces , int
 	}
 }
 
+inline glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from){ //https://stackoverflow.com/a/29184538
+    glm::mat4 to;
+    to[0][0] = (GLfloat)from.a1; to[0][1] = (GLfloat)from.b1;  to[0][2] = (GLfloat)from.c1; to[0][3] = (GLfloat)from.d1;
+    to[1][0] = (GLfloat)from.a2; to[1][1] = (GLfloat)from.b2;  to[1][2] = (GLfloat)from.c2; to[1][3] = (GLfloat)from.d2;
+    to[2][0] = (GLfloat)from.a3; to[2][1] = (GLfloat)from.b3;  to[2][2] = (GLfloat)from.c3; to[2][3] = (GLfloat)from.d3;
+    to[3][0] = (GLfloat)from.a4; to[3][1] = (GLfloat)from.b4;  to[3][2] = (GLfloat)from.c4; to[3][3] = (GLfloat)from.d4;
+    return to;
+}
+
+SceneNodeInterface* fillTreeData(aiNode *ai_node , const std::vector<Mesh*>& mesh_lookup , SceneNodeInterface* parent , std::vector<SceneNodeInterface*> &node_deletion){
+	if(ai_node != nullptr){
+		std::string name = ai_node->mName.C_Str();
+		glm::mat4 transformation = aiMatrix4x4ToGlm(ai_node->mTransformation);
+		std::vector<SceneNodeInterface*> add_node ; 
+		if(ai_node->mNumMeshes == 0){
+			add_node.push_back(SceneNodeBuilder::buildEmptyNode(parent));
+			node_deletion.push_back(add_node[0]); 
+		}	 
+		else if(ai_node->mNumMeshes == 1)
+			add_node.push_back(mesh_lookup[ai_node->mMeshes[0]]);
+		else{
+			add_node.push_back(SceneNodeBuilder::buildEmptyNode(parent)); //Little compatibility hack between assimp and the node system, assimp nodes can contain multiples meshes , but SceneTreeNode can be a mesh. 
+																		  //So we create a dummy node at position 0 in add_node to be the ancestors of the children nodes , while meshes will be attached to parent and without children.
+			for(unsigned i = 0 ; i < ai_node->mNumMeshes ; i++)
+				add_node.push_back(mesh_lookup[ai_node->mMeshes[i]]); 	
+		}
+		for(auto A : add_node){
+			A->setLocalModelMatrix(transformation);
+			A->setName(name);
+			std::vector<SceneNodeInterface*> parents_array = {parent}; 
+			A->setParents(parents_array); 	
+		}
+		for(unsigned i = 0 ; i < ai_node->mNumChildren ; i++)
+			fillTreeData(ai_node->mChildren[i] , mesh_lookup , add_node[0] , node_deletion); 
+		return add_node[0]; 
+	}
+	return nullptr ; 
+}
+
+SceneTree generateSceneTree(const aiScene* modelScene , const std::vector<Mesh*> &node_lookup){	
+	aiNode *ai_root = modelScene->mRootNode ;
+	SceneTree scene_tree;
+	std::vector<SceneNodeInterface*> node_deletion ;
+	SceneNodeInterface* node = fillTreeData(ai_root , node_lookup , nullptr , node_deletion);
+	assert (node != nullptr) ;  
+	node = node->returnRoot(); 
+	scene_tree.setRoot(node); 
+	scene_tree.updateAccumulatedTransformations(); 
+	return scene_tree; 
+}
+
+
 /**
  * The function loads 3D objects from a file using the Assimp library, creates meshes with their
  * associated materials and shaders, and returns them as a vector.
@@ -292,16 +345,19 @@ void load_indices_buffer(std::vector<unsigned> &dest , const aiFace *faces , int
  * 
  * @return a vector of pointers to Mesh objects.
  */
-
-std::vector<Mesh*> Loader::loadObjects(const char* file){
+std::pair<std::vector<Mesh*> , SceneTree> Loader::loadObjects(const char* file){ //TODO! return scene data structure , with lights + meshes + cameras 
 	TextureDatabase *texture_database = resource_database->getTextureDatabase() ; 	
 	ShaderDatabase *shader_database = resource_database->getShaderDatabase(); 
-	std::vector<Mesh*> objects; 
+	std::pair<std::vector<Mesh*> , SceneTree> objects;
 	Assimp::Importer importer ;	
 	std::mutex mesh_load_mutex;	
 	const aiScene *modelScene = importer.ReadFile(file , aiProcess_CalcTangentSpace | aiProcess_Triangulate  | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs ) ;
 	if(modelScene != nullptr){	
-		Shader* shader_program = shader_database->get(Shader::BLINN) ; 	
+		std::vector<std::future<std::pair<unsigned ,Object3D*>>> loaded_meshes_futures ; 	
+		std::vector<Material> material_array ;	
+		std::vector<Mesh*> node_lookup_table; 	
+		Shader* shader_program = shader_database->get(Shader::BLINN) ; 
+		
 		/**************************************************************************************************/
 		/*
 		 * This lambda function fills the different geometry buffers
@@ -337,7 +393,6 @@ std::vector<Mesh*> Loader::loadObjects(const char* file){
 			f_uv = std::async(std::launch::async,[&](){
 					load_geometry_buffer(object->uv , mesh->mTextureCoords[0] , mesh->mNumVertices , 2);
 					});	
-			
 			load_indices_buffer(object->indices , mesh->mFaces , mesh->mNumFaces);	
 			std::vector<std::shared_future<void>> shared_futures = {f_vertices.share() , f_normals.share() , f_bitangents.share() , f_tangents.share() , f_uv.share()};			
 			std::for_each(shared_futures.begin() , shared_futures.end() , [](std::shared_future<void> &it) -> void{	
@@ -345,9 +400,8 @@ std::vector<Mesh*> Loader::loadObjects(const char* file){
 			});
 			return std::pair<unsigned , Object3D*>(i , object); 	
 		};
-		/**************************************************************************************************/
-		std::vector<std::future<std::pair<unsigned ,Object3D*>>> loaded_meshes_futures ; 	
-		std::vector<Material> material_array ;
+		/**************************************************************************************************/	
+		node_lookup_table.resize(modelScene->mNumMeshes); 
 		material_array.resize(modelScene->mNumMeshes);
 		//* Launching threads using lambda_fill_buffers
 		for(unsigned int i = 0 ; i < modelScene->mNumMeshes ; i++){ 
@@ -364,16 +418,20 @@ std::vector<Mesh*> Loader::loadObjects(const char* file){
 			const aiMesh* mesh = modelScene->mMeshes[mesh_index] ; 
 			const char* mesh_name = mesh->mName.C_Str(); 
 			std::string name(mesh_name);	
-			Mesh *loaded_mesh = new Mesh(std::string(mesh->mName.C_Str()) , std::move(*geometry), material_array[mesh_index] , shader_program) ;	
-			std::cout << "object loaded : " << mesh->mName.C_Str()<< "\n" ; 	
-			objects.push_back(loaded_mesh);
+			Mesh *loaded_mesh = static_cast<Mesh*>(SceneNodeBuilder::buildMesh(nullptr , name , std::move(*geometry), material_array[mesh_index] , shader_program )) ;
+			std::cout << "object loaded : " << name << "\n" ;
+			node_lookup_table[mesh_index] = loaded_mesh; 
+			
+			objects.first.push_back(loaded_mesh);
 			delete geometry ; 	
-		}	
+		}
+		SceneTree scene_tree = generateSceneTree(modelScene , node_lookup_table); 
+		objects.second = scene_tree ; 	
 		return objects ; 
 	}	
 	else{
 		std::cout << "Problem loading scene" << std::endl ; 
-		return std::vector<Mesh*>() ; 
+		return std::pair<std::vector<Mesh*> , SceneTree>() ; 
 	}
 	
 }
@@ -385,16 +443,18 @@ std::vector<Mesh*> Loader::loadObjects(const char* file){
  * 
  * @return A vector of Mesh pointers.
  */
-std::vector<Mesh*> Loader::load(const char* file){
+std::pair<std::vector<Mesh*> , SceneTree> Loader::load(const char* file){
 	TextureDatabase *texture_database = resource_database->getTextureDatabase(); 	
 	ShaderDatabase *shader_database = resource_database->getShaderDatabase(); 
 	texture_database->clean();
 	shader_database->clean(); 
 	loadShaderDatabase(); 
-	std::vector<Mesh*> scene = loadObjects(file); 
+	std::pair<std::vector<Mesh*> , SceneTree> scene = loadObjects(file); 
 	Mesh* cube_map = generateCubeMap(false) ; 		
-	if(cube_map != nullptr)
-		scene.push_back(cube_map);	
+	if(cube_map != nullptr){
+		scene.first.push_back(cube_map);
+		scene.second.setAsRootChild(cube_map); 
+	}	
 	return scene ; 
 }
 
@@ -407,7 +467,6 @@ std::vector<Mesh*> Loader::load(const char* file){
  * @return The function `loadShader` returns a `std::string` which contains the text read from the file
  * specified by the `filename` parameter.
  */
-
 std::string Loader::loadShader(const char* filename){
 	std::ifstream stream(filename) ; 
 	std::string buffer; 
@@ -416,7 +475,6 @@ std::string Loader::loadShader(const char* filename){
 		shader_text = shader_text + buffer + "\n" ;
 	stream.close(); 
 	return shader_text ; 
-
 }
 
 

@@ -3,6 +3,7 @@
 
 #include "Shader.h"
 #include "utils_3D.h"
+#include "Node.h"
 
 /**
  * @file LightingSystem.h
@@ -16,7 +17,7 @@
  * @brief Abstract class providing an interface for the base light system 
  * 
  */
-class AbstractLight{
+class AbstractLight : public SceneTreeNode{
 public:
 
     /**
@@ -33,9 +34,9 @@ public:
         QUAD = 5 , 
         AREA_TEXTURE = 6
     };
-     
-    virtual ~AbstractLight(){}
-   
+
+    virtual ~AbstractLight() {} 
+    
     /**
      * @brief Set the Position of the ligh
      * 
@@ -108,10 +109,10 @@ public:
      * @brief Updates the uniforms values of lights in the shader
      * 
      * @param shader Pointer to the shader
-     * @param modelview Modelview matrix for light transformations
+     * @param view view matrix for light transformations
      * @param index Index position in the array corresponding on the type of the light in the database 
      */
-    virtual void updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) ; 
+    virtual void updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) ; 
 
     /**
      * @brief Get the type of the light
@@ -129,6 +130,15 @@ public:
     virtual unsigned int getID() {return id ; } 
 
 protected:
+    
+    /**
+     * @brief Construct a new Abstract Light object
+     * 
+     * @param parent Predecessor in the scene graph 
+     */
+    AbstractLight(SceneNodeInterface* parent = nullptr) ; 
+
+protected:
     TYPE type; 
     unsigned int id ;  
     glm::vec3 position ;
@@ -137,7 +147,9 @@ protected:
     glm::vec3 ambientColor; 
     glm::vec3 diffuseColor;
     std::string light_struct_name ;  
-    float intensity ; 
+    float intensity ;
+
+
 };
 /*****************************************************************************************************************/
 
@@ -145,14 +157,14 @@ protected:
  * @class DirectionalLight
  * @brief Class declaration of the Directional light
  */
-class DirectionalLight : public AbstractLight {
+class DirectionalLight : public AbstractLight  {
 public:
 
     /**
      * @brief Construct a new Directional Light object
-     * 
+     * @param parent Predecessor in the scene graph 
      */
-    DirectionalLight() ;
+    DirectionalLight(SceneNodeInterface* parent = nullptr) ;
 
     /**
      * @brief Construct a new Directional Light object
@@ -160,8 +172,9 @@ public:
      * @param position Position of the light
      * @param color General color of the light 
      * @param intensity Intensity of the light
+     * @param parent Predecessor in the scene graph  
      */
-    DirectionalLight(glm::vec3 position , glm::vec3 color , float intensity);
+    DirectionalLight(glm::vec3 position , glm::vec3 color , float intensity , SceneNodeInterface *parent = nullptr);
 
     /**
      * @brief Construct a new Directional Light 
@@ -171,8 +184,9 @@ public:
      * @param diffuseColor Diffuse color 
      * @param specularColor Specular color 
      * @param intensity Intensity of the light
+     * @param parent Predecessor in the scene graph  
      */
-    DirectionalLight(glm::vec3 position , glm::vec3 ambientColor , glm::vec3 diffuseColor , glm::vec3 specularColor , float intensity);  
+    DirectionalLight(glm::vec3 position , glm::vec3 ambientColor , glm::vec3 diffuseColor , glm::vec3 specularColor , float intensity , SceneNodeInterface *parent = nullptr);  
  
     /**
      * @brief Destroy the Directional Light object
@@ -182,9 +196,9 @@ public:
  
     /**
      * @brief Computes the directional light direction and stores it into the viewspace_position property , then calls AbstractLight::updateShaderData() which updates uniforms accordingly
-     * @overload void AbstractLight::updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) const ; 
+     * @overload void AbstractLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) const ; 
      */
-    virtual void updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) ; 
+    virtual void updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) ; 
 
 protected:
 };
@@ -200,9 +214,10 @@ class PointLight : public AbstractLight{
 public:
     /**
      * @brief Construct a new Point Light object
+     * @param parent Predecessor in the scene graph  
      * 
      */
-    PointLight(); 
+    PointLight(SceneNodeInterface* parent = nullptr); 
     
     /**
      * @brief Construct a new Point Light object
@@ -211,8 +226,9 @@ public:
      * @param color Color of the light
      * @param attenuation_components glm::vec3 representing the 3 attenuation components of a point light , attenuation_components.x being the constant component , attenuation_components.y the linear , and the last one is the quadratic.
      * @param intensity Intensity of the light
+     * @param parent Predecessor in the scene graph  
      */
-    PointLight(glm::vec3 position , glm::vec3 color , glm::vec3 attenuation_components , float intensity); 
+    PointLight(glm::vec3 position , glm::vec3 color , glm::vec3 attenuation_components , float intensity , SceneNodeInterface *parent = nullptr); 
     
     /**
      * @brief Construct a new Point Light object
@@ -223,8 +239,9 @@ public:
      * @param specularColor The specular color
      * @param attenuation_components glm::vec3 representing the 3 attenuation components of a point light , attenuation_components.x being the constant component , attenuation_components.y the linear , and the last one is the quadratic.
      * @param intensity Intensity of the light 
+     * @param parent Predecessor in the scene graph  
      */
-    PointLight(glm::vec3 position , glm::vec3 ambientColor , glm::vec3 diffuseColor , glm::vec3 specularColor , glm::vec3 attenuation_compnents , float intensity); 
+    PointLight(glm::vec3 position , glm::vec3 ambientColor , glm::vec3 diffuseColor , glm::vec3 specularColor , glm::vec3 attenuation_compnents , float intensity , SceneNodeInterface *parent = nullptr); 
     
     /**
      * @brief Destroy the Point Light object
@@ -235,23 +252,24 @@ public:
     /**
      * @brief Enable point light values in shader's uniforms
      *
-     * @overload void AbstractLight::updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) const ;
+     * @overload void AbstractLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) const ;
      */
-    virtual void updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) override ; 
+    virtual void updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) override ; 
 protected:
     glm::vec3 attenuation ;         /**<Constant, linear, and quadratic attenuation values*/
 };
 
 /*****************************************************************************************************************/
 
-class SpotLight : public AbstractLight{
+class SpotLight : public AbstractLight {
 public:
     
     /**
      * @brief Construct a new Spot Light object
+     * @param parent Predecessor in the scene graph  
      * 
      */
-    SpotLight(); 
+    SpotLight(SceneNodeInterface *parent = nullptr); 
     
     /**
      * @brief Construct a new Spot Light object
@@ -261,8 +279,9 @@ public:
      * @param color 
      * @param cutoff_angle 
      * @param intensity 
+     * @param parent Predecessor in the scene graph 
      */
-    SpotLight(glm::vec3 position , glm::vec3 direction , glm::vec3 color , float cutoff_angle , float intensity); 
+    SpotLight(glm::vec3 position , glm::vec3 direction , glm::vec3 color , float cutoff_angle , float intensity , SceneNodeInterface *parent = nullptr); 
     
     /**
      * @brief Construct a new Spot Light object
@@ -273,26 +292,27 @@ public:
      * @param diffuse 
      * @param specular 
      * @param cutoff_angle 
-     * @param intensity 
+     * @param intensity
+     * @param parent Predecessor in the scene graph  
      */
-    SpotLight( glm::vec3 position , glm::vec3 direction , glm::vec3 ambient , glm::vec3 diffuse , glm::vec3 specular , float cutoff_angle ,  float intensity);
+    SpotLight( glm::vec3 position , glm::vec3 direction , glm::vec3 ambient , glm::vec3 diffuse , glm::vec3 specular , float cutoff_angle ,  float intensity , SceneNodeInterface *parent = nullptr);
 
     /**
      * @brief 
      * 
-     * @overload void AbstractLight::updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) const ;  
+     * @overload void AbstractLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) const ;  
      */
-    virtual void updateShaderData(Shader* shader , glm::mat4& modelview , unsigned int index) ; 
+    virtual void updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) ; 
 
 protected:
     glm::vec3 direction ;           /**<Direction of the light cone*/
-    glm::vec3 viewspace_direction;  /**<Direction in modelview space*/
+    glm::vec3 viewspace_direction;  /**<Direction in view space*/
     float theta;                    /**<Angle of the light cone , in degrees*/
 
 };
 
 
 
-//TODO: Add Area lighting
+//TODO: [AX-33] Add Area lighting
 
 #endif

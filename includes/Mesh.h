@@ -11,13 +11,12 @@
  * Mesh class implementation
  * 
  */
-namespace axomae {
 
 /**
  * @brief Mesh class
  * 
  */
-class Mesh{
+class Mesh : public SceneTreeNode{
 public:
 	/**
 	 * @brief Behavior of the depth function for the mesh
@@ -42,12 +41,14 @@ public:
 		FILL = GL_FILL
 	};
 
-	/**
-	 * @brief Construct a new Mesh object
-	 * 
-	 */
-	Mesh();
 	
+	/**
+	 * @brief Construct a new Mesh , using parent as predecessor in the hierarchy
+	 * 
+	 * @param parent Parent object in the scene graph 
+	 */
+	Mesh(SceneNodeInterface* parent = nullptr);
+
 	/**
 	 * @brief Copy constructor
 	 * 
@@ -61,7 +62,7 @@ public:
 	 * @param obj Geometry data
 	 * @param mat Material data
 	 */
-	Mesh(const Object3D& obj , const Material& mat); 
+	Mesh(const Object3D& obj , const Material& mat , SceneNodeInterface* parent = nullptr); 
 	
 	/**
 	 * @brief Construct a new Mesh object with a name , geometry , and material
@@ -70,7 +71,7 @@ public:
 	 * @param obj Geometry data
 	 * @param mat Material data
 	 */
-	Mesh(std::string name , const Object3D& obj , const Material& mat); 
+	Mesh(const std::string& name , const Object3D& obj , const Material& mat , SceneNodeInterface* parent = nullptr); 
 
 	/**
 	 * @brief Construct a new Mesh object
@@ -80,7 +81,7 @@ public:
 	 * @param mat Mesh material
 	 * @param shader Shader used
 	 */
-	Mesh(std::string name , const Object3D& obj , const Material& mat , Shader* shader);
+	Mesh(const std::string& name , const Object3D& obj , const Material& mat , Shader* shader , SceneNodeInterface* parent = nullptr);
 
 	/**
 	 * @brief Construct a new Mesh object
@@ -90,7 +91,7 @@ public:
 	 * @param mat 
 	 * @param shader 
 	 */
-	Mesh(std::string name , Object3D&& obj , const Material& mat , Shader* shader); 
+	Mesh(const std::string& name , const Object3D&& obj , const Material& mat , Shader* shader , SceneNodeInterface* parent = nullptr); 
 	
 	/**
 	 * @brief Destroy the Mesh object
@@ -166,19 +167,6 @@ public:
 	 */
 	virtual void setSceneCameraPointer(Camera *camera); 
 	
-	/**
-	 * @brief Set the Model Matrix 
-	 * 
-	 * @param matrix mat4 representing the model matrix 
-	 */
-	virtual void setModelMatrix(glm::mat4 &matrix){ model_matrix = matrix ; }
-	
-	/**
-	 * @brief Get the Model Matrix object
-	 * 
-	 */
-	virtual glm::mat4& getModelMatrix() {return model_matrix;}
-
 	/**
 	 * @brief Get the ModelView matrix
 	 * 
@@ -291,10 +279,8 @@ public:
 	Object3D geometry;					/**<3D Geometry of the mesh , vertex positions , UVs etc*/	
 	Material material; 					/**<Material to be used for the mesh*/
 protected:
-	std::string name; 					/**<Name of the mesh*/
 	bool mesh_initialized ; 			/**<Is the mesh ready to render*/
 	Camera* camera; 					/**<Pointer on the scene camera*/
-	glm::mat4 model_matrix;				/**<Mesh's model matrix*/
 	glm::mat4 modelview_matrix;			/**<Mesh's view x model matrix*/ 
 	bool face_culling_enabled ;			/**<Is culling enabled*/
 	bool depth_mask_enabled ; 			/**<Is depth enabled*/ 
@@ -315,7 +301,7 @@ public:
 	 * @brief Construct a new Cube Map Mesh object
 	 * 
 	 */
-	CubeMapMesh(); 
+	CubeMapMesh(SceneNodeInterface* parent = nullptr); 
 
 	/**
 	 * @brief Destroy the Cube Map Mesh object
@@ -377,10 +363,10 @@ public:
 	
 	/**
 	 * @brief Construct a new Bounding Box Mesh object
-	 * 
+	 * @param parent Predecessor in the scene graph 
 	 */
-	BoundingBoxMesh(); 
-	
+	BoundingBoxMesh(SceneNodeInterface* parent = nullptr); 
+
 	/**
 	 * @brief Construct a new Bounding Box Mesh object
 	 * 
@@ -392,9 +378,9 @@ public:
 	/**
 	 * @brief Construct a new Bounding Box Mesh using pre-computed bounding boxes
 	 * 
-	 * @param bound_mesh The Mesh we want to wrap in an aabb
+	 * @param bound_mesh The Mesh we want to wrap in an aabb . Note that this mesh is used as parent in the scene graph
 	 * @param bounding_box The pre-computed bounding box 
-	 * @param display_shader 
+	 * @param display_shader Shader used to display the bounding box 
 	 */
 	BoundingBoxMesh(Mesh* bound_mesh , const BoundingBox& bounding_box , Shader* display_shader); 
 	/**
@@ -415,7 +401,6 @@ public:
 
 	virtual BoundingBox getBoundingBoxObject(){return bounding_box;}
 protected:
-	Mesh* bound_mesh;
 	BoundingBox bounding_box;  
 };
 
@@ -435,5 +420,4 @@ protected:
 
 
 
-}
 #endif

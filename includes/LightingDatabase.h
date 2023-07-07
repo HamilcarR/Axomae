@@ -64,16 +64,17 @@ public:
      * @brief Update shader uniforms for all lights
      * 
      * @param shader Shader pointer to send data to 
-     * @param modelview  Modelview matrix for light transformations
+     * @param view  View matrix for light transformations
      */
-    virtual void updateShadersData(Shader* shader , glm::mat4& modelview); 
+    virtual void updateShadersData(Shader* shader , glm::mat4& view); 
     /**
      * @brief Update shader uniforms only for lights of "type" 
      * 
      * @param type Type of lights to send to the shader 
      * @param shader Shader applied to the mesh 
+     * @param view View matrix for light transformations
      */
-    virtual void updateShadersData(AbstractLight::TYPE type , Shader* shader , glm::mat4& modelview);
+    virtual void updateShadersData(AbstractLight::TYPE type , Shader* shader , glm::mat4& view);
 protected:
     std::map<AbstractLight::TYPE , std::vector<AbstractLight*>> light_database ;    /**<Map of all lights in the scene. The map key stored is the type of light*/
 

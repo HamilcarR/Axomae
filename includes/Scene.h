@@ -5,7 +5,7 @@
 #include "Drawable.h"
 #include "BoundingBox.h"
 #include "Camera.h"
-
+#include "SceneHierarchy.h"
 /**
  * @file Scene.h
  * File implementing classes and functions relative to how the scene is represented and how to manage it 
@@ -14,6 +14,7 @@
 
 
 //TODO: [AX-14] Add mouse picking
+//TODO: [AX-34] Add object lookup system
 
 /**
  * @class This class manages all drawable meshes inside the scene and provides methods to sort them by types.
@@ -44,7 +45,7 @@ public:
      * 
      * @param to_copy Meshes to copy  
      */
-    void setScene(std::vector<axomae::Mesh*>& to_copy); 
+    void setScene(std::pair<std::vector<Mesh*> , SceneTree> &to_copy); 
     
     /**
      * @brief Get only the opaque objects. These objects are not sorted , since the draw order doesn't have an incidence
@@ -128,7 +129,13 @@ public:
      * 
      * @param _scene_camera 
      */
-    void setCameraPointer(Camera* _scene_camera){scene_camera = _scene_camera;}
+    void setCameraPointer(Camera* _scene_camera);
+
+    /**
+     * @brief Update the hierarchy tree of the scene  
+     * 
+     */
+    void updateTree(); 
 
 private:
     /**
@@ -139,6 +146,7 @@ private:
 protected:
     std::map<float , Drawable*> sorted_transparent_meshes ; 
     std::vector<AABB> scene ;
+    SceneTree scene_tree ; 
     std::vector<Drawable*> bounding_boxes_array;
     LightingDatabase* light_database;
     Camera* scene_camera; 

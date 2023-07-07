@@ -15,6 +15,7 @@
 #include "utils_3D.h" 
 #include "Mesh.h"
 #include "ResourceDatabaseManager.h"
+#include "SceneHierarchy.h"
 
 /**
  * @file Loader.h
@@ -48,7 +49,7 @@ public:
 	 * @param file Path of the 3D glb model
 	 * @return std::vector<Mesh*> 
 	 */
-	std::vector<Mesh*> load(const char* file);   				
+	std::pair<std::vector<Mesh*> , SceneTree> load(const char* file);   				
 	
 	/**
 	 * @brief Loads a shader file into an std::string
@@ -82,7 +83,7 @@ public:
 	 * @param filename GLB file path
 	 * @return std::vector<Mesh*>
 	 */
-	std::vector<Mesh*> loadObjects(const char* filename) ; 
+	std::pair<std::vector<Mesh*> , SceneTree> loadObjects(const char* filename) ; 
 	
 
 protected:

@@ -70,7 +70,7 @@ public:
 	 * 
 	 * @param new_scene New scene to be rendererd
 	 */
-	void set_new_scene(std::vector<axomae::Mesh*> &new_scene);
+	void set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scene);
 	
 	/**
 	 * @brief Checks if all Drawable objects in the scene have been initialized

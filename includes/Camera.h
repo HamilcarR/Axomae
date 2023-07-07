@@ -2,7 +2,7 @@
 #define CAMERA_H
 
 #include "utils_3D.h"
-
+#include "Node.h"
 /**
  * @file Camera.h
  * 
@@ -18,7 +18,7 @@
  *
  *
  */
-class Camera
+class Camera : public SceneTreeNode
 {
 public:
 	/**
@@ -159,16 +159,7 @@ public:
 	 * @return const glm::mat4& 
 	 */
 	virtual const glm::mat4& getSceneTranslationMatrix() const = 0;
-	
-	/**
-	 * @brief Get the product rotation x translation matrix of the scene
-	 * Note that this method is valid only in the case where the camera computes a part or totality of the scene's transformation
-	 * @see virtual const glm::mat4& getSceneRotationMatrix() 
-	 * @see virtual const glm::mat4& getSceneTranslationMatrix() 
-	 * @return const glm::mat4& 
-	 */
-	virtual const glm::mat4 &getSceneModelMatrix() const = 0;
-	
+		
 	/**
 	 * @brief Returns the type of the camera
 	 * 
@@ -190,7 +181,6 @@ protected:
 	glm::vec3 right;			/**<Right vector computed */
 	glm::vec3 direction;		/**<Direction vector of the camera */
 	glm::vec3 camera_up;		/**<Up vector of the camera */
-	glm::mat4 scene_model_matrix;			/**<Computed model matrix , product of (rotation x translation)*/
 	const glm::vec3 world_up;	/**<World space up vector */
 	MouseState *mouse_state_pointer;  /**<Pointer on a MouseState structure keeping track of the mouse data*/
 	ScreenSize *gl_widget_screen_size; /**<Pointer on ScreeSize structure keeping track of the size of the gl widget*/
@@ -267,12 +257,7 @@ public:
 	 * 
 	 */
 	virtual void reset();
-	/**
-	 * @brief Get the Scene Model Matrix object
-	 * 
-	 * @return const glm::mat4& 
-	 */
-	virtual const glm::mat4 &getSceneModelMatrix() const;
+	
 	/**
 	 * @brief Get the Scene Translation Matrix object
 	 * 
@@ -344,7 +329,6 @@ public:
 	virtual void movePosition() override;
 	virtual void zoomIn() override;
 	virtual void zoomOut() override;
-	virtual const glm::mat4& getSceneModelMatrix() const override; 
 };
 
 #endif

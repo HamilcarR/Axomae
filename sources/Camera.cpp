@@ -12,7 +12,7 @@ Camera::Camera() : world_up(glm::vec3(0,1,0)){
 	target = glm::vec3(0,0,0);
 	direction = glm::vec3(0,0,0);
 	right = glm::vec3(0,0,0);
-	scene_model_matrix = glm::mat4(1.f); 
+	local_modelmatrix = glm::mat4(1.f); 
 	type = EMPTY ; 
 }
 
@@ -93,7 +93,8 @@ ArcballCamera::ArcballCamera(){
  */
 ArcballCamera::ArcballCamera(float radians , ScreenSize* screen  , float near , float far , float radius , MouseState* pointer): Camera(radians ,screen, near , far , pointer) {
 	reset() ; 	
-	default_radius = radius ; 
+	default_radius = radius ;
+	name = "Arcball-Camera";  
 	this->radius = radius ; 
 }
 
@@ -115,7 +116,7 @@ void ArcballCamera::reset(){
 	target = glm::vec3(0.f) ;
 	panning_offset = glm::vec3(0) ;
 	delta_position = glm::vec3(0.f); 
-	translation = last_translation = scene_translation_matrix = scene_rotation_matrix = scene_model_matrix = glm::mat4(1.f) ; 
+	translation = last_translation = scene_translation_matrix = scene_rotation_matrix = local_modelmatrix =  glm::mat4(1.f) ; 
 }
 
 /**
@@ -167,7 +168,7 @@ void ArcballCamera::computeViewSpace(){
 		scene_rotation_matrix = glm::mat4_cast(last_rotation);
 		scene_translation_matrix = last_translation ;
 	}
-		scene_model_matrix = scene_rotation_matrix * scene_translation_matrix; 	
+		local_modelmatrix = scene_rotation_matrix * scene_translation_matrix; 	
 		direction = target - glm::vec3(0 , 0 , radius) ; 
 		position = glm::vec3(0 , 0 , radius) ; 
 		view = glm::lookAt(position , target , world_up)  ; 
@@ -179,10 +180,6 @@ const glm::mat4& ArcballCamera::getSceneRotationMatrix() const {
 
 const glm::mat4& ArcballCamera::getSceneTranslationMatrix() const {
 	return scene_translation_matrix ; 
-}
-
-const glm::mat4& ArcballCamera::getSceneModelMatrix() const {
-	return scene_model_matrix ; 
 }
 
 /**
@@ -305,9 +302,7 @@ void FreePerspectiveCamera::zoomOut(){
 
 }
 
-const glm::mat4& FreePerspectiveCamera::getSceneModelMatrix() const {
-	return scene_model_matrix; 
-}
+
 
 
 

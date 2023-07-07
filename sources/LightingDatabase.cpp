@@ -22,7 +22,7 @@ bool LightingDatabase::addLight(AbstractLight* light){
 const std::vector<AbstractLight*>& LightingDatabase::getLightsArrayByType(AbstractLight::TYPE type) {
     return light_database[type] ;
 }
-//TODO: [AX-36] fix invalidated iterator after erase
+
 void LightingDatabase::eraseLightsArray(AbstractLight::TYPE type){
     auto arr = light_database[type] ; 
     for(AbstractLight* A :  arr)

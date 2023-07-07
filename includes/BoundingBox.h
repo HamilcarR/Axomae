@@ -3,9 +3,9 @@
 
 
 #include "utils_3D.h" 
+#include "Node.h"
 
-
-class BoundingBox {
+class BoundingBox : public SceneTreeNode {
 public:
 	
 	/**

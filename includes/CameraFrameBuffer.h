@@ -40,7 +40,7 @@ private:
 
 protected: 
     Drawable *drawable_screen_quad; 
-    axomae::Mesh *mesh_screen_quad;
+    Mesh *mesh_screen_quad;
     ShaderDatabase* shader_database;  
     Shader* shader_framebuffer;
     float gamma ;
