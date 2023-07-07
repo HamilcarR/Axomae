@@ -3,8 +3,8 @@
 #include <map>
 
 constexpr unsigned int DUMMY_TEXTURE_DIM = 1 ;
-constexpr uint32_t DEFAULT_NORMAL_DUMMY_PIXEL_RGBA = 0x007F7FFF; 
-constexpr uint32_t DEFAULT_OPACITY_DUMMY_PIXEL_RGBA = 0xFF000000; 
+constexpr uint32_t DEFAULT_NORMAL_DUMMY_PIXEL_RGBA = 0x007F7FFF; //Default pixel color for a normal map 
+constexpr uint32_t DEFAULT_OPACITY_DUMMY_PIXEL_RGBA = 0xFF000000;//Default pixel color for other textures 
 static std::map<Texture::TYPE , const char*> texture_type_c_str = {
 	{Texture::DIFFUSE , "diffuse_map"}, 
 	{Texture::NORMAL , "normal_map"}, 
@@ -130,8 +130,10 @@ DiffuseTexture::~DiffuseTexture(){
 
 }
 
-DiffuseTexture::DiffuseTexture(TextureData* data):Texture(data){
+DiffuseTexture::DiffuseTexture(TextureData* data){
 	name = DIFFUSE ; 
+	if(data != nullptr)
+		set(data); 
 }
 
 void DiffuseTexture::setGlData(Shader* shader){
@@ -153,6 +155,20 @@ void DiffuseTexture::unbindTexture(){
 	glActiveTexture(GL_TEXTURE0 + DIFFUSE); 
 	glBindTexture(GL_TEXTURE_2D , 0);
 
+}
+
+
+void DiffuseTexture::set(TextureData *texture){
+	clean(); 
+	width = texture->width ; 
+	height = texture->height ; 
+	data = new uint32_t [ width * height ] ; 
+	has_transparency = false ; 
+	for(unsigned int i = 0 ; i < width * height ; i++){
+		data[i] = texture->data[i] ;
+		if((data[i] & 0xFF000000) != 0xFF000000)
+			has_transparency = true ; 
+	}
 }
 
 const char* DiffuseTexture::getTextureTypeCStr() {

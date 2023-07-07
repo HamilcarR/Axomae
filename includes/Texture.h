@@ -149,7 +149,7 @@ public:
 	 * @param texture A pointer to a TextureData object that contains information about the texture,
 	 * including its width, height, and pixel data.
 	 */	
-	void set(TextureData *texture); 
+	virtual void set(TextureData *texture); 
 	
 	/**
 	 * @brief Cleans the texture
@@ -240,7 +240,8 @@ protected:
 	unsigned int height ; 		/**<Height of the texture*/
 	uint32_t *data ; 			/**<Raw data of the texture*/
 	unsigned int sampler2D ; 	/**<ID of the texture*/
-	bool is_dummy; 	
+	bool is_dummy; 				/**<Check if the current texture is a dummy texture*/
+		
 };
 
 /******************************************************************************************************************************************************************************************************************/
@@ -289,11 +290,28 @@ public:
 	virtual void setGlData(Shader* shader)  ;
 
 	/**
+	 * @brief This overriden method will additionally check for the presence of transparency in the map. 
+	 * If alpha < 1.f , the texture is considered as having transparency values. 
+	 * 
+	 * @param texture Texture data to copy.
+	 */
+	virtual void set(TextureData* texture) override;
+
+	/**
+	 * @brief Returns true if the texture contains alpha value < 1 
+	 * 
+	 */
+	virtual bool hasTransparency(){return has_transparency;}
+
+	/**
 	 * @brief Get the texture string description
 	 * 
 	 * @return C string 
 	 */
-	static const char* getTextureTypeCStr()   ; 	
+	static const char* getTextureTypeCStr()   ; 
+
+protected:
+	bool has_transparency; 		
 }; 
 
 /******************************************************************************************************************************************************************************************************************/

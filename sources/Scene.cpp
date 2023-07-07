@@ -146,6 +146,7 @@ void Scene::drawForwardTransparencyMode(){
 	}	
 }
 
+//TODO: [AX-39] Merge bounding box geometry 
 void Scene::drawBoundingBoxes(){
     std::vector<Drawable*> bounding_boxes = getBoundingBoxElements(); 
     for(Drawable* A : bounding_boxes){
