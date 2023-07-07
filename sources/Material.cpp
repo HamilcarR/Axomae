@@ -19,7 +19,6 @@ Material::~Material(){
 
 }
 
-//TODO: [AX-38] Use transparency with texture alpha channel 
 bool Material::isTransparent(){
 	Texture* tex_opacity = textures_group.getTexturePointer(Texture::OPACITY);
 	Texture* tex_diffuse = textures_group.getTexturePointer(Texture::DIFFUSE);  

@@ -308,7 +308,8 @@ void main(){
     if(E.rgb != vec3(0))
         final_computed_fragment = C + (Rf * 0.3f * refract_active + R * refract_active) + E * material.emissive_factor ; 
     else
-        final_computed_fragment = vec4(specular + diffuse + ambient * 0.4f, 1.f) * C + (Rf * 0.3f * refract_active + R * refract_active); 
-    final_computed_fragment.a = material.alpha_factor; 
+        final_computed_fragment = vec4(specular + diffuse + ambient * 0.4f, 1.f) * C + (Rf * 0.3f * refract_active + R * refract_active);
+    float alpha = C.a < material.alpha_factor ? C.a : material.alpha_factor; 
+    final_computed_fragment.a = alpha; 
     fragment = final_computed_fragment; 
 }
