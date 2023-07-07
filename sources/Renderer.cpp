@@ -105,7 +105,6 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scen
 	light_database->addLight(L3);  
 	scene->generateBoundingBoxes(resource_database->getShaderDatabase()->get(Shader::BOUNDING_BOX)); 	
 	start_draw = true ;
-	scene_camera->reset() ;
 	resource_database->getShaderDatabase()->initializeShaders(); 
 	camera_framebuffer->updateFrameBufferShader();
 }
