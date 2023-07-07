@@ -73,7 +73,6 @@ void Mesh::preRenderSetup(){
 	setDepthMask(true); 
 	setDepthFunc(LESS); 
 	depth_mask_enabled = true ;
-	setParent(camera) ; 
 	glm::mat4 model_mat = getWorldSpaceModelMatrix();
 	modelview_matrix = camera->getView() * model_mat ;
 	if(shader_program){	

@@ -307,7 +307,7 @@ SceneNodeInterface* fillTreeData(aiNode *ai_node , const std::vector<Mesh*>& mes
 			add_node.push_back(mesh_lookup[ai_node->mMeshes[0]]);
 		else{
 			add_node.push_back(SceneNodeBuilder::buildEmptyNode(parent)); //Little compatibility hack between assimp and the node system, assimp nodes can contain multiples meshes , but SceneTreeNode can be a mesh. 
-																		  //So we create a dummy node at position 0 in add_node to be the ancestors of the children nodes , while meshes will be attached to parent and without children.
+			node_deletion.push_back(add_node[0]); 						 //So we create a dummy node at position 0 in add_node to be the ancestors of the children nodes , while meshes will be attached to parent and without children.
 			for(unsigned i = 0 ; i < ai_node->mNumMeshes ; i++)
 				add_node.push_back(mesh_lookup[ai_node->mMeshes[i]]); 	
 		}
