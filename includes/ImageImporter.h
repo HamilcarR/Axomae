@@ -22,7 +22,7 @@ class ImageImporter
 		
 		ImageImporter(); 
 		~ImageImporter();
-	        SDL_Surface* surf;	
+	    SDL_Surface* surf;	
 		static ImageImporter* instance;
 		
 

@@ -34,6 +34,10 @@ public:
 		ALWAYS = GL_ALWAYS
 	} ;  
 
+	/**
+	 * @brief Rasterization mode for the drawn mesh
+	 * 
+	 */
 	enum RASTERMODE : GLenum 
 	{
 		POINT = GL_POINT , 
@@ -86,10 +90,10 @@ public:
 	/**
 	 * @brief Construct a new Mesh object
 	 * 
-	 * @param name 
-	 * @param obj 
-	 * @param mat 
-	 * @param shader 
+	 * @param name Mesh name 
+	 * @param obj Mesh geometry
+	 * @param mat Mesh material
+	 * @param shader Shader used
 	 */
 	Mesh(const std::string& name , const Object3D&& obj , const Material& mat , Shader* shader , SceneNodeInterface* parent = nullptr); 
 	

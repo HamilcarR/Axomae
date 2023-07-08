@@ -55,7 +55,7 @@ void SceneTree::updateAccumulatedTransformations(){
     if(root != nullptr){
         auto recompute_matrices = [](SceneNodeInterface* node){
             if(!node->isRoot()){
-                glm::mat4 new_accum = node->getParents()[0]->getWorldSpaceModelMatrix();
+                glm::mat4 new_accum = node->getParents()[0]->computeFinalTransformation();
                 node->setAccumulatedModelMatrix(new_accum);
             }
             else

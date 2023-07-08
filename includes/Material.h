@@ -22,6 +22,10 @@
 class Material{
 public:
 
+	/**
+	 * @brief Enumeration mapping OpenGL values for blending constants
+	 * 
+	 */
 	enum BLENDFUNC : unsigned {
 		ZERO = GL_ZERO , 
 		ONE = GL_ONE , 
@@ -135,15 +139,68 @@ public:
 	 * @return false If the alpha_factor == 1
 	 */
 	virtual bool isTransparent(); 
-
+	/**
+	 * @brief Get the Texture Group value
+	 * 
+	 * @return TextureGroup 
+	 */
 	TextureGroup getTextureGroup() const {return textures_group;}
+	
+	/**
+	 * @brief Get the Dielectric Factor value
+	 * 
+	 * @return float 
+	 */
 	float getDielectricFactor() const {return dielectric_factor;} 
+	
+	/**
+	 * @brief Get the Roughness Factor value
+	 * 
+	 * @return float 
+	 */
 	float getRoughnessFactor() const {return roughness_factor;}
+	
+	/**
+	 * @brief Get the Transmission Factor value
+	 * 
+	 * @return float 
+	 */
 	float getTransmissionFactor() const{return transmission_factor;}
+	
+	/**
+	 * @brief Get the Emissive Factor value
+	 * 
+	 * @return float 
+	 */
 	float getEmissiveFactor() const {return emissive_factor;} 
+	
+	/**
+	 * @brief Get the Alpha Factor value
+	 * 
+	 * @return float 
+	 */
 	float getAlphaFactor() const {return alpha_factor;}
+	
+	/**
+	 * @brief Get the Refractive Index value
+	 * 
+	 * @return glm::vec2 
+	 */
 	glm::vec2 getRefractiveIndex() const {return refractive_index;}
+	
+	/**
+	 * @brief Get the Shader Program object
+	 * 
+	 * @return Shader* 
+	 */
 	Shader* getShaderProgram() const {return shader_program;}
+	
+	/**
+	 * @brief Get the Transparency value
+	 * 
+	 * @return true 
+	 * @return false 
+	 */
 	bool getTransparency() const {return is_transparent;} 	
 
 protected:

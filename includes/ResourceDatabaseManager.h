@@ -7,7 +7,7 @@
 
 /**
  * @file ResourceDatabaseManager.h
- * This file implements a singleton containing resources databases, like textures and shaders databases 
+ * @brief This file implements a singleton containing resources databases, like textures and shaders databases 
  * 
  */
 
@@ -36,25 +36,25 @@ public:
     void purge();
 
     /**
-     * @brief  
+     * @brief Proceeds with a soft clean on the texture database 
      * 
      */
     void cleanTextureDatabase() const; 
     
     /**
-     * @brief 
+     * @brief Proceeds with a soft clean on the shader database 
      * 
      */
     void cleanShaderDatabase() const; 
     
     /**
-     * @brief 
+     * @brief Purge the entire texture database 
      * 
      */
     void purgeTextureDatabase() const; 
     
     /**
-     * @brief 
+     * @brief Purge the entire shader database 
      * 
      */
     void purgeShaderDatabase() const; 
@@ -73,15 +73,36 @@ public:
     ShaderDatabase* getShaderDatabase() const {return shader_database;} 
 
 private:
+
+    /**
+     * @brief Construct a new Resource Database Manager object
+     * 
+     */
     ResourceDatabaseManager();  
+    
+    /**
+     * @brief Destroy the Resource Database Manager object
+     * 
+     */
     virtual ~ResourceDatabaseManager();
+    
+    /**
+     * @brief Construct a new Resource Database Manager object
+     * 
+     */
     ResourceDatabaseManager(const ResourceDatabaseManager&) = delete ; 
+    
+    /**
+     * @brief 
+     * 
+     * @return ResourceDatabaseManager 
+     */
     ResourceDatabaseManager operator=(const ResourceDatabaseManager&) = delete; 
 
 private: 
-    static ResourceDatabaseManager *instance;
-    TextureDatabase *texture_database; 
-    ShaderDatabase  *shader_database; 
+    static ResourceDatabaseManager *instance;   /*<Instance of this ResourceDatabaseManager*/
+    TextureDatabase *texture_database;          /*<Pointer on the texture database*/ 
+    ShaderDatabase  *shader_database;           /*<Pointer on the shader database*/
 };
 
 

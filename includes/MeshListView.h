@@ -3,11 +3,19 @@
 
 #include "constants.h"
 #include "Mesh.h" 
-
-
 #include <QListWidget>
 
+/**
+ * @file MeshListView.h
+ * This file implements the list of meshes in the UV renderer UI 
+ * 
+ */
 
+
+/**
+ * @class MeshListView
+ * 
+ */
 class MeshListView : public QListWidget {
 public:
 	MeshListView(QWidget* parent=nullptr);

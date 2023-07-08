@@ -3,7 +3,15 @@
 #include <mutex>
 #include <cstdlib>
 
+/**
+ * @file GenericLockInterface.h
+ * Provide thread locking mechanisms
+ */
 
+/**
+ * @class GenericLockInterface 
+ * 
+ */
 class GenericLockInterface{
 public:
     virtual void lock() = 0 ; 

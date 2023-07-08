@@ -1,10 +1,21 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
-
-
 #include "utils_3D.h" 
 #include "Node.h"
 
+
+/**
+ * @brief File implementing the bounding boxes calculations 
+ * @file BoundingBox.h
+ */
+
+
+
+/**
+ * @brief Class implementing bounding boxes computation
+ * @class BoundingBox
+ * 
+ */
 class BoundingBox : public SceneTreeNode {
 public:
 	
@@ -36,11 +47,11 @@ public:
 	virtual ~BoundingBox() ;
 
 	/**
-	 * @brief 
+	 * @brief Product operator between a 4x4 matrix , and a BoundingBox object.  
 	 * 
-	 * @param matrix 
-	 * @param bounding_box 
-	 * @return BoundingBox 
+	 * @param matrix Matrix that will be multiplied by the current bounding box 
+	 * @param bounding_box The bounding box we want to apply a transformation on.
+	 * @return BoundingBox A new Bounding box with transformed coordinates and center using the matrix argument
 	 */
 	friend BoundingBox operator*(const glm::mat4& matrix , const BoundingBox& bounding_box); 
 

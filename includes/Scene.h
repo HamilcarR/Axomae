@@ -8,7 +8,7 @@
 #include "SceneHierarchy.h"
 /**
  * @file Scene.h
- * File implementing classes and functions relative to how the scene is represented and how to manage it 
+ * @brief File implementing classes and functions relative to how the scene is represented and how to manage it 
  * 
  */
 
@@ -144,12 +144,12 @@ private:
      */
     void sortTransparentElements(); 
 protected:
-    std::map<float , Drawable*> sorted_transparent_meshes ; 
-    std::vector<AABB> scene ;
-    SceneTree scene_tree ; 
-    std::vector<Drawable*> bounding_boxes_array;
-    LightingDatabase* light_database;
-    Camera* scene_camera; 
+    std::map<float , Drawable*> sorted_transparent_meshes ;         /*<Sorted collection of transparent meshes , by distance to the camera*/ 
+    std::vector<AABB> scene ;                                       /*<Meshes of the scene , and their computed bounding boxes*/
+    SceneTree scene_tree ;                                          /*<Scene tree containing a hierarchy of transformations*/ 
+    std::vector<Drawable*> bounding_boxes_array;                    /*<Array of bounding boxes*/
+    LightingDatabase* light_database;                               /*<Light database pointer*/
+    Camera* scene_camera;                                           /*<Pointer on the scene camera*/ 
 };
 
 

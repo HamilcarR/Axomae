@@ -12,7 +12,7 @@ Camera::Camera() : world_up(glm::vec3(0,1,0)){
 	target = glm::vec3(0,0,0);
 	direction = glm::vec3(0,0,0);
 	right = glm::vec3(0,0,0);
-	local_modelmatrix = glm::mat4(1.f); 
+	local_transformation = glm::mat4(1.f); 
 	type = EMPTY ; 
 }
 
@@ -116,7 +116,7 @@ void ArcballCamera::reset(){
 	target = glm::vec3(0.f) ;
 	panning_offset = glm::vec3(0) ;
 	delta_position = glm::vec3(0.f); 
-	translation = last_translation = scene_translation_matrix = scene_rotation_matrix = local_modelmatrix =  glm::mat4(1.f) ; 
+	translation = last_translation = scene_translation_matrix = scene_rotation_matrix = local_transformation =  glm::mat4(1.f) ; 
 }
 
 /**
@@ -168,7 +168,7 @@ void ArcballCamera::computeViewSpace(){
 		scene_rotation_matrix = glm::mat4_cast(last_rotation);
 		scene_translation_matrix = last_translation ;
 	}
-		local_modelmatrix = scene_rotation_matrix * scene_translation_matrix; 	
+		local_transformation = scene_rotation_matrix * scene_translation_matrix; 	
 		direction = target - glm::vec3(0 , 0 , radius) ; 
 		position = glm::vec3(0 , 0 , radius) ; 
 		view = glm::lookAt(position , target , world_up)  ; 

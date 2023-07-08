@@ -23,8 +23,17 @@ public:
     }; 
 
 private:
+
+    /**
+     * @brief Lock the mutex
+     * 
+     */
     virtual void lock(); 
 
+    /**
+     * @brief Unlock the mutex
+     * 
+     */
     virtual void unlock(); 
     
 };

@@ -7,7 +7,7 @@
 
 /**
  * @file SceneGraph.h
- * This file implements the hierarchy system of a scene. 
+ * @brief This file implements the hierarchy system of a scene. 
  * 
  */
 
@@ -79,17 +79,18 @@ public:
     virtual void addGenericNodeToDelete(SceneNodeInterface* node){generic_nodes_to_delete.push_back(node); }
 
     /**
-     * @brief 
+     * @brief Free all generic nodes allocated and only generic nodes . 
+     * Other types of nodes need to be deallocated by their own structures and owners. For example , lights should be freed by their LightDatabase , even though they are stored in the scene tree as well .  
      * 
      */
     virtual void clear(); 
     /**
-     * @brief 
+     * @brief This method will traverse the structure doing a depth first search, and apply a functor to each node.  
      * 
-     * @tparam Args 
-     * @param begin 
-     * @param func 
-     * @param args 
+     * @tparam Args Templated arguments to pass to a functor. 
+     * @param begin Node from which we begin the traversal .
+     * @param func Functor to be applied on each node . 
+     * @param args Variadic arguments of func
      */
     template<class F , class ...Args>
     void dfs(SceneNodeInterface* begin ,F func, Args&& ...args);
@@ -97,12 +98,12 @@ public:
 private:
     
     /**
-     * @brief 
-     * 
-     * @tparam Args 
-     * @param node 
-     * @param func 
-     * @param args 
+     * @brief Recursive traversal of dfs. 
+     * @see  template<class F , class ...Args> void dfs(SceneNodeInterface* begin ,F func, Args&& ...args) 
+     * @tparam Args Templated arguments to pass to a functor. 
+     * @param begin Node from which we begin the traversal .
+     * @param func Functor to be applied on each node . 
+     * @param args Variadic arguments of func 
      */
     template<class F , class ...Args>
     void dfsTraverse(SceneNodeInterface* node ,F func , Args&& ...args); 
@@ -110,9 +111,9 @@ private:
 
 
 protected:
-    SceneNodeInterface* root;
+    SceneNodeInterface* root;       /*<Root of the hierarchy*/
 private:
-    SceneNodeInterface* iterator;
+    SceneNodeInterface* iterator;   /*<Iterator to keep track of nodes in traversals*/
     std::vector<SceneNodeInterface*> generic_nodes_to_delete; /*<Array of pointers on nodes that contain only a transformation*/  
 
 };

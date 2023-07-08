@@ -57,7 +57,7 @@ DirectionalLight::~DirectionalLight(){
 }
 
 void DirectionalLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) {
-    glm::mat4 modelview = view * getWorldSpaceModelMatrix();
+    glm::mat4 modelview = view * computeFinalTransformation();
     viewspace_position = glm::vec3(modelview * glm::vec4(position , 0.f));
     AbstractLight::updateShaderData(shader , modelview , index); 
 }
@@ -101,8 +101,8 @@ PointLight::~PointLight(){
 }
 
 void PointLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) {
-    local_modelmatrix = glm::translate(glm::mat4(1.f) , position); 
-    glm::mat4 modelview = view * getWorldSpaceModelMatrix();
+    local_transformation = glm::translate(glm::mat4(1.f) , position); 
+    glm::mat4 modelview = view * computeFinalTransformation();
     viewspace_position = glm::vec3(modelview * glm::vec4(position , 1.f));
     if(shader){
         std::string struct_name = light_struct_name + std::string("[") + std::to_string(index) + std::string("]."); 
@@ -151,8 +151,8 @@ SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _amb
 }
 
 void SpotLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) {
-    local_modelmatrix = glm::translate(glm::mat4(1.f) , position); 
-    glm::mat4 modelview = view * getWorldSpaceModelMatrix();
+    local_transformation = glm::translate(glm::mat4(1.f) , position); 
+    glm::mat4 modelview = view * computeFinalTransformation();
     viewspace_position = glm::vec3(modelview * glm::vec4(position , 1.f));  
     viewspace_direction = glm::vec3(modelview * glm::vec4(direction - position, 0.f) ); 
     float rad_theta = glm::radians(theta);  

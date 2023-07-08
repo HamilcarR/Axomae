@@ -258,33 +258,16 @@ void Loader::loadShaderDatabase(){
 	shader_database->addShader(vertex_shader_screen_fbo , fragment_shader_screen_fbo , Shader::SCREEN_FRAMEBUFFER); 
 }
 
-template<class T>
-void load_geometry_buffer(std::vector<T> &dest , const aiVector3D *from , int size , int dimension ){
-	for(int f = 0 , i = 0 ; f < size ; f++){	
-		const aiVector3D vect = from[f]; 
-		if(dimension == 3){
-			dest[i] = vect.x; 
-			dest[i + 1] = vect.y; 
-			dest[i + 2] = vect.z;
-			i += 3 ; 
-		}
-		else {
-			dest[i] = vect.x;
-			dest[i + 1] = vect.y;
-			i += 2;  
-		}	
-	} 
-}
 
-void load_indices_buffer(std::vector<unsigned> &dest , const aiFace *faces , int num_faces){
-	for(int i = 0 , f = 0 ; i < num_faces ; i++ , f += 3){
-		assert(faces[i].mNumIndices==3) ;  
-		dest[f] = faces[i].mIndices[0]; 	
-		dest[f + 1] = faces[i].mIndices[1]; 	
-		dest[f + 2] = faces[i].mIndices[2]; 	
-	}
-}
 
+/**
+ * The function `aiMatrix4x4ToGlm` converts an `aiMatrix4x4` object to a `glm::mat4` object in C++.
+ * 
+ * @param from The "from" parameter is of type aiMatrix4x4, which is a 4x4 matrix structure used in the
+ * Assimp library. It represents a transformation matrix.
+ * 
+ * @return a glm::mat4 object.
+ */
 inline glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from){ //https://stackoverflow.com/a/29184538
     glm::mat4 to;
     to[0][0] = (GLfloat)from.a1; to[0][1] = (GLfloat)from.b1;  to[0][2] = (GLfloat)from.c1; to[0][3] = (GLfloat)from.d1;
@@ -294,6 +277,23 @@ inline glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from){ //https://stackoverf
     return to;
 }
 
+/**
+ * The function "fillTreeData" recursively fills a tree data structure with scene nodes and their
+ * corresponding transformations and meshes.
+ * 
+ * @param ai_node A pointer to an aiNode object, which represents a node in the scene hierarchy of an
+ * imported model. This parameter is used to traverse the scene hierarchy and extract data from each
+ * node.
+ * @param mesh_lookup The `mesh_lookup` parameter is a vector that contains pointers to `Mesh` objects.
+ * These `Mesh` objects represent the meshes in the scene. The `ai_node->mMeshes` array contains
+ * indices that correspond to the meshes in the `mesh_lookup` vector.
+ * @param parent The parent parameter is a pointer to the parent scene node. It represents the parent
+ * node in the scene graph hierarchy.
+ * @param node_deletion The `node_deletion` parameter is a vector that stores pointers to
+ * SceneNodeInterface objects that need to be deleted later by the SceneTree structure. 
+ * 
+ * @return a pointer to a random node of the tree... Root can be determined from any point of the tree , by using the method SceneNodeInterface::returnRoot()
+ */
 SceneNodeInterface* fillTreeData(aiNode *ai_node , const std::vector<Mesh*>& mesh_lookup , SceneNodeInterface* parent , std::vector<SceneNodeInterface*> &node_deletion){
 	if(ai_node != nullptr){
 		std::string name = ai_node->mName.C_Str();
@@ -324,6 +324,17 @@ SceneNodeInterface* fillTreeData(aiNode *ai_node , const std::vector<Mesh*>& mes
 	return nullptr ; 
 }
 
+/**
+ * The function generates a scene tree from a model scene and a lookup of mesh nodes.
+ * 
+ * @param modelScene The modelScene parameter is a pointer to an aiScene object, which represents a 3D
+ * model scene loaded from a file using the Assimp library. It contains information about the model's
+ * hierarchy, meshes, materials, textures, animations, etc.
+ * @param node_lookup The `node_lookup` parameter is a vector of pointers to `Mesh` objects. It is used
+ * to map the `aiNode` objects in the `modelScene` to their corresponding `Mesh` objects.
+ * 
+ * @return a SceneTree object.
+ */
 SceneTree generateSceneTree(const aiScene* modelScene , const std::vector<Mesh*> &node_lookup){	
 	aiNode *ai_root = modelScene->mRootNode ;
 	SceneTree scene_tree;
@@ -336,15 +347,116 @@ SceneTree generateSceneTree(const aiScene* modelScene , const std::vector<Mesh*>
 	return scene_tree; 
 }
 
+/**
+ * The function "load_geometry_buffer" takes an array of aiVector3D objects, converts them to a
+ * specified dimension, and stores the result in a destination vector.
+ * 
+ * @param dest The `dest` parameter is a reference to a `std::vector<T>` object, where `T` is the type
+ * of the elements in the vector. This vector will be used to store the loaded geometry data.
+ * @param from The "from" parameter is a pointer to an array of aiVector3D objects.
+ * @param size The size parameter represents the number of elements in the from array.
+ * @param dimension The "dimension" parameter determines the number of components in each vector. If
+ * dimension is set to 3, each vector will have three components (x, y, and z). If dimension is set to
+ * 2, each vector will have two components (x and y).
+ */
+template<class T>
+void load_geometry_buffer(std::vector<T> &dest , const aiVector3D *from , int size , int dimension ){
+	for(int f = 0 , i = 0 ; f < size ; f++){	
+		const aiVector3D vect = from[f]; 
+		if(dimension == 3){
+			dest[i] = vect.x; 
+			dest[i + 1] = vect.y; 
+			dest[i + 2] = vect.z;
+			i += 3 ; 
+		}
+		else {
+			dest[i] = vect.x;
+			dest[i + 1] = vect.y;
+			i += 2;  
+		}	
+	} 
+}
 
 /**
- * The function loads 3D objects from a file using the Assimp library, creates meshes with their
- * associated materials and shaders, and returns them as a vector.
+ * The function `load_indices_buffer` loads the indices of a mesh's faces into a destination vector.
  * 
- * @param file The file path of the 3D model to be loaded.
- * 
- * @return a vector of pointers to Mesh objects.
+ * @param dest A reference to a vector of unsigned integers where the indices will be loaded into.
+ * @param faces The `faces` parameter is a pointer to an array of `aiFace` objects. Each `aiFace`
+ * object represents a face in a 3D model and contains an array of indices that define the vertices of
+ * the face.
+ * @param num_faces The parameter "num_faces" represents the number of faces in the mesh.
  */
+void load_indices_buffer(std::vector<unsigned> &dest , const aiFace *faces , int num_faces){
+	for(int i = 0 , f = 0 ; i < num_faces ; i++ , f += 3){
+		assert(faces[i].mNumIndices==3) ;  
+		dest[f] = faces[i].mIndices[0]; 	
+		dest[f + 1] = faces[i].mIndices[1]; 	
+		dest[f + 2] = faces[i].mIndices[2]; 	
+	}
+}
+
+
+/**
+ * The function "geometry_fill_buffers" fills the buffers of a 3D object with vertex, normal, tangent,
+ * bitangent, and UV data from an imported model.
+ * 
+ * @param modelScene modelScene is a pointer to an aiScene object, which represents a 3D model scene.
+ * It contains information about the model's meshes, materials, textures, and other properties.
+ * @param i The parameter "i" is the index of the mesh in the model scene that you want to fill the
+ * buffers for.
+ * 
+ * @return a std::pair<unsigned, Object3D*>.
+ */
+std::pair<unsigned , Object3D*> geometry_fill_buffers(const aiScene* modelScene , unsigned i){			
+	const aiMesh* mesh = modelScene->mMeshes[i] ; 
+	Object3D *object = new Object3D ;
+	auto size_dim3 = mesh->mNumVertices * 3; 
+	auto size_dim2 = mesh->mNumVertices * 2; 
+	auto size_dim3_indices = mesh->mNumFaces * 3; 
+	object->vertices.resize(size_dim3);
+	object->normals.resize(size_dim3); 
+	object->tangents.resize(size_dim3); 
+	object->bitangents.resize(size_dim3);	
+	object->indices.resize(size_dim3_indices); 
+	object->uv.resize(size_dim2) ; 	
+	assert(mesh->HasTextureCoords(0)) ; 
+	std::future<void> f_vertices , f_normals , f_bitangents , f_tangents , f_uv ;
+	f_vertices = std::async(std::launch::async, [&](){
+			load_geometry_buffer(object->vertices , mesh->mVertices , mesh->mNumVertices , 3);
+			}); 
+	f_normals = std::async(std::launch::async,[&](){
+			load_geometry_buffer(object->normals , mesh->mNormals , mesh->mNumVertices , 3);
+			}); 
+	f_bitangents = std::async(std::launch::async,[&](){
+			load_geometry_buffer(object->bitangents , mesh->mBitangents , mesh->mNumVertices , 3);
+			});
+	f_tangents = std::async(std::launch::async,[&](){
+			load_geometry_buffer(object->tangents , mesh->mTangents , mesh->mNumVertices , 3);
+			}); 
+	f_uv = std::async(std::launch::async,[&](){
+			load_geometry_buffer(object->uv , mesh->mTextureCoords[0] , mesh->mNumVertices , 2);
+			});	
+	load_indices_buffer(object->indices , mesh->mFaces , mesh->mNumFaces);	
+	std::vector<std::shared_future<void>> shared_futures = {f_vertices.share() , f_normals.share() , f_bitangents.share() , f_tangents.share() , f_uv.share()};			
+	std::for_each(shared_futures.begin() , shared_futures.end() , [](std::shared_future<void> &it) -> void{	
+		it.wait(); 
+	});
+	return std::pair<unsigned , Object3D*>(i , object); 	
+};
+
+
+
+
+/**
+ * The function "loadObjects" loads objects from a file using the Assimp library and returns a pair
+ * containing a vector of meshes and a scene tree.
+ * 
+ * @param file The "file" parameter is a const char pointer that represents the file path of the scene
+ * file that needs to be loaded.
+ * 
+ * @return a pair containing a vector of Mesh pointers and a SceneTree object.
+ */
+
 std::pair<std::vector<Mesh*> , SceneTree> Loader::loadObjects(const char* file){ //TODO! return scene data structure , with lights + meshes + cameras 
 	TextureDatabase *texture_database = resource_database->getTextureDatabase() ; 	
 	ShaderDatabase *shader_database = resource_database->getShaderDatabase(); 
@@ -356,57 +468,12 @@ std::pair<std::vector<Mesh*> , SceneTree> Loader::loadObjects(const char* file){
 		std::vector<std::future<std::pair<unsigned ,Object3D*>>> loaded_meshes_futures ; 	
 		std::vector<Material> material_array ;	
 		std::vector<Mesh*> node_lookup_table; 	
-		Shader* shader_program = shader_database->get(Shader::BLINN) ; 
-		
-		/**************************************************************************************************/
-		/*
-		 * This lambda function fills the different geometry buffers
-		 * We use threads for each meshes , and each buffers.
-		 * It returns an std::pair<ID , Geometry*> 
-		 * */	
-		auto lambda_fill_buffers = [&](unsigned i) -> std::pair<unsigned , Object3D*> {			
-			const aiMesh* mesh = modelScene->mMeshes[i] ; 
-			Object3D *object = new Object3D ;
-			auto size_dim3 = mesh->mNumVertices * 3; 
-			auto size_dim2 = mesh->mNumVertices * 2; 
-			auto size_dim3_indices = mesh->mNumFaces * 3; 
-			object->vertices.resize(size_dim3);
-			object->normals.resize(size_dim3); 
-			object->tangents.resize(size_dim3); 
-			object->bitangents.resize(size_dim3);	
-			object->indices.resize(size_dim3_indices); 
-			object->uv.resize(size_dim2) ; 	
-			assert(mesh->HasTextureCoords(0)) ; 
-			std::future<void> f_vertices , f_normals , f_bitangents , f_tangents , f_uv ;
-			f_vertices = std::async(std::launch::async, [&](){
-					load_geometry_buffer(object->vertices , mesh->mVertices , mesh->mNumVertices , 3);
-					}); 
-			f_normals = std::async(std::launch::async,[&](){
-					load_geometry_buffer(object->normals , mesh->mNormals , mesh->mNumVertices , 3);
-					}); 
-			f_bitangents = std::async(std::launch::async,[&](){
-					load_geometry_buffer(object->bitangents , mesh->mBitangents , mesh->mNumVertices , 3);
-					});
-			f_tangents = std::async(std::launch::async,[&](){
-					load_geometry_buffer(object->tangents , mesh->mTangents , mesh->mNumVertices , 3);
-					}); 
-			f_uv = std::async(std::launch::async,[&](){
-					load_geometry_buffer(object->uv , mesh->mTextureCoords[0] , mesh->mNumVertices , 2);
-					});	
-			load_indices_buffer(object->indices , mesh->mFaces , mesh->mNumFaces);	
-			std::vector<std::shared_future<void>> shared_futures = {f_vertices.share() , f_normals.share() , f_bitangents.share() , f_tangents.share() , f_uv.share()};			
-			std::for_each(shared_futures.begin() , shared_futures.end() , [](std::shared_future<void> &it) -> void{	
-				it.wait(); 
-			});
-			return std::pair<unsigned , Object3D*>(i , object); 	
-		};
-		/**************************************************************************************************/	
+		Shader* shader_program = shader_database->get(Shader::BLINN) ; 	
 		node_lookup_table.resize(modelScene->mNumMeshes); 
 		material_array.resize(modelScene->mNumMeshes);
-		//* Launching threads using lambda_fill_buffers
 		for(unsigned int i = 0 ; i < modelScene->mNumMeshes ; i++){ 
 			loaded_meshes_futures.push_back(
-				std::async(std::launch::async , lambda_fill_buffers , i) //*We launch multiple threads loading the geometry , and the main thread loads the materials
+				std::async(std::launch::async , geometry_fill_buffers , modelScene,  i) //*We launch multiple threads loading the geometry , and the main thread loads the materials
 			);
 			aiMaterial* ai_mat = modelScene->mMaterials[modelScene->mMeshes[i]->mMaterialIndex]; 	
 			material_array[i] = loadMaterials(modelScene , ai_mat , texture_database , i).second; 
@@ -420,8 +487,7 @@ std::pair<std::vector<Mesh*> , SceneTree> Loader::loadObjects(const char* file){
 			std::string name(mesh_name);	
 			Mesh *loaded_mesh = static_cast<Mesh*>(SceneNodeBuilder::buildMesh(nullptr , name , std::move(*geometry), material_array[mesh_index] , shader_program )) ;
 			std::cout << "object loaded : " << name << "\n" ;
-			node_lookup_table[mesh_index] = loaded_mesh; 
-			
+			node_lookup_table[mesh_index] = loaded_mesh; 	
 			objects.first.push_back(loaded_mesh);
 			delete geometry ; 	
 		}

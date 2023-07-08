@@ -73,7 +73,7 @@ void Mesh::preRenderSetup(){
 	setDepthMask(true); 
 	setDepthFunc(LESS); 
 	depth_mask_enabled = true ;
-	glm::mat4 model_mat = getWorldSpaceModelMatrix();
+	glm::mat4 model_mat = computeFinalTransformation();
 	modelview_matrix = camera->getView() * model_mat ;
 	if(shader_program){	
 		shader_program->setSceneCameraPointer(camera); 
@@ -203,7 +203,7 @@ CubeMapMesh::CubeMapMesh(SceneNodeInterface* parent) : Mesh(parent) {
 	geometry.vertices = vertices ;
 	geometry.uv = textures ; 
 	geometry.colors = colors ; 
-	local_modelmatrix = glm::mat4(1.f);
+	local_transformation = glm::mat4(1.f);
 	name="CubeMap" ;
 }
 
@@ -215,10 +215,10 @@ void CubeMapMesh::preRenderSetup(){
 	setDepthFunc(LESS_OR_EQUAL); 	
 	glm::mat4 view = glm::mat4(glm::mat3(camera->getView()));
 	glm::mat4 projection = camera->getProjection() ; 
-	local_modelmatrix = camera->getSceneRotationMatrix() ;  				
+	local_transformation = camera->getSceneRotationMatrix() ;  				
 	if(shader_program != nullptr){
 		shader_program->setSceneCameraPointer(camera); 	
-		shader_program->setAllMatricesUniforms(projection , view , local_modelmatrix) ; 
+		shader_program->setAllMatricesUniforms(projection , view , local_transformation) ; 
 	}
 }
 
@@ -246,7 +246,7 @@ FrameBufferMesh::FrameBufferMesh():Mesh(){
 	geometry.vertices = vertices ; 
 	geometry.uv = textures ;
 	name = "Custom screen framebuffer";
-	local_modelmatrix = glm::mat4(1.f);   
+	local_transformation = glm::mat4(1.f);   
 }
 
 FrameBufferMesh::FrameBufferMesh(int texture_index , Shader* _shader): FrameBufferMesh(){	
@@ -305,7 +305,7 @@ void BoundingBoxMesh::preRenderSetup(){
 	setDepthFunc(LESS);
 	setPolygonDrawMode(LINE); 
 	depth_mask_enabled = true;
-	glm::mat4 model = getWorldSpaceModelMatrix(); 
+	glm::mat4 model = computeFinalTransformation(); 
 	modelview_matrix = camera->getView() * model ; 
 	bounding_box = modelview_matrix * bounding_box ;  
 	if(shader_program){	

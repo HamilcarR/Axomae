@@ -11,13 +11,13 @@
 class Object3D{
 
 public:
-	std::vector<float> vertices; 
-	std::vector<float> uv ; 
-	std::vector<float> colors; 
-	std::vector<float> normals; 
-	std::vector<float> bitangents ; 
-	std::vector<float> tangents;
-	std::vector<unsigned int> indices;
+	std::vector<float> vertices;	/*<Vertices array*/ 
+	std::vector<float> uv ;			/*<UV arrays of dimension 2*/ 
+	std::vector<float> colors; 		/*<Colors array , Format is RGB*/
+	std::vector<float> normals; 	/*<Normals of the geometry*/
+	std::vector<float> bitangents ; /*<Bitangent of each vertex*/
+	std::vector<float> tangents;	/*<Tangent of each vertex*/
+	std::vector<unsigned int> indices;	/*<Indices of the vertices buffer*/
 };
 
 

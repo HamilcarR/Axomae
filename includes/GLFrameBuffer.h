@@ -48,58 +48,56 @@ public:
 
     /**
      * @brief Generates the framebuffer's ID. 
-     * Note : This method should be called after the framebuffer texture generation as it uses : glFramebufferTexture2D
+     * !Note : This method should be called after the framebuffer texture generation as it uses : glFramebufferTexture2D
      * 
      */
     virtual void initializeBuffers() override ; 
 
     /**
-     * @brief 
+     * @brief Checks if framebuffer is ready to use 
      * 
-     * @return true 
-     * @return false 
      */
     virtual bool isReady() const override; 
 
     /**
-     * @brief 
+     * @brief Binds the framebuffer 
      * 
      */
     virtual void bind() override ; 
 
     /**
-     * @brief 
+     * @brief Unbinds the framebuffer
      * 
      */
     virtual void unbind() override ; 
 
     /**
-     * @brief 
+     * @brief Frees all ressources allocated by the framebuffer
      * 
      */
     virtual void clean() override ;
 
     /**
-     * @brief 
+     * @brief Resize the textures of the framebuffer and render buffer
      * 
-     * @param width 
-     * @param height 
+     * @param width New width 
+     * @param height  New height
      */
     virtual void resize(unsigned int width , unsigned int height) ; 
 private:
    
      /**
-     * @brief 
+     * @brief Dummy method 
      * 
      */
     virtual void fillBuffers() override ; 
 
 protected:
-    INTERNAL_FORMAT format; 
-    GLRenderBuffer *renderbuffer_object ; 
-    unsigned int framebuffer_id ; 
-    unsigned int texture_id ;
-    unsigned int *pointer_on_default_fbo_id ;  
+    INTERNAL_FORMAT format;                     /*<Internal Format*/ 
+    GLRenderBuffer *renderbuffer_object ;       /*<Pointer on the renderbuffer */ 
+    unsigned int framebuffer_id ;               /*<Framebuffer ID*/ 
+    unsigned int texture_id ;                   /*<ID of the texture rendered to*/
+    unsigned int *pointer_on_default_fbo_id ;   /*<Pointer on default fbo variable*/ 
 
 
 
