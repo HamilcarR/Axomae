@@ -44,10 +44,10 @@ int main(int argv , char** argc){
 	ProgramStatus * main_program_command = ProgramStatus::getInstance();
 	if (argv >= 2) {
 		string mode = argc[1];
-		regex cmd, gui;
+		regex cmd, test;
 		try {
 			cmd = regex("-cmd", regex_constants::icase);
-			gui = regex("-gui", regex_constants::icase); 
+			test = regex("-test", regex_constants::icase); 
 		}
 		catch (const std::regex_error& e) { cout << e.what() << "\n"; }
 		if (regex_match(mode, cmd)) {
@@ -72,12 +72,10 @@ int main(int argv , char** argc){
 			}
 			main_program_command->exit();
 		}
-		else if (regex_match(mode, gui)) {
-			QApplication app(argv, argc); 
-			GUIWindow win; 
-			win.show(); 
-			return app.exec(); 
-
+		else if (regex_match(mode, test)) {
+			::testing::InitGoogleTest(&argv , argc);
+			auto a = RUN_ALL_TESTS(); 
+			return a; 
 		}
 		else {
 			cout << "Wrong argument used" << "\n";
@@ -85,9 +83,7 @@ int main(int argv , char** argc){
 		}
 	}
 	else{
-		QApplication app(argv, argc);
-		::testing::InitGoogleTest(&argv , argc);
-		auto a = RUN_ALL_TESTS(); 
+		QApplication app(argv, argc);		
 		GUIWindow win; 
 		win.show(); 
 		return app.exec(); 
