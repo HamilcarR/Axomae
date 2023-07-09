@@ -3,13 +3,15 @@
 #include <regex>
 #include <string>
 #include <thread> 
-
+#include <gtest/gtest.h>
 
 #include "../includes/ImageManager.h"
 #include "../includes/ImageImporter.h"
 #include "../includes/Window.h"
 #include "../includes/TerminalOpt.h"
 #include "../includes/GUIWindow.h"
+
+
 using namespace std;
 using namespace axomae;
 
@@ -83,7 +85,9 @@ int main(int argv , char** argc){
 		}
 	}
 	else{
-		QApplication app(argv, argc); 
+		QApplication app(argv, argc);
+		::testing::InitGoogleTest(&argv , argc);
+		auto a = RUN_ALL_TESTS(); 
 		GUIWindow win; 
 		win.show(); 
 		return app.exec(); 
