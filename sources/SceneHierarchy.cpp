@@ -81,3 +81,13 @@ void SceneTree::pushNewRoot(SceneNodeInterface* new_root){
         updateOwner() ; 
     }
 }
+
+std::vector<SceneNodeInterface*> SceneTree::findByName(const std::string& name){
+    auto lambda_search_name = [](SceneNodeInterface* node , const std::string& name , std::vector<SceneNodeInterface*> &collection){
+        if(node->getName() == name)
+            collection.push_back(node); 
+    };
+    std::vector<SceneNodeInterface*> collection ; 
+    dfs(root , lambda_search_name , name , collection);
+    return collection ;  
+}

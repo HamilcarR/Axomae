@@ -137,6 +137,14 @@ public:
      */
     void updateTree(); 
 
+    /**
+     * @brief Search for the node of the specified name.
+     * 
+     * @param name String the method should look for in the scene tree. 
+     * @return SceneNodeInterface* Node having the name "name" or nullptr.
+     */
+    std::vector<SceneNodeInterface*> getNodeByName(const std::string& name) ;
+
 private:
     /**
      * @brief Sort transparent elements by distance and store their position in sorted_transparent_meshes

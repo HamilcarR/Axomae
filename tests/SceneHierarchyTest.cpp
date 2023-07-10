@@ -3,7 +3,7 @@
 #include "Test.h"
 
 
-
+constexpr unsigned int ITERATIONS = 5 ; 
 constexpr unsigned int TEST_TREE_MAX_DEPTH = 4; 
 constexpr unsigned int TEST_TREE_MAX_NODE_DEGREE = 3 ;  
 class SceneTreeBuilder{
@@ -17,6 +17,7 @@ public:
 
     void buildSceneTree(unsigned int depth , unsigned int max_degree){
         SceneNodeInterface *root = SceneNodeBuilder::buildEmptyNode(nullptr);
+        root->setName("root"); 
         tree.setRoot(root);
         tree.addGenericNodeToDelete(root);  
         node_count ++ ; 
@@ -31,7 +32,25 @@ public:
     unsigned getNodeCount(){return node_count; }
     
     void clean(){tree.clear(); }
+
+    std::vector<SceneNodeInterface*> findByName(const std::string& name){
+        std::vector<SceneNodeInterface*> names; 
+        findByNameRecursive(tree.getRootNode(), name , names);
+        return names; 
+    }
 private:
+
+    void findByNameRecursive(SceneNodeInterface* node, const std::string& name , std::vector<SceneNodeInterface*> &collection){
+        if(node != nullptr){
+            if(node->getName() == name)
+                collection.push_back(node);
+            for(auto A : node->getChildren())
+                findByNameRecursive(A , name , collection); 
+        }
+        return;
+    }
+
+    
     void buildRecursive(SceneNodeInterface* node , unsigned max_degree , unsigned depth){
         if(depth == 0){
             leaf_count ++; 
@@ -40,6 +59,7 @@ private:
         int size_numbers = rand() % max_degree + 1 ;
         for(int i = 0 ; i < size_numbers ; i++){
             SceneNodeInterface* child = SceneNodeBuilder::buildEmptyNode(node);
+            child->setName(std::string("child-") + std::to_string(depth) + std::string("-") + std::to_string(i)); 
             tree.addGenericNodeToDelete(child);
             node_count ++ ; 
             buildRecursive(child , max_degree , depth - 1);  
@@ -108,5 +128,23 @@ TEST(DFSTest , leafCount){
     unsigned i = 0 ; 
     tree->dfs(tree->getRootNode() , &PseudoFunctors::testLeafCount , &i);
     EXPECT_EQ(i , builder.getLeafCount()); 
+
+}
+
+TEST(DFSTest , findName){
+    SceneTreeBuilder builder; 
+    builder.buildSceneTree(TEST_TREE_MAX_DEPTH , TEST_TREE_MAX_NODE_DEGREE); 
+    SceneTree* tree = builder.getTreePointer();  
+    std::vector<std::string> names;
+    names.push_back("root"); 
+    for(unsigned i = 0 ; i < ITERATIONS ; i++){
+        std::string test_string = std::string("child-") + std::to_string(rand()%TEST_TREE_MAX_DEPTH + 1) + std::string("-") + std::to_string(rand()%TEST_TREE_MAX_NODE_DEGREE + 1);
+        names.push_back(test_string); 
+    }
+    for(auto A : names){
+        auto test_result = builder.findByName(A); 
+        auto dfs_result = tree->findByName(A);
+        EXPECT_EQ (test_result , dfs_result); 
+    } 
 
 }

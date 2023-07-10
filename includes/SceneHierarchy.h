@@ -95,6 +95,13 @@ public:
     template<class F , class ...Args>
     void dfs(SceneNodeInterface* begin ,F func, Args&& ...args);
 
+    /**
+     * @brief Returns a collection of nodes of the specified name
+     * 
+     * @param name String the method searches for
+     * @return std::vector<SceneNodeInterface*> Collection of nodes returned . Empty if the method didn't find any node of specified name.
+     */
+    virtual std::vector<SceneNodeInterface*> findByName(const std::string& name) = 0 ; 
 private:
     
     /**
@@ -128,7 +135,8 @@ public:
     virtual void createGenericRootNode() override ;
     virtual SceneTree& operator=(const SceneTree& copy);
     virtual void updateAccumulatedTransformations() override;
-    virtual void pushNewRoot(SceneNodeInterface* new_root); 
+    virtual void pushNewRoot(SceneNodeInterface* new_root);
+    virtual std::vector<SceneNodeInterface*> findByName(const std::string& name) override; 
     virtual ~SceneTree(); 
 
 private:
