@@ -104,7 +104,7 @@ BoundingBox::~BoundingBox(){
 
 BoundingBox operator*(const glm::mat4& matrix , const BoundingBox& bounding_box){
     glm::vec3 min_c = matrix * glm::vec4(bounding_box.getMinCoords() , 1.f);
-    glm::vec3 max_c = matrix * glm::vec4(bounding_box.getMinCoords() , 1.f); 
+    glm::vec3 max_c = matrix * glm::vec4(bounding_box.getMaxCoords() , 1.f); 
     return BoundingBox(min_c , max_c);  
 }
 
