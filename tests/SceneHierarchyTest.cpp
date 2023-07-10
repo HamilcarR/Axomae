@@ -1,7 +1,8 @@
 #include "../includes/SceneHierarchy.h"
 #include "../includes/SceneNodeBuilder.h"
-#include <time.h>
-#include <gtest/gtest.h>
+#include "Test.h"
+
+
 
 constexpr unsigned int TEST_TREE_MAX_DEPTH = 4; 
 constexpr unsigned int TEST_TREE_MAX_NODE_DEGREE = 3 ;  
