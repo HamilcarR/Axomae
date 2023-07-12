@@ -15,7 +15,7 @@ GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent){
 	format.setAlphaBufferSize(8); 
 	format.setSwapInterval(1);
 	setFormat(format);
-	renderer = new Renderer(width() , height());
+	renderer = new Renderer(width() , height() , this);
 	glew_initialized = false;
 }
 

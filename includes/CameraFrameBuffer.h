@@ -70,6 +70,43 @@ public:
      */
     virtual void updateFrameBufferShader();
 
+    /**
+     * @brief Set the Gamma value
+     * 
+     * @param value 
+     */
+    void setGamma(float value){gamma = value;}
+
+    /**
+     * @brief Set the Exposure value
+     * 
+     * @param value 
+     */
+    void setExposure(float value){exposure = value;}
+
+    /**
+     * @brief Set the Post Process Default object
+     * 
+     */
+    void setPostProcessDefault();  
+
+    /**
+     * @brief Set the Post Process Edge object
+     * 
+     */
+    void setPostProcessEdge();
+
+    /**
+     * @brief Set the Post Process Sharpen object
+     * 
+     */
+    void setPostProcessSharpen(); 
+
+    /**
+     * @brief Set the Post Process Blurr object
+     * 
+     */
+    void setPostProcessBlurr();
 private:
 
     /**
@@ -83,7 +120,7 @@ protected:
     Drawable *drawable_screen_quad;         /*<Drawable of the screen quad*/ 
     Mesh *mesh_screen_quad;                 /*<Pointer on the screen quad mesh*/
     ShaderDatabase* shader_database;        /*<Pointer on the shader database*/
-    Shader* shader_framebuffer;             /*<Post processing shader*/
+    ScreenFrameBufferShader* shader_framebuffer;             /*<Post processing shader*/
     float gamma ;                           /*<Gamma of the screen*/
     float exposure ;                        /*<Exposure of the screen*/
     

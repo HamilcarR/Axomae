@@ -14,6 +14,7 @@
 namespace axomae { 
 using namespace gui ; 
 
+constexpr float POSTP_SLIDER_DIV = 90.f ; 
 static double NORMAL_FACTOR = 1.;
 static float NORMAL_ATTENUATION = 1.56; 
 static double DUDV_FACTOR = 1.;
@@ -194,10 +195,12 @@ namespace image_session_pointers {
 /**************************************************************************************************************/
 
 HeapManagement *GUIWindow::_MemManagement = new HeapManagement;
+
 GUIWindow::GUIWindow( QWidget *parent) : QMainWindow(parent) {
 	_UI.setupUi(this);
 	connect_all_slots(); 
 	_UI.progressBar->setValue(0);
+	_renderer = _UI.renderer_view->getRenderer(); 
 	image_session_pointers::greyscale = nullptr; 
 	image_session_pointers::albedo = nullptr; 
 	image_session_pointers::height = nullptr; 
@@ -248,31 +251,24 @@ QGraphicsView* GUIWindow::get_corresponding_view(IMAGETYPE type) {
 		case HEIGHT:
 			return _UI.height_image; 
 		break;
-
 		case PROJECTED_NMAP:
 			return _UI.uv_projection ; 
-		break;
-		
+		break;	
 		case ALBEDO:
 			return _UI.diffuse_image ; 
 		break;
-
 		case GREYSCALE_LUMI :
 			return _UI.greyscale_image ; 
 		break ;
-
 		case GREYSCALE_AVG:
 			return _UI.greyscale_image; 
 		break;
-
 		case NMAP:
 			return _UI.normal_image ; 
 		break ; 
-
 		case DUDV:
 			return _UI.dudv_image ; 
 		break ; 		
-		
 		default:
 			return nullptr; 
 		break; 
@@ -386,7 +382,25 @@ void GUIWindow::connect_all_slots() {
 	QObject::connect(_UI.actionImport_3D_model , SIGNAL(triggered()) , this , SLOT(import_3DOBJ())) ; 	
 
 	QObject::connect(_UI.next_mesh_button , SIGNAL(clicked()) , this , SLOT(next_mesh()));
-	QObject::connect(_UI.previous_mesh_button , SIGNAL(clicked()) , this , SLOT(previous_mesh()));	
+	QObject::connect(_UI.previous_mesh_button , SIGNAL(clicked()) , this , SLOT(previous_mesh()));
+
+	/*Renderer tab -> Post processing -> Camera*/
+	QObject::connect(_UI.gamma_slider , SIGNAL(valueChanged(int)) , this , SLOT(set_renderer_gamma_value(int))); 	
+	QObject::connect(_UI.exposure_slider , SIGNAL(valueChanged(int)) , this , SLOT(set_renderer_exposure_value(int))); 		
+	QObject::connect(_UI.reset_camera_button , SIGNAL(pressed()) , this , SLOT(reset_renderer_camera())); 
+	QObject::connect(_UI.set_standard_post_p , SIGNAL(clicked()) , this , SLOT(set_renderer_no_post_process())); 
+	QObject::connect(_UI.set_edge_post_p , SIGNAL(pressed()) , this , SLOT(set_renderer_edge_post_process())); 
+	QObject::connect(_UI.set_sharpen_post_p , SIGNAL(pressed()) , this , SLOT(set_renderer_sharpen_post_process())); 
+	QObject::connect(_UI.set_blurr_post_p , SIGNAL(pressed()) , this , SLOT(set_renderer_blurr_post_process()));
+
+	/*Renderer tab -> Rasterization -> Polygon display*/
+	QObject::connect(_UI.rasterize_fill_button, SIGNAL(pressed()) , this , SLOT(set_rasterizer_fill())); 
+	QObject::connect(_UI.rasterize_point_button , SIGNAL(pressed()) , this , SLOT(set_rasterizer_point()));
+	QObject::connect(_UI.rasterize_wireframe_button , SIGNAL(pressed()) , this , SLOT(set_rasterizer_wireframe())); 
+	QObject::connect(_UI.rasterize_display_bbox_checkbox , SIGNAL(toggled(bool)), this , SLOT(set_display_boundingbox(bool))); 
+
+
+
 }
 
 
@@ -719,7 +733,7 @@ void GUIWindow::undo(){
 /**************************************************************************************************************/
 
 void GUIWindow::redo(){
-	//TODO : bug here , greyscale -> prewitt -> sharpen -> undo -> sharpen -> prewitt ->  ... ? 
+	//TODO: [AX-41] Fix crash when processing using undo / redo values on the Stack
 	_MemManagement->addTemptoStack() ; 
 	image_type<SDL_Surface> next = _MemManagement->topStack(); 
 	if(next.image != nullptr && next.imagetype != INVALID){
@@ -728,6 +742,88 @@ void GUIWindow::redo(){
 	}
 
 }
+
+/**************************************************************************************************************/
+
+void GUIWindow::set_renderer_gamma_value(int value){
+	if(_renderer != nullptr){
+		float v = (float) value / POSTP_SLIDER_DIV ; 
+		_renderer->setGammaValue(v); 
+	}
+}
+
+/**************************************************************************************************************/
+
+void GUIWindow::reset_renderer_camera(){
+	if(_renderer != nullptr)
+		_renderer->resetSceneCamera();
+}
+
+
+/**************************************************************************************************************/
+
+void GUIWindow::set_renderer_exposure_value(int value){
+	if(_renderer != nullptr){
+		float v = (float) value / POSTP_SLIDER_DIV ; 
+		_renderer->setExposureValue(v); 
+	}
+}
+/**************************************************************************************************************/
+void GUIWindow::set_renderer_no_post_process(){
+	if(_renderer != nullptr){
+		_renderer->setNoPostProcess();
+	}
+} 
+/**************************************************************************************************************/
+void GUIWindow::set_renderer_edge_post_process(){
+	if(_renderer != nullptr){
+		_renderer->setPostProcessEdge(); 
+	}
+}
+
+/**************************************************************************************************************/
+void GUIWindow::set_renderer_sharpen_post_process(){
+	if(_renderer != nullptr)
+		_renderer->setPostProcessSharpen(); 
+}
+
+/**************************************************************************************************************/
+void GUIWindow::set_renderer_blurr_post_process(){
+	if(_renderer != nullptr)
+		_renderer->setPostProcessBlurr(); 
+}
+
+/**************************************************************************************************************/
+void GUIWindow::set_rasterizer_point(){
+	if(_renderer)
+		_renderer->setRasterizerPoint(); 
+}
+
+/**************************************************************************************************************/
+void GUIWindow::set_rasterizer_fill(){
+	if(_renderer)
+		_renderer->setRasterizerFill(); 
+}
+
+/**************************************************************************************************************/
+void GUIWindow::set_rasterizer_wireframe(){
+	if(_renderer)
+		_renderer->setRasterizerWireframe(); 
+} 
+
+/**************************************************************************************************************/
+void GUIWindow::set_display_boundingbox(bool display){
+	if(_renderer)
+		_renderer->displayBoundingBoxes(display); 
+} 
+
+
+
+
+
+
+
+
 
 
 /**************************************************************************************************************/

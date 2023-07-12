@@ -4,7 +4,7 @@
 using namespace axomae ; 
 
 Scene::Scene(){
-
+    display_bbox = false; 
 }
 
 Scene::~Scene(){
@@ -148,25 +148,43 @@ void Scene::drawForwardTransparencyMode(){
 
 //TODO: [AX-39] Merge bounding box geometry 
 void Scene::drawBoundingBoxes(){
-    std::vector<Drawable*> bounding_boxes = getBoundingBoxElements(); 
-    for(Drawable* A : bounding_boxes){
-		A->bind();
-		glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
-		A->unbind(); 
-	}
+    if(display_bbox){
+        std::vector<Drawable*> bounding_boxes = getBoundingBoxElements(); 
+        for(Drawable* A : bounding_boxes){
+            A->bind();
+            glDrawElements(GL_TRIANGLES , A->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
+            A->unbind(); 
+        }
+    }
 }
 
 std::vector<SceneNodeInterface*> Scene::getNodeByName(const std::string& name){
     return scene_tree.findByName(name); 
 }
 
+void Scene::setPolygonWireframe(){
+    for(auto A : scene){
+        Mesh* tmp = A.drawable->getMeshPointer(); 
+        if(tmp)
+            tmp->setPolygonDrawMode(Mesh::LINE); 
+    }
+}
 
+void Scene::setPolygonPoint(){
+    for(auto A : scene){
+        Mesh* tmp = A.drawable->getMeshPointer(); 
+        if(tmp)
+            tmp->setPolygonDrawMode(Mesh::POINT); 
+    }
+}
 
-
-
-
-
-
+void Scene::setPolygonFill(){
+    for(auto A : scene){
+        Mesh* tmp = A.drawable->getMeshPointer(); 
+        if(tmp)
+            tmp->setPolygonDrawMode(Mesh::FILL); 
+    }
+}
 
 
 

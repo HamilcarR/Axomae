@@ -262,17 +262,55 @@ CubeMapShader::~CubeMapShader(){
 /***********************************************************************************************************************************************************/
 
 ScreenFrameBufferShader::ScreenFrameBufferShader() : Shader() {
-	type = SCREEN_FRAMEBUFFER ; 
+	type = SCREEN_FRAMEBUFFER ;
+	post_p_blurr = false; 
+	post_p_sharpen = false; 
+	post_p_edge = false; 
 }
 
 ScreenFrameBufferShader::ScreenFrameBufferShader(const std::string vertex , const std::string frag) : Shader(vertex , frag) {
 	type = SCREEN_FRAMEBUFFER ; 
+	post_p_blurr = false; 
+	post_p_sharpen = false; 
+	post_p_edge = false; 
 }
 
 ScreenFrameBufferShader::~ScreenFrameBufferShader(){
 
 }
 
+void ScreenFrameBufferShader::setPostProcessUniforms(){
+	setUniform(uniform_name_bool_blurr , post_p_blurr);
+	setUniform(uniform_name_bool_edge , post_p_edge); 
+	setUniform(uniform_name_bool_sharpen , post_p_sharpen); 
+
+}
+
+void ScreenFrameBufferShader::setPostProcess(POST_PROCESS_TYPE type){
+	switch(type){
+		case EDGE:
+			post_p_edge = true ; 
+			post_p_sharpen = false; 
+			post_p_blurr = false; 
+		break;
+		case SHARPEN:
+			post_p_edge = true ; 
+			post_p_sharpen = true; 
+			post_p_blurr = false; 
+		break;
+		case BLURR:
+			post_p_edge = false ; 
+			post_p_sharpen = false; 
+			post_p_blurr = true; 					
+		break;
+		default:
+			post_p_edge = false ; 
+			post_p_sharpen = false; 
+			post_p_blurr = false; 
+		break;
+	}
+	
+}
 /***********************************************************************************************************************************************************/
 
 BoundingBoxShader::BoundingBoxShader() : Shader(){

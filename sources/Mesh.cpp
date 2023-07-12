@@ -6,7 +6,8 @@ Mesh::Mesh(SceneNodeInterface* parent):SceneTreeNode(parent){
 	mesh_initialized = false;
 	shader_program = nullptr; 
 	name = "uninitialized mesh" ; 
-	is_drawn = true; 
+	is_drawn = true;
+	polygon_mode = FILL ;  
 }
 
 Mesh::Mesh(const Mesh& copy) : SceneTreeNode(copy){
@@ -71,7 +72,8 @@ void Mesh::preRenderSetup(){
 	cullBackFace();
 	face_culling_enabled = true ; 
 	setDepthMask(true); 
-	setDepthFunc(LESS); 
+	setDepthFunc(LESS);
+	glPolygonMode(GL_FRONT_AND_BACK , polygon_mode); 
 	depth_mask_enabled = true ;
 	glm::mat4 model_mat = computeFinalTransformation();
 	modelview_matrix = camera->getView() * model_mat ;
@@ -129,7 +131,7 @@ void Mesh::afterRenderSetup(){
 }
 
 void Mesh::setPolygonDrawMode(RASTERMODE mode){
-	glPolygonMode(GL_FRONT_AND_BACK , mode); 
+	polygon_mode = mode; 
 }
 
 void Mesh::setFaceCulling(bool value){
@@ -212,7 +214,8 @@ CubeMapMesh::~CubeMapMesh(){
 
 void CubeMapMesh::preRenderSetup(){
 	setFaceCulling(false);
-	setDepthFunc(LESS_OR_EQUAL); 	
+	setDepthFunc(LESS_OR_EQUAL); 
+	glPolygonMode(GL_FRONT_AND_BACK , FILL); 	
 	glm::mat4 view = glm::mat4(glm::mat3(camera->getView()));
 	glm::mat4 projection = camera->getProjection() ; 
 	local_transformation = camera->getSceneRotationMatrix() ;  
@@ -263,7 +266,8 @@ FrameBufferMesh::~FrameBufferMesh(){
 void FrameBufferMesh::preRenderSetup(){
 	setFaceCulling(false);
 	face_culling_enabled = false;
-	setDepthFunc(ALWAYS); 
+	setDepthFunc(ALWAYS);
+	glPolygonMode(GL_FRONT_AND_BACK , FILL); 
 }
 
 
@@ -304,7 +308,7 @@ void BoundingBoxMesh::preRenderSetup(){
 	face_culling_enabled = true;
 	setDepthMask(true); 
 	setDepthFunc(LESS);
-	setPolygonDrawMode(LINE); 
+	glPolygonMode(GL_FRONT_AND_BACK , LINE); 
 	depth_mask_enabled = true;
 	glm::mat4 model = computeFinalTransformation(); 
 	modelview_matrix = camera->getView() * model ; 
@@ -317,7 +321,7 @@ void BoundingBoxMesh::preRenderSetup(){
 
 
 void BoundingBoxMesh::afterRenderSetup(){
-	setPolygonDrawMode(FILL); 
+	glPolygonMode(GL_FRONT_AND_BACK , polygon_mode); 
 }
 
 

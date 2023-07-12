@@ -145,6 +145,31 @@ public:
      */
     std::vector<SceneNodeInterface*> getNodeByName(const std::string& name) ;
 
+    /**
+     * @brief 
+     * 
+     */
+    void setPolygonFill();
+
+    /**
+     * @brief Set the Polygon Point object
+     * 
+     */
+    void setPolygonPoint(); 
+
+    /**
+     * @brief Set the Polygon Wireframe object
+     * 
+     */
+    void setPolygonWireframe(); 
+
+    /**
+     * @brief 
+     * 
+     * @param display 
+     */
+    void displayBoundingBoxes(bool display){display_bbox = display; } 
+
 private:
     /**
      * @brief Sort transparent elements by distance and store their position in sorted_transparent_meshes
@@ -158,6 +183,13 @@ protected:
     std::vector<Drawable*> bounding_boxes_array;                    /*<Array of bounding boxes*/
     LightingDatabase* light_database;                               /*<Light database pointer*/
     Camera* scene_camera;                                           /*<Pointer on the scene camera*/ 
+    bool display_bbox; 
+
+
+
+
+
+
 };
 
 

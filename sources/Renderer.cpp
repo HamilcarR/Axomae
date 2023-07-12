@@ -23,10 +23,10 @@ Renderer::Renderer(){
 	scene_camera = new ArcballCamera(45.f , &screen_size ,  0.1f , 10000.f , 100.f, &mouse_state);
 }
 
-Renderer::Renderer(unsigned width , unsigned height):Renderer(){
+Renderer::Renderer(unsigned width , unsigned height , GLViewer* widget):Renderer(){
 	screen_size.width = width ; 
 	screen_size.height = height ;
-	
+	gl_widget = widget ; 
 }
 
 Renderer::~Renderer(){
@@ -112,18 +112,23 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scen
 void Renderer::onLeftClick(){
 	scene_camera->onLeftClick(); 
 }
+
 void Renderer::onRightClick(){
 	scene_camera->onRightClick(); 
 }
+
 void Renderer::onLeftClickRelease(){
 	scene_camera->onLeftClickRelease(); 
 }
+
 void Renderer::onRightClickRelease(){
 	scene_camera->onRightClickRelease();
 }
+
 void Renderer::onScrollDown(){
 	scene_camera->zoomOut(); 
 }
+
 void Renderer::onScrollUp(){
 	scene_camera->zoomIn(); 
 }
@@ -135,7 +140,79 @@ void Renderer::onResize(unsigned int width , unsigned int height){
 		camera_framebuffer->resize();  
 }
 
+void Renderer::setGammaValue(float value){
+	if(camera_framebuffer != nullptr){
+		camera_framebuffer->setGamma(value);
+		gl_widget->update(); 
+	} 
+}
 
+void Renderer::setExposureValue(float value){
+	if(camera_framebuffer != nullptr){
+		camera_framebuffer->setExposure(value); 
+		gl_widget->update();
+	}
+}
 
+void Renderer::setNoPostProcess(){
+	if(camera_framebuffer != nullptr){
+		camera_framebuffer->setPostProcessDefault(); 
+		gl_widget->update(); 
+	}
+}
 
+void Renderer::setPostProcessEdge(){
+	if(camera_framebuffer != nullptr){
+		camera_framebuffer->setPostProcessEdge(); 
+		gl_widget->update(); 
+	}
+} 
 
+void Renderer::setPostProcessSharpen(){
+	if(camera_framebuffer != nullptr){
+		camera_framebuffer->setPostProcessSharpen(); 
+		gl_widget->update(); 
+	}
+} 
+
+void Renderer::setPostProcessBlurr(){
+	if(camera_framebuffer != nullptr){
+		camera_framebuffer->setPostProcessBlurr(); 
+		gl_widget->update(); 
+	}
+} 
+
+void Renderer::resetSceneCamera(){
+	if(scene_camera != nullptr){
+		scene_camera->reset(); 
+		gl_widget->update(); 
+	}
+} 
+
+void Renderer::setRasterizerFill(){
+	if(scene){
+		scene->setPolygonFill(); 
+		gl_widget->update();
+	}
+}
+
+void Renderer::setRasterizerPoint(){
+	if(scene){
+		scene->setPolygonPoint(); 
+		gl_widget->update();
+	}
+}
+
+void Renderer::setRasterizerWireframe(){
+	if(scene){
+		scene->setPolygonWireframe(); 
+		gl_widget->update();
+	}
+}
+
+void Renderer::displayBoundingBoxes(bool display){
+	if(scene){
+		scene->displayBoundingBoxes(display); 
+		gl_widget->update();
+	}
+}

@@ -11,6 +11,7 @@
 #include "LightingDatabase.h"
 #include "CameraFrameBuffer.h"
 #include "Scene.h"
+#include "GLViewer.h"
 
 /**
  * @file Renderer.h
@@ -19,6 +20,7 @@
  */
 
 
+class GLViewer;
 /**
  * @brief Renderer class definition
  * 
@@ -37,8 +39,10 @@ public:
 	 * 
 	 * @param width Width of the window
 	 * @param height Height of the window
+	 * @param widget
 	 */
-	Renderer(unsigned width , unsigned height); 
+	Renderer(unsigned width , unsigned height , GLViewer* widget = nullptr); 
+
 
 	/**
 	 * @brief Destroy the Renderer object
@@ -138,7 +142,71 @@ public:
 	 */
 	void setDefaultFrameBufferId(unsigned id){default_framebuffer_id = id ; }
 
-	
+	/**
+	 * @brief Set the Gamma Value object
+	 * 
+	 * @param gamma 
+	 */
+	void setGammaValue(float gamma); 	
+
+	/**
+	 * @brief Set the Exposure Value object
+	 * 
+	 * @param exposure 
+	 */
+	void setExposureValue(float exposure);
+
+	/**
+	 * @brief Set post process to default
+	 * 
+	 */
+	void setNoPostProcess(); 
+
+	/**
+	 *	@brief  Set post process to edge
+	 */
+	void setPostProcessEdge(); 
+
+	/**
+	 *	@brief  Set post process to sharpen
+	 */
+	void setPostProcessSharpen(); 
+
+	/**
+	 * @brief Set post process to blurr 
+	 */
+	void setPostProcessBlurr(); 
+
+	/**
+	 * @brief Resets the scene camera to default position 
+	 * 
+	 */
+	void resetSceneCamera(); 
+
+	/**
+	 * @brief Display meshes in point clouds 
+	 * 
+	 */
+	void setRasterizerPoint();
+
+	/**
+	 * @brief Standard rasterizer display in polygons
+	 * 
+	 */
+	void setRasterizerFill(); 
+
+	/**
+	 * @brief Display meshes in wireframe
+	 * 
+	 */
+	void setRasterizerWireframe();
+
+	/**
+	 * @brief Control if we display every mesh's bounding box
+	 * 
+	 */
+	void displayBoundingBoxes(bool display);
+
 
 public:
 	Scene *scene ; 								/**<The scene to be rendered*/ 
@@ -150,6 +218,8 @@ public:
 	ScreenSize screen_size ; 					/**<Dimensions of the renderer windows*/
 	CameraFrameBuffer *camera_framebuffer ;		/**<Main framebuffer attached to the view*/ 
 	unsigned int default_framebuffer_id ;		/**<In the case the GUI uses other contexts and other framebuffers , we use this variable to reset the rendering to the default framebuffer*/ 
+	GLViewer *gl_widget;
+
 };
 
 #endif

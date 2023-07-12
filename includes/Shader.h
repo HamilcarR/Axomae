@@ -333,9 +333,21 @@ public:
 
 class ScreenFrameBufferShader : public Shader{
 public:
+	enum POST_PROCESS_TYPE : signed{
+		DEFAULT = -1 , 
+		EDGE = 1 , 
+		SHARPEN = 2 ,
+		BLURR = 3 
+	};
 	ScreenFrameBufferShader(); 
 	ScreenFrameBufferShader(const std::string vertex_code , const std::string fragment_code);
-	virtual ~ScreenFrameBufferShader(); 
+	void setPostProcess(POST_PROCESS_TYPE postp);
+	void setPostProcessUniforms(); 
+	virtual ~ScreenFrameBufferShader();
+protected:
+	bool post_p_edge; 
+	bool post_p_sharpen;
+	bool post_p_blurr; 
 };
 
 /***********************************************************************************************************************************************************/

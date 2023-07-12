@@ -290,6 +290,7 @@ protected:
 	bool depth_mask_enabled ; 			/**<Is depth enabled*/ 
 	bool is_drawn;						/**<Is the mesh */
 	Shader* shader_program; 			/**<Shader to be used for the mesh*/
+	RASTERMODE polygon_mode;
 };
 
 /*****************************************************************************************************************/

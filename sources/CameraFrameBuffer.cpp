@@ -29,14 +29,14 @@ CameraFrameBuffer::~CameraFrameBuffer(){
 
 
 void CameraFrameBuffer::updateFrameBufferShader(){
-    shader_framebuffer = shader_database->get(Shader::SCREEN_FRAMEBUFFER); 
+    shader_framebuffer = static_cast<ScreenFrameBufferShader*>(shader_database->get(Shader::SCREEN_FRAMEBUFFER)); 
     assert(mesh_screen_quad); 
     mesh_screen_quad->setShader(shader_framebuffer); 
 }
 
 void CameraFrameBuffer::initializeFrameBuffer(){  
     initializeFrameBufferTexture(); 
-    shader_framebuffer = shader_database->get(Shader::SCREEN_FRAMEBUFFER);
+    shader_framebuffer = static_cast<ScreenFrameBufferShader*>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
     mesh_screen_quad = new FrameBufferMesh(texture_id , shader_framebuffer) ;
     drawable_screen_quad = new Drawable(mesh_screen_quad) ; 
     FrameBufferInterface::initializeFrameBuffer();  
@@ -53,7 +53,8 @@ void CameraFrameBuffer::startDraw(){
     if(shader_framebuffer){
         shader_framebuffer->bind(); 
         shader_framebuffer->setUniform(uniform_name_float_gamma_name , gamma);
-        shader_framebuffer->setUniform(uniform_name_float_exposure_name , exposure);  
+        shader_framebuffer->setUniform(uniform_name_float_exposure_name , exposure); 
+        shader_framebuffer->setPostProcessUniforms();  
         shader_framebuffer->release(); 
     }
     if(drawable_screen_quad)
@@ -64,6 +65,24 @@ void CameraFrameBuffer::renderFrameBufferMesh(){
     drawable_screen_quad->bind();
 	glDrawElements(GL_TRIANGLES , drawable_screen_quad->getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
 	drawable_screen_quad->unbind();
-
 }
 
+void CameraFrameBuffer::setPostProcessEdge(){
+    if(shader_framebuffer)
+        shader_framebuffer->setPostProcess(ScreenFrameBufferShader::EDGE); 
+}
+
+void CameraFrameBuffer::setPostProcessDefault(){
+    if(shader_framebuffer)
+        shader_framebuffer->setPostProcess(ScreenFrameBufferShader::DEFAULT); 
+}
+
+void CameraFrameBuffer::setPostProcessBlurr(){
+    if(shader_framebuffer)
+        shader_framebuffer->setPostProcess(ScreenFrameBufferShader::BLURR); 
+}
+
+void CameraFrameBuffer::setPostProcessSharpen(){
+    if(shader_framebuffer)
+        shader_framebuffer->setPostProcess(ScreenFrameBufferShader::SHARPEN); 
+}

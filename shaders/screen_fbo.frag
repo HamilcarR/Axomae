@@ -11,13 +11,14 @@ out vec4 fragment ;
 /*Uniforms*/
 uniform float gamma ; 
 uniform float exposure; 
-
+uniform bool uniform_sharpen; 
+uniform bool uniform_edge; 
 
 const float offset = 1.f / 300.f ;
 float kernel[9] = float[](
-    -1 , -1 , -1 , 
-    -1 , 9 , -1 , 
-    -1 , -1 , -1
+    -0 , -1 , -0 , 
+    -1 , 5 , -1 , 
+    -0 , -1 , -0
 ); 
 
 vec4 samplePixel(float x , float y , float factor){
@@ -42,7 +43,13 @@ vec3 computeExposureToneMapping(vec3 hdr_color){
 }
 
 void main(){ 
-    vec4 hdr_color = texture(framebuffer_map , vertex_fragment_uv) ; 
-    vec3 tone_mapped_color = computeExposureToneMapping(hdr_color.rgb); 
+    vec4 hdr_color; 
+    if(uniform_sharpen)
+        hdr_color = sharpen(); 
+    else if(uniform_edge)
+        hdr_color = edge(); 
+    else
+        hdr_color = texture(framebuffer_map , vertex_fragment_uv) ; 
+    vec3 tone_mapped_color = computeExposureToneMapping(hdr_color.rgb);
     fragment = vec4(pow(tone_mapped_color.rgb , vec3(1.0/gamma)) , hdr_color.a); 
 }
