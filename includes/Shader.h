@@ -330,6 +330,16 @@ public:
 };
 
 /***********************************************************************************************************************************************************/
+class PBRShader : public Shader{
+public:
+	PBRShader(); 
+	PBRShader(const std::string vertex_code , const std::string fragment_code); 
+	virtual ~PBRShader(); 
+};
+
+
+
+/***********************************************************************************************************************************************************/
 
 class ScreenFrameBufferShader : public Shader{
 public:

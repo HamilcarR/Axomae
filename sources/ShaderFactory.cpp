@@ -21,6 +21,9 @@ Shader* ShaderFactory::constructShader(std::string v , std::string f , Shader::T
 		break;
 		case Shader::BOUNDING_BOX:
 			constructed_shader = new BoundingBoxShader(v , f); 
+		break;
+		case Shader::PBR:
+			constructed_shader = new PBRShader(v , f); 
 		break; 
 		default:
 			constructed_shader = nullptr ; 

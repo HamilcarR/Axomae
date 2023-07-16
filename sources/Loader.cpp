@@ -245,17 +245,20 @@ std::pair<unsigned , Material> loadMaterials(const aiScene* scene , const aiMate
 void Loader::loadShaderDatabase(){	
 	ShaderDatabase* shader_database = resource_database->getShaderDatabase(); 
 	std::string vertex_shader = loadShader("../shaders/phong.vert") ; 
-	std::string fragment_shader = loadShader("../shaders/phong.frag"); 
+	std::string fragment_shader = loadShader("../shaders/phong.frag");
+	std::string vertex_shader_pbr = loadShader("../shaders/pbr.vert"); 
+	std::string fragment_shader_pbr = loadShader("../shaders/pbr.frag");  	
 	std::string vertex_shader_cubemap = loadShader("../shaders/cubemap.vert"); 
 	std::string fragment_shader_cubemap = loadShader("../shaders/cubemap.frag");
-	std::string vertex_shader_screen_fbo = loadShader("../shaders/screen_fbo.vert"); 
-	std::string fragment_shader_screen_fbo = loadShader("../shaders/screen_fbo.frag"); 
 	std::string vertex_shader_bouding_box = loadShader("../shaders/bbox.vert"); 
 	std::string fragment_shader_bounding_box = loadShader("../shaders/bbox.frag"); 
+	std::string vertex_shader_screen_fbo = loadShader("../shaders/screen_fbo.vert"); 
+	std::string fragment_shader_screen_fbo = loadShader("../shaders/screen_fbo.frag"); 	
 	shader_database->addShader(vertex_shader_bouding_box , fragment_shader_bounding_box , Shader::BOUNDING_BOX);  
 	shader_database->addShader(vertex_shader , fragment_shader , Shader::BLINN) ; 
 	shader_database->addShader(vertex_shader_cubemap , fragment_shader_cubemap , Shader::CUBEMAP) ; 
 	shader_database->addShader(vertex_shader_screen_fbo , fragment_shader_screen_fbo , Shader::SCREEN_FRAMEBUFFER); 
+	shader_database->addShader(vertex_shader_pbr , fragment_shader_pbr , Shader::PBR); 
 }
 
 
@@ -468,7 +471,7 @@ std::pair<std::vector<Mesh*> , SceneTree> Loader::loadObjects(const char* file){
 		std::vector<std::future<std::pair<unsigned ,Object3D*>>> loaded_meshes_futures ; 	
 		std::vector<Material> material_array ;	
 		std::vector<Mesh*> node_lookup_table; 	
-		Shader* shader_program = shader_database->get(Shader::BLINN) ; 	
+		Shader* shader_program = shader_database->get(Shader::PBR) ; 	
 		node_lookup_table.resize(modelScene->mNumMeshes); 
 		material_array.resize(modelScene->mNumMeshes);
 		for(unsigned int i = 0 ; i < modelScene->mNumMeshes ; i++){ 

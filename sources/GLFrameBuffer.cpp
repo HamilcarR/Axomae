@@ -31,8 +31,8 @@ void GLFrameBuffer::initializeBuffers(){
             renderbuffer_object->bind(); 
             glFramebufferRenderbuffer(GL_FRAMEBUFFER , DEPTH_STENCIL , GL_RENDERBUFFER , renderbuffer_object->getID());
         }
-         else
-           std::cout << "Problem initializing render buffer" << "\n";     
+        else
+            std::cout << "Problem initializing render buffer" << "\n";     
         auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if(status != GL_FRAMEBUFFER_COMPLETE){
             std::cout << "Framebuffer not ready to use " << std::to_string(status) << "\n";  

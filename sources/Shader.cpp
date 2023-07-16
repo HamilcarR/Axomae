@@ -260,7 +260,17 @@ CubeMapShader::~CubeMapShader(){
 }
 
 /***********************************************************************************************************************************************************/
+PBRShader::PBRShader(){
 
+}
+PBRShader::PBRShader(const std::string vertex , const std::string frag) : Shader(vertex , frag){
+
+}
+PBRShader::~PBRShader(){
+
+}
+
+/***********************************************************************************************************************************************************/
 ScreenFrameBufferShader::ScreenFrameBufferShader() : Shader() {
 	type = SCREEN_FRAMEBUFFER ;
 	post_p_blurr = false; 
