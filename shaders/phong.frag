@@ -210,7 +210,7 @@ LIGHT_COMPONENTS computeDirectionalLightsContrib(){
     vec3 n = getSurfaceNormal();
     vec3 view_direction = getViewDirection(); 
     for(i = 0 ; i < directional_light_number ; i++){
-        vec3 light_direction = normalize(directional_light_struct[i].position - vertex_fragment_fragment_position); 
+        vec3 light_direction = normalize(directional_light_struct[i].position); 
         light.diffuse += computeDiffuseDirectionalLight(n , light_direction , i); 
         light.ambient += computeAmbientDirectionalLight(i); 
         light.specular += computeSpecularDirectionalLight(n , light_direction , view_direction, i); 
