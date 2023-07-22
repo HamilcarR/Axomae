@@ -13,13 +13,14 @@
 #include "Scene.h"
 #include "GLViewer.h"
 
+
 /**
  * @file Renderer.h
  * Implementation of the renderer system 
  * 
  */
 
-
+class RenderPipeline ; 
 class GLViewer;
 /**
  * @brief Renderer class definition
@@ -143,6 +144,13 @@ public:
 	void setDefaultFrameBufferId(unsigned id){default_framebuffer_id = id ; }
 
 	/**
+	 * @brief Returns a pointer on the default framebuffer property 
+	 * 
+	 * @return unsigned* 
+	 */
+	unsigned int* getDefaultFrameBufferIdPointer(){return &default_framebuffer_id;}
+
+	/**
 	 * @brief Set the Gamma Value object
 	 * 
 	 * @param gamma 
@@ -219,7 +227,7 @@ public:
 	CameraFrameBuffer *camera_framebuffer ;		/**<Main framebuffer attached to the view*/ 
 	unsigned int default_framebuffer_id ;		/**<In the case the GUI uses other contexts and other framebuffers , we use this variable to reset the rendering to the default framebuffer*/ 
 	GLViewer *gl_widget;
-
+	RenderPipeline *render_pipeline ; 
 };
 
 #endif

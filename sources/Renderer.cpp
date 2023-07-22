@@ -1,5 +1,6 @@
 #include "../includes/Renderer.h"
 #include "../includes/Loader.h"
+#include "../includes/RenderPipeline.h"
 
 using namespace axomae ; 
 
@@ -47,6 +48,11 @@ Renderer::~Renderer(){
 		delete camera_framebuffer; 
 		camera_framebuffer = nullptr;  
 	}
+	if(render_pipeline){
+		render_pipeline->clean();
+		delete render_pipeline;
+		render_pipeline = nullptr ;
+	}
 	delete scene_camera ; 
 	scene_camera = nullptr ; 
 }
@@ -57,7 +63,7 @@ void Renderer::initialize(){
 	camera_framebuffer = new CameraFrameBuffer(resource_database->getTextureDatabase() , resource_database->getShaderDatabase() , &screen_size , &default_framebuffer_id);  
 	camera_framebuffer->initializeFrameBuffer(); 	
 	scene = new Scene(); 
-	
+	render_pipeline = new RenderPipeline(this , resource_database); 
 }
 
 bool Renderer::scene_ready(){
@@ -80,30 +86,40 @@ bool Renderer::prep_draw(){
 		return false ;	
 	}
 }
-
 void Renderer::draw(){
+	
+	
 	scene->updateTree(); 
 	camera_framebuffer->bindFrameBuffer();	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		
 	scene->drawForwardTransparencyMode(); 
 	scene->drawBoundingBoxes();	
 	camera_framebuffer->unbindFrameBuffer();	
-	camera_framebuffer->renderFrameBufferMesh();	
+	camera_framebuffer->renderFrameBufferMesh();
+	errorCheck(__FILE__, __LINE__);  
 }
 
 void Renderer::set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scene){
 	scene->clear();	
-	scene->setScene(new_scene); 
+	Loader loader; 
+	EnvironmentMapTexture* env = loader.loadHdrEnvmap();  //! TODO in case we want to seek the cubemap to replace it's texture with this , use visitor pattern in scene graph 
+	//CubeMapMesh* cubemap_mesh = render_pipeline->bakeEnvmapToCubemap(dynamic_cast<EnvironmentMapTexture*>(resource_database->getTextureDatabase()->getTexturesByType(Texture::ENVMAP)[0].second), 1024 , 1024 , gl_widget); 
+
+	CubeMapMesh* cubemap_mesh = render_pipeline->bakeEnvmapToCubemap(env , 2048 , 2048 , gl_widget); 
+	assert(cubemap_mesh);
+	new_scene.first.push_back(cubemap_mesh); 
+	new_scene.second.setAsRootChild(cubemap_mesh); 
+	scene->setScene(new_scene); 	
 	scene->setLightDatabasePointer(light_database); 
 	scene->setCameraPointer(scene_camera); 
-	light_database->clearDatabase(); 
-	AbstractLight *L1 = new SpotLight(glm::vec3(-55 , 90 , 5) , glm::vec3(0.f) , glm::vec3(2.f , 1.8f , 0.8f), 10.f , 3.f , scene_camera); 
-    AbstractLight *L2 = new PointLight(glm::vec3(-5 , 0 , -20) , glm::vec3(0.875f , 0.557f , 0.184f), glm::vec3(1.f , 0.0045 , 0.0075) , 90.f , L1); 	
-    AbstractLight *L3 = new PointLight(glm::vec3(5 , 5 , 0) , glm::vec3(0.489f , 0.2f , 0.347f), glm::vec3(1.f , 0.045 , 0.075) , 200.f , L1); 
+	light_database->clearDatabase();
+	AbstractLight *L1 = new SpotLight(glm::vec3(-55 , 90 , 5) , glm::vec3(0.f) , glm::vec3(1.f , 1.f , 0.9f), 12.f , 102000.f , scene_camera); 
+    AbstractLight *L2 = new PointLight(glm::vec3(-5 , 0 , -20) , glm::vec3(0.875f , 0.257f , 0.184f), glm::vec3(1.f , 0.0045 , 0.0075) , 200.f , L1); 
+	AbstractLight *L3 = new DirectionalLight(glm::vec3(1 , 1 , 1) , glm::vec3(1.f , 1.f , 1.f) , 2.f , scene_camera); 
 	light_database->addLight(L1); 
 	light_database->addLight(L2);
-	light_database->addLight(L3);  
-	scene->generateBoundingBoxes(resource_database->getShaderDatabase()->get(Shader::BOUNDING_BOX)); 	
+	light_database->addLight(L3); 
+	scene->generateBoundingBoxes(resource_database->getShaderDatabase()->get(Shader::BOUNDING_BOX)); 		
 	start_draw = true ;
 	resource_database->getShaderDatabase()->initializeShaders(); 
 	camera_framebuffer->updateFrameBufferShader();

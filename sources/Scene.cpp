@@ -102,7 +102,8 @@ void Scene::clear(){
     for(unsigned int i = 0 ; i < scene.size() ; i++)
 		if(scene[i].drawable != nullptr){
 			scene[i].drawable->clean();
-			delete scene[i].drawable; 
+			
+            delete scene[i].drawable; 
 		}	
     scene.clear();
     scene_tree.clear(); 

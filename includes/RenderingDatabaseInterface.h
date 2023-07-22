@@ -14,7 +14,7 @@
  * @class RenderingDatabaseInterface
  * @tparam T Class type of the object stored in the database
  */
-template<class T>
+template<class U , class T>
 class RenderingDatabaseInterface {
 public:
 
@@ -32,18 +32,33 @@ public:
     
     /**
      * @brief Return a pointer on a single element , after a search using an ID . 
-     * 
      * @param id ID of the element
      * @return T* Pointer on the element 
      */
-    virtual T* get(const int id)  = 0; 
-    
+    virtual T* get(const U id)  = 0; 
+
+    /**
+     * @brief Adds an element in the database
+     * 
+     * @param element Object to store 
+     * @param keep Keep the element between scene change
+     */
+    virtual U add(T *element , bool keep) = 0 ; 
+
     /**
      * @brief Checks if database contains an object with specific ID . 
      * 
      * @param id ID of the element sought. 
      */
-    virtual bool contains(const int id) = 0;
+    virtual bool contains(const U id) = 0;
+
+    /**
+     * @brief Checks if the element is present , if element not present , returns nullptr
+     * 
+     * @param element_address address of the element we check
+     * @return T* Pointer on the element  
+     */
+    virtual std::pair<U , T*> contains(const T* element_address) = 0; 
 protected:
     Mutex mutex;        /*<Mutex used for thread safety*/ 
 };
