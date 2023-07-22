@@ -111,7 +111,9 @@ bool Mesh::isInitialized(){
 }
 
 void Mesh::setSceneCameraPointer(Camera *camera){
-	this->camera = camera ;	
+	this->camera = camera ;
+	if(shader_program)
+		shader_program->setSceneCameraPointer(camera); 	
 }
 
 void Mesh::cullBackFace(){
@@ -155,8 +157,7 @@ void Mesh::setDepthFunc(DEPTHFUNC func){
 }
 
 /*****************************************************************************************************************/
-
-CubeMapMesh::CubeMapMesh(SceneNodeInterface* parent) : Mesh(parent) {
+CubeMesh::CubeMesh(SceneNodeInterface* parent) : Mesh(parent) {
 	std::vector<float> vertices = { 
 		-1 , -1 , -1 	,  // 0
 		1 , -1 , -1 	,  // 1
@@ -206,7 +207,32 @@ CubeMapMesh::CubeMapMesh(SceneNodeInterface* parent) : Mesh(parent) {
 	geometry.uv = textures ; 
 	geometry.colors = colors ; 
 	local_transformation = glm::mat4(1.f);
-	name="CubeMap" ;
+	name="Generic-Cube" ;
+}
+
+CubeMesh::~CubeMesh(){
+}
+
+
+
+void CubeMesh::preRenderSetup(){
+	setFaceCulling(true); 
+	setDepthMask(true); 
+	setDepthFunc(ALWAYS);
+	glPolygonMode(GL_FRONT_AND_BACK , FILL); 
+	glm::mat4 model_mat = computeFinalTransformation(); 
+	modelview_matrix = camera->getView() * model_mat ;
+	if(shader_program){	
+		shader_program->setSceneCameraPointer(camera); 
+		shader_program->setAllMatricesUniforms(camera->getProjection() , camera->getView() , model_mat) ; 	
+	}
+}
+
+
+
+/*****************************************************************************************************************/
+CubeMapMesh::CubeMapMesh(SceneNodeInterface* parent) : CubeMesh(parent) {
+		name="CubeMap" ;
 }
 
 CubeMapMesh::~CubeMapMesh(){

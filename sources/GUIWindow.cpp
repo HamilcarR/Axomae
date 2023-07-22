@@ -646,7 +646,7 @@ bool GUIWindow::import_3DOBJ(){
 		Loader loader ;
 		auto struct_holder =  loader.load(filename.toStdString().c_str());
 		std::vector<Mesh*> scene = struct_holder.first;
-		SceneSelector *instance = SceneSelector::getInstance(); 	
+		SceneSelector *instance = SceneSelector::getInstance(); 
 		_UI.renderer_view->setNewScene(struct_holder); 
 		instance->setScene(scene);
 		_UI.meshes_list->setList(scene) ; 	

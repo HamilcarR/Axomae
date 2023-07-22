@@ -296,10 +296,39 @@ protected:
 /*****************************************************************************************************************/
 
 /**
+ * @brief A generic cube
+ * 
+ */
+class CubeMesh : public Mesh{
+public:
+
+	/**
+	 * @brief Construct a new Cube  Mesh object
+	 * 
+	 */
+	CubeMesh(SceneNodeInterface* parent = nullptr); 
+
+	/**
+	 * @brief 
+	 * 
+	 */
+	void preRenderSetup();
+	
+	/**
+	 * @brief Destroy the Cube  Mesh object
+	 * 
+	 */
+	virtual ~CubeMesh();
+};
+
+/*****************************************************************************************************************/
+
+
+/**
  * @brief Cubemap Mesh class
  * 
  */
-class CubeMapMesh : public Mesh{
+class CubeMapMesh : public CubeMesh{
 public:
 
 	/**
@@ -307,6 +336,7 @@ public:
 	 * 
 	 */
 	CubeMapMesh(SceneNodeInterface* parent = nullptr); 
+
 
 	/**
 	 * @brief Destroy the Cube Map Mesh object
