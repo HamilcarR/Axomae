@@ -16,8 +16,14 @@ inline void errorCheck(const char* filename , unsigned int line ){
 
 }
 
-
-
+inline void glDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity,GLsizei length, const GLchar* message, const void* userParam){ 
+    std::cout << "OpenGL Debug Message:"
+    << "Source:" << source << "\n"
+    << "Type:" << type << "\n" 
+    << "ID:" << id << "\n" 
+    << "Severity:" << severity << "\n" 
+    << "Message:" << message << "\n";
+}
 
 class GLDebugLogs{
 

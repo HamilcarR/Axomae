@@ -6,11 +6,11 @@
 using namespace axomae;
 
 GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent){
-	QSurfaceFormat format;
-	
+	QSurfaceFormat format;	
 	format.setRenderableType(QSurfaceFormat::OpenGL); 
 	format.setVersion(4, 6);	
 	format.setProfile(QSurfaceFormat::CoreProfile);
+	format.setOption(QSurfaceFormat::DebugContext); 
 	format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
 	format.setAlphaBufferSize(8); 
 	format.setSwapInterval(1);
@@ -27,8 +27,8 @@ GLViewer::~GLViewer(){
 
 void GLViewer::initializeGL(){
 	makeCurrent();
-	if (!glew_initialized)
-	{
+	if (!glew_initialized){
+		glewExperimental = GL_TRUE ; 
 		GLenum err = glewInit();
 		std::cout << "glew initialized!\n";
 		if (err != GLEW_OK)
@@ -36,8 +36,16 @@ void GLViewer::initializeGL(){
 			std::cerr << "failed to initialize glew with error : " << reinterpret_cast<const char *>(glewGetErrorString(err)) << "\n";
 			exit(EXIT_FAILURE);
 		}
-		else
+		else{
 			glew_initialized = true;
+			if(GLEW_ARB_debug_output){			
+				glEnable(GL_DEBUG_OUTPUT); 
+				glDebugMessageCallback(glDebugCallback , nullptr); 
+			}
+			else{
+				std::cout << "Debug output extension not supported\n" ; 
+			}
+		}
 	}
 	renderer->onResize(width(), height());
 	renderer->initialize();
