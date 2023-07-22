@@ -1,7 +1,7 @@
 #version 460 core
 
 
-layout(binding=10) uniform sampler2D framebuffer_map; 
+layout(binding=1) uniform sampler2D framebuffer_map; 
 
 
 in vec2 vertex_fragment_uv ;

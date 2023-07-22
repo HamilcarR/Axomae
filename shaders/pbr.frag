@@ -80,16 +80,16 @@ uniform SPOT_LIGHT_STRUCT spot_light_struct[MAX_LIGHTS];
 
 /*****************************************/
 /* Samplers and textures */
-layout(binding=0) uniform sampler2D diffuse_map ; // Albedo 
-layout(binding=1) uniform sampler2D normal_map ; 
-layout(binding=2) uniform sampler2D metallic_map ; 
-layout(binding=3) uniform sampler2D roughness_map ; 
-layout(binding=4) uniform sampler2D ambiantocclusion_map ;
-layout(binding=5) uniform sampler2D specular_map;
-layout(binding=6) uniform sampler2D emissive_map;
-layout(binding=7) uniform sampler2D opacity_map ;  
-layout(binding=8) uniform samplerCube cubemap; 
-layout(binding=9) uniform sampler2D generic_map ;
+layout(binding=2) uniform sampler2D diffuse_map ; // Albedo 
+layout(binding=3) uniform sampler2D normal_map ; 
+layout(binding=4) uniform sampler2D metallic_map ; 
+layout(binding=5) uniform sampler2D roughness_map ; 
+layout(binding=6) uniform sampler2D ambiantocclusion_map ;
+layout(binding=7) uniform sampler2D specular_map;
+layout(binding=8) uniform sampler2D emissive_map;
+layout(binding=9) uniform sampler2D opacity_map ;  
+layout(binding=10) uniform samplerCube cubemap; 
+
 /******************************************/
 
 
@@ -165,7 +165,7 @@ vec3 computeRadiancePointLight(vec3 surface_normal , uint i){
 }
 
 vec3 computeRadianceDirectionalLight(vec3 surface_normal ,vec3 light_dir , uint i){
-    float radiance = max(dot(light_dir , surface_normal) , 0.f) * directional_light_struct[i].intensity ; 
+    float radiance = max(dot(light_dir , surface_normal) , 0.f) * directional_light_struct[i].intensity * 200.f; 
     return radiance * directional_light_struct[i].diffuseColor ;    
 }
 
@@ -294,7 +294,7 @@ LIGHT_COMPONENTS computeDirectionalLightsContribBRDF(float roughness , float met
     uint i = 0 ; 
     vec3 L0 = vec3(0.f) ; 
     for(i = 0 ; i < directional_light_number ; i++){
-        vec3 l= normalize(directional_light_struct[i].position - vertex_fragment_fragment_position); // This is wi 
+        vec3 l= normalize(directional_light_struct[i].position ); // This is wi 
         vec3 brdf = computeBRDF(directional_light_struct[i].position , n , v , roughness , metallic , albedo , IBL);
         light.radiance += computeRadianceDirectionalLight(n , l , i); 
         L0 += brdf * light.radiance ; 

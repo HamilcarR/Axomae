@@ -76,16 +76,15 @@ uniform SPOT_LIGHT_STRUCT spot_light_struct[MAX_LIGHTS];
 
 /*****************************************/
 /* Samplers and textures */
-layout(binding=0) uniform sampler2D diffuse_map ; 
-layout(binding=1) uniform sampler2D normal_map ; 
-layout(binding=2) uniform sampler2D metallic_map ; 
-layout(binding=3) uniform sampler2D roughness_map ; 
-layout(binding=4) uniform sampler2D ambiantocclusion_map ;
-layout(binding=5) uniform sampler2D specular_map;
-layout(binding=6) uniform sampler2D emissive_map;
-layout(binding=7) uniform sampler2D opacity_map ;  
-layout(binding=8) uniform samplerCube cubemap; 
-layout(binding=9) uniform sampler2D generic_map ;
+layout(binding=2) uniform sampler2D diffuse_map ; // Albedo 
+layout(binding=3) uniform sampler2D normal_map ; 
+layout(binding=4) uniform sampler2D metallic_map ; 
+layout(binding=5) uniform sampler2D roughness_map ; 
+layout(binding=6) uniform sampler2D ambiantocclusion_map ;
+layout(binding=7) uniform sampler2D specular_map;
+layout(binding=8) uniform sampler2D emissive_map;
+layout(binding=9) uniform sampler2D opacity_map ;  
+layout(binding=10) uniform samplerCube cubemap; 
 /******************************************/
 
 

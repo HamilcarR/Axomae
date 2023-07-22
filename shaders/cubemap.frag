@@ -2,7 +2,7 @@
 
 in vec3 cubemap_vector_sample; 
 
-layout(binding=7) uniform samplerCube cubemap; 
+layout(binding=10) uniform samplerCube cubemap; 
 
 out vec4 fragment ;
 

@@ -24,6 +24,9 @@ Shader* ShaderFactory::constructShader(std::string v , std::string f , Shader::T
 		break;
 		case Shader::PBR:
 			constructed_shader = new PBRShader(v , f); 
+		break;
+		case Shader::ENVMAP_CUBEMAP_CONVERTER:
+			constructed_shader = new EnvmapCubemapBakerShader(v , f) ; 
 		break; 
 		default:
 			constructed_shader = nullptr ; 

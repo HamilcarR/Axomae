@@ -187,20 +187,30 @@ void Shader::setUniformValue(int location , const glm::vec2& value){
 
 void Shader::initializeShader(){
 	if(!is_initialized){
+		
+		errorCheck(__FILE__ , __LINE__);
 		const char* vertex_shader_source = (const char*) vertex_shader_txt.c_str() ; 
 		const char* fragment_shader_source = (const char*) fragment_shader_txt.c_str(); 
 		vertex_shader = glCreateShader(GL_VERTEX_SHADER) ; 
+		
 		glShaderSource(vertex_shader , 1 , &vertex_shader_source , nullptr) ; 
 		glCompileShader(vertex_shader); 
+		
+		errorCheck(__FILE__ , __LINE__);
 		shaderCompilationErrorCheck(vertex_shader) ; 
 		fragment_shader = glCreateShader(GL_FRAGMENT_SHADER) ; 
 		glShaderSource(fragment_shader , 1 , &fragment_shader_source , nullptr) ; 
 		glCompileShader(fragment_shader); 
+		errorCheck(__FILE__ , __LINE__);
 		shaderCompilationErrorCheck(fragment_shader) ; 
 		shader_program = glCreateProgram();
 		glAttachShader(shader_program , vertex_shader); 
 		glAttachShader(shader_program , fragment_shader);
+	
+		errorCheck(__FILE__ , __LINE__);
 		glLinkProgram(shader_program) ; 
+		
+		errorCheck(__FILE__ , __LINE__);
 		programLinkingErrorCheck(shader_program) ; 
 		errorCheck(__FILE__ , __LINE__);
 		is_initialized = true;  
@@ -261,10 +271,10 @@ CubeMapShader::~CubeMapShader(){
 
 /***********************************************************************************************************************************************************/
 PBRShader::PBRShader(){
-
+	type = PBR ; 
 }
 PBRShader::PBRShader(const std::string vertex , const std::string frag) : Shader(vertex , frag){
-
+	type = PBR ; 
 }
 PBRShader::~PBRShader(){
 
@@ -332,5 +342,20 @@ BoundingBoxShader::BoundingBoxShader(const std::string vertex , const std::strin
 }
 
 BoundingBoxShader::~BoundingBoxShader(){
+
+}
+
+
+/***********************************************************************************************************************************************************/
+
+EnvmapCubemapBakerShader::EnvmapCubemapBakerShader() : Shader(){
+	type = ENVMAP_CUBEMAP_CONVERTER ; 
+}
+
+EnvmapCubemapBakerShader::EnvmapCubemapBakerShader(const std::string vertex , const std::string fragment) : Shader(vertex , fragment){
+	type = ENVMAP_CUBEMAP_CONVERTER ; 
+}
+
+EnvmapCubemapBakerShader::~EnvmapCubemapBakerShader(){
 
 }
