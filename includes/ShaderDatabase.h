@@ -16,7 +16,7 @@
  * @brief ShaderDatabase class implementation
  * 
  */
-class ShaderDatabase : public RenderingDatabaseInterface<Shader>{
+class ShaderDatabase : public RenderingDatabaseInterface<Shader::TYPE , Shader>{
 public:
 	/**
 	 * @brief Construct a new Shader Database object
@@ -65,7 +65,7 @@ public:
 	 * @return The function `contains` returns a boolean value indicating whether the `shader_database`
 	 * contains a shader of the specified `type`.
 	 */
-	virtual bool contains(const int type) override ;
+	virtual bool contains(const Shader::TYPE type) override ;
 	
 	/**
 	 * This function returns a pointer to a shader object of a given type from a shader database, or
@@ -78,7 +78,7 @@ public:
 	 * @return a pointer to a Shader object of the specified type if it exists in the shader_database map.
 	 * If the shader of the specified type does not exist in the map, the function returns a null pointer.
 	 */
-	Shader* get(const int type) override;
+	Shader* get(const Shader::TYPE type) override;
 
 	/**
 	 * @brief Recompile the database of shaders
@@ -91,6 +91,27 @@ public:
 	 * 
 	 */
 	virtual void initializeShaders();  
+
+	/**
+	 * @brief Add a shader into the database
+	 * 
+	 * @param shader Shader object
+	 * @param keep Not used ... for now .  
+	 * @return Shader::TYPE ID of the shader in database
+	 */
+	virtual Shader::TYPE add(Shader* shader , bool keep) override ; 
+
+	/**
+	 * @brief Checks if the database contains this shader . returns a pair of it's ID and it's address 
+	 * 
+	 * @param shader Shader to search
+	 * @return std::pair<Shader::TYPE , Shader*> Pair <ID , Shader*>. If nothing found , returns <Shader::EMPTY , nullptr>
+	 */
+	virtual std::pair<Shader::TYPE , Shader*> contains(const Shader* shader) override; 
+
+
+
+
 private:
 	
 

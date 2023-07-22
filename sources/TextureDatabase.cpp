@@ -37,7 +37,14 @@ TextureDatabase::TextureDatabase(){
 TextureDatabase::~TextureDatabase(){
 
 }
-
+/*
+* This method add textures to the database according to the "keep" criteria. 
+* The database map is sorted using two parts : the negative side from index -1 , going down , and the positive from index 0 going up. 
+* The negative side is reserved for special textures that don't get erased between scene changes(dummy textures , screen fbo texture).  
+* The positive side is freed between each scene change. 
+*
+*
+*/
 int TextureDatabase::addTexture(TextureData *texture , Texture::TYPE type , bool keep , bool is_dummy){
 	int index = 0;
 	Texture* tex = nullptr;
@@ -84,4 +91,30 @@ std::vector<std::pair<int, Texture*>>  TextureDatabase::getTexturesByType(Textur
 		}
 	}
 	return type_collection ; 
+}
+
+int TextureDatabase::add(Texture* texture , bool keep ){	
+	Mutex::Lock lock(mutex); 
+	if(keep){
+		int index = -1 ; 
+		while(texture_database[index] != nullptr)
+			index -- ;	
+		texture_database[index] = texture ;
+		return index;  
+	}
+	else{
+		int index = 0 ; 
+		while(texture_database[index] != nullptr)
+			index ++ ;
+		texture_database[index] = texture ; 
+		return index;  
+	}
+}
+
+std::pair<int , Texture*> TextureDatabase::contains(const Texture* address){
+	Mutex::Lock lock(mutex); 
+	for(auto A : texture_database)
+		if(A.second == address)
+			return A ; 
+	return std::pair(0 , nullptr); 
 }

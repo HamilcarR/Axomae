@@ -24,12 +24,14 @@ public:
 	 */
 	enum TYPE : signed 
 	{
+		EMPTY = -1 , 
 		GENERIC = 0 , 				/**<Undefined shader type*/
 		BLINN = 1 ,   				/**<Blinn-Phong shader*/
 		CUBEMAP = 2 , 				/**<Shader used for displaying the environment map*/
 		PBR = 3	, 	  				/**<PBR shader type*/
 		SCREEN_FRAMEBUFFER = 4 ,	/**<Used for post processing*/
-		BOUNDING_BOX = 5			/**<Shader used for displaying bounding boxes of meshes*/
+		BOUNDING_BOX = 5,			/**<Shader used for displaying bounding boxes of meshes*/
+		ENVMAP_CUBEMAP_CONVERTER  = 6 	/**<Shader used to bake an equirectangular environment map to a cubemap*/
 	};
 public: 
 	
@@ -58,6 +60,20 @@ public:
 	 *  
 	 */
 	virtual void initializeShader();
+
+	/**
+	 * @brief Set the Type of the shader
+	 * 
+	 * @param _type 
+	 */
+	void setType(Shader::TYPE _type){type = _type;}
+
+	/**
+	 * @brief Returns the Type of the shader
+	 * 
+	 * @return Shader::TYPE 
+	 */
+	Shader::TYPE getType(){return type;}
 
 	/**
 	 * @brief Recompiles the shader program
@@ -369,8 +385,14 @@ public:
 	virtual ~BoundingBoxShader(); 
 };
 
+/***********************************************************************************************************************************************************/
 
-
+class EnvmapCubemapBakerShader : public Shader{
+public:
+	EnvmapCubemapBakerShader(); 
+	EnvmapCubemapBakerShader(const std::string vertex_code , const std::string fragment_code); 
+	virtual ~EnvmapCubemapBakerShader();
+};
 
 
 

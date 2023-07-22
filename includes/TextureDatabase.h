@@ -17,7 +17,7 @@
  * We use it to keep texture objects in one place , meshes will only reference the textures. 
  *
  */
-class TextureDatabase : public RenderingDatabaseInterface<Texture>{
+class TextureDatabase : public RenderingDatabaseInterface<int , Texture>{
 public:
 	
 	/**
@@ -45,13 +45,12 @@ public:
 	void purge() override; 
 
 	/**
-	 * @brief 
-	 * 
-	 * @param texture 
-	 * @param type 
-	 * @param keep_texture_after_clean 
-	 * @param is_dummy 
-	 * @return int 
+	 * @brief Construct a texture of type "type" , and adds it to the database , as a reserved resource or a regular resource.  
+	 * @param texture  Raw pixel data
+	 * @param type Type of the texture
+	 * @param keep_texture_after_clean In case a texture needs to stay between scene changes , this  value needs to be true. 
+	 * @param is_dummy Is the texture a dummy texture ?  
+	 * @return int Index of the texture inside the database
 	 */
 	int addTexture(TextureData* texture , Texture::TYPE type , bool keep_texture_after_clean = false , bool is_dummy = false); 
 
@@ -62,7 +61,16 @@ public:
 	 * @return Texture* nullptr if nothing found , Texture at "index" else 
 	 */
 	Texture* get(const int index) override;
-	
+
+	/**
+	 * @brief Add a texture object to the database . In case the object is already present , this method will return the already present texture's id 
+	 * 
+	 * @param texture Texture object to add 
+	 * @param keep True if texture is to be kept  
+	 * @return int Database ID of the texture
+	 */
+	virtual int add(Texture* texture , bool keep) override; 
+
 	/**
 	 * @brief Checks if database contains this index
 	 * 
@@ -70,7 +78,15 @@ public:
 	 * @return true If database contains "index"
 	 */
 	bool contains(const int index) override;
-	
+
+	/**
+	 * @brief Checks if a texture is present in the database
+	 * 
+	 * @param address The texture this methods searches for. 
+	 * @return std::pair<int , Texture*> Pair of <ID  , Texture*>. If address is not present in the database , returns < 0 , nullptr> .
+	 */
+	std::pair<int , Texture*> contains(const Texture* address) override; 
+
 	/**
 	 * @brief Retrieve all textures of type "texture_type"
 	 * 
@@ -79,8 +95,7 @@ public:
 	 * @see Texture
 	 * @see Texture::TYPE
 	 */
-	std::vector<std::pair<int , Texture*>> getTexturesByType(Texture::TYPE texture_type) ; 
-	
+	std::vector<std::pair<int , Texture*>> getTexturesByType(Texture::TYPE texture_type) ;	
 private:
 	std::map<int , Texture*> texture_database;				/**<Database of textures*/ 
 }; 

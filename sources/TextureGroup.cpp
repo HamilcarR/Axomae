@@ -36,7 +36,8 @@ bool TextureGroup::containsType(Texture::TYPE type){
 
 void TextureGroup::initializeGlTextureData(Shader* shader){
 	for(Texture* A : texture_collection){
-		A->setGlData(shader);
+		if(!A->isInitialized())
+			A->setGlData(shader);
 	}	
 	initialized = true ; 
 }
