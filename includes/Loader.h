@@ -77,7 +77,15 @@ public:
 	 * @param is_glb_model Used to load a glb mesh as cubemap 
 	 * @return Mesh* 
 	 */
-	Mesh* generateCubeMap(bool is_glb_model) ; 
+	Mesh* generateCubeMap(bool is_glb_model) ;
+
+	/**
+	 * @brief Loads an environment map from the disk  
+	 * 
+	 * @return CubeMesh* 
+	 */
+	EnvironmentMapTexture* loadHdrEnvmap(); 
+
 	/**
 	 * @brief Loads all meshes from the GLB file. 
 	 * @param filename GLB file path

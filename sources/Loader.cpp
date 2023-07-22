@@ -8,7 +8,8 @@
 #include "../includes/PerformanceLogger.h"
 #include "../includes/Mutex.h"
 #include "../includes/SceneNodeBuilder.h"
-
+#define STB_IMAGE_IMPLEMENTATION
+#include "../vendor/stb_image.h"
 /**
  * @file Loader.cpp
  * Loader implementation 
@@ -119,7 +120,7 @@ static void loadTexture(const aiScene* scene , Material *material ,TextureData &
 		texture_index_string = texture_index_string.substr(1) ; 
 		unsigned int texture_index_int = stoi(texture_index_string);  
 		if(!texture_database->contains(texture_index_int)){
-			copyTexels(&texture , scene->mTextures[texture_index_int]) ; 
+			copyTexels(&texture , scene->mTextures[texture_index_int]) ;
 			int index = texture_database->addTexture(&texture , type , false); 
 			material->addTexture(index , type);
 			texture.clean(); 
@@ -243,7 +244,7 @@ std::pair<unsigned , Material> loadMaterials(const aiScene* scene , const aiMate
  * The function loads shader files and adds them to a shader database.
  */
 void Loader::loadShaderDatabase(){	
-	ShaderDatabase* shader_database = resource_database->getShaderDatabase(); 
+	ShaderDatabase* shader_database = resource_database->getShaderDatabase();
 	std::string vertex_shader = loadShader("../shaders/phong.vert") ; 
 	std::string fragment_shader = loadShader("../shaders/phong.frag");
 	std::string vertex_shader_pbr = loadShader("../shaders/pbr.vert"); 
@@ -254,11 +255,14 @@ void Loader::loadShaderDatabase(){
 	std::string fragment_shader_bounding_box = loadShader("../shaders/bbox.frag"); 
 	std::string vertex_shader_screen_fbo = loadShader("../shaders/screen_fbo.vert"); 
 	std::string fragment_shader_screen_fbo = loadShader("../shaders/screen_fbo.frag"); 	
+	std::string vertex_envmap_to_cubemap = loadShader("../shaders/envmap_bake.vert"); 
+	std::string fragment_envmap_to_cubemap = loadShader("../shaders/envmap_bake.frag"); 
 	shader_database->addShader(vertex_shader_bouding_box , fragment_shader_bounding_box , Shader::BOUNDING_BOX);  
 	shader_database->addShader(vertex_shader , fragment_shader , Shader::BLINN) ; 
 	shader_database->addShader(vertex_shader_cubemap , fragment_shader_cubemap , Shader::CUBEMAP) ; 
 	shader_database->addShader(vertex_shader_screen_fbo , fragment_shader_screen_fbo , Shader::SCREEN_FRAMEBUFFER); 
 	shader_database->addShader(vertex_shader_pbr , fragment_shader_pbr , Shader::PBR); 
+	shader_database->addShader(vertex_envmap_to_cubemap , fragment_envmap_to_cubemap , Shader::ENVMAP_CUBEMAP_CONVERTER); 
 }
 
 
@@ -519,13 +523,17 @@ std::pair<std::vector<Mesh*> , SceneTree> Loader::load(const char* file){
 	shader_database->clean(); 
 	loadShaderDatabase(); 
 	std::pair<std::vector<Mesh*> , SceneTree> scene = loadObjects(file); 
-	Mesh* cube_map = generateCubeMap(false) ; 		
+	/*Mesh* cube_map = generateCubeMap(false) ; 		
 	if(cube_map != nullptr){
 		scene.first.push_back(cube_map);
 		scene.second.setAsRootChild(cube_map); 
-	}	
+	}*/
+	errorCheck(__FILE__ , __LINE__); 	
 	return scene ; 
 }
+
+
+
 
 
 /**
@@ -573,6 +581,9 @@ Mesh* Loader::generateCubeMap(bool is_glb){
 	QImage top(":/"+skybox_folder+"/posy.jpg" , format); 		
 	QImage back(":/"+skybox_folder+"/posz.jpg" , format); 
 	std::vector<QImage> array = { right , left , top , bot , back , front} ; 
+	cubemap.data_format = Texture::RGBA ; 
+	cubemap.internal_format = Texture::RGBA ; 
+	cubemap.data_type = Texture::UBYTE;  
 	cubemap.width = left.width() ; 
 	cubemap.height = left.height(); 	
 	cubemap.data = new uint32_t [cubemap.width * cubemap.height * 6] ;	
@@ -610,6 +621,39 @@ Mesh* Loader::generateCubeMap(bool is_glb){
 	return cube_map; 		
 }
 
+
+
+EnvironmentMapTexture* Loader::loadHdrEnvmap(){
+	TextureDatabase* texture_database = resource_database->getTextureDatabase(); 
+	std::string folder_night = "../Ressources/Skybox_Textures/HDR/Night_City/" ; 
+	std::string folder_forest = "../Ressources/Skybox_Textures/HDR/Forest/" ; 
+	std::string env = folder_night + "night_env.hdr";
+	std::string hdr = folder_night +"night.hdr";
+
+//	hdr = folder_forest + "Forest.hdr" ; 
+	TextureData envmap; 	
+	int width , height , channels ; 
+	stbi_set_flip_vertically_on_load(true); 
+	float *hdr_data = stbi_loadf(hdr.c_str() , &width , &height , &channels , 0);
+	envmap.width = static_cast<unsigned int>(width); 
+	envmap.height = static_cast<unsigned int>(height);
+	envmap.data_type = Texture::FLOAT; 
+	envmap.internal_format = Texture::RGB32F ; 
+	envmap.data_format = Texture::RGB;
+	envmap.nb_components = channels ;
+	envmap.f_data = new float[width * height * channels]; 
+	std::memcpy(envmap.f_data , hdr_data , width * height * channels * sizeof(float)); 
+	int index = texture_database->addTexture(&envmap , Texture::ENVMAP); 
+	EnvironmentMapTexture* envmap_texture = dynamic_cast<EnvironmentMapTexture*>(texture_database->get(index));
+	envmap.clean(); 
+	if(envmap_texture) 
+		return envmap_texture; 	
+	else{
+		std::cout << "ENVMAP loading failed!\n" ; 
+		return nullptr; 
+	}
+
+}
 
 
 

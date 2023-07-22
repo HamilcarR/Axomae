@@ -13,8 +13,10 @@
 
 /******************************************************************************************************************************************************************************************************************/
 class Shader; 
+class Texture; 
 /**
  * @brief Class for raw binary data of textures
+ * !Note : While using HDR envmap , the data format is still uint32_t , as we wont need to use any other texture format than .hdr files
  * 
  */
 class TextureData{
@@ -36,7 +38,12 @@ public:
 	TextureData(){
 		width = 0 ; 
 		height = 0 ; 
-		data = nullptr ; 
+		data = nullptr ;
+		f_data = nullptr ;
+		nb_components = 1 ; 
+		internal_format = GL_RGBA ; 
+		data_format = GL_BGRA ; 
+		data_type = GL_UNSIGNED_BYTE ; 
 	}
 
 	/**
@@ -55,9 +62,16 @@ public:
 	 */
 	TextureData& operator=(const TextureData& from){ 
 		width = from.width ;
-		height = from.height ; 
-		data = new uint32_t [from.width * from.height] ; 
-		memcpy((void*) data , (void*) from.data , from.width * from.height * sizeof(uint32_t));		
+		height = from.height ;
+		nb_components = from.nb_components; 
+		if(from.data){ 
+			data = new uint32_t [from.width * from.height] ; 
+			std::memcpy((void*) data , (void*) from.data , from.width * from.height * sizeof(uint32_t));		
+		}
+		if(from.f_data){
+			f_data = new float [from.width * from.height * nb_components] ; 
+			std::memcpy((void*) data , (void*) from.data , from.width * from.height * nb_components * sizeof(float));		
+		}
 		name = from.name ; 
 		return *this ;
 	}
@@ -68,7 +82,9 @@ public:
 	 */
 	void clean(){
 		if(data != nullptr)
-			delete data ; 
+			delete data ;
+		if(f_data)
+			delete f_data;  
 		data = nullptr ;
 		width = 0 ; 
 		height = 0 ;
@@ -80,6 +96,11 @@ public:
 	unsigned int height ; 	/**<Height of the texture*/
 	std::string name ; 		/**<Name of the texture*/
 	uint32_t *data ; 		/*<1D array raw data of the texture*/
+	float *f_data ;
+	unsigned nb_components ; 
+	GLenum internal_format ; 
+	GLenum data_format ;
+	GLenum data_type ; 
 };
 
 /******************************************************************************************************************************************************************************************************************/
@@ -94,7 +115,8 @@ public:
 	 * @brief Internal format of textures
 	 * 
 	 */
-	enum FORMAT : signed {
+	enum FORMAT : unsigned {
+		/*Internal and data formats*/
 		RGBA = GL_RGBA , 				/**<RGBA with 8 bits per channel*/
 		BGRA = GL_BGRA , 				/**<BGRA with 8 bits per channel*/
 		RGB = GL_RGB , 					/**<RGB with 8 bits per channel*/
@@ -102,7 +124,10 @@ public:
 		RGBA16F = GL_RGBA16F , 			/**<RGBA with 16 bits floating point per channel*/
 		RGBA32F = GL_RGBA32F , 			/**<RGBA with 32 bits floating point per channel*/
 		RGB16F = GL_RGB16F , 			/**<RGB with 16 bits floating point per channel*/
-		RGB32F = GL_RGB32F				/**<RGB with 32 bits floating point per channel*/ 
+		RGB32F = GL_RGB32F  ,			/**<RGB with 32 bits floating point per channel*/	
+		/*Data type*/
+		UBYTE = GL_UNSIGNED_BYTE ,		 /**<Unsigned byte*/
+		FLOAT = GL_FLOAT 				 /**<4 byte float*/
 	};
 
 	/**
@@ -112,17 +137,20 @@ public:
 	enum TYPE : signed 
 	{
 		EMPTY = -1 , 
-		DIFFUSE = 0 , 
-		NORMAL = 1 , 
-		METALLIC = 2 , 
-		ROUGHNESS = 3 , 
-		AMBIANTOCCLUSION = 4 , 
-		SPECULAR = 5, 
-		EMISSIVE = 6 , 
-		OPACITY = 7 ,  
-		CUBEMAP = 8 ,
-		GENERIC = 9 , 
-		FRAMEBUFFER = 10
+		GENERIC = 0 , 	
+		FRAMEBUFFER = 1,
+		DIFFUSE = 2 , 
+		NORMAL = 3 , 
+		METALLIC = 4 , 
+		ROUGHNESS = 5 , 
+		AMBIANTOCCLUSION = 6 , 
+		SPECULAR =  7, 
+		EMISSIVE = 8 , 
+		OPACITY = 9 ,  
+		CUBEMAP = 10 ,
+		ENVMAP = 11  
+		
+		
 	} ;
 
 	/**
@@ -164,6 +192,14 @@ public:
 	 */
 	unsigned int getSamplerID(){return sampler2D;}
 
+	/**
+	 * @brief Set the texture's sampler ID . 
+	 * This method will not check if sampler2D has already a valid value.
+	 * In this case , the caller needs to free the sampler2D ID first. 
+	 * @param id New Sampler2D id. 
+	 */
+	void setSamplerID(unsigned int id){sampler2D = id;}
+	
 	/**
 	 * @brief Set the Texture Type object
 	 * 
@@ -218,6 +254,17 @@ public:
 	 */
 	virtual bool isDummyTexture(){return is_dummy ; }
 
+	/**
+	 * @brief Checks if the texture has raw pixel data stored  
+	 * 
+	 */
+	virtual bool hasRawData(){return data != nullptr ;}
+
+	/**
+	 * @brief Checks if the texture has been initialized  
+	 * 
+	 */
+	virtual bool isInitialized(){return sampler2D != 0 ; }
 protected:
 
 	/**
@@ -236,12 +283,14 @@ protected:
 	TYPE name ;					/**<Type of the texture*/
 	FORMAT internal_format ;	/**<Data layout format on the GPU*/ 
 	FORMAT data_format ; 		/**<Raw texture data format*/
+	FORMAT data_type ; 
 	unsigned int width ; 		/**<Width of the texture*/
 	unsigned int height ; 		/**<Height of the texture*/
 	uint32_t *data ; 			/**<Raw data of the texture*/
+	float *f_data ; 
 	unsigned int sampler2D ; 	/**<ID of the texture*/
 	bool is_dummy; 				/**<Check if the current texture is a dummy texture*/
-		
+	bool is_initialized ; 
 };
 
 /******************************************************************************************************************************************************************************************************************/
@@ -295,7 +344,7 @@ public:
 	 * 
 	 * @param texture Texture data to copy.
 	 */
-	virtual void set(TextureData* texture) override;
+	virtual void set(TextureData *texture) override;
 
 	/**
 	 * @brief Returns true if the texture contains alpha value < 1 
@@ -759,7 +808,7 @@ public:
 	 * @brief Construct a new Cube Map Texture object
 	 * 
 	 */
-	CubeMapTexture();
+	CubeMapTexture(FORMAT internal_format = RGBA , FORMAT data_format = RGBA , FORMAT data_type = UBYTE , unsigned width = 0 , unsigned height = 0);
 	
 	/**
 	 * @brief Construct a new Cube Map Texture object
@@ -790,6 +839,7 @@ public:
  	* 	  4 x width² = BOTTOM => GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
  	* 	  5 x width² = BACK => GL_TEXTURE_CUBE_MAP_POSITIVE_Z
  	* 	  6 x width² = FRONT => GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+	*!Note : If data == nullptr , this will instead allocate an empty cubemap . 
 	 */
 	virtual void initializeTexture2D() override; 	
 	
@@ -829,6 +879,67 @@ protected:
 
 }; 
 
+/******************************************************************************************************************************************************************************************************************/
+/**
+ * @brief Environment map texture class definition
+ * 
+ */
+class EnvironmentMapTexture : public Texture{
+public:
+	
+	/**
+	 * @brief Construct a new Cube Map Texture object
+	 * 
+	 */
+	EnvironmentMapTexture(FORMAT internal_format = RGB32F , FORMAT data_format = RGB , FORMAT data_type = FLOAT , unsigned width = 0 , unsigned height = 0);
+	
+	/**
+	 * @brief Construct a new environment map Texture object
+	 * 
+	 * @param data Texture raw data 
+	 * @see TextureData
+	 */
+	EnvironmentMapTexture(TextureData* data);  
+	
+	/**
+	 * @brief Destroy the envmap texture
+	 * 
+	 */
+	virtual ~EnvironmentMapTexture();
+	
+	/**
+	 * @brief 
+	 * 
+	 */
+	virtual void initializeTexture2D() override; 	
+	
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
+	virtual void bindTexture()  ; 
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
+	virtual void unbindTexture() ;
+	
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData(Shader* shader) ;
+	
+	/**
+	 * @brief Get the texture string description
+	 * 
+	 * @return C string 
+	 */
+	static const char* getTextureTypeCStr() ;
+
+
+}; 
 /******************************************************************************************************************************************************************************************************************/
 /**
  * @brief 
