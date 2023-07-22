@@ -38,7 +38,7 @@ public:
 	 * @brief Constructor for the Camera class , which initializes various properties of the
 	 * camera.
 	 *
-	 * @param radians The field of view angle in radians for the camera.
+	 * @param degrees The field of view angle in degrees for the camera.
 	 * @param screen A pointer to an object of type ScreenSize, which contains information about the size
 	 * of the screen or window where the camera will be rendering.
 	 * @param clip_near The distance from the camera to the near clipping plane. Any objects closer to the
@@ -48,7 +48,7 @@ public:
 	 * @param pointer The "pointer" parameter is a pointer to a MouseState object, which is used to
 	 * track the state of the mouse (e.g. position, button clicks) for camera movement and control.
 	 */
-	Camera(float radians, ScreenSize *screen, float clip_near, float clip_far, MouseState *pointer);
+	Camera(float degrees, ScreenSize *screen, float clip_near, float clip_far, MouseState *pointer = nullptr);
 	
 	/**
 	 * @brief Destroy the Camera object 
@@ -76,7 +76,21 @@ public:
 	 * @return * glm::mat4 
 	 */
 	virtual glm::mat4 getView() const { return view; }
+
+	/**
+	 * @brief Set the new view matrix
+	 * 
+	 * @param _view View Matrix
+	 */
+	virtual void setView(glm::mat4 _view){view = _view;}
 	
+	/**
+	 * @brief Set the target position 
+	 * 
+	 * @param _target Point that the camera will view 
+	 */
+	virtual void setTarget(glm::vec3 _target){target = _target;}	
+
 	/**
 	 * @brief Get the product of (Projection x View) matrix
 	 * 
@@ -145,20 +159,27 @@ public:
 	 * @return const glm::vec3& 
 	 */
 	virtual const glm::vec3& getPosition() const { return position; }
+
+	/**
+	 * @brief Set the camera's new position
+	 * 
+	 * @param new_pos New position  
+	 */
+	virtual void setPosition(glm::vec3 new_pos){position = new_pos;}
 	
 	/**
 	 * @brief Get the rotation matrix of the scene
 	 * 
 	 * @return const glm::mat4& 
 	 */
-	virtual const glm::mat4& getSceneRotationMatrix() const = 0;
+	virtual const glm::mat4 getSceneRotationMatrix() const = 0;
 	
 	/**
 	 * @brief Get the translation matrix of the scene
 	 * 
 	 * @return const glm::mat4& 
 	 */
-	virtual const glm::mat4& getSceneTranslationMatrix() const = 0;
+	virtual const glm::mat4 getSceneTranslationMatrix() const = 0;
 		
 	/**
 	 * @brief Returns the type of the camera
@@ -172,7 +193,7 @@ protected:
 	TYPE type; 					/**<Camera type */
 	float near; 				/**<Near plane */
 	float far; 					/**<Far plane */
-	float fov;					/**<FOV of the camera */
+	float fov;					/**<FOV of the camera in degrees*/
 	glm::mat4 projection;		/**<Projection matrix */
 	glm::mat4 view;				/**<View Matrix */
 	glm::mat4 view_projection;	/**<Projection x View product matrix */
@@ -183,7 +204,7 @@ protected:
 	glm::vec3 camera_up;		/**<Up vector of the camera */
 	const glm::vec3 world_up;	/**<World space up vector */
 	MouseState *mouse_state_pointer;  /**<Pointer on a MouseState structure keeping track of the mouse data*/
-	ScreenSize *gl_widget_screen_size; /**<Pointer on ScreeSize structure keeping track of the size of the gl widget*/
+	ScreenSize *ratio_dimensions;  /**<Pointer on a ScreenSize structure with fields giving informations about a width , and a height.*/
 
 };
 
@@ -203,7 +224,7 @@ public:
 	/**
 	 * @brief ArcballCamera Constructor
 	 * 
-	 * @param radians The field of view angle in radians for the camera .
+	 * @param degrees The field of view angle in degrees for the camera .
 	 * @param screen The `screen` parameter is a pointer to an object of the `ScreenSize` class, which
 	 * contains information about the size of the screen .
 	 * @param near The distance to the near clipping plane of the camera's frustum .
@@ -211,7 +232,7 @@ public:
 	 * @param radius The radius of the Camera's orbit. 
 	 * @param pointer Pointer to a MouseState object, contains information about the current state of the mouse (e.g. position, button presses, etc.) .
 	 */		
-	ArcballCamera(float radians, ScreenSize *screen, float near, float far, float radius, MouseState *pointer);
+	ArcballCamera(float degrees, ScreenSize *screen, float near, float far, float radius, MouseState *pointer);
 	/**
 	 * @brief Destroy the Arcball Camera object
 	 * 
@@ -263,13 +284,13 @@ public:
 	 * 
 	 * @return const glm::mat4& 
 	 */
-	virtual const glm::mat4 &getSceneTranslationMatrix() const;
+	virtual const glm::mat4 getSceneTranslationMatrix() const;
 	/**
 	 * @brief Get the Scene Rotation Matrix object
 	 * 
 	 * @return const glm::mat4& 
 	 */
-	virtual const glm::mat4 &getSceneRotationMatrix() const;
+	virtual const glm::mat4 getSceneRotationMatrix() const;
 
 protected:
 	/**
@@ -320,7 +341,7 @@ class FreePerspectiveCamera : public Camera
 {
 public:
 	FreePerspectiveCamera();
-	FreePerspectiveCamera(float radians, ScreenSize *screen, float near, float far, float radius, MouseState *pointer);
+	FreePerspectiveCamera(float degrees, ScreenSize *screen, float near, float far,MouseState *pointer = nullptr);
 	virtual ~FreePerspectiveCamera();
 	virtual void onLeftClick() override;
 	virtual void onRightClick() override;
@@ -329,6 +350,8 @@ public:
 	virtual void movePosition() override;
 	virtual void zoomIn() override;
 	virtual void zoomOut() override;
+	virtual const glm::mat4 getSceneTranslationMatrix() const override ;
+	virtual const glm::mat4 getSceneRotationMatrix() const  override ;
 };
 
 #endif
