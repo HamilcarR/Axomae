@@ -21,6 +21,7 @@ void GLRenderBuffer::initializeBuffers(){
     glGenRenderbuffers(1 , &renderbuffer_id);
     bind();  
     glRenderbufferStorage(GL_RENDERBUFFER , format , width , height);
+    errorCheck(__FILE__ , __LINE__); 
 }
 
 bool GLRenderBuffer::isReady() const {

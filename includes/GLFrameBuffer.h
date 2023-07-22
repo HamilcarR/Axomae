@@ -23,6 +23,11 @@ public:
         DEPTH_STENCIL = GL_DEPTH_STENCIL_ATTACHMENT
     };
 
+    enum TEXTURE_TARGET : unsigned {
+        TEXTURE2D = GL_TEXTURE_2D , 
+        CUBEMAP = GL_TEXTURE_CUBE_MAP_POSITIVE_X
+    }; 
+
     /**
      * @brief Construct a new GLFrameBuffer object
      * 
@@ -36,9 +41,15 @@ public:
      * @param height Height to pass to GLRenderBuffer renderbuffer_object variable creation
      * @param texture_id The created texture ID to attach to the framebuffer 
      * @param renderbuffer_internal_format Depth format to use for the attached GLRenderBuffer
-     * @param default_fbo_id_pointer A pointer on the ID of the default framebuffer . In the case of only one context , will be nullptr . 
+     * @param default_fbo_id_pointer A pointer on the ID of the default framebuffer . In the case of only one context , will be nullptr .  
+     * @param target_texture_type Target texture type
      */
-    GLFrameBuffer(unsigned width , unsigned height , unsigned texture_id , INTERNAL_FORMAT format = COLOR0, GLRenderBuffer::INTERNAL_FORMAT renderbuffer_internal_format = GLRenderBuffer::EMPTY , unsigned int* default_fbo_id_pointer = nullptr); 
+    GLFrameBuffer(unsigned width , 
+                unsigned height , 
+                unsigned texture_id , 
+                GLRenderBuffer::INTERNAL_FORMAT renderbuffer_internal_format = GLRenderBuffer::EMPTY  ,
+                unsigned int* default_fbo_id_pointer = nullptr , 
+                TEXTURE_TARGET target_texture_type = TEXTURE2D); 
     
     /**
      * @brief Destroy the GLFrameBuffer object
@@ -59,6 +70,13 @@ public:
      */
     virtual bool isReady() const override; 
 
+    /**
+     * @brief 
+     * 
+     * @param target 
+     */
+    void attachTexture2D(unsigned target ) ; 
+    
     /**
      * @brief Binds the framebuffer 
      * 
@@ -83,17 +101,20 @@ public:
      * @param width New width 
      * @param height  New height
      */
-    virtual void resize(unsigned int width , unsigned int height) ; 
+    virtual void resize(unsigned int width , unsigned int height) ;
+    
+    virtual void setColorAttachment(INTERNAL_FORMAT attachment){color_attachment = attachment; }
 private:
-   
-     /**
+
+    /**
      * @brief Dummy method 
      * 
      */
     virtual void fillBuffers() override ; 
 
 protected:
-    INTERNAL_FORMAT format;                     /*<Internal Format*/ 
+    INTERNAL_FORMAT color_attachment;                     /*<Internal Format*/ 
+    TEXTURE_TARGET target_texture_type ;        /*<Type of the target texture */
     GLRenderBuffer *renderbuffer_object ;       /*<Pointer on the renderbuffer */ 
     unsigned int framebuffer_id ;               /*<Framebuffer ID*/ 
     unsigned int texture_id ;                   /*<ID of the texture rendered to*/

@@ -5,15 +5,16 @@ GLFrameBuffer::GLFrameBuffer(){
     renderbuffer_object = nullptr;
     framebuffer_id = 0 ; 
     texture_id = 0 ; 
-    format = COLOR0;
+    color_attachment = COLOR0 ; 
 }
 
-GLFrameBuffer::GLFrameBuffer(unsigned _width , unsigned _height , unsigned _texture_id , INTERNAL_FORMAT fbo_format , GLRenderBuffer::INTERNAL_FORMAT rbo_format , unsigned int* default_fbo_id_pointer):GLFrameBuffer(){
+GLFrameBuffer::GLFrameBuffer(unsigned _width , unsigned _height , unsigned _texture_id ,  GLRenderBuffer::INTERNAL_FORMAT rbo_format , unsigned int* default_fbo_id_pointer ,  TEXTURE_TARGET target_type ):GLFrameBuffer(){
     if(rbo_format != GLRenderBuffer::EMPTY)
         renderbuffer_object = new GLRenderBuffer(_width, _height , rbo_format); 
-    format = fbo_format ;
     texture_id = _texture_id ;
+    target_texture_type = target_type ; 
     pointer_on_default_fbo_id = default_fbo_id_pointer ;  
+
 }
 
 GLFrameBuffer::~GLFrameBuffer(){
@@ -21,10 +22,14 @@ GLFrameBuffer::~GLFrameBuffer(){
         delete renderbuffer_object; 
 }
 
+void GLFrameBuffer::attachTexture2D(unsigned target ){
+    assert(texture_id != 0); 
+    glFramebufferTexture2D(GL_FRAMEBUFFER , color_attachment , target , texture_id , 0); 
+}
+
 void GLFrameBuffer::initializeBuffers(){
     glGenFramebuffers(1 , &framebuffer_id);
     bind(); 
-    glFramebufferTexture2D(GL_FRAMEBUFFER , format , GL_TEXTURE_2D , texture_id , 0);
     if(renderbuffer_object != nullptr){
         renderbuffer_object->initializeBuffers(); 
         if(renderbuffer_object->isReady()){

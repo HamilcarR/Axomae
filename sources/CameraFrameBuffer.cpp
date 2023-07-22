@@ -7,8 +7,13 @@ using namespace axomae ;
 
 
 
-CameraFrameBuffer::CameraFrameBuffer(TextureDatabase* _texture_database , ShaderDatabase* _shader_database, ScreenSize* screen_size_pointer , unsigned int* default_fbo_pointer):FrameBufferInterface(_texture_database , screen_size_pointer){
-    default_framebuffer_pointer = default_fbo_pointer; 
+CameraFrameBuffer::CameraFrameBuffer(TextureDatabase* _texture_database , 
+                                    ShaderDatabase* _shader_database, 
+                                    ScreenSize* screen_size_pointer , 
+                                    unsigned int* default_fbo_pointer) : FrameBufferInterface(_texture_database , screen_size_pointer , default_fbo_pointer){
+    internal_format = Texture::RGBA16F ; 
+    data_format = Texture::BGRA ; 
+    data_type = Texture::UBYTE ; 
     texture_database = _texture_database ;
     shader_database = _shader_database ;
     gamma = 1.2f;
@@ -39,7 +44,10 @@ void CameraFrameBuffer::initializeFrameBuffer(){
     shader_framebuffer = static_cast<ScreenFrameBufferShader*>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
     mesh_screen_quad = new FrameBufferMesh(texture_id , shader_framebuffer) ;
     drawable_screen_quad = new Drawable(mesh_screen_quad) ; 
-    FrameBufferInterface::initializeFrameBuffer();  
+    FrameBufferInterface::initializeFrameBuffer(); 
+    bindFrameBuffer(); 
+    gl_framebuffer_object->attachTexture2D(GLFrameBuffer::TEXTURE2D );
+    unbindFrameBuffer();  
 }
 
 void CameraFrameBuffer::clean(){
