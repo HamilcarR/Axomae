@@ -70,11 +70,7 @@ int TextureDatabase::addTexture(TextureData *texture , Texture::TYPE type , bool
 
 Texture* TextureDatabase::get(const int index){
 	Mutex::Lock lock(mutex); 
-	auto it = texture_database.begin(); 
-	for(it ; it != texture_database.end() ; it++)
-		if(it->first == index)
-			return it->second; 
-	return nullptr; 
+	return texture_database[index]; 
 }
 
 bool TextureDatabase::contains(const int index){

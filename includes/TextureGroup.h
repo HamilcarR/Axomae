@@ -77,7 +77,7 @@ public:
 	 * @return true if the textures are ready to use
 	 * @return false if the textures are not ready to use
 	 */
-	bool isInitialized(){return initialized;};
+	bool isInitialized() const {return initialized;};
 
 	/**
 	 * @brief Checks if a texture of a certain type exists in the TextureGroup's collection
@@ -98,17 +98,9 @@ public:
 	/**
 	 * @brief Get the Texture Collection object
 	 * 
-	 * @return std::vector<Texture*> 
+	 * @return std::vector<int> 
 	 */
-	const std::vector<Texture*>& getTextureCollection() const {return texture_collection;}
-
-	/**
-	 * @brief 
-	 * 
-	 * @return true 
-	 * @return false 
-	 */
-	bool isInitialized() const {return initialized;}
+	const std::vector<int>& getTextureCollection() const {return texture_collection;}
 
 	/**
 	 * @brief 
@@ -121,7 +113,8 @@ public:
 public:
 	TextureDatabase* texture_database ; 	  /**<Pointer to the database texture*/
 private:
-	std::vector<Texture*> texture_collection; /**<Array of Pointers to textures in the texture database*/
+	//std::vector<Texture*> texture_collection; /**<Array of Pointers to textures in the texture database*/
+	std::vector<int> texture_collection;
 	bool initialized; 						  /**<State of the textures*/ 
 	
 };
