@@ -359,3 +359,17 @@ EnvmapCubemapBakerShader::EnvmapCubemapBakerShader(const std::string vertex , co
 EnvmapCubemapBakerShader::~EnvmapCubemapBakerShader(){
 
 }
+
+
+/***********************************************************************************************************************************************************/
+
+IrradianceCubemapBakerShader::IrradianceCubemapBakerShader() : Shader() {
+	type = IRRADIANCE_CUBEMAP_COMPUTE ; 
+} 
+IrradianceCubemapBakerShader::IrradianceCubemapBakerShader(const std::string vertex_code , const std::string fragment_code) : Shader(vertex_code , fragment_code){
+	type = IRRADIANCE_CUBEMAP_COMPUTE ; 
+}
+
+IrradianceCubemapBakerShader::~IrradianceCubemapBakerShader(){
+
+}

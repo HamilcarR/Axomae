@@ -5,13 +5,11 @@ GLFrameBuffer::GLFrameBuffer(){
     renderbuffer_object = nullptr;
     framebuffer_id = 0 ; 
     texture_id = 0 ; 
-    color_attachment = COLOR0 ; 
 }
 
-GLFrameBuffer::GLFrameBuffer(unsigned _width , unsigned _height , unsigned _texture_id ,  GLRenderBuffer::INTERNAL_FORMAT rbo_format , unsigned int* default_fbo_id_pointer ,  TEXTURE_TARGET target_type ):GLFrameBuffer(){
+GLFrameBuffer::GLFrameBuffer(unsigned _width , unsigned _height , GLRenderBuffer::INTERNAL_FORMAT rbo_format , unsigned int* default_fbo_id_pointer ,  TEXTURE_TARGET target_type ):GLFrameBuffer(){
     if(rbo_format != GLRenderBuffer::EMPTY)
         renderbuffer_object = new GLRenderBuffer(_width, _height , rbo_format); 
-    texture_id = _texture_id ;
     target_texture_type = target_type ; 
     pointer_on_default_fbo_id = default_fbo_id_pointer ;  
 
@@ -22,7 +20,7 @@ GLFrameBuffer::~GLFrameBuffer(){
         delete renderbuffer_object; 
 }
 
-void GLFrameBuffer::attachTexture2D(unsigned target ){
+void GLFrameBuffer::attachTexture2D(INTERNAL_FORMAT color_attachment , TEXTURE_TARGET target  , unsigned int texture_id){
     assert(texture_id != 0); 
     glFramebufferTexture2D(GL_FRAMEBUFFER , color_attachment , target , texture_id , 0); 
 }
@@ -67,7 +65,6 @@ void GLFrameBuffer::unbind(){
 
 void GLFrameBuffer::clean(){
     if(renderbuffer_object != nullptr){
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER , DEPTH_STENCIL , GL_RENDERBUFFER , 0);
         renderbuffer_object->clean(); 
     }
     unbind(); 

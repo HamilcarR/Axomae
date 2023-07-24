@@ -15,7 +15,8 @@ static std::map<Texture::TYPE , const char*> texture_type_c_str = {
 	{Texture::EMISSIVE , "emissive_map"},
 	{Texture::OPACITY , "opacity_map"}, 
 	{Texture::CUBEMAP , "cubemap"},
-	{Texture::ENVMAP  , "environment_map"}, 
+	{Texture::ENVMAP  , "environment_map"},
+	{Texture::IRRADIANCE , "irradiance_map"},
 	{Texture::GENERIC , "generic_map"}, 
 	{Texture::FRAMEBUFFER , "framebuffer_map"}
 
@@ -99,7 +100,8 @@ void Texture::clean(){
 		delete data;
 	if(f_data)
 		delete f_data ; 
-	data = nullptr ; 
+	data = nullptr ;
+	f_data = nullptr; 
 	width = 0 ; 
 	height = 0 ; 
 	name = EMPTY ; 
@@ -523,10 +525,19 @@ void CubeMapTexture::setCubeMapTextureData(TextureData *texture){
 	internal_format = static_cast<Texture::FORMAT> (texture->internal_format); 
 	data_format = static_cast<Texture::FORMAT> (texture->data_format) ; 
 	data_type = static_cast<Texture::FORMAT> (texture->data_type);	
+	f_data = nullptr ; 
+	data = nullptr ;
+	/* In case the raw data is in RGB-RGBA with 8 bits/channel*/
 	if(texture->data){
 		data = new uint32_t [ width * height * 6 ] ; 
 		for(unsigned int i = 0 ; i < width * height * 6 ; i++)
 			data[i] = texture->data[i] ; 
+	}
+	/* In case raw data is 4 bytes float / channel */
+	if(texture->f_data){
+		f_data = new float[width * height * 6 * texture->nb_components] ;
+		for(unsigned i = 0 ; i < width * height * 6 * texture->nb_components ; i++)
+			f_data[i] = texture->f_data[i] ; 
 	}
 }
 
@@ -557,27 +568,50 @@ void CubeMapTexture::initializeTexture2D(){
 
 void CubeMapTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 	
-	glActiveTexture(GL_TEXTURE0 + CUBEMAP); 
-	glBindTexture(GL_TEXTURE_CUBE_MAP , sampler2D); 
-	CubeMapTexture::initializeTexture2D(); 
-	shader->setTextureUniforms(texture_type_c_str[name] , name);  
+	bindTexture(); 
+	initializeTexture2D(); 
+	shader->setTextureUniforms(texture_type_c_str[name] , name); 
+	unbindTexture();
 }
 
 void CubeMapTexture::bindTexture(){
-	glActiveTexture(GL_TEXTURE0 + CUBEMAP ); 
+	glActiveTexture(GL_TEXTURE0 + name ); 
 	glBindTexture(GL_TEXTURE_CUBE_MAP , sampler2D);
 }
 
 void CubeMapTexture::unbindTexture(){
-	glActiveTexture(GL_TEXTURE0 + CUBEMAP); 
+	glActiveTexture(GL_TEXTURE0 + name); 
 	glBindTexture(GL_TEXTURE_CUBE_MAP , 0); 
 }
 
 const char* CubeMapTexture::getTextureTypeCStr() {
 	return texture_type_c_str[CUBEMAP] ; 		
 }
+
+
 /****************************************************************************************************************************/
-/* This is loaded from the disk as an .hdr image , with 4 bytes float for texel format*/
+IrradianceTexture::IrradianceTexture(FORMAT _internal_format , FORMAT _data_format , FORMAT _data_type , unsigned _width , unsigned _height):CubeMapTexture(_internal_format , _data_format , _data_type , _width , _height){
+	name = IRRADIANCE ; 
+}
+
+IrradianceTexture::~IrradianceTexture(){
+
+}
+
+IrradianceTexture::IrradianceTexture(TextureData* data):IrradianceTexture(){
+	name = IRRADIANCE ;
+	if(data)
+		setCubeMapTextureData(data) ; 
+}
+
+const char* IrradianceTexture::getTextureTypeCStr() {
+	return texture_type_c_str[IRRADIANCE] ; 		
+}
+
+/****************************************************************************************************************************/
+/* This is loaded from the disk as an .hdr image , with 4 bytes float for texel format on each channel... 
+ * note: make it generic so that we can generate it on the fly ? 
+ */
 
 EnvironmentMapTexture::EnvironmentMapTexture(FORMAT _internal_format  , FORMAT _data_format  , FORMAT _data_type , unsigned _width  , unsigned _height ) : Texture(){
 	name = ENVMAP;

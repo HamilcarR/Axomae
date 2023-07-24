@@ -238,7 +238,7 @@ public:
 	 * 
 	 * @param shader 
 	 */
-	void setShader(Shader* shader){shader_program = shader; material.setShaderPointer(shader); }
+	void setShader(Shader* shader); 
 
 	/**
 	 * @brief Get the pointer on the current material properties

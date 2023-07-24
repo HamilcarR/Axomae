@@ -26,7 +26,7 @@ public:
      * @brief Construct a new Frame Buffer Interface object
      * 
      */
-    FrameBufferInterface(Texture::TYPE rendertype = Texture::FRAMEBUFFER); 
+    FrameBufferInterface(); 
 
     /**
      * @brief Construct a new Frame Buffer Interface object
@@ -34,20 +34,11 @@ public:
      * @param texture_database 
      * @param texture_size 
      * @param default_fbo_id_pointer
-     * @param color_attachment 
      * @param rendertype 
-     * @param internal_format 
-     * @param data_format 
-     * @param data_type 
      */
     FrameBufferInterface(TextureDatabase* texture_database , 
                         ScreenSize* texture_size , 
-                        unsigned int* default_fbo_id_pointer = nullptr ,
-                        GLFrameBuffer::INTERNAL_FORMAT color_attachment = GLFrameBuffer::COLOR0 , 
-                        Texture::TYPE rendertype = Texture::FRAMEBUFFER , 
-                        Texture::FORMAT internal_format = Texture::RGBA ,
-                        Texture::FORMAT data_format = Texture::BGRA ,
-                        Texture::FORMAT data_type = Texture::UBYTE 
+                        unsigned int* default_fbo_id_pointer = nullptr 
                         ); 
     
     /**
@@ -101,39 +92,55 @@ public:
      */
     virtual void setDefaultFrameBufferIdPointer(unsigned *id){default_framebuffer_pointer = id ; }
 
-
-    Texture* getFrameBufferTexturePointer() const {return fbo_texture_pointer;}
+    /**
+     * @brief Get the texture used for a color attachment. 
+     * 
+     * @param color_attachment 
+     * @return Texture* 
+     */
+    Texture* getFrameBufferTexturePointer(GLFrameBuffer::INTERNAL_FORMAT color_attachment) {return fbo_attachment_texture_collection[color_attachment];}
 
     /**
-     * @brief Initialize an empty target texture to be rendered to , and returns it's database ID 
+     * @brief Initialize an empty target texture to be rendered to , saves it in the database , and returns it's database ID 
      * 
      * @param database The texture database.
      * @param width Width of the target texture
-     * @param height Height of the target texture 
+     * @param height Height of the target texture
+     * @param persistence If true , keeps the texture after texture database cleanup  
+     * @param internal_format Internal format of the texture to generate 
+     * @param data_format Data format of the texture
+     * @param data_type Type of the data for the texture
      * @param type Type of the target texture , can be of type Texture::FRAMEBUFFER , or Texture::CUBEMAP
      * @return int Database ID of this texture
      */
-    virtual int setUpEmptyTexture(unsigned width , unsigned height , Texture::TYPE type); 
+    virtual int setUpEmptyTexture(unsigned width , unsigned height , bool persistence , Texture::FORMAT internal_format , Texture::FORMAT data_format , Texture::FORMAT data_type , Texture::TYPE type); 
     
     /**
-     * @brief Initializes an empty texture on a framebuffer. 
-     * The resulting texture will be stored in the texture database , and saves it in "fbo_texture_pointer" property 
+     * @brief Initialize 1 or more textures , and store them in the database
      * 
+     * @param color_attachment  
+     * @param persistence 
+     * @param internal_format 
+     * @param data_format 
+     * @param data_type
+     * @param width 
+     * @param height
      */
-    virtual void initializeFrameBufferTexture(); 
+    virtual void initializeFrameBufferTexture(GLFrameBuffer::INTERNAL_FORMAT color_attachment ,
+                                                bool persistence , 
+                                                Texture::FORMAT internal_format , 
+                                                Texture::FORMAT data_format , 
+                                                Texture::FORMAT data_type , 
+                                                unsigned width , 
+                                                unsigned height , 
+                                                Texture::TYPE rendertype); 
 
 protected:
-    Texture::TYPE render_type ;
-    Texture::FORMAT internal_format ;
-    GLFrameBuffer::INTERNAL_FORMAT color_attachment ; 
-    Texture::FORMAT data_format ; 
-    Texture::FORMAT data_type ; 
     GLFrameBuffer *gl_framebuffer_object;  
     ScreenSize *texture_dim ;
     TextureDatabase* texture_database;
-    Texture* fbo_texture_pointer; 
+    std::map<GLFrameBuffer::INTERNAL_FORMAT , Texture*> fbo_attachment_texture_collection; 
     unsigned int *default_framebuffer_pointer; //! use as argument in constructor , or getters and setters
-    int texture_id ;            /**<ID of the framebuffer texture in the Texture database*/
 };
 
 

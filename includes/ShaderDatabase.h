@@ -81,6 +81,24 @@ public:
 	Shader* get(const Shader::TYPE type) override;
 
 	/**
+	 * @brief 
+	 * 
+	 * @param type 
+	 * @return true 
+	 * @return false 
+	 */
+	virtual bool remove(const Shader::TYPE type) ;	
+	
+	/**
+	 * @brief 
+	 * 
+	 * @param shader 
+	 * @return true 
+	 * @return false 
+	 */
+	virtual bool remove(const Shader* shader);
+	
+	/**
 	 * @brief Recompile the database of shaders
 	 * 
 	 */

@@ -118,3 +118,24 @@ std::pair<int , Texture*> TextureDatabase::contains(const Texture* address){
 			return A ; 
 	return std::pair(0 , nullptr); 
 }
+
+bool TextureDatabase::remove(const int index){
+	Texture* tex = get(index); 
+	if(tex){
+		tex->clean();
+		texture_database.erase(index); 
+		return true;
+	}
+	return false;
+}
+
+bool TextureDatabase::remove(const Texture* address){	
+	for(auto it = texture_database.begin() ; it != texture_database.end() ; it++){
+		if(it->second == address && address != nullptr){
+			it->second->clean(); 
+			texture_database.erase(it);
+			return true ; 
+		}
+	}
+	return false;
+}

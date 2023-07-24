@@ -63,6 +63,24 @@ public:
 	Texture* get(const int index) override;
 
 	/**
+	 * @brief Removes a texture from the database using it's ID
+	 * 
+	 * @param index 
+	 * @return true 
+	 * @return false 
+	 */
+	virtual bool remove(const int index);
+
+	/**
+	 * @brief Removes a texture from the database using it's address
+	 * 
+	 * @param texture Texture to remove 
+	 * @return true If the texture has been found
+	 * @return false If the address is not in the database
+	 */
+	virtual bool remove(const Texture* texture);
+
+	/**
 	 * @brief Add a texture object to the database . In case the object is already present , this method will return the already present texture's id 
 	 * 
 	 * @param texture Texture object to add 

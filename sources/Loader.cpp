@@ -256,13 +256,15 @@ void Loader::loadShaderDatabase(){
 	std::string vertex_shader_screen_fbo = loadShader("../shaders/screen_fbo.vert"); 
 	std::string fragment_shader_screen_fbo = loadShader("../shaders/screen_fbo.frag"); 	
 	std::string vertex_envmap_to_cubemap = loadShader("../shaders/envmap_bake.vert"); 
-	std::string fragment_envmap_to_cubemap = loadShader("../shaders/envmap_bake.frag"); 
+	std::string fragment_envmap_to_cubemap = loadShader("../shaders/envmap_bake.frag");
+	std::string fragment_irradiance_compute = loadShader("../shaders/irradiance_baker.frag"); 
 	shader_database->addShader(vertex_shader_bouding_box , fragment_shader_bounding_box , Shader::BOUNDING_BOX);  
 	shader_database->addShader(vertex_shader , fragment_shader , Shader::BLINN) ; 
 	shader_database->addShader(vertex_shader_cubemap , fragment_shader_cubemap , Shader::CUBEMAP) ; 
 	shader_database->addShader(vertex_shader_screen_fbo , fragment_shader_screen_fbo , Shader::SCREEN_FRAMEBUFFER); 
 	shader_database->addShader(vertex_shader_pbr , fragment_shader_pbr , Shader::PBR); 
 	shader_database->addShader(vertex_envmap_to_cubemap , fragment_envmap_to_cubemap , Shader::ENVMAP_CUBEMAP_CONVERTER); 
+	shader_database->addShader(vertex_envmap_to_cubemap , fragment_irradiance_compute , Shader::IRRADIANCE_CUBEMAP_COMPUTE); 
 }
 
 
@@ -626,11 +628,13 @@ Mesh* Loader::generateCubeMap(bool is_glb){
 EnvironmentMapTexture* Loader::loadHdrEnvmap(){
 	TextureDatabase* texture_database = resource_database->getTextureDatabase(); 
 	std::string folder_night = "../Ressources/Skybox_Textures/HDR/Night_City/" ; 
-	std::string folder_forest = "../Ressources/Skybox_Textures/HDR/Forest/" ; 
+	std::string folder_forest = "../Ressources/Skybox_Textures/HDR/Forest/" ;
+	std::string folder_park = "../Ressources/Skybox_Textures/HDR/Park/" ;
+	std::string folder_snow = "../Ressources/Skybox_Textures/HDR/Snow/" ; 
 	std::string env = folder_night + "night_env.hdr";
 	std::string hdr = folder_night +"night.hdr";
 
-//	hdr = folder_forest + "Forest.hdr" ; 
+	hdr = folder_snow + "Snow.hdr" ; 
 	TextureData envmap; 	
 	int width , height , channels ; 
 	stbi_set_flip_vertically_on_load(true); 

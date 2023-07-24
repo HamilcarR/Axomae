@@ -26,7 +26,7 @@ Texture* TextureFactory::constructTexture(TextureData *data , Texture::TYPE type
 			constructed_texture =  data == nullptr ? new DummyRoughnessTexture() : new RoughnessTexture(data); 
 		break ; 
 		case Texture::AMBIANTOCCLUSION:
-			constructed_texture =  data == nullptr ? new DummyAmbiantOcclusionTexture()  : new AmbiantOcclusionTexture(data); 
+			constructed_texture =  data == nullptr ? new DummyAmbiantOcclusionTexture() : new AmbiantOcclusionTexture(data); 
 		break ;
 		case Texture::SPECULAR:
 			constructed_texture = data == nullptr ? new DummySpecularTexture() : new SpecularTexture(data); 
@@ -40,6 +40,9 @@ Texture* TextureFactory::constructTexture(TextureData *data , Texture::TYPE type
 		case Texture::CUBEMAP:
 			constructed_texture =  new CubeMapTexture(data); 
 		break ;
+		case Texture::IRRADIANCE: 
+			constructed_texture = new IrradianceTexture(data);
+		break;
 		case Texture::ENVMAP:
 			constructed_texture =  new EnvironmentMapTexture(data); 
 		break ; 

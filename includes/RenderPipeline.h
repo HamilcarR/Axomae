@@ -46,6 +46,22 @@ public:
      */
     CubeMapMesh* bakeEnvmapToCubemap(EnvironmentMapTexture* hdri_map , unsigned width , unsigned height , GLViewer* gl_widget); 
 
+    /**
+     * @brief This method produces an irradiance texture , that it will store inside the texture database
+     * 
+     * @param cube_envmap Pre-computed Cubemap database index , from an environment map
+     * @param width Width of the irradiance texture
+     * @param height Height of the irradiance texture
+     * @param gl_widget Used to extract pertinent data. 
+     * @return int Irradiance texture database index 
+     */
+    int bakeIrradianceCubemap(int cube_envmap , unsigned width , unsigned height , GLViewer* gl_widget);
+
+    /**
+     * @brief 
+     * 
+     * @return * void 
+     */
     virtual void clean(); 
 protected:
     Renderer* renderer ; 

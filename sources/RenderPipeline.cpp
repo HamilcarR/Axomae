@@ -14,6 +14,12 @@ namespace camera_angles {
 }
 
 
+const std::vector<glm::mat4> views = { camera_angles::left , 
+                                    camera_angles::right , 
+                                    camera_angles::down , 
+                                    camera_angles::up , 
+                                    camera_angles::back , 
+                                    camera_angles::front};
 
 
 
@@ -44,7 +50,7 @@ void RenderPipeline::clean(){
  * 
  * @return a pointer to a CubeMapMesh object.
  */
-// "You have to clean this shit before things go boom"
+//TODO: [AX-43] Fix memory leak in RenderPipeline
 CubeMapMesh* RenderPipeline::bakeEnvmapToCubemap( EnvironmentMapTexture *hdri_map , unsigned width , unsigned height , GLViewer* gl_widget){
     assert(resource_database != nullptr); 
     assert(resource_database->getTextureDatabase() != nullptr); 
@@ -53,12 +59,12 @@ CubeMapMesh* RenderPipeline::bakeEnvmapToCubemap( EnvironmentMapTexture *hdri_ma
     TextureDatabase *texture_database = resource_database->getTextureDatabase();
     ShaderDatabase *shader_database = resource_database->getShaderDatabase();
     Shader* bake_shader = shader_database->get(Shader::ENVMAP_CUBEMAP_CONVERTER); 
-    ScreenSize tex_dim , cam_dim ;
+    ScreenSize tex_dim , cam_dim;
     /*Set up camera ratio + cubemap texture resolution*/
     cam_dim.width = width ; 
     cam_dim.height = height ; 
     tex_dim.width = width ; 
-    tex_dim.height = height ;  
+    tex_dim.height = height ;
     FreePerspectiveCamera camera(90.f ,&cam_dim , 0.1f , 2000.f ) ; //Generic camera object 
     CubeMapMesh *cubemap = new CubeMapMesh();
     CubeMesh *cube = new CubeMesh(); 
@@ -69,48 +75,78 @@ CubeMapMesh* RenderPipeline::bakeEnvmapToCubemap( EnvironmentMapTexture *hdri_ma
     if(query_envmap_result.second == nullptr)
         database_id_envmap = texture_database->add(hdri_map , false);  
     cube->material.addTexture(database_id_envmap , Texture::ENVMAP);    
-    Drawable cube_drawable(cube);  
-    
-    /*Set up view angles , each rotated 90° to get all faces */
-    std::vector<glm::mat4> views = { camera_angles::left , 
-                                    camera_angles::right , 
-                                    camera_angles::down , 
-                                    camera_angles::up , 
-                                    camera_angles::back , 
-                                    camera_angles::front};
-   
+    Drawable cube_drawable(cube);   
     /* Generate a framebuffer that will render to a cubemap*/
-    RenderCubeMap cubemap_renderer_framebuffer(texture_database , &cam_dim , renderer->getDefaultFrameBufferIdPointer()); 
-    cubemap_renderer_framebuffer.initializeFrameBufferTexture();
+    RenderCubeMap cubemap_renderer_framebuffer(texture_database , &cam_dim , renderer->getDefaultFrameBufferIdPointer());
+    cubemap_renderer_framebuffer.initializeFrameBufferTexture(GLFrameBuffer::COLOR0 , false , Texture::RGB16F , Texture::RGB , Texture::FLOAT , width , height , Texture::CUBEMAP) ; 
+    errorCheck(__FILE__ , __LINE__); 
     bake_shader->bind(); 
-    cubemap_renderer_framebuffer.getFrameBufferTexturePointer()->setGlData(bake_shader);
-    bake_shader->release(); 
+    cubemap_renderer_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0)->setGlData(bake_shader); 
+    bake_shader->release();
     cubemap_renderer_framebuffer.initializeFrameBuffer(); 
     cube_drawable.startDraw();
     cubemap_renderer_framebuffer.bindFrameBuffer();
     glViewport(0 , 0 , width , height); 
     for(unsigned i = 0 ; i < 6 ; i++){    
         camera.setView(views[i]); 
-        cube_drawable.bind(); 
-        cubemap_renderer_framebuffer.renderToFace(i , GLFrameBuffer::COLOR0);  
+        cube_drawable.bind();  
+        cubemap_renderer_framebuffer.renderToFace(i , GLFrameBuffer::COLOR0);    
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   
         glDrawElements(GL_TRIANGLES , cube->geometry.indices.size() , GL_UNSIGNED_INT , 0 );
         cube_drawable.unbind();     
     }
-   
-   /*Irradiance convolution here*/
-   
-   
-   
-    glViewport(0 , 0 , gl_widget->width() , gl_widget->height());
-    cubemap_renderer_framebuffer.unbindFrameBuffer();  
+    cubemap_renderer_framebuffer.unbindFrameBuffer(); 
+    glViewport(0 , 0 , gl_widget->width() , gl_widget->height()); 
+    cubemap_renderer_framebuffer.clean() ;  
     cube_drawable.clean();
-    
-    //TODO: [AX-43] Fix memory leak in RenderPipeline
-    
-    std::pair<int , Texture*> query_baked_cubemap_texture = texture_database->contains(cubemap_renderer_framebuffer.getFrameBufferTexturePointer());
-    assert(query_baked_cubemap_texture.second); 
-    cubemap->material.addTexture(query_baked_cubemap_texture.first , Texture::CUBEMAP);
+    std::pair<int , Texture*> query_baked_cubemap_texture = texture_database->contains(cubemap_renderer_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0)); 
+    cubemap->material.addTexture(query_baked_cubemap_texture.first , Texture::CUBEMAP); 
     cubemap->setShader(shader_database->get(Shader::CUBEMAP));
+    errorCheck(__FILE__ , __LINE__);
+    bakeIrradianceCubemap(query_baked_cubemap_texture.first , 64 , 64 , gl_widget); 
     return cubemap;  
+}
+
+int RenderPipeline::bakeIrradianceCubemap(int cube_envmap , unsigned width , unsigned height , GLViewer* gl_widget){
+    ScreenSize irrad_dim , cam_dim ;
+    TextureDatabase *texture_database = resource_database->getTextureDatabase();
+    ShaderDatabase *shader_database = resource_database->getShaderDatabase();
+    Shader* irradiance_shader = shader_database->get(Shader::IRRADIANCE_CUBEMAP_COMPUTE); 
+    RenderCubeMap cubemap_irradiance_framebuffer(texture_database , &irrad_dim , renderer->getDefaultFrameBufferIdPointer());   
+    FreePerspectiveCamera camera(90.f ,&cam_dim , 0.1f , 2000.f ) ;
+    CubeMesh *cube = new CubeMesh(); 
+    
+    cam_dim.width = width ; 
+    cam_dim.height = height ;  
+    irrad_dim.width = width ; 
+    irrad_dim.height = height ; 
+    cubemap_irradiance_framebuffer.initializeFrameBufferTexture(GLFrameBuffer::COLOR0 , false , Texture::RGB16F , Texture::RGB , Texture::FLOAT , irrad_dim.width , irrad_dim.height , Texture::IRRADIANCE);
+    cube->setShader(irradiance_shader); 
+    cube->material.addTexture(cube_envmap , Texture::CUBEMAP);
+    cube->setSceneCameraPointer(&camera); 
+    Drawable cube_drawable(cube); 
+    
+    irradiance_shader->bind(); 
+    cubemap_irradiance_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0)->setGlData(irradiance_shader);
+    irradiance_shader->release();
+    cubemap_irradiance_framebuffer.initializeFrameBuffer();
+    cubemap_irradiance_framebuffer.bindFrameBuffer();
+    cube_drawable.startDraw();  
+    glViewport(0 , 0 , irrad_dim.width , irrad_dim.height);  
+    for(unsigned i = 0 ; i < 6 ; i++){    
+        camera.setView(views[i]); 
+        cube_drawable.bind();  
+        cubemap_irradiance_framebuffer.renderToFace(i , GLFrameBuffer::COLOR0);         
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    
+        glDrawElements(GL_TRIANGLES , cube->geometry.indices.size() , GL_UNSIGNED_INT , 0 );    
+    }
+    glFinish(); 
+    cube_drawable.unbind();     
+    cubemap_irradiance_framebuffer.unbindFrameBuffer(); 
+    glViewport(0 , 0 , gl_widget->width() , gl_widget->height()); 
+    cubemap_irradiance_framebuffer.clean();
+    cube_drawable.clean(); 
+    std::pair<int , Texture*> query_baked_irradiance_texture = texture_database->contains(cubemap_irradiance_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));  
+    assert(query_baked_irradiance_texture.second);
+    return query_baked_irradiance_texture.first ;
 }

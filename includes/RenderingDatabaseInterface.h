@@ -38,6 +38,24 @@ public:
     virtual T* get(const U id)  = 0; 
 
     /**
+     * @brief Removes the element from a database , using it's ID
+     * 
+     * @param id ID to remove 
+     * @return true If the element has been found and removed 
+     * @return false If no element with this ID have been found
+     */
+    virtual bool remove(const U id) = 0 ; 
+
+    /**
+     * @brief Removes an element from the database using it's address 
+     * 
+     * @param element Address of the element to be removed
+     * @return true If the element has been removed
+     * @return false If the element has not been found
+     */
+    virtual bool remove(const T *element) = 0; 
+
+    /**
      * @brief Adds an element in the database
      * 
      * @param element Object to store 

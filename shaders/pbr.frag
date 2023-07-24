@@ -88,7 +88,8 @@ layout(binding=6) uniform sampler2D ambiantocclusion_map ;
 layout(binding=7) uniform sampler2D specular_map;
 layout(binding=8) uniform sampler2D emissive_map;
 layout(binding=9) uniform sampler2D opacity_map ;  
-layout(binding=10) uniform samplerCube cubemap; 
+layout(binding=10) uniform samplerCube cubemap;
+layout(binding=12) uniform samplerCube irradiance_map;  
 
 /******************************************/
 
@@ -140,6 +141,10 @@ vec4 computeMetallicValue(){
 
 vec4 computeDiffuseValue(){
     return texture(diffuse_map , vertex_fragment_uv);
+}
+
+vec4 computeIrradiance(vec3 normal){
+    return texture(irradiance_map , normal); 
 }
 
 /**************************************************************************************************************/
@@ -195,14 +200,14 @@ vec3 fresnelConstant(){
     return vec3(cste);  
 }
 
-vec3 fresnelSchlickGGX(float cos_theta , float metallic , vec3 albedo){
+vec3 fresnelSchlickGGX(float cos_theta , float metallic , vec3 albedo , float roughness){
     vec3 F0 = vec3(0.04) ; //fresnelConstant();
     F0 = mix(F0 , albedo , metallic); 
-    return F0 + (1 - F0) * pow(clamp(1.f - cos_theta , 0.f , 1.f) , 5.f) ; 
+    return F0 + (max(vec3(1 - roughness) , F0) - F0) * pow(clamp(1.f - cos_theta , 0.f , 1.f) , 5.f) ; 
 }
 
-vec3 computeFresnel(vec3 h , vec3 v , float metallic , vec3 albedo){
-    return fresnelSchlickGGX(max(dot(h , v) , 0.f) , metallic , albedo); 
+vec3 computeFresnel(vec3 h , vec3 v , float metallic , vec3 albedo , float roughness){
+    return fresnelSchlickGGX(max(dot(h , v) , 0.f) , metallic , albedo , roughness); 
 }
 
 /**************************** NORMAL DISTRIBUTION FUNCTION ***************************************************/
@@ -234,12 +239,12 @@ float geometrySmith(vec3 light_direction , vec3 surface_normal , vec3 eye_pos, f
 
 
 /**************************************************************************************************************/
-vec3 computeBRDF(vec3 light_pos , vec3 n , vec3 v , float roughness , float metallic , vec3 albedo , bool IBL){
+vec3 computeBRDF(vec3 light_pos , vec3 n , vec3 v , float roughness , float metallic , vec3 albedo , vec3 irradiance_sample, bool IBL){
     vec3 h = computeHalfVect(light_pos);  
     vec3 l = normalize(light_pos - vertex_fragment_fragment_position); 
     float D = distributionGGX(h , n , roughness * roughness);
     float G = geometrySmith(l , n , v , roughness * roughness , IBL);
-    vec3 F = computeFresnel(h , v , metallic , albedo); 
+    vec3 F = computeFresnel(h , v , metallic , albedo , roughness); 
     vec3 nom = D*F*G ; 
     float dot_v_n = max(dot(v , n) , 0.f); 
     float dot_l_n = max(dot(l , n), 0.f);
@@ -248,11 +253,12 @@ vec3 computeBRDF(vec3 light_pos , vec3 n , vec3 v , float roughness , float meta
     vec3 Ks = F ; 
     vec3 Kd = vec3(1.f) - Ks ; 
     Kd *= (1.f - metallic) ;
+    albedo = albedo * irradiance_sample ; 
     return (Kd * albedo / PI + specular) * dot_l_n;  
 }
 
 /**************************************************************************************************************/
-LIGHT_COMPONENTS computePointLightsContribBRDF(float roughness , float metallic , vec3 albedo , bool IBL){
+LIGHT_COMPONENTS computePointLightsContribBRDF(float roughness , float metallic , vec3 albedo , vec3 irradiance_sample , bool IBL){
     vec3 v = -getViewDirection();
     vec3 n = getSurfaceNormal(); 
     LIGHT_COMPONENTS light;  
@@ -260,7 +266,7 @@ LIGHT_COMPONENTS computePointLightsContribBRDF(float roughness , float metallic 
     vec3 L0 = vec3(0.f) ; 
     for(i = 0 ; i < point_light_number ; i++){
         vec3 light_pos = point_light_struct[i].position ; 
-        vec3 brdf = computeBRDF(light_pos , n , v , roughness , metallic , albedo , IBL); 
+        vec3 brdf = computeBRDF(light_pos , n , v , roughness , metallic , albedo , irradiance_sample, IBL); 
         vec3 radiance = computeRadiancePointLight(n ,i); 
         L0 += brdf * radiance ; 
     }
@@ -269,7 +275,7 @@ LIGHT_COMPONENTS computePointLightsContribBRDF(float roughness , float metallic 
 }
 
 /**************************************************************************************************************/
-LIGHT_COMPONENTS computeSpotLightsContribBRDF(float roughness , float metallic , vec3 albedo , bool IBL){
+LIGHT_COMPONENTS computeSpotLightsContribBRDF(float roughness , float metallic , vec3 albedo , vec3 irradiance_sample , bool IBL){
     vec3 v = -getViewDirection();
     vec3 n = getSurfaceNormal(); 
     LIGHT_COMPONENTS light;  
@@ -277,7 +283,7 @@ LIGHT_COMPONENTS computeSpotLightsContribBRDF(float roughness , float metallic ,
     vec3 L0 = vec3(0.f) ; 
     for(i = 0 ; i < spot_light_number ; i++){
         vec3 light_pos = spot_light_struct[i].position ; 
-        vec3 brdf = computeBRDF(light_pos , n , v , roughness , metallic , albedo , IBL);
+        vec3 brdf = computeBRDF(light_pos , n , v , roughness , metallic , albedo , irradiance_sample , IBL);
         vec3 l = normalize(light_pos - vertex_fragment_fragment_position);  
         vec3 radiance = computeRadianceSpotLight(n , l, i); 
         L0 += brdf * radiance ; 
@@ -287,15 +293,16 @@ LIGHT_COMPONENTS computeSpotLightsContribBRDF(float roughness , float metallic ,
 }
 
 /**************************************************************************************************************/
-LIGHT_COMPONENTS computeDirectionalLightsContribBRDF(float roughness , float metallic , vec3 albedo , bool IBL){
+LIGHT_COMPONENTS computeDirectionalLightsContribBRDF(float roughness , float metallic , vec3 albedo , vec3 irradiance_sample , bool IBL){
     vec3 v = -getViewDirection();
     vec3 n = getSurfaceNormal(); 
     LIGHT_COMPONENTS light;  
     uint i = 0 ; 
     vec3 L0 = vec3(0.f) ; 
     for(i = 0 ; i < directional_light_number ; i++){
-        vec3 l= normalize(directional_light_struct[i].position ); // This is wi 
-        vec3 brdf = computeBRDF(directional_light_struct[i].position , n , v , roughness , metallic , albedo , IBL);
+        vec3 l= normalize(directional_light_struct[i].position ); // This is wi
+        vec3 light_dir = vertex_fragment_fragment_position + directional_light_struct[i].position; 
+        vec3 brdf = computeBRDF(light_dir , n , v , roughness , metallic , albedo , irradiance_sample , IBL);
         light.radiance += computeRadianceDirectionalLight(n , l , i); 
         L0 += brdf * light.radiance ; 
     }
@@ -313,20 +320,13 @@ void main(){
     float ambient_occlusion = mrao.r ; 
     vec4 E = computeEmissiveValue() ;
     vec4 C = computeDiffuseValue() ;
+    vec4 A = computeIrradiance(getSurfaceNormal());
     vec3 albedo = pow(C.rgb , vec3(2.2)); 
-    LIGHT_COMPONENTS point = computePointLightsContribBRDF(roughness , metallic,  albedo , false );
-    LIGHT_COMPONENTS spot = computeSpotLightsContribBRDF(roughness , metallic , albedo , false); 
-    LIGHT_COMPONENTS direct = computeDirectionalLightsContribBRDF(roughness , metallic , albedo , false); 
-    final_computed_fragment = vec4(point.radiance + spot.radiance + direct.radiance + vec3(0.1) * albedo * ambient_occlusion + E.rgb * material.emissive_factor, 0.f) ;  
+    LIGHT_COMPONENTS point = computePointLightsContribBRDF(roughness , metallic,  albedo , A.rgb ,  false );
+    LIGHT_COMPONENTS spot = computeSpotLightsContribBRDF(roughness , metallic , albedo , A.rgb , false); 
+    LIGHT_COMPONENTS direct = computeDirectionalLightsContribBRDF(roughness , metallic , albedo , A.rgb , false); 
+    final_computed_fragment = vec4(point.radiance + spot.radiance + direct.radiance + A.rgb * albedo * ambient_occlusion + E.rgb * material.emissive_factor, 0.f) ;  
     float alpha = C.a < material.alpha_factor ? C.a : material.alpha_factor; 
     final_computed_fragment.a = alpha;
-    uint i = 0 ;
-  /*  vec4 test = vec4(0.f);  
-    for(i ; i < point_light_number ; i++){
-        if(length(point_light_struct[i].position - vertex_fragment_fragment_position) < 10){
-            test = vec4(1.f); 
-        }
-    } 
-    final_computed_fragment = test ; */
     fragment = final_computed_fragment; 
 }

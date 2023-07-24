@@ -27,7 +27,10 @@ Shader* ShaderFactory::constructShader(std::string v , std::string f , Shader::T
 		break;
 		case Shader::ENVMAP_CUBEMAP_CONVERTER:
 			constructed_shader = new EnvmapCubemapBakerShader(v , f) ; 
-		break; 
+		break;
+		case Shader::IRRADIANCE_CUBEMAP_COMPUTE:
+			constructed_shader = new IrradianceCubemapBakerShader(v , f); 
+		break ; 
 		default:
 			constructed_shader = nullptr ; 
 		break; 

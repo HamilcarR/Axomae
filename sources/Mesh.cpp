@@ -83,6 +83,14 @@ void Mesh::preRenderSetup(){
 	}
 }
 
+void Mesh::setShader(Shader* shader){
+	shader_program = shader;
+	if(!shader_program->isInitialized())
+		shader_program->initializeShader(); 
+	material.setShaderPointer(shader); 
+
+}
+
 void Mesh::setupAndBind(){
 	if(shader_program){
 		bindShaders();

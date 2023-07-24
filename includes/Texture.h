@@ -148,7 +148,8 @@ public:
 		EMISSIVE = 8 , 
 		OPACITY = 9 ,  
 		CUBEMAP = 10 ,
-		ENVMAP = 11  
+		ENVMAP = 11 ,
+		IRRADIANCE = 12
 		
 		
 	} ;
@@ -878,6 +879,43 @@ protected:
 
 
 }; 
+/******************************************************************************************************************************************************************************************************************/
+/**
+ * @brief Irradiance texture class definition
+ * 
+ */
+class IrradianceTexture : public CubeMapTexture{
+public:
+	
+	/**
+	 * @brief Construct an Irradiance cube map 
+	 * 
+	 */
+	IrradianceTexture(FORMAT internal_format = RGB16F , FORMAT data_format = RGB , FORMAT data_type = FLOAT , unsigned width = 0 , unsigned height = 0);
+	
+	/**
+	 * @brief Construct a new Cube Map Texture object
+	 * 
+	 * @param data Texture raw data 
+	 * @see TextureData
+	 */
+	IrradianceTexture(TextureData* data);  
+	
+	/**
+	 * @brief Destroy the Cube Map Texture object
+	 * 
+	 */
+	virtual ~IrradianceTexture();
+	
+	/**
+	 * @brief Get the texture's alias
+	 * 
+	 * @return const char* 
+	 */
+	const char* getTextureTypeCStr() ; 
+}; 
+
+
 
 /******************************************************************************************************************************************************************************************************************/
 /**
@@ -942,7 +980,8 @@ public:
 }; 
 /******************************************************************************************************************************************************************************************************************/
 /**
- * @brief 
+ * @class FrameBufferTexture
+ * @brief A custom framebuffer's texture for post processing
  * 
  */
 class FrameBufferTexture : public Texture {

@@ -25,7 +25,12 @@ public:
 
     enum TEXTURE_TARGET : unsigned {
         TEXTURE2D = GL_TEXTURE_2D , 
-        CUBEMAP = GL_TEXTURE_CUBE_MAP_POSITIVE_X
+        CUBEMAP_POSITIVE_X = GL_TEXTURE_CUBE_MAP_POSITIVE_X, 
+        CUBEMAP_NEGATIVE_X = GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 
+        CUBEMAP_POSITIVE_Y = GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 
+        CUBEMAP_NEGATIVE_Y = GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 
+        CUBEMAP_POSITIVE_Z = GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 
+        CUBEMAP_NEGATIVE_Z = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z 
     }; 
 
     /**
@@ -39,14 +44,12 @@ public:
      * 
      * @param width Width to pass to GLRenderBuffer renderbuffer_objet variable creation  
      * @param height Height to pass to GLRenderBuffer renderbuffer_object variable creation
-     * @param texture_id The created texture ID to attach to the framebuffer 
      * @param renderbuffer_internal_format Depth format to use for the attached GLRenderBuffer
      * @param default_fbo_id_pointer A pointer on the ID of the default framebuffer . In the case of only one context , will be nullptr .  
      * @param target_texture_type Target texture type
      */
     GLFrameBuffer(unsigned width , 
                 unsigned height , 
-                unsigned texture_id , 
                 GLRenderBuffer::INTERNAL_FORMAT renderbuffer_internal_format = GLRenderBuffer::EMPTY  ,
                 unsigned int* default_fbo_id_pointer = nullptr , 
                 TEXTURE_TARGET target_texture_type = TEXTURE2D); 
@@ -71,11 +74,12 @@ public:
     virtual bool isReady() const override; 
 
     /**
-     * @brief 
+     * @brief Attach a texture to the framebuffer
      * 
      * @param target 
+     * @param texture_id 
      */
-    void attachTexture2D(unsigned target ) ; 
+    void attachTexture2D(INTERNAL_FORMAT color_attachment , TEXTURE_TARGET target  , unsigned int texture_id) ; 
     
     /**
      * @brief Binds the framebuffer 
@@ -103,7 +107,6 @@ public:
      */
     virtual void resize(unsigned int width , unsigned int height) ;
     
-    virtual void setColorAttachment(INTERNAL_FORMAT attachment){color_attachment = attachment; }
 private:
 
     /**
@@ -113,7 +116,6 @@ private:
     virtual void fillBuffers() override ; 
 
 protected:
-    INTERNAL_FORMAT color_attachment;                     /*<Internal Format*/ 
     TEXTURE_TARGET target_texture_type ;        /*<Type of the target texture */
     GLRenderBuffer *renderbuffer_object ;       /*<Pointer on the renderbuffer */ 
     unsigned int framebuffer_id ;               /*<Framebuffer ID*/ 

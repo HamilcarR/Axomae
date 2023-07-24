@@ -11,19 +11,14 @@ CameraFrameBuffer::CameraFrameBuffer(TextureDatabase* _texture_database ,
                                     ShaderDatabase* _shader_database, 
                                     ScreenSize* screen_size_pointer , 
                                     unsigned int* default_fbo_pointer) : FrameBufferInterface(_texture_database , screen_size_pointer , default_fbo_pointer){
-    internal_format = Texture::RGBA16F ; 
-    data_format = Texture::BGRA ; 
-    data_type = Texture::UBYTE ; 
     texture_database = _texture_database ;
     shader_database = _shader_database ;
     gamma = 1.2f;
     exposure = 0.3f;  
-    texture_id = 0 ; 
     gl_framebuffer_object = nullptr ; 
     drawable_screen_quad = nullptr; 
     mesh_screen_quad = nullptr; 
     shader_framebuffer = nullptr ;
-    fbo_texture_pointer = nullptr;  
 }
 
 CameraFrameBuffer::~CameraFrameBuffer(){
@@ -40,14 +35,16 @@ void CameraFrameBuffer::updateFrameBufferShader(){
 }
 
 void CameraFrameBuffer::initializeFrameBuffer(){  
-    initializeFrameBufferTexture(); 
+    initializeFrameBufferTexture(GLFrameBuffer::COLOR0 ,  true , Texture::RGBA16F , Texture::BGRA , Texture::UBYTE , texture_dim->width , texture_dim->height , Texture::FRAMEBUFFER); 
     shader_framebuffer = static_cast<ScreenFrameBufferShader*>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
-    mesh_screen_quad = new FrameBufferMesh(texture_id , shader_framebuffer) ;
-    drawable_screen_quad = new Drawable(mesh_screen_quad) ; 
+    Texture* fbo_texture = fbo_attachment_texture_collection[GLFrameBuffer::COLOR0] ;
+    auto database_texture_id = texture_database->contains(fbo_texture).first; 
+    mesh_screen_quad = new FrameBufferMesh(database_texture_id , shader_framebuffer) ;
+    drawable_screen_quad = new Drawable(mesh_screen_quad) ;
     FrameBufferInterface::initializeFrameBuffer(); 
     bindFrameBuffer(); 
-    gl_framebuffer_object->attachTexture2D(GLFrameBuffer::TEXTURE2D );
-    unbindFrameBuffer();  
+    gl_framebuffer_object->attachTexture2D(GLFrameBuffer::COLOR0 , GLFrameBuffer::TEXTURE2D  , fbo_texture->getSamplerID());
+    unbindFrameBuffer();   
 }
 
 void CameraFrameBuffer::clean(){
@@ -55,7 +52,6 @@ void CameraFrameBuffer::clean(){
         drawable_screen_quad->clean();
     FrameBufferInterface::clean(); 
 }   
-
 
 void CameraFrameBuffer::startDraw(){
     if(shader_framebuffer){

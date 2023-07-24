@@ -72,3 +72,12 @@ std::pair<Shader::TYPE , Shader*> ShaderDatabase::contains(const Shader* shader)
 	}
 	return std::pair(Shader::EMPTY , nullptr); 
 }
+
+
+bool ShaderDatabase::remove(const Shader* shader){
+	return false;
+}
+
+bool ShaderDatabase::remove(const Shader::TYPE type){
+	return false;
+}

@@ -87,8 +87,6 @@ bool Renderer::prep_draw(){
 	}
 }
 void Renderer::draw(){
-	
-	
 	scene->updateTree(); 
 	camera_framebuffer->bindFrameBuffer();	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		
@@ -104,8 +102,9 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scen
 	Loader loader; 
 	EnvironmentMapTexture* env = loader.loadHdrEnvmap();  //! TODO in case we want to seek the cubemap to replace it's texture with this , use visitor pattern in scene graph 
 	//CubeMapMesh* cubemap_mesh = render_pipeline->bakeEnvmapToCubemap(dynamic_cast<EnvironmentMapTexture*>(resource_database->getTextureDatabase()->getTexturesByType(Texture::ENVMAP)[0].second), 1024 , 1024 , gl_widget); 
-
-	CubeMapMesh* cubemap_mesh = render_pipeline->bakeEnvmapToCubemap(env , 2048 , 2048 , gl_widget); 
+	CubeMapMesh* cubemap_mesh = render_pipeline->bakeEnvmapToCubemap(env , 2048 , 2048  , gl_widget);
+	int irradiance_tex_id = resource_database->getTextureDatabase()->getTexturesByType(Texture::IRRADIANCE)[0].first; 
+	std::for_each(new_scene.first.begin() , new_scene.first.end() , [&irradiance_tex_id](Mesh* m){m->material.addTexture(irradiance_tex_id , Texture::IRRADIANCE) ; });
 	assert(cubemap_mesh);
 	new_scene.first.push_back(cubemap_mesh); 
 	new_scene.second.setAsRootChild(cubemap_mesh); 
@@ -113,9 +112,9 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scen
 	scene->setLightDatabasePointer(light_database); 
 	scene->setCameraPointer(scene_camera); 
 	light_database->clearDatabase();
-	AbstractLight *L1 = new SpotLight(glm::vec3(-55 , 90 , 5) , glm::vec3(0.f) , glm::vec3(1.f , 1.f , 0.9f), 12.f , 102000.f , scene_camera); 
-    AbstractLight *L2 = new PointLight(glm::vec3(-5 , 0 , -20) , glm::vec3(0.875f , 0.257f , 0.184f), glm::vec3(1.f , 0.0045 , 0.0075) , 200.f , L1); 
-	AbstractLight *L3 = new DirectionalLight(glm::vec3(1 , 1 , 1) , glm::vec3(1.f , 1.f , 1.f) , 2.f , scene_camera); 
+	AbstractLight *L1 = new SpotLight(glm::vec3(-55 , 90 , -5) , glm::vec3(0.f) , glm::vec3(1.f , 1.f , 0.9f), 12.f , 102000.f , scene_camera); 
+    AbstractLight *L2 = new PointLight(glm::vec3(0 , 20 , -2) , glm::vec3(0.875f , 0.257f , 0.184f), glm::vec3(1.f , 0.0045 , 0.0075) , 200.f , L1); 
+	AbstractLight *L3 = new DirectionalLight(glm::vec3(0 , 1 , 0) , glm::vec3(1.f , 1.f , 1.f) , .5f , scene_camera); 
 	light_database->addLight(L1); 
 	light_database->addLight(L2);
 	light_database->addLight(L3); 

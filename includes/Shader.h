@@ -31,7 +31,8 @@ public:
 		PBR = 3	, 	  				/**<PBR shader type*/
 		SCREEN_FRAMEBUFFER = 4 ,	/**<Used for post processing*/
 		BOUNDING_BOX = 5,			/**<Shader used for displaying bounding boxes of meshes*/
-		ENVMAP_CUBEMAP_CONVERTER  = 6 	/**<Shader used to bake an equirectangular environment map to a cubemap*/
+		ENVMAP_CUBEMAP_CONVERTER  = 6 ,	/**<Shader used to bake an equirectangular environment map to a cubemap*/
+		IRRADIANCE_CUBEMAP_COMPUTE = 7 /**<Shader used to compute the irradiance map*/
 	};
 public: 
 	
@@ -217,6 +218,14 @@ public:
 	}
 	
 	/**
+	 * @brief 
+	 * 
+	 * @return true 
+	 * @return false 
+	 */
+	bool isInitialized() const { return shader_program != 0 ; }
+
+	/**
 	 * @brief Convenience method for setUniform
 	 * 
 	 * @tparam T Type of data
@@ -392,6 +401,15 @@ public:
 	EnvmapCubemapBakerShader(); 
 	EnvmapCubemapBakerShader(const std::string vertex_code , const std::string fragment_code); 
 	virtual ~EnvmapCubemapBakerShader();
+};
+
+/***********************************************************************************************************************************************************/
+
+class IrradianceCubemapBakerShader : public Shader{
+public:
+	IrradianceCubemapBakerShader() ; 
+	IrradianceCubemapBakerShader(const std::string vertex_code , const std::string fragment_code); 
+	virtual ~IrradianceCubemapBakerShader();
 };
 
 
