@@ -113,8 +113,7 @@ public:
 public:
 	TextureDatabase* texture_database ; 	  /**<Pointer to the database texture*/
 private:
-	//std::vector<Texture*> texture_collection; /**<Array of Pointers to textures in the texture database*/
-	std::vector<int> texture_collection;
+	std::vector<int> texture_collection;	/**<Array of Pointers to textures in the texture database*/
 	bool initialized; 						  /**<State of the textures*/ 
 	
 };
