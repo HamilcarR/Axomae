@@ -1,0 +1,174 @@
+\hypertarget{classLightingDatabase}{}\doxysection{Lighting\+Database Class Reference}
+\label{classLightingDatabase}\index{LightingDatabase@{LightingDatabase}}
+
+
+Class declaration of the light database system.  
+
+
+
+
+{\ttfamily \#include $<$Lighting\+Database.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classLightingDatabase_a0b9fb1f85f1b0d502d7d9144e6673f16}{Lighting\+Database}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new Lighting Database object. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classLightingDatabase_a07318c3a594f720e1bab49abca4cb760}{$\sim$\+Lighting\+Database}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the Lighting Database object. \end{DoxyCompactList}\item 
+virtual bool \mbox{\hyperlink{classLightingDatabase_af6dd0225288bbd1fa705016b4f369b77}{add\+Light}} (\mbox{\hyperlink{classAbstractLight}{Abstract\+Light}} $\ast$light)
+\begin{DoxyCompactList}\small\item\em Add a new light in the scene. \end{DoxyCompactList}\item 
+const std\+::vector$<$ \mbox{\hyperlink{classAbstractLight}{Abstract\+Light}} $\ast$ $>$ \& \mbox{\hyperlink{classLightingDatabase_acdacfea7f828a0993e72bfc4c6c36ad4}{get\+Lights\+Array\+By\+Type}} (\mbox{\hyperlink{classAbstractLight_a5c8289262e80b0694b4ff6bfa00bcd51}{Abstract\+Light\+::\+TYPE}} type)
+\begin{DoxyCompactList}\small\item\em Get all lights of certain type. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classLightingDatabase_a876c4055e3f987878dbb80209e3dbc7a}{erase\+Lights\+Array}} (\mbox{\hyperlink{classAbstractLight_a5c8289262e80b0694b4ff6bfa00bcd51}{Abstract\+Light\+::\+TYPE}} type)
+\begin{DoxyCompactList}\small\item\em Deletes all pointers and the subsequent vector array of lights that matches the type. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classLightingDatabase_a25e333ec01f3fb5ba631e8ac2401580d}{clear\+Database}} ()
+\begin{DoxyCompactList}\small\item\em Empty the whole database , and deletes all objects stored ~\newline
+ \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classLightingDatabase_a6b1ca6883cfb52824c6ace93e23d3350}{update\+Shaders\+Data}} (\mbox{\hyperlink{classShader}{Shader}} $\ast$shader, glm\+::mat4 \&view)
+\begin{DoxyCompactList}\small\item\em Update shader uniforms for all lights. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classLightingDatabase_aaca6a619deb2d2cca354aca9e7a9ee0f}{update\+Shaders\+Data}} (\mbox{\hyperlink{classAbstractLight_a5c8289262e80b0694b4ff6bfa00bcd51}{Abstract\+Light\+::\+TYPE}} type, \mbox{\hyperlink{classShader}{Shader}} $\ast$shader, glm\+::mat4 \&view)
+\begin{DoxyCompactList}\small\item\em Update shader uniforms only for lights of \char`\"{}type\char`\"{}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::map$<$ \mbox{\hyperlink{classAbstractLight_a5c8289262e80b0694b4ff6bfa00bcd51}{Abstract\+Light\+::\+TYPE}}, std\+::vector$<$ \mbox{\hyperlink{classAbstractLight}{Abstract\+Light}} $\ast$ $>$ $>$ \mbox{\hyperlink{classLightingDatabase_ab7f7b9de83d6094d7fb23d7e7dd11947}{light\+\_\+database}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class declaration of the light database system. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classLightingDatabase_a0b9fb1f85f1b0d502d7d9144e6673f16}\label{classLightingDatabase_a0b9fb1f85f1b0d502d7d9144e6673f16}} 
+\index{LightingDatabase@{LightingDatabase}!LightingDatabase@{LightingDatabase}}
+\index{LightingDatabase@{LightingDatabase}!LightingDatabase@{LightingDatabase}}
+\doxysubsubsection{\texorpdfstring{LightingDatabase()}{LightingDatabase()}}
+{\footnotesize\ttfamily Lighting\+Database\+::\+Lighting\+Database (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Construct a new Lighting Database object. 
+
+\mbox{\Hypertarget{classLightingDatabase_a07318c3a594f720e1bab49abca4cb760}\label{classLightingDatabase_a07318c3a594f720e1bab49abca4cb760}} 
+\index{LightingDatabase@{LightingDatabase}!````~LightingDatabase@{$\sim$LightingDatabase}}
+\index{````~LightingDatabase@{$\sim$LightingDatabase}!LightingDatabase@{LightingDatabase}}
+\doxysubsubsection{\texorpdfstring{$\sim$LightingDatabase()}{~LightingDatabase()}}
+{\footnotesize\ttfamily virtual Lighting\+Database\+::$\sim$\+Lighting\+Database (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Destroy the Lighting Database object. 
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classLightingDatabase_af6dd0225288bbd1fa705016b4f369b77}\label{classLightingDatabase_af6dd0225288bbd1fa705016b4f369b77}} 
+\index{LightingDatabase@{LightingDatabase}!addLight@{addLight}}
+\index{addLight@{addLight}!LightingDatabase@{LightingDatabase}}
+\doxysubsubsection{\texorpdfstring{addLight()}{addLight()}}
+{\footnotesize\ttfamily virtual bool Lighting\+Database\+::add\+Light (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classAbstractLight}{Abstract\+Light}} $\ast$}]{light }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Add a new light in the scene. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em light} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classLightingDatabase_a25e333ec01f3fb5ba631e8ac2401580d}\label{classLightingDatabase_a25e333ec01f3fb5ba631e8ac2401580d}} 
+\index{LightingDatabase@{LightingDatabase}!clearDatabase@{clearDatabase}}
+\index{clearDatabase@{clearDatabase}!LightingDatabase@{LightingDatabase}}
+\doxysubsubsection{\texorpdfstring{clearDatabase()}{clearDatabase()}}
+{\footnotesize\ttfamily void Lighting\+Database\+::clear\+Database (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Empty the whole database , and deletes all objects stored ~\newline
+ 
+
+\mbox{\Hypertarget{classLightingDatabase_a876c4055e3f987878dbb80209e3dbc7a}\label{classLightingDatabase_a876c4055e3f987878dbb80209e3dbc7a}} 
+\index{LightingDatabase@{LightingDatabase}!eraseLightsArray@{eraseLightsArray}}
+\index{eraseLightsArray@{eraseLightsArray}!LightingDatabase@{LightingDatabase}}
+\doxysubsubsection{\texorpdfstring{eraseLightsArray()}{eraseLightsArray()}}
+{\footnotesize\ttfamily void Lighting\+Database\+::erase\+Lights\+Array (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classAbstractLight_a5c8289262e80b0694b4ff6bfa00bcd51}{Abstract\+Light\+::\+TYPE}}}]{type }\end{DoxyParamCaption})}
+
+
+
+Deletes all pointers and the subsequent vector array of lights that matches the type. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em type} & Type to be deleted \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classLightingDatabase_acdacfea7f828a0993e72bfc4c6c36ad4}\label{classLightingDatabase_acdacfea7f828a0993e72bfc4c6c36ad4}} 
+\index{LightingDatabase@{LightingDatabase}!getLightsArrayByType@{getLightsArrayByType}}
+\index{getLightsArrayByType@{getLightsArrayByType}!LightingDatabase@{LightingDatabase}}
+\doxysubsubsection{\texorpdfstring{getLightsArrayByType()}{getLightsArrayByType()}}
+{\footnotesize\ttfamily const std\+::vector$<$ \mbox{\hyperlink{classAbstractLight}{Abstract\+Light}} $\ast$ $>$ \& Lighting\+Database\+::get\+Lights\+Array\+By\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classAbstractLight_a5c8289262e80b0694b4ff6bfa00bcd51}{Abstract\+Light\+::\+TYPE}}}]{type }\end{DoxyParamCaption})}
+
+
+
+Get all lights of certain type. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em type} & Type of light we want \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+const std\+::vector$<$\+Abstract\+Light$\ast$$>$\& Collection of light pointers 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classLightingDatabase_aaca6a619deb2d2cca354aca9e7a9ee0f}\label{classLightingDatabase_aaca6a619deb2d2cca354aca9e7a9ee0f}} 
+\index{LightingDatabase@{LightingDatabase}!updateShadersData@{updateShadersData}}
+\index{updateShadersData@{updateShadersData}!LightingDatabase@{LightingDatabase}}
+\doxysubsubsection{\texorpdfstring{updateShadersData()}{updateShadersData()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Lighting\+Database\+::update\+Shaders\+Data (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classAbstractLight_a5c8289262e80b0694b4ff6bfa00bcd51}{Abstract\+Light\+::\+TYPE}}}]{type,  }\item[{\mbox{\hyperlink{classShader}{Shader}} $\ast$}]{shader,  }\item[{glm\+::mat4 \&}]{view }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Update shader uniforms only for lights of \char`\"{}type\char`\"{}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em type} & Type of lights to send to the shader \\
+\hline
+{\em shader} & \mbox{\hyperlink{classShader}{Shader}} applied to the mesh \\
+\hline
+{\em view} & View matrix for light transformations \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classLightingDatabase_a6b1ca6883cfb52824c6ace93e23d3350}\label{classLightingDatabase_a6b1ca6883cfb52824c6ace93e23d3350}} 
+\index{LightingDatabase@{LightingDatabase}!updateShadersData@{updateShadersData}}
+\index{updateShadersData@{updateShadersData}!LightingDatabase@{LightingDatabase}}
+\doxysubsubsection{\texorpdfstring{updateShadersData()}{updateShadersData()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Lighting\+Database\+::update\+Shaders\+Data (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classShader}{Shader}} $\ast$}]{shader,  }\item[{glm\+::mat4 \&}]{view }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Update shader uniforms for all lights. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em shader} & \mbox{\hyperlink{classShader}{Shader}} pointer to send data to \\
+\hline
+{\em view} & View matrix for light transformations \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classLightingDatabase_ab7f7b9de83d6094d7fb23d7e7dd11947}\label{classLightingDatabase_ab7f7b9de83d6094d7fb23d7e7dd11947}} 
+\index{LightingDatabase@{LightingDatabase}!light\_database@{light\_database}}
+\index{light\_database@{light\_database}!LightingDatabase@{LightingDatabase}}
+\doxysubsubsection{\texorpdfstring{light\_database}{light\_database}}
+{\footnotesize\ttfamily std\+::map$<$\mbox{\hyperlink{classAbstractLight_a5c8289262e80b0694b4ff6bfa00bcd51}{Abstract\+Light\+::\+TYPE}} , std\+::vector$<$\mbox{\hyperlink{classAbstractLight}{Abstract\+Light}}$\ast$$>$ $>$ Lighting\+Database\+::light\+\_\+database\hspace{0.3cm}{\ttfamily [protected]}}
+
+Map of all lights in the scene. The map key stored is the type of light 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/\mbox{\hyperlink{LightingDatabase_8h}{Lighting\+Database.\+h}}\end{DoxyCompactItemize}

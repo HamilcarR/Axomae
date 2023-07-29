@@ -1,0 +1,296 @@
+\hypertarget{classGLRenderBuffer}{}\doxysection{GLRender\+Buffer Class Reference}
+\label{classGLRenderBuffer}\index{GLRenderBuffer@{GLRenderBuffer}}
+
+
+Provides a wrapper for render buffers.  
+
+
+
+
+{\ttfamily \#include $<$GLRender\+Buffer.\+h$>$}
+
+Inheritance diagram for GLRender\+Buffer\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classGLRenderBuffer}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classGLRenderBuffer_a880703f010b03219234e137e4b23d699}{INTERNAL\+\_\+\+FORMAT}} \+: signed \{ \newline
+{\bfseries EMPTY} = -\/1
+, {\bfseries DEPTH16} = GL\+\_\+\+DEPTH\+\_\+\+COMPONENT16
+, {\bfseries DEPTH24} = GL\+\_\+\+DEPTH\+\_\+\+COMPONENT24
+, {\bfseries DEPTH32} = GL\+\_\+\+DEPTH\+\_\+\+COMPONENT32
+, \newline
+{\bfseries DEPTH32F} = GL\+\_\+\+DEPTH\+\_\+\+COMPONENT32F
+, {\bfseries DEPTH24\+\_\+\+STENCIL8} = GL\+\_\+\+DEPTH24\+\_\+\+STENCIL8
+, {\bfseries DEPTH32\+F\+\_\+\+STENCIL8} = GL\+\_\+\+DEPTH32\+F\+\_\+\+STENCIL8
+ \}
+\begin{DoxyCompactList}\small\item\em Enumeration providing a shorter name for usual internal format values. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classGLRenderBuffer_a5983ae497caf729678bf5decf09a252a}{GLRender\+Buffer}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{classGLRenderBuffer}{GLRender\+Buffer}} object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classGLRenderBuffer_a641ac2fd9945587a82af3b1854d1136a}{GLRender\+Buffer}} (unsigned int \mbox{\hyperlink{classGLRenderBuffer_a152a9c2cc8c08b1edcc51dedc3b14f7b}{width}}, unsigned int \mbox{\hyperlink{classGLRenderBuffer_a1d0095805d8e508d160c800edaf8ca98}{height}}, \mbox{\hyperlink{classGLRenderBuffer_a880703f010b03219234e137e4b23d699}{INTERNAL\+\_\+\+FORMAT}} type)
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{classGLRenderBuffer}{GLRender\+Buffer}} object. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classGLRenderBuffer_a2c8a76f93b739b0677f4de375395ff10}{$\sim$\+GLRender\+Buffer}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the \mbox{\hyperlink{classGLRenderBuffer}{GLRender\+Buffer}} object. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classGLRenderBuffer_ae8fd1e96ee85a7a01c44cb3a1dfa4784}{initialize\+Buffers}} ()
+\begin{DoxyCompactList}\small\item\em Creates a render buffer ID. \end{DoxyCompactList}\item 
+virtual bool \mbox{\hyperlink{classGLRenderBuffer_ad2edf91c6221393e81fccfb3f4c0440c}{is\+Ready}} () const
+\begin{DoxyCompactList}\small\item\em Checks if buffers IDs have been initialized. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classGLRenderBuffer_a31a6e933cdbd674f078071200c5e57ff}{bind}} ()
+\begin{DoxyCompactList}\small\item\em Binds the render buffer for offscreen rendering. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classGLRenderBuffer_a85eb9ee0af29b3f8e190613ecf92af61}{unbind}} ()
+\begin{DoxyCompactList}\small\item\em Unbinds the current render buffer. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classGLRenderBuffer_abf30645f739027c0d141fed2f7b9dcdc}{clean}} ()
+\begin{DoxyCompactList}\small\item\em Free the IDs used by Open\+GL. \end{DoxyCompactList}\item 
+unsigned int \mbox{\hyperlink{classGLRenderBuffer_a795677d130678cbc4de894a4842a0073}{get\+ID}} ()
+\begin{DoxyCompactList}\small\item\em Returns the opengl ID of the RBO. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classGLRenderBuffer_a880703f010b03219234e137e4b23d699}{INTERNAL\+\_\+\+FORMAT}} \mbox{\hyperlink{classGLRenderBuffer_a97731767443edb45ca47d8f04c42cfa6}{get\+Format}} ()
+\begin{DoxyCompactList}\small\item\em Get the internal format value. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classGLRenderBuffer_a03b0ba909cd328ae222c18a394a00aa0}{resize}} (unsigned \mbox{\hyperlink{classGLRenderBuffer_a152a9c2cc8c08b1edcc51dedc3b14f7b}{width}}, unsigned \mbox{\hyperlink{classGLRenderBuffer_a1d0095805d8e508d160c800edaf8ca98}{height}})
+\begin{DoxyCompactList}\small\item\em Resizes the render buffer textures. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classGLBufferInterface_afc10d432557d20d4eede720985074c71}{initialize\+Buffers}} ()=0
+\begin{DoxyCompactList}\small\item\em Initializes the buffers the class uses. \end{DoxyCompactList}\item 
+virtual bool \mbox{\hyperlink{classGLBufferInterface_a5143c1e73b37a8eea1fc7bb521b30111}{is\+Ready}} () const =0
+\begin{DoxyCompactList}\small\item\em Checks if buffers IDs have been initialized. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classGLBufferInterface_adfef3a4701e9d58b1206392ff08a297e}{fill\+Buffers}} ()=0
+\begin{DoxyCompactList}\small\item\em Fills the buffers with raw data. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classGLBufferInterface_ac7a11c079237373625342a63020bdf94}{bind}} ()=0
+\begin{DoxyCompactList}\small\item\em Generic method to bind the GLBuffer class object. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classGLBufferInterface_a4237d716fcac41dde351f3d8744f5f05}{unbind}} ()=0
+\begin{DoxyCompactList}\small\item\em Generic method to unbind the GLBuffer class object. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classGLBufferInterface_afb1be2756610c84e181615ee7886ca43}{clean}} ()=0
+\begin{DoxyCompactList}\small\item\em Free the IDs used by Open\+GL. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+unsigned int \mbox{\hyperlink{classGLRenderBuffer_adc90a4ae832357fc5e75462fbc495f16}{renderbuffer\+\_\+id}}
+\item 
+unsigned int \mbox{\hyperlink{classGLRenderBuffer_a152a9c2cc8c08b1edcc51dedc3b14f7b}{width}}
+\item 
+unsigned int \mbox{\hyperlink{classGLRenderBuffer_a1d0095805d8e508d160c800edaf8ca98}{height}}
+\item 
+\mbox{\hyperlink{classGLRenderBuffer_a880703f010b03219234e137e4b23d699}{INTERNAL\+\_\+\+FORMAT}} \mbox{\hyperlink{classGLRenderBuffer_ac05628e50672c58d87591d841d78bc0e}{format}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Provides a wrapper for render buffers. 
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\mbox{\Hypertarget{classGLRenderBuffer_a880703f010b03219234e137e4b23d699}\label{classGLRenderBuffer_a880703f010b03219234e137e4b23d699}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!INTERNAL\_FORMAT@{INTERNAL\_FORMAT}}
+\index{INTERNAL\_FORMAT@{INTERNAL\_FORMAT}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_FORMAT}{INTERNAL\_FORMAT}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{classGLRenderBuffer_a880703f010b03219234e137e4b23d699}{GLRender\+Buffer\+::\+INTERNAL\+\_\+\+FORMAT}} \+: signed}
+
+
+
+Enumeration providing a shorter name for usual internal format values. 
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classGLRenderBuffer_a5983ae497caf729678bf5decf09a252a}\label{classGLRenderBuffer_a5983ae497caf729678bf5decf09a252a}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!GLRenderBuffer@{GLRenderBuffer}}
+\index{GLRenderBuffer@{GLRenderBuffer}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{GLRenderBuffer()}{GLRenderBuffer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily GLRender\+Buffer\+::\+GLRender\+Buffer (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Construct a new \mbox{\hyperlink{classGLRenderBuffer}{GLRender\+Buffer}} object. 
+
+\mbox{\Hypertarget{classGLRenderBuffer_a641ac2fd9945587a82af3b1854d1136a}\label{classGLRenderBuffer_a641ac2fd9945587a82af3b1854d1136a}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!GLRenderBuffer@{GLRenderBuffer}}
+\index{GLRenderBuffer@{GLRenderBuffer}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{GLRenderBuffer()}{GLRenderBuffer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily GLRender\+Buffer\+::\+GLRender\+Buffer (\begin{DoxyParamCaption}\item[{unsigned int}]{width,  }\item[{unsigned int}]{height,  }\item[{\mbox{\hyperlink{classGLRenderBuffer_a880703f010b03219234e137e4b23d699}{INTERNAL\+\_\+\+FORMAT}}}]{type }\end{DoxyParamCaption})}
+
+
+
+Construct a new \mbox{\hyperlink{classGLRenderBuffer}{GLRender\+Buffer}} object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em width} & Width of the buffer \\
+\hline
+{\em height} & Height of the buffer \\
+\hline
+{\em type} & Internal depth format \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{classGLRenderBuffer_a880703f010b03219234e137e4b23d699}{INTERNAL\+\_\+\+FORMAT}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{classGLRenderBuffer_a2c8a76f93b739b0677f4de375395ff10}\label{classGLRenderBuffer_a2c8a76f93b739b0677f4de375395ff10}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!````~GLRenderBuffer@{$\sim$GLRenderBuffer}}
+\index{````~GLRenderBuffer@{$\sim$GLRenderBuffer}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{$\sim$GLRenderBuffer()}{~GLRenderBuffer()}}
+{\footnotesize\ttfamily virtual GLRender\+Buffer\+::$\sim$\+GLRender\+Buffer (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Destroy the \mbox{\hyperlink{classGLRenderBuffer}{GLRender\+Buffer}} object. 
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classGLRenderBuffer_a31a6e933cdbd674f078071200c5e57ff}\label{classGLRenderBuffer_a31a6e933cdbd674f078071200c5e57ff}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!bind@{bind}}
+\index{bind@{bind}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{bind()}{bind()}}
+{\footnotesize\ttfamily virtual void GLRender\+Buffer\+::bind (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Binds the render buffer for offscreen rendering. 
+
+
+
+Implements \mbox{\hyperlink{classGLBufferInterface_ac7a11c079237373625342a63020bdf94}{GLBuffer\+Interface}}.
+
+\mbox{\Hypertarget{classGLRenderBuffer_abf30645f739027c0d141fed2f7b9dcdc}\label{classGLRenderBuffer_abf30645f739027c0d141fed2f7b9dcdc}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!clean@{clean}}
+\index{clean@{clean}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{clean()}{clean()}}
+{\footnotesize\ttfamily virtual void GLRender\+Buffer\+::clean (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Free the IDs used by Open\+GL. 
+
+
+
+Implements \mbox{\hyperlink{classGLBufferInterface_afb1be2756610c84e181615ee7886ca43}{GLBuffer\+Interface}}.
+
+\mbox{\Hypertarget{classGLRenderBuffer_a97731767443edb45ca47d8f04c42cfa6}\label{classGLRenderBuffer_a97731767443edb45ca47d8f04c42cfa6}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!getFormat@{getFormat}}
+\index{getFormat@{getFormat}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{getFormat()}{getFormat()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classGLRenderBuffer_a880703f010b03219234e137e4b23d699}{INTERNAL\+\_\+\+FORMAT}} GLRender\+Buffer\+::get\+Format (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get the internal format value. 
+
+\begin{DoxyReturn}{Returns}
+INTERNAL\+\_\+\+FORMAT 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classGLRenderBuffer_a795677d130678cbc4de894a4842a0073}\label{classGLRenderBuffer_a795677d130678cbc4de894a4842a0073}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!getID@{getID}}
+\index{getID@{getID}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{getID()}{getID()}}
+{\footnotesize\ttfamily unsigned int GLRender\+Buffer\+::get\+ID (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the opengl ID of the RBO. 
+
+\begin{DoxyReturn}{Returns}
+unsigned int ID of the RBO ~\newline
+ 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classGLRenderBuffer_ae8fd1e96ee85a7a01c44cb3a1dfa4784}\label{classGLRenderBuffer_ae8fd1e96ee85a7a01c44cb3a1dfa4784}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!initializeBuffers@{initializeBuffers}}
+\index{initializeBuffers@{initializeBuffers}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{initializeBuffers()}{initializeBuffers()}}
+{\footnotesize\ttfamily virtual void GLRender\+Buffer\+::initialize\+Buffers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Creates a render buffer ID. 
+
+
+
+Implements \mbox{\hyperlink{classGLBufferInterface_afc10d432557d20d4eede720985074c71}{GLBuffer\+Interface}}.
+
+\mbox{\Hypertarget{classGLRenderBuffer_ad2edf91c6221393e81fccfb3f4c0440c}\label{classGLRenderBuffer_ad2edf91c6221393e81fccfb3f4c0440c}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!isReady@{isReady}}
+\index{isReady@{isReady}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{isReady()}{isReady()}}
+{\footnotesize\ttfamily virtual bool GLRender\+Buffer\+::is\+Ready (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Checks if buffers IDs have been initialized. 
+
+\begin{DoxyReturn}{Returns}
+true If ID is ready to use 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classGLBufferInterface_a5143c1e73b37a8eea1fc7bb521b30111}{GLBuffer\+Interface}}.
+
+\mbox{\Hypertarget{classGLRenderBuffer_a03b0ba909cd328ae222c18a394a00aa0}\label{classGLRenderBuffer_a03b0ba909cd328ae222c18a394a00aa0}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!resize@{resize}}
+\index{resize@{resize}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{resize()}{resize()}}
+{\footnotesize\ttfamily virtual void GLRender\+Buffer\+::resize (\begin{DoxyParamCaption}\item[{unsigned}]{width,  }\item[{unsigned}]{height }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Resizes the render buffer textures. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em width} & New width \\
+\hline
+{\em height} & New height \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classGLRenderBuffer_a85eb9ee0af29b3f8e190613ecf92af61}\label{classGLRenderBuffer_a85eb9ee0af29b3f8e190613ecf92af61}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!unbind@{unbind}}
+\index{unbind@{unbind}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{unbind()}{unbind()}}
+{\footnotesize\ttfamily virtual void GLRender\+Buffer\+::unbind (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Unbinds the current render buffer. 
+
+
+
+Implements \mbox{\hyperlink{classGLBufferInterface_a4237d716fcac41dde351f3d8744f5f05}{GLBuffer\+Interface}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classGLRenderBuffer_ac05628e50672c58d87591d841d78bc0e}\label{classGLRenderBuffer_ac05628e50672c58d87591d841d78bc0e}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!format@{format}}
+\index{format@{format}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{format}{format}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classGLRenderBuffer_a880703f010b03219234e137e4b23d699}{INTERNAL\+\_\+\+FORMAT}} GLRender\+Buffer\+::format\hspace{0.3cm}{\ttfamily [protected]}}
+
+Depth and stencil format value \mbox{\Hypertarget{classGLRenderBuffer_a1d0095805d8e508d160c800edaf8ca98}\label{classGLRenderBuffer_a1d0095805d8e508d160c800edaf8ca98}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!height@{height}}
+\index{height@{height}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{height}{height}}
+{\footnotesize\ttfamily unsigned int GLRender\+Buffer\+::height\hspace{0.3cm}{\ttfamily [protected]}}
+
+Height of the buffer \mbox{\Hypertarget{classGLRenderBuffer_adc90a4ae832357fc5e75462fbc495f16}\label{classGLRenderBuffer_adc90a4ae832357fc5e75462fbc495f16}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!renderbuffer\_id@{renderbuffer\_id}}
+\index{renderbuffer\_id@{renderbuffer\_id}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{renderbuffer\_id}{renderbuffer\_id}}
+{\footnotesize\ttfamily unsigned int GLRender\+Buffer\+::renderbuffer\+\_\+id\hspace{0.3cm}{\ttfamily [protected]}}
+
+ID of the render buffer \mbox{\Hypertarget{classGLRenderBuffer_a152a9c2cc8c08b1edcc51dedc3b14f7b}\label{classGLRenderBuffer_a152a9c2cc8c08b1edcc51dedc3b14f7b}} 
+\index{GLRenderBuffer@{GLRenderBuffer}!width@{width}}
+\index{width@{width}!GLRenderBuffer@{GLRenderBuffer}}
+\doxysubsubsection{\texorpdfstring{width}{width}}
+{\footnotesize\ttfamily unsigned int GLRender\+Buffer\+::width\hspace{0.3cm}{\ttfamily [protected]}}
+
+Width of the buffer 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/\mbox{\hyperlink{GLRenderBuffer_8h}{GLRender\+Buffer.\+h}}\end{DoxyCompactItemize}

@@ -1,37 +1,29 @@
 # Axomae
+![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 
-Axomae is a texture generation tool, to create normal maps , height maps , and distortion maps.
+## Overview:
 
--We can "convert" diffuse textures to a normal map , using an edge detection:
+Axomae is an image processing tool used for texture baking and viewing 3D models.  
 
-![axomae](https://user-images.githubusercontent.com/18567118/32781705-4d34f8aa-c946-11e7-9b6a-851b5d6e4cea.png)
--Or we can project a 3D mesh normals on it's UVs , hence baking the normals , for exemple , in world space : 
+## Features:
 
-![axomae](https://user-images.githubusercontent.com/18567118/47607072-add21a80-da1b-11e8-8a4d-5e14f9c9133a.png)
-![axomae](https://user-images.githubusercontent.com/18567118/47607074-b32f6500-da1b-11e8-9ca0-90e7b64464eb.png)
+### Physically Based 3D renderer : 
+![Mirror](Documentation/Screenshots/mirror.png)
+![Spheres](Documentation/Screenshots/spheres.png)
+![Helmet](Documentation/Screenshots/helmet.png)
+### Normal Map baking : 
 
-Or in tangent space : 
-
-![axomae](https://user-images.githubusercontent.com/18567118/47607073-b0cd0b00-da1b-11e8-823a-9839e13ac352.png)
-
-
-
-The software is still in developpement. 
-
-Features planned : 
-
--Full GPU parallelism support (using NVidia Cuda) . 
-
--Multi-threading. 
-
--OpenGL viewer with PBR shaders.
-
--Material editor.
-
--UV editor. 
-
--Automatic UV unwrap.
-
--Batch processing.
+![Wood texture](Documentation/Screenshots/wood-map-bake.png)
+![Pistol texture](Documentation/Screenshots/texture_baking.png)
+![Normal map baking](Documentation/Screenshots/normal-map-baked.png)
 
 
+### Normal Distribution , UV layout : 
+![Boat UV](Documentation/Screenshots/UV_normals.png)
+
+## Upcoming features : 
+
+- Command line irradiance baking. 
+- Traditional normal map baking. 
+- Raytracing engine. 
+- Automatic occluder generation for occlusion culling. 

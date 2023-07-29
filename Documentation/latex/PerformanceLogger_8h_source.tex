@@ -1,0 +1,44 @@
+\hypertarget{PerformanceLogger_8h_source}{}\doxysection{Performance\+Logger.\+h}
+\label{PerformanceLogger_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/PerformanceLogger.h@{/home/hamilcar/Desktop/projects/Axomae/includes/PerformanceLogger.h}}
+\mbox{\hyperlink{PerformanceLogger_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ PERFORMANCELOGGER\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ PERFORMANCELOGGER\_H}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ "{}Logger.h"{}}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00015\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classPerformanceLogger}{PerformanceLogger}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classLogger}{Logger}}\{}
+\DoxyCodeLine{00016\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00017\ \ \ \ \ }
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{classPerformanceLogger_a17eb747c5da772c6f35b1d59e14b7820}{PerformanceLogger}}()\ :\ \mbox{\hyperlink{classLogger}{Logger}}()\{}
+\DoxyCodeLine{00023\ \ \ \ \ \}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classPerformanceLogger_ae2a2181c2c495c7bf995ff8c9dc8112a}{\string~PerformanceLogger}}()\{\}}
+\DoxyCodeLine{00030\ \ \ \ \ }
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classPerformanceLogger_a051bce6a910fb7858f9d952c0bf1fe2a}{startTimer}}()\{\ }
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Timer\ started!\(\backslash\)n"{}}\ ;\ }
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ start\ =\ std::chrono::high\_resolution\_clock::now();\ \ }
+\DoxyCodeLine{00038\ \ \ \ \ \}\ }
+\DoxyCodeLine{00039\ \ \ \ \ }
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classPerformanceLogger_a47b931a83ab92ffc6895e9be1be3c800}{endTimer}}()\{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ end\ =\ std::chrono::high\_resolution\_clock::now();\ \ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Timer\ end!\(\backslash\)n"{}};\ }
+\DoxyCodeLine{00047\ \ \ \ \ \}}
+\DoxyCodeLine{00048\ \ \ \ \ }
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classPerformanceLogger_aa53f96844108fc6bf811713dbec13783}{print}}()\{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ duration\ =\ std::chrono::duration\_cast<std::chrono::milliseconds>\ (end\ -\/\ start);\ }
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Duration\ :\ "{}}\ <<\ duration.count()\ <<\ \textcolor{stringliteral}{"{}ms\(\backslash\)n"{}}\ ;\ }
+\DoxyCodeLine{00056\ \ \ \ \ \}}
+\DoxyCodeLine{00057\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00058\ \ \ \ \ std::chrono::high\_resolution\_clock::time\_point\ start;\ }
+\DoxyCodeLine{00059\ \ \ \ \ std::chrono::high\_resolution\_clock::time\_point\ end\ ;\ }
+\DoxyCodeLine{00060\ \ \ \ \ std::chrono::milliseconds\ duration\ ;\ }
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \};}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,56 @@
+\hypertarget{FrameBufferInterface_8h_source}{}\doxysection{Frame\+Buffer\+Interface.\+h}
+\label{FrameBufferInterface_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/FrameBufferInterface.h@{/home/hamilcar/Desktop/projects/Axomae/includes/FrameBufferInterface.h}}
+\mbox{\hyperlink{FrameBufferInterface_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ FRAMEBUFFERINTERFACE\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ FRAMEBUFFERINTERFACE\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Texture_8h}{Texture.h}}"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ShaderDatabase_8h}{ShaderDatabase.h}}"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Drawable_8h}{Drawable.h}}"{}}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}GLFrameBuffer.h"{}}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}Mesh.h"{}}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classFrameBufferInterface}{FrameBufferInterface}}\{}
+\DoxyCodeLine{00023\ \textcolor{keyword}{public}:\ }
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{classFrameBufferInterface_a881dd3e46501b99e9cd514a35bb2a091}{FrameBufferInterface}}();\ }
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{classFrameBufferInterface_a546e46afca734ddc3c7d5da39be6371d}{FrameBufferInterface}}(\mbox{\hyperlink{classTextureDatabase}{TextureDatabase}}*\ texture\_database\ ,\ \mbox{\hyperlink{structScreenSize}{ScreenSize}}*\ texture\_size);\ }
+\DoxyCodeLine{00038\ \ \ \ \ }
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classFrameBufferInterface_a7086392349c9e3f0e0302c88378dfe66}{\string~FrameBufferInterface}}();\ }
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classFrameBufferInterface_a95108539b40be3de3db2fd137709be03}{resize}}();}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classFrameBufferInterface_a85e8d6334f992c3318be001dc410c152}{setTextureDimensions}}(\mbox{\hyperlink{structScreenSize}{ScreenSize}}*\ pointer\_on\_texture\_size)\{texture\_dim\ =\ pointer\_on\_texture\_size;\}}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classFrameBufferInterface_a03f2a53f38a0782b29a855d7c36a12c8}{bindFrameBuffer}}()\ ;\ }
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classFrameBufferInterface_a1dd9c7fee1b0b772f66bf6e954cd8ffb}{unbindFrameBuffer}}()\ ;\ }
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classFrameBufferInterface_abbcef0a7b104891bf0d4d6fe7ef0f893}{initializeFrameBuffer}}();}
+\DoxyCodeLine{00076\ \ \ \ \ }
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classFrameBufferInterface_a111c115aecafaf7244ed3f7734b013ee}{clean}}();}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ }
+\DoxyCodeLine{00084\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordtype}{int}\ setUpEmptyTexture(\mbox{\hyperlink{classTextureDatabase}{TextureDatabase}}*\ database\ ,\ \textcolor{keywordtype}{unsigned}\ width\ ,\ \textcolor{keywordtype}{unsigned}\ height);\ }
+\DoxyCodeLine{00086\ \ \ \ \ }
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{keywordtype}{void}\ initializeFrameBufferTexture();\ }
+\DoxyCodeLine{00088\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00089\ \ \ \ \ \mbox{\hyperlink{classGLFrameBuffer}{GLFrameBuffer}}\ *gl\_framebuffer\_object;\ \ }
+\DoxyCodeLine{00090\ \ \ \ \ \mbox{\hyperlink{structScreenSize}{ScreenSize}}\ *texture\_dim\ ;}
+\DoxyCodeLine{00091\ \ \ \ \ \mbox{\hyperlink{classTextureDatabase}{TextureDatabase}}*\ texture\_database;}
+\DoxyCodeLine{00092\ \ \ \ \ \mbox{\hyperlink{classTexture}{Texture}}*\ fbo\_texture\_pointer;\ }
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ *default\_framebuffer\_pointer;}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classFrameBufferInterface_a50e39585dc4637f883d54cf42ad7f34e}{texture\_id}}\ ;\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00096\ \};}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

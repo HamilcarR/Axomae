@@ -1,0 +1,59 @@
+\hypertarget{ResourceDatabaseManager_8h_source}{}\doxysection{Resource\+Database\+Manager.\+h}
+\label{ResourceDatabaseManager_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/ResourceDatabaseManager.h@{/home/hamilcar/Desktop/projects/Axomae/includes/ResourceDatabaseManager.h}}
+\mbox{\hyperlink{ResourceDatabaseManager_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ RESOURCEDATABASEMANAGER\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ RESOURCEDATABASEMANAGER\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{TextureDatabase_8h}{TextureDatabase.h}}"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ShaderDatabase_8h}{ShaderDatabase.h}}"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{RenderingDatabaseInterface_8h}{RenderingDatabaseInterface.h}}"{}}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00020\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classResourceDatabaseManager}{ResourceDatabaseManager}}\{}
+\DoxyCodeLine{00021\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classResourceDatabaseManager}{ResourceDatabaseManager}}*\ getInstance()\ ;}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classResourceDatabaseManager_a95cd13614f1a399b67b2e0b61633c294}{destroyInstance}}();}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classResourceDatabaseManager_a50eb4356ec4087f2048fc3faf7657847}{purge}}();}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classResourceDatabaseManager_a81e68fc78f51ea1d189e2987da59c46e}{cleanTextureDatabase}}()\ \textcolor{keyword}{const};\ }
+\DoxyCodeLine{00043\ \ \ \ \ }
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classResourceDatabaseManager_af5d8d58e733475ebbe5c6e61b20b9de2}{cleanShaderDatabase}}()\ \textcolor{keyword}{const};\ }
+\DoxyCodeLine{00049\ \ \ \ \ }
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classResourceDatabaseManager_a138f2921ff4e9f5c5cda3cbc17437c53}{purgeTextureDatabase}}()\ \textcolor{keyword}{const};\ }
+\DoxyCodeLine{00055\ \ \ \ \ }
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classResourceDatabaseManager_ad7955ca765514c85e5a61d787f1e30cf}{purgeShaderDatabase}}()\ \textcolor{keyword}{const};\ }
+\DoxyCodeLine{00066\ \ \ \ \ \mbox{\hyperlink{classTextureDatabase}{TextureDatabase}}*\ \mbox{\hyperlink{classResourceDatabaseManager_a7c4790d99d77e1cca80a3ec13e0c14b8}{getTextureDatabase}}()\textcolor{keyword}{\ const\ }\{\textcolor{keywordflow}{return}\ texture\_database;\}}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00073\ \ \ \ \ \mbox{\hyperlink{classShaderDatabase}{ShaderDatabase}}*\ \mbox{\hyperlink{classResourceDatabaseManager_ab7824174fa5f55b02ab139ba9bc820fa}{getShaderDatabase}}()\textcolor{keyword}{\ const\ }\{\textcolor{keywordflow}{return}\ shader\_database;\}\ }
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{classResourceDatabaseManager}{ResourceDatabaseManager}}();\ \ }
+\DoxyCodeLine{00082\ \ \ \ \ }
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classResourceDatabaseManager}{\string~ResourceDatabaseManager}}();}
+\DoxyCodeLine{00088\ \ \ \ \ }
+\DoxyCodeLine{00093\ \ \ \ \ \mbox{\hyperlink{classResourceDatabaseManager}{ResourceDatabaseManager}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classResourceDatabaseManager}{ResourceDatabaseManager}}\&)\ =\ delete\ ;\ }
+\DoxyCodeLine{00094\ \ \ \ \ }
+\DoxyCodeLine{00100\ \ \ \ \ \mbox{\hyperlink{classResourceDatabaseManager}{ResourceDatabaseManager}}\ operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{classResourceDatabaseManager}{ResourceDatabaseManager}}\&)\ =\ \textcolor{keyword}{delete};\ }
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \textcolor{keyword}{private}:\ }
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classResourceDatabaseManager}{ResourceDatabaseManager}}\ *instance;\ \ \ \textcolor{comment}{/*<Instance\ of\ this\ ResourceDatabaseManager*/}}
+\DoxyCodeLine{00104\ \ \ \ \ \mbox{\hyperlink{classTextureDatabase}{TextureDatabase}}\ *texture\_database;\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Pointer\ on\ the\ texture\ database*/}\ }
+\DoxyCodeLine{00105\ \ \ \ \ \mbox{\hyperlink{classShaderDatabase}{ShaderDatabase}}\ \ *shader\_database;\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Pointer\ on\ the\ shader\ database*/}}
+\DoxyCodeLine{00106\ \};}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

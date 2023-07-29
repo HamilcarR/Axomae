@@ -1,0 +1,145 @@
+\hypertarget{Node_8h_source}{}\doxysection{Node.\+h}
+\label{Node_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/Node.h@{/home/hamilcar/Desktop/projects/Axomae/includes/Node.h}}
+\mbox{\hyperlink{Node_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ NODE\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ NODE\_H}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ "{}utils\_3D.h"{}}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <memory>}\ }
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00016\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classSceneHierarchyInterface}{SceneHierarchyInterface}};\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classSceneNodeInterface}{SceneNodeInterface}}\ \{}
+\DoxyCodeLine{00022\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classSceneNodeInterface_acea48e269cb6c255115c74744d5bd565}{\string~SceneNodeInterface}}()\{\}}
+\DoxyCodeLine{00029\ \ \ \ \ }
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keyword}{virtual}\ glm::mat4\ \mbox{\hyperlink{classSceneNodeInterface_aa5dd38c92df1a0bc17c01eaa8dc56523}{computeFinalTransformation}}()\ \textcolor{keyword}{const}\ =\ 0\ ;}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ glm::mat4\ \mbox{\hyperlink{classSceneNodeInterface_a7bb24f15ca3275d1139505df1f2dfc0c}{getLocalModelMatrix}}()\textcolor{keyword}{\ const\ }\{\textcolor{keywordflow}{return}\ local\_transformation;\}\ }
+\DoxyCodeLine{00043\ \ \ \ \ }
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classSceneNodeInterface_a69ef22c8c32bca21592b4fe8e4f312fa}{setLocalModelMatrix}}(\textcolor{keyword}{const}\ glm::mat4\ matrix)\{local\_transformation\ =\ matrix;\ \}}
+\DoxyCodeLine{00050\ \ \ \ \ }
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classSceneNodeInterface_a24ad2d46729fc1dc6d9c6b4e719aca23}{resetLocalModelMatrix}}();\ }
+\DoxyCodeLine{00056\ \ \ \ \ }
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ std::vector<SceneNodeInterface*>\&\ \mbox{\hyperlink{classSceneNodeInterface_afda785ba4b1bc4f1a6ebbf7909dcc574}{getChildren}}()\ \textcolor{keyword}{const}\ =\ 0\ ;\ }
+\DoxyCodeLine{00063\ \ \ \ \ }
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ std::vector<SceneNodeInterface*>\&\ \mbox{\hyperlink{classSceneNodeInterface_a34bc79e17ff0f24dd6e00846bfdf7353}{getParents}}()\ \textcolor{keyword}{const}\ =\ 0\ ;\ }
+\DoxyCodeLine{00070\ \ \ \ \ }
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classSceneNodeInterface_a6a4be9b177a9ad5083423697760c50df}{addChildNode}}(\mbox{\hyperlink{classSceneNodeInterface}{SceneNodeInterface}}*\ node)\ =\ 0;\ }
+\DoxyCodeLine{00077\ \ \ \ \ }
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classSceneNodeInterface_ac4c59c55ef1ec29da1d340e759648b58}{setParents}}(std::vector<SceneNodeInterface*>\ \&parents)\ =\ 0;}
+\DoxyCodeLine{00084\ \ \ \ \ }
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classSceneNodeInterface_af10928549f08f3a4ff02cf5ce209671f}{emptyParents}}()\ ;}
+\DoxyCodeLine{00090\ \ \ \ \ }
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classSceneNodeInterface_a55ca13865c04aca71bc5c41f0d559c5a}{emptyChildren}}();\ \ }
+\DoxyCodeLine{00096\ \ \ \ \ }
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classSceneNodeInterface_a9d3d5e1142c8d55537a95ef8662f9c32}{isLeaf}}()\ \textcolor{keyword}{const}\ ;}
+\DoxyCodeLine{00102\ \ \ \ \ }
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classSceneNodeInterface_a2c1bde38972e77aa43cd732e23991333}{setMark}}(\textcolor{keywordtype}{bool}\ marked)\{mark\ =\ marked;\}}
+\DoxyCodeLine{00109\ \ \ \ \ }
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classSceneNodeInterface_aeac92784a7d0bd0ef2d01998923bdaae}{isMarked}}()\{\textcolor{keywordflow}{return}\ mark;\}}
+\DoxyCodeLine{00115\ \ \ \ \ }
+\DoxyCodeLine{00121\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classSceneNodeInterface_ae9a23efb7b7e7d6dfcb1775350240eb2}{setName}}(std::string\ str)\{name\ =\ str;\}}
+\DoxyCodeLine{00122\ \ \ \ \ }
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{classSceneNodeInterface_aebd6953fdd8294f62c5adc7fe898036e}{getName}}()\textcolor{keyword}{\ const\ }\{\textcolor{keywordflow}{return}\ name;\}}
+\DoxyCodeLine{00129\ \ \ \ \ }
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classSceneNodeInterface_a50508cbd1e2d67dd867a3addeb453ac4}{setHierarchyOwner}}(\mbox{\hyperlink{classSceneHierarchyInterface}{SceneHierarchyInterface}}*\ \_owner)\{owner\ =\ \_owner;\}}
+\DoxyCodeLine{00136\ \ \ \ \ }
+\DoxyCodeLine{00142\ \ \ \ \ \mbox{\hyperlink{classSceneHierarchyInterface}{SceneHierarchyInterface}}*\ \mbox{\hyperlink{classSceneNodeInterface_a2ca19eabc6ce94cf31c0ab85a0fe69bf}{getHierarchyOwner}}()\textcolor{keyword}{\ const\ }\{\textcolor{keywordflow}{return}\ owner;\}}
+\DoxyCodeLine{00143\ \ \ \ \ }
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classSceneNodeInterface_a96785edee12174e259448d5771bb2a2d}{isRoot}}()\ \textcolor{keyword}{const};\ }
+\DoxyCodeLine{00151\ \ \ \ \ }
+\DoxyCodeLine{00157\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classSceneNodeInterface}{SceneNodeInterface}}*\ \mbox{\hyperlink{classSceneNodeInterface_a706abe675212835d3b3a2f1831f2b125}{returnRoot}}()\ =\ 0;\ }
+\DoxyCodeLine{00158\ \ \ \ \ }
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classSceneNodeInterface_ae594ab45cc35ddf35830ea2922d4272d}{setAccumulatedModelMatrix}}(\textcolor{keyword}{const}\ glm::mat4\ \&matrix)\{accumulated\_transformation\ =\ matrix;\ \}}
+\DoxyCodeLine{00165\ \ \ \ \ }
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ glm::mat4\&\ \mbox{\hyperlink{classSceneNodeInterface_a98d85ec445ae4bfa242c634b887ad70a}{getAccumulatedModelMatrix}}()\textcolor{keyword}{\ const\ }\{\textcolor{keywordflow}{return}\ accumulated\_transformation;\}}
+\DoxyCodeLine{00172\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00173\ \ \ \ \ glm::mat4\ local\_transformation;\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Local\ transformation\ of\ the\ node*/}\ }
+\DoxyCodeLine{00174\ \ \ \ \ glm::mat4\ accumulated\_transformation;\ \ \ \ \ \textcolor{comment}{/*<Matrix\ equal\ to\ all\ ancestors\ transformations*/}\ }
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{keywordtype}{bool}\ mark;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Generic\ mark\ ,\ for\ graph\ traversal*/}}
+\DoxyCodeLine{00176\ \ \ \ \ std::string\ name;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Name\ of\ the\ node*/}}
+\DoxyCodeLine{00177\ \ \ \ \ std::vector<SceneNodeInterface*>\ parents\ ;\ \textcolor{comment}{/*<List\ of\ parents*/}\ }
+\DoxyCodeLine{00178\ \ \ \ \ std::vector<SceneNodeInterface*>\ children\ ;\ \textcolor{comment}{/*<List\ of\ children*/}\ }
+\DoxyCodeLine{00179\ \ \ \ \ \mbox{\hyperlink{classSceneHierarchyInterface}{SceneHierarchyInterface}}*\ owner\ ;\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Structure\ owning\ this\ hierarchy*/}}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \textcolor{comment}{//TODO:\ [AX-\/37]\ Replace\ with\ adjacency\ list\ +\ pointer\ on\ one\ node\ that\ is\ a\ parent}}
+\DoxyCodeLine{00182\ \};}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \textcolor{comment}{/***************************************************************************************************************************************************/}}
+\DoxyCodeLine{00190\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classSceneTreeNode}{SceneTreeNode}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classSceneNodeInterface}{SceneNodeInterface}}\{}
+\DoxyCodeLine{00191\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00192\ \ \ \ \ }
+\DoxyCodeLine{00199\ \ \ \ \ \mbox{\hyperlink{classSceneTreeNode_a938eaa7650fe38158522273a71dbdda3}{SceneTreeNode}}(\mbox{\hyperlink{classSceneNodeInterface}{SceneNodeInterface}}\ *parent\ =\ \textcolor{keyword}{nullptr}\ ,\ \mbox{\hyperlink{classSceneHierarchyInterface}{SceneHierarchyInterface}}*\ owner\ =\ \textcolor{keyword}{nullptr});\ }
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00209\ \ \ \ \ \mbox{\hyperlink{classSceneTreeNode_a5e45696d0f8dc5fb06b91757d8de3ba3}{SceneTreeNode}}(\textcolor{keyword}{const}\ std::string\&\ name\ ,\ \textcolor{keyword}{const}\ glm::mat4\&\ transformation\ ,\ \mbox{\hyperlink{classSceneNodeInterface}{SceneNodeInterface}}\ *parent\ =\ \textcolor{keyword}{nullptr}\ ,\ \mbox{\hyperlink{classSceneHierarchyInterface}{SceneHierarchyInterface}}*\ owner\ =\ \textcolor{keyword}{nullptr});\ }
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00216\ \ \ \ \ \mbox{\hyperlink{classSceneTreeNode_ad9df104f5337fe32530cab82bf768e9d}{SceneTreeNode}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classSceneTreeNode}{SceneTreeNode}}\&\ copy);\ }
+\DoxyCodeLine{00217\ \ \ \ \ }
+\DoxyCodeLine{00222\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classSceneTreeNode_a0331bb436fd6f3f9dfe729dd53593cd5}{\string~SceneTreeNode}}();}
+\DoxyCodeLine{00223\ \ \ \ \ }
+\DoxyCodeLine{00229\ \ \ \ \ \textcolor{keyword}{virtual}\ glm::mat4\ \mbox{\hyperlink{classSceneTreeNode_ad12112222ac7dd0a2f18427753c10135}{computeFinalTransformation}}()\ \textcolor{keyword}{const\ override}\ ;}
+\DoxyCodeLine{00230\ \ \ \ \ }
+\DoxyCodeLine{00237\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classSceneTreeNode}{SceneTreeNode}}\&\ \mbox{\hyperlink{classSceneTreeNode_a625fb32dd0f9627d13d5be3a90e0dc8d}{operator=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classSceneTreeNode}{SceneTreeNode}}\&\ copy);}
+\DoxyCodeLine{00238\ \ \ \ \ }
+\DoxyCodeLine{00244\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classSceneTreeNode_aa8ec6b5ec97f32aa958d55d8be6c502d}{addChildNode}}(\mbox{\hyperlink{classSceneNodeInterface}{SceneNodeInterface}}*\ node)\ \textcolor{keyword}{override};\ }
+\DoxyCodeLine{00245\ \ \ \ \ }
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classSceneTreeNode_af57ae4f53438528db50879ceb2d13d54}{setParent}}(\mbox{\hyperlink{classSceneNodeInterface}{SceneNodeInterface}}*\ node)\ ;}
+\DoxyCodeLine{00252\ }
+\DoxyCodeLine{00258\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classSceneTreeNode}{SceneTreeNode}}*\ \mbox{\hyperlink{classSceneTreeNode_aaa18e180e3003278d26236d858ee7b2f}{getParent}}()\ \textcolor{keyword}{const}\ ;\ \ }
+\DoxyCodeLine{00259\ }
+\DoxyCodeLine{00265\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ std::vector<SceneNodeInterface*>\&\ \mbox{\hyperlink{classSceneTreeNode_acbc88799cdee776a9276d14e74ab1a99}{getChildren}}()\textcolor{keyword}{\ const\ }\{\textcolor{keywordflow}{return}\ children;\}\ ;\ }
+\DoxyCodeLine{00266\ \ \ \ \ }
+\DoxyCodeLine{00272\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ std::vector<SceneNodeInterface*>\&\ \mbox{\hyperlink{classSceneTreeNode_a7a7a2b6a2251c0fc3038bfc5341b88a0}{getParents}}()\textcolor{keyword}{\ const\ }\{\textcolor{keywordflow}{return}\ parents\ ;\ \}\ \ }
+\DoxyCodeLine{00273\ }
+\DoxyCodeLine{00279\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classSceneNodeInterface}{SceneNodeInterface}}*\ \mbox{\hyperlink{classSceneTreeNode_a291309cfd1f6c89d293ff8c424d92149}{returnRoot}}()\ ;\ }
+\DoxyCodeLine{00280\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00281\ \ \ \ \ }
+\DoxyCodeLine{00287\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classSceneTreeNode_a411bbde5f5867a2c354943935c5a9fc1}{setParents}}(std::vector<SceneNodeInterface*>\ \&parents)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00288\ }
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \};}
+\DoxyCodeLine{00291\ }
+\DoxyCodeLine{00292\ \textcolor{comment}{/***************************************************************************************************************************************************/}}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00294\ }
+\DoxyCodeLine{00295\ }
+\DoxyCodeLine{00296\ }
+\DoxyCodeLine{00297\ }
+\DoxyCodeLine{00298\ }
+\DoxyCodeLine{00299\ }
+\DoxyCodeLine{00300\ }
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ }
+\DoxyCodeLine{00303\ }
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ }
+\DoxyCodeLine{00306\ }
+\DoxyCodeLine{00307\ }
+\DoxyCodeLine{00308\ }
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ }
+\DoxyCodeLine{00312\ }
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ }
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ }
+\DoxyCodeLine{00317\ }
+\DoxyCodeLine{00318\ }
+\DoxyCodeLine{00319\ }
+\DoxyCodeLine{00320\ }
+\DoxyCodeLine{00321\ }
+\DoxyCodeLine{00322\ }
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ }
+\DoxyCodeLine{00325\ }
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ \textcolor{comment}{//TODO:\ [AX-\/35]\ Implement\ graph\ nodes}}
+\DoxyCodeLine{00328\ }
+\DoxyCodeLine{00329\ }
+\DoxyCodeLine{00330\ \textcolor{preprocessor}{\#endif\ }}
+
+\end{DoxyCode}

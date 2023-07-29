@@ -1,0 +1,35 @@
+\hypertarget{LightingDatabase_8h_source}{}\doxysection{Lighting\+Database.\+h}
+\label{LightingDatabase_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/LightingDatabase.h@{/home/hamilcar/Desktop/projects/Axomae/includes/LightingDatabase.h}}
+\mbox{\hyperlink{LightingDatabase_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ LIGHTINGDATABASE\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ LIGHTINGDATABASE\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}utils\_3D.h"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{LightingSystem_8h}{LightingSystem.h}}"{}}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classLightingDatabase}{LightingDatabase}}\{}
+\DoxyCodeLine{00022\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{classLightingDatabase_a0b9fb1f85f1b0d502d7d9144e6673f16}{LightingDatabase}}();\ }
+\DoxyCodeLine{00028\ \ \ \ \ }
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classLightingDatabase_a07318c3a594f720e1bab49abca4cb760}{\string~LightingDatabase}}();\ }
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classLightingDatabase_af6dd0225288bbd1fa705016b4f369b77}{addLight}}(\mbox{\hyperlink{classAbstractLight}{AbstractLight}}*\ light);}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keyword}{const}\ std::vector<AbstractLight*>\&\ \mbox{\hyperlink{classLightingDatabase_acdacfea7f828a0993e72bfc4c6c36ad4}{getLightsArrayByType}}(\mbox{\hyperlink{classAbstractLight_a5c8289262e80b0694b4ff6bfa00bcd51}{AbstractLight::TYPE}}\ type)\ ;}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classLightingDatabase_a876c4055e3f987878dbb80209e3dbc7a}{eraseLightsArray}}(\mbox{\hyperlink{classAbstractLight_a5c8289262e80b0694b4ff6bfa00bcd51}{AbstractLight::TYPE}}\ type);\ }
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classLightingDatabase_a25e333ec01f3fb5ba631e8ac2401580d}{clearDatabase}}();}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classLightingDatabase_a6b1ca6883cfb52824c6ace93e23d3350}{updateShadersData}}(\mbox{\hyperlink{classShader}{Shader}}*\ shader\ ,\ glm::mat4\&\ view);\ }
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classLightingDatabase_aaca6a619deb2d2cca354aca9e7a9ee0f}{updateShadersData}}(\mbox{\hyperlink{classAbstractLight_a5c8289262e80b0694b4ff6bfa00bcd51}{AbstractLight::TYPE}}\ type\ ,\ \mbox{\hyperlink{classShader}{Shader}}*\ shader\ ,\ glm::mat4\&\ view);}
+\DoxyCodeLine{00078\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00079\ \ \ \ \ std::map<AbstractLight::TYPE\ ,\ std::vector<AbstractLight*>>\ \mbox{\hyperlink{classLightingDatabase_ab7f7b9de83d6094d7fb23d7e7dd11947}{light\_database}}\ ;\ \ \ \ }
+\DoxyCodeLine{00083\ \};}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

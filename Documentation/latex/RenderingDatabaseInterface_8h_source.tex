@@ -1,0 +1,31 @@
+\hypertarget{RenderingDatabaseInterface_8h_source}{}\doxysection{Rendering\+Database\+Interface.\+h}
+\label{RenderingDatabaseInterface_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/RenderingDatabaseInterface.h@{/home/hamilcar/Desktop/projects/Axomae/includes/RenderingDatabaseInterface.h}}
+\mbox{\hyperlink{RenderingDatabaseInterface_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ RENDERINGDATABASEINTERFACE\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ RENDERINGDATABASEINTERFACE\_H}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Mutex_8h}{Mutex.h}}"{}}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00017\ \textcolor{keyword}{template}<\textcolor{keyword}{class}\ T>}
+\DoxyCodeLine{00018\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classRenderingDatabaseInterface}{RenderingDatabaseInterface}}\ \{}
+\DoxyCodeLine{00019\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classRenderingDatabaseInterface_a7b7b6a639a400b49f6e7098698fcfa5c}{clean}}()\ =\ 0;}
+\DoxyCodeLine{00026\ \ \ \ \ }
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classRenderingDatabaseInterface_a359f09b30c58fe513987faebd85e75cf}{purge}}()\ =\ 0\ ;}
+\DoxyCodeLine{00032\ \ \ \ \ }
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keyword}{virtual}\ T*\ \mbox{\hyperlink{classRenderingDatabaseInterface_af61ca644381c83ac8467a57d9ec9a3dc}{get}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id})\ \ =\ 0;\ }
+\DoxyCodeLine{00040\ \ \ \ \ }
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classRenderingDatabaseInterface_a0f1b72b8c23851daca87cb542e705027}{contains}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id})\ =\ 0;}
+\DoxyCodeLine{00047\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{classMutex}{Mutex}}\ mutex;\ \ \ \ \ \ \ \ \textcolor{comment}{/*<Mutex\ used\ for\ thread\ safety*/}\ }
+\DoxyCodeLine{00049\ \};}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

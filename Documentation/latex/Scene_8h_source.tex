@@ -1,0 +1,91 @@
+\hypertarget{Scene_8h_source}{}\doxysection{Scene.\+h}
+\label{Scene_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/Scene.h@{/home/hamilcar/Desktop/projects/Axomae/includes/Scene.h}}
+\mbox{\hyperlink{Scene_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ SCENE\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ SCENE\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}utils\_3D.h"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Drawable_8h}{Drawable.h}}"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}BoundingBox.h"{}}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Camera_8h}{Camera.h}}"{}}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}SceneHierarchy.h"{}}}
+\DoxyCodeLine{00016\ \textcolor{comment}{//TODO:\ [AX-\/14]\ Add\ mouse\ picking}}
+\DoxyCodeLine{00017\ \textcolor{comment}{//TODO:\ [AX-\/34]\ Add\ object\ lookup\ system}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classScene}{Scene}}\{}
+\DoxyCodeLine{00024\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structScene_1_1AABB}{AABB}}\{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classBoundingBox}{BoundingBox}}\ aabb;\ }
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classDrawable}{Drawable}}*\ drawable;\ }
+\DoxyCodeLine{00029\ \ \ \ \ \};\ }
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{classScene_ad10176d75a9cc0da56626f682d083507}{Scene}}();\ }
+\DoxyCodeLine{00036\ \ \ \ \ }
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classScene_aa0a5be58e2ee2d1fdafc5fb46b5e661e}{\string~Scene}}();\ }
+\DoxyCodeLine{00042\ \ \ \ \ }
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classScene_ac757dd5d47b13899cfb520fc26e582ad}{setScene}}(std::pair<std::vector<Mesh*>\ ,\ \mbox{\hyperlink{classSceneTree}{SceneTree}}>\ \&to\_copy);\ }
+\DoxyCodeLine{00049\ \ \ \ \ }
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<Drawable*>\ \mbox{\hyperlink{classScene_a10f428e3ef22bf4ab5b9c6685c60c63f}{getOpaqueElements}}()\ \textcolor{keyword}{const}\ ;\ }
+\DoxyCodeLine{00056\ \ \ \ \ \ }
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<Drawable*>\ \mbox{\hyperlink{classScene_ac4b17eff8d5085d06eaa61839a7564ce}{getSortedTransparentElements}}();}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<Drawable*>\ \mbox{\hyperlink{classScene_ad3e28bb91af440672332f13b22b759e7}{getBoundingBoxElements}}();}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classScene_a801e5cad8bca50153a902e6d4f6156ac}{generateBoundingBoxes}}(\mbox{\hyperlink{classShader}{Shader}}*\ box\_shader);\ }
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classScene_a70e5b1218abb729d70d9f41b107017f9}{clear}}();}
+\DoxyCodeLine{00085\ \ }
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classScene_a2368a83d2f7930647d4fd693aac26ccc}{isReady}}();}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classScene_a5318346ba026e366fe8e8dab78c06fd5}{prepare\_draw}}(\mbox{\hyperlink{classCamera}{Camera}}*\ camera);\ \ }
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00106\ \ \ \ \ std::vector<Drawable*>\ \mbox{\hyperlink{classScene_aa9fd65213de7f381f56e2caa0206cca4}{getSortedSceneByTransparency}}();}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classScene_acb9a1692fa12188956b6a0546df7d1ec}{drawForwardTransparencyMode}}();\ }
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classScene_af9418b804c987650478175c44e1dafb1}{drawBoundingBoxes}}();}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classScene_a71b5cdf8620f3f89db8729cb64bcfa9d}{setLightDatabasePointer}}(\mbox{\hyperlink{classLightingDatabase}{LightingDatabase}}*\ database)\{light\_database\ =\ database;\}}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classScene_a5238b00db65ce7ee0c7d9e46b70dbe9f}{setCameraPointer}}(\mbox{\hyperlink{classCamera}{Camera}}*\ \_scene\_camera);}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classScene_ac9298aba489551227b5326c6580958a1}{updateTree}}();\ }
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00145\ \ \ \ \ \textcolor{keywordtype}{void}\ sortTransparentElements();\ }
+\DoxyCodeLine{00146\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00147\ \ \ \ \ std::map<float\ ,\ Drawable*>\ sorted\_transparent\_meshes\ ;\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Sorted\ collection\ of\ transparent\ meshes\ ,\ by\ distance\ to\ the\ camera*/}\ }
+\DoxyCodeLine{00148\ \ \ \ \ std::vector<AABB>\ scene\ ;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Meshes\ of\ the\ scene\ ,\ and\ their\ computed\ bounding\ boxes*/}}
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{classSceneTree}{SceneTree}}\ scene\_tree\ ;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Scene\ tree\ containing\ a\ hierarchy\ of\ transformations*/}\ }
+\DoxyCodeLine{00150\ \ \ \ \ std::vector<Drawable*>\ bounding\_boxes\_array;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Array\ of\ bounding\ boxes*/}}
+\DoxyCodeLine{00151\ \ \ \ \ \mbox{\hyperlink{classLightingDatabase}{LightingDatabase}}*\ light\_database;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Light\ database\ pointer*/}}
+\DoxyCodeLine{00152\ \ \ \ \ \mbox{\hyperlink{classCamera}{Camera}}*\ scene\_camera;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Pointer\ on\ the\ scene\ camera*/}\ }
+\DoxyCodeLine{00153\ \};}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,129 @@
+\hypertarget{classResourceDatabaseManager}{}\doxysection{Resource\+Database\+Manager Class Reference}
+\label{classResourceDatabaseManager}\index{ResourceDatabaseManager@{ResourceDatabaseManager}}
+
+
+\mbox{\hyperlink{classThis}{This}} class contains all databases relative to resources used by the renderer. Every resource loaded using IO is managed from this class.  
+
+
+
+
+{\ttfamily \#include $<$Resource\+Database\+Manager.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classResourceDatabaseManager_a95cd13614f1a399b67b2e0b61633c294}{destroy\+Instance}} ()
+\begin{DoxyCompactList}\small\item\em \mbox{\hyperlink{classThis}{This}} method deletes the stored databases objects . \mbox{\hyperlink{classThis}{This}} method DOES NOT free the memory of what these databases contain. For this , use \mbox{\hyperlink{classResourceDatabaseManager_a50eb4356ec4087f2048fc3faf7657847}{Resource\+Database\+Manager\+::purge()}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classResourceDatabaseManager_a50eb4356ec4087f2048fc3faf7657847}\label{classResourceDatabaseManager_a50eb4356ec4087f2048fc3faf7657847}} 
+void {\bfseries purge} ()
+\begin{DoxyCompactList}\small\item\em \mbox{\hyperlink{classThis}{This}} method purges everything, deleting every resource stored , and the resources space taken GPU side Additionally , will delete the singleton instance pointer , as well as the databases pointers. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classResourceDatabaseManager_a81e68fc78f51ea1d189e2987da59c46e}{clean\+Texture\+Database}} () const
+\begin{DoxyCompactList}\small\item\em Proceeds with a soft clean on the texture database. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classResourceDatabaseManager_af5d8d58e733475ebbe5c6e61b20b9de2}{clean\+Shader\+Database}} () const
+\begin{DoxyCompactList}\small\item\em Proceeds with a soft clean on the shader database. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classResourceDatabaseManager_a138f2921ff4e9f5c5cda3cbc17437c53}{purge\+Texture\+Database}} () const
+\begin{DoxyCompactList}\small\item\em Purge the entire texture database. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classResourceDatabaseManager_ad7955ca765514c85e5a61d787f1e30cf}{purge\+Shader\+Database}} () const
+\begin{DoxyCompactList}\small\item\em Purge the entire shader database. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classTextureDatabase}{Texture\+Database}} $\ast$ \mbox{\hyperlink{classResourceDatabaseManager_a7c4790d99d77e1cca80a3ec13e0c14b8}{get\+Texture\+Database}} () const
+\begin{DoxyCompactList}\small\item\em Get the \mbox{\hyperlink{classTexture}{Texture}} Database object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classShaderDatabase}{Shader\+Database}} $\ast$ \mbox{\hyperlink{classResourceDatabaseManager_ab7824174fa5f55b02ab139ba9bc820fa}{get\+Shader\+Database}} () const
+\begin{DoxyCompactList}\small\item\em Get the \mbox{\hyperlink{classShader}{Shader}} Database object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classResourceDatabaseManager_a9785d3208dcf80b1c497ef8cf37d4d3e}\label{classResourceDatabaseManager_a9785d3208dcf80b1c497ef8cf37d4d3e}} 
+static \mbox{\hyperlink{classResourceDatabaseManager}{Resource\+Database\+Manager}} $\ast$ {\bfseries get\+Instance} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classThis}{This}} class contains all databases relative to resources used by the renderer. Every resource loaded using IO is managed from this class. 
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classResourceDatabaseManager_af5d8d58e733475ebbe5c6e61b20b9de2}\label{classResourceDatabaseManager_af5d8d58e733475ebbe5c6e61b20b9de2}} 
+\index{ResourceDatabaseManager@{ResourceDatabaseManager}!cleanShaderDatabase@{cleanShaderDatabase}}
+\index{cleanShaderDatabase@{cleanShaderDatabase}!ResourceDatabaseManager@{ResourceDatabaseManager}}
+\doxysubsubsection{\texorpdfstring{cleanShaderDatabase()}{cleanShaderDatabase()}}
+{\footnotesize\ttfamily void Resource\+Database\+Manager\+::clean\+Shader\+Database (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+Proceeds with a soft clean on the shader database. 
+
+\mbox{\Hypertarget{classResourceDatabaseManager_a81e68fc78f51ea1d189e2987da59c46e}\label{classResourceDatabaseManager_a81e68fc78f51ea1d189e2987da59c46e}} 
+\index{ResourceDatabaseManager@{ResourceDatabaseManager}!cleanTextureDatabase@{cleanTextureDatabase}}
+\index{cleanTextureDatabase@{cleanTextureDatabase}!ResourceDatabaseManager@{ResourceDatabaseManager}}
+\doxysubsubsection{\texorpdfstring{cleanTextureDatabase()}{cleanTextureDatabase()}}
+{\footnotesize\ttfamily void Resource\+Database\+Manager\+::clean\+Texture\+Database (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+Proceeds with a soft clean on the texture database. 
+
+\mbox{\Hypertarget{classResourceDatabaseManager_a95cd13614f1a399b67b2e0b61633c294}\label{classResourceDatabaseManager_a95cd13614f1a399b67b2e0b61633c294}} 
+\index{ResourceDatabaseManager@{ResourceDatabaseManager}!destroyInstance@{destroyInstance}}
+\index{destroyInstance@{destroyInstance}!ResourceDatabaseManager@{ResourceDatabaseManager}}
+\doxysubsubsection{\texorpdfstring{destroyInstance()}{destroyInstance()}}
+{\footnotesize\ttfamily void Resource\+Database\+Manager\+::destroy\+Instance (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\mbox{\hyperlink{classThis}{This}} method deletes the stored databases objects . \mbox{\hyperlink{classThis}{This}} method DOES NOT free the memory of what these databases contain. For this , use \mbox{\hyperlink{classResourceDatabaseManager_a50eb4356ec4087f2048fc3faf7657847}{Resource\+Database\+Manager\+::purge()}}. 
+
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{classResourceDatabaseManager_a50eb4356ec4087f2048fc3faf7657847}{Resource\+Database\+Manager\+::purge()}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{classResourceDatabaseManager_ab7824174fa5f55b02ab139ba9bc820fa}\label{classResourceDatabaseManager_ab7824174fa5f55b02ab139ba9bc820fa}} 
+\index{ResourceDatabaseManager@{ResourceDatabaseManager}!getShaderDatabase@{getShaderDatabase}}
+\index{getShaderDatabase@{getShaderDatabase}!ResourceDatabaseManager@{ResourceDatabaseManager}}
+\doxysubsubsection{\texorpdfstring{getShaderDatabase()}{getShaderDatabase()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classShaderDatabase}{Shader\+Database}} $\ast$ Resource\+Database\+Manager\+::get\+Shader\+Database (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get the \mbox{\hyperlink{classShader}{Shader}} Database object. 
+
+\begin{DoxyReturn}{Returns}
+Shader\+Database$\ast$ 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classResourceDatabaseManager_a7c4790d99d77e1cca80a3ec13e0c14b8}\label{classResourceDatabaseManager_a7c4790d99d77e1cca80a3ec13e0c14b8}} 
+\index{ResourceDatabaseManager@{ResourceDatabaseManager}!getTextureDatabase@{getTextureDatabase}}
+\index{getTextureDatabase@{getTextureDatabase}!ResourceDatabaseManager@{ResourceDatabaseManager}}
+\doxysubsubsection{\texorpdfstring{getTextureDatabase()}{getTextureDatabase()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classTextureDatabase}{Texture\+Database}} $\ast$ Resource\+Database\+Manager\+::get\+Texture\+Database (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get the \mbox{\hyperlink{classTexture}{Texture}} Database object. 
+
+\begin{DoxyReturn}{Returns}
+Texture\+Database$\ast$ 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classResourceDatabaseManager_ad7955ca765514c85e5a61d787f1e30cf}\label{classResourceDatabaseManager_ad7955ca765514c85e5a61d787f1e30cf}} 
+\index{ResourceDatabaseManager@{ResourceDatabaseManager}!purgeShaderDatabase@{purgeShaderDatabase}}
+\index{purgeShaderDatabase@{purgeShaderDatabase}!ResourceDatabaseManager@{ResourceDatabaseManager}}
+\doxysubsubsection{\texorpdfstring{purgeShaderDatabase()}{purgeShaderDatabase()}}
+{\footnotesize\ttfamily void Resource\+Database\+Manager\+::purge\+Shader\+Database (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+Purge the entire shader database. 
+
+\mbox{\Hypertarget{classResourceDatabaseManager_a138f2921ff4e9f5c5cda3cbc17437c53}\label{classResourceDatabaseManager_a138f2921ff4e9f5c5cda3cbc17437c53}} 
+\index{ResourceDatabaseManager@{ResourceDatabaseManager}!purgeTextureDatabase@{purgeTextureDatabase}}
+\index{purgeTextureDatabase@{purgeTextureDatabase}!ResourceDatabaseManager@{ResourceDatabaseManager}}
+\doxysubsubsection{\texorpdfstring{purgeTextureDatabase()}{purgeTextureDatabase()}}
+{\footnotesize\ttfamily void Resource\+Database\+Manager\+::purge\+Texture\+Database (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+Purge the entire texture database. 
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/\mbox{\hyperlink{ResourceDatabaseManager_8h}{Resource\+Database\+Manager.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,210 @@
+\hypertarget{classSceneHierarchyInterface}{}\doxysection{Scene\+Hierarchy\+Interface Class Reference}
+\label{classSceneHierarchyInterface}\index{SceneHierarchyInterface@{SceneHierarchyInterface}}
+Inheritance diagram for Scene\+Hierarchy\+Interface\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classSceneHierarchyInterface}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classSceneHierarchyInterface_ad6b5c78fa5d96ee81d7d6fddc912b2c0}{set\+Root}} (\mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$\+\_\+root)
+\begin{DoxyCompactList}\small\item\em Set the Root object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$ \mbox{\hyperlink{classSceneHierarchyInterface_ab99bb4172d5805d3ca980214b33c1773}{get\+Iterator}} () const
+\begin{DoxyCompactList}\small\item\em Returns the iterator of the structure. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classSceneHierarchyInterface_a671f9be7f095e5dc64a298b83aaab50e}{set\+Iterator}} (\mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$iter)
+\begin{DoxyCompactList}\small\item\em Set the Iterator of the structure. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classSceneHierarchyInterface_a5b65ccbfc17654f2dd1fb02cbe782f47}{create\+Generic\+Root\+Node}} ()=0
+\begin{DoxyCompactList}\small\item\em Create an empty root node. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$ \mbox{\hyperlink{classSceneHierarchyInterface_a2fb9f504b07d39cfd325b01721fcdc9d}{get\+Root\+Node}} () const
+\begin{DoxyCompactList}\small\item\em Get the Root Node object. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classSceneHierarchyInterface_ab70b9ad91f8cd19a7bb7a180db9c8435}{set\+As\+Root\+Child}} (\mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$node)
+\begin{DoxyCompactList}\small\item\em Set the node as a child of root. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classSceneHierarchyInterface_aeffee94440514d0b430699eba1db3232}{update\+Owner}} ()
+\begin{DoxyCompactList}\small\item\em Traverse the scene structure, and set their owner of each node to this structure. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classSceneHierarchyInterface_a847cc39636ab70a91b265b071fb575b1}{update\+Accumulated\+Transformations}} ()=0
+\begin{DoxyCompactList}\small\item\em Traverse the scene structure , and recomputes all transformations up to the accumulated\+\_\+modelmatrix of each node. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classSceneHierarchyInterface_a9e61104ddb39c1896414eea8aaba7a26}{add\+Generic\+Node\+To\+Delete}} (\mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$node)
+\begin{DoxyCompactList}\small\item\em Add node to the list of nodes that need to be deleted by the current structure. Specialized nodes like meshes , and lights , can be freed by their own scene structures. Empty generic nodes are deleted by the scene Tree/\+Graph structure. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classSceneHierarchyInterface_a380596d3b53e6eb828d6646a4394f502}{clear}} ()
+\begin{DoxyCompactList}\small\item\em Free all generic nodes allocated and only generic nodes . Other types of nodes need to be deallocated by their own structures and owners. For example , lights should be freed by their Light\+Database , even though they are stored in the scene tree as well . ~\newline
+ \end{DoxyCompactList}\item 
+{\footnotesize template$<$class F , class ... Args$>$ }\\void \mbox{\hyperlink{classSceneHierarchyInterface_ad7f1c9ec7d5cfb5fd77c9a3e8cba0b83}{dfs}} (\mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$begin, F func, Args \&\&...args)
+\begin{DoxyCompactList}\small\item\em \mbox{\hyperlink{classThis}{This}} method will traverse the structure doing a depth first search, and apply a functor to each node. ~\newline
+ \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classSceneHierarchyInterface_aec3a1ed6f3681f7ea541ec35e87575fe}\label{classSceneHierarchyInterface_aec3a1ed6f3681f7ea541ec35e87575fe}} 
+\mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$ {\bfseries root}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classSceneHierarchyInterface_a9e61104ddb39c1896414eea8aaba7a26}\label{classSceneHierarchyInterface_a9e61104ddb39c1896414eea8aaba7a26}} 
+\index{SceneHierarchyInterface@{SceneHierarchyInterface}!addGenericNodeToDelete@{addGenericNodeToDelete}}
+\index{addGenericNodeToDelete@{addGenericNodeToDelete}!SceneHierarchyInterface@{SceneHierarchyInterface}}
+\doxysubsubsection{\texorpdfstring{addGenericNodeToDelete()}{addGenericNodeToDelete()}}
+{\footnotesize\ttfamily virtual void Scene\+Hierarchy\+Interface\+::add\+Generic\+Node\+To\+Delete (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$}]{node }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Add node to the list of nodes that need to be deleted by the current structure. Specialized nodes like meshes , and lights , can be freed by their own scene structures. Empty generic nodes are deleted by the scene Tree/\+Graph structure. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em node} & Node to track for deletion. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classSceneHierarchyInterface_a380596d3b53e6eb828d6646a4394f502}\label{classSceneHierarchyInterface_a380596d3b53e6eb828d6646a4394f502}} 
+\index{SceneHierarchyInterface@{SceneHierarchyInterface}!clear@{clear}}
+\index{clear@{clear}!SceneHierarchyInterface@{SceneHierarchyInterface}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily virtual void Scene\+Hierarchy\+Interface\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Free all generic nodes allocated and only generic nodes . Other types of nodes need to be deallocated by their own structures and owners. For example , lights should be freed by their Light\+Database , even though they are stored in the scene tree as well . ~\newline
+ 
+
+\mbox{\Hypertarget{classSceneHierarchyInterface_a5b65ccbfc17654f2dd1fb02cbe782f47}\label{classSceneHierarchyInterface_a5b65ccbfc17654f2dd1fb02cbe782f47}} 
+\index{SceneHierarchyInterface@{SceneHierarchyInterface}!createGenericRootNode@{createGenericRootNode}}
+\index{createGenericRootNode@{createGenericRootNode}!SceneHierarchyInterface@{SceneHierarchyInterface}}
+\doxysubsubsection{\texorpdfstring{createGenericRootNode()}{createGenericRootNode()}}
+{\footnotesize\ttfamily virtual void Scene\+Hierarchy\+Interface\+::create\+Generic\+Root\+Node (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Create an empty root node. 
+
+
+
+Implemented in \mbox{\hyperlink{classSceneTree_aadd7bafe07db73003b55297126737e40}{Scene\+Tree}}.
+
+\mbox{\Hypertarget{classSceneHierarchyInterface_ad7f1c9ec7d5cfb5fd77c9a3e8cba0b83}\label{classSceneHierarchyInterface_ad7f1c9ec7d5cfb5fd77c9a3e8cba0b83}} 
+\index{SceneHierarchyInterface@{SceneHierarchyInterface}!dfs@{dfs}}
+\index{dfs@{dfs}!SceneHierarchyInterface@{SceneHierarchyInterface}}
+\doxysubsubsection{\texorpdfstring{dfs()}{dfs()}}
+{\footnotesize\ttfamily template$<$class F , class ... Args$>$ \\
+void Scene\+Hierarchy\+Interface\+::dfs (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$}]{begin,  }\item[{F}]{func,  }\item[{Args \&\&...}]{args }\end{DoxyParamCaption})}
+
+
+
+\mbox{\hyperlink{classThis}{This}} method will traverse the structure doing a depth first search, and apply a functor to each node. ~\newline
+ 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Args} & Templated arguments to pass to a functor. \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em begin} & Node from which we begin the traversal . \\
+\hline
+{\em func} & Functor to be applied on each node . \\
+\hline
+{\em args} & Variadic arguments of func \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classSceneHierarchyInterface_ab99bb4172d5805d3ca980214b33c1773}\label{classSceneHierarchyInterface_ab99bb4172d5805d3ca980214b33c1773}} 
+\index{SceneHierarchyInterface@{SceneHierarchyInterface}!getIterator@{getIterator}}
+\index{getIterator@{getIterator}!SceneHierarchyInterface@{SceneHierarchyInterface}}
+\doxysubsubsection{\texorpdfstring{getIterator()}{getIterator()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$ Scene\+Hierarchy\+Interface\+::get\+Iterator (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the iterator of the structure. 
+
+\begin{DoxyReturn}{Returns}
+Scene\+Node\+Interface$\ast$ 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classSceneHierarchyInterface_a2fb9f504b07d39cfd325b01721fcdc9d}\label{classSceneHierarchyInterface_a2fb9f504b07d39cfd325b01721fcdc9d}} 
+\index{SceneHierarchyInterface@{SceneHierarchyInterface}!getRootNode@{getRootNode}}
+\index{getRootNode@{getRootNode}!SceneHierarchyInterface@{SceneHierarchyInterface}}
+\doxysubsubsection{\texorpdfstring{getRootNode()}{getRootNode()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$ Scene\+Hierarchy\+Interface\+::get\+Root\+Node (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get the Root Node object. 
+
+\begin{DoxyReturn}{Returns}
+Scene\+Node\+Interface$\ast$ 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classSceneHierarchyInterface_ab70b9ad91f8cd19a7bb7a180db9c8435}\label{classSceneHierarchyInterface_ab70b9ad91f8cd19a7bb7a180db9c8435}} 
+\index{SceneHierarchyInterface@{SceneHierarchyInterface}!setAsRootChild@{setAsRootChild}}
+\index{setAsRootChild@{setAsRootChild}!SceneHierarchyInterface@{SceneHierarchyInterface}}
+\doxysubsubsection{\texorpdfstring{setAsRootChild()}{setAsRootChild()}}
+{\footnotesize\ttfamily void Scene\+Hierarchy\+Interface\+::set\+As\+Root\+Child (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$}]{node }\end{DoxyParamCaption})}
+
+
+
+Set the node as a child of root. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em node} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classSceneHierarchyInterface_a671f9be7f095e5dc64a298b83aaab50e}\label{classSceneHierarchyInterface_a671f9be7f095e5dc64a298b83aaab50e}} 
+\index{SceneHierarchyInterface@{SceneHierarchyInterface}!setIterator@{setIterator}}
+\index{setIterator@{setIterator}!SceneHierarchyInterface@{SceneHierarchyInterface}}
+\doxysubsubsection{\texorpdfstring{setIterator()}{setIterator()}}
+{\footnotesize\ttfamily void Scene\+Hierarchy\+Interface\+::set\+Iterator (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$}]{iter }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Set the Iterator of the structure. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em iter} & Iterator of type Scene\+Node\+Interface$\ast$ \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classSceneHierarchyInterface_ad6b5c78fa5d96ee81d7d6fddc912b2c0}\label{classSceneHierarchyInterface_ad6b5c78fa5d96ee81d7d6fddc912b2c0}} 
+\index{SceneHierarchyInterface@{SceneHierarchyInterface}!setRoot@{setRoot}}
+\index{setRoot@{setRoot}!SceneHierarchyInterface@{SceneHierarchyInterface}}
+\doxysubsubsection{\texorpdfstring{setRoot()}{setRoot()}}
+{\footnotesize\ttfamily void Scene\+Hierarchy\+Interface\+::set\+Root (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classSceneNodeInterface}{Scene\+Node\+Interface}} $\ast$}]{\+\_\+root }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Set the Root object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+root} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classSceneHierarchyInterface_a847cc39636ab70a91b265b071fb575b1}\label{classSceneHierarchyInterface_a847cc39636ab70a91b265b071fb575b1}} 
+\index{SceneHierarchyInterface@{SceneHierarchyInterface}!updateAccumulatedTransformations@{updateAccumulatedTransformations}}
+\index{updateAccumulatedTransformations@{updateAccumulatedTransformations}!SceneHierarchyInterface@{SceneHierarchyInterface}}
+\doxysubsubsection{\texorpdfstring{updateAccumulatedTransformations()}{updateAccumulatedTransformations()}}
+{\footnotesize\ttfamily virtual void Scene\+Hierarchy\+Interface\+::update\+Accumulated\+Transformations (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Traverse the scene structure , and recomputes all transformations up to the accumulated\+\_\+modelmatrix of each node. 
+
+
+
+Implemented in \mbox{\hyperlink{classSceneTree_ae8d8274f1be8defd2f37e6217c3cf215}{Scene\+Tree}}.
+
+\mbox{\Hypertarget{classSceneHierarchyInterface_aeffee94440514d0b430699eba1db3232}\label{classSceneHierarchyInterface_aeffee94440514d0b430699eba1db3232}} 
+\index{SceneHierarchyInterface@{SceneHierarchyInterface}!updateOwner@{updateOwner}}
+\index{updateOwner@{updateOwner}!SceneHierarchyInterface@{SceneHierarchyInterface}}
+\doxysubsubsection{\texorpdfstring{updateOwner()}{updateOwner()}}
+{\footnotesize\ttfamily virtual void Scene\+Hierarchy\+Interface\+::update\+Owner (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Traverse the scene structure, and set their owner of each node to this structure. 
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/Scene\+Hierarchy.\+h\end{DoxyCompactItemize}

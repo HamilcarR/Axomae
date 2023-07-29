@@ -1,0 +1,102 @@
+\hypertarget{classPerformanceLogger}{}\doxysection{Performance\+Logger Class Reference}
+\label{classPerformanceLogger}\index{PerformanceLogger@{PerformanceLogger}}
+Inheritance diagram for Performance\+Logger\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classPerformanceLogger}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classPerformanceLogger_a17eb747c5da772c6f35b1d59e14b7820}{Performance\+Logger}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new Performance \mbox{\hyperlink{classLogger}{Logger}} object. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classPerformanceLogger_ae2a2181c2c495c7bf995ff8c9dc8112a}{$\sim$\+Performance\+Logger}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the Performance \mbox{\hyperlink{classLogger}{Logger}} object. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classPerformanceLogger_a051bce6a910fb7858f9d952c0bf1fe2a}{start\+Timer}} ()
+\begin{DoxyCompactList}\small\item\em Store the present timestamp in variable start. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classPerformanceLogger_a47b931a83ab92ffc6895e9be1be3c800}{end\+Timer}} ()
+\begin{DoxyCompactList}\small\item\em Store the present timestamp in variable end. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classPerformanceLogger_aa53f96844108fc6bf811713dbec13783}{print}} ()
+\begin{DoxyCompactList}\small\item\em Print the difference between time at end , and time at start. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classLogger_adea865643afda736cc9ee1dba1580ee4}{print}} ()=0
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classPerformanceLogger_ae79832d6a9644b20c69f1251eac28d46}\label{classPerformanceLogger_ae79832d6a9644b20c69f1251eac28d46}} 
+std\+::chrono\+::high\+\_\+resolution\+\_\+clock\+::time\+\_\+point {\bfseries start}
+\item 
+\mbox{\Hypertarget{classPerformanceLogger_a41e71333e9e3ce6ab6eed38b1115fa3b}\label{classPerformanceLogger_a41e71333e9e3ce6ab6eed38b1115fa3b}} 
+std\+::chrono\+::high\+\_\+resolution\+\_\+clock\+::time\+\_\+point {\bfseries end}
+\item 
+\mbox{\Hypertarget{classPerformanceLogger_a3b261ce172a9603956489bb5ae60546c}\label{classPerformanceLogger_a3b261ce172a9603956489bb5ae60546c}} 
+std\+::chrono\+::milliseconds {\bfseries duration}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classPerformanceLogger_a17eb747c5da772c6f35b1d59e14b7820}\label{classPerformanceLogger_a17eb747c5da772c6f35b1d59e14b7820}} 
+\index{PerformanceLogger@{PerformanceLogger}!PerformanceLogger@{PerformanceLogger}}
+\index{PerformanceLogger@{PerformanceLogger}!PerformanceLogger@{PerformanceLogger}}
+\doxysubsubsection{\texorpdfstring{PerformanceLogger()}{PerformanceLogger()}}
+{\footnotesize\ttfamily Performance\+Logger\+::\+Performance\+Logger (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Construct a new Performance \mbox{\hyperlink{classLogger}{Logger}} object. 
+
+\mbox{\Hypertarget{classPerformanceLogger_ae2a2181c2c495c7bf995ff8c9dc8112a}\label{classPerformanceLogger_ae2a2181c2c495c7bf995ff8c9dc8112a}} 
+\index{PerformanceLogger@{PerformanceLogger}!````~PerformanceLogger@{$\sim$PerformanceLogger}}
+\index{````~PerformanceLogger@{$\sim$PerformanceLogger}!PerformanceLogger@{PerformanceLogger}}
+\doxysubsubsection{\texorpdfstring{$\sim$PerformanceLogger()}{~PerformanceLogger()}}
+{\footnotesize\ttfamily virtual Performance\+Logger\+::$\sim$\+Performance\+Logger (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Destroy the Performance \mbox{\hyperlink{classLogger}{Logger}} object. 
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classPerformanceLogger_a47b931a83ab92ffc6895e9be1be3c800}\label{classPerformanceLogger_a47b931a83ab92ffc6895e9be1be3c800}} 
+\index{PerformanceLogger@{PerformanceLogger}!endTimer@{endTimer}}
+\index{endTimer@{endTimer}!PerformanceLogger@{PerformanceLogger}}
+\doxysubsubsection{\texorpdfstring{endTimer()}{endTimer()}}
+{\footnotesize\ttfamily void Performance\+Logger\+::end\+Timer (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Store the present timestamp in variable end. 
+
+\mbox{\Hypertarget{classPerformanceLogger_aa53f96844108fc6bf811713dbec13783}\label{classPerformanceLogger_aa53f96844108fc6bf811713dbec13783}} 
+\index{PerformanceLogger@{PerformanceLogger}!print@{print}}
+\index{print@{print}!PerformanceLogger@{PerformanceLogger}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}}
+{\footnotesize\ttfamily void Performance\+Logger\+::print (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Print the difference between time at end , and time at start. 
+
+
+
+Implements \mbox{\hyperlink{classLogger}{Logger}}.
+
+\mbox{\Hypertarget{classPerformanceLogger_a051bce6a910fb7858f9d952c0bf1fe2a}\label{classPerformanceLogger_a051bce6a910fb7858f9d952c0bf1fe2a}} 
+\index{PerformanceLogger@{PerformanceLogger}!startTimer@{startTimer}}
+\index{startTimer@{startTimer}!PerformanceLogger@{PerformanceLogger}}
+\doxysubsubsection{\texorpdfstring{startTimer()}{startTimer()}}
+{\footnotesize\ttfamily void Performance\+Logger\+::start\+Timer (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Store the present timestamp in variable start. 
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/\mbox{\hyperlink{PerformanceLogger_8h}{Performance\+Logger.\+h}}\end{DoxyCompactItemize}

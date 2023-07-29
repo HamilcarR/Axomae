@@ -1,0 +1,200 @@
+\hypertarget{classFrameBufferInterface}{}\doxysection{Frame\+Buffer\+Interface Class Reference}
+\label{classFrameBufferInterface}\index{FrameBufferInterface@{FrameBufferInterface}}
+
+
+{\ttfamily \#include $<$Frame\+Buffer\+Interface.\+h$>$}
+
+Inheritance diagram for Frame\+Buffer\+Interface\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classFrameBufferInterface}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classFrameBufferInterface_a881dd3e46501b99e9cd514a35bb2a091}{Frame\+Buffer\+Interface}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new Frame Buffer Interface object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classFrameBufferInterface_a546e46afca734ddc3c7d5da39be6371d}{Frame\+Buffer\+Interface}} (\mbox{\hyperlink{classTextureDatabase}{Texture\+Database}} $\ast$texture\+\_\+database, \mbox{\hyperlink{structScreenSize}{Screen\+Size}} $\ast$texture\+\_\+size)
+\begin{DoxyCompactList}\small\item\em Construct a new Frame Buffer Interface object. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classFrameBufferInterface_a7086392349c9e3f0e0302c88378dfe66}{$\sim$\+Frame\+Buffer\+Interface}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the Frame Buffer Interface object. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classFrameBufferInterface_a95108539b40be3de3db2fd137709be03}{resize}} ()
+\begin{DoxyCompactList}\small\item\em Resizes the textures used by the framebuffer . Will use the values stored inside the texture\+\_\+dim pointer property. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classFrameBufferInterface_a85e8d6334f992c3318be001dc410c152}{set\+Texture\+Dimensions}} (\mbox{\hyperlink{structScreenSize}{Screen\+Size}} $\ast$pointer\+\_\+on\+\_\+texture\+\_\+size)
+\begin{DoxyCompactList}\small\item\em Set new screen dimensions. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classFrameBufferInterface_a03f2a53f38a0782b29a855d7c36a12c8}{bind\+Frame\+Buffer}} ()
+\begin{DoxyCompactList}\small\item\em Render to the texture stored inside the framebuffer. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classFrameBufferInterface_a1dd9c7fee1b0b772f66bf6e954cd8ffb}{unbind\+Frame\+Buffer}} ()
+\begin{DoxyCompactList}\small\item\em Unbind the framebuffer , and use the default framebuffer. ~\newline
+ \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classFrameBufferInterface_abbcef0a7b104891bf0d4d6fe7ef0f893}{initialize\+Frame\+Buffer}} ()
+\begin{DoxyCompactList}\small\item\em Initializes shaders , and render buffers textures . \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classFrameBufferInterface_a111c115aecafaf7244ed3f7734b013ee}{clean}} ()
+\begin{DoxyCompactList}\small\item\em Clean the framebuffer\textquotesingle{}s data ~\newline
+ \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classFrameBufferInterface_aeabfdd98e7d49aa6a77b1a5461db4d75}\label{classFrameBufferInterface_aeabfdd98e7d49aa6a77b1a5461db4d75}} 
+int {\bfseries set\+Up\+Empty\+Texture} (\mbox{\hyperlink{classTextureDatabase}{Texture\+Database}} $\ast$database, unsigned width, unsigned height)
+\item 
+\mbox{\Hypertarget{classFrameBufferInterface_a049ede25b6bdbde34805b0f240ddedc4}\label{classFrameBufferInterface_a049ede25b6bdbde34805b0f240ddedc4}} 
+void {\bfseries initialize\+Frame\+Buffer\+Texture} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classFrameBufferInterface_af44a7ff9b503d030310d844acf561fa9}\label{classFrameBufferInterface_af44a7ff9b503d030310d844acf561fa9}} 
+\mbox{\hyperlink{classGLFrameBuffer}{GLFrame\+Buffer}} $\ast$ {\bfseries gl\+\_\+framebuffer\+\_\+object}
+\item 
+\mbox{\Hypertarget{classFrameBufferInterface_a25d87a33eaa3e618de089b19d8bb9b1e}\label{classFrameBufferInterface_a25d87a33eaa3e618de089b19d8bb9b1e}} 
+\mbox{\hyperlink{structScreenSize}{Screen\+Size}} $\ast$ {\bfseries texture\+\_\+dim}
+\item 
+\mbox{\Hypertarget{classFrameBufferInterface_a19a61f2be0b875a255bfa9d130a1654f}\label{classFrameBufferInterface_a19a61f2be0b875a255bfa9d130a1654f}} 
+\mbox{\hyperlink{classTextureDatabase}{Texture\+Database}} $\ast$ {\bfseries texture\+\_\+database}
+\item 
+\mbox{\Hypertarget{classFrameBufferInterface_a40603af6660cc0e29122e182b89c4c78}\label{classFrameBufferInterface_a40603af6660cc0e29122e182b89c4c78}} 
+\mbox{\hyperlink{classTexture}{Texture}} $\ast$ {\bfseries fbo\+\_\+texture\+\_\+pointer}
+\item 
+\mbox{\Hypertarget{classFrameBufferInterface_a7d2dca142d46dec717942db262fa3971}\label{classFrameBufferInterface_a7d2dca142d46dec717942db262fa3971}} 
+unsigned int $\ast$ {\bfseries default\+\_\+framebuffer\+\_\+pointer}
+\item 
+int \mbox{\hyperlink{classFrameBufferInterface_a50e39585dc4637f883d54cf42ad7f34e}{texture\+\_\+id}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classThis}{This}} class implements a generic framebuffer 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFrameBufferInterface_a881dd3e46501b99e9cd514a35bb2a091}\label{classFrameBufferInterface_a881dd3e46501b99e9cd514a35bb2a091}} 
+\index{FrameBufferInterface@{FrameBufferInterface}!FrameBufferInterface@{FrameBufferInterface}}
+\index{FrameBufferInterface@{FrameBufferInterface}!FrameBufferInterface@{FrameBufferInterface}}
+\doxysubsubsection{\texorpdfstring{FrameBufferInterface()}{FrameBufferInterface()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Frame\+Buffer\+Interface\+::\+Frame\+Buffer\+Interface (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Construct a new Frame Buffer Interface object. 
+
+\mbox{\Hypertarget{classFrameBufferInterface_a546e46afca734ddc3c7d5da39be6371d}\label{classFrameBufferInterface_a546e46afca734ddc3c7d5da39be6371d}} 
+\index{FrameBufferInterface@{FrameBufferInterface}!FrameBufferInterface@{FrameBufferInterface}}
+\index{FrameBufferInterface@{FrameBufferInterface}!FrameBufferInterface@{FrameBufferInterface}}
+\doxysubsubsection{\texorpdfstring{FrameBufferInterface()}{FrameBufferInterface()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Frame\+Buffer\+Interface\+::\+Frame\+Buffer\+Interface (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classTextureDatabase}{Texture\+Database}} $\ast$}]{texture\+\_\+database,  }\item[{\mbox{\hyperlink{structScreenSize}{Screen\+Size}} $\ast$}]{texture\+\_\+size }\end{DoxyParamCaption})}
+
+
+
+Construct a new Frame Buffer Interface object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em texture\+\_\+database} & Pointer on the texture database \\
+\hline
+{\em texture\+\_\+size} & Pointer on the \mbox{\hyperlink{structScreenSize}{Screen\+Size}} property from the \mbox{\hyperlink{classRenderer}{Renderer}} \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classFrameBufferInterface_a7086392349c9e3f0e0302c88378dfe66}\label{classFrameBufferInterface_a7086392349c9e3f0e0302c88378dfe66}} 
+\index{FrameBufferInterface@{FrameBufferInterface}!````~FrameBufferInterface@{$\sim$FrameBufferInterface}}
+\index{````~FrameBufferInterface@{$\sim$FrameBufferInterface}!FrameBufferInterface@{FrameBufferInterface}}
+\doxysubsubsection{\texorpdfstring{$\sim$FrameBufferInterface()}{~FrameBufferInterface()}}
+{\footnotesize\ttfamily virtual Frame\+Buffer\+Interface\+::$\sim$\+Frame\+Buffer\+Interface (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Destroy the Frame Buffer Interface object. 
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classFrameBufferInterface_a03f2a53f38a0782b29a855d7c36a12c8}\label{classFrameBufferInterface_a03f2a53f38a0782b29a855d7c36a12c8}} 
+\index{FrameBufferInterface@{FrameBufferInterface}!bindFrameBuffer@{bindFrameBuffer}}
+\index{bindFrameBuffer@{bindFrameBuffer}!FrameBufferInterface@{FrameBufferInterface}}
+\doxysubsubsection{\texorpdfstring{bindFrameBuffer()}{bindFrameBuffer()}}
+{\footnotesize\ttfamily virtual void Frame\+Buffer\+Interface\+::bind\+Frame\+Buffer (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Render to the texture stored inside the framebuffer. 
+
+\mbox{\Hypertarget{classFrameBufferInterface_a111c115aecafaf7244ed3f7734b013ee}\label{classFrameBufferInterface_a111c115aecafaf7244ed3f7734b013ee}} 
+\index{FrameBufferInterface@{FrameBufferInterface}!clean@{clean}}
+\index{clean@{clean}!FrameBufferInterface@{FrameBufferInterface}}
+\doxysubsubsection{\texorpdfstring{clean()}{clean()}}
+{\footnotesize\ttfamily virtual void Frame\+Buffer\+Interface\+::clean (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Clean the framebuffer\textquotesingle{}s data ~\newline
+ 
+
+
+
+Reimplemented in \mbox{\hyperlink{classCameraFrameBuffer_aabe1ee2caf983cad1d81f4b4d9f07d21}{Camera\+Frame\+Buffer}}.
+
+\mbox{\Hypertarget{classFrameBufferInterface_abbcef0a7b104891bf0d4d6fe7ef0f893}\label{classFrameBufferInterface_abbcef0a7b104891bf0d4d6fe7ef0f893}} 
+\index{FrameBufferInterface@{FrameBufferInterface}!initializeFrameBuffer@{initializeFrameBuffer}}
+\index{initializeFrameBuffer@{initializeFrameBuffer}!FrameBufferInterface@{FrameBufferInterface}}
+\doxysubsubsection{\texorpdfstring{initializeFrameBuffer()}{initializeFrameBuffer()}}
+{\footnotesize\ttfamily virtual void Frame\+Buffer\+Interface\+::initialize\+Frame\+Buffer (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Initializes shaders , and render buffers textures . 
+
+
+
+Reimplemented in \mbox{\hyperlink{classCameraFrameBuffer_a55601e5a4be7d10d9d6ee62a02126d62}{Camera\+Frame\+Buffer}}.
+
+\mbox{\Hypertarget{classFrameBufferInterface_a95108539b40be3de3db2fd137709be03}\label{classFrameBufferInterface_a95108539b40be3de3db2fd137709be03}} 
+\index{FrameBufferInterface@{FrameBufferInterface}!resize@{resize}}
+\index{resize@{resize}!FrameBufferInterface@{FrameBufferInterface}}
+\doxysubsubsection{\texorpdfstring{resize()}{resize()}}
+{\footnotesize\ttfamily virtual void Frame\+Buffer\+Interface\+::resize (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Resizes the textures used by the framebuffer . Will use the values stored inside the texture\+\_\+dim pointer property. 
+
+\mbox{\Hypertarget{classFrameBufferInterface_a85e8d6334f992c3318be001dc410c152}\label{classFrameBufferInterface_a85e8d6334f992c3318be001dc410c152}} 
+\index{FrameBufferInterface@{FrameBufferInterface}!setTextureDimensions@{setTextureDimensions}}
+\index{setTextureDimensions@{setTextureDimensions}!FrameBufferInterface@{FrameBufferInterface}}
+\doxysubsubsection{\texorpdfstring{setTextureDimensions()}{setTextureDimensions()}}
+{\footnotesize\ttfamily virtual void Frame\+Buffer\+Interface\+::set\+Texture\+Dimensions (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structScreenSize}{Screen\+Size}} $\ast$}]{pointer\+\_\+on\+\_\+texture\+\_\+size }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Set new screen dimensions. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pointer\+\_\+on\+\_\+texture\+\_\+size} & Pointer on screen ~\newline
+ \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classFrameBufferInterface_a1dd9c7fee1b0b772f66bf6e954cd8ffb}\label{classFrameBufferInterface_a1dd9c7fee1b0b772f66bf6e954cd8ffb}} 
+\index{FrameBufferInterface@{FrameBufferInterface}!unbindFrameBuffer@{unbindFrameBuffer}}
+\index{unbindFrameBuffer@{unbindFrameBuffer}!FrameBufferInterface@{FrameBufferInterface}}
+\doxysubsubsection{\texorpdfstring{unbindFrameBuffer()}{unbindFrameBuffer()}}
+{\footnotesize\ttfamily virtual void Frame\+Buffer\+Interface\+::unbind\+Frame\+Buffer (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Unbind the framebuffer , and use the default framebuffer. ~\newline
+ 
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classFrameBufferInterface_a50e39585dc4637f883d54cf42ad7f34e}\label{classFrameBufferInterface_a50e39585dc4637f883d54cf42ad7f34e}} 
+\index{FrameBufferInterface@{FrameBufferInterface}!texture\_id@{texture\_id}}
+\index{texture\_id@{texture\_id}!FrameBufferInterface@{FrameBufferInterface}}
+\doxysubsubsection{\texorpdfstring{texture\_id}{texture\_id}}
+{\footnotesize\ttfamily int Frame\+Buffer\+Interface\+::texture\+\_\+id\hspace{0.3cm}{\ttfamily [protected]}}
+
+ID of the framebuffer texture in the \mbox{\hyperlink{classTexture}{Texture}} database 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/\mbox{\hyperlink{FrameBufferInterface_8h}{Frame\+Buffer\+Interface.\+h}}\end{DoxyCompactItemize}

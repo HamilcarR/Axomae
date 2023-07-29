@@ -1,0 +1,87 @@
+\hypertarget{GLFrameBuffer_8h_source}{}\doxysection{GLFrame\+Buffer.\+h}
+\label{GLFrameBuffer_8h_source}\index{/home/hamilcar/Desktop/projects/Axomae/includes/GLFrameBuffer.h@{/home/hamilcar/Desktop/projects/Axomae/includes/GLFrameBuffer.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ GLFRAMEBUFFER\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ GLFRAMEBUFFER\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{GLBufferInterface_8h}{GLBufferInterface.h}}"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{GLRenderBuffer_8h}{GLRenderBuffer.h}}"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Texture_8h}{Texture.h}}"{}}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classGLFrameBuffer}{GLFrameBuffer}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classGLBufferInterface}{GLBufferInterface}}\{}
+\DoxyCodeLine{00009\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \ \ \ \ \textcolor{keyword}{enum}\ INTERNAL\_FORMAT\ :\ \textcolor{keywordtype}{signed}\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ EMPTY\ =\ -\/1,\ }
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ COLOR0\ =\ GL\_COLOR\_ATTACHMENT0\ ,}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ COLOR1\ =\ GL\_COLOR\_ATTACHMENT1\ ,\ }
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ COLOR2\ =\ GL\_COLOR\_ATTACHMENT2\ ,\ }
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ COLOR3\ =\ GL\_COLOR\_ATTACHMENT3\ ,\ }
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ COLOR4\ =\ GL\_COLOR\_ATTACHMENT4\ ,\ }
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ COLOR5\ =\ GL\_COLOR\_ATTACHMENT5\ ,\ }
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ COLOR6\ =\ GL\_COLOR\_ATTACHMENT6\ ,}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ COLOR7\ =\ GL\_COLOR\_ATTACHMENT7\ ,\ }
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ DEPTH\ =\ GL\_DEPTH\_ATTACHMENT\ ,\ }
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ STENCIL\ =\ GL\_STENCIL\_ATTACHMENT\ ,\ }
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ DEPTH\_STENCIL\ =\ GL\_DEPTH\_STENCIL\_ATTACHMENT}
+\DoxyCodeLine{00024\ \ \ \ \ \};}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{classGLFrameBuffer_a9d2c2573cc285693c466bca772cd4f71}{GLFrameBuffer}}();\ }
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{classGLFrameBuffer_ab6637f005effe80460cffb12774c1872}{GLFrameBuffer}}(\textcolor{keywordtype}{unsigned}\ width\ ,\ \textcolor{keywordtype}{unsigned}\ height\ ,\ \textcolor{keywordtype}{unsigned}\ texture\_id\ ,\ INTERNAL\_FORMAT\ format\ =\ COLOR0,\ \mbox{\hyperlink{classGLRenderBuffer_a880703f010b03219234e137e4b23d699}{GLRenderBuffer::INTERNAL\_FORMAT}}\ renderbuffer\_internal\_format\ =\ GLRenderBuffer::EMPTY\ ,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}*\ default\_fbo\_id\_pointer\ =\ \textcolor{keyword}{nullptr});\ }
+\DoxyCodeLine{00042\ \ \ \ \ }
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classGLFrameBuffer_ac97ee32e465c6eb54506354f027e2ec1}{\string~GLFrameBuffer}}();\ }
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classGLFrameBuffer_aa7bb30ccbf66c5e51ecb67642a2831c2}{initializeBuffers}}()\ \textcolor{keyword}{override}\ ;\ }
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classGLFrameBuffer_a6d0f06917e7f3eb4a57f4ede55df0c42}{isReady}}()\ \textcolor{keyword}{const\ override};\ }
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classGLFrameBuffer_ae38889760258f031feac252704d95c7c}{bind}}()\ \textcolor{keyword}{override}\ ;\ }
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classGLFrameBuffer_a6bc5d08606cb71ad73f6f7884ae1cd1c}{unbind}}()\ \textcolor{keyword}{override}\ ;\ }
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classGLFrameBuffer_a9038ad1af3f5c37cb171ad16ce6dce8a}{clean}}()\ \textcolor{keyword}{override}\ ;}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classGLFrameBuffer_a658e4a8688ad1599c964fbc2def428f4}{resize}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ width\ ,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ height)\ ;\ }
+\DoxyCodeLine{00087\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00088\ \ \ \ }
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ fillBuffers()\ \textcolor{keyword}{override}\ ;\ }
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00096\ \ \ \ \ INTERNAL\_FORMAT\ format;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Internal\ Format*/}\ }
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{classGLRenderBuffer}{GLRenderBuffer}}\ *renderbuffer\_object\ ;\ \ \ \ \ \ \ \textcolor{comment}{/*<Pointer\ on\ the\ renderbuffer\ */}\ }
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ framebuffer\_id\ ;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<Framebuffer\ ID*/}\ }
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ texture\_id\ ;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<ID\ of\ the\ texture\ rendered\ to*/}}
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ *pointer\_on\_default\_fbo\_id\ ;\ \ \ \textcolor{comment}{/*<Pointer\ on\ default\ fbo\ variable*/}\ }
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \};}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \textcolor{preprocessor}{\#endif\ }}
+
+\end{DoxyCode}

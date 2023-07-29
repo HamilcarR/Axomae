@@ -1,0 +1,236 @@
+\hypertarget{classOpacityTexture}{}\doxysection{Opacity\+Texture Class Reference}
+\label{classOpacityTexture}\index{OpacityTexture@{OpacityTexture}}
+
+
+Opacity texture class definition.  
+
+
+
+
+{\ttfamily \#include $<$Texture.\+h$>$}
+
+Inheritance diagram for Opacity\+Texture\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{classOpacityTexture}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classOpacityTexture_a98140ae5cf1c71e4437d36c3d18811f3}{Opacity\+Texture}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new Opacity \mbox{\hyperlink{classTexture}{Texture}} object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classOpacityTexture_a865abf2d34bb578ab788e48a560a27e6}{Opacity\+Texture}} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$\mbox{\hyperlink{classTexture_adfe232cc4d823d873b2e2eb35d11af2a}{data}})
+\begin{DoxyCompactList}\small\item\em Construct a new Opacity \mbox{\hyperlink{classTexture}{Texture}} object. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classOpacityTexture_a5752d33659d21a646117c45eb698d7ff}{$\sim$\+Opacity\+Texture}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the Opacity \mbox{\hyperlink{classTexture}{Texture}} object. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classOpacityTexture_ac9bc65f81f79fe7dec59388adcb84947}{bind\+Texture}} ()
+\begin{DoxyCompactList}\small\item\em Bind the texture using gl\+Bind\+Texture. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classOpacityTexture_a3212187a707d9f9af31d5793767e2de9}{unbind\+Texture}} ()
+\begin{DoxyCompactList}\small\item\em Unbind texture. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classOpacityTexture_a2667861b8c90df397468bc14a81f89d4}{set\+Gl\+Data}} (\mbox{\hyperlink{classShader}{Shader}} $\ast$shader)
+\begin{DoxyCompactList}\small\item\em Set the Open\+GL texture data infos. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions inherited from \mbox{\hyperlink{classTexture}{Texture}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classTexture_a6c275e3f186675ff6ed73ccf970e552f}{Texture}} ()
+\begin{DoxyCompactList}\small\item\em Construct a new empty \mbox{\hyperlink{classTexture}{Texture}} object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classTexture_ab2d871f55dfd7f278914ea5dfef3c12a}{Texture}} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$tex)
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{classTexture}{Texture}} object from texture data. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{classTexture_a4eaff28a38f061c3ed1a21ef210e7030}{$\sim$\+Texture}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the \mbox{\hyperlink{classTexture}{Texture}} object. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classTexture_aecb425c36dd3fedc8f19ddac38742e4b}{set}} (\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$texture)
+\begin{DoxyCompactList}\small\item\em Sets the raw data. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classTexture_a2d0283525256389a133f23d0933e207e}{clean}} ()
+\begin{DoxyCompactList}\small\item\em Cleans the texture. \end{DoxyCompactList}\item 
+unsigned int \mbox{\hyperlink{classTexture_a76160ec48e7b67fd550a90672c0ae4c6}{get\+Sampler\+ID}} ()
+\begin{DoxyCompactList}\small\item\em Get the \mbox{\hyperlink{classTexture}{Texture}} ID. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classTexture_a3d146627c648426c0f3096451483ce3c}{set\+Texture\+Type}} (\mbox{\hyperlink{classTexture_ac1974514d0c1fc17c0f422a63f349376}{TYPE}} type)
+\begin{DoxyCompactList}\small\item\em Set the \mbox{\hyperlink{classTexture}{Texture}} Type object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classTexture_ac1974514d0c1fc17c0f422a63f349376}{TYPE}} \mbox{\hyperlink{classTexture_aa7f1bffe6fe55d92799aebff9bc1919a}{get\+Texture\+Type}} ()
+\begin{DoxyCompactList}\small\item\em Get the \mbox{\hyperlink{classTexture}{Texture}} Type. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classTexture_a297a48c11cf62a12ad6a23395e1dd46c}{bind\+Texture}} ()=0
+\begin{DoxyCompactList}\small\item\em Bind the texture using gl\+Bind\+Texture. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classTexture_a7bef4a5acc61f41c2bb958fdd6b910d1}{unbind\+Texture}} ()=0
+\begin{DoxyCompactList}\small\item\em Unbind texture. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classTexture_a8a356e6490bc4b26955930e55eb7bf91}{set\+Gl\+Data}} (\mbox{\hyperlink{classShader}{Shader}} $\ast$shader)=0
+\begin{DoxyCompactList}\small\item\em Set the Open\+GL texture data infos. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classTexture_ae127c522ca6a943775101dc9e8039d8f}{clean\+Gl\+Data}} ()
+\begin{DoxyCompactList}\small\item\em Release Opengl data. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classTexture_a1a18325c3fa187b4ca2ed8fc3991712f}{set\+New\+Size}} (unsigned \mbox{\hyperlink{classTexture_a5d81cb05821b158ded3d5a46a4cd8f5a}{width}}, unsigned \mbox{\hyperlink{classTexture_ab4b01ae73439cbcc210a5977e227a880}{height}})
+\begin{DoxyCompactList}\small\item\em Set the New Size of the texture. \end{DoxyCompactList}\item 
+virtual bool \mbox{\hyperlink{classTexture_a7e3d5682e7464f03bc3aa2d0a549b026}{is\+Dummy\+Texture}} ()
+\begin{DoxyCompactList}\small\item\em Checks if the texture is a dummy. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static const char $\ast$ \mbox{\hyperlink{classOpacityTexture_a365d6710356aa393a41f5f2f02d1c6e0}{get\+Texture\+Type\+CStr}} ()
+\begin{DoxyCompactList}\small\item\em Get the texture string description. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+\doxysubsubsection*{Public Types inherited from \mbox{\hyperlink{classTexture}{Texture}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classTexture_a2f457108c3f9c2aabb8bf16dc6c0e9c7}{FORMAT}} \+: signed \{ \newline
+\mbox{\hyperlink{classTexture_a2f457108c3f9c2aabb8bf16dc6c0e9c7a6a2e558c55ef02327963bae8c0938256}{RGBA}} = GL\+\_\+\+RGBA
+, \mbox{\hyperlink{classTexture_a2f457108c3f9c2aabb8bf16dc6c0e9c7a4508ea9d0c395b1df196220393a3408a}{BGRA}} = GL\+\_\+\+BGRA
+, \mbox{\hyperlink{classTexture_a2f457108c3f9c2aabb8bf16dc6c0e9c7af7d1af8e5f3b864a48c081ca85112240}{RGB}} = GL\+\_\+\+RGB
+, \mbox{\hyperlink{classTexture_a2f457108c3f9c2aabb8bf16dc6c0e9c7aa07ee1b4ca2d1c5b54b52d68bd10ee72}{BGR}} = GL\+\_\+\+BGR
+, \newline
+\mbox{\hyperlink{classTexture_a2f457108c3f9c2aabb8bf16dc6c0e9c7a148f7737abd9b6ac8de7d359df046a0b}{RGBA16F}} = GL\+\_\+\+RGBA16F
+, \mbox{\hyperlink{classTexture_a2f457108c3f9c2aabb8bf16dc6c0e9c7ae9d84d0dfc5ee5b9966483bce4294c26}{RGBA32F}} = GL\+\_\+\+RGBA32F
+, \mbox{\hyperlink{classTexture_a2f457108c3f9c2aabb8bf16dc6c0e9c7a6053097f6eb48225ab403729ab65b609}{RGB16F}} = GL\+\_\+\+RGB16F
+, \mbox{\hyperlink{classTexture_a2f457108c3f9c2aabb8bf16dc6c0e9c7aefdde27d1b2e44630886b0e5018c1131}{RGB32F}} = GL\+\_\+\+RGB32F
+ \}
+\begin{DoxyCompactList}\small\item\em Internal format of textures. \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{classTexture_ac1974514d0c1fc17c0f422a63f349376}{TYPE}} \+: signed \{ \newline
+{\bfseries EMPTY} = -\/1
+, {\bfseries DIFFUSE} = 0
+, {\bfseries NORMAL} = 1
+, {\bfseries METALLIC} = 2
+, \newline
+{\bfseries ROUGHNESS} = 3
+, {\bfseries AMBIANTOCCLUSION} = 4
+, {\bfseries SPECULAR} = 5
+, {\bfseries EMISSIVE} = 6
+, \newline
+{\bfseries OPACITY} = 7
+, {\bfseries CUBEMAP} = 8
+, {\bfseries GENERIC} = 9
+, {\bfseries FRAMEBUFFER} = 10
+ \}
+\begin{DoxyCompactList}\small\item\em Type of the texture. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classTexture}{Texture}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classTexture_a14df145286d1b1114c4db94685dd368c}{initialize\+Texture2D}} ()
+\begin{DoxyCompactList}\small\item\em Initialize texture filters , mipmaps and gl\+Tex\+Image2D. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classTexture_a8d3d815aef19cee3496779a9c2e5f111}{set\+Texture\+Parameters\+Options}} ()
+\begin{DoxyCompactList}\small\item\em Set the \mbox{\hyperlink{classTexture}{Texture}} Parameters Options object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes inherited from \mbox{\hyperlink{classTexture}{Texture}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classTexture_ac1974514d0c1fc17c0f422a63f349376}{TYPE}} \mbox{\hyperlink{classTexture_a89ca5996442a334121098ebaa3f9f959}{name}}
+\item 
+\mbox{\hyperlink{classTexture_a2f457108c3f9c2aabb8bf16dc6c0e9c7}{FORMAT}} \mbox{\hyperlink{classTexture_afbd1ae7ae46de69f14a1a51c0385201f}{internal\+\_\+format}}
+\item 
+\mbox{\hyperlink{classTexture_a2f457108c3f9c2aabb8bf16dc6c0e9c7}{FORMAT}} \mbox{\hyperlink{classTexture_ad45b0d74374858eed2db3469e45e19f7}{data\+\_\+format}}
+\item 
+unsigned int \mbox{\hyperlink{classTexture_a5d81cb05821b158ded3d5a46a4cd8f5a}{width}}
+\item 
+unsigned int \mbox{\hyperlink{classTexture_ab4b01ae73439cbcc210a5977e227a880}{height}}
+\item 
+uint32\+\_\+t $\ast$ \mbox{\hyperlink{classTexture_adfe232cc4d823d873b2e2eb35d11af2a}{data}}
+\item 
+unsigned int \mbox{\hyperlink{classTexture_a557c44467fc0a8f66a579a2d6bb708cd}{sampler2D}}
+\item 
+bool \mbox{\hyperlink{classTexture_a68e82f9e669cbb46da96c3ae9e010614}{is\+\_\+dummy}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Opacity texture class definition. 
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classOpacityTexture_a98140ae5cf1c71e4437d36c3d18811f3}\label{classOpacityTexture_a98140ae5cf1c71e4437d36c3d18811f3}} 
+\index{OpacityTexture@{OpacityTexture}!OpacityTexture@{OpacityTexture}}
+\index{OpacityTexture@{OpacityTexture}!OpacityTexture@{OpacityTexture}}
+\doxysubsubsection{\texorpdfstring{OpacityTexture()}{OpacityTexture()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Opacity\+Texture\+::\+Opacity\+Texture (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Construct a new Opacity \mbox{\hyperlink{classTexture}{Texture}} object. 
+
+\mbox{\Hypertarget{classOpacityTexture_a865abf2d34bb578ab788e48a560a27e6}\label{classOpacityTexture_a865abf2d34bb578ab788e48a560a27e6}} 
+\index{OpacityTexture@{OpacityTexture}!OpacityTexture@{OpacityTexture}}
+\index{OpacityTexture@{OpacityTexture}!OpacityTexture@{OpacityTexture}}
+\doxysubsubsection{\texorpdfstring{OpacityTexture()}{OpacityTexture()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Opacity\+Texture\+::\+Opacity\+Texture (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classTextureData}{Texture\+Data}} $\ast$}]{data }\end{DoxyParamCaption})}
+
+
+
+Construct a new Opacity \mbox{\hyperlink{classTexture}{Texture}} object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Raw texture data \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{classTextureData}{Texture\+Data}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{classOpacityTexture_a5752d33659d21a646117c45eb698d7ff}\label{classOpacityTexture_a5752d33659d21a646117c45eb698d7ff}} 
+\index{OpacityTexture@{OpacityTexture}!````~OpacityTexture@{$\sim$OpacityTexture}}
+\index{````~OpacityTexture@{$\sim$OpacityTexture}!OpacityTexture@{OpacityTexture}}
+\doxysubsubsection{\texorpdfstring{$\sim$OpacityTexture()}{~OpacityTexture()}}
+{\footnotesize\ttfamily virtual Opacity\+Texture\+::$\sim$\+Opacity\+Texture (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Destroy the Opacity \mbox{\hyperlink{classTexture}{Texture}} object. 
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classOpacityTexture_ac9bc65f81f79fe7dec59388adcb84947}\label{classOpacityTexture_ac9bc65f81f79fe7dec59388adcb84947}} 
+\index{OpacityTexture@{OpacityTexture}!bindTexture@{bindTexture}}
+\index{bindTexture@{bindTexture}!OpacityTexture@{OpacityTexture}}
+\doxysubsubsection{\texorpdfstring{bindTexture()}{bindTexture()}}
+{\footnotesize\ttfamily virtual void Opacity\+Texture\+::bind\+Texture (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Bind the texture using gl\+Bind\+Texture. 
+
+
+
+Implements \mbox{\hyperlink{classTexture_a297a48c11cf62a12ad6a23395e1dd46c}{Texture}}.
+
+\mbox{\Hypertarget{classOpacityTexture_a365d6710356aa393a41f5f2f02d1c6e0}\label{classOpacityTexture_a365d6710356aa393a41f5f2f02d1c6e0}} 
+\index{OpacityTexture@{OpacityTexture}!getTextureTypeCStr@{getTextureTypeCStr}}
+\index{getTextureTypeCStr@{getTextureTypeCStr}!OpacityTexture@{OpacityTexture}}
+\doxysubsubsection{\texorpdfstring{getTextureTypeCStr()}{getTextureTypeCStr()}}
+{\footnotesize\ttfamily static const char $\ast$ Opacity\+Texture\+::get\+Texture\+Type\+CStr (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Get the texture string description. 
+
+\begin{DoxyReturn}{Returns}
+C string 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classOpacityTexture_a2667861b8c90df397468bc14a81f89d4}\label{classOpacityTexture_a2667861b8c90df397468bc14a81f89d4}} 
+\index{OpacityTexture@{OpacityTexture}!setGlData@{setGlData}}
+\index{setGlData@{setGlData}!OpacityTexture@{OpacityTexture}}
+\doxysubsubsection{\texorpdfstring{setGlData()}{setGlData()}}
+{\footnotesize\ttfamily virtual void Opacity\+Texture\+::set\+Gl\+Data (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classShader}{Shader}} $\ast$}]{shader }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set the Open\+GL texture data infos. 
+
+
+
+Implements \mbox{\hyperlink{classTexture_a8a356e6490bc4b26955930e55eb7bf91}{Texture}}.
+
+\mbox{\Hypertarget{classOpacityTexture_a3212187a707d9f9af31d5793767e2de9}\label{classOpacityTexture_a3212187a707d9f9af31d5793767e2de9}} 
+\index{OpacityTexture@{OpacityTexture}!unbindTexture@{unbindTexture}}
+\index{unbindTexture@{unbindTexture}!OpacityTexture@{OpacityTexture}}
+\doxysubsubsection{\texorpdfstring{unbindTexture()}{unbindTexture()}}
+{\footnotesize\ttfamily virtual void Opacity\+Texture\+::unbind\+Texture (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Unbind texture. 
+
+
+
+Implements \mbox{\hyperlink{classTexture_a7bef4a5acc61f41c2bb958fdd6b910d1}{Texture}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/hamilcar/\+Desktop/projects/\+Axomae/includes/\mbox{\hyperlink{Texture_8h}{Texture.\+h}}\end{DoxyCompactItemize}
