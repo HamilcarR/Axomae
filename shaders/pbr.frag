@@ -335,8 +335,8 @@ void main(){
     float ambient_occlusion = mrao.r ; 
     vec4 E = computeEmissiveValue() ;
     vec4 C = computeDiffuseValue() ;
-    vec4 A = computeIrradiance(normal);
-    vec3 albedo = pow(C.rgb + EMPTY_CONSTANT , vec3(2.2)); 
+    vec4 A = computeIrradiance(inverse(MAT_CUBEMAP_NORMAL) * normal);
+    vec3 albedo = pow(C.rgb, vec3(2.2)); 
     
     LIGHT_COMPONENTS point = computePointLightsContribBRDF(roughness , metallic,  albedo  );
     LIGHT_COMPONENTS spot = computeSpotLightsContribBRDF(roughness , metallic , albedo ); 
