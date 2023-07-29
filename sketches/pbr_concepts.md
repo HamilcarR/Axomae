@@ -1,5 +1,5 @@
 
-# Physically based rendering
+# Punctual lighting
 ## Concepts
 
 ### Energy conservation : 
@@ -190,6 +190,62 @@ With :
     vec3 fresnelSchlick(float cosT , vec3 F0){
         return F0 + (1 - F0) * pow(1 - cosT , 5) ; 
     } 
+
+
+
+# Image Based Lighting : IBL 
+## Diffuse Irradiance: 
+The reflectance equation being : 
+$$L_0(p , \omega_0) = \int_{\Omega}( k_d\frac{c}{\pi} + k_s\frac{DFG}{4(\omega_0.n)(\omega_i.n)})L_i(p , \omega_i)n.\omega_id\omega_i$$
+
+It is equivalent to : 
+
+$$L_o(p,\omega_o) = \int\limits_{\Omega} (k_d\frac{c}{\pi}) L_i(p,\omega_i) n \cdot \omega_i  d\omega_i +\int\limits_{\Omega} (k_s\frac{DFG}{4(\omega_o \cdot n)(\omega_i \cdot n)}) L_i(p,\omega_i) n \cdot \omega_i  d\omega_i$$
+
+
+This gives us the diffuse irradiance term: 
+
+$$L_0(p , \omega_0) = k_d\frac{c}{\pi}\int_{\Omega}L_i(p , \omega_i)n.\omega_id\omega_i$$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
