@@ -111,20 +111,23 @@ public:
      * @param data_format Data format of the texture
      * @param data_type Type of the data for the texture
      * @param type Type of the target texture , can be of type Texture::FRAMEBUFFER , or Texture::CUBEMAP
+     * @param mipmaps Level of mipmaps for this texture 
      * @return int Database ID of this texture
      */
-    virtual int setUpEmptyTexture(unsigned width , unsigned height , bool persistence , Texture::FORMAT internal_format , Texture::FORMAT data_format , Texture::FORMAT data_type , Texture::TYPE type); 
+    virtual int setUpEmptyTexture(unsigned width , unsigned height , bool persistence , Texture::FORMAT internal_format , Texture::FORMAT data_format , Texture::FORMAT data_type , Texture::TYPE type , unsigned mipmaps = 0); 
     
     /**
-     * @brief Initialize 1 or more textures , and store them in the database
+     * @brief Calls setUpEmptyTexture() , with these args , and store the resulting texture to be rendered into in the database
      * 
-     * @param color_attachment  
+     * @param color_attachment 
      * @param persistence 
      * @param internal_format 
      * @param data_format 
-     * @param data_type
+     * @param data_type 
      * @param width 
-     * @param height
+     * @param height 
+     * @param rendertype 
+     * @param mipmaps 
      */
     virtual void initializeFrameBufferTexture(GLFrameBuffer::INTERNAL_FORMAT color_attachment ,
                                                 bool persistence , 
@@ -133,7 +136,8 @@ public:
                                                 Texture::FORMAT data_type , 
                                                 unsigned width , 
                                                 unsigned height , 
-                                                Texture::TYPE rendertype); 
+                                                Texture::TYPE rendertype , 
+                                                unsigned int mipmaps = 0); 
 
 protected:
     GLFrameBuffer *gl_framebuffer_object;  

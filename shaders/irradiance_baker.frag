@@ -11,8 +11,7 @@ in vec3 vertex_fragment_fragment_position ;
 const float PI = 3.14159265358;
 const float zenith_max = PI / 2 ; 
 const float azimuth_max = 2 * PI ;
-const float delta = 0.075 ; // set as uniform ?  
-int number_samples = 0 ;
+const float delta = 0.0075 ; // set as uniform ?  
 const vec3 UP = vec3(0.f , 1.f , 0.f); 
 
 
@@ -25,6 +24,7 @@ vec3 computeIrradiance(vec3 normal){
     float theta = 0.f ; 
     float phi = 0.f ;
     /* Riemann sum */
+    int number_samples = 0 ;
     for(phi = 0.f ; phi <= azimuth_max ; phi += delta){
         for(theta = 0.f ; theta <= zenith_max ; theta += delta ){
             float x = cos(phi) * sin(theta);

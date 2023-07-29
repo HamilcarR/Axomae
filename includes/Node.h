@@ -32,7 +32,7 @@ public:
      * 
      * @return glm::mat4 
      */
-    virtual glm::mat4 computeFinalTransformation() const = 0 ;
+    virtual glm::mat4 computeFinalTransformation() = 0 ;
 
     /**
      * @brief Get the Local Model Matrix 
@@ -226,7 +226,7 @@ public:
      * 
      * @return glm::mat4 Model matrix in world space
      */
-    virtual glm::mat4 computeFinalTransformation() const override ;
+    virtual glm::mat4 computeFinalTransformation() override ;
     
     /**
      * @brief Assignment operator for the SceneTreeNode 

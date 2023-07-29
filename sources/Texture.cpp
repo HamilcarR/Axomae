@@ -15,10 +15,11 @@ static std::map<Texture::TYPE , const char*> texture_type_c_str = {
 	{Texture::EMISSIVE , "emissive_map"},
 	{Texture::OPACITY , "opacity_map"}, 
 	{Texture::CUBEMAP , "cubemap"},
-	{Texture::ENVMAP  , "environment_map"},
+	{Texture::ENVMAP2D  , "environment_map"},
 	{Texture::IRRADIANCE , "irradiance_map"},
 	{Texture::GENERIC , "generic_map"}, 
-	{Texture::FRAMEBUFFER , "framebuffer_map"}
+	{Texture::FRAMEBUFFER , "framebuffer_map"},
+	{Texture::BRDFLUT , "brdf_lookup_map"}
 
 };
 
@@ -91,7 +92,8 @@ void Texture::set(TextureData *texture){
 	}
 	data_format = static_cast<Texture::FORMAT>(texture->data_format) ; 
 	internal_format = static_cast<Texture::FORMAT>(texture->internal_format) ; 
-	data_type = static_cast<Texture::FORMAT>(texture->data_type) ; 
+	data_type = static_cast<Texture::FORMAT>(texture->data_type) ;
+	mipmaps = texture->mipmaps ; 
 }
 
 void Texture::clean(){
@@ -109,8 +111,8 @@ void Texture::clean(){
 
 void Texture::setTextureParametersOptions(){
 	glGenerateMipmap(GL_TEXTURE_2D); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER , GL_LINEAR_MIPMAP_LINEAR); 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	errorCheck(__FILE__ , __LINE__); 	
@@ -402,12 +404,23 @@ EmissiveTexture::EmissiveTexture(TextureData* data):Texture(data){
 	name = EMISSIVE ; 
 }
 
+void EmissiveTexture::initializeTexture2D(){
+	glTexImage2D(GL_TEXTURE_2D , 0 , internal_format , width , height , 0 , data_format , data_type , data); 
+	glGenerateMipmap(GL_TEXTURE_2D); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER , GL_LINEAR_MIPMAP_LINEAR); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	errorCheck(__FILE__ , __LINE__); 
+}
+
+
 void EmissiveTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 	
 	glActiveTexture(GL_TEXTURE0 + EMISSIVE); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
 	if(data != nullptr)
-		Texture::initializeTexture2D();
+		initializeTexture2D();
 	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
@@ -511,7 +524,8 @@ CubeMapTexture::CubeMapTexture(FORMAT _internal_format , FORMAT _data_format , F
 	data_format = _data_format ; 
 	data_type = _data_type;
 	width = _width ; 
-	height = _height ;  
+	height = _height ; 
+	mipmaps = 0 ; 
 }
 
 CubeMapTexture::~CubeMapTexture(){
@@ -527,6 +541,7 @@ void CubeMapTexture::setCubeMapTextureData(TextureData *texture){
 	data_type = static_cast<Texture::FORMAT> (texture->data_type);	
 	f_data = nullptr ; 
 	data = nullptr ;
+	mipmaps = texture->mipmaps; 
 	/* In case the raw data is in RGB-RGBA with 8 bits/channel*/
 	if(texture->data){
 		data = new uint32_t [ width * height * 6 ] ; 
@@ -558,12 +573,19 @@ void CubeMapTexture::initializeTexture2D(){
 		for(unsigned i = 0 ; i < 6 ; i++){
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i , 0 , internal_format , width , height , 0 , data_format , data_type , nullptr); 
 			errorCheck(__FILE__ , __LINE__); 
-		}
+		}		
+	if(mipmaps !=0){	
+		glTexParameteri(GL_TEXTURE_CUBE_MAP , GL_TEXTURE_MAX_LEVEL , mipmaps - 1); //! 0 -> N-1 levels of mipmaps
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER , GL_LINEAR_MIPMAP_LINEAR); 
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP); 
+	}
+	else
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER , GL_LINEAR); 
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);  
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER , GL_LINEAR); 
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);  	
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	
+	
 }
 
 void CubeMapTexture::setGlData(Shader* shader){
@@ -582,6 +604,10 @@ void CubeMapTexture::bindTexture(){
 void CubeMapTexture::unbindTexture(){
 	glActiveTexture(GL_TEXTURE0 + name); 
 	glBindTexture(GL_TEXTURE_CUBE_MAP , 0); 
+}
+
+void CubeMapTexture::setNewSize(unsigned w , unsigned h){
+	//!Implements this
 }
 
 const char* CubeMapTexture::getTextureTypeCStr() {
@@ -613,8 +639,8 @@ const char* IrradianceTexture::getTextureTypeCStr() {
  * note: make it generic so that we can generate it on the fly ? 
  */
 
-EnvironmentMapTexture::EnvironmentMapTexture(FORMAT _internal_format  , FORMAT _data_format  , FORMAT _data_type , unsigned _width  , unsigned _height ) : Texture(){
-	name = ENVMAP;
+EnvironmentMap2DTexture::EnvironmentMap2DTexture(FORMAT _internal_format  , FORMAT _data_format  , FORMAT _data_type , unsigned _width  , unsigned _height ) : Texture(){
+	name = ENVMAP2D;
 	internal_format = _internal_format ; 
 	data_format =_data_format ;
 	data_type = _data_type;
@@ -622,16 +648,16 @@ EnvironmentMapTexture::EnvironmentMapTexture(FORMAT _internal_format  , FORMAT _
 	height = _height ;   
 }
 
-EnvironmentMapTexture::EnvironmentMapTexture(TextureData* data) : Texture(data){
-	name = ENVMAP ; 
+EnvironmentMap2DTexture::EnvironmentMap2DTexture(TextureData* data) : Texture(data){
+	name = ENVMAP2D ; 
 	
 }
 
-EnvironmentMapTexture::~EnvironmentMapTexture(){
+EnvironmentMap2DTexture::~EnvironmentMap2DTexture(){
 
 }
 
-void EnvironmentMapTexture::initializeTexture2D(){
+void EnvironmentMap2DTexture::initializeTexture2D(){
 	glTexImage2D(GL_TEXTURE_2D , 0 , internal_format , width , height , 0 , data_format , data_type , f_data); 
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -641,27 +667,27 @@ void EnvironmentMapTexture::initializeTexture2D(){
 	errorCheck(__FILE__ , __LINE__); 	
 }
 
-void EnvironmentMapTexture::setGlData(Shader* shader){
+void EnvironmentMap2DTexture::setGlData(Shader* shader){
 	glGenTextures(1 , &sampler2D); 	
-	glActiveTexture(GL_TEXTURE0 + ENVMAP); 
+	glActiveTexture(GL_TEXTURE0 + ENVMAP2D); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D);
 	if(f_data != nullptr)
-		EnvironmentMapTexture::initializeTexture2D(); 
+		EnvironmentMap2DTexture::initializeTexture2D(); 
 	shader->setTextureUniforms(texture_type_c_str[name] , name);  
 }
 
-void EnvironmentMapTexture::bindTexture(){
-	glActiveTexture(GL_TEXTURE0 + ENVMAP); 
+void EnvironmentMap2DTexture::bindTexture(){
+	glActiveTexture(GL_TEXTURE0 + ENVMAP2D); 
 	glBindTexture(GL_TEXTURE_2D , sampler2D); 
 }
 
-void EnvironmentMapTexture::unbindTexture(){
-	glActiveTexture(GL_TEXTURE0 + ENVMAP); 
+void EnvironmentMap2DTexture::unbindTexture(){
+	glActiveTexture(GL_TEXTURE0 + ENVMAP2D); 
 	glBindTexture(GL_TEXTURE_2D , 0); 
 }
 
-const char* EnvironmentMapTexture::getTextureTypeCStr(){
-	return texture_type_c_str[ENVMAP] ;
+const char* EnvironmentMap2DTexture::getTextureTypeCStr(){
+	return texture_type_c_str[ENVMAP2D] ;
 }
 
 
@@ -722,6 +748,66 @@ void FrameBufferTexture::unbindTexture(){
 
 const char* FrameBufferTexture::getTextureTypeCStr(){
 	return texture_type_c_str[FRAMEBUFFER]; 
+}
+
+/****************************************************************************************************************************/
+
+BRDFLookupTexture::BRDFLookupTexture():Texture(){
+	name=BRDFLUT;
+}
+
+
+BRDFLookupTexture::BRDFLookupTexture(TextureData* data) : Texture(data){
+	name=BRDFLUT; 
+}
+
+
+BRDFLookupTexture::~BRDFLookupTexture(){
+
+} 
+
+
+void BRDFLookupTexture::bindTexture(){
+	glActiveTexture(GL_TEXTURE0 + name);
+	glBindTexture(GL_TEXTURE_2D , sampler2D); 
+
+} 
+
+	
+void BRDFLookupTexture::unbindTexture(){
+	glActiveTexture(GL_TEXTURE0 + name);
+	glBindTexture(GL_TEXTURE_2D , 0); 
+} 
+
+
+void BRDFLookupTexture::setGlData(Shader* shader){
+	glGenTextures(1 , &sampler2D); 
+	bindTexture(); 
+	initializeTexture2D(); 
+	shader->setTextureUniforms(texture_type_c_str[name] , name); 
+} 
+	
+	
+void BRDFLookupTexture::initializeTexture2D(){
+	if(!data){
+		glTexImage2D(GL_TEXTURE_2D , 0 , internal_format , width , height , 0 , data_format , data_type , nullptr);
+		glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_MIN_FILTER , GL_LINEAR); 
+		glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_MAG_FILTER , GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_WRAP_S , GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_WRAP_T , GL_CLAMP_TO_EDGE); 
+	}
+	else{
+		glTexImage2D(GL_TEXTURE_2D , 0 , internal_format , width , height , 0 , data_format , data_type , f_data);
+		glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_MIN_FILTER , GL_LINEAR); 
+		glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_MAG_FILTER , GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_WRAP_S , GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_WRAP_T , GL_CLAMP_TO_EDGE); 
+	}
+} 
+	
+	
+const char* BRDFLookupTexture::getTextureTypeCStr(){
+	return texture_type_c_str[BRDFLUT]; 
 }
 
 /****************************************************************************************************************************/

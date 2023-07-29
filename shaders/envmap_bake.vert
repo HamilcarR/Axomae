@@ -10,9 +10,9 @@ uniform mat4 MAT_VP ;
 uniform mat4 MAT_MVP ;
 
 out vec3 vertex_fragment_fragment_position ; 
-
+out vec2 vertex_fragment_texCoords;
 void main(){
-    
+    vertex_fragment_texCoords = uv; 
     vertex_fragment_fragment_position = positions; 
     gl_Position = MAT_VP * vec4(positions , 1.f);
 }

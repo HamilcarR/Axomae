@@ -32,7 +32,9 @@ public:
 		SCREEN_FRAMEBUFFER = 4 ,	/**<Used for post processing*/
 		BOUNDING_BOX = 5,			/**<Shader used for displaying bounding boxes of meshes*/
 		ENVMAP_CUBEMAP_CONVERTER  = 6 ,	/**<Shader used to bake an equirectangular environment map to a cubemap*/
-		IRRADIANCE_CUBEMAP_COMPUTE = 7 /**<Shader used to compute the irradiance map*/
+		IRRADIANCE_CUBEMAP_COMPUTE = 7 , /**<Shader used to compute the irradiance map*/
+		ENVMAP_PREFILTER = 8,			/**<Shader used to compute the prefiltering pass of the environment map*/
+		BRDF_LUT_BAKER = 9				/**<Shader used to bake a BRDF lookup table*/
 	};
 public: 
 	
@@ -126,6 +128,13 @@ public:
 	 * 
 	 */
 	void setCameraPositionUniform(); 
+
+	/**
+	 * @brief Set the Cubemap Normal Matrix uniform
+	 * 
+	 * @param cubemap_model_matrix 
+	 */
+	void setCubemapNormalMatrixUniform(glm::mat4 cubemap_model_matrix);
 	
 	/**
 	 * @brief Set all matrices uniforms in the shader, like projection , view , model etc
@@ -413,11 +422,26 @@ public:
 };
 
 
+/***********************************************************************************************************************************************************/
+
+class EnvmapPrefilterBakerShader : public Shader{
+public:
+	EnvmapPrefilterBakerShader(); 
+	EnvmapPrefilterBakerShader(const std::string vertex_code , const std::string fragment_code);
+	virtual void setRoughnessValue(float roughness);
+	virtual void setCubeEnvmapResolution(unsigned int resolution); 
+	virtual ~EnvmapPrefilterBakerShader(); 
+};
 
 
+/***********************************************************************************************************************************************************/
 
-
-
+class BRDFLookupTableBakerShader : public Shader{
+public:
+	BRDFLookupTableBakerShader(); 
+	BRDFLookupTableBakerShader(const std::string vertex_code , const std::string fragment_code); 
+	virtual ~BRDFLookupTableBakerShader(); 
+};
 
 
 

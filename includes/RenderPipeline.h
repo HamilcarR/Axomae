@@ -3,6 +3,8 @@
 #include "Renderer.h"
 #include "Scene.h"
 #include "ResourceDatabaseManager.h"
+#include "RenderCubeMap.h"
+#include "RenderQuad.h"
 
 /**
  * @file RenderPipeline.h
@@ -44,7 +46,7 @@ public:
      * @param width Width of the texture baked  
      * @param height Height of the texture baked
      */
-    CubeMapMesh* bakeEnvmapToCubemap(EnvironmentMapTexture* hdri_map , unsigned width , unsigned height , GLViewer* gl_widget); 
+    CubeMapMesh* bakeEnvmapToCubemap(EnvironmentMap2DTexture* hdri_map , unsigned width , unsigned height , GLViewer* gl_widget); 
 
     /**
      * @brief This method produces an irradiance texture , that it will store inside the texture database
@@ -62,7 +64,102 @@ public:
      * 
      * @return * void 
      */
-    virtual void clean(); 
+    virtual void clean();
+
+    /**
+     * @brief Generates mip maps of the environment map according to a computed roughness
+     * 
+     * @param cube_envmap_database_id Cubemap of the environment map database ID 
+     * @param mipmap_levels Mip maps level 
+     * @param gl_widget 
+     * @return int Database ID of the mip mapped cubemap with roughness levels 
+     */
+    int preFilterEnvmap(int cube_envmap_database_id , unsigned int width , unsigned int height , unsigned int mipmap_levels ,  GLViewer* gl_widget);
+
+    
+    int generateBRDFLookupTexture(unsigned int width , unsigned int height , GLViewer* gl_widget); 
+
+protected:
+
+    /**
+     * @brief Constructs a quad mesh , wrap it inside a drawable , and returns it
+     * 
+     * @param shader 
+     * @param camera 
+     * @return Drawable 
+     */
+    Drawable constructQuad(Shader* shader , Camera *camera); 
+    
+    /**
+     * @brief Construct a cube mesh , wrap it inside a drawable , and returns the drawable
+     * 
+     * @param shader 
+     * @param database_texture_id 
+     * @param type 
+     * @param camera 
+     * @return Drawable 
+     */
+    Drawable constructCube(Shader* shader , int database_texture_id , Texture::TYPE type , Camera *camera);
+    
+    /**
+     * @brief Constructs a framebuffer object that will render to a cubemap
+     * 
+     * @param dimensions Dimensions of the texture cubemap 
+     * @param persistence Texture database persistence . True if needs to be kept between scenes. 
+     * @param color_attachment Color attachment to use . <- temporary parameter. 
+     * @param internal_format Internal format of the cubemap
+     * @param data_format Data format of the cubemap
+     * @param data_type Data type of the cubemap 
+     * @param texture_type Type of the cubemap
+     * @param shader Shader to initialize the texture with 
+     * @param level Cubemap mipmap level
+     * @return RenderCubeMap Constructed FBO  
+     */
+    RenderCubeMap constructCubemapFbo(  
+                                        ScreenSize* dimensions , 
+                                        bool persistence ,
+                                        GLFrameBuffer::INTERNAL_FORMAT color_attachment , 
+                                        Texture::FORMAT internal_format , 
+                                        Texture::FORMAT data_format , 
+                                        Texture::FORMAT data_type ,
+                                        Texture::TYPE texture_type,
+                                        Shader* shader,
+                                        unsigned level = 0
+                                        ); 
+
+    RenderQuadFBO constructQuadFbo(
+                                    ScreenSize* dimensions , 
+                                    bool persistence , 
+                                    GLFrameBuffer::INTERNAL_FORMAT color_attachment , 
+                                    Texture::FORMAT internal_format, 
+                                    Texture::FORMAT data_format , 
+                                    Texture::FORMAT data_type , 
+                                    Texture::TYPE texture_type , 
+                                    Shader* shader  
+                                    );
+    /**
+     * @brief 
+     * 
+     * @param cube_drawable 
+     * @param cubemap_framebuffer 
+     * @param camera 
+     * @param render_viewport 
+     * @param origin_viewport
+     * @param mip_level 
+     */
+    void renderToCubemap(Drawable &cube_drawable , RenderCubeMap &cubemap_framebuffer , Camera &camera , const ScreenSize render_viewport , const ScreenSize origin_viewport , unsigned int mip_level = 0);
+
+    /**
+     * @brief 
+     * 
+     * @param quad_drawable 
+     * @param quad_framebuffer 
+     * @param camera 
+     * @param render_viewport 
+     * @param origin_viewport 
+     * @param mip_level 
+     */
+    void renderToQuad(Drawable& quad_drawable , RenderQuadFBO &quad_framebuffer , Camera &camera , const ScreenSize render_viewport , const ScreenSize origin_viewport , unsigned int mip_level = 0);
 protected:
     Renderer* renderer ; 
     ResourceDatabaseManager* resource_database; 

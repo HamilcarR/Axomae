@@ -75,15 +75,18 @@ void Mesh::preRenderSetup(){
 	setDepthFunc(LESS);
 	glPolygonMode(GL_FRONT_AND_BACK , polygon_mode); 
 	depth_mask_enabled = true ;
-	glm::mat4 model_mat = computeFinalTransformation();
+	glm::mat4 model_mat = computeFinalTransformation(); //!This causes the trouble in PBR reflection ? 
 	modelview_matrix = camera->getView() * model_mat ;
 	if(shader_program){	
 		shader_program->setSceneCameraPointer(camera); 
-		shader_program->setAllMatricesUniforms(model_mat) ; 	
+		shader_program->setAllMatricesUniforms(model_mat) ; 
+		if(cubemap_reference)
+			shader_program->setCubemapNormalMatrixUniform(camera->getView() * cubemap_reference->getAccumulatedModelMatrix()); 	
 	}
 }
 
 void Mesh::setShader(Shader* shader){
+	assert(shader != nullptr); 
 	shader_program = shader;
 	if(!shader_program->isInitialized())
 		shader_program->initializeShader(); 
@@ -221,8 +224,6 @@ CubeMesh::CubeMesh(SceneNodeInterface* parent) : Mesh(parent) {
 CubeMesh::~CubeMesh(){
 }
 
-
-
 void CubeMesh::preRenderSetup(){
 	setFaceCulling(true); 
 	setDepthMask(true); 
@@ -252,18 +253,20 @@ void CubeMapMesh::preRenderSetup(){
 	glPolygonMode(GL_FRONT_AND_BACK , FILL); 	
 	glm::mat4 view = glm::mat4(glm::mat3(camera->getView()));
 	glm::mat4 projection = camera->getProjection() ; 
-	local_transformation = camera->getSceneRotationMatrix() ;  
-	local_transformation = glm::scale(local_transformation , glm::vec3(INT_MAX , INT_MAX , INT_MAX)); 				
+	glm::mat4 local = camera->getSceneRotationMatrix() ; 
+	local = glm::scale(local , glm::vec3(INT_MAX , INT_MAX , INT_MAX)); 				
 	if(shader_program != nullptr){
 		shader_program->setSceneCameraPointer(camera); 	
-		shader_program->setAllMatricesUniforms(projection , view , local_transformation) ; 
+		shader_program->setAllMatricesUniforms(projection , view , local) ; 
 	}
 }
 
+glm::mat4 CubeMapMesh::computeFinalTransformation(){
+	accumulated_transformation = getParent()->computeFinalTransformation(); 
+	return accumulated_transformation; 
+}
 /*****************************************************************************************************************/
-
-FrameBufferMesh::FrameBufferMesh():Mesh(){
-
+QuadMesh::QuadMesh(SceneNodeInterface* parent): Mesh(parent){
 	std::vector<float> vertices = {  
 		-1.0f, -1.0f, 0.f, 
 		-1.0f, 1.0f, 0.f ,  
@@ -283,8 +286,35 @@ FrameBufferMesh::FrameBufferMesh():Mesh(){
 	geometry.indices = indices; 
 	geometry.vertices = vertices ; 
 	geometry.uv = textures ;
+	local_transformation = glm::mat4(1.f);
+	name = "Quad"; 
+}
+
+QuadMesh::~QuadMesh(){
+
+}
+
+void QuadMesh::preRenderSetup(){
+	setFaceCulling(false); 
+	setDepthMask(true); 
+	setDepthFunc(LESS);
+	glPolygonMode(GL_FRONT_AND_BACK , FILL); 
+	glm::mat4 model_mat = computeFinalTransformation(); 
+	modelview_matrix = camera->getView() * model_mat ;
+	if(shader_program){	
+		shader_program->setSceneCameraPointer(camera); 
+		shader_program->setAllMatricesUniforms(camera->getProjection() , camera->getView() , model_mat) ; 	
+	}
+}
+
+
+
+
+
+/*****************************************************************************************************************/
+
+FrameBufferMesh::FrameBufferMesh():QuadMesh(){
 	name = "Custom screen framebuffer";
-	local_transformation = glm::mat4(1.f);   
 }
 
 FrameBufferMesh::FrameBufferMesh(int texture_index , Shader* _shader): FrameBufferMesh(){	

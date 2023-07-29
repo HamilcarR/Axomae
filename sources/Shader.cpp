@@ -102,6 +102,9 @@ void Shader::setAllMatricesUniforms(const glm::mat4& model){
 	if(camera_pointer != nullptr) 
 		setInverseModelViewMatrixUniform(camera_pointer->getView() , model);  
 }
+void Shader::setCubemapNormalMatrixUniform(glm::mat4 modelview_matrix){
+	setUniform(uniform_name_cubemap_matrix_normal , glm::mat3(glm::transpose(glm::inverse(modelview_matrix))));
+}
 
 void Shader::setAllMatricesUniforms(const glm::mat4& projection , const glm::mat4& view , const glm::mat4& model){
 	setModelViewProjection(projection , view , model); 
@@ -373,3 +376,43 @@ IrradianceCubemapBakerShader::IrradianceCubemapBakerShader(const std::string ver
 IrradianceCubemapBakerShader::~IrradianceCubemapBakerShader(){
 
 }
+
+
+/***********************************************************************************************************************************************************/
+
+EnvmapPrefilterBakerShader::EnvmapPrefilterBakerShader():Shader(){
+	type = ENVMAP_PREFILTER ; 
+}
+
+EnvmapPrefilterBakerShader::EnvmapPrefilterBakerShader(const std::string vertex_code , const std::string fragment_code) : Shader(vertex_code , fragment_code){
+	type = ENVMAP_PREFILTER ; 
+}
+
+EnvmapPrefilterBakerShader::~EnvmapPrefilterBakerShader(){
+
+}
+
+void EnvmapPrefilterBakerShader::setRoughnessValue(float roughness){
+	setUniform(uniform_name_float_cubemap_prefilter_roughness , roughness); 
+}
+
+void EnvmapPrefilterBakerShader::setCubeEnvmapResolution(unsigned int resolution){
+	setUniform(uniform_name_uint_prefilter_shader_envmap_resolution , resolution); 
+}
+
+
+
+
+/***********************************************************************************************************************************************************/
+
+BRDFLookupTableBakerShader::BRDFLookupTableBakerShader():Shader(){
+	type = BRDF_LUT_BAKER;
+}
+
+BRDFLookupTableBakerShader::BRDFLookupTableBakerShader(const std::string vertex_code , const std::string fragment_code) : Shader(vertex_code , fragment_code){
+	type = BRDF_LUT_BAKER;
+}
+
+BRDFLookupTableBakerShader::~BRDFLookupTableBakerShader(){
+
+} 

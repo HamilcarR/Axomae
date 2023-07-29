@@ -275,6 +275,8 @@ public:
 	 */
 	void setGeometry(Object3D _geometry){geometry = _geometry;}
 
+	void setCubemapPointer(Mesh* cubemap_pointer){cubemap_reference = cubemap_pointer; }
+
 	void setDrawState(bool draw){is_drawn = draw;}
 
 	bool isDrawn(){return is_drawn;}
@@ -284,6 +286,7 @@ public:
 	Material material; 					/**<Material to be used for the mesh*/
 protected:
 	bool mesh_initialized ; 			/**<Is the mesh ready to render*/
+	Mesh* cubemap_reference ;			/**<Tracks the scene's cubemap*/ 
 	Camera* camera; 					/**<Pointer on the scene camera*/
 	glm::mat4 modelview_matrix;			/**<Mesh's view x model matrix*/ 
 	bool face_culling_enabled ;			/**<Is culling enabled*/
@@ -330,6 +333,14 @@ public:
  */
 class CubeMapMesh : public CubeMesh{
 public:
+	/**
+	 * @brief 
+	 * 
+	 * @return glm::mat4 
+	 */
+	glm::mat4 computeFinalTransformation() override ; 
+
+public:
 
 	/**
 	 * @brief Construct a new Cube Map Mesh object
@@ -353,13 +364,39 @@ public:
 };
 
 /*****************************************************************************************************************/
+class QuadMesh : public Mesh{
+public:
+	
+	/**
+	 * @brief Construct a new Quad Mesh object
+	 * 
+	 * @param parent 
+	 */
+	QuadMesh(SceneNodeInterface* parent = nullptr);
+	
+	/**
+	 * @brief Destroy the Quad Mesh object
+	 * 
+	 */
+	virtual ~QuadMesh(); 
+	
+	/**
+	 * @brief 
+	 * 
+	 */
+	void preRenderSetup() override;
+	
+};
+
+
+/*****************************************************************************************************************/
 
 /**
  * @class FrameBufferMesh
  * @brief Mesh with an FBO or/and RBO attached to it  
  * 
  */
-class FrameBufferMesh : public Mesh{
+class FrameBufferMesh : public QuadMesh{
 public:
 	
 	/**

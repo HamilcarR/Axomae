@@ -40,7 +40,8 @@ public:
 		height = 0 ; 
 		data = nullptr ;
 		f_data = nullptr ;
-		nb_components = 1 ; 
+		nb_components = 1 ;
+		mipmaps = 5 ; 
 		internal_format = GL_RGBA ; 
 		data_format = GL_BGRA ; 
 		data_type = GL_UNSIGNED_BYTE ; 
@@ -60,20 +61,26 @@ public:
 	 * @param from The texture to be copied 
 	 * @return * TextureData& Deep copy of the original TextureData object
 	 */
-	TextureData& operator=(const TextureData& from){ 
-		width = from.width ;
-		height = from.height ;
-		nb_components = from.nb_components; 
-		if(from.data){ 
-			data = new uint32_t [from.width * from.height] ; 
-			std::memcpy((void*) data , (void*) from.data , from.width * from.height * sizeof(uint32_t));		
+	TextureData& operator=(const TextureData& from){
+		if(this != &from){ 
+			width = from.width ;
+			height = from.height ;
+			data_format = from.data_format ; 
+			data_type = from.data_type ; 
+			internal_format = from.internal_format;
+			mipmaps = from.mipmaps ; 
+			nb_components = from.nb_components; 
+			if(from.data){ 
+	    		data = new uint32_t [from.width * from.height] ; 
+	    		std::memcpy((void*) data , (void*) from.data , from.width * from.height * sizeof(uint32_t));		
+			}
+			if(from.f_data){
+	    		f_data = new float [from.width * from.height * nb_components] ; 
+	    		std::memcpy((void*) data , (void*) from.data , from.width * from.height * nb_components * sizeof(float));		
+			}
+			name = from.name ; 
 		}
-		if(from.f_data){
-			f_data = new float [from.width * from.height * nb_components] ; 
-			std::memcpy((void*) data , (void*) from.data , from.width * from.height * nb_components * sizeof(float));		
-		}
-		name = from.name ; 
-		return *this ;
+		return *this ; 
 	}
 
 	/**
@@ -98,9 +105,11 @@ public:
 	uint32_t *data ; 		/*<1D array raw data of the texture*/
 	float *f_data ;
 	unsigned nb_components ; 
+	unsigned mipmaps ; 
 	GLenum internal_format ; 
 	GLenum data_format ;
-	GLenum data_type ; 
+	GLenum data_type ;
+	
 };
 
 /******************************************************************************************************************************************************************************************************************/
@@ -117,6 +126,7 @@ public:
 	 */
 	enum FORMAT : unsigned {
 		/*Internal and data formats*/
+		RG = GL_RG ,					
 		RGBA = GL_RGBA , 				/**<RGBA with 8 bits per channel*/
 		BGRA = GL_BGRA , 				/**<BGRA with 8 bits per channel*/
 		RGB = GL_RGB , 					/**<RGB with 8 bits per channel*/
@@ -131,28 +141,27 @@ public:
 	};
 
 	/**
-	 * @brief Type of the texture
+	 * @brief 
 	 * 
 	 */
 	enum TYPE : signed 
 	{
-		EMPTY = -1 , 
-		GENERIC = 0 , 	
-		FRAMEBUFFER = 1,
-		DIFFUSE = 2 , 
-		NORMAL = 3 , 
-		METALLIC = 4 , 
-		ROUGHNESS = 5 , 
-		AMBIANTOCCLUSION = 6 , 
-		SPECULAR =  7, 
-		EMISSIVE = 8 , 
-		OPACITY = 9 ,  
-		CUBEMAP = 10 ,
-		ENVMAP = 11 ,
-		IRRADIANCE = 12
-		
-		
-	} ;
+		EMPTY = -1 ,						/**<Designate an empty , non generated texture*/ 
+		GENERIC = 0 , 						/**<A "compute and forget" texture , used to store generic data*/	
+		FRAMEBUFFER = 1,					/**<A texture to be rendered and displayed as a custom framebuffer , by the screen*/
+		DIFFUSE = 2 ,						/**<Diffuse texture. In case the shader used is PBR , this is the albedo*/ 
+		NORMAL = 3 , 						/**<A normal map texture. Stores normal data*/
+		METALLIC = 4 ,						/**<Metallic texture. Stores the amount of metallic property at a given texel.*/ 
+		ROUGHNESS = 5 , 					/**<A roughness texture.*/
+		AMBIANTOCCLUSION = 6 , 				/**<Ambiant occlusion texture. Occludes light contributions in some areas of the mesh */
+		SPECULAR =  7,						/**<Specular texture. In case of PBR , this texture may not be used*/ 
+		EMISSIVE = 8 , 						/**<Emissive texture. This texture emits light */
+		OPACITY = 9 ,  						/**<Alpha blending map . Provides transparency data*/		
+		CUBEMAP = 10 ,						/**<Environment map , in the form of a cubemap. Possesses mip maps for use in specular BRDF*/
+		ENVMAP2D = 11 ,						/**<Raw 2D environment map , in equirectangular form. This texture is not used in the final draw loop , until it has been baked into a regular cubemap. */
+		IRRADIANCE = 12 ,					/**<Irradiance map . Provides ambient lighting data to the PBR shaders. */
+		BRDFLUT = 13 						/**<BRDF lookup texture. Stores reflection factor according to it's texture coordinates*/
+		};
 
 	/**
 	 * @brief Construct a new empty Texture object
@@ -266,6 +275,22 @@ public:
 	 * 
 	 */
 	virtual bool isInitialized(){return sampler2D != 0 ; }
+
+	/**
+	 * @brief Set the number of mipmaps
+	 * 
+	 * @param level 
+	 */
+	virtual void setMipmapsLevel(unsigned level){mipmaps = level;}
+
+	/**
+	 * @brief Get the mip maps level number
+	 * 
+	 * @return unsigned int 
+	 */
+	virtual unsigned int getMipmapsLevel(){return mipmaps; }
+
+
 protected:
 
 	/**
@@ -278,7 +303,8 @@ protected:
 	 * @brief Set the Texture Parameters Options object
 	 * 
 	 */
-	virtual void setTextureParametersOptions(); 
+	virtual void setTextureParametersOptions();
+
 
 protected:
 	TYPE name ;					/**<Type of the texture*/
@@ -290,6 +316,7 @@ protected:
 	uint32_t *data ; 			/**<Raw data of the texture*/
 	float *f_data ; 
 	unsigned int sampler2D ; 	/**<ID of the texture*/
+	unsigned int mipmaps ;		/**<Texture mipmaps level*/ 
 	bool is_dummy; 				/**<Check if the current texture is a dummy texture*/
 	bool is_initialized ; 
 };
@@ -656,6 +683,12 @@ public:
 	 * @see TextureData
 	 */
 	EmissiveTexture(TextureData *data);
+
+	/**
+	 * @brief 
+	 * 
+	 */
+	void initializeTexture2D() override;	
 	
 	/**
 	 * @brief Destroy the Emissive Texture object
@@ -840,7 +873,7 @@ public:
  	* 	  4 x width² = BOTTOM => GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
  	* 	  5 x width² = BACK => GL_TEXTURE_CUBE_MAP_POSITIVE_Z
  	* 	  6 x width² = FRONT => GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
-	*!Note : If data == nullptr , this will instead allocate an empty cubemap . 
+	*!Note : If TextureData == nullptr , this will instead allocate an empty cubemap . 
 	 */
 	virtual void initializeTexture2D() override; 	
 	
@@ -855,6 +888,14 @@ public:
 	 * 
 	 */
 	virtual void unbindTexture() ;
+
+	/**
+	 * @brief Set the New Size object
+	 * 
+	 * @param _width 
+	 * @param _height 
+	 */
+	virtual void setNewSize(unsigned _width , unsigned _height) override ; 	
 	
 	/**
 	 * @brief Set the OpenGL texture data infos
@@ -922,14 +963,14 @@ public:
  * @brief Environment map texture class definition
  * 
  */
-class EnvironmentMapTexture : public Texture{
+class EnvironmentMap2DTexture : public Texture{
 public:
 	
 	/**
 	 * @brief Construct a new Cube Map Texture object
 	 * 
 	 */
-	EnvironmentMapTexture(FORMAT internal_format = RGB32F , FORMAT data_format = RGB , FORMAT data_type = FLOAT , unsigned width = 0 , unsigned height = 0);
+	EnvironmentMap2DTexture(FORMAT internal_format = RGB32F , FORMAT data_format = RGB , FORMAT data_type = FLOAT , unsigned width = 0 , unsigned height = 0);
 	
 	/**
 	 * @brief Construct a new environment map Texture object
@@ -937,13 +978,13 @@ public:
 	 * @param data Texture raw data 
 	 * @see TextureData
 	 */
-	EnvironmentMapTexture(TextureData* data);  
+	EnvironmentMap2DTexture(TextureData* data);  
 	
 	/**
 	 * @brief Destroy the envmap texture
 	 * 
 	 */
-	virtual ~EnvironmentMapTexture();
+	virtual ~EnvironmentMap2DTexture();
 	
 	/**
 	 * @brief 
@@ -1050,6 +1091,70 @@ public:
 protected:
 
 }; 
+
+/******************************************************************************************************************************************************************************************************************/
+
+/**
+ * @brief Pre baked texture storing the amount of specular reflection for a given triplets of (I , V , R) , where I is the incident light , V is the view direction , and R a roughness value . IE , for (X , Y) being the
+ * texture coordinates , Y is a roughness scale , X <==> (I dot V) is the angle betweend the incident light and view direction.
+ * @class BRDFLookupTexture
+ */
+class BRDFLookupTexture : public Texture{
+public:
+	/**
+	 * @brief Construct a new BRDFLookupTexture object
+	 * 
+	 */
+	BRDFLookupTexture();
+	
+	/**
+	 * @brief Construct a new BRDFLookupTexture object
+	 * 
+	 * @param data 
+	 */
+	BRDFLookupTexture(TextureData* data);
+	
+	/**
+	 * @brief Destroy the BRDFLookupTexture object
+	 * 
+	 */
+	virtual ~BRDFLookupTexture(); 
+	
+	/**
+	 * @brief Binds the texture
+	 * 
+	 */
+	virtual void bindTexture(); 
+	
+	/**
+	 * @brief Unbinds the texture
+	 * 
+	 */
+	virtual void unbindTexture(); 
+	
+	/**
+	 * @brief Initializes the texture and gives it it's ID 
+	 * 
+	 * @param shader 
+	 */
+	virtual void setGlData(Shader* shader); 
+	
+	/**
+	 * @brief Initializes the filters of the texture 
+	 * 
+	 */
+	virtual void initializeTexture2D() override ; 
+	
+	/**
+	 * @brief Get the Texture Type C Str object
+	 * 
+	 * @return const char* 
+	 */
+	static const char* getTextureTypeCStr(); 
+protected:
+
+};
+
 
 /******************************************************************************************************************************************************************************************************************/
 

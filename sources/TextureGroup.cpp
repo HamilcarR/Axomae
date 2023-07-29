@@ -54,12 +54,35 @@ void TextureGroup::clean(){
 	texture_collection.clear();  
 }
 
+
+void TextureGroup::synchronizeWithDatabaseState(){
+	std::vector<unsigned int> to_delete ; 
+	unsigned delete_index = 0 ; 
+	for(int id : texture_collection){
+		Texture* A = texture_database->get(id);
+		if(!A) 
+			to_delete.push_back(delete_index); 
+		delete_index ++ ; 
+	}
+	for(unsigned i : to_delete)
+		texture_collection.erase(texture_collection.begin() + i); 	
+
+}
+
+
 void TextureGroup::bind(){
+	std::vector<unsigned int> to_delete ; 
+	unsigned delete_index = 0 ; 
 	for(int id : texture_collection){
 		Texture* A = texture_database->get(id);
 		if(A) 
 			A->bindTexture(); 
+		else
+			to_delete.push_back(delete_index); 
+		delete_index ++ ; 
 	}
+	for(unsigned i : to_delete)
+		texture_collection.erase(texture_collection.begin() + i); 	
 }
 
 void TextureGroup::unbind(){
@@ -69,7 +92,6 @@ void TextureGroup::unbind(){
 			A->unbindTexture(); 
 	}
 }
-
 
 /****************************************************************************************************************************/
 

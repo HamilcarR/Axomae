@@ -15,7 +15,7 @@ Texture* TextureFactory::constructTexture(TextureData *data , Texture::TYPE type
 	switch(type){
 		case Texture::DIFFUSE:
 			constructed_texture =  data == nullptr ? new DummyDiffuseTexture() : new DiffuseTexture(data); 
-		break; 
+		break ; 
 		case Texture::NORMAL:
 			constructed_texture =  data == nullptr ? new DummyNormalTexture() : new NormalTexture(data);
 		break ; 
@@ -36,19 +36,22 @@ Texture* TextureFactory::constructTexture(TextureData *data , Texture::TYPE type
 		break ; 
 		case Texture::OPACITY:
 			constructed_texture = data == nullptr ? new DummyOpacityTexture() : new OpacityTexture(data);
-		break; 
+		break ; 
 		case Texture::CUBEMAP:
 			constructed_texture =  new CubeMapTexture(data); 
 		break ;
 		case Texture::IRRADIANCE: 
 			constructed_texture = new IrradianceTexture(data);
-		break;
-		case Texture::ENVMAP:
-			constructed_texture =  new EnvironmentMapTexture(data); 
-		break ; 
+		break ;
+		case Texture::ENVMAP2D:
+			constructed_texture =  new EnvironmentMap2DTexture(data); 
+		break ;
+		case Texture::BRDFLUT:
+			constructed_texture = new BRDFLookupTexture(data); 
+		break ;
 		case Texture::FRAMEBUFFER:
 			constructed_texture = new FrameBufferTexture(data);
-		break; 
+		break ; 
 		case Texture::GENERIC: 
 			constructed_texture =  new GenericTexture(data); 
 		break ; 

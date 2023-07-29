@@ -10,7 +10,8 @@ constexpr const char uniform_name_matrix_view_projection[] = "MAT_VP";
 constexpr const char uniform_name_matrix_model_view_projection[] = "MAT_MVP" ; 
 constexpr const char uniform_name_matrix_normal[] = "MAT_NORMAL" ;
 constexpr const char uniform_name_matrix_inverse_model[] = "MAT_INV_MODEL" ;
-constexpr const char uniform_name_matrix_inverse_modelview[] = "MAT_INV_MODELVIEW" ;  
+constexpr const char uniform_name_matrix_inverse_modelview[] = "MAT_INV_MODELVIEW" ; 
+constexpr const char uniform_name_cubemap_matrix_normal[] = "MAT_CUBEMAP_NORMAL"; 
 
 /**************Shader variables uniforms*********************/
 
@@ -53,13 +54,15 @@ constexpr const char uniform_name_uint_lighting_spot_number_name[] = "spot_light
 /*HDR*/
 constexpr const char uniform_name_float_gamma_name[] = "gamma"; 
 constexpr const char uniform_name_float_exposure_name[] = "exposure"; 
+
 /*Post-Processing*/
 constexpr const char uniform_name_bool_sharpen[] = "uniform_sharpen"; 
 constexpr const char uniform_name_bool_edge[] = "uniform_edge"; 
 constexpr const char uniform_name_bool_blurr[] = "uniform_blurr"; 
 
-
-
+/*PBR*/
+constexpr const char uniform_name_float_cubemap_prefilter_roughness[] = "roughness"; 
+constexpr const char uniform_name_uint_prefilter_shader_envmap_resolution[] = "envmap_resolution";  
 
 
 

@@ -29,12 +29,13 @@ Drawable::Drawable(Mesh *mesh){
 
 
 Drawable::~Drawable(){
-	delete mesh_object;  
+	
 }
 
 void Drawable::clean(){
 	gl_buffers.clean() ; 
 	mesh_object->clean(); 	
+	delete mesh_object;
 }
 
 bool Drawable::ready(){

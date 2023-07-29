@@ -257,7 +257,9 @@ void Loader::loadShaderDatabase(){
 	std::string fragment_shader_screen_fbo = loadShader("../shaders/screen_fbo.frag"); 	
 	std::string vertex_envmap_to_cubemap = loadShader("../shaders/envmap_bake.vert"); 
 	std::string fragment_envmap_to_cubemap = loadShader("../shaders/envmap_bake.frag");
-	std::string fragment_irradiance_compute = loadShader("../shaders/irradiance_baker.frag"); 
+	std::string fragment_irradiance_compute = loadShader("../shaders/irradiance_baker.frag");
+	std::string fragment_envmap_prefilter = loadShader("../shaders/envmap_prefilter.frag");
+	std::string fragment_brdf_lut_baker = loadShader("../shaders/brdf_lookup_table_baker.frag"); 
 	shader_database->addShader(vertex_shader_bouding_box , fragment_shader_bounding_box , Shader::BOUNDING_BOX);  
 	shader_database->addShader(vertex_shader , fragment_shader , Shader::BLINN) ; 
 	shader_database->addShader(vertex_shader_cubemap , fragment_shader_cubemap , Shader::CUBEMAP) ; 
@@ -265,6 +267,8 @@ void Loader::loadShaderDatabase(){
 	shader_database->addShader(vertex_shader_pbr , fragment_shader_pbr , Shader::PBR); 
 	shader_database->addShader(vertex_envmap_to_cubemap , fragment_envmap_to_cubemap , Shader::ENVMAP_CUBEMAP_CONVERTER); 
 	shader_database->addShader(vertex_envmap_to_cubemap , fragment_irradiance_compute , Shader::IRRADIANCE_CUBEMAP_COMPUTE); 
+	shader_database->addShader(vertex_envmap_to_cubemap , fragment_envmap_prefilter , Shader::ENVMAP_PREFILTER);
+	shader_database->addShader(vertex_envmap_to_cubemap , fragment_brdf_lut_baker , Shader::BRDF_LUT_BAKER);
 }
 
 
@@ -625,7 +629,7 @@ Mesh* Loader::generateCubeMap(bool is_glb){
 
 
 
-EnvironmentMapTexture* Loader::loadHdrEnvmap(){
+EnvironmentMap2DTexture* Loader::loadHdrEnvmap(){
 	TextureDatabase* texture_database = resource_database->getTextureDatabase(); 
 	std::string folder_night = "../Ressources/Skybox_Textures/HDR/Night_City/" ; 
 	std::string folder_forest = "../Ressources/Skybox_Textures/HDR/Forest/" ;
@@ -634,7 +638,7 @@ EnvironmentMapTexture* Loader::loadHdrEnvmap(){
 	std::string env = folder_night + "night_env.hdr";
 	std::string hdr = folder_night +"night.hdr";
 
-	hdr = folder_snow + "Snow.hdr" ; 
+	hdr = folder_forest + "Forest.hdr" ; 
 	TextureData envmap; 	
 	int width , height , channels ; 
 	stbi_set_flip_vertically_on_load(true); 
@@ -647,8 +651,8 @@ EnvironmentMapTexture* Loader::loadHdrEnvmap(){
 	envmap.nb_components = channels ;
 	envmap.f_data = new float[width * height * channels]; 
 	std::memcpy(envmap.f_data , hdr_data , width * height * channels * sizeof(float)); 
-	int index = texture_database->addTexture(&envmap , Texture::ENVMAP); 
-	EnvironmentMapTexture* envmap_texture = dynamic_cast<EnvironmentMapTexture*>(texture_database->get(index));
+	int index = texture_database->addTexture(&envmap , Texture::ENVMAP2D); 
+	EnvironmentMap2DTexture* envmap_texture = dynamic_cast<EnvironmentMap2DTexture*>(texture_database->get(index));
 	envmap.clean(); 
 	if(envmap_texture) 
 		return envmap_texture; 	

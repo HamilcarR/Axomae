@@ -77,9 +77,10 @@ public:
      * @brief Attach a texture to the framebuffer
      * 
      * @param target 
-     * @param texture_id 
+     * @param texture_id
+     * @param mipmap_level 
      */
-    void attachTexture2D(INTERNAL_FORMAT color_attachment , TEXTURE_TARGET target  , unsigned int texture_id) ; 
+    void attachTexture2D(INTERNAL_FORMAT color_attachment , TEXTURE_TARGET target  , unsigned int texture_id , unsigned int mipmap_level = 0) ; 
     
     /**
      * @brief Binds the framebuffer 

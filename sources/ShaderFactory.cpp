@@ -31,6 +31,12 @@ Shader* ShaderFactory::constructShader(std::string v , std::string f , Shader::T
 		case Shader::IRRADIANCE_CUBEMAP_COMPUTE:
 			constructed_shader = new IrradianceCubemapBakerShader(v , f); 
 		break ; 
+		case Shader::ENVMAP_PREFILTER:
+			constructed_shader = new EnvmapPrefilterBakerShader(v , f);
+		break ;
+		case Shader::BRDF_LUT_BAKER:
+			constructed_shader = new BRDFLookupTableBakerShader(v , f); 
+		break; 
 		default:
 			constructed_shader = nullptr ; 
 		break; 

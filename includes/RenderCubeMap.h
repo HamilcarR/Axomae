@@ -14,7 +14,7 @@ public:
     RenderCubeMap();
     RenderCubeMap(TextureDatabase* texture_database , ScreenSize* texture_size , unsigned int* default_fbo_pointer_id); 
     virtual ~RenderCubeMap(); 
-    virtual void renderToFace(unsigned face = 0 , GLFrameBuffer::INTERNAL_FORMAT color_attachment = GLFrameBuffer::COLOR0 );
+    virtual void renderToTexture(unsigned face = 0 , GLFrameBuffer::INTERNAL_FORMAT color_attachment = GLFrameBuffer::COLOR0  , unsigned mipmap_level = 0);
 
 
 protected:

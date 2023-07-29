@@ -110,6 +110,12 @@ public:
 	 */
 	TextureGroup& operator=(const TextureGroup& texture_group); 
 
+	/**
+	 * @brief This method will check if every ID references a valid texture in the database. 
+	 * If not , the ID is removed . 
+	 */
+	void synchronizeWithDatabaseState(); 
+
 public:
 	TextureDatabase* texture_database ; 	  /**<Pointer to the database texture*/
 private:

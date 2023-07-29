@@ -49,6 +49,6 @@ void main(){
 	T = MAT_NORMAL * T ; 
 	N = MAT_NORMAL * N ; 
 	B = MAT_NORMAL * B ;
-	MAT_TBN = mat3(T , B , N); 
+	MAT_TBN = mat3(T , B , N);
 	gl_Position = MAT_MVP * vec4(positions , 1.f) ; 
 }

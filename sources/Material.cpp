@@ -8,7 +8,7 @@ Material::Material(){
 	shininess = 100.f ;  
 	roughness_factor = 0.f ; 
 	transmission_factor = 0.f ; 
-	emissive_factor = 5.f ;
+	emissive_factor = 1.f ;
 	alpha_factor = 1.f ; 
 	refractive_index = glm::vec2(1.f , 1.1f) ; 
 	shader_program = nullptr; 

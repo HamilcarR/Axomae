@@ -84,7 +84,7 @@ public:
 	 * 
 	 * @return CubeMesh* 
 	 */
-	EnvironmentMapTexture* loadHdrEnvmap(); 
+	EnvironmentMap2DTexture* loadHdrEnvmap(); 
 
 	/**
 	 * @brief Loads all meshes from the GLB file. 

@@ -20,9 +20,9 @@ GLFrameBuffer::~GLFrameBuffer(){
         delete renderbuffer_object; 
 }
 
-void GLFrameBuffer::attachTexture2D(INTERNAL_FORMAT color_attachment , TEXTURE_TARGET target  , unsigned int texture_id){
+void GLFrameBuffer::attachTexture2D(INTERNAL_FORMAT color_attachment , TEXTURE_TARGET target  , unsigned int texture_id , unsigned mip_level){
     assert(texture_id != 0); 
-    glFramebufferTexture2D(GL_FRAMEBUFFER , color_attachment , target , texture_id , 0); 
+    glFramebufferTexture2D(GL_FRAMEBUFFER , color_attachment , target , texture_id , mip_level); 
 }
 
 void GLFrameBuffer::initializeBuffers(){

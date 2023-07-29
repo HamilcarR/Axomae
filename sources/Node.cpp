@@ -83,11 +83,12 @@ SceneNodeInterface* SceneTreeNode::returnRoot() {
  * 
  * @return a glm::mat4, which is a 4x4 matrix representing a transformation.
  */
-glm::mat4 SceneTreeNode::computeFinalTransformation() const {
+glm::mat4 SceneTreeNode::computeFinalTransformation() {
     if(parents.empty() || parents[0] == nullptr)
         return local_transformation;
     else
         return accumulated_transformation * local_transformation; 
+    
 }
 
 SceneTreeNode& SceneTreeNode::operator=(const SceneTreeNode& copy){
