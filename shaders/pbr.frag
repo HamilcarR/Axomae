@@ -99,7 +99,7 @@ layout(binding=13) uniform sampler2D brdf_lookup_map ;
 
 /*Constants*/
 const vec3 camera_position = vec3(0.f) ;
-const float MAX_CUBEMAP_LOD = 9.0f ; 
+const float MAX_CUBEMAP_LOD = 5.0f ; 
 const vec3 EMPTY_CONSTANT = vec3(0.000001); 
 /******************************************/
 /*Structures*/

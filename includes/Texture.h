@@ -290,7 +290,11 @@ public:
 	 */
 	virtual unsigned int getMipmapsLevel(){return mipmaps; }
 
-
+	/**
+	 * @brief Generate mip maps , and set texture filters accordingly (LINEAR_MIPMAP_LINEAR)
+	 * 
+	 */
+	virtual void generateMipmap(); 
 protected:
 
 	/**
@@ -902,6 +906,12 @@ public:
 	 * 
 	 */
 	virtual void setGlData(Shader* shader) ;
+
+	/**
+	 * @brief Generate mipmaps for the cubemap  
+	 * 
+	 */
+	virtual void generateMipmap() override;
 	
 	/**
 	 * @brief Get the texture string description

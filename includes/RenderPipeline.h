@@ -74,7 +74,7 @@ public:
      * @param gl_widget 
      * @return int Database ID of the mip mapped cubemap with roughness levels 
      */
-    int preFilterEnvmap(int cube_envmap_database_id , unsigned int width , unsigned int height , unsigned int mipmap_levels ,  GLViewer* gl_widget);
+    int preFilterEnvmap(int cube_envmap_database_id , unsigned int resolution ,  unsigned int width , unsigned int height , unsigned int mipmap_levels ,  GLViewer* gl_widget);
 
     
     int generateBRDFLookupTexture(unsigned int width , unsigned int height , GLViewer* gl_widget); 

@@ -123,6 +123,13 @@ void Texture::initializeTexture2D(){
 	setTextureParametersOptions(); 
 }
 
+void Texture::generateMipmap(){
+	bindTexture(); 
+	glGenerateMipmap(GL_TEXTURE_2D); 
+	glTexParameteri(GL_TEXTURE_2D , GL_TEXTURE_MIN_FILTER , GL_LINEAR_MIPMAP_LINEAR); 
+	unbindTexture(); 
+}
+
 void Texture::setNewSize(unsigned _width , unsigned _height){
 	width = _width ; 
 	height = _height; 
@@ -586,6 +593,13 @@ void CubeMapTexture::initializeTexture2D(){
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);  	
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	
 	
+}
+
+void CubeMapTexture::generateMipmap(){
+	bindTexture(); 
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP); 
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER , GL_LINEAR_MIPMAP_LINEAR); 
+	unbindTexture(); 
 }
 
 void CubeMapTexture::setGlData(Shader* shader){

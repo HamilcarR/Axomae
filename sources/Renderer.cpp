@@ -102,10 +102,10 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scen
 	scene->clear();	
 	Loader loader; 
 	EnvironmentMap2DTexture* env = loader.loadHdrEnvmap();  //! TODO in case we want to seek the cubemap to replace it's texture with this , use visitor pattern in scene graph 
-	CubeMapMesh* cubemap_mesh = render_pipeline->bakeEnvmapToCubemap(env , 1080 , 1080  , gl_widget);
+	CubeMapMesh* cubemap_mesh = render_pipeline->bakeEnvmapToCubemap(env , 2048 , 2048  , gl_widget);
 	int cube_envmap_id =  cubemap_mesh->material.getTextureGroup().getTextureCollection()[0] ;
 	int irradiance_tex_id = render_pipeline->bakeIrradianceCubemap(cube_envmap_id , 64 , 64 , gl_widget);
-	int prefiltered_cubemap = render_pipeline->preFilterEnvmap(cube_envmap_id , 512 , 512 , 10 , gl_widget);
+	int prefiltered_cubemap = render_pipeline->preFilterEnvmap(cube_envmap_id , 2048 , 512 , 512 , 6 , gl_widget);
 	int brdf_lut = render_pipeline->generateBRDFLookupTexture(512 , 512 , gl_widget);  
 	std::for_each(new_scene.first.begin() , new_scene.first.end() , [irradiance_tex_id , brdf_lut , prefiltered_cubemap , cube_envmap_id , cubemap_mesh](Mesh* m){
 																						m->material.addTexture(irradiance_tex_id , Texture::IRRADIANCE) ;

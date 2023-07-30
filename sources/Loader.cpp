@@ -634,11 +634,13 @@ EnvironmentMap2DTexture* Loader::loadHdrEnvmap(){
 	std::string folder_night = "../Ressources/Skybox_Textures/HDR/Night_City/" ; 
 	std::string folder_forest = "../Ressources/Skybox_Textures/HDR/Forest/" ;
 	std::string folder_park = "../Ressources/Skybox_Textures/HDR/Park/" ;
-	std::string folder_snow = "../Ressources/Skybox_Textures/HDR/Snow/" ; 
+	std::string folder_snow = "../Ressources/Skybox_Textures/HDR/Snow/" ;
+	std::string folder_sky = "../Ressources/Skybox_Textures/HDR/Sky/" ; 
+	std::string folder_street = "../Ressources/Skybox_Textures/HDR/Street/" ;  
 	std::string env = folder_night + "night_env.hdr";
 	std::string hdr = folder_night +"night.hdr";
 
-	hdr = folder_forest + "Forest.hdr" ; 
+	hdr = folder_street + "Street.hdr" ; 
 	TextureData envmap; 	
 	int width , height , channels ; 
 	stbi_set_flip_vertically_on_load(true); 

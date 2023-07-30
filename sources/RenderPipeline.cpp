@@ -77,7 +77,8 @@ CubeMapMesh* RenderPipeline::bakeEnvmapToCubemap( EnvironmentMap2DTexture *hdri_
     renderToCubemap(cube_drawable , cubemap_renderer_framebuffer , camera , tex_dim , default_dim); 
     cube_drawable.clean();
     cubemap_renderer_framebuffer.clean();
-    std::pair<int , Texture*> query_baked_cubemap_texture = texture_database->contains(cubemap_renderer_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0)); 
+    std::pair<int , Texture*> query_baked_cubemap_texture = texture_database->contains(cubemap_renderer_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
+    query_baked_cubemap_texture.second->generateMipmap(); 
     /* Mesh to be returned */
     CubeMapMesh *cubemap = new CubeMapMesh();
     cubemap->material.addTexture(query_baked_cubemap_texture.first , Texture::CUBEMAP); 
@@ -127,7 +128,7 @@ int RenderPipeline::bakeIrradianceCubemap(int cube_envmap , unsigned width , uns
 }
 /********************************************************************************************************************************************************************************************************/
 
-int RenderPipeline::preFilterEnvmap(int cube_envmap , unsigned int width , unsigned int height , unsigned int max_mip_level , GLViewer* gl_widget){
+int RenderPipeline::preFilterEnvmap(int cube_envmap , unsigned int resolution ,  unsigned int width , unsigned int height , unsigned int max_mip_level , GLViewer* gl_widget){
     std::cout << "Generating a prefiltered cubemap" << "\n"; 
     ScreenSize cubemap_dim , default_dim , resize_dim; 
     EnvmapPrefilterBakerShader* prefilter_shader = static_cast<EnvmapPrefilterBakerShader*>(resource_database->getShaderDatabase()->get(Shader::ENVMAP_PREFILTER));
@@ -147,7 +148,7 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap , unsigned int width , unsig
         float roughness = (float) i / (float) (max_mip_level - 1); 
         prefilter_shader->bind();
         prefilter_shader->setRoughnessValue(roughness);
-        prefilter_shader->setCubeEnvmapResolution(2048);
+        prefilter_shader->setCubeEnvmapResolution(resolution);
         renderToCubemap(cube_drawable , cubemap_prefilter_fbo , camera , resize_dim , default_dim , i);
     }
     cube_drawable.clean();
