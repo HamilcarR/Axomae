@@ -324,6 +324,8 @@ LIGHT_COMPONENTS computeDirectionalLightsContribBRDF(float roughness , float met
 }
 
 
+
+
 /**************************************************************************************************************/
 void main(){	
     vec3 normal = getSurfaceNormal();
@@ -335,7 +337,8 @@ void main(){
     float ambient_occlusion = mrao.r ; 
     vec4 E = computeEmissiveValue() ;
     vec4 C = computeDiffuseValue() ;
-    vec4 A = computeIrradiance(inverse(MAT_CUBEMAP_NORMAL) * normal);
+    vec3 irrad_sample_coords = inverse(MAT_CUBEMAP_NORMAL) * normal ; 
+    vec4 A = computeIrradiance(vec3(irrad_sample_coords.x , irrad_sample_coords.y , -irrad_sample_coords.z));
     vec3 albedo = pow(C.rgb, vec3(2.2)); 
     
     LIGHT_COMPONENTS point = computePointLightsContribBRDF(roughness , metallic,  albedo  );
@@ -348,7 +351,7 @@ void main(){
     Kd *= 1 - metallic ; 
     vec3 diffuse = albedo * A.rgb ;
     vec3 R = inverse(MAT_CUBEMAP_NORMAL) * reflect(-V , normal); 
-    R.z = -R.z ;   
+    R.z = -R.z ;
     vec3 R_color = textureLod(cubemap , R , roughness * MAX_CUBEMAP_LOD).rgb ;
     vec2 brdf = texture(brdf_lookup_map , vec2(max(dot(normal , V) , 0.f) , roughness)).rg ;
     vec3 specular = R_color * (F * brdf.x + brdf.y); 
