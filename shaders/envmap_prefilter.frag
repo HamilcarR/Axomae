@@ -11,8 +11,19 @@ uniform float roughness;
 uniform uint envmap_resolution;
 const float PI = 3.14159265;
 
+float HaltonSequence(uint base , uint index){
+    float result = 0.f ; 
+    float digit_weight = 1.f ; 
+    while(index > 0){
+        digit_weight = digit_weight / float(base); 
+        uint nominator = index % base ;
+        result += float(nominator) *digit_weight;
+        index = index / base ;   
+    }
+    return result ; 
+}
 
-// return uniformly spread pseudo randoms float between 0 and 1 
+// return uniformly spread , low discrepancy pseudo randoms float between 0 and 1 
 float radicalInverse(uint bits) 
 {
     bits = (bits << 16u) | (bits >> 16u);
@@ -68,14 +79,15 @@ void main(){
     vec3 R = N;
     vec3 V = R;
 
-    const uint SAMPLE_COUNT = 4096;
+    const uint SAMPLE_COUNT = 8000;
     float totalWeight = 0.0;   
     vec3 prefilteredColor = vec3(0.0);     
-    for(uint i = 0u; i < SAMPLE_COUNT; ++i)
+    for(uint i = 1u; i < SAMPLE_COUNT; ++i)
     {
         vec2 Xi = Hammersley(i, SAMPLE_COUNT);
+        //vec2 Xi = vec2(HaltonSequence(2 , i) , HaltonSequence(3 , i));
         vec3 H  = ImportanceSampleGGX(Xi, N, roughness);
-        vec3 L  = normalize(2.0 * dot(V, H) * H - V);
+        vec3 L  = reflect(-V , H);
 
         float NdotL = max(dot(N, L), 0.0);
         if(NdotL > 0.0){
