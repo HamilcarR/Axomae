@@ -146,8 +146,9 @@ public:
 	 */
 	enum TYPE : signed 
 	{
-		EMPTY = -1 ,						/**<Designate an empty , non generated texture*/ 
-		GENERIC = 0 , 						/**<A "compute and forget" texture , used to store generic data*/	
+		GENERIC_CUBE = -3 ,					/**<Generic cubemap for general purpose */
+		GENERIC = -2 , 						/**<Generic texture used for general purpose */	
+		EMPTY = -1 ,						/**<Designate an empty , non generated texture*/ 	
 		FRAMEBUFFER = 1,					/**<A texture to be rendered and displayed as a custom framebuffer , by the screen*/
 		DIFFUSE = 2 ,						/**<Diffuse texture. In case the shader used is PBR , this is the albedo*/ 
 		NORMAL = 3 , 						/**<A normal map texture. Stores normal data*/
@@ -785,14 +786,14 @@ public:
  * @brief Generic texture class definition
  * 
  */
-class GenericTexture : public Texture{
+class GenericTexture2D : public Texture{
 public:
 	
 	/**
 	 * @brief Construct a new Generic Texture object
 	 * 
 	 */
-	GenericTexture();
+	GenericTexture2D();
 	
 	/**
 	 * @brief Construct a new Generic Texture object
@@ -800,13 +801,13 @@ public:
 	 * @param data Raw texture data 
 	 * @see TextureData
 	 */
-	GenericTexture(TextureData* data);  
+	GenericTexture2D(TextureData* data);  
 	
 	/**
 	 * @brief Destroy the Generic Texture object
 	 * 
 	 */
-	virtual ~GenericTexture(); 
+	virtual ~GenericTexture2D(); 
 	
 	/**
 	 * @brief Bind the texture using glBindTexture
@@ -825,13 +826,32 @@ public:
 	 * 
 	 */
 	virtual void setGlData(Shader* shader)  ;
-	
+
+	/**
+	 * @brief Set the Texture Unit 
+	 * 
+	 * @param texture_unit 
+	 */
+	virtual void setTextureUnit(unsigned int texture_unit);
+
+	/**
+	 * @brief Set the Location Name object
+	 * 
+	 * @param name 
+	 */
+	virtual void setLocationName(std::string name);
+
 	/**
 	 * @brief Get the texture string description
 	 * 
 	 * @return C string 
 	 */
-	static const char* getTextureTypeCStr() ; 		
+	const char* getTextureTypeCStr() ; 		
+
+protected:
+	unsigned int texture_unit ; 
+	std::string location_name ; 
+
 }; 
 
 /******************************************************************************************************************************************************************************************************************/
@@ -839,14 +859,14 @@ public:
  * @brief Cubemap texture class definition
  * 
  */
-class CubeMapTexture : public Texture{
+class CubemapTexture : public Texture{
 public:
 	
 	/**
 	 * @brief Construct a new Cube Map Texture object
 	 * 
 	 */
-	CubeMapTexture(FORMAT internal_format = RGBA , FORMAT data_format = RGBA , FORMAT data_type = UBYTE , unsigned width = 0 , unsigned height = 0);
+	CubemapTexture(FORMAT internal_format = RGBA , FORMAT data_format = RGBA , FORMAT data_type = UBYTE , unsigned width = 0 , unsigned height = 0);
 	
 	/**
 	 * @brief Construct a new Cube Map Texture object
@@ -854,16 +874,15 @@ public:
 	 * @param data Texture raw data 
 	 * @see TextureData
 	 */
-	CubeMapTexture(TextureData* data);  
+	CubemapTexture(TextureData* data);  
 	
 	/**
 	 * @brief Destroy the Cube Map Texture object
 	 * 
 	 */
-	virtual ~CubeMapTexture();
+	virtual ~CubemapTexture();
 	
-	/**
-	* @brief Initialize cubemap data
+	/*
 	* 
 	* width * height is the size of one single face. The total size of the cubemap will be :
 	*
@@ -878,6 +897,10 @@ public:
  	* 	  5 x width² = BACK => GL_TEXTURE_CUBE_MAP_POSITIVE_Z
  	* 	  6 x width² = FRONT => GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 	*!Note : If TextureData == nullptr , this will instead allocate an empty cubemap . 
+	*/
+	/**
+	 * @brief Initializes the cubemap texture data
+	 * 
 	 */
 	virtual void initializeTexture2D() override; 	
 	
@@ -928,14 +951,79 @@ protected:
 	 */
 	virtual void setCubeMapTextureData(TextureData* texture);
 
-
 }; 
+
+
+/******************************************************************************************************************************************************************************************************************/
+class GenericCubemapTexture : public CubemapTexture{
+public:
+	/**
+	 * @brief Construct a new generic cube Map Texture object
+	 * 
+	 */
+	GenericCubemapTexture(FORMAT internal_format = RGBA , FORMAT data_format = RGBA , FORMAT data_type = UBYTE , unsigned width = 0 , unsigned height = 0);
+	
+	/**
+	 * @brief Construct a new Cube Map Texture object
+	 * 
+	 * @param data Texture raw data 
+	 * @see TextureData
+	 */
+	GenericCubemapTexture(TextureData* data);  
+	
+	/**
+	 * @brief Destroy the Generic Cubemap Texture object
+	 * 
+	 */
+	virtual ~GenericCubemapTexture();
+	
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
+	virtual void bindTexture()  ; 
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
+	virtual void unbindTexture() ;
+
+
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData(Shader* shader) ;
+
+	/**
+	 * @brief Get the texture string description
+	 * 
+	 * @return C string 
+	 */
+	const char* getTextureTypeCStr() ;
+
+	void setTextureUnit(unsigned int tex_unit){texture_unit = tex_unit;}
+
+	void setLocationName(std::string loc_name){location_name = loc_name;}
+
+	unsigned int getTextureUnit(){return texture_unit;}
+
+	std::string getLocationName(){return location_name;}
+	
+protected:
+	unsigned int texture_unit ; 
+	std::string location_name ; 
+
+
+};
+
 /******************************************************************************************************************************************************************************************************************/
 /**
  * @brief Irradiance texture class definition
  * 
  */
-class IrradianceTexture : public CubeMapTexture{
+class IrradianceTexture : public CubemapTexture{
 public:
 	
 	/**
