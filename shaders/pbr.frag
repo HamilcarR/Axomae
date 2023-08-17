@@ -328,7 +328,7 @@ void main(){
     vec3 V = -getViewDirection(); 
     vec4 final_computed_fragment ; 
     vec4 mrao = computeMetallicValue(); 
-    float metallic = mrao.b ; 
+    float metallic =  mrao.b ; 
     float roughness = mrao.g; 
     float ambient_occlusion = mrao.r ; 
     vec4 E = computeEmissiveValue() ;
@@ -337,39 +337,32 @@ void main(){
     vec4 A = computeIrradiance(vec3(irrad_sample_coords.x , irrad_sample_coords.y , -irrad_sample_coords.z));
     vec2 brdf = texture(brdf_lookup_map , vec2(max(dot(normal , V) , 0.f) , roughness)).rg ; 
     vec3 R = inverse(MAT_CUBEMAP_NORMAL) * reflect(-V , normal); 
-    vec3 albedo = pow(C.rgb, vec3(2.2)); 
+    R.z = -R.z ;
+    vec3 specularColor = textureLod(cubemap , R , roughness * MAX_CUBEMAP_LOD).rgb ;
+    vec3 albedo = C.rgb ; 
     vec3 F0 = vec3(0.04) ; 
-    F0 = mix(F0 , albedo , metallic); 
+    F0 = mix(F0 , albedo , metallic);  
+    vec3 diffuseColor = albedo * (1.f - F0) * (1.f - metallic); 
     LIGHT_COMPONENTS point = computePointLightsContribBRDF(roughness , metallic,  albedo , F0 );
     LIGHT_COMPONENTS spot = computeSpotLightsContribBRDF(roughness , metallic , albedo , F0 ); 
     LIGHT_COMPONENTS direct = computeDirectionalLightsContribBRDF(roughness , metallic , albedo , F0);
-    vec3 F = computeFresnelRoughness(normal , V ,metallic , albedo , roughness , F0);
-    vec3 Ks = F ; 
-    vec3 Kd = 1 - Ks ; 
-    /* 
-    * This part defines variables for multiple scattering  ,
-    * see : "A Multiple-Scattering Microfacet Model for Real-Time Image-based Lighting - Carmelo J.Fdez-Aguera" 
-    * 
-    */
+    vec3 Fr =  computeFresnelRoughness(normal , V ,metallic , albedo , roughness , F0);
+    
+    /*
+    * This part defines variables for multiple scattering  , see : "A Multiple-Scattering Microfacet Model for Real-Time Image-based Lighting - Carmelo J.Fdez-Aguera" 
+    /**************************************************************************/
     float Ems = 1 - brdf.x - brdf.y ; 
     vec3 f_avg = F0 + (1 - F0) / 21.f ;
+    vec3 Ks = F0 + Fr * pow(1.f - max(dot(normal , V) , 0.f) , 5.f) ; 
     vec3 FssEss = Ks * brdf.x + brdf.y ; 
-    vec3 FmsEms = Ems * FssEss * f_avg / (1. - f_avg * Ems); 
+    vec3 FmsEms = Ems * FssEss * f_avg / (1. - f_avg * Ems);    
+    vec3 Kd = diffuseColor * ambient_occlusion * (1 - FssEss - FmsEms);  
     /**************************************************************************/
-    Kd *= 1 - metallic ; 
-    Kd *= (1 - FssEss - FmsEms); 
-    R.z = -R.z ;
-    vec3 R_color = textureLod(cubemap , R , roughness * MAX_CUBEMAP_LOD).rgb ;
-    
-
-    vec3 specular = R_color * (F * brdf.x + brdf.y); 
-    vec3 diffuse = albedo * A.rgb ;
-    vec3 ambient = FssEss * specular + (FmsEms + Kd) * diffuse;
-    final_computed_fragment = vec4(point.radiance + spot.radiance + direct.radiance + ambient + (E.rgb * material.emissive_factor * vec3(0.1)) , 0.f) ;  
+    vec3 ibl_color = FssEss * specularColor + (FmsEms + Kd) * A.rgb;
+    final_computed_fragment = vec4(point.radiance + spot.radiance + direct.radiance + ibl_color  + (E.rgb * material.emissive_factor ) , 0.f) ;  
     float alpha = C.a < material.alpha_factor ? C.a : material.alpha_factor; 
     final_computed_fragment.a = alpha;
     fragment = final_computed_fragment;
-
 
         
 }
