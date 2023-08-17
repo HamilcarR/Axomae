@@ -217,17 +217,19 @@ public:
 
 
 public:
-	Scene *scene ; 								/**<The scene to be rendered*/ 
+	std::unique_ptr<Scene> scene ; 								/**<The scene to be rendered*/ 	
+	std::unique_ptr<RenderPipeline> render_pipeline ; 
+	std::unique_ptr<CameraFrameBuffer> camera_framebuffer ;		/**<Main framebuffer attached to the view*/ 
 	bool start_draw ; 							/**<If the renderer is ready to draw*/
 	ResourceDatabaseManager *resource_database; /**<The main database containing a texture database , and a shader database*/
 	LightingDatabase* light_database;			/**<Light database object*/ 
 	Camera *scene_camera ;						/**<Pointer on the scene camera*/
 	MouseState mouse_state ;					/**<Pointer on the MouseState structure*/
 	ScreenSize screen_size ; 					/**<Dimensions of the renderer windows*/
-	CameraFrameBuffer *camera_framebuffer ;		/**<Main framebuffer attached to the view*/ 
+	
 	unsigned int default_framebuffer_id ;		/**<In the case the GUI uses other contexts and other framebuffers , we use this variable to reset the rendering to the default framebuffer*/ 
 	GLViewer *gl_widget;
-	RenderPipeline *render_pipeline ; 
+	
 };
 
 #endif

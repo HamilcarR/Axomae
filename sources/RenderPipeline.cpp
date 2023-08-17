@@ -66,7 +66,7 @@ CubeMapMesh* RenderPipeline::bakeEnvmapToCubemap( EnvironmentMap2DTexture *hdri_
     cam_dim.height = height ; 
     tex_dim.width = width ; 
     tex_dim.height = height ;
-    FreePerspectiveCamera camera(90.f ,&cam_dim , 0.1f , 2000.f ) ; //Generic camera object 
+    FreePerspectiveCamera camera(90.f ,&cam_dim , 0.1f , 2000.f ) ; //Generic camera  
     std::pair<int , Texture*> query_envmap_result = texture_database->contains(hdri_map); 
     int database_id_envmap = query_envmap_result.first; 
     if(query_envmap_result.second == nullptr)
@@ -78,9 +78,10 @@ CubeMapMesh* RenderPipeline::bakeEnvmapToCubemap( EnvironmentMap2DTexture *hdri_
     cube_drawable.clean();
     cubemap_renderer_framebuffer.clean();
     std::pair<int , Texture*> query_baked_cubemap_texture = texture_database->contains(cubemap_renderer_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
-    query_baked_cubemap_texture.second->generateMipmap(); 
+   // query_baked_cubemap_texture.second->generateMipmap(); 
     /* Mesh to be returned */
     CubeMapMesh *cubemap = new CubeMapMesh();
+    query_baked_cubemap_texture.second->generateMipmap();
     cubemap->material.addTexture(query_baked_cubemap_texture.first , Texture::CUBEMAP); 
     cubemap->setShader(shader_database->get(Shader::CUBEMAP));
     errorCheck(__FILE__ , __LINE__);
@@ -104,7 +105,7 @@ CubeMapMesh* RenderPipeline::bakeEnvmapToCubemap( EnvironmentMap2DTexture *hdri_
  * @return an integer value, which is the database ID of the baked irradiance cubemap texture.
  */
 int RenderPipeline::bakeIrradianceCubemap(int cube_envmap , unsigned width , unsigned height , GLViewer* gl_widget){
-    std::cout << "Generating an irradiance cubemap" << "\n"; 
+    std::cout << "Generating an irradiance cubemap" << "\n";
     ScreenSize irrad_dim , cam_dim , default_dim ;
     TextureDatabase *texture_database = resource_database->getTextureDatabase();
     ShaderDatabase *shader_database = resource_database->getShaderDatabase();
@@ -128,7 +129,7 @@ int RenderPipeline::bakeIrradianceCubemap(int cube_envmap , unsigned width , uns
 }
 /********************************************************************************************************************************************************************************************************/
 
-int RenderPipeline::preFilterEnvmap(int cube_envmap , unsigned int resolution ,  unsigned int width , unsigned int height , unsigned int max_mip_level , GLViewer* gl_widget){
+int RenderPipeline::preFilterEnvmap(int cube_envmap , unsigned int resolution ,  unsigned int width , unsigned int height , unsigned int max_mip_level , unsigned int base_sample_count, unsigned int factor_per_mip, GLViewer* gl_widget){
     std::cout << "Generating a prefiltered cubemap" << "\n"; 
     ScreenSize cubemap_dim , default_dim , resize_dim; 
     EnvmapPrefilterBakerShader* prefilter_shader = static_cast<EnvmapPrefilterBakerShader*>(resource_database->getShaderDatabase()->get(Shader::ENVMAP_PREFILTER));
@@ -140,18 +141,34 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap , unsigned int resolution , 
     default_dim.height = gl_widget->height();  
     FreePerspectiveCamera camera(90.f , &cubemap_dim , 0.1f , 2000.f); 
     RenderCubeMap cubemap_prefilter_fbo = constructCubemapFbo(&resize_dim , false , GLFrameBuffer::COLOR0 , Texture::RGB32F , Texture::RGB , Texture::FLOAT , Texture::CUBEMAP , prefilter_shader , max_mip_level); 
-    Drawable cube_drawable = constructCube(prefilter_shader , cube_envmap , Texture::CUBEMAP , &camera); 
+    Drawable cube_drawable = constructCube(prefilter_shader , cube_envmap , Texture::CUBEMAP , &camera);
+    cubemap_prefilter_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0)->generateMipmap(); 
+    cubemap_prefilter_fbo.bindFrameBuffer();
+    cube_drawable.startDraw();  
+    cube_drawable.bind();  
     for(unsigned i = 0 ; i < max_mip_level ; i++){
         resize_dim.width = cubemap_dim.width / std::pow(2.f , i); 
         resize_dim.height = cubemap_dim.height / std::pow(2.f , i); 
         cubemap_prefilter_fbo.resize();
         float roughness = (float) i / (float) (max_mip_level - 1); 
-        prefilter_shader->bind();
         prefilter_shader->setRoughnessValue(roughness);
-        prefilter_shader->setCubeEnvmapResolution(resolution);
-        renderToCubemap(cube_drawable , cubemap_prefilter_fbo , camera , resize_dim , default_dim , i);
+        prefilter_shader->setSamplesCount(base_sample_count * i * factor_per_mip); 
+        prefilter_shader->setCubeEnvmapResolution(resolution); 
+        glViewport(0 , 0 , resize_dim.width , resize_dim.height);  
+        for(unsigned k = 0 ; k < 6 ; k++){    
+            camera.setView(views[k]); 
+            prefilter_shader->setAllMatricesUniforms(glm::mat4(1.f)); 
+            cubemap_prefilter_fbo.renderToTexture(k , GLFrameBuffer::COLOR0 , i);         
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    
+            glDrawElements(GL_TRIANGLES , cube_drawable.getMeshPointer()->geometry.indices.size() , GL_UNSIGNED_INT , 0 );   
+            glFinish(); 
+        }
     }
+
+    glViewport(0 , 0 , default_dim.width , default_dim.height); 
+    cube_drawable.unbind();     
     cube_drawable.clean();
+    cubemap_prefilter_fbo.unbindFrameBuffer(); 
     cubemap_prefilter_fbo.clean(); 
     std::pair<int , Texture*> query_prefiltered_cubemap_texture = texture_database->contains(cubemap_prefilter_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
     errorCheck(__FILE__ , __LINE__);

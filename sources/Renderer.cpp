@@ -31,10 +31,10 @@ Renderer::Renderer(unsigned width , unsigned height , GLViewer* widget):Renderer
 }
 
 Renderer::~Renderer(){
-	if(scene != nullptr){
-		scene->clear(); 
-		delete scene ; 
-	}
+	camera_framebuffer->clean();
+	scene->clear(); 
+	render_pipeline->clean();
+	
 	if(resource_database){
 		resource_database->purge();
 		resource_database->destroyInstance(); 
@@ -43,16 +43,8 @@ Renderer::~Renderer(){
 		light_database->clearDatabase(); 
 		delete light_database;
 	}
-	if(camera_framebuffer){
-		camera_framebuffer->clean();
-		delete camera_framebuffer; 
-		camera_framebuffer = nullptr;  
-	}
-	if(render_pipeline){
-		render_pipeline->clean();
-		delete render_pipeline;
-		render_pipeline = nullptr ;
-	}
+		
+	
 	delete scene_camera ; 
 	scene_camera = nullptr ; 
 }
@@ -61,10 +53,12 @@ void Renderer::initialize(){
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); 		
 	resource_database->getShaderDatabase()->initializeShaders(); 		
-	camera_framebuffer = new CameraFrameBuffer(resource_database->getTextureDatabase() , resource_database->getShaderDatabase() , &screen_size , &default_framebuffer_id);  
+	camera_framebuffer = std::make_unique<CameraFrameBuffer>(resource_database->getTextureDatabase() , resource_database->getShaderDatabase() , &screen_size , &default_framebuffer_id);  
+	render_pipeline = std::make_unique<RenderPipeline>(this , resource_database); 
+	scene = std::make_unique<Scene>(); 
 	camera_framebuffer->initializeFrameBuffer(); 	
-	scene = new Scene(); 
-	render_pipeline = new RenderPipeline(this , resource_database); 
+	
+	
 }
 
 bool Renderer::scene_ready(){
@@ -105,7 +99,7 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scen
 	CubeMapMesh* cubemap_mesh = render_pipeline->bakeEnvmapToCubemap(env , 2048 , 2048  , gl_widget);
 	int cube_envmap_id =  cubemap_mesh->material.getTextureGroup().getTextureCollection()[0] ;
 	int irradiance_tex_id = render_pipeline->bakeIrradianceCubemap(cube_envmap_id , 64 , 64 , gl_widget);
-	int prefiltered_cubemap = render_pipeline->preFilterEnvmap(cube_envmap_id , 2048 , 512 , 512 , 6 , gl_widget);
+	int prefiltered_cubemap = render_pipeline->preFilterEnvmap(cube_envmap_id , 2048 , 512 , 512 , 10 , 10000 , 2 , gl_widget);
 	int brdf_lut = render_pipeline->generateBRDFLookupTexture(512 , 512 , gl_widget);  
 	std::for_each(new_scene.first.begin() , new_scene.first.end() , [irradiance_tex_id , brdf_lut , prefiltered_cubemap , cube_envmap_id , cubemap_mesh](Mesh* m){
 																						m->material.addTexture(irradiance_tex_id , Texture::IRRADIANCE) ;

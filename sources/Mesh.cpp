@@ -75,7 +75,7 @@ void Mesh::preRenderSetup(){
 	setDepthFunc(LESS);
 	glPolygonMode(GL_FRONT_AND_BACK , polygon_mode); 
 	depth_mask_enabled = true ;
-	glm::mat4 model_mat = computeFinalTransformation(); //!This causes the trouble in PBR reflection ? 
+	glm::mat4 model_mat = computeFinalTransformation();  
 	modelview_matrix = camera->getView() * model_mat ;
 	if(shader_program){	
 		shader_program->setSceneCameraPointer(camera); 
