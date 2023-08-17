@@ -9,6 +9,7 @@ in vec3 vertex_fragment_fragment_position;
 
 uniform float roughness; 
 uniform uint envmap_resolution;
+uniform uint samples_count;  
 const float PI = 3.14159265;
 
 float HaltonSequence(uint base , uint index){
@@ -36,6 +37,9 @@ float radicalInverse(uint bits)
 
 vec2 Hammersley(uint i , uint N){
     return vec2(float(i) / float(N) , radicalInverse(i)); 
+}
+vec2 pseudo_rand(uint i , uint N){
+    return vec2(float(i) / float(N) , fract(sin(dot(vec2(i , N) ,vec2(12.9898,78.233))) * 43758.5453));
 }
 
 float DistributionGGX(vec3 N, vec3 H, float r)
@@ -74,39 +78,50 @@ vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float r)
 } 
 
 
+vec3 averageSample(vec3 L , float step_s , float mipLevel){
+    vec3 col = vec3(0.f); 
+    for(int i = -1 ; i <= 1 ; i++)
+        for(int j = -1 ; j <= 1 ; j++)
+            for(int k = -1 ; k <= 1 ; k++)
+                col += textureLod(cubemap , L + vec3(i*step_s , j * step_s , k * step_s) , mipLevel).rgb ; 
+    return col / 9.f; 
+}
+
+
+
 void main(){
     vec3 N = normalize(vertex_fragment_fragment_position);    
     vec3 R = N;
     vec3 V = R;
 
-    const uint SAMPLE_COUNT = 8000;
     float totalWeight = 0.0;   
     vec3 prefilteredColor = vec3(0.0);     
-    for(uint i = 1u; i < SAMPLE_COUNT; ++i)
-    {
-        vec2 Xi = Hammersley(i, SAMPLE_COUNT);
-        //vec2 Xi = vec2(HaltonSequence(2 , i) , HaltonSequence(3 , i));
-        vec3 H  = ImportanceSampleGGX(Xi, N, roughness);
-        vec3 L  = reflect(-V , H);
+    
+    if(roughness == 0)
+        prefilteredColor = textureLod(cubemap , N , 0).rgb ; 
+    else{
+        float resolution = float(envmap_resolution); // resolution of source cubemap (per face)
+        float saTexel  = 4.0 * PI / (6.0 * resolution * resolution);
+        for(uint i = 0; i < samples_count; ++i){
+            vec2 Xi = Hammersley(i, samples_count);
+            vec3 H  = ImportanceSampleGGX(Xi, N, roughness);
+            vec3 L  = reflect(-V , H);
 
-        float NdotL = max(dot(N, L), 0.0);
-        if(NdotL > 0.0){
-            // sample from the environment's mip level based on roughness/pdf
-            float D   = DistributionGGX(N, H, roughness);
-            float NdotH = max(dot(N, H), 0.0);
-            float HdotV = max(dot(H, V), 0.0);
-            float pdf = D * NdotH / (4.0 * HdotV) + 0.0001; 
-
-            float resolution = float(envmap_resolution); // resolution of source cubemap (per face)
-            float saTexel  = 4.0 * PI / (6.0 * resolution * resolution);
-            float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
-
-            float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel); 
-            
-            prefilteredColor += textureLod(cubemap, L, mipLevel).rgb * NdotL;
-            totalWeight      += NdotL;
+            float NdotL = max(dot(N, L), 0.0);
+            if(NdotL > 0.0){
+                // sample from the environment's mip level based on roughness/pdf
+                float D   = DistributionGGX(N, H, roughness);
+                float NdotH = max(dot(N, H), 0.0);
+                float HdotV = max(dot(H, V), 0.0);
+                float pdf = D * NdotH / (4.0 * HdotV) + 0.0001; 
+                
+                float saSample = 1.0 / (float(samples_count) * pdf + 0.0001);
+                float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel); 
+                prefilteredColor += textureLod(cubemap, L , mipLevel).rgb * NdotL;
+                totalWeight      += NdotL;
+            }
         }
+        prefilteredColor = prefilteredColor / totalWeight;
     }
-    prefilteredColor = prefilteredColor / totalWeight;
     fragment=vec4(prefilteredColor , 1.f); 
 }
