@@ -1,11 +1,7 @@
 #ifndef KERNEL_CUH
 #define KERNEL_CUH
+#include "Includes.cuh"
 #include <SDL2/SDL_surface.h>
-#include "../includes/constants.h"
-#include <cuda.h>
-#include <cuda_device_runtime_api.h>
-#include <cuda_runtime_api.h>
-#include <device_launch_parameters.h>
 #include <cstdint>
 #include <stdio.h>
 #include <iostream>
@@ -106,65 +102,40 @@ const int prewitt_mask_horizontal[KERNEL_SIZE][KERNEL_SIZE] = {
 			{ -1,0,1 }
 };
 
- __host__ __device__
-static float magnitude(float x, float y) {return sqrtf(x*x + y*y);}
+
+/*convolution kernels*******************************/
 
 
-template<typename U , typename  T> 
- __host__ __device__
-static T normalize(U maxx, U minn, T pixel) {
-	assert(maxx - minn != 0);
-	return ((pixel - minn) * 255 / (maxx - minn) + 0);
-}
+struct max_colors {
 
-/*we add linear interpolation to compute smoother normals differences*/
+	uint8_t  max_rgb[3];
+	uint8_t  min_rgb[3];
 
-template<typename T, typename D> 
- __host__ __device__
-	 auto lerp(T value1, T value2, D cste) {
-		return (1 - cste) * value1 + cste * value2;
+	__device__
+		void init() {
+		for (int i = 0; i < 3; i++) {
+			max_rgb[i] = 0; 
+			min_rgb[i] = 255; 
+		}
+	}
+	__device__
+		void compare_max(uint8_t r, uint8_t g, uint8_t b) {
+		max_rgb[0] = max_rgb[0] >= r ? max_rgb[0] : r;
+		max_rgb[1] = max_rgb[1] >= g ? max_rgb[1] : g;
+		max_rgb[2] = max_rgb[2] >= b ? max_rgb[2] : b;
+
+	}
+	__device__
+		void compare_min(uint8_t r, uint8_t g, uint8_t b) {
+		min_rgb[0] = min_rgb[0] < r ? min_rgb[0] : r;
+		min_rgb[1] = min_rgb[1] < g ? min_rgb[1] : g;
+		min_rgb[2] = min_rgb[2] < b ? min_rgb[2] : b;
 	}
 
 
-
-
-	/*convolution kernels*******************************/
-
-
-	struct max_colors {
-
-		uint8_t  max_rgb[3];
-		uint8_t  min_rgb[3];
-
-		__device__
-			void init() {
-			for (int i = 0; i < 3; i++) {
-				max_rgb[i] = 0; 
-				min_rgb[i] = 255; 
-			}
-		}
-		__device__
-			void compare_max(uint8_t r, uint8_t g, uint8_t b) {
-			max_rgb[0] = max_rgb[0] >= r ? max_rgb[0] : r;
-			max_rgb[1] = max_rgb[1] >= g ? max_rgb[1] : g;
-			max_rgb[2] = max_rgb[2] >= b ? max_rgb[2] : b;
-
-		}
-		__device__
-			void compare_min(uint8_t r, uint8_t g, uint8_t b) {
-			min_rgb[0] = min_rgb[0] < r ? min_rgb[0] : r;
-			min_rgb[1] = min_rgb[1] < g ? min_rgb[1] : g;
-			min_rgb[2] = min_rgb[2] < b ? min_rgb[2] : b;
-		}
-
-	
-	};
-	
-
-
+};
 
 /**************************************************/
-
 inline void write_file_arrays(void* host_array, int size_w, int size_h, int bpp, int pitch, std::string T) {
 	std::ofstream file;
 	file.open(T.c_str(), std::ios::out | std::ios::ate | std::ios::trunc);
@@ -181,15 +152,6 @@ void GPU_compute_greyscale(SDL_Surface* image, const bool luminance);
 void GPU_compute_height(SDL_Surface* image, uint8_t convolution_flag, uint8_t border_behaviour);
 
 void GPU_compute_normal(SDL_Surface* image, double factor, uint8_t border_behaviour); 
-
-
-
-
-
-
-
-
-
 
 
 }

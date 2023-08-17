@@ -13,7 +13,10 @@ public:
         node_count = 0 ; 
         leaf_count = 0 ; 
     }
-    virtual ~SceneTreeBuilder(){}
+
+    virtual ~SceneTreeBuilder(){
+
+    }
 
     void buildSceneTree(unsigned int depth , unsigned int max_degree){
         SceneNodeInterface *root = SceneNodeBuilder::buildEmptyNode(nullptr);
@@ -25,19 +28,28 @@ public:
         tree.updateOwner();
     }
 
-    SceneTree* getTreePointer(){return &tree;}
+    SceneTree* getTreePointer(){
+        return &tree;
+    }
 
-    unsigned getLeafCount(){return leaf_count;}
+    unsigned getLeafCount(){
+        return leaf_count;
+    }
 
-    unsigned getNodeCount(){return node_count; }
-    
-    void clean(){tree.clear(); }
+    unsigned getNodeCount(){
+        return node_count; 
+    }
+
+    void clean(){
+        tree.clear(); 
+    }
 
     std::vector<SceneNodeInterface*> findByName(const std::string& name){
         std::vector<SceneNodeInterface*> names; 
         findByNameRecursive(tree.getRootNode(), name , names);
         return names; 
     }
+
 private:
 
     void findByNameRecursive(SceneNodeInterface* node, const std::string& name , std::vector<SceneNodeInterface*> &collection){
