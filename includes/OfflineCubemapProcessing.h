@@ -41,9 +41,9 @@ public:
     /**
      * @brief Construct a texture from an envmap double HDR with 3 channels 
      * 
-     * @param _data 
-     * @param _width 
-     * @param _height 
+     * @param _data Float data of the HDR texture. 
+     * @param _width Pixel width size . 
+     * @param _height Pixel height size . 
      */
     EnvmapProcessing(const T *_data , const unsigned _width , const unsigned _height , const unsigned int num_channels = 3)  {
 
@@ -62,14 +62,20 @@ public:
      * @brief Destroy the Envmap Processing object
      * 
      */
-    virtual ~EnvmapProcessing(){
-    }
+    virtual ~EnvmapProcessing(){}
 
-    const std::vector<glm::vec3>& getData(){return data;}
+    /**
+     * @brief Returns the stored texture.
+     * 
+     * @return const std::vector<glm::vec3>& 
+     */
+    const std::vector<glm::vec3>& getData(){
+        return data;
+    }
 
     
     /**
-     * @brief 
+     * @brief Computes Specular Prefiltered envmap  
      * 
      * @param roughness 
      * @return TextureData 
@@ -92,11 +98,11 @@ public:
     } 
 
     /**
-     * @brief Get the Pixel Coords From Uv object
+     * @brief UV to pixel conversion. 
      * 
-     * @tparam D 
-     * @param u 
-     * @param v 
+     * @tparam D Type of UV coordinates.
+     * @param u Width uv coordinates.
+     * @param v Height uv coordinates.
      * @return const glm::dvec2 
      */
     template<class D>
@@ -130,10 +136,6 @@ public:
         return glm::dvec2(u_double_p , v_double_p); 
     }       
 
-
-    //! try with no wraps
-
-
     /**
      * @brief Normalizes a set of pixel coordinates into texture bounds. 
      *       
@@ -161,13 +163,13 @@ public:
     }
 
    /**
-    * @brief 
+    * @brief Computes the linear interpolation of a point based on 4 of it's neighbours. 
     * 
-    * @param top_left 
-    * @param top_right 
-    * @param bottom_left 
-    * @param bottom_right 
-    * @param point 
+    * @param top_left Top left pixel . 
+    * @param top_right Top right pixel . 
+    * @param bottom_left Bottom left pixel . 
+    * @param bottom_right Bottom right pixel .
+    * @param point Coordinates of the point being computed. 
     * @return * const T 
     */
     const glm::dvec3 bilinearInterpolate(const glm::dvec2 top_left , const glm::dvec2 top_right , const glm::dvec2 bottom_left , const glm::dvec2 bottom_right , const glm::dvec2 point) const {
@@ -180,10 +182,10 @@ public:
 
 
     /**
-     * @brief 
+     * @brief Sample the original texture using pixel coordinates. 
      * 
-     * @param x 
-     * @param y 
+     * @param x Width in pixels.
+     * @param y Height in pixels.
      * @return const T 
      */
     inline const glm::dvec3 discreteSample(int x , int y) const{
@@ -192,11 +194,7 @@ public:
         return texel_value ; 
     }
 
-    template<class D>
-    inline bool isPixel(const D x , const D y) const {
-        return std::floor(x) == x && std::floor(y) == y ;  
-    }
-
+    
     /**
      * @brief This method samples a value from the equirectangular envmap 
      *! Note : In case the coordinates go beyond the bounds of the texture , we wrap around .
@@ -218,8 +216,17 @@ public:
         return texel_value ; 
     } 
 
-
-
+    /**
+     * @brief Computes the value of the diffuse irradiance on a part of the texture.  Used with threads . 
+     * 
+     * @tparam D Type of the delta step .  
+     * @param delta Size of the hemisphere sampling steps , or number of samples if using importance sampling + low discrep rand generators . 
+     * @param f_data Original texture.
+     * @param width_begin X_min of the computation . 
+     * @param width_end X_max of the computation . 
+     * @param height Height of the original texture . 
+     * @param use_importance_sampling True if using importance sampling.
+     */
     template<typename D > 
     void launchAsyncDiffuseIrradianceCompute(const D delta , 
                                             float *f_data , 
@@ -319,10 +326,17 @@ public:
                 }
         return  irradiance * glm::pi<double>() / static_cast<double>(samples) ; 
     } 
-    
 
-    
-
+    /**
+     * @brief Returns the irradiance value at a specific position of the texture using importance sampling. 
+     * 
+     * @tparam D Data type of the coordinates 
+     * @param x Cartesian X
+     * @param y Cartesian Y 
+     * @param z Cartesian Z
+     * @param total_samples Total number of samples. 
+     * @return const glm::dvec3 Irradiance value texel 
+     */
     template<class D , class E>
     inline const glm::dvec3 computeIrradianceImportanceSampling(const D x , const D y , const D z , const E total_samples) const { //! use importance sampling ?
         unsigned int samples = 0 ;
@@ -348,7 +362,6 @@ public:
         }
         return irradiance  / static_cast<double>(total_samples) ; 
     } 
-
 
 protected:
     std::vector<glm::vec3> data ;

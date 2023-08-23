@@ -108,21 +108,3 @@ TEST(EnvmapComputation , uvCartesianCohesion){
 }
 
 
-TEST(EnvmapComputation , computeDiffuseIrradiance){
-	std::string image = "test4.hdr" ;
-    int width = 2 ; 
-    int height = 2 ;
-    int channels = 3 ; 
-    float *hdr_data = stbi_loadf( image.c_str() , &width , &height , &channels , 0); 
-    if(stbi_failure_reason())
-		std::cout << stbi_failure_reason() << "\n";
-    float float_data[] = {
-        1.f , 1.f , 1.f   ,   0.f , 0.f , 1.f    ,   1.f , 0.f , 1.f ,  
-        1.f , 0.f , 0.f   ,   0.f , 1.f , 0.f    ,   0.f , 0.f , 0.f  
-    };
-    EnvmapProcessing process(hdr_data , (unsigned) width , (unsigned) height);
-    auto tex = process.computeDiffuseIrradiance(0.01f , false); 
-    stbi_write_hdr("response.hdr" , width , height , 3 , tex->f_data); 
-    tex->clean(); 
-}
-
