@@ -3,9 +3,12 @@
 #include "Texture.h"
 #include "Mutex.h"
 #include "../kernels/CubemapProcessing.cuh"
+#include "GenericException.h"
+#include "PerformanceLogger.h"
+#include <immintrin.h>
 #include <sstream>
 #include <fstream>
-#include "GenericException.h"
+
 
 constexpr long double epsilon = 1e-6; 
 constexpr glm::dvec3 RED = glm::dvec3(1. , 0 , 0); 
@@ -235,7 +238,8 @@ public:
                                             const unsigned height , 
                                             const bool use_importance_sampling) const 
     {
-
+        PerformanceLogger log ; 
+        log.startTimer(); 
         for(unsigned i = width_begin ; i <= width_end ; i++){
             for(unsigned j = 0 ; j < height ; j++){
                 glm::dvec2 uv = getUvFromPixelCoords(i , j);
@@ -252,7 +256,9 @@ public:
                 f_data[index + 1] = static_cast<float>(irrad.y) ;  
                 f_data[index + 2] = static_cast<float>(irrad.z) ; 
             }
-        } 
+        }
+        log.endTimer() ; 
+        log.print(); 
     }
 
 
@@ -280,19 +286,23 @@ public:
         std::vector<std::shared_future<void>> futures ; 
         for(unsigned i = 1 ; i <= MAX_THREADS ; i++){
             unsigned int width_max = (width/MAX_THREADS) * i  , width_min = width_max - (width / MAX_THREADS) ;  
-            if(i == MAX_THREADS)
+            if(i == MAX_THREADS){
                 width_max += width % MAX_THREADS - 1 ;
-            auto lambda = [this , &envmap_tex_data](const D delta , const unsigned width_min , const unsigned width_max , const unsigned height , bool use_importance_sampling){
-                this->launchAsyncDiffuseIrradianceCompute(delta , envmap_tex_data.f_data , width_min , width_max , height ,  use_importance_sampling);
-            };
-            futures.push_back(std::async(std::launch::async , lambda , delta , width_min , width_max , height , use_importance_sampling )); 
-            
+                launchAsyncDiffuseIrradianceCompute(delta , envmap_tex_data.f_data , width_min , width_max , height ,  use_importance_sampling);
+            }
+            else{
+                auto lambda = [this , &envmap_tex_data](const D delta , const unsigned width_min , const unsigned width_max , const unsigned height , bool use_importance_sampling){
+                    this->launchAsyncDiffuseIrradianceCompute(delta , envmap_tex_data.f_data , width_min , width_max , height ,  use_importance_sampling);
+                };
+                futures.push_back(std::async(std::launch::async , lambda , delta , width_min , width_max , height , use_importance_sampling )); 
+            }
         }
         for(auto it = futures.begin() ; it != futures.end() ; it++){
             it->get();
         }
         return std::make_unique<TextureData>(envmap_tex_data);
     } 
+
 
     /**
      * @brief Returns the irradiance value at a specific position of the texture , in accordance to it's computed hemisphere. 
@@ -327,6 +337,19 @@ public:
         return  irradiance * glm::pi<double>() / static_cast<double>(samples) ; 
     } 
 
+
+    template<class D>
+    inline glm::dvec3 computeIrradianceSingleTexel(const unsigned x ,const unsigned y ,const unsigned samples , const D tangent , const D bitangent , const D normal) const {
+        glm::dvec3 random = gpgpu_math::pgc3d((unsigned) x , (unsigned) y , samples);  
+        double phi = 2 * PI * random.x ; 
+        double theta = asin(sqrt(random.y));
+        glm::dvec3 uv_cart = gpgpu_math::sphericalToCartesian(phi , theta) ;
+        uv_cart = uv_cart.x * tangent + uv_cart.y * bitangent + uv_cart.z * normal ; 
+        auto spherical = gpgpu_math::cartesianToSpherical(uv_cart.x , uv_cart.y , uv_cart.z);
+        glm::dvec2 uvt = gpgpu_math::sphericalToUv(spherical.x , spherical.y);
+        return uvSample(uvt.x , uvt.y);  
+    }
+
     /**
      * @brief Returns the irradiance value at a specific position of the texture using importance sampling. 
      * 
@@ -338,7 +361,7 @@ public:
      * @return const glm::dvec3 Irradiance value texel 
      */
     template<class D , class E>
-    inline const glm::dvec3 computeIrradianceImportanceSampling(const D x , const D y , const D z , const E total_samples) const { //! use importance sampling ?
+    inline const glm::dvec3 computeIrradianceImportanceSampling(const D x , const D y , const D z , const E total_samples) const { 
         unsigned int samples = 0 ;
         glm::dvec3 irradiance = glm::dvec3(0.f); 
         glm::dvec3 normal(x , y , z);
@@ -349,16 +372,9 @@ public:
         glm::dvec3 tangent = glm::dvec3(0.0, 1.0, 0.0);
         if(1.0 - abs(dd) > 1e-6) 
             tangent = glm::normalize(glm::cross(someVec, normal));
-        glm::dvec3 bitangent = glm::cross(normal, tangent);
+        glm::dvec3 bitangent = glm::cross(normal, tangent); 
         for(samples = 0 ; samples < total_samples ; samples ++){ 
-            glm::dvec3 random = gpgpu_math::pgc3d((unsigned) pix.x , (unsigned) pix.y , samples);  
-            double phi = 2 * PI * random.x ; 
-            double theta = asin(sqrt(random.y));
-            glm::dvec3 uv_cart = gpgpu_math::sphericalToCartesian(phi , theta) ;
-            uv_cart = uv_cart.x * tangent + uv_cart.y * bitangent + uv_cart.z * normal ; 
-            auto spherical = gpgpu_math::cartesianToSpherical(uv_cart.x , uv_cart.y , uv_cart.z);
-            glm::dvec2 uvt = gpgpu_math::sphericalToUv(spherical.x , spherical.y); 
-            irradiance += uvSample(uvt.x , uvt.y)  ; 
+            irradiance += computeIrradianceSingleTexel((unsigned) pix.x , (unsigned) pix.y , samples  , tangent , bitangent , normal); 
         }
         return irradiance  / static_cast<double>(total_samples) ; 
     } 
