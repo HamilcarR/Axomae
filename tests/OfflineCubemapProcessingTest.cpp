@@ -60,30 +60,25 @@ public:
     }
 };
 
-
-
-
-/*
 TEST(EnvmapComputation , WrapPixelCoords){
-    TextureBuilder<float> builder(100 , 100); 
+    TextureBuilder<float> builder(128 , 256);
     EnvmapProcessing process(builder.getData().data , builder.getData().width , builder.getData().height); 
     std::vector<std::pair<glm::dvec2 , glm::dvec2>> test_cases ={
         std::pair(glm::dvec2(0 , 0) , glm::dvec2(0 , 0)) , 
-        std::pair(glm::dvec2(100 , 100) , glm::dvec2(0 , 0)), 
-        std::pair(glm::dvec2(101 , 0) , glm::dvec2(1 , 0)) , 
-        std::pair(glm::dvec2(101 , -101) , glm::dvec2(1 , 99))
+        std::pair(glm::dvec2(128 , 256) , glm::dvec2(0 , 0)), 
+        std::pair(glm::dvec2(129 , 0) , glm::dvec2(1 , 0)) , 
+        std::pair(glm::dvec2(129 , -257) , glm::dvec2(1 , 255))
     };
     for(auto A : test_cases){
         glm::dvec2 case_test = A.first ; 
         glm::dvec2 expected_result = A.second ;
-        glm::dvec2 wrap_result = process.wrapAroundPixelCoords(case_test.x , case_test.y); 
+        glm::dvec2 wrap_result = process.wrapAroundPixelCoords(case_test.x , case_test.y);
         EXPECT_EQ(wrap_result , expected_result); 
     }
 }
 
-
 TEST(EnvmapComputation , discreteSample){
-    TextureBuilder<float> builder(10 , 10 , false , 1.f) ; 
+    TextureBuilder<float> builder(16 , 16 , false , 1.f) ; 
     EnvmapProcessing process(builder.getData().data , builder.getData().width, builder.getData().height); 
     for(unsigned i = 0 ; i < builder.width ; i++)
         for(unsigned j = 0 ; j < builder.height ; j++){
@@ -92,42 +87,42 @@ TEST(EnvmapComputation , discreteSample){
         }
 }
 
-TEST(EnvmapComputation , uvSample){
-    std::vector<float> array = {
-        -0.7f  , 0.3f , 0.9f,  0.7f , 0.2f , 0.1f ,
-        -0.3f , 0.1f , 0.5f , 0.1f , 0.2f , 0.3f 
-    };
-    EnvmapProcessing process(array.data() , 2 , 2);
-    EXPECT_EQ(process.uvSample(0.f , 0.f) , glm::dvec3(-0.7f , 0.3f , 0.9f));
-    EXPECT_EQ(process.uvSample(1.f , 0.f) , glm::dvec3(-0.3f , 0.1f , 0.5f)); 
-    EXPECT_EQ(process.uvSample(0.f , 1.f) , glm::dvec3(0.7f , 0.2f , 0.1f)); 
-    EXPECT_EQ(process.uvSample(1.f , 1.f) , glm::dvec3(0.1f , 0.2f , 0.3f));
-}
-
 TEST(EnvmapComputation , uvSphericalCohesion){
     RandomVecBuilder<glm::dvec2> builder;
-    for(unsigned i = 0 ; i < 10 ; i ++){
+    for(unsigned i = 0 ; i < 100 ; i ++){
         glm::dvec2 uv = builder.generate(); 
         glm::dvec2 sph = gpgpu_math::uvToSpherical(uv); 
         glm::dvec2 test = gpgpu_math::sphericalToUv(sph);
-        std::cout << "UV : (" << uv.x << " , " << uv.y << ")   Test:(" <<test.x << " , " << test.y << ")\n"; 
-        std::cout << (test == uv ? "Equals" : "Not Equals") << "\n" ; 
-        EXPECT_EQ(test , uv);
+        EXPECT_LE(glm::length(test - uv) , epsilon);
     } 
 }
 
-*/
+TEST(EnvmapComputation , uvCartesianCohesion){
+    RandomVecBuilder<glm::dvec2> builder ; 
+    for(unsigned i = 0 ; i < 100 ; i++){
+        glm::dvec2 sph = builder.generate(); 
+        glm::dvec3 cart = gpgpu_math::sphericalToCartesian(sph); 
+        glm::dvec2 test = gpgpu_math::cartesianToSpherical(cart) ;
+        EXPECT_LE(glm::length(test-sph) , epsilon); 
+    }
+}
+
+
 TEST(EnvmapComputation , computeDiffuseIrradiance){
-	std::string image = "test3.hdr" ;
-    int width = 0 ; 
-    int height = 0 ;
-    int channels = 0 ;  
-    float *hdr_data = stbi_loadf( image.c_str() , &width , &height , &channels , 0);
+	std::string image = "test4.hdr" ;
+    int width = 2 ; 
+    int height = 2 ;
+    int channels = 3 ; 
+    float *hdr_data = stbi_loadf( image.c_str() , &width , &height , &channels , 0); 
     if(stbi_failure_reason())
-		std::cout << stbi_failure_reason() << "\n"; 
+		std::cout << stbi_failure_reason() << "\n";
+    float float_data[] = {
+        1.f , 1.f , 1.f   ,   0.f , 0.f , 1.f    ,   1.f , 0.f , 1.f ,  
+        1.f , 0.f , 0.f   ,   0.f , 1.f , 0.f    ,   0.f , 0.f , 0.f  
+    };
     EnvmapProcessing process(hdr_data , (unsigned) width , (unsigned) height);
-    stbi_write_hdr("template.hdr" , width , height , 3 , hdr_data); 
-    auto tex = process.computeDiffuseIrradiance(1.f); 
+    auto tex = process.computeDiffuseIrradiance(0.01f , false); 
     stbi_write_hdr("response.hdr" , width , height , 3 , tex->f_data); 
     tex->clean(); 
 }
+
