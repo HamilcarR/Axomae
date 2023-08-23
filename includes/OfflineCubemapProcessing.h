@@ -373,9 +373,8 @@ public:
         if(1.0 - abs(dd) > 1e-6) 
             tangent = glm::normalize(glm::cross(someVec, normal));
         glm::dvec3 bitangent = glm::cross(normal, tangent); 
-        for(samples = 0 ; samples < total_samples ; samples ++){ 
+        for(samples = 0 ; samples < total_samples ; samples ++)
             irradiance += computeIrradianceSingleTexel((unsigned) pix.x , (unsigned) pix.y , samples  , tangent , bitangent , normal); 
-        }
         return irradiance  / static_cast<double>(total_samples) ; 
     } 
 
