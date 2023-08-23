@@ -5,14 +5,34 @@
 #include "../kernels/CubemapProcessing.cuh"
 #include <sstream>
 #include <fstream>
+#include "GenericException.h"
 
-
-constexpr long double epsilon = 1e-10; 
+constexpr long double epsilon = 1e-6; 
 constexpr glm::dvec3 RED = glm::dvec3(1. , 0 , 0); 
 constexpr glm::dvec3 YELLOW = glm::dvec3(0 , 1 , 1); 
 constexpr glm::dvec3 GREEN = glm::dvec3(0 , 1 ,0);
 constexpr glm::dvec3 BLUE = glm::dvec3(0 , 0 , 1);
 constexpr glm::dvec3 BLACK = glm::dvec3(0); 
+
+
+class TextureInvalidDimensionsException : virtual public AxomaeGenericException{
+public:
+    TextureInvalidDimensionsException() : AxomaeGenericException(){
+        this_error_string = "This texture has invalid dimensions. (negative or non numerical)\n" ; 
+    }
+    virtual ~TextureInvalidDimensionsException(){} 
+
+};
+
+class TextureNonPowerOfTwoDimensionsException : virtual public AxomaeGenericException{
+public:
+    TextureNonPowerOfTwoDimensionsException() : AxomaeGenericException(){
+        this_error_string = "This texture has dimensions that are not a power of two. \n"; 
+    }
+    virtual ~TextureNonPowerOfTwoDimensionsException(){}
+};
+
+
 
 template <class T> 
 class EnvmapProcessing{
@@ -25,13 +45,14 @@ public:
      * @param _width 
      * @param _height 
      */
-    EnvmapProcessing(const T *_data , const unsigned _width , const unsigned _height , const unsigned int num_channels = 3){
+    EnvmapProcessing(const T *_data , const unsigned _width , const unsigned _height , const unsigned int num_channels = 3)  {
 
-        //? Weird 
-        width = _height ; 
-        height = _width ;
-        assert((width & (width - 1)) == 0 && "Width provided is not a power of two !"); 
-        assert((height & (height - 1)) == 0 && "Height provided is not a power of two!") ; 
+        if(std::isnan(_width + _height) || (_width * _height <= 0))
+            throw TextureInvalidDimensionsException(); 
+        else if ((_width & (_width - 1)) != 0 || (_height & (_height - 1)) != 0)
+            throw TextureNonPowerOfTwoDimensionsException(); 
+        width = _width ; 
+        height = _height ;
         channels = num_channels ; 
         for(unsigned i = 0 ; i < width * height * num_channels ; i+=num_channels){
             data.push_back(glm::vec3(_data[i] , _data[i+1] , _data[i+2])); 
@@ -80,7 +101,7 @@ public:
      */
     template<class D>
     inline const glm::dvec2 getPixelCoordsFromUv(const D u , const D v) const {
-            return glm::dvec2(u * (static_cast<double>(width) - 0.5) , v * (static_cast<double>(height) - 0.5)); 
+            return glm::dvec2(u * (static_cast<double>(width)) , v * (static_cast<double>(height))); 
     }
 
 
@@ -167,7 +188,7 @@ public:
      */
     inline const glm::dvec3 discreteSample(int x , int y) const{
         const glm::dvec2 normalized = wrapAroundPixelCoords(static_cast<int>(x) , static_cast<int>(y));
-        const glm::dvec3 texel_value = data[normalized.x * height + normalized.y] ;
+        const glm::dvec3 texel_value = data[normalized.y * width + normalized.x] ;
         return texel_value ; 
     }
 
@@ -208,8 +229,7 @@ public:
                                             const bool use_importance_sampling) const 
     {
 
-        std::cout << "WIDTH MIN : " << width_begin  << "  WIDTH MAX : " << width_end << "\n" ; 
-        for(unsigned i = width_begin ; i < width_end ; i++){
+        for(unsigned i = width_begin ; i <= width_end ; i++){
             for(unsigned j = 0 ; j < height ; j++){
                 glm::dvec2 uv = getUvFromPixelCoords(i , j);
                 const glm::dvec2 sph = gpgpu_math::uvToSpherical(uv.x , uv.y);
@@ -220,7 +240,7 @@ public:
                     irrad = computeIrradianceImportanceSampling(cart.x , cart.y , cart.z , delta);
                 else
                     irrad = computeIrradianceFullStep(cart.x , cart.y , cart.z , delta);
-                unsigned index = (i * height + j) * channels; 
+                unsigned index = (j * width + i) * channels; 
                 f_data[index] = static_cast<float>(irrad.x) ;  
                 f_data[index + 1] = static_cast<float>(irrad.y) ;  
                 f_data[index + 2] = static_cast<float>(irrad.z) ; 
@@ -263,7 +283,6 @@ public:
         }
         for(auto it = futures.begin() ; it != futures.end() ; it++){
             it->get();
-            std::cout << "Work done! \n" ; 
         }
         return std::make_unique<TextureData>(envmap_tex_data);
     } 
@@ -278,8 +297,8 @@ public:
      * @param step Value of the increment
      * @return const glm::dvec3 Irradiance value texel 
      */
-    template<class D>
-    inline const glm::dvec3 computeIrradianceFullStep(const D x , const D y , const D z , const T step) const { //! use importance sampling ?
+    template<class D , class E>
+    inline const glm::dvec3 computeIrradianceFullStep(const D x , const D y , const D z , const E step) const { //! use importance sampling ?
         unsigned int samples = 0 ; 
         glm::dvec3 irradiance = glm::dvec3(0.f);  
         glm::dvec3 normal(x , y , z);
@@ -289,50 +308,20 @@ public:
         if(1.0 - abs(dd) > 1e-6) 
             tangent = glm::normalize(glm::cross(someVec, normal));
         glm::dvec3 bitangent = glm::cross(normal, tangent);
-        for(double phi = 0.f ; phi < 2*PI ; phi += step)
-                for(double theta = 0.f ; theta < PI/2.f ; theta += step){
+        for(double phi = 0.f ; phi <= 2*PI ; phi += step)
+                for(double theta = 0.f ; theta <= PI/2.f ; theta += step){
                         glm::dvec3 uv_cart = gpgpu_math::sphericalToCartesian(phi , theta);
                         uv_cart = uv_cart.x * tangent + uv_cart.y * bitangent + uv_cart.z * normal ; 
                         auto spherical = gpgpu_math::cartesianToSpherical(uv_cart.x , uv_cart.y , uv_cart.z);
                         glm::dvec2 uv = gpgpu_math::sphericalToUv(spherical.x , spherical.y); 
-                        irradiance += uvSample(uv.x , uv.y); 
+                        irradiance += uvSample(uv.x , uv.y) * cos(theta) * sin(theta); 
                         samples ++ ; 
                 }
-        return  irradiance  / static_cast<double>(samples) ; 
+        return  irradiance * glm::pi<double>() / static_cast<double>(samples) ; 
     } 
     
 
-    static inline glm::vec3 pgc3d(unsigned x , unsigned y , unsigned z) {
-        x = x * 1664525u + 1013904223u; 
-        y = y * 1664525u + 1013904223u;
-        z = z * 1664525u + 1013904223u;
-
-        x += y*z; 
-        y += z*x; 
-        z += x*y;
-        
-        x ^= x >> 16u;
-        y ^= y >> 16u;
-        z ^= z >> 16u;
-        
-        x += y*z; 
-        y += z*x; 
-        z += x*y;
-
-        return glm::vec3(x , y , z) * (1.f / float(0xFFFFFFFFu));
-    }
-    static inline double radicalInverse(unsigned bits) {
-        bits = (bits << 16u) | (bits >> 16u);
-        bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
-        bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
-        bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
-        bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
-        return double(bits) * 2.3283064365386963e-10; 
-    }
-
-    static inline glm::dvec3 hammersley3D(unsigned  i , unsigned N){
-        return glm::dvec3(double(i) / double(N) , radicalInverse(i) , radicalInverse(i ^ 0xAAAAAAAAu)); 
-    }
+    
 
     template<class D , class E>
     inline const glm::dvec3 computeIrradianceImportanceSampling(const D x , const D y , const D z , const E total_samples) const { //! use importance sampling ?
@@ -348,7 +337,7 @@ public:
             tangent = glm::normalize(glm::cross(someVec, normal));
         glm::dvec3 bitangent = glm::cross(normal, tangent);
         for(samples = 0 ; samples < total_samples ; samples ++){ 
-            glm::dvec3 random = pgc3d((unsigned) pix.x , (unsigned) pix.y , samples);  
+            glm::dvec3 random = gpgpu_math::pgc3d((unsigned) pix.x , (unsigned) pix.y , samples);  
             double phi = 2 * PI * random.x ; 
             double theta = asin(sqrt(random.y));
             glm::dvec3 uv_cart = gpgpu_math::sphericalToCartesian(phi , theta) ;
@@ -368,7 +357,7 @@ protected:
     unsigned channels ; 
 
 private:
-    static constexpr unsigned MAX_THREADS = 12 ; 
+    static constexpr unsigned MAX_THREADS = 8 ; 
     mutable Mutex mutex ; 
 
 
