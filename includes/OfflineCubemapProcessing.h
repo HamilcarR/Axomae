@@ -1,6 +1,6 @@
 #ifndef OFFLINECUBEMAPPROCESSING_H
 #define OFFLINECUBEMAPPROCESSING_H
-#include "Texture.h"
+#include "GenericTextureProcessing.h"
 #include "Mutex.h"
 #include "../kernels/CubemapProcessing.cuh"
 #include "GenericException.h"
@@ -36,10 +36,17 @@ public:
 };
 
 
-
+//TODO: [AX-51] Create generic texture processing class
 template <class T> 
-class EnvmapProcessing{
+class EnvmapProcessing : virtual public GenericTextureProcessing{
 public:
+
+    virtual bool isDimPowerOfTwo(int dimension) const override {
+        return (dimension & (dimension - 1)) == 0 ;  
+    }
+    virtual bool isValidDim(int dimension) const override {
+        return !std::isnan(dimension) && dimension > 0 ; 
+    }
 
     /**
      * @brief Construct a texture from an envmap double HDR with 3 channels 
@@ -50,9 +57,9 @@ public:
      */
     EnvmapProcessing(const T *_data , const unsigned _width , const unsigned _height , const unsigned int num_channels = 3)  {
 
-        if(std::isnan(_width + _height) || (_width * _height <= 0))
+        if(!isValidDim(_width) || !isValidDim(_height))
             throw TextureInvalidDimensionsException(); 
-        else if ((_width & (_width - 1)) != 0 || (_height & (_height - 1)) != 0)
+        else if (!isDimPowerOfTwo(_width) || !isDimPowerOfTwo(_height))
             throw TextureNonPowerOfTwoDimensionsException(); 
         width = _width ; 
         height = _height ;
@@ -89,30 +96,30 @@ public:
 public:
 
     /**
-     * @brief Get the normalized UV in [0 , 1] range , from [0 ,width/height] coordinates.
-     * @tparam D Type of coordinates .
-     * @param x Width coordinates in the range [0 , width[.
-     * @param y Height coordinates in the range [0 , height[.
-     * @return const glm::dvec2 UVs in the range [0 , 1].
-     */
-    template<class D>
-    inline const glm::dvec2 getUvFromPixelCoords(const D x , const D y) const {
-        return glm::dvec2(static_cast<long double>(x) / static_cast<long double>(width) , static_cast<long double>(y) / static_cast<long double>(height)) ; 
-    } 
-
-    /**
-     * @brief UV to pixel conversion. 
+     * @brief Convert Pixel coordinates to UV.
      * 
-     * @tparam D Type of UV coordinates.
-     * @param u Width uv coordinates.
-     * @param v Height uv coordinates.
-     * @return const glm::dvec2 
+     * @tparam D Type of the pixel coordinates.
+     * @param coord 
+     * @param dim 
+     * @return const double 
      */
     template<class D>
-    inline const glm::dvec2 getPixelCoordsFromUv(const D u , const D v) const {
-            return glm::dvec2(u * (static_cast<double>(width)) , v * (static_cast<double>(height))); 
+    inline double getUvFromPixelCoords(const D coord , const unsigned dim) const {
+        return static_cast<double>(coord) / static_cast<double>(dim); 
     }
 
+    /**
+     * @brief Convert UV component to pixel coordinate.
+     * 
+     * @tparam D Type of the UV coordinate.
+     * @param coord UV coordinate component.
+     * @param dim Dimension of the image in pixels .
+     * @return const unsigned Pixel coordinate. 
+     */
+    template<class D>
+    inline unsigned getPixelCoordsFromUv(const D coord , unsigned dim) const {
+        return static_cast<unsigned> (coord * dim) ; 
+    }
 
     /**
      * @brief This method wrap around if the texture coordinates provided land beyond the texture dimensions, repeating the texture values on both axes. 
@@ -165,7 +172,7 @@ public:
         return glm::dvec2(x_coord , y_coord) ; 
     }
 
-   /**
+    /**
     * @brief Computes the linear interpolation of a point based on 4 of it's neighbours. 
     * 
     * @param top_left Top left pixel . 
@@ -210,7 +217,7 @@ public:
     template<class D> 
     inline const glm::dvec3 uvSample(const D u , const D v) const {
         const glm::dvec2 wrap_uv = wrapAroundTexCoords(u , v); 
-        const glm::dvec2 pixel_coords = getPixelCoordsFromUv(wrap_uv.x , wrap_uv.y);
+        const glm::dvec2 pixel_coords = glm::dvec2(getPixelCoordsFromUv(wrap_uv.x , width) , getPixelCoordsFromUv(wrap_uv.y , height));
         const glm::dvec2 top_left(std::floor(pixel_coords.x) , std::floor(pixel_coords.y));
         const glm::dvec2 top_right(std::floor(pixel_coords.x) + 1 , std::floor(pixel_coords.y));
         const glm::dvec2 bottom_left(std::floor(pixel_coords.x)  , std::floor(pixel_coords.y) + 1);
@@ -234,31 +241,23 @@ public:
     void launchAsyncDiffuseIrradianceCompute(const D delta , 
                                             float *f_data , 
                                             const unsigned width_begin , 
-                                            const unsigned width_end , 
-                                            const unsigned height , 
-                                            const bool use_importance_sampling) const 
+                                            const unsigned width_end ,
+                                            const unsigned _width , 
+                                            const unsigned _height ) const 
     {
-        PerformanceLogger log ; 
-        log.startTimer(); 
         for(unsigned i = width_begin ; i <= width_end ; i++){
-            for(unsigned j = 0 ; j < height ; j++){
-                glm::dvec2 uv = getUvFromPixelCoords(i , j);
+            for(unsigned j = 0 ; j < _height ; j++){
+                glm::dvec2 uv = glm::dvec2(getUvFromPixelCoords(i , _width) , getUvFromPixelCoords(j , _height));
                 const glm::dvec2 sph = gpgpu_math::uvToSpherical(uv.x , uv.y);
                 const glm::dvec2 sph_to_uv = gpgpu_math::sphericalToUv(sph); 
                 const glm::dvec3 cart = gpgpu_math::sphericalToCartesian(sph.x , sph.y); 
-                glm::dvec3 irrad ; 
-                if(use_importance_sampling)
-                    irrad = computeIrradianceImportanceSampling(cart.x , cart.y , cart.z , delta);
-                else
-                    irrad = computeIrradianceFullStep(cart.x , cart.y , cart.z , delta);
-                unsigned index = (j * width + i) * channels; 
+                glm::dvec3 irrad = computeIrradianceImportanceSampling(cart.x , cart.y , cart.z , _width , _height,  delta);
+                unsigned index = (j * _width + i) * channels; 
                 f_data[index] = static_cast<float>(irrad.x) ;  
                 f_data[index + 1] = static_cast<float>(irrad.y) ;  
                 f_data[index + 2] = static_cast<float>(irrad.z) ; 
             }
         }
-        log.endTimer() ; 
-        log.print(); 
     }
 
 
@@ -271,31 +270,28 @@ public:
      * @return std::unique_ptr<TextureData> Texture data containing width , height , and double f_data about the newly created map.
      */
     template<typename D> 
-    std::unique_ptr<TextureData> computeDiffuseIrradiance(const D delta , bool use_importance_sampling = true) const {
+    std::unique_ptr<TextureData> computeDiffuseIrradiance(const unsigned _width , const unsigned _height , const D delta) const {
+        if(!isValidDim(_width) || !isValidDim(_height))
+            throw TextureInvalidDimensionsException(); 
+        if(!isDimPowerOfTwo(_width) || !isDimPowerOfTwo(_height))
+            throw TextureNonPowerOfTwoDimensionsException(); 
         TextureData envmap_tex_data ; 
-        envmap_tex_data.data_format = Texture::RGB ; 
-        envmap_tex_data.internal_format = Texture::RGB32F ; 
-        envmap_tex_data.data_type = Texture::FLOAT;
-        envmap_tex_data.width = width ;
-        envmap_tex_data.height = height ;  
+        envmap_tex_data.width = _width ;
+        envmap_tex_data.height = _height ;  
         envmap_tex_data.mipmaps = 0;
-        envmap_tex_data.f_data = new float[width * height * channels];
+        envmap_tex_data.f_data = new float[_width * _height * channels];
         envmap_tex_data.nb_components = channels ;
-        std::memset(envmap_tex_data.f_data , 0 , width * height * channels * sizeof(float)); 
+        std::memset(envmap_tex_data.f_data , 0 , _width * _height * channels * sizeof(float)); 
         unsigned index = 0 ;
         std::vector<std::shared_future<void>> futures ; 
         for(unsigned i = 1 ; i <= MAX_THREADS ; i++){
-            unsigned int width_max = (width/MAX_THREADS) * i  , width_min = width_max - (width / MAX_THREADS) ;  
-            if(i == MAX_THREADS){
-                width_max += width % MAX_THREADS - 1 ;
-                launchAsyncDiffuseIrradianceCompute(delta , envmap_tex_data.f_data , width_min , width_max , height ,  use_importance_sampling);
-            }
-            else{
-                auto lambda = [this , &envmap_tex_data](const D delta , const unsigned width_min , const unsigned width_max , const unsigned height , bool use_importance_sampling){
-                    this->launchAsyncDiffuseIrradianceCompute(delta , envmap_tex_data.f_data , width_min , width_max , height ,  use_importance_sampling);
-                };
-                futures.push_back(std::async(std::launch::async , lambda , delta , width_min , width_max , height , use_importance_sampling )); 
-            }
+            unsigned int width_max = (_width/MAX_THREADS) * i  , width_min = width_max - (_width / MAX_THREADS) ;  
+            if(i == MAX_THREADS)
+                width_max += _width % MAX_THREADS - 1 ;
+            auto lambda = [this , &envmap_tex_data](const D delta , const unsigned width_min , const unsigned width_max ){
+                this->launchAsyncDiffuseIrradianceCompute(delta , envmap_tex_data.f_data , width_min , width_max , envmap_tex_data.width , envmap_tex_data.height);
+            };
+            futures.push_back(std::async(std::launch::async , lambda , delta , width_min , width_max)); 
         }
         for(auto it = futures.begin() ; it != futures.end() ; it++){
             it->get();
@@ -303,39 +299,6 @@ public:
         return std::make_unique<TextureData>(envmap_tex_data);
     } 
 
-
-    /**
-     * @brief Returns the irradiance value at a specific position of the texture , in accordance to it's computed hemisphere. 
-     * 
-     * @tparam D Data type of the coordinates 
-     * @param x Cartesian X
-     * @param y Cartesian Y 
-     * @param z Cartesian Z
-     * @param step Value of the increment
-     * @return const glm::dvec3 Irradiance value texel 
-     */
-    template<class D , class E>
-    inline const glm::dvec3 computeIrradianceFullStep(const D x , const D y , const D z , const E step) const { //! use importance sampling ?
-        unsigned int samples = 0 ; 
-        glm::dvec3 irradiance = glm::dvec3(0.f);  
-        glm::dvec3 normal(x , y , z);
-        glm::dvec3 someVec = glm::dvec3(1.0, 0.0, 0.0);
-        float dd = glm::dot(someVec, normal);
-        glm::dvec3 tangent = glm::dvec3(0.0, 1.0, 0.0);
-        if(1.0 - abs(dd) > 1e-6) 
-            tangent = glm::normalize(glm::cross(someVec, normal));
-        glm::dvec3 bitangent = glm::cross(normal, tangent);
-        for(double phi = 0.f ; phi <= 2*PI ; phi += step)
-                for(double theta = 0.f ; theta <= PI/2.f ; theta += step){
-                        glm::dvec3 uv_cart = gpgpu_math::sphericalToCartesian(phi , theta);
-                        uv_cart = uv_cart.x * tangent + uv_cart.y * bitangent + uv_cart.z * normal ; 
-                        auto spherical = gpgpu_math::cartesianToSpherical(uv_cart.x , uv_cart.y , uv_cart.z);
-                        glm::dvec2 uv = gpgpu_math::sphericalToUv(spherical.x , spherical.y); 
-                        irradiance += uvSample(uv.x , uv.y) * cos(theta) * sin(theta); 
-                        samples ++ ; 
-                }
-        return  irradiance * glm::pi<double>() / static_cast<double>(samples) ; 
-    } 
 
 
     template<class D>
@@ -360,14 +323,14 @@ public:
      * @param total_samples Total number of samples. 
      * @return const glm::dvec3 Irradiance value texel 
      */
-    template<class D , class E>
-    inline const glm::dvec3 computeIrradianceImportanceSampling(const D x , const D y , const D z , const E total_samples) const { 
+    template<class D>
+    inline const glm::dvec3 computeIrradianceImportanceSampling(const D x , const D y , const D z , const unsigned _width , const unsigned _height , const unsigned total_samples) const { 
         unsigned int samples = 0 ;
         glm::dvec3 irradiance = glm::dvec3(0.f); 
         glm::dvec3 normal(x , y , z);
         glm::dvec3 someVec = glm::dvec3(1.0, 0.0, 0.0);
         glm::dvec2 uv = gpgpu_math::sphericalToUv(gpgpu_math::cartesianToSpherical(x , y , z)); 
-        glm::dvec2 pix = getPixelCoordsFromUv(uv.x , uv.y);  
+        glm::dvec2 pix = glm::dvec2(getPixelCoordsFromUv(uv.x , _width) , getPixelCoordsFromUv(uv.y , _height));  
         float dd = glm::dot(someVec, normal);
         glm::dvec3 tangent = glm::dvec3(0.0, 1.0, 0.0);
         if(1.0 - abs(dd) > 1e-6) 
