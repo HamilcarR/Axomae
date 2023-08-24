@@ -635,7 +635,7 @@ void GUIWindow::project_uv_normals(){
 	SceneSelector* instance = SceneSelector::getInstance();
 	Mesh* retrieved_mesh = instance->getCurrent() ; 
 	if(retrieved_mesh){
-		SDL_Surface* surf = ImageManager::project_uv_normals(retrieved_mesh->geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 	
+		SDL_Surface* surf = ImageManager::project_uv_normals(retrieved_mesh->geometry , _UI.uv_width->value() , _UI.uv_height->value() , true); //TODO : change for managing the entire scene , maybe add scroll between different meshes 	
 		display_image(surf , PROJECTED_NMAP , true);
 	} 
 }
