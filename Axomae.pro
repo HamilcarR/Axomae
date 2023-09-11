@@ -46,12 +46,15 @@ LIBS+=-L/usr/local/cuda/lib64 -L/usr/lib64 -lSDL2 -ldl -lpthread -lSDL2_image -l
 CUDA_LIBS += -L/usr/local/cuda/lib64 -L/usr/lib64 -lcudart -lcuda -lcudadevrt -lSDL2 
 CUDA_ARCH = sm_75
 CUDA_SRC += kernels/*.cu	
-CUDA_INC = $$join(INCLUDEPATH,' -I','-I',' ') 
-NVCCFLAGS = --expt-relaxed-constexpr --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v --device-debug 
+CUDA_INC = $$join(INCLUDEPATH,' -I','-I',' ')
+CUDA_PROFILE_FLAG = -g -G -lineinfo 
+CUDA_DEBUG_FLAG = -g -G --device-debug
+CUDA_OPTI_FLAG = -Xptxas -O3 -use_fast_math
+NVCCFLAGS =  $$CUDA_DEBUG_FLAG --threads 8  
 cudaIntr.input = CUDA_SRC
 cudaIntr.output = ${OBJECTS_DIR}${QMAKE_FILE_BASE}.o
  
-cudaIntr.commands = nvcc --compiler-bindir /usr/bin/g++-12 -m64 -g -G -arch=$$CUDA_ARCH -dc $$NVCCFLAGS $$CUDA_INC $$LIBS ${QMAKE_FILE_NAME} -o ${QMAKE_FILE_OUT}
+cudaIntr.commands = nvcc --compiler-bindir /usr/bin/g++-12 -m64 -arch=$$CUDA_ARCH -dc $$NVCCFLAGS ${QMAKE_FILE_NAME} -o ${QMAKE_FILE_OUT}
 cudaIntr.variable_out = CUDA_OBJ
 cudaIntr.variable_out += OBJECTS
 cudaIntr.clean = cudaIntrObj/*.o
@@ -60,9 +63,9 @@ QMAKE_EXTRA_UNIX_COMPILERS += cudaIntr
 cuda.input = CUDA_OBJ
 cuda.output = ${QMAKE_FILE_BASE}_link.o
 # Tweak arch according to your hw's compute capability
-cuda.commands = $$CUDA_DIR/bin/nvcc -m64 -g -G -arch=$$CUDA_ARCH -dlink ${QMAKE_FILE_NAME} -o ${QMAKE_FILE_OUT}
+cuda.commands = $$CUDA_DIR/bin/nvcc -m64 -arch=$$CUDA_ARCH -dlink ${QMAKE_FILE_NAME} -o ${QMAKE_FILE_OUT}
 cuda.dependency_type = TYPE_C
-cuda.depend_command = nvcc -g -G -M $$CUDA_INC $$NVCCFLAGS ${QMAKE_FILE_NAME}
+cuda.depend_command = nvcc -M $$CUDA_INC $$NVCCFLAGS ${QMAKE_FILE_NAME}
 # Tell Qt that we want add more stuff to the Makefile
 QMAKE_EXTRA_UNIX_COMPILERS += cuda
 

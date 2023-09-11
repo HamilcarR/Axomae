@@ -95,31 +95,7 @@ public:
 /* Implementation of templated methods*/
 public:
 
-    /**
-     * @brief Convert Pixel coordinates to UV.
-     * 
-     * @tparam D Type of the pixel coordinates.
-     * @param coord 
-     * @param dim 
-     * @return const double 
-     */
-    template<class D>
-    inline double getUvFromPixelCoords(const D coord , const unsigned dim) const {
-        return static_cast<double>(coord) / static_cast<double>(dim); 
-    }
-
-    /**
-     * @brief Convert UV component to pixel coordinate.
-     * 
-     * @tparam D Type of the UV coordinate.
-     * @param coord UV coordinate component.
-     * @param dim Dimension of the image in pixels .
-     * @return const unsigned Pixel coordinate. 
-     */
-    template<class D>
-    inline unsigned getPixelCoordsFromUv(const D coord , unsigned dim) const {
-        return static_cast<unsigned> (coord * dim) ; 
-    }
+    
 
     /**
      * @brief This method wrap around if the texture coordinates provided land beyond the texture dimensions, repeating the texture values on both axes. 
@@ -217,7 +193,7 @@ public:
     template<class D> 
     inline const glm::dvec3 uvSample(const D u , const D v) const {
         const glm::dvec2 wrap_uv = wrapAroundTexCoords(u , v); 
-        const glm::dvec2 pixel_coords = glm::dvec2(getPixelCoordsFromUv(wrap_uv.x , width) , getPixelCoordsFromUv(wrap_uv.y , height));
+        const glm::dvec2 pixel_coords = glm::dvec2(uvToPixel(wrap_uv.x , width) , uvToPixel(wrap_uv.y , height));
         const glm::dvec2 top_left(std::floor(pixel_coords.x) , std::floor(pixel_coords.y));
         const glm::dvec2 top_right(std::floor(pixel_coords.x) + 1 , std::floor(pixel_coords.y));
         const glm::dvec2 bottom_left(std::floor(pixel_coords.x)  , std::floor(pixel_coords.y) + 1);
@@ -247,10 +223,10 @@ public:
     {
         for(unsigned i = width_begin ; i <= width_end ; i++){
             for(unsigned j = 0 ; j < _height ; j++){
-                glm::dvec2 uv = glm::dvec2(getUvFromPixelCoords(i , _width) , getUvFromPixelCoords(j , _height));
-                const glm::dvec2 sph = gpgpu_math::uvToSpherical(uv.x , uv.y);
-                const glm::dvec2 sph_to_uv = gpgpu_math::sphericalToUv(sph); 
-                const glm::dvec3 cart = gpgpu_math::sphericalToCartesian(sph.x , sph.y); 
+                glm::dvec2 uv = glm::dvec2(pixelToUv(i , _width) , pixelToUv(j , _height));
+                const glm::dvec2 sph = spherical_math::uvToSpherical(uv.x , uv.y);
+                const glm::dvec2 sph_to_uv = spherical_math::sphericalToUv(sph); 
+                const glm::dvec3 cart = spherical_math::sphericalToCartesian(sph.x , sph.y); 
                 glm::dvec3 irrad = computeIrradianceImportanceSampling(cart.x , cart.y , cart.z , _width , _height,  delta);
                 unsigned index = (j * _width + i) * channels; 
                 f_data[index] = static_cast<float>(irrad.x) ;  
@@ -303,13 +279,13 @@ public:
 
     template<class D>
     inline glm::dvec3 computeIrradianceSingleTexel(const unsigned x ,const unsigned y ,const unsigned samples , const D tangent , const D bitangent , const D normal) const {
-        glm::dvec3 random = gpgpu_math::pgc3d((unsigned) x , (unsigned) y , samples);  
+        glm::dvec3 random = spherical_math::pgc3d((unsigned) x , (unsigned) y , samples);  
         double phi = 2 * PI * random.x ; 
         double theta = asin(sqrt(random.y));
-        glm::dvec3 uv_cart = gpgpu_math::sphericalToCartesian(phi , theta) ;
+        glm::dvec3 uv_cart = spherical_math::sphericalToCartesian(phi , theta) ;
         uv_cart = uv_cart.x * tangent + uv_cart.y * bitangent + uv_cart.z * normal ; 
-        auto spherical = gpgpu_math::cartesianToSpherical(uv_cart.x , uv_cart.y , uv_cart.z);
-        glm::dvec2 uvt = gpgpu_math::sphericalToUv(spherical.x , spherical.y);
+        auto spherical = spherical_math::cartesianToSpherical(uv_cart.x , uv_cart.y , uv_cart.z);
+        glm::dvec2 uvt = spherical_math::sphericalToUv(spherical.x , spherical.y);
         return uvSample(uvt.x , uvt.y);  
     }
 
@@ -329,8 +305,8 @@ public:
         glm::dvec3 irradiance = glm::dvec3(0.f); 
         glm::dvec3 normal(x , y , z);
         glm::dvec3 someVec = glm::dvec3(1.0, 0.0, 0.0);
-        glm::dvec2 uv = gpgpu_math::sphericalToUv(gpgpu_math::cartesianToSpherical(x , y , z)); 
-        glm::dvec2 pix = glm::dvec2(getPixelCoordsFromUv(uv.x , _width) , getPixelCoordsFromUv(uv.y , _height));  
+        glm::dvec2 uv = spherical_math::sphericalToUv(spherical_math::cartesianToSpherical(x , y , z)); 
+        glm::dvec2 pix = glm::dvec2(uvToPixel(uv.x , _width) , uvToPixel(uv.y , _height));  
         float dd = glm::dot(someVec, normal);
         glm::dvec3 tangent = glm::dvec3(0.0, 1.0, 0.0);
         if(1.0 - abs(dd) > 1e-6) 

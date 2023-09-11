@@ -25,7 +25,7 @@ struct image_type {
 	IMAGETYPE imagetype; 
 };
 
-
+//TODO: [AX-52] Fix memory leak at normal map generation when sliding the factor scale
 /*structure to keep track of pointers to destroy*/
 class HeapManagement {
 public:
@@ -744,7 +744,6 @@ void GUIWindow::redo(){
 }
 
 /**************************************************************************************************************/
-
 void GUIWindow::set_renderer_gamma_value(int value){
 	if(_renderer != nullptr){
 		float v = (float) value / POSTP_SLIDER_DIV ; 
@@ -753,15 +752,12 @@ void GUIWindow::set_renderer_gamma_value(int value){
 }
 
 /**************************************************************************************************************/
-
 void GUIWindow::reset_renderer_camera(){
 	if(_renderer != nullptr)
 		_renderer->resetSceneCamera();
 }
 
-
 /**************************************************************************************************************/
-
 void GUIWindow::set_renderer_exposure_value(int value){
 	if(_renderer != nullptr){
 		float v = (float) value / POSTP_SLIDER_DIV ; 
@@ -816,15 +812,6 @@ void GUIWindow::set_display_boundingbox(bool display){
 	if(_renderer)
 		_renderer->displayBoundingBoxes(display); 
 } 
-
-
-
-
-
-
-
-
-
 
 /**************************************************************************************************************/
 /*Protected utility methods*/

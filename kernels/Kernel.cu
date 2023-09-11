@@ -100,11 +100,6 @@ struct custom_convolution_kernel {
 	uint8_t size_h;
 };
 
-struct gpu_threads {
-	dim3 threads;
-	dim3 blocks;
-};
-
 /*device*/
 /*********************************************************************************************************************************************/
 __host__ __device__
@@ -398,34 +393,7 @@ __global__ void GPU_compute_normals(void* image, void* save, unsigned int width,
 
 /*host functions*/
 /*********************************************************************************************************************************************/
-gpu_threads get_optimal_thread_distribution(int width, int height, int pitch, int bpp) {
-	gpu_threads value;
-	int flat_array_size = width*height;
-	/*need compute capability > 2.0*/
-	dim3 threads = dim3(24, 24);
-	value.threads = threads;
-	if (flat_array_size <= threads.y * threads.x) {
-		dim3 blocks = dim3(1);
-		value.blocks = blocks;
-	}
-	else {
-		float divx = (float)width / threads.x;
-		float divy = (float)height / threads.y;
-		int blockx = (std::floor(divx) == divx) ? static_cast<int>(divx) : std::floor(divx) + 1;
-		int blocky = (std::floor(divy) == divy) ? static_cast<int>(divy) : std::floor(divy) + 1;
-		dim3 blocks(blockx, blocky);
-		value.blocks = blocks;
-	}
-	std::cout << "launching kernel with : " << value.blocks.x << "  " << value.blocks.y << "\n"; 
-	return value;
-}
 
-static void check_error() {
-	cudaError_t err = cudaGetLastError(); 
-	if (err != cudaSuccess) {
-		std::cout << cudaGetErrorString(err) << "\n"; 
-	}
-}
 
 void GPU_compute_greyscale(SDL_Surface* image, const bool luminance) {
 	int width = image->w;
@@ -436,9 +404,9 @@ void GPU_compute_greyscale(SDL_Surface* image, const bool luminance) {
 	size_t size = pitch * height;
 	cudaMalloc((void**)&D_image, size);
 	cudaMemcpy(D_image, image->pixels, size, cudaMemcpyHostToDevice);
-	gpu_threads D = get_optimal_thread_distribution(width, height, pitch, bpp);
+	gpu_threads D = get_optimal_thread_distribution(width, height);
 	GPU_compute_greyscale << <D.blocks, D.threads >> > (D_image, width, height, bpp, pitch, luminance);
-	check_error(); 
+	check_error(__FILE__ , __LINE__); 
 	SDL_LockSurface(image);
 	cudaMemcpy(image->pixels, D_image, size, cudaMemcpyDeviceToHost);
 	SDL_UnlockSurface(image);
@@ -453,11 +421,11 @@ void GPU_compute_height(SDL_Surface* greyscale, uint8_t convolution, uint8_t bor
 	cudaMalloc((void**)&D_image, size);
 	cudaMalloc((void**)&R_image, size); 
 	cudaMemcpy(D_image, param.data, size, cudaMemcpyHostToDevice);
-	gpu_threads D = get_optimal_thread_distribution(param.width, param.height, param.pitch, param.bpp);
+	gpu_threads D = get_optimal_thread_distribution(param.width, param.height);
 	D.blocks.x++; // border management
 	D.blocks.y++; //
 	GPU_compute_edges << < D.blocks, D.threads >> > (D_image,R_image, param.width, param.height, param.bpp, param.pitch, convolution, border);
-	check_error(); 
+    check_error(__FILE__ , __LINE__);
 	SDL_LockSurface(greyscale);
 	cudaMemcpy(greyscale->pixels, R_image, size, cudaMemcpyDeviceToHost);
 	SDL_UnlockSurface(greyscale);
@@ -473,12 +441,11 @@ void GPU_compute_normal(SDL_Surface* height, double factor, uint8_t border) {
 	cudaMalloc((void**)&D_save, param.getByteSize()); 
 
 	cudaMemcpy(D_image, param.data, param.getByteSize(), cudaMemcpyHostToDevice); 
-	gpu_threads blocks = get_optimal_thread_distribution(param.width, param.height, param.pitch, param.bpp); 
+	gpu_threads blocks = get_optimal_thread_distribution(param.width, param.height); 
 	blocks.blocks.x++; 
 	blocks.blocks.y++;
 	GPU_compute_normals << < blocks.blocks, blocks.threads >> > (D_image, D_save, param.width, param.height, param.bpp, param.pitch, factor, border); 
-	check_error(); 
-
+    check_error(__FILE__ , __LINE__);
 	SDL_LockSurface(height); 
 	cudaMemcpy(height->pixels, D_save, param.getByteSize(), cudaMemcpyDeviceToHost); 
 	SDL_UnlockSurface(height); 

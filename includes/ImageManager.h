@@ -74,12 +74,13 @@ public:
 	static SDL_Surface* project_uv_normals(Object3D object,  int width , int height , bool tangent_space);		    
 	static void smooth_image(SDL_Surface* surf , FILTER filter, const unsigned int smooth_iterations); 
 	static void sharpen_image(SDL_Surface* surf , FILTER filter , const unsigned int sharpen_iterations); 
+
 private:
-
-
 	ImageManager();
 	~ImageManager();
 
+
+private:
 	static bool gpu;
 
 	};
