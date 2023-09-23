@@ -1,13 +1,16 @@
 #ifndef GLVIEWER_H
 #define GLVIEWER_H
 
-#include <QMouseEvent> 
-
+#include "Renderer.h" 
+#include "RendererEnums.h"
 #include "constants.h"
 #include "utils_3D.h" 
-#include "Renderer.h" 
 #include "Mesh.h"
+
+#include <QMouseEvent> 
 #include <QOpenGLWidget>
+
+
 
 
 
@@ -15,6 +18,7 @@
  * @file GLView.h
  * This file implements Viewer widget in the QT interface
  */
+
 
 class Renderer;
 /**
@@ -51,7 +55,9 @@ public:
 	 * @brief Returns the pointer on the renderer's instance
 	 * 
 	 */
-	Renderer* getRenderer(){return renderer;}
+	const Renderer& getConstRenderer(){return *renderer ;}
+	
+	Renderer& getRenderer(){return *renderer;}
 
 protected:
 	
@@ -113,7 +119,7 @@ private:
 
 	
 private:
-	Renderer* renderer; 		/*<Pointer on the renderer of the scene*/	
+	std::unique_ptr<Renderer> renderer; 		/*<Pointer on the renderer of the scene*/	
 	bool glew_initialized ; 	/*<Check if context is initialized*/	
 
 
@@ -122,6 +128,7 @@ private:
 
 
 };
+
 
 
 

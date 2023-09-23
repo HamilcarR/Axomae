@@ -2,6 +2,7 @@
 #define RENDERER_H
 
 #include "constants.h"
+#include "RendererEnums.h"
 #include "utils_3D.h"
 #include "Loader.h"
 #include "Mesh.h"
@@ -22,13 +23,17 @@
 
 class RenderPipeline ; 
 class GLViewer;
+
+
+
 /**
  * @brief Renderer class definition
  * 
  */
 class Renderer {
 public:
-	
+
+
 	/**
 	 * @brief Construct a new Renderer object
 	 * 
@@ -215,6 +220,47 @@ public:
 	 */
 	void displayBoundingBoxes(bool display);
 
+	template<class Func , class ...Args>
+	void execCallback(Func&& function , Renderer* instance , Args&& ...args){
+		function(instance , std::forward<Args>(args)...); 
+	}
+
+	/**
+	 * @brief Executes a specific method according to the value of the callback flag 
+	 * 
+	 * @tparam Args Type of the arguments 
+	 * @param callback_flag	A flag of type RENDERER_CALLBACK_ENUM , will call one of the renderer methods 
+	 * @param args Arguments of the callback function 
+	 */
+	template<RENDERER_CALLBACK_ENUM function_flag , class ...Args>
+	void executeMethod(Args&& ...args){
+		if constexpr(function_flag == SET_GAMMA)
+			setGammaValue(std::forward<Args>(args)...);
+		else if constexpr(function_flag == SET_EXPOSURE) 
+			setExposureValue(std::forward<Args>(args)...);
+		else if constexpr(function_flag == SET_POSTPROCESS_NOPROCESS) 
+			setNoPostProcess(std::forward<Args>(args)...);
+		else if constexpr(function_flag == SET_POSTPROCESS_SHARPEN)
+			setPostProcessSharpen(std::forward<Args>(args)...);  
+		else if constexpr(function_flag == SET_POSTPROCESS_BLURR)
+			setPostProcessBlurr(std::forward<Args>(args)...);  
+        else if constexpr(function_flag == SET_POSTPROCESS_EDGE)
+			setPostProcessEdge(std::forward<Args>(args)...); 
+        else if constexpr(function_flag == SET_RASTERIZER_POINT)
+			setRasterizerPoint(std::forward<Args>(args)...); 
+        else if constexpr(function_flag == SET_RASTERIZER_FILL)
+			setRasterizerFill(std::forward<Args>(args)...); 
+    	else if constexpr(function_flag == SET_RASTERIZER_WIREFRAME)
+			setRasterizerWireframe(std::forward<Args>(args)...); 
+        else if constexpr(function_flag == SET_DISPLAY_BOUNDINGBOX)
+			displayBoundingBoxes(std::forward<Args>(args)...); 
+        else if constexpr(function_flag == SET_DISPLAY_RESET_CAMERA)
+			resetSceneCamera(std::forward<Args>(args)...); 
+		else{
+			return;
+		}
+
+	}
 
 public:
 	std::unique_ptr<Scene> scene ; 								/**<The scene to be rendered*/ 	

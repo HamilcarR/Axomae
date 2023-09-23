@@ -318,7 +318,7 @@ private:
 	bool set_corresponding_session_pointer(image_type<SDL_Surface> *image_type_pointer) ; 
 	void display_image(SDL_Surface *surf , gui::IMAGETYPE image , bool save_in_heap); 
 	Ui::MainWindow _UI;
-	Renderer *_renderer; 
+	GLViewer * viewer_3d; 
 	Window *_window; 
 	ImageImporter *_importer; 
 	

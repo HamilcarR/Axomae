@@ -15,14 +15,11 @@ GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent){
 	format.setAlphaBufferSize(8); 
 	format.setSwapInterval(1);
 	setFormat(format);
-	renderer = new Renderer(width() , height() , this);
+	renderer = std::make_unique<Renderer>(width() , height() , this);
 	glew_initialized = false;
 }
 
 GLViewer::~GLViewer(){
-	makeCurrent();
-	delete renderer;
-	doneCurrent();
 }
 
 void GLViewer::initializeGL(){
@@ -131,3 +128,4 @@ void GLViewer::setNewScene(std::pair<std::vector<Mesh *> , SceneTree> &new_scene
 	renderer->set_new_scene(new_scene);
 	doneCurrent();
 }
+
