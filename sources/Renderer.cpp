@@ -31,10 +31,12 @@ Renderer::Renderer(unsigned width , unsigned height , GLViewer* widget):Renderer
 }
 
 Renderer::~Renderer(){
-	camera_framebuffer->clean();
-	scene->clear(); 
+	if(camera_framebuffer)
+		camera_framebuffer->clean();
+	if(scene)
+		scene->clear(); 
+	if(render_pipeline)
 	render_pipeline->clean();
-	
 	if(resource_database){
 		resource_database->purge();
 		resource_database->destroyInstance(); 
@@ -43,8 +45,6 @@ Renderer::~Renderer(){
 		light_database->clearDatabase(); 
 		delete light_database;
 	}
-		
-	
 	delete scene_camera ; 
 	scene_camera = nullptr ; 
 }
