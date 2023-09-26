@@ -140,5 +140,5 @@ TEST(EnvmapComputation , computeDiffuseIrradiance){
     gpgpu_functions::irradiance_mapping::GPU_compute_irradiance(src_texture , width , height , 4 , &dest_texture , _width , _height , 10000);
      
     stbi_write_hdr("response.hdr" , _width , _height , 4 , dest_texture); 
-
+    delete src_texture ; 
 }
