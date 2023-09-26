@@ -176,7 +176,7 @@ public:
 	 * 
 	 * @return glm::mat4 
 	 */
-	virtual glm::mat4& getModelViewMatrix(){
+	virtual const glm::mat4 getModelViewMatrix(){
 		return modelview_matrix ; 
 	}	
 	

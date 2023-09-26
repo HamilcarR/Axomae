@@ -4,10 +4,15 @@
 
 Mesh::Mesh(SceneNodeInterface* parent):SceneTreeNode(parent){
 	mesh_initialized = false;
+	face_culling_enabled = false;
+	depth_mask_enabled = false; 
+	is_drawn = false ; 
+	polygon_mode = FILL ; 
 	shader_program = nullptr; 
 	name = "uninitialized mesh" ; 
 	is_drawn = true;
-	polygon_mode = FILL ;  
+	polygon_mode = FILL ; 
+	modelview_matrix = glm::mat4(1.f);  
 }
 
 Mesh::Mesh(const Mesh& copy) : SceneTreeNode(copy){
