@@ -99,9 +99,9 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scen
 	CubeMapMesh* cubemap_mesh = render_pipeline->bakeEnvmapToCubemap(env , 2048 , 2048  , gl_widget);
 	int cube_envmap_id =  cubemap_mesh->material.getTextureGroup().getTextureCollection()[0] ;
 	int irradiance_tex_id = render_pipeline->bakeIrradianceCubemap(cube_envmap_id , 64 , 64 , gl_widget);
-	int prefiltered_cubemap = render_pipeline->preFilterEnvmap(cube_envmap_id , 2048 , 512 , 512 , 10 , 2000 , 2 , gl_widget);
+	int prefiltered_cubemap = render_pipeline->preFilterEnvmap(cube_envmap_id , 2048 , 512 , 512 , 10 , 500 , 2 , gl_widget);
 	int brdf_lut = render_pipeline->generateBRDFLookupTexture(512 , 512 , gl_widget);  
-	std::for_each(new_scene.first.begin() , new_scene.first.end() , [irradiance_tex_id , brdf_lut , prefiltered_cubemap , cube_envmap_id , cubemap_mesh](Mesh* m){
+	std::for_each(new_scene.first.begin() , new_scene.first.end() , [irradiance_tex_id , brdf_lut , prefiltered_cubemap , cube_envmap_id , cubemap_mesh , this](Mesh* m){
 																						m->material.addTexture(irradiance_tex_id , Texture::IRRADIANCE) ;
 																						m->material.addTexture(prefiltered_cubemap , Texture::CUBEMAP); 
 																						//m->material.addTexture(cube_envmap_id , Texture::CUBEMAP); 
@@ -115,6 +115,7 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scen
 	scene->setLightDatabasePointer(light_database); 
 	scene->setCameraPointer(scene_camera); 
 	light_database->clearDatabase();
+	scene->updateTree(); 
 	AbstractLight *L1 = new SpotLight(glm::vec3(-55 , 90 , -5) , glm::vec3(0.f) , glm::vec3(1.f , 1.f , 0.9f), 12.f , 102000.f , scene_camera); 
     AbstractLight *L2 = new PointLight(glm::vec3(0 , 20 , -2) , glm::vec3(0.875f , 0.257f , 0.184f), glm::vec3(1.f , 0.0045 , 0.0075) , 200.f , L1); 
 	AbstractLight *L3 = new DirectionalLight(glm::vec3(1 , 1 , 0) , glm::vec3(1.f , 1.f , 1.f) , 1.5f , scene_camera); 
