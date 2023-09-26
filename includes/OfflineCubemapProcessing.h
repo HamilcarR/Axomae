@@ -21,7 +21,7 @@ constexpr glm::dvec3 BLACK = glm::dvec3(0);
 class TextureInvalidDimensionsException : virtual public AxomaeGenericException{
 public:
     TextureInvalidDimensionsException() : AxomaeGenericException(){
-        this_error_string = "This texture has invalid dimensions. (negative or non numerical)\n" ; 
+        saveErrorString("This texture has invalid dimensions. (negative or non numerical)") ; 
     }
     virtual ~TextureInvalidDimensionsException(){} 
 
@@ -30,7 +30,7 @@ public:
 class TextureNonPowerOfTwoDimensionsException : virtual public AxomaeGenericException{
 public:
     TextureNonPowerOfTwoDimensionsException() : AxomaeGenericException(){
-        this_error_string = "This texture has dimensions that are not a power of two. \n"; 
+        saveErrorString("This texture has dimensions that are not a power of two."); 
     }
     virtual ~TextureNonPowerOfTwoDimensionsException(){}
 };
