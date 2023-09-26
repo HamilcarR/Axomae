@@ -77,7 +77,7 @@ bool Renderer::prep_draw(){
 		return true; 				
 	}
 	else{
-		glClearColor(0 , 0 , 0.1 , 1.f);
+		glClearColor(0 , 0 , 0 , 1.f);
 		return false ;	
 	}
 }

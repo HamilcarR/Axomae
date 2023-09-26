@@ -1,6 +1,6 @@
 #include "Test.h"
 #include "../includes/OfflineCubemapProcessing.h"
-
+#include "../kernels/CubemapProcessing.cuh"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../vendor/stb/stb_image_write.h"
 #include "../vendor/stb/stb_image.h"
@@ -91,8 +91,8 @@ TEST(EnvmapComputation , uvSphericalCohesion){
     RandomVecBuilder<glm::dvec2> builder;
     for(unsigned i = 0 ; i < 100 ; i ++){
         glm::dvec2 uv = builder.generate(); 
-        glm::dvec2 sph = gpgpu_math::uvToSpherical(uv); 
-        glm::dvec2 test = gpgpu_math::sphericalToUv(sph);
+        glm::dvec2 sph = spherical_math::uvToSpherical(uv); 
+        glm::dvec2 test = spherical_math::sphericalToUv(sph);
         EXPECT_LE(glm::length(test - uv) , epsilon);
     } 
 }
@@ -101,23 +101,44 @@ TEST(EnvmapComputation , uvCartesianCohesion){
     RandomVecBuilder<glm::dvec2> builder ; 
     for(unsigned i = 0 ; i < 100 ; i++){
         glm::dvec2 sph = builder.generate(); 
-        glm::dvec3 cart = gpgpu_math::sphericalToCartesian(sph); 
-        glm::dvec2 test = gpgpu_math::cartesianToSpherical(cart) ;
+        glm::dvec3 cart = spherical_math::sphericalToCartesian(sph); 
+        glm::dvec2 test = spherical_math::cartesianToSpherical(cart) ;
         EXPECT_LE(glm::length(test-sph) , epsilon); 
     }
 }
 
 
 TEST(EnvmapComputation , computeDiffuseIrradiance){
-	std::string image = "test3.hdr" ;
+	std::string image = "test2.hdr" ;
     int width = 0 ; 
     int height = 0 ;
     int channels = 0 ;  
     float *hdr_data = stbi_loadf( image.c_str() , &width , &height , &channels , 0);
     if(stbi_failure_reason())
-		std::cout << stbi_failure_reason() << "\n"; 
-    EnvmapProcessing process(hdr_data , (unsigned) width , (unsigned) height);
-    auto tex = process.computeDiffuseIrradiance((unsigned) 1000 , true); 
-    stbi_write_hdr("response.hdr" , width , height , 3 , tex->f_data); 
-    tex->clean(); 
+		std::cout << stbi_failure_reason() << "\n";
+    /*try{ 
+        EnvmapProcessing process(hdr_data , (unsigned) width , (unsigned) height);
+        auto tex = process.computeDiffuseIrradiance(512 , 256 , 1000); 
+        stbi_write_hdr("response.hdr" , 512 , 256 , channels , tex->f_data); 
+        tex->clean();
+    }
+    catch(const std::exception &e){
+        const char* exception = e.what();
+        std::cout << exception << std::endl;  
+    }*/
+    unsigned _width = 512; 
+    unsigned _height = 256 ; 
+    float *src_texture = new float[width * height * 4]; 
+    float *dest_texture ; 
+    unsigned j = 0 ; 
+    for(unsigned i = 0 ; i < width * height * 3 ; i+=3){
+       src_texture[j++] = hdr_data[i] ;  
+       src_texture[j++] = hdr_data[i + 1] ; 
+       src_texture[j++] = hdr_data[i + 2] ;
+       src_texture[j++] = 0 ; 
+    }
+    gpgpu_functions::irradiance_mapping::GPU_compute_irradiance(src_texture , width , height , 4 , &dest_texture , _width , _height , 10000);
+     
+    stbi_write_hdr("response.hdr" , _width , _height , 4 , dest_texture); 
+
 }
