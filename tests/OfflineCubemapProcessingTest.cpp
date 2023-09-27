@@ -108,26 +108,32 @@ TEST(EnvmapComputation , uvCartesianCohesion){
 }
 
 
-TEST(EnvmapComputation , computeDiffuseIrradiance){
+TEST(EnvmapComputation , computeDiffuseIrradianceCPU){
 	std::string image = "test2.hdr" ;
     int width = 0 ; 
     int height = 0 ;
+    unsigned _width = 512; 
+    unsigned _height = 256 ;  
     int channels = 0 ;  
     float *hdr_data = stbi_loadf( image.c_str() , &width , &height , &channels , 0);
     if(stbi_failure_reason())
 		std::cout << stbi_failure_reason() << "\n";
-    /*try{ 
+    try{ 
+        PerformanceLogger logger; 
+        
         EnvmapProcessing process(hdr_data , (unsigned) width , (unsigned) height);
-        auto tex = process.computeDiffuseIrradiance(512 , 256 , 1000); 
-        stbi_write_hdr("response.hdr" , 512 , 256 , channels , tex->f_data); 
+        
+        logger.startTimer(); 
+        auto tex = process.computeDiffuseIrradiance(_width , _height , 1000); 
+        logger.endTimer(); 
+        logger.print(); 
+        stbi_write_hdr("response_cpu.hdr" , _width , _height , channels , tex->f_data); 
         tex->clean();
     }
     catch(const std::exception &e){
         const char* exception = e.what();
         std::cout << exception << std::endl;  
-    }*/
-    unsigned _width = 512; 
-    unsigned _height = 256 ; 
+    }
     float *src_texture = new float[width * height * 4]; 
     float *dest_texture ; 
     unsigned j = 0 ; 
@@ -137,8 +143,8 @@ TEST(EnvmapComputation , computeDiffuseIrradiance){
        src_texture[j++] = hdr_data[i + 2] ;
        src_texture[j++] = 0 ; 
     }
-    gpgpu_functions::irradiance_mapping::GPU_compute_irradiance(src_texture , width , height , 4 , &dest_texture , _width , _height , 10000);
+    gpgpu_functions::irradiance_mapping::GPU_compute_irradiance(src_texture , width , height , 4 , &dest_texture , _width , _height , 1000);
      
-    stbi_write_hdr("response.hdr" , _width , _height , 4 , dest_texture); 
-    delete src_texture ; 
+    stbi_write_hdr("response_gpu.hdr" , _width , _height , 4 , dest_texture); 
+    delete[] src_texture ; 
 }
