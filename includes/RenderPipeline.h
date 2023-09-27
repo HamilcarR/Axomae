@@ -70,11 +70,15 @@ public:
      * @brief Generates mip maps of the environment map according to a computed roughness
      * 
      * @param cube_envmap_database_id Cubemap of the environment map database ID 
-     * @param mipmap_levels Mip maps level 
+     * @param width
+     * @param height 
+     * @param mipmap_levels Mip maps level
+     * @param base_sample Base amount of sampling .
+     * @param factor_per_mip Factor of sampling per mip levels ... more samples for high roughness
      * @param gl_widget 
      * @return int Database ID of the mip mapped cubemap with roughness levels 
      */
-    int preFilterEnvmap(int cube_envmap_database_id , unsigned int width , unsigned int height , unsigned int mipmap_levels ,  GLViewer* gl_widget);
+    int preFilterEnvmap(int cube_envmap_database_id , unsigned int resolution ,  unsigned int width , unsigned int height , unsigned int mipmap_levels , unsigned int base_samples , unsigned int factor_per_mip ,  GLViewer* gl_widget);
 
     
     int generateBRDFLookupTexture(unsigned int width , unsigned int height , GLViewer* gl_widget); 

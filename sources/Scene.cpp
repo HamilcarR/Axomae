@@ -63,6 +63,7 @@ std::vector<Drawable*> Scene::getSortedSceneByTransparency(){
             to_return.push_back(A); 
         else{
             glm::mat4 modelview_matrix = A->getMeshPointer()->getModelViewMatrix(); 
+            //glm::mat4 modelview_matrix = A->getMeshPointer()->computeFinalTransformation() * scene_camera->getView();
             glm::vec3 updated_aabb_center = aabb.aabb.computeModelViewPosition(modelview_matrix);
             float dist_to_camera = glm::length(updated_aabb_center);
             sorted_transparent_meshes[dist_to_camera] = A; 

@@ -23,6 +23,6 @@ vec3 sphericalToUv(in vec3 coord)
 
 void main(){
     vec3 uv = sphericalToUv(normalize(vertex_fragment_fragment_position)); 
-    vec3 color = texture(environment_map , vec2(uv.x , -uv.y)).rgb ; 
+    vec3 color = texture(environment_map , vec2(uv.x , uv.y)).rgb ; 
     fragment = vec4(color , 1.f); 
 }

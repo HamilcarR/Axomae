@@ -14,8 +14,6 @@ namespace axomae{
 using namespace std;
 bool ImageManager::gpu = false;
 static bool CHECK_IF_CUDA_AVAILABLE() {
-	if  (CUDART_VERSION != 9000 ) 
-		return false;
 	if (!ImageManager::USING_GPU()) 
 		return false; 
 	else 
@@ -37,9 +35,9 @@ uint8_t truncate(T n){
 	if(static_cast<float> (n) <= 0.)
 		return 0;
 	else if (static_cast<float>(n) >= 255)
-		 return 255;
+		return 255;
 	else
-  		 return static_cast<float> (n) ; 
+		return static_cast<float> (n) ; 
 }
 
 /**************************************************************************************************************/
@@ -386,6 +384,9 @@ void ImageManager::compute_edge(SDL_Surface* surface,uint8_t flag,uint8_t border
 	else  {
 		//TODO : use multi threading for initialization and greyscale computing
 		/*to avoid concurrent access on image*/
+
+		std::cout << "CUDA : " << cuda << "\n"; 
+
 		int w = surface->w;
 		int h = surface->h;
 		//thread this :

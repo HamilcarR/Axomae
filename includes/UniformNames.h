@@ -63,7 +63,7 @@ constexpr const char uniform_name_bool_blurr[] = "uniform_blurr";
 /*PBR*/
 constexpr const char uniform_name_float_cubemap_prefilter_roughness[] = "roughness"; 
 constexpr const char uniform_name_uint_prefilter_shader_envmap_resolution[] = "envmap_resolution";  
-
+constexpr const char uniform_name_uint_prefilter_shader_samples_count[] = "samples_count" ; 
 
 
 

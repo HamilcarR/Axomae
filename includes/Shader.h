@@ -255,6 +255,15 @@ public:
 	 */
 	virtual void setTextureUniforms(std::string texture_name , Texture::TYPE texture_type);
 
+	/**
+	 * @brief Set the texture uniforms . 
+	 * This method is to use for easier generic textures bindings. 
+	 * 
+	 * @param texture_name Texture name in the shader. 
+	 * @param location Texture location. 
+	 */
+	virtual void setTextureUniforms(std::string texture_name , int location);
+
 protected:
 	
 	/**
@@ -430,6 +439,7 @@ public:
 	EnvmapPrefilterBakerShader(const std::string vertex_code , const std::string fragment_code);
 	virtual void setRoughnessValue(float roughness);
 	virtual void setCubeEnvmapResolution(unsigned int resolution); 
+	virtual void setSamplesCount(unsigned sample_count); 
 	virtual ~EnvmapPrefilterBakerShader(); 
 };
 

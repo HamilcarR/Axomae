@@ -38,7 +38,7 @@ Texture* TextureFactory::constructTexture(TextureData *data , Texture::TYPE type
 			constructed_texture = data == nullptr ? new DummyOpacityTexture() : new OpacityTexture(data);
 		break ; 
 		case Texture::CUBEMAP:
-			constructed_texture =  new CubeMapTexture(data); 
+			constructed_texture =  new CubemapTexture(data); 
 		break ;
 		case Texture::IRRADIANCE: 
 			constructed_texture = new IrradianceTexture(data);
@@ -53,8 +53,11 @@ Texture* TextureFactory::constructTexture(TextureData *data , Texture::TYPE type
 			constructed_texture = new FrameBufferTexture(data);
 		break ; 
 		case Texture::GENERIC: 
-			constructed_texture =  new GenericTexture(data); 
-		break ; 
+			constructed_texture =  new GenericTexture2D(data); 
+		break ;
+		case Texture::GENERIC_CUBE : 
+			constructed_texture = new GenericCubemapTexture(data);
+		break;
 		default : 
 			constructed_texture =  nullptr ;
 		break ;

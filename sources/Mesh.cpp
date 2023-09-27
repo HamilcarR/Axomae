@@ -4,10 +4,15 @@
 
 Mesh::Mesh(SceneNodeInterface* parent):SceneTreeNode(parent){
 	mesh_initialized = false;
+	face_culling_enabled = false;
+	depth_mask_enabled = false; 
+	is_drawn = false ; 
+	polygon_mode = FILL ; 
 	shader_program = nullptr; 
 	name = "uninitialized mesh" ; 
 	is_drawn = true;
-	polygon_mode = FILL ;  
+	polygon_mode = FILL ; 
+	modelview_matrix = glm::mat4(1.f);  
 }
 
 Mesh::Mesh(const Mesh& copy) : SceneTreeNode(copy){
@@ -75,7 +80,7 @@ void Mesh::preRenderSetup(){
 	setDepthFunc(LESS);
 	glPolygonMode(GL_FRONT_AND_BACK , polygon_mode); 
 	depth_mask_enabled = true ;
-	glm::mat4 model_mat = computeFinalTransformation(); //!This causes the trouble in PBR reflection ? 
+	glm::mat4 model_mat = computeFinalTransformation();  
 	modelview_matrix = camera->getView() * model_mat ;
 	if(shader_program){	
 		shader_program->setSceneCameraPointer(camera); 

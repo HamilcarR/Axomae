@@ -9,7 +9,7 @@
 #include "../includes/Mutex.h"
 #include "../includes/SceneNodeBuilder.h"
 #define STB_IMAGE_IMPLEMENTATION
-#include "../vendor/stb_image.h"
+#include "../vendor/stb/stb_image.h"
 /**
  * @file Loader.cpp
  * Loader implementation 
@@ -634,15 +634,19 @@ EnvironmentMap2DTexture* Loader::loadHdrEnvmap(){
 	std::string folder_night = "../Ressources/Skybox_Textures/HDR/Night_City/" ; 
 	std::string folder_forest = "../Ressources/Skybox_Textures/HDR/Forest/" ;
 	std::string folder_park = "../Ressources/Skybox_Textures/HDR/Park/" ;
-	std::string folder_snow = "../Ressources/Skybox_Textures/HDR/Snow/" ; 
+	std::string folder_snow = "../Ressources/Skybox_Textures/HDR/Snow/" ;
+	std::string folder_sky = "../Ressources/Skybox_Textures/HDR/Sky/" ; 
+	std::string folder_street = "../Ressources/Skybox_Textures/HDR/Street/" ;  
 	std::string env = folder_night + "night_env.hdr";
 	std::string hdr = folder_night +"night.hdr";
 
 	hdr = folder_forest + "Forest.hdr" ; 
 	TextureData envmap; 	
 	int width , height , channels ; 
-	stbi_set_flip_vertically_on_load(true); 
 	float *hdr_data = stbi_loadf(hdr.c_str() , &width , &height , &channels , 0);
+	
+	if(stbi_failure_reason())
+		std::cout << stbi_failure_reason() << "\n"; 
 	envmap.width = static_cast<unsigned int>(width); 
 	envmap.height = static_cast<unsigned int>(height);
 	envmap.data_type = Texture::FLOAT; 
@@ -650,7 +654,10 @@ EnvironmentMap2DTexture* Loader::loadHdrEnvmap(){
 	envmap.data_format = Texture::RGB;
 	envmap.nb_components = channels ;
 	envmap.f_data = new float[width * height * channels]; 
-	std::memcpy(envmap.f_data , hdr_data , width * height * channels * sizeof(float)); 
+	std::memcpy(envmap.f_data , hdr_data , width * height * channels * sizeof(float)); 	
+	/* Furnace test */
+	/*for(unsigned i = 0 ; i < width * height * channels ; i++)
+		envmap.f_data[i] = 1.f ; */
 	int index = texture_database->addTexture(&envmap , Texture::ENVMAP2D); 
 	EnvironmentMap2DTexture* envmap_texture = dynamic_cast<EnvironmentMap2DTexture*>(texture_database->get(index));
 	envmap.clean(); 

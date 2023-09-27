@@ -2,9 +2,9 @@
 #include "../includes/UniformNames.h"
 #include <QMatrix4x4>
 #include <cstring>
+#include <stdexcept>
 
 #define SHADER_ERROR_LOG_SIZE 512
-
 
 /**
  * @file Shader.cpp
@@ -15,6 +15,10 @@
 
 static int success  ; 
 static char infoLog[SHADER_ERROR_LOG_SIZE] ; 
+
+
+
+constexpr const char* RUNTIME_ERROR_NEGATIVE_TEXTURE_UNIT = "Texture unit provided is negative"; 
 
 
 /**
@@ -78,6 +82,17 @@ void Shader::setAttributeBuffer(GLuint location , GLenum type , int offset , int
 }
 
 void Shader::setTextureUniforms(std::string texture_name , Texture::TYPE type){
+	try{
+		setTextureUniforms(texture_name , static_cast<int>(type)); 
+	}
+	catch(const std::exception& e){
+		std::cerr << "Exception caught : " << e.what() << "\n"; 
+	}
+}
+
+void Shader::setTextureUniforms(std::string texture_name , int type){
+	if(type < 0)
+		throw std::runtime_error(RUNTIME_ERROR_NEGATIVE_TEXTURE_UNIT);
 	setUniform(texture_name , static_cast<int>(type));
 }
 
@@ -400,6 +415,9 @@ void EnvmapPrefilterBakerShader::setCubeEnvmapResolution(unsigned int resolution
 	setUniform(uniform_name_uint_prefilter_shader_envmap_resolution , resolution); 
 }
 
+void EnvmapPrefilterBakerShader::setSamplesCount(unsigned int amount){
+	setUniform(uniform_name_uint_prefilter_shader_samples_count , amount); 
+}
 
 
 

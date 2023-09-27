@@ -25,7 +25,7 @@ struct image_type {
 	IMAGETYPE imagetype; 
 };
 
-
+//TODO: [AX-52] Fix memory leak at normal map generation when sliding the factor scale
 /*structure to keep track of pointers to destroy*/
 class HeapManagement {
 public:
@@ -200,7 +200,7 @@ GUIWindow::GUIWindow( QWidget *parent) : QMainWindow(parent) {
 	_UI.setupUi(this);
 	connect_all_slots(); 
 	_UI.progressBar->setValue(0);
-	_renderer = _UI.renderer_view->getRenderer(); 
+	viewer_3d = _UI.renderer_view; 
 	image_session_pointers::greyscale = nullptr; 
 	image_session_pointers::albedo = nullptr; 
 	image_session_pointers::height = nullptr; 
@@ -635,7 +635,7 @@ void GUIWindow::project_uv_normals(){
 	SceneSelector* instance = SceneSelector::getInstance();
 	Mesh* retrieved_mesh = instance->getCurrent() ; 
 	if(retrieved_mesh){
-		SDL_Surface* surf = ImageManager::project_uv_normals(retrieved_mesh->geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()); //TODO : change for managing the entire scene , maybe add scroll between different meshes 	
+		SDL_Surface* surf = ImageManager::project_uv_normals(retrieved_mesh->geometry , _UI.uv_width->value() , _UI.uv_height->value() , true); //TODO : change for managing the entire scene , maybe add scroll between different meshes 	
 		display_image(surf , PROJECTED_NMAP , true);
 	} 
 }
@@ -744,87 +744,74 @@ void GUIWindow::redo(){
 }
 
 /**************************************************************************************************************/
-
 void GUIWindow::set_renderer_gamma_value(int value){
-	if(_renderer != nullptr){
+	if(viewer_3d != nullptr){
 		float v = (float) value / POSTP_SLIDER_DIV ; 
-		_renderer->setGammaValue(v); 
+		viewer_3d->getRenderer().executeMethod<SET_GAMMA>(v);  
 	}
 }
 
 /**************************************************************************************************************/
-
 void GUIWindow::reset_renderer_camera(){
-	if(_renderer != nullptr)
-		_renderer->resetSceneCamera();
+	if(viewer_3d != nullptr)
+		viewer_3d->getRenderer().executeMethod<SET_DISPLAY_RESET_CAMERA>(); 
 }
 
-
 /**************************************************************************************************************/
-
 void GUIWindow::set_renderer_exposure_value(int value){
-	if(_renderer != nullptr){
+	if(viewer_3d != nullptr){
 		float v = (float) value / POSTP_SLIDER_DIV ; 
-		_renderer->setExposureValue(v); 
+		viewer_3d->getRenderer().executeMethod<SET_EXPOSURE>(v); 
 	}
 }
 /**************************************************************************************************************/
 void GUIWindow::set_renderer_no_post_process(){
-	if(_renderer != nullptr){
-		_renderer->setNoPostProcess();
+	if(viewer_3d != nullptr){
+		viewer_3d->getRenderer().executeMethod<SET_POSTPROCESS_NOPROCESS>();
 	}
 } 
 /**************************************************************************************************************/
 void GUIWindow::set_renderer_edge_post_process(){
-	if(_renderer != nullptr){
-		_renderer->setPostProcessEdge(); 
+	if(viewer_3d != nullptr){	
+		viewer_3d->getRenderer().executeMethod<SET_POSTPROCESS_EDGE>();
 	}
 }
 
 /**************************************************************************************************************/
 void GUIWindow::set_renderer_sharpen_post_process(){
-	if(_renderer != nullptr)
-		_renderer->setPostProcessSharpen(); 
+	if(viewer_3d != nullptr)		
+		viewer_3d->getRenderer().executeMethod<SET_POSTPROCESS_SHARPEN>();
 }
 
 /**************************************************************************************************************/
 void GUIWindow::set_renderer_blurr_post_process(){
-	if(_renderer != nullptr)
-		_renderer->setPostProcessBlurr(); 
+	if(viewer_3d != nullptr)		
+		viewer_3d->getRenderer().executeMethod<SET_POSTPROCESS_BLURR>();
 }
 
 /**************************************************************************************************************/
 void GUIWindow::set_rasterizer_point(){
-	if(_renderer)
-		_renderer->setRasterizerPoint(); 
+	if(viewer_3d)		
+		viewer_3d->getRenderer().executeMethod<SET_RASTERIZER_POINT>(); 
 }
 
 /**************************************************************************************************************/
 void GUIWindow::set_rasterizer_fill(){
-	if(_renderer)
-		_renderer->setRasterizerFill(); 
+	if(viewer_3d)		
+		viewer_3d->getRenderer().executeMethod<SET_RASTERIZER_FILL>();
 }
 
 /**************************************************************************************************************/
 void GUIWindow::set_rasterizer_wireframe(){
-	if(_renderer)
-		_renderer->setRasterizerWireframe(); 
+	if(viewer_3d)		
+		viewer_3d->getRenderer().executeMethod<SET_RASTERIZER_WIREFRAME>();
 } 
 
 /**************************************************************************************************************/
 void GUIWindow::set_display_boundingbox(bool display){
-	if(_renderer)
-		_renderer->displayBoundingBoxes(display); 
+	if(viewer_3d)		
+		viewer_3d->getRenderer().executeMethod<SET_DISPLAY_BOUNDINGBOX>(display);
 } 
-
-
-
-
-
-
-
-
-
 
 /**************************************************************************************************************/
 /*Protected utility methods*/

@@ -3,6 +3,7 @@
 
 #include "constants.h"
 #include "utils_3D.h" 
+#include "GenericTextureProcessing.h"
 
 /**
  * @file Texture.h
@@ -14,105 +15,6 @@
 /******************************************************************************************************************************************************************************************************************/
 class Shader; 
 class Texture; 
-/**
- * @brief Class for raw binary data of textures
- * !Note : While using HDR envmap , the data format is still uint32_t , as we wont need to use any other texture format than .hdr files
- * 
- */
-class TextureData{
-public:
-	/**
-	 * @brief Rgb channels types 
-	 * 
-	 */
-	enum CHANNELS : unsigned 
-	{ 
-		RGB = 0 , 
-		RGBA = 1
-	} ; 	 
-
-	/**
-	 * @brief Construct a new Texture Data object
-	 * 
-	 */
-	TextureData(){
-		width = 0 ; 
-		height = 0 ; 
-		data = nullptr ;
-		f_data = nullptr ;
-		nb_components = 1 ;
-		mipmaps = 5 ; 
-		internal_format = GL_RGBA ; 
-		data_format = GL_BGRA ; 
-		data_type = GL_UNSIGNED_BYTE ; 
-	}
-
-	/**
-	 * @brief Destroy the Texture Data object
-	 * 
-	 */
-	~TextureData(){}
-
-	/**
-	 * @brief Copy a texture
-	 * 
-	 * Provides deep copy of the object , but doesn't do the cleanup for the copied object
-	 * 
-	 * @param from The texture to be copied 
-	 * @return * TextureData& Deep copy of the original TextureData object
-	 */
-	TextureData& operator=(const TextureData& from){
-		if(this != &from){ 
-			width = from.width ;
-			height = from.height ;
-			data_format = from.data_format ; 
-			data_type = from.data_type ; 
-			internal_format = from.internal_format;
-			mipmaps = from.mipmaps ; 
-			nb_components = from.nb_components; 
-			if(from.data){ 
-	    		data = new uint32_t [from.width * from.height] ; 
-	    		std::memcpy((void*) data , (void*) from.data , from.width * from.height * sizeof(uint32_t));		
-			}
-			if(from.f_data){
-	    		f_data = new float [from.width * from.height * nb_components] ; 
-	    		std::memcpy((void*) data , (void*) from.data , from.width * from.height * nb_components * sizeof(float));		
-			}
-			name = from.name ; 
-		}
-		return *this ; 
-	}
-
-	/**
-	 * @brief Free the object
-	 *  
-	 */
-	void clean(){
-		if(data != nullptr)
-			delete data ;
-		if(f_data)
-			delete f_data;  
-		data = nullptr ;
-		width = 0 ; 
-		height = 0 ;
-		name = "" ; 
-	}
-
-public:
-	unsigned int width ;	/**<Width of the texture*/ 
-	unsigned int height ; 	/**<Height of the texture*/
-	std::string name ; 		/**<Name of the texture*/
-	uint32_t *data ; 		/*<1D array raw data of the texture*/
-	float *f_data ;
-	unsigned nb_components ; 
-	unsigned mipmaps ; 
-	GLenum internal_format ; 
-	GLenum data_format ;
-	GLenum data_type ;
-	
-};
-
-/******************************************************************************************************************************************************************************************************************/
 /**
  * @brief Texture class
  * 
@@ -146,8 +48,9 @@ public:
 	 */
 	enum TYPE : signed 
 	{
-		EMPTY = -1 ,						/**<Designate an empty , non generated texture*/ 
-		GENERIC = 0 , 						/**<A "compute and forget" texture , used to store generic data*/	
+		GENERIC_CUBE = -3 ,					/**<Generic cubemap for general purpose */
+		GENERIC = -2 , 						/**<Generic texture used for general purpose */	
+		EMPTY = -1 ,						/**<Designate an empty , non generated texture*/ 	
 		FRAMEBUFFER = 1,					/**<A texture to be rendered and displayed as a custom framebuffer , by the screen*/
 		DIFFUSE = 2 ,						/**<Diffuse texture. In case the shader used is PBR , this is the albedo*/ 
 		NORMAL = 3 , 						/**<A normal map texture. Stores normal data*/
@@ -290,7 +193,11 @@ public:
 	 */
 	virtual unsigned int getMipmapsLevel(){return mipmaps; }
 
-
+	/**
+	 * @brief Generate mip maps , and set texture filters accordingly (LINEAR_MIPMAP_LINEAR)
+	 * 
+	 */
+	virtual void generateMipmap(); 
 protected:
 
 	/**
@@ -781,14 +688,14 @@ public:
  * @brief Generic texture class definition
  * 
  */
-class GenericTexture : public Texture{
+class GenericTexture2D : public Texture{
 public:
 	
 	/**
 	 * @brief Construct a new Generic Texture object
 	 * 
 	 */
-	GenericTexture();
+	GenericTexture2D();
 	
 	/**
 	 * @brief Construct a new Generic Texture object
@@ -796,13 +703,13 @@ public:
 	 * @param data Raw texture data 
 	 * @see TextureData
 	 */
-	GenericTexture(TextureData* data);  
+	GenericTexture2D(TextureData* data);  
 	
 	/**
 	 * @brief Destroy the Generic Texture object
 	 * 
 	 */
-	virtual ~GenericTexture(); 
+	virtual ~GenericTexture2D(); 
 	
 	/**
 	 * @brief Bind the texture using glBindTexture
@@ -821,13 +728,32 @@ public:
 	 * 
 	 */
 	virtual void setGlData(Shader* shader)  ;
-	
+
+	/**
+	 * @brief Set the Texture Unit 
+	 * 
+	 * @param texture_unit 
+	 */
+	virtual void setTextureUnit(unsigned int texture_unit);
+
+	/**
+	 * @brief Set the Location Name object
+	 * 
+	 * @param name 
+	 */
+	virtual void setLocationName(std::string name);
+
 	/**
 	 * @brief Get the texture string description
 	 * 
 	 * @return C string 
 	 */
-	static const char* getTextureTypeCStr() ; 		
+	const char* getTextureTypeCStr() ; 		
+
+protected:
+	unsigned int texture_unit ; 
+	std::string location_name ; 
+
 }; 
 
 /******************************************************************************************************************************************************************************************************************/
@@ -835,14 +761,14 @@ public:
  * @brief Cubemap texture class definition
  * 
  */
-class CubeMapTexture : public Texture{
+class CubemapTexture : public Texture{
 public:
 	
 	/**
 	 * @brief Construct a new Cube Map Texture object
 	 * 
 	 */
-	CubeMapTexture(FORMAT internal_format = RGBA , FORMAT data_format = RGBA , FORMAT data_type = UBYTE , unsigned width = 0 , unsigned height = 0);
+	CubemapTexture(FORMAT internal_format = RGBA , FORMAT data_format = RGBA , FORMAT data_type = UBYTE , unsigned width = 0 , unsigned height = 0);
 	
 	/**
 	 * @brief Construct a new Cube Map Texture object
@@ -850,16 +776,15 @@ public:
 	 * @param data Texture raw data 
 	 * @see TextureData
 	 */
-	CubeMapTexture(TextureData* data);  
+	CubemapTexture(TextureData* data);  
 	
 	/**
 	 * @brief Destroy the Cube Map Texture object
 	 * 
 	 */
-	virtual ~CubeMapTexture();
+	virtual ~CubemapTexture();
 	
-	/**
-	* @brief Initialize cubemap data
+	/*
 	* 
 	* width * height is the size of one single face. The total size of the cubemap will be :
 	*
@@ -874,6 +799,10 @@ public:
  	* 	  5 x width² = BACK => GL_TEXTURE_CUBE_MAP_POSITIVE_Z
  	* 	  6 x width² = FRONT => GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 	*!Note : If TextureData == nullptr , this will instead allocate an empty cubemap . 
+	*/
+	/**
+	 * @brief Initializes the cubemap texture data
+	 * 
 	 */
 	virtual void initializeTexture2D() override; 	
 	
@@ -902,6 +831,12 @@ public:
 	 * 
 	 */
 	virtual void setGlData(Shader* shader) ;
+
+	/**
+	 * @brief Generate mipmaps for the cubemap  
+	 * 
+	 */
+	virtual void generateMipmap() override;
 	
 	/**
 	 * @brief Get the texture string description
@@ -918,14 +853,79 @@ protected:
 	 */
 	virtual void setCubeMapTextureData(TextureData* texture);
 
-
 }; 
+
+
+/******************************************************************************************************************************************************************************************************************/
+class GenericCubemapTexture : public CubemapTexture{
+public:
+	/**
+	 * @brief Construct a new generic cube Map Texture object
+	 * 
+	 */
+	GenericCubemapTexture(FORMAT internal_format = RGBA , FORMAT data_format = RGBA , FORMAT data_type = UBYTE , unsigned width = 0 , unsigned height = 0);
+	
+	/**
+	 * @brief Construct a new Cube Map Texture object
+	 * 
+	 * @param data Texture raw data 
+	 * @see TextureData
+	 */
+	GenericCubemapTexture(TextureData* data);  
+	
+	/**
+	 * @brief Destroy the Generic Cubemap Texture object
+	 * 
+	 */
+	virtual ~GenericCubemapTexture();
+	
+	/**
+	 * @brief Bind the texture using glBindTexture
+	 * 
+	 */
+	virtual void bindTexture()  ; 
+
+	/**
+	 * @brief Unbind texture 
+	 * 
+	 */
+	virtual void unbindTexture() ;
+
+
+	/**
+	 * @brief Set the OpenGL texture data infos
+	 * 
+	 */
+	virtual void setGlData(Shader* shader) ;
+
+	/**
+	 * @brief Get the texture string description
+	 * 
+	 * @return C string 
+	 */
+	const char* getTextureTypeCStr() ;
+
+	void setTextureUnit(unsigned int tex_unit){texture_unit = tex_unit;}
+
+	void setLocationName(std::string loc_name){location_name = loc_name;}
+
+	unsigned int getTextureUnit(){return texture_unit;}
+
+	std::string getLocationName(){return location_name;}
+	
+protected:
+	unsigned int texture_unit ; 
+	std::string location_name ; 
+
+
+};
+
 /******************************************************************************************************************************************************************************************************************/
 /**
  * @brief Irradiance texture class definition
  * 
  */
-class IrradianceTexture : public CubeMapTexture{
+class IrradianceTexture : public CubemapTexture{
 public:
 	
 	/**
