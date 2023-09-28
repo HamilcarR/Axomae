@@ -33,7 +33,7 @@ inline void shaderCompilationErrorCheck(unsigned int shader_id){
 	glGetShaderiv(shader_id , GL_COMPILE_STATUS , &success) ; 
 	if(!success){
 		glGetShaderInfoLog(shader_id , SHADER_ERROR_LOG_SIZE , nullptr , infoLog);
-		std::cerr << "Shader compilation failed with error : " << infoLog << "\n" ; 
+		LOG("Shader compilation failed with error : " + std::string(infoLog), LogLevel::ERROR) ; 
 	}
 }
 
@@ -49,7 +49,7 @@ inline void programLinkingErrorCheck(unsigned int program_id){
 	glGetProgramiv(program_id, GL_LINK_STATUS , &success) ; 
 	if(!success){
 		glGetProgramInfoLog(program_id , SHADER_ERROR_LOG_SIZE , nullptr , infoLog); 
-		std::cerr << "Shader linkage failed with error : " << infoLog << "\n" ; 
+		LOG("Shader linkage failed with error : " + std::string(infoLog) , LogLevel::ERROR) ; 
 	}
 }
 
@@ -86,7 +86,7 @@ void Shader::setTextureUniforms(std::string texture_name , Texture::TYPE type){
 		setTextureUniforms(texture_name , static_cast<int>(type)); 
 	}
 	catch(const std::exception& e){
-		std::cerr << "Exception caught : " << e.what() << "\n"; 
+		LOG("Exception caught : " + std::string(e.what()) , LogLevel::ERROR); 
 	}
 }
 
@@ -249,7 +249,7 @@ void Shader::release(){
 
 void Shader::clean(){
 	if(shader_program != 0){	
-		std::cout << "Destroying shader : "<< shader_program  << std::endl ;  
+		LOG("Destroying shader : " + std::to_string(shader_program) , LogLevel::INFO) ; 
 		glDeleteShader(vertex_shader) ; 
 		glDeleteShader(fragment_shader) ; 
 		glDeleteProgram(shader_program) ; 

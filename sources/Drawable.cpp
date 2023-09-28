@@ -23,7 +23,7 @@ Drawable::Drawable(Mesh *mesh){
 		camera_pointer = nullptr ; 
 		gl_buffers.setGeometryPointer(&mesh_object->geometry); 
 		if(!initialize())
-			std::cout << "A problem prevented mesh initialization!\n" ; 
+			LOG("A problem prevented mesh initialization!" , LogLevel::ERROR) ; 
 	}
 }
 

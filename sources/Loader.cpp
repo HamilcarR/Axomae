@@ -92,7 +92,7 @@ static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 			async_copy_buffer(image_width , image_height , from_buffer , dest_buffer); 
 			totexture->width = image_width ; 
 			totexture->height = image_height ; 
-			std::cout << "image of size " << totexture->width << " x " << totexture->height << " uncompressed " << std::endl ; 
+			LOG("image of size " + std::to_string(totexture->width) + " x " + std::to_string(totexture->height) + " uncompressed " , LogLevel::INFO) ; 
 		}
 	}
 }
@@ -100,7 +100,7 @@ static void copyTexels(TextureData *totexture , aiTexture *fromtexture){
 
 static void loadTextureDummy(Material* material , Texture::TYPE type , TextureDatabase* texture_database){
 	int index = texture_database->addTexture(nullptr , type , true , true); 	
-	std::cout << "Loading dummy texture at index : " << index << std::endl;  
+	LOG("Loading dummy texture at index : " + std::to_string(index) , LogLevel::INFO);  
 	material->addTexture(index , type); 
 }
 
@@ -115,7 +115,7 @@ static void loadTextureDummy(Material* material , Texture::TYPE type , TextureDa
  */
 static void loadTexture(const aiScene* scene , Material *material ,TextureData &texture ,aiString texture_string ,Texture::TYPE type , TextureDatabase* texture_database){
 	std::string texture_index_string = texture_string.C_Str();
-	std::cout << "Texture type loaded : " << texture.name << " / GLB index is: " << texture_index_string <<  "\n" ; 
+	LOG("Texture type loaded : " + texture.name + " / GLB index is: " + texture_index_string, LogLevel::INFO) ; 
 	if(texture_index_string.size() != 0){
 		texture_index_string = texture_index_string.substr(1) ; 
 		unsigned int texture_index_int = stoi(texture_index_string);  
@@ -129,7 +129,7 @@ static void loadTexture(const aiScene* scene , Material *material ,TextureData &
 			material->addTexture(texture_index_int , type); 
 	}
 	else
-		std::cout << "Loader can't load texture\n" ;  
+		LOG("Loader can't load texture\n" , LogLevel::WARNING) ;  
 }
 
 
@@ -499,7 +499,7 @@ std::pair<std::vector<Mesh*> , SceneTree> Loader::loadObjects(const char* file){
 			const char* mesh_name = mesh->mName.C_Str(); 
 			std::string name(mesh_name);	
 			Mesh *loaded_mesh = static_cast<Mesh*>(SceneNodeBuilder::buildMesh(nullptr , name , std::move(*geometry), material_array[mesh_index] , shader_program )) ;
-			std::cout << "object loaded : " << name << "\n" ;
+			LOG("object loaded : " + name , LogLevel::INFO);
 			node_lookup_table[mesh_index] = loaded_mesh; 	
 			objects.first.push_back(loaded_mesh);
 			delete geometry ; 	
@@ -509,7 +509,7 @@ std::pair<std::vector<Mesh*> , SceneTree> Loader::loadObjects(const char* file){
 		return objects ; 
 	}	
 	else{
-		std::cout << "Problem loading scene" << std::endl ; 
+		LOG("Problem loading scene" , LogLevel::ERROR) ; 
 		return std::pair<std::vector<Mesh*> , SceneTree>() ; 
 	}
 	
@@ -646,7 +646,7 @@ EnvironmentMap2DTexture* Loader::loadHdrEnvmap(){
 	float *hdr_data = stbi_loadf(hdr.c_str() , &width , &height , &channels , 0);
 	
 	if(stbi_failure_reason())
-		std::cout << stbi_failure_reason() << "\n"; 
+		LOG("STBI FAILED WITH :" + std::string(stbi_failure_reason()) , LogLevel::ERROR); 
 	envmap.width = static_cast<unsigned int>(width); 
 	envmap.height = static_cast<unsigned int>(height);
 	envmap.data_type = Texture::FLOAT; 
@@ -664,7 +664,7 @@ EnvironmentMap2DTexture* Loader::loadHdrEnvmap(){
 	if(envmap_texture) 
 		return envmap_texture; 	
 	else{
-		std::cout << "ENVMAP loading failed!\n" ; 
+		LOG("ENVMAP loading failed!\n" , LogLevel::ERROR)  ; 
 		return nullptr; 
 	}
 

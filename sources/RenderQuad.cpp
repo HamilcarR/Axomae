@@ -5,7 +5,7 @@ RenderQuadFBO::RenderQuadFBO(){
 }
 
 RenderQuadFBO::RenderQuadFBO(TextureDatabase* database , ScreenSize* screen , unsigned int* default_fbo): FrameBufferInterface(database , screen , default_fbo  ){
-    std::cout << "initialized cubemap" << std::endl;  
+    LOG("initialized cubemap" , LogLevel::INFO);  
 }
 
 

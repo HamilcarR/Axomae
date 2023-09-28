@@ -27,10 +27,10 @@ void GLViewer::initializeGL(){
 	if (!glew_initialized){
 		glewExperimental = GL_TRUE ; 
 		GLenum err = glewInit();
-		std::cout << "glew initialized!\n";
+		LOG("glew initialized!" , LogLevel::INFO);
 		if (err != GLEW_OK)
 		{
-			std::cerr << "failed to initialize glew with error : " << reinterpret_cast<const char *>(glewGetErrorString(err)) << "\n";
+			LOG("failed to initialize glew with error : " + std::string(reinterpret_cast<const char *>(glewGetErrorString(err))) , LogLevel::CRITICAL);
 			exit(EXIT_FAILURE);
 		}
 		else{
@@ -40,7 +40,7 @@ void GLViewer::initializeGL(){
 				glDebugMessageCallback(glDebugCallback , nullptr); 
 			}
 			else{
-				std::cout << "Debug output extension not supported\n" ; 
+				LOG("Debug output extension not supported\n" , LogLevel::WARNING) ; 
 			}
 		}
 	}

@@ -50,7 +50,7 @@ void RenderPipeline::clean(){
  */
 //TODO: [AX-43] Fix memory leak in RenderPipeline
 CubeMapMesh* RenderPipeline::bakeEnvmapToCubemap( EnvironmentMap2DTexture *hdri_map , unsigned width , unsigned height , GLViewer* gl_widget){
-    std::cout << "Generating an environment cubemap" << "\n"; 
+    LOG("Generating an environment cubemap",LogLevel::INFO); 
     assert(resource_database != nullptr); 
     assert(resource_database->getTextureDatabase() != nullptr); 
     assert(renderer != nullptr);
@@ -105,7 +105,7 @@ CubeMapMesh* RenderPipeline::bakeEnvmapToCubemap( EnvironmentMap2DTexture *hdri_
  * @return an integer value, which is the database ID of the baked irradiance cubemap texture.
  */
 int RenderPipeline::bakeIrradianceCubemap(int cube_envmap , unsigned width , unsigned height , GLViewer* gl_widget){
-    std::cout << "Generating an irradiance cubemap" << "\n";
+    LOG("Generating an irradiance cubemap" , LogLevel::INFO);
     ScreenSize irrad_dim , cam_dim , default_dim ;
     TextureDatabase *texture_database = resource_database->getTextureDatabase();
     ShaderDatabase *shader_database = resource_database->getShaderDatabase();
@@ -130,7 +130,7 @@ int RenderPipeline::bakeIrradianceCubemap(int cube_envmap , unsigned width , uns
 /********************************************************************************************************************************************************************************************************/
 
 int RenderPipeline::preFilterEnvmap(int cube_envmap , unsigned int resolution ,  unsigned int width , unsigned int height , unsigned int max_mip_level , unsigned int base_sample_count, unsigned int factor_per_mip, GLViewer* gl_widget){
-    std::cout << "Generating a prefiltered cubemap" << "\n"; 
+    LOG("Generating a prefiltered cubemap" , LogLevel::INFO); 
     ScreenSize cubemap_dim , default_dim , resize_dim; 
     EnvmapPrefilterBakerShader* prefilter_shader = static_cast<EnvmapPrefilterBakerShader*>(resource_database->getShaderDatabase()->get(Shader::ENVMAP_PREFILTER));
     auto texture_database = resource_database->getTextureDatabase(); 

@@ -4,13 +4,13 @@
 #include <ostream>
 #include <iostream>
 #include <future>
+#include <ctime>
+#include <chrono>
 #include <cmath>
 #include <vector>
 #include <SDL2/SDL.h> 
 #include <memory>
-#include "utils_3D.h" 
-
-
+#include "Logger.h" 
 
 namespace axomae {
 	

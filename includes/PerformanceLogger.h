@@ -12,14 +12,14 @@
  * @class PerformanceLogger
  * 
  */
-class PerformanceLogger : public Logger{
+class PerformanceLogger : virtual public AbstractLogger{
 public:
     
     /**
      * @brief Construct a new Performance Logger object
      * 
      */
-    PerformanceLogger() : Logger(){
+    PerformanceLogger() : AbstractLogger(){
     }
 
     /**
@@ -50,9 +50,9 @@ public:
      * @brief Print the difference between time at end , and time at start 
      * 
      */
-    void print(){
-        duration = std::chrono::duration_cast<std::chrono::milliseconds> (end - start); 
-        std::cout << "Duration : " << duration.count() << "ms\n" ; 
+    virtual void print() const {
+        std::chrono::milliseconds dur = std::chrono::duration_cast<std::chrono::milliseconds> (end - start); 
+        std::cout << "Duration : " << dur.count() << "ms\n" ; 
     }
 protected:
     std::chrono::high_resolution_clock::time_point start; 

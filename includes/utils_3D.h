@@ -3,6 +3,7 @@
 
 
 #include "DebugGL.h"
+#include "constants.h"
 #include "Object3D.h" 
 #include <map>
 #include <GL/glew.h>

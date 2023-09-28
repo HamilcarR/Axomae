@@ -7,17 +7,18 @@
 #include <texture_types.h>
 #include <device_launch_parameters.h>
 #include "../includes/constants.h"
+#include "../includes/utils_3D.h"
 
 
 
 #define cudaErrCheck(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
-{
-        if (code != cudaSuccess) 
-        {
-                fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
-                if (abort) exit(code);
-        }
+inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true){
+	if (code != cudaSuccess) {
+		const char* err_str = cudaGetErrorString(code);
+		std::string err = "CUDA GPU assert :" + std::string(err_str) ;
+		LOG(err , LogLevel::ERROR); 
+		if (abort) exit(code);
+    }
 }
 
 
@@ -53,7 +54,8 @@ struct gpu_threads {
 inline void check_error(const char* file , int line) {
 	cudaError_t err = cudaGetLastError(); 
 	if (err != cudaSuccess) {
-		std::cout << "CUDA ERROR at file :  " << file << " Line : " << line << " => " << cudaGetErrorString(err) << "\n"; 
+		std::string err_str = "CUDA ERROR : " + std::string(cudaGetErrorString(err)); 
+		LOG(err_str , LogLevel::ERROR); 
 	}
 }
 

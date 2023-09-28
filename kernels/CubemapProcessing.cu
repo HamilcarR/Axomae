@@ -208,7 +208,7 @@ __host__ void gpgpu_functions::irradiance_mapping::gpgpu_kernel_call(void (*devi
     cudaEventSynchronize(stop);
     float time;
     cudaEventElapsedTime(&time, start, stop);
-    std::cout << "Diffuse irradiance kernel elapsed time : " << time << "\n";
+    LOG("Diffuse irradiance kernel elapsed time : " + std::to_string(time) , LogLevel::INFO); 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
 }
