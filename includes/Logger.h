@@ -11,6 +11,7 @@
 
 
 
+#define LOG(message , level) Logger::logMessage(message , level , __FILE__ , __LINE__)
 
 namespace LogLevel{
     enum LOGENUMTYPE : unsigned {
@@ -48,7 +49,7 @@ protected:
     std::vector<LogLine> log_buffer ;  
 };
 
-#define LOG(message , level) Logger::logMessage(message , level , __FILE__ , __LINE__)
+
 
 
 
