@@ -8,9 +8,11 @@
 #include "Window.h"
 #include "../Form Files/ui_test.h"
 #include "SceneSelector.h" 
+#include "Config.h"
 #include "constants.h"
 #include "utils_3D.h" 
 #include "Renderer.h"
+
 /**
  * @file GUIWindow.h
  * UI layout
@@ -25,14 +27,16 @@ namespace axomae {
 class HeapManagement; 
 class ImageImporter ;
 template <typename T> struct image_type ;  		
-class GUIWindow : public QMainWindow {
+class Controller : public QMainWindow {
 		Q_OBJECT
 public:	
-	GUIWindow( QWidget *parent = nullptr);
-	~GUIWindow();
+	Controller( QWidget *parent = nullptr);
+	~Controller();
+	void setApplicationConfig(const std::string& config_string); 
 	Ui::MainWindow& getUi() { return _UI;  }
 	static HeapManagement *_MemManagement;
-	static SDL_Surface* copy_surface(SDL_Surface* surface); 	
+	static SDL_Surface* copy_surface(SDL_Surface* surface); 
+
 /* SLOTS */
 public slots:
 		
@@ -275,35 +279,6 @@ public slots:
 	void set_display_boundingbox(bool display); 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 protected slots:
 	/**
 	 * @brief Updates UI slider according to the factor 
@@ -321,6 +296,7 @@ private:
 	GLViewer * viewer_3d; 
 	Window *_window; 
 	ImageImporter *_importer; 
+	ApplicationConfig configuration ; 	
 	
 };
 

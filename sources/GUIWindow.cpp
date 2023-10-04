@@ -32,7 +32,7 @@ public:
 	
 	void addToStack(image_type<SDL_Surface> a){
 		image_type<SDL_Surface> copy = a ; 
-		copy.image = GUIWindow::copy_surface(a.image);  
+		copy.image = Controller::copy_surface(a.image);  
 		SDLSurf_stack.push(copy); 		
 	}
 	image_type<SDL_Surface> topStack(){
@@ -194,9 +194,9 @@ namespace image_session_pointers {
 
 /**************************************************************************************************************/
 
-HeapManagement *GUIWindow::_MemManagement = new HeapManagement;
+HeapManagement *Controller::_MemManagement = new HeapManagement;
 
-GUIWindow::GUIWindow( QWidget *parent) : QMainWindow(parent) {
+Controller::Controller( QWidget *parent) : QMainWindow(parent) {
 	_UI.setupUi(this);
 	connect_all_slots(); 
 	_UI.progressBar->setValue(0);
@@ -206,15 +206,23 @@ GUIWindow::GUIWindow( QWidget *parent) : QMainWindow(parent) {
 	image_session_pointers::height = nullptr; 
 	image_session_pointers::normalmap = nullptr;
 	image_session_pointers::dudv = nullptr; 
-
+	LoggerConfigDataStruct log_struct = configuration.generateLoggerConfigDataStruct();  
+	LOGCONFIG(log_struct); 
 }
 
-GUIWindow::~GUIWindow() {
+Controller::~Controller() {
 	delete _MemManagement;
 }
 
+void Controller::setApplicationConfig(const std::string& config_string){
+	configuration.setConfig(config_string);
+	LoggerConfigDataStruct log_struct = configuration.generateLoggerConfigDataStruct();  
+	LOGCONFIG(log_struct); 
+}
+
+
 /**************************************************************************************************************/
-void GUIWindow::display_image(SDL_Surface* surf , IMAGETYPE type , bool save_in_heap) {
+void Controller::display_image(SDL_Surface* surf , IMAGETYPE type , bool save_in_heap) {
 	QGraphicsView *view = get_corresponding_view(type);
 	if(surf != nullptr && type != INVALID && save_in_heap){
 		_MemManagement->addToHeap({surf , type}); 
@@ -235,7 +243,7 @@ void GUIWindow::display_image(SDL_Surface* surf , IMAGETYPE type , bool save_in_
 }
 
 /**************************************************************************************************************/
-SDL_Surface* GUIWindow::copy_surface(SDL_Surface *src) {
+SDL_Surface* Controller::copy_surface(SDL_Surface *src) {
 	SDL_Surface* res; 
 	res = SDL_CreateRGBSurface(src->flags, src->w, src->h, src->format->BitsPerPixel, src->format->Rmask, src->format->Gmask, src->format->Bmask, src->format->Amask); 
 	if (res != nullptr) {
@@ -246,7 +254,7 @@ SDL_Surface* GUIWindow::copy_surface(SDL_Surface *src) {
 		return nullptr; 
 }
 /**************************************************************************************************************/
-QGraphicsView* GUIWindow::get_corresponding_view(IMAGETYPE type) {
+QGraphicsView* Controller::get_corresponding_view(IMAGETYPE type) {
 	switch(type){
 		case HEIGHT:
 			return _UI.height_image; 
@@ -275,7 +283,7 @@ QGraphicsView* GUIWindow::get_corresponding_view(IMAGETYPE type) {
 	}
 }
 /**************************************************************************************************************/
-SDL_Surface* GUIWindow::get_corresponding_session_pointer(IMAGETYPE type){
+SDL_Surface* Controller::get_corresponding_session_pointer(IMAGETYPE type){
 	switch(type){
 		case HEIGHT:
 			return image_session_pointers::height; 
@@ -312,7 +320,7 @@ SDL_Surface* GUIWindow::get_corresponding_session_pointer(IMAGETYPE type){
 }
 
 /**************************************************************************************************************/
-bool GUIWindow::set_corresponding_session_pointer(image_type<SDL_Surface> *image){
+bool Controller::set_corresponding_session_pointer(image_type<SDL_Surface> *image){
 	switch(image->imagetype){
 		case HEIGHT:
 			image_session_pointers::height = image->image; 
@@ -353,7 +361,7 @@ bool GUIWindow::set_corresponding_session_pointer(image_type<SDL_Surface> *image
 
 
 /**************************************************************************************************************/
-void GUIWindow::connect_all_slots() {
+void Controller::connect_all_slots() {
 	QObject::connect(_UI.actionImport_image, SIGNAL(triggered()), this, SLOT(import_image()));
 	QObject::connect(_UI.use_average, SIGNAL(clicked()), this, SLOT(greyscale_average()));
 	QObject::connect(_UI.use_luminance, SIGNAL(clicked()), this, SLOT(greyscale_luminance()));
@@ -406,7 +414,7 @@ void GUIWindow::connect_all_slots() {
 
 /*SLOTS*/
 /**************************************************************************************************************/
-bool GUIWindow::import_image() {
+bool Controller::import_image() {
 	HeapManagement* temp = _MemManagement; 
 	_MemManagement = new HeapManagement; 
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("Images (*.png *.bmp *.jpg)")); 
@@ -427,9 +435,9 @@ bool GUIWindow::import_image() {
 }
 
 /**************************************************************************************************************/
-bool GUIWindow::greyscale_average() {
+bool Controller::greyscale_average() {
 	SDL_Surface* s = image_session_pointers::albedo; 
-	SDL_Surface* copy = GUIWindow::copy_surface(s); 
+	SDL_Surface* copy = Controller::copy_surface(s); 
 
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , GREYSCALE_AVG });
@@ -444,9 +452,9 @@ bool GUIWindow::greyscale_average() {
 
 /**************************************************************************************************************/
 
-bool GUIWindow::greyscale_luminance() {
+bool Controller::greyscale_luminance() {
 	SDL_Surface* s = image_session_pointers::albedo; // use image_session_pointers TODO 
-	SDL_Surface *copy = GUIWindow::copy_surface(s);
+	SDL_Surface *copy = Controller::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , GREYSCALE_LUMI });
 		ImageManager::set_greyscale_luminance(copy);
@@ -461,7 +469,7 @@ bool GUIWindow::greyscale_luminance() {
 
 /**************************************************************************************************************/
 
-void GUIWindow::use_gpgpu(bool checked) {
+void Controller::use_gpgpu(bool checked) {
 	if (checked)
 		ImageManager::USE_GPU_COMPUTING();
 	else
@@ -472,9 +480,9 @@ void GUIWindow::use_gpgpu(bool checked) {
 /**************************************************************************************************************/
 
 
-void GUIWindow::use_scharr() {
+void Controller::use_scharr() {
 	SDL_Surface* s = image_session_pointers::greyscale; 
-	SDL_Surface* copy = GUIWindow::copy_surface(s);
+	SDL_Surface* copy = Controller::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , HEIGHT });
 		ImageManager::compute_edge(copy, AXOMAE_USE_SCHARR, AXOMAE_REPEAT); 
@@ -491,9 +499,9 @@ void GUIWindow::use_scharr() {
 }
 
 /**************************************************************************************************************/
-void GUIWindow::use_prewitt() {
+void Controller::use_prewitt() {
 	SDL_Surface* s = image_session_pointers::greyscale;
-	SDL_Surface* copy = GUIWindow::copy_surface(s);
+	SDL_Surface* copy = Controller::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , HEIGHT });
 		ImageManager::compute_edge(copy, AXOMAE_USE_PREWITT, AXOMAE_REPEAT);
@@ -509,9 +517,9 @@ void GUIWindow::use_prewitt() {
 }
 
 /**************************************************************************************************************/
-void GUIWindow::use_sobel() {
+void Controller::use_sobel() {
 	SDL_Surface* s = image_session_pointers::greyscale;
-	SDL_Surface* copy = GUIWindow::copy_surface(s);
+	SDL_Surface* copy = Controller::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , HEIGHT });
 		ImageManager::compute_edge(copy, AXOMAE_USE_SOBEL, AXOMAE_REPEAT);
@@ -530,9 +538,9 @@ void GUIWindow::use_sobel() {
 
 /**************************************************************************************************************/
 
-void GUIWindow::use_tangent_space() {
+void Controller::use_tangent_space() {
 	SDL_Surface* s = image_session_pointers::height;
-	SDL_Surface* copy = GUIWindow::copy_surface(s);
+	SDL_Surface* copy = Controller::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , NMAP });
 		ImageManager::compute_normal_map(copy, NORMAL_FACTOR , NORMAL_ATTENUATION); 
@@ -552,13 +560,13 @@ void GUIWindow::use_tangent_space() {
 /**************************************************************************************************************/
 
 
-void GUIWindow::use_object_space() {
+void Controller::use_object_space() {
 
 }
 
 /**************************************************************************************************************/
 
-void GUIWindow::change_nmap_factor(int f) {
+void Controller::change_nmap_factor(int f) {
 	NORMAL_FACTOR = f/dividor; 
 	_UI.factor_nmap->setValue(NORMAL_FACTOR); 
 	if (_UI.use_tangentSpace->isChecked()) {
@@ -570,7 +578,7 @@ void GUIWindow::change_nmap_factor(int f) {
 
 }
 
-void GUIWindow::change_nmap_attenuation(int f) {
+void Controller::change_nmap_attenuation(int f) {
 	NORMAL_ATTENUATION = f / dividor;
 	if (_UI.use_tangentSpace->isChecked()) {
 		use_tangent_space(); 
@@ -582,9 +590,9 @@ void GUIWindow::change_nmap_attenuation(int f) {
 }
 
 /**************************************************************************************************************/
-void GUIWindow::compute_dudv() {
+void Controller::compute_dudv() {
 	SDL_Surface* s = image_session_pointers::normalmap;
-	SDL_Surface* copy = GUIWindow::copy_surface(s);
+	SDL_Surface* copy = Controller::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , DUDV });
 		ImageManager::compute_dudv(copy, DUDV_FACTOR);
@@ -601,11 +609,11 @@ void GUIWindow::compute_dudv() {
 }
 
 /**************************************************************************************************************/
-void GUIWindow::change_dudv_nmap(int factor) {
+void Controller::change_dudv_nmap(int factor) {
 	DUDV_FACTOR = factor / dividor;
 	_UI.factor_dudv->setValue(DUDV_FACTOR);
 	SDL_Surface* s = image_session_pointers::normalmap;
-	SDL_Surface* copy = GUIWindow::copy_surface(s);
+	SDL_Surface* copy = Controller::copy_surface(s);
 	if (copy != nullptr) {
 		//_MemManagement->addToHeap({ copy , DUDV });
 		ImageManager::compute_dudv(copy, DUDV_FACTOR);
@@ -620,7 +628,7 @@ void GUIWindow::change_dudv_nmap(int factor) {
 }
 
 /**************************************************************************************************************/
-void GUIWindow::compute_projection(){ //TODO : complete uv projection method , implement baking
+void Controller::compute_projection(){ //TODO : complete uv projection method , implement baking
 	int width = _UI.uv_width->value() ; 
 	int height = _UI.uv_height->value() ; 
 	width = 0 ; 
@@ -631,7 +639,7 @@ void GUIWindow::compute_projection(){ //TODO : complete uv projection method , i
 /**************************************************************************************************************/
 
 //TODO: [AX-26] Optimize the normals projection on UVs in the UV tool 
-void GUIWindow::project_uv_normals(){	
+void Controller::project_uv_normals(){	
 	SceneSelector* instance = SceneSelector::getInstance();
 	Mesh* retrieved_mesh = instance->getCurrent() ; 
 	if(retrieved_mesh){
@@ -640,7 +648,7 @@ void GUIWindow::project_uv_normals(){
 	} 
 }
 /**************************************************************************************************************/
-bool GUIWindow::import_3DOBJ(){
+bool Controller::import_3DOBJ(){
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
 	if(!filename.isEmpty()){
 		Loader loader ;
@@ -656,28 +664,28 @@ bool GUIWindow::import_3DOBJ(){
 	return false ; 
 }
 /**************************************************************************************************************/
-void GUIWindow::next_mesh(){
+void Controller::next_mesh(){
 	SceneSelector::getInstance()->toNext();
 	project_uv_normals(); 
 }
 /**************************************************************************************************************/
-void GUIWindow::previous_mesh(){
+void Controller::previous_mesh(){
 	SceneSelector::getInstance()->toPrevious();
 	project_uv_normals(); 
 }
 
 /**************************************************************************************************************/
-bool GUIWindow::open_project() {
+bool Controller::open_project() {
 	return false; 
 }
 
 /**************************************************************************************************************/
-bool GUIWindow::save_project() {
+bool Controller::save_project() {
 	return false;
 }
 
 /**************************************************************************************************************/
-bool GUIWindow::save_image() {
+bool Controller::save_image() {
 	ImageImporter *inst = ImageImporter::getInstance(); 
 	QString filename = QFileDialog::getSaveFileName(this, tr("Save files"), "./", tr("All Files (*)"));
 	if (image_session_pointers::height != nullptr)
@@ -690,9 +698,9 @@ bool GUIWindow::save_image() {
 }
 
 /**************************************************************************************************************/
-void GUIWindow::smooth_edge(){
+void Controller::smooth_edge(){
 	SDL_Surface* surface = image_session_pointers::height;
-	SDL_Surface* copy = GUIWindow::copy_surface(surface) ; 
+	SDL_Surface* copy = Controller::copy_surface(surface) ; 
 	if (copy != nullptr) {
 		unsigned int factor = _UI.smooth_dial->value(); 
 		ImageManager::FILTER box_blur = _UI.box_blur_radio->isChecked() ? ImageManager::BOX_BLUR : ImageManager::FILTER_NULL ; 
@@ -705,9 +713,9 @@ void GUIWindow::smooth_edge(){
 }
 
 /**************************************************************************************************************/
-void GUIWindow::sharpen_edge(){
+void Controller::sharpen_edge(){
 	SDL_Surface* surface = image_session_pointers::greyscale;
-	SDL_Surface* copy = GUIWindow::copy_surface(surface) ; 
+	SDL_Surface* copy = Controller::copy_surface(surface) ; 
 	if (copy != nullptr) {
 		float factor = _UI.sharpen_float_box->value(); 
 		ImageManager::FILTER sharpen = _UI.sharpen_radio->isChecked() ? ImageManager::SHARPEN : ImageManager::FILTER_NULL ; 
@@ -720,7 +728,7 @@ void GUIWindow::sharpen_edge(){
 }
 /**************************************************************************************************************/
 
-void GUIWindow::undo(){
+void Controller::undo(){
 	image_type<SDL_Surface> previous = _MemManagement->topStack(); 
 	if(previous.image != nullptr && previous.imagetype != INVALID){
 		display_image(previous.image , previous.imagetype , false); 
@@ -732,7 +740,7 @@ void GUIWindow::undo(){
 
 /**************************************************************************************************************/
 
-void GUIWindow::redo(){
+void Controller::redo(){
 	//TODO: [AX-41] Fix crash when processing using undo / redo values on the Stack
 	_MemManagement->addTemptoStack() ; 
 	image_type<SDL_Surface> next = _MemManagement->topStack(); 
@@ -744,7 +752,7 @@ void GUIWindow::redo(){
 }
 
 /**************************************************************************************************************/
-void GUIWindow::set_renderer_gamma_value(int value){
+void Controller::set_renderer_gamma_value(int value){
 	if(viewer_3d != nullptr){
 		float v = (float) value / POSTP_SLIDER_DIV ; 
 		viewer_3d->getRenderer().executeMethod<SET_GAMMA>(v);  
@@ -752,63 +760,63 @@ void GUIWindow::set_renderer_gamma_value(int value){
 }
 
 /**************************************************************************************************************/
-void GUIWindow::reset_renderer_camera(){
+void Controller::reset_renderer_camera(){
 	if(viewer_3d != nullptr)
 		viewer_3d->getRenderer().executeMethod<SET_DISPLAY_RESET_CAMERA>(); 
 }
 
 /**************************************************************************************************************/
-void GUIWindow::set_renderer_exposure_value(int value){
+void Controller::set_renderer_exposure_value(int value){
 	if(viewer_3d != nullptr){
 		float v = (float) value / POSTP_SLIDER_DIV ; 
 		viewer_3d->getRenderer().executeMethod<SET_EXPOSURE>(v); 
 	}
 }
 /**************************************************************************************************************/
-void GUIWindow::set_renderer_no_post_process(){
+void Controller::set_renderer_no_post_process(){
 	if(viewer_3d != nullptr){
 		viewer_3d->getRenderer().executeMethod<SET_POSTPROCESS_NOPROCESS>();
 	}
 } 
 /**************************************************************************************************************/
-void GUIWindow::set_renderer_edge_post_process(){
+void Controller::set_renderer_edge_post_process(){
 	if(viewer_3d != nullptr){	
 		viewer_3d->getRenderer().executeMethod<SET_POSTPROCESS_EDGE>();
 	}
 }
 
 /**************************************************************************************************************/
-void GUIWindow::set_renderer_sharpen_post_process(){
+void Controller::set_renderer_sharpen_post_process(){
 	if(viewer_3d != nullptr)		
 		viewer_3d->getRenderer().executeMethod<SET_POSTPROCESS_SHARPEN>();
 }
 
 /**************************************************************************************************************/
-void GUIWindow::set_renderer_blurr_post_process(){
+void Controller::set_renderer_blurr_post_process(){
 	if(viewer_3d != nullptr)		
 		viewer_3d->getRenderer().executeMethod<SET_POSTPROCESS_BLURR>();
 }
 
 /**************************************************************************************************************/
-void GUIWindow::set_rasterizer_point(){
+void Controller::set_rasterizer_point(){
 	if(viewer_3d)		
 		viewer_3d->getRenderer().executeMethod<SET_RASTERIZER_POINT>(); 
 }
 
 /**************************************************************************************************************/
-void GUIWindow::set_rasterizer_fill(){
+void Controller::set_rasterizer_fill(){
 	if(viewer_3d)		
 		viewer_3d->getRenderer().executeMethod<SET_RASTERIZER_FILL>();
 }
 
 /**************************************************************************************************************/
-void GUIWindow::set_rasterizer_wireframe(){
+void Controller::set_rasterizer_wireframe(){
 	if(viewer_3d)		
 		viewer_3d->getRenderer().executeMethod<SET_RASTERIZER_WIREFRAME>();
 } 
 
 /**************************************************************************************************************/
-void GUIWindow::set_display_boundingbox(bool display){
+void Controller::set_display_boundingbox(bool display){
 	if(viewer_3d)		
 		viewer_3d->getRenderer().executeMethod<SET_DISPLAY_BOUNDINGBOX>(display);
 } 
@@ -816,7 +824,7 @@ void GUIWindow::set_display_boundingbox(bool display){
 /**************************************************************************************************************/
 /*Protected utility methods*/
 
-void GUIWindow::update_smooth_factor(int factor){
+void Controller::update_smooth_factor(int factor){
 	_UI.smooth_factor->setValue(factor); 
 }
 

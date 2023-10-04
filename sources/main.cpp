@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <regex>
+#include <signal.h>
 #include <string>
 #include <thread> 
 #include <gtest/gtest.h>
@@ -26,12 +27,19 @@ void init_api(){
 
 		cout<<"IMG init problem : " <<IMG_GetError()<<endl;             
 	}
-
-
-	
-
 }
 
+void sigsegv_handler(int signal){	
+	try{
+		LOG("Application crash" , LogLevel::CRITICAL); 
+		LOGFLUSH(); 
+	}
+	catch(const std::exception &e){
+		std::cerr << e.what(); 
+	}
+	abort(); 
+
+}
 
 void quit_api(){
 	IMG_Quit();
@@ -40,7 +48,8 @@ void quit_api(){
 
 
 int main(int argv , char** argc){
-	init_api();
+	signal(SIGSEGV , sigsegv_handler);
+	init_api();	
 	ProgramStatus * main_program_command = ProgramStatus::getInstance();
 	if (argv >= 2) {
 		string mode = argc[1];
@@ -78,13 +87,19 @@ int main(int argv , char** argc){
 			return a; 
 		}
 		else {
-			cout << "Wrong argument used" << "\n";
-			return EXIT_FAILURE;
+			QApplication app(argv , argc);
+			Controller win ; 
+			std::string param_string = "" ; 
+			for(int i = 1 ; i < argv ; i++)
+				param_string += argc[i] + std::string(" ") ; 
+			win.setApplicationConfig(param_string);
+			win.show(); 
+			return app.exec();
 		}
 	}
 	else{
 		QApplication app(argv, argc);		
-		GUIWindow win; 
+		Controller win; 
 		win.show(); 
 		return app.exec(); 
 	}
