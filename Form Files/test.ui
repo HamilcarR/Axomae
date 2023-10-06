@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1528</width>
-    <height>900</height>
+    <height>934</height>
    </rect>
   </property>
   <property name="palette">
@@ -499,10 +499,10 @@
              </sizepolicy>
             </property>
             <property name="tabShape">
-             <enum>QTabWidget::Triangular</enum>
+             <enum>QTabWidget::Rounded</enum>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>2</number>
             </property>
             <property name="movable">
              <bool>false</bool>
@@ -1174,6 +1174,9 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
              <layout class="QGridLayout" name="gridLayout_6">
               <item row="1" column="1">
                <widget class="GLViewer" name="renderer_view">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                   <horstretch>0</horstretch>
@@ -1181,6 +1184,9 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                  </sizepolicy>
                 </property>
                 <property name="mouseTracking">
+                 <bool>true</bool>
+                </property>
+                <property name="acceptDrops">
                  <bool>true</bool>
                 </property>
                </widget>
@@ -1200,7 +1206,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                  <enum>QTabWidget::Rounded</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>3</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideNone</enum>
@@ -1400,10 +1406,536 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                   </item>
                  </layout>
                 </widget>
+                <widget class="QWidget" name="tab_6">
+                 <attribute name="title">
+                  <string>Scene</string>
+                 </attribute>
+                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                  <item>
+                   <layout class="QVBoxLayout" name="verticalLayout_12">
+                    <item>
+                     <widget class="QGroupBox" name="groupBox_7">
+                      <property name="title">
+                       <string>Object Transformations</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QGroupBox" name="groupBox_6">
+                      <property name="title">
+                       <string>Geometry </string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
                 <widget class="QWidget" name="tab_2">
                  <attribute name="title">
                   <string>Lighting</string>
                  </attribute>
+                 <layout class="QGridLayout" name="gridLayout_18">
+                  <item row="0" column="0">
+                   <layout class="QGridLayout" name="gridLayout_16">
+                    <item row="0" column="1">
+                     <widget class="QTabWidget" name="tabWidget_5">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="currentIndex">
+                       <number>1</number>
+                      </property>
+                      <widget class="QWidget" name="tab_9">
+                       <attribute name="title">
+                        <string>Point Lights</string>
+                       </attribute>
+                       <layout class="QVBoxLayout" name="verticalLayout_23">
+                        <item>
+                         <layout class="QVBoxLayout" name="verticalLayout_22">
+                          <item>
+                           <widget class="QGroupBox" name="groupBox_9">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="focusPolicy">
+                             <enum>Qt::NoFocus</enum>
+                            </property>
+                            <property name="acceptDrops">
+                             <bool>false</bool>
+                            </property>
+                            <property name="autoFillBackground">
+                             <bool>false</bool>
+                            </property>
+                            <property name="title">
+                             <string>Configuration</string>
+                            </property>
+                            <property name="flat">
+                             <bool>false</bool>
+                            </property>
+                            <property name="checkable">
+                             <bool>false</bool>
+                            </property>
+                            <property name="checked">
+                             <bool>false</bool>
+                            </property>
+                            <layout class="QVBoxLayout" name="verticalLayout_19">
+                             <item>
+                              <widget class="QTabWidget" name="tabWidget_4">
+                               <property name="sizePolicy">
+                                <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                                 <horstretch>0</horstretch>
+                                 <verstretch>0</verstretch>
+                                </sizepolicy>
+                               </property>
+                               <property name="currentIndex">
+                                <number>0</number>
+                               </property>
+                               <property name="documentMode">
+                                <bool>false</bool>
+                               </property>
+                               <property name="tabsClosable">
+                                <bool>false</bool>
+                               </property>
+                               <property name="tabBarAutoHide">
+                                <bool>false</bool>
+                               </property>
+                               <widget class="QWidget" name="tab_7">
+                                <attribute name="title">
+                                 <string>Colors</string>
+                                </attribute>
+                                <layout class="QVBoxLayout" name="verticalLayout_20">
+                                 <item>
+                                  <layout class="QGridLayout" name="gridLayout_20">
+                                   <item row="4" column="0">
+                                    <widget class="QSlider" name="hslider_renderer_lighting_PointLights_colors_red">
+                                     <property name="sizePolicy">
+                                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                                       <horstretch>0</horstretch>
+                                       <verstretch>0</verstretch>
+                                      </sizepolicy>
+                                     </property>
+                                     <property name="maximum">
+                                      <number>255</number>
+                                     </property>
+                                     <property name="value">
+                                      <number>0</number>
+                                     </property>
+                                     <property name="orientation">
+                                      <enum>Qt::Horizontal</enum>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="3" column="0">
+                                    <widget class="QLabel" name="label_7">
+                                     <property name="text">
+                                      <string>Red</string>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="5" column="0">
+                                    <widget class="QLabel" name="label_8">
+                                     <property name="text">
+                                      <string>Green</string>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="6" column="1">
+                                    <widget class="QSpinBox" name="spinbox_renderer_lighting_PointLights_colors_green">
+                                     <property name="readOnly">
+                                      <bool>true</bool>
+                                     </property>
+                                     <property name="maximum">
+                                      <number>255</number>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="8" column="0">
+                                    <widget class="QSlider" name="hslider_renderer_lighting_PointLights_colors_blue">
+                                     <property name="sizePolicy">
+                                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                                       <horstretch>0</horstretch>
+                                       <verstretch>0</verstretch>
+                                      </sizepolicy>
+                                     </property>
+                                     <property name="maximum">
+                                      <number>255</number>
+                                     </property>
+                                     <property name="orientation">
+                                      <enum>Qt::Horizontal</enum>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="6" column="0">
+                                    <widget class="QSlider" name="hslider_renderer_lighting_PointLights_colors_green">
+                                     <property name="sizePolicy">
+                                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                                       <horstretch>0</horstretch>
+                                       <verstretch>0</verstretch>
+                                      </sizepolicy>
+                                     </property>
+                                     <property name="maximum">
+                                      <number>255</number>
+                                     </property>
+                                     <property name="orientation">
+                                      <enum>Qt::Horizontal</enum>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="4" column="1">
+                                    <widget class="QSpinBox" name="spinbox_renderer_lighting_PointLights_colors_red">
+                                     <property name="readOnly">
+                                      <bool>true</bool>
+                                     </property>
+                                     <property name="maximum">
+                                      <number>255</number>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="8" column="1">
+                                    <widget class="QSpinBox" name="spinbox_renderer_lighting_PointLights_colors_blue">
+                                     <property name="readOnly">
+                                      <bool>true</bool>
+                                     </property>
+                                     <property name="maximum">
+                                      <number>255</number>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="7" column="0">
+                                    <widget class="QLabel" name="label_9">
+                                     <property name="text">
+                                      <string>Blue</string>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                  </layout>
+                                 </item>
+                                 <item>
+                                  <widget class="QLabel" name="label_16">
+                                   <property name="text">
+                                    <string>power</string>
+                                   </property>
+                                  </widget>
+                                 </item>
+                                 <item>
+                                  <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+                                 </item>
+                                </layout>
+                               </widget>
+                               <widget class="QWidget" name="tab_8">
+                                <attribute name="title">
+                                 <string>Attenuation</string>
+                                </attribute>
+                                <layout class="QGridLayout" name="gridLayout_23">
+                                 <item row="0" column="0">
+                                  <layout class="QGridLayout" name="gridLayout_22">
+                                   <item row="3" column="0">
+                                    <widget class="QDoubleSpinBox" name="dspinbox_renderer_lighting_PointLights_Attenuation_linear">
+                                     <property name="decimals">
+                                      <number>9</number>
+                                     </property>
+                                     <property name="maximum">
+                                      <double>10000000000000.000000000000000</double>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="2" column="0">
+                                    <widget class="QLabel" name="label_11">
+                                     <property name="text">
+                                      <string>Linear</string>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="5" column="0">
+                                    <widget class="QDoubleSpinBox" name="dspinbox_renderer_lighting_PointLights_Attenuation_quadratic">
+                                     <property name="decimals">
+                                      <number>9</number>
+                                     </property>
+                                     <property name="maximum">
+                                      <double>10000000000000.000000000000000</double>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="1" column="0">
+                                    <widget class="QDoubleSpinBox" name="dspinbox_renderer_lighting_PointLights_Attenuation_constant">
+                                     <property name="decimals">
+                                      <number>9</number>
+                                     </property>
+                                     <property name="maximum">
+                                      <double>10000000000000.000000000000000</double>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="0" column="0">
+                                    <widget class="QLabel" name="label_10">
+                                     <property name="text">
+                                      <string>Constant</string>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="4" column="0">
+                                    <widget class="QLabel" name="label_12">
+                                     <property name="text">
+                                      <string>Quadratic</string>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                  </layout>
+                                 </item>
+                                </layout>
+                               </widget>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QPushButton" name="button_renderer_lighting_PointLights_add">
+                               <property name="text">
+                                <string>Add</string>
+                               </property>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QPushButton" name="button_renderer_lighting_PointLights_modify">
+                               <property name="text">
+                                <string>Modify</string>
+                               </property>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QPushButton" name="button_renderer_lighting_PointLights_delete">
+                               <property name="text">
+                                <string>Delete</string>
+                               </property>
+                              </widget>
+                             </item>
+                            </layout>
+                           </widget>
+                          </item>
+                         </layout>
+                        </item>
+                       </layout>
+                      </widget>
+                      <widget class="QWidget" name="tab_12">
+                       <attribute name="title">
+                        <string>Directional Lights</string>
+                       </attribute>
+                       <layout class="QVBoxLayout" name="verticalLayout_28">
+                        <item>
+                         <layout class="QVBoxLayout" name="verticalLayout_27">
+                          <item>
+                           <widget class="QGroupBox" name="groupBox_10">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="focusPolicy">
+                             <enum>Qt::NoFocus</enum>
+                            </property>
+                            <property name="acceptDrops">
+                             <bool>false</bool>
+                            </property>
+                            <property name="autoFillBackground">
+                             <bool>false</bool>
+                            </property>
+                            <property name="title">
+                             <string>Configuration</string>
+                            </property>
+                            <property name="flat">
+                             <bool>false</bool>
+                            </property>
+                            <property name="checkable">
+                             <bool>false</bool>
+                            </property>
+                            <property name="checked">
+                             <bool>false</bool>
+                            </property>
+                            <layout class="QVBoxLayout" name="verticalLayout_24">
+                             <item>
+                              <widget class="QTabWidget" name="tabWidget_6">
+                               <property name="sizePolicy">
+                                <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                                 <horstretch>0</horstretch>
+                                 <verstretch>0</verstretch>
+                                </sizepolicy>
+                               </property>
+                               <property name="currentIndex">
+                                <number>0</number>
+                               </property>
+                               <property name="documentMode">
+                                <bool>false</bool>
+                               </property>
+                               <property name="tabsClosable">
+                                <bool>false</bool>
+                               </property>
+                               <property name="tabBarAutoHide">
+                                <bool>false</bool>
+                               </property>
+                               <widget class="QWidget" name="tab_13">
+                                <attribute name="title">
+                                 <string>Colors</string>
+                                </attribute>
+                                <layout class="QVBoxLayout" name="verticalLayout_26">
+                                 <item>
+                                  <layout class="QGridLayout" name="gridLayout_21">
+                                   <item row="3" column="0">
+                                    <widget class="QLabel" name="label_13">
+                                     <property name="text">
+                                      <string>Red</string>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="8" column="1">
+                                    <widget class="QSpinBox" name="spinbox_renderer_lighting_DirectionalLights_colors_blue">
+                                     <property name="readOnly">
+                                      <bool>true</bool>
+                                     </property>
+                                     <property name="maximum">
+                                      <number>255</number>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="5" column="0">
+                                    <widget class="QLabel" name="label_14">
+                                     <property name="text">
+                                      <string>Green</string>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="8" column="0">
+                                    <widget class="QSlider" name="hslider_renderer_lighting_DirectionalLights_colors_blue">
+                                     <property name="sizePolicy">
+                                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                                       <horstretch>0</horstretch>
+                                       <verstretch>0</verstretch>
+                                      </sizepolicy>
+                                     </property>
+                                     <property name="maximum">
+                                      <number>255</number>
+                                     </property>
+                                     <property name="orientation">
+                                      <enum>Qt::Horizontal</enum>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="6" column="0">
+                                    <widget class="QSlider" name="hslider_renderer_lighting_DirectionalLights_colors_green">
+                                     <property name="sizePolicy">
+                                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                                       <horstretch>0</horstretch>
+                                       <verstretch>0</verstretch>
+                                      </sizepolicy>
+                                     </property>
+                                     <property name="maximum">
+                                      <number>255</number>
+                                     </property>
+                                     <property name="orientation">
+                                      <enum>Qt::Horizontal</enum>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="4" column="1">
+                                    <widget class="QSpinBox" name="spinbox_renderer_lighting_DirectionalLight_colors_red">
+                                     <property name="readOnly">
+                                      <bool>true</bool>
+                                     </property>
+                                     <property name="maximum">
+                                      <number>255</number>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="6" column="1">
+                                    <widget class="QSpinBox" name="spinbox_renderer_lighting_DirectionalLights_colors_green">
+                                     <property name="readOnly">
+                                      <bool>true</bool>
+                                     </property>
+                                     <property name="maximum">
+                                      <number>255</number>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="4" column="0">
+                                    <widget class="QSlider" name="hslider_renderer_lighting_DirectionalLights_colors_red">
+                                     <property name="sizePolicy">
+                                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                                       <horstretch>0</horstretch>
+                                       <verstretch>0</verstretch>
+                                      </sizepolicy>
+                                     </property>
+                                     <property name="maximum">
+                                      <number>255</number>
+                                     </property>
+                                     <property name="value">
+                                      <number>0</number>
+                                     </property>
+                                     <property name="orientation">
+                                      <enum>Qt::Horizontal</enum>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                   <item row="7" column="0">
+                                    <widget class="QLabel" name="label_15">
+                                     <property name="text">
+                                      <string>Blue</string>
+                                     </property>
+                                    </widget>
+                                   </item>
+                                  </layout>
+                                 </item>
+                                </layout>
+                               </widget>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QPushButton" name="button_renderer_lighting_PointLights_add_2">
+                               <property name="text">
+                                <string>Add</string>
+                               </property>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QPushButton" name="button_renderer_lighting_PointLights_modify_2">
+                               <property name="text">
+                                <string>Modify</string>
+                               </property>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QPushButton" name="button_renderer_lighting_PointLights_delete_2">
+                               <property name="text">
+                                <string>Delete</string>
+                               </property>
+                              </widget>
+                             </item>
+                            </layout>
+                           </widget>
+                          </item>
+                         </layout>
+                        </item>
+                       </layout>
+                      </widget>
+                      <widget class="QWidget" name="tab_11">
+                       <attribute name="title">
+                        <string>Spot Lights</string>
+                       </attribute>
+                      </widget>
+                      <widget class="QWidget" name="tab_10">
+                       <attribute name="title">
+                        <string>Area Lights</string>
+                       </attribute>
+                      </widget>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
                 </widget>
                </widget>
               </item>
