@@ -109,6 +109,13 @@ private:
 	 * @param event 
 	 */
 	void mouseReleaseEvent(QMouseEvent *event) override; 
+
+	/**
+	 * @brief 
+	 * 
+	 * @param event 
+	 */
+	void mouseDoubleClickEvent(QMouseEvent *event) override;	
 	
 	/**
 	 * @brief Mouse event triggered by the mouse wheel 

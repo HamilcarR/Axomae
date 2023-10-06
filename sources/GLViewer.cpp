@@ -57,6 +57,7 @@ void GLViewer::paintGL(){
 }
 
 void GLViewer::resizeGL(int w, int h){
+	QOpenGLWidget::resizeGL(w , h); 
 	renderer->onResize(width(), height());
 }
 
@@ -65,6 +66,7 @@ void GLViewer::printInfo(){
 }
 
 void GLViewer::mouseMoveEvent(QMouseEvent *event){
+	QOpenGLWidget::mouseMoveEvent(event); 
 	QPoint p = this->mapFromGlobal(QCursor::pos());
 	MouseState *mouse = renderer->getMouseStatePointer();
 	QRect bounds = this->rect();
@@ -78,6 +80,7 @@ void GLViewer::mouseMoveEvent(QMouseEvent *event){
 }
 
 void GLViewer::wheelEvent(QWheelEvent *event){
+	QOpenGLWidget::wheelEvent(event); 
 	if (event->angleDelta().y() > 0) // scroll up
 		renderer->onScrollUp();
 	else if (event->angleDelta().y() < 0)
@@ -86,6 +89,7 @@ void GLViewer::wheelEvent(QWheelEvent *event){
 }
 
 void GLViewer::mousePressEvent(QMouseEvent *event){
+	QOpenGLWidget::mousePressEvent(event);
 	MouseState *mouse = renderer->getMouseStatePointer();
 	switch (event->button()){
 	case Qt::LeftButton:
@@ -105,6 +109,7 @@ void GLViewer::mousePressEvent(QMouseEvent *event){
 }
 
 void GLViewer::mouseReleaseEvent(QMouseEvent *event){
+	QOpenGLWidget::mouseReleaseEvent(event);
 	MouseState *mouse = renderer->getMouseStatePointer();
 	switch (event->button()){
 	case Qt::LeftButton:
@@ -122,6 +127,13 @@ void GLViewer::mouseReleaseEvent(QMouseEvent *event){
 	}
 	update();
 }
+
+void GLViewer::mouseDoubleClickEvent(QMouseEvent *event){
+	QOpenGLWidget::mouseDoubleClickEvent(event);
+}
+
+
+
 
 void GLViewer::setNewScene(std::pair<std::vector<Mesh *> , SceneTree> &new_scene){
 	makeCurrent();
