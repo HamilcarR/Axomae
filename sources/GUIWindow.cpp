@@ -244,7 +244,9 @@ void Controller::display_image(SDL_Surface* surf , IMAGETYPE type , bool save_in
 
 /**************************************************************************************************************/
 SDL_Surface* Controller::copy_surface(SDL_Surface *src) {
-	SDL_Surface* res; 
+	SDL_Surface* res;
+	if(!src)
+		return nullptr;  
 	res = SDL_CreateRGBSurface(src->flags, src->w, src->h, src->format->BitsPerPixel, src->format->Rmask, src->format->Gmask, src->format->Bmask, src->format->Amask); 
 	if (res != nullptr) {
 		SDL_BlitSurface(src, nullptr, res, nullptr); 
@@ -362,6 +364,8 @@ bool Controller::set_corresponding_session_pointer(image_type<SDL_Surface> *imag
 
 /**************************************************************************************************************/
 void Controller::connect_all_slots() {
+	//TODO : replace this part by structures/classes + callbacks on function executed 
+
 	QObject::connect(_UI.actionImport_image, SIGNAL(triggered()), this, SLOT(import_image()));
 	QObject::connect(_UI.use_average, SIGNAL(clicked()), this, SLOT(greyscale_average()));
 	QObject::connect(_UI.use_luminance, SIGNAL(clicked()), this, SLOT(greyscale_luminance()));
@@ -407,8 +411,7 @@ void Controller::connect_all_slots() {
 	QObject::connect(_UI.rasterize_wireframe_button , SIGNAL(pressed()) , this , SLOT(set_rasterizer_wireframe())); 
 	QObject::connect(_UI.rasterize_display_bbox_checkbox , SIGNAL(toggled(bool)), this , SLOT(set_display_boundingbox(bool))); 
 
-
-
+	/*Renderer tab -> Lighting -> Point lights*/
 }
 
 
@@ -418,8 +421,12 @@ bool Controller::import_image() {
 	HeapManagement* temp = _MemManagement; 
 	_MemManagement = new HeapManagement; 
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("Images (*.png *.bmp *.jpg)")); 
-	if (filename.isEmpty())
+	if (filename.isEmpty()){
+		delete _MemManagement ; 
+		_MemManagement = temp ; 
 		return false;
+	}
+		
 	else {
 		image_session_pointers::filename = filename.toStdString(); ;
 		SDL_Surface* surf = ImageImporter::getInstance()->load_image(filename.toStdString().c_str()); 
