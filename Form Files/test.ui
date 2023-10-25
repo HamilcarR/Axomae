@@ -648,8 +648,7 @@
                        <string>undo</string>
                       </property>
                       <property name="icon">
-                       <iconset theme="go-previous">
-                        <normaloff>.</normaloff>.</iconset>
+                       <iconset theme="go-previous"/>
                       </property>
                      </widget>
                     </item>
@@ -659,8 +658,7 @@
                        <string>redo</string>
                       </property>
                       <property name="icon">
-                       <iconset theme="go-next">
-                        <normaloff>.</normaloff>.</iconset>
+                       <iconset theme="go-next"/>
                       </property>
                      </widget>
                     </item>
@@ -1447,7 +1445,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                        </sizepolicy>
                       </property>
                       <property name="currentIndex">
-                       <number>1</number>
+                       <number>0</number>
                       </property>
                       <widget class="QWidget" name="tab_9">
                        <attribute name="title">
@@ -1456,6 +1454,19 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                        <layout class="QVBoxLayout" name="verticalLayout_23">
                         <item>
                          <layout class="QVBoxLayout" name="verticalLayout_22">
+                          <item>
+                           <widget class="QListView" name="renderer_lighting_PointLights_list">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="frameShape">
+                             <enum>QFrame::StyledPanel</enum>
+                            </property>
+                           </widget>
+                          </item>
                           <item>
                            <widget class="QGroupBox" name="groupBox_9">
                             <property name="sizePolicy">
@@ -1728,6 +1739,16 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                        <layout class="QVBoxLayout" name="verticalLayout_28">
                         <item>
                          <layout class="QVBoxLayout" name="verticalLayout_27">
+                          <item>
+                           <widget class="QListView" name="renderer_lighting_DirectionalLights_list">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                           </widget>
+                          </item>
                           <item>
                            <widget class="QGroupBox" name="groupBox_10">
                             <property name="sizePolicy">
