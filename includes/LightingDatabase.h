@@ -40,6 +40,25 @@ public:
     virtual bool addLight(AbstractLight* light);
 
     /**
+     * @brief Remove specified light. 
+     * 
+     * @param light 
+     * @return false if not found 
+     */
+    virtual bool removeLight(AbstractLight* light); 
+    
+    /**
+     * @brief Remove light according to it's ID . 
+     * 
+     * @param id 
+     * @return true 
+     * @return false if not found 
+     */
+    virtual bool removeLight(const unsigned id);
+   
+    virtual bool updateLight(const unsigned id ,  const LightData& data);    
+    
+    /**
      * @brief Get all lights of certain type
      * 
      * @param type Type of light we want
@@ -75,10 +94,14 @@ public:
      * @param view View matrix for light transformations
      */
     virtual void updateShadersData(AbstractLight::TYPE type , Shader* shader , glm::mat4& view);
+
+    AbstractLight* getLightFromID(const unsigned id) const ;
+
 protected:
+    void giveID(AbstractLight* light); 
     std::map<AbstractLight::TYPE , std::vector<AbstractLight*>> light_database ;    /**<Map of all lights in the scene. The map key stored is the type of light*/
-
-
+    std::vector<unsigned int> free_id_list ;                                        /**<List of free IDs belonging to deleted lights*/ 
+    unsigned int last_id ; 
 
 };
 

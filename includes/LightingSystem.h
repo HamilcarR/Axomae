@@ -10,6 +10,43 @@
  * Defines polymorphic lighting system , as directional , spot lights and point lights  
  */
 
+class LightData {
+public:
+    
+    enum LIGHTDATA_UPDATE_FLAGS : unsigned {
+        POSITION_UPDATE = 1 , 
+        DIRECTION_UPDATE = 1 << 2 , 
+        ATTENUATION_UPDATE = 1 << 3 ,
+        DIFFUSE_UPDATE = 1 << 4 , 
+        SPECULAR_UPDATE = 1 << 5 , 
+        AMBIANT_UPDATE = 1 << 6 ,
+        INTENSITY_UPDATE = 1 << 7 , 
+        THETA_UPDATE = 1 << 8 
+    };
+
+    glm::vec3 position ; 
+    glm::vec3 direction ; 
+    glm::vec3 attenuation ;
+    glm::vec3 diffuse_col ; 
+    glm::vec3 specular_col ; 
+    glm::vec3 ambiant_col ; 
+    float intensity; 
+    float theta; 
+    uint16_t update_flags = 0; 
+
+    void enableUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag){
+        update_flags |= flag ;     
+    }
+
+    void disableUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag){
+        update_flags &= ~flag ; 
+    }
+
+    bool checkUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag) const {
+        return update_flags & flag ; 
+    }
+
+};
 
 
 /**
@@ -129,6 +166,14 @@ public:
      */
     virtual unsigned int getID() {return id ; } 
 
+    /**
+     * @brief Updates this light's internal data with new values
+     * 
+     * @param data LightData structure .  
+     */
+    virtual void updateLightData(const LightData& data) ; 
+
+    void setID(const unsigned light_id){id = light_id;}
 protected:
     
     /**
@@ -144,8 +189,8 @@ protected:
     glm::vec3 position ;
     glm::vec3 viewspace_position;  
     glm::vec3 specularColor; 
-    glm::vec3 ambientColor; 
-    glm::vec3 diffuseColor;
+    glm::vec3 ambientColor;  
+    glm::vec3 diffuseColor; //In case the renderer is PBR , we use only this variable for irradiance 
     std::string light_struct_name ;  
     float intensity ;
 
@@ -199,6 +244,8 @@ public:
      * @overload void AbstractLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) const ; 
      */
     virtual void updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) ; 
+
+    virtual void updateLightData(const LightData& data) override ; 
 
 protected:
 };
@@ -254,7 +301,15 @@ public:
      *
      * @overload void AbstractLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) const ;
      */
-    virtual void updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) override ; 
+    virtual void updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) override ;
+
+
+    glm::vec3 getAttenuation() const {return attenuation;}
+
+    void setAttenuation(glm::vec3 atten){attenuation = atten ;}
+
+    virtual void updateLightData(const LightData& data) override ; 
+
 protected:
     glm::vec3 attenuation ;         /**<Constant, linear, and quadratic attenuation values*/
 };
@@ -304,6 +359,11 @@ public:
      */
     virtual void updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) ; 
 
+    virtual void updateLightData(const LightData& data) override ;
+
+    virtual void setDirection(glm::vec3 dir){direction = dir; }
+
+    virtual void setAngle(float angle){theta = angle; } 
 protected:
     glm::vec3 direction ;           /**<Direction of the light cone*/
     glm::vec3 viewspace_direction;  /**<Direction in view space*/

@@ -255,7 +255,9 @@ public:
         else if constexpr(function_flag == SET_DISPLAY_BOUNDINGBOX)
 			displayBoundingBoxes(std::forward<Args>(args)...); 
         else if constexpr(function_flag == SET_DISPLAY_RESET_CAMERA)
-			resetSceneCamera(std::forward<Args>(args)...); 
+			resetSceneCamera(std::forward<Args>(args)...);
+		else if constexpr(function_flag == ADD_ELEMENT_POINTLIGHT)
+			light_database->addLight(std::forward<Args>(args)...);
 		else{
 			return;
 		}
