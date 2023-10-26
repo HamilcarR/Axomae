@@ -84,6 +84,15 @@ public:
      * 
      */
     virtual void clear(); 
+
+    /**
+     * @brief Returns a collection of nodes of the specified name
+     * 
+     * @param name String the method searches for
+     * @return std::vector<SceneNodeInterface*> Collection of nodes returned . Empty if the method didn't find any node of specified name.
+     */
+    virtual std::vector<INode*> findByName(const std::string& name) = 0 ; 
+
     /**
      * @brief This method will traverse the structure doing a depth first search, and apply a functor to each node.  
      * 
@@ -96,15 +105,14 @@ public:
     void dfs(INode* begin ,F func, Args&& ...args);
 
     template<class F , class ...Args>
-    void dfs(const INode* begin ,F func, Args&& ...args);
+    void dfs(const INode* begin ,F func, Args&& ...args) const ;
 
-    /**
-     * @brief Returns a collection of nodes of the specified name
-     * 
-     * @param name String the method searches for
-     * @return std::vector<SceneNodeInterface*> Collection of nodes returned . Empty if the method didn't find any node of specified name.
-     */
-    virtual std::vector<INode*> findByName(const std::string& name) = 0 ; 
+    template<class F , class ...Args>
+    void bfs(INode* begin , F func , Args&& ...args); 
+   
+    template<class F , class ...Args>
+    void bfs(const INode* begin , F func , Args&& ...args) const; 
+   
 private:
     
     /**
@@ -119,13 +127,19 @@ private:
     void dfsTraverse(INode* node ,F func , Args&& ...args); 
 
     template<class F , class ...Args>
-    void dfsTraverse(const INode* node ,F func , Args&& ...args); 
+    void dfsTraverse(const INode* node ,F func , Args&& ...args) const ; 
 
+    template<class F , class ...Args>
+    void bfsTraverse(INode* node ,F func , Args&& ...args); 
+
+    template<class F , class ...Args>
+    void bfsTraverse(const INode* node ,F func , Args&& ...args) const ;
 
 protected:
     INode* root;       /*<Root of the hierarchy*/
 private:
-    INode* iterator;   /*<Iterator to keep track of nodes in traversals*/
+    mutable INode* iterator;   /*<Iterator to keep track of nodes in traversals*/
+    mutable const INode* const_iterator ; 
     std::vector<INode*> generic_nodes_to_delete; /*<Array of pointers on nodes that contain only a transformation*/  
 
 };
@@ -181,18 +195,56 @@ void ISceneHierarchy::dfsTraverse(INode* node , F func, Args&& ...args){
     }
 
 template<class F , class ...Args>
-void ISceneHierarchy::dfs(const INode* begin , F func , Args&& ...args){
-    if((iterator = begin) != nullptr){
-        dfsTraverse(iterator , func , std::forward<Args>(args)...);
+void ISceneHierarchy::dfs(const INode* begin , F func , Args&& ...args) const{
+    if((const_iterator = begin) != nullptr){
+        dfsTraverse(const_iterator , func , std::forward<Args>(args)...);
     }
 }
 
 template<class F , class ...Args>
-void ISceneHierarchy::dfsTraverse(const INode* node , F func, Args&& ...args){
+void ISceneHierarchy::dfsTraverse(const INode* node , F func, Args&& ...args) const {
         if(node != nullptr){
             func(node , std::forward<Args>(args)...);
             for(const INode* child : node->getChildren())
                 dfsTraverse(child , func , std::forward<Args>(args)...); 
+        }
+    }
+
+template<class F , class ...Args>
+void ISceneHierarchy::bfs(INode* begin , F func , Args&& ...args){
+    if((iterator = begin) != nullptr){
+        bfsTraverse(iterator , func , std::forward<Args>(args)...); 
+    }
+}
+
+template<class F , class ...Args>
+void ISceneHierarchy::bfsTraverse(INode* node , F func, Args&& ...args){
+        if(node != nullptr){
+            if(node->isRoot())
+                func(node , std::forward<Args>(args)...);
+            for(INode* child : node->getChildren())
+                func(child , std::forward<Args>(args)...);
+            for(INode* child : node->getChildren()) 
+                bfsTraverse(child , func , std::forward<Args>(args)...); 
+        }
+    }
+
+template<class F , class ...Args>
+void ISceneHierarchy::bfs(const INode* begin , F func , Args&& ...args) const {
+    if((const_iterator = begin) != nullptr){
+        bfsTraverse(const_iterator , func , std::forward<Args>(args)...);
+    }
+}
+
+template<class F , class ...Args>
+void ISceneHierarchy::bfsTraverse(const INode* node , F func, Args&& ...args) const {
+    if(node != nullptr){
+            if(node->isRoot())
+                func(node , std::forward<Args>(args)...);
+            for(INode* child : node->getChildren())
+                func(child , std::forward<Args>(args)...);
+            for(INode* child : node->getChildren()) 
+                bfsTraverse(child , func , std::forward<Args>(args)...); 
         }
     }
 
