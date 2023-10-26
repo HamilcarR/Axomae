@@ -37,7 +37,7 @@ public:
      * 
      * @param light 
      */
-    virtual bool addLight(AbstractLight* light);
+    virtual bool addLight(AbstractLight* light); //Replace this by a light builder , and set Light constructors to private
 
     /**
      * @brief Remove specified light. 

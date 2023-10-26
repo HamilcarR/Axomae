@@ -12,6 +12,7 @@
 #include "constants.h"
 #include "utils_3D.h" 
 #include "Renderer.h"
+#include "SceneListView.h"
 
 /**
  * @file GUIWindow.h
@@ -291,13 +292,15 @@ private:
 	QGraphicsView* get_corresponding_view(gui::IMAGETYPE image);
 	SDL_Surface* get_corresponding_session_pointer(gui::IMAGETYPE image);
 	bool set_corresponding_session_pointer(image_type<SDL_Surface> *image_type_pointer) ; 
-	void display_image(SDL_Surface *surf , gui::IMAGETYPE image , bool save_in_heap); 
+	void display_image(SDL_Surface *surf , gui::IMAGETYPE image , bool save_in_heap);
+
+private: 
 	Ui::MainWindow _UI;
 	GLViewer * viewer_3d; 
 	Window *_window; 
 	ImageImporter *_importer; 
 	ApplicationConfig configuration ; 	
-	
+	SceneListView *renderer_scene_list ; 
 };
 
 

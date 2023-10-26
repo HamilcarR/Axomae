@@ -19,7 +19,7 @@ public:
     }
 
     void buildSceneTree(unsigned int depth , unsigned int max_degree){
-        SceneNodeInterface *root = SceneNodeBuilder::buildEmptyNode(nullptr);
+        ISceneNode *root = SceneNodeBuilder::buildEmptyNode(nullptr);
         root->setName("root"); 
         tree.setRoot(root);
         tree.addGenericNodeToDelete(root);  
@@ -44,15 +44,15 @@ public:
         tree.clear(); 
     }
 
-    std::vector<SceneNodeInterface*> findByName(const std::string& name){
-        std::vector<SceneNodeInterface*> names; 
+    std::vector<INode*> findByName(const std::string& name){
+        std::vector<INode*> names; 
         findByNameRecursive(tree.getRootNode(), name , names);
         return names; 
     }
 
 private:
 
-    void findByNameRecursive(SceneNodeInterface* node, const std::string& name , std::vector<SceneNodeInterface*> &collection){
+    void findByNameRecursive(INode* node, const std::string& name , std::vector<INode*> &collection){
         if(node != nullptr){
             if(node->getName() == name)
                 collection.push_back(node);
@@ -63,14 +63,14 @@ private:
     }
 
     
-    void buildRecursive(SceneNodeInterface* node , unsigned max_degree , unsigned depth){
+    void buildRecursive(ISceneNode* node , unsigned max_degree , unsigned depth){
         if(depth == 0){
             leaf_count ++; 
             return ; 
         }
         int size_numbers = rand() % max_degree + 1 ;
         for(int i = 0 ; i < size_numbers ; i++){
-            SceneNodeInterface* child = SceneNodeBuilder::buildEmptyNode(node);
+            ISceneNode* child = SceneNodeBuilder::buildEmptyNode(node);
             child->setName(std::string("child-") + std::to_string(depth) + std::string("-") + std::to_string(i)); 
             tree.addGenericNodeToDelete(child);
             node_count ++ ; 
@@ -87,17 +87,17 @@ protected:
 
 class PseudoFunctors{
 public:
-    static void testDummyFunction(SceneNodeInterface* node) {
+    static void testDummyFunction(INode* node) {
         std::cout << node << "\n"; 
     }
-    static void testNodeCount(SceneNodeInterface* node , unsigned int *i){
+    static void testNodeCount(INode* node , unsigned int *i){
         (*i)++; 
     }
-    static void testTransformationPropagation(SceneNodeInterface* node , std::vector<glm::mat4> &matrices){
-        glm::mat4 m = node->computeFinalTransformation(); 
+    static void testTransformationPropagation(INode* node , std::vector<glm::mat4> &matrices){
+        glm::mat4 m = static_cast<ISceneNode*>(node)->computeFinalTransformation(); 
         matrices.push_back(m); 
     }
-    static void testLeafCount(SceneNodeInterface* node , unsigned int *leaf_number){
+    static void testLeafCount(INode* node , unsigned int *leaf_number){
         if(node->isLeaf())
             (*leaf_number)++;
     }
@@ -119,9 +119,9 @@ TEST(DFSTest , updateAccumulatedTransformations){
     SceneTreeBuilder builder;
     builder.buildSceneTree(TEST_TREE_MAX_DEPTH , TEST_TREE_MAX_NODE_DEGREE);  
     SceneTree *tree = builder.getTreePointer(); 
-    auto root_local_transf = tree->getRootNode()->getLocalModelMatrix(); 
+    auto root_local_transf = static_cast<ISceneNode*> (tree->getRootNode())->getLocalModelMatrix(); 
     auto updated_local_transf = glm::translate(root_local_transf , glm::vec3(1. , 0. , 0.));
-    tree->getRootNode()->setLocalModelMatrix(updated_local_transf); 
+    static_cast<ISceneNode*>(tree->getRootNode())->setLocalModelMatrix(updated_local_transf); 
     tree->updateAccumulatedTransformations();
     std::vector<glm::mat4> matrices; 
     tree->dfs(tree->getRootNode() , &PseudoFunctors::testTransformationPropagation , matrices);

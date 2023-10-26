@@ -3,8 +3,20 @@
 
 
 
+/* Sets up a new ID for the light if none is available , or give an old one that belonged to a former light*/
+void LightingDatabase::giveID(AbstractLight* light){
+    if(free_id_list.empty())
+        light->setID(last_id++);
+    else{
+        auto it = free_id_list.begin(); 
+        light->setID(*it); 
+        free_id_list.erase(it); 
+    }
+}
+
+
 LightingDatabase::LightingDatabase(){ 
-   
+   last_id = 0 ; 
 }
 
 LightingDatabase::~LightingDatabase(){
@@ -12,11 +24,54 @@ LightingDatabase::~LightingDatabase(){
 }
 
 bool LightingDatabase::addLight(AbstractLight* light){
-    if(!light)
-        return false;
+    assert(light != nullptr); 
     AbstractLight::TYPE type = light->getType(); 
-    light_database[type].push_back(light) ; 
+    light_database[type].push_back(light) ;
+    giveID(light); 
     return true;
+}
+
+
+bool LightingDatabase::removeLight(AbstractLight* light){
+    assert(light != nullptr); 
+    for(auto array : light_database)
+        for(auto it = array.second.begin() ; it != array.second.end() ; it++){
+            if(*it == light){
+                array.second.erase(it); 
+                delete light; 
+                return true; 
+            }   
+        }
+    return false; 
+}
+
+bool LightingDatabase::removeLight(const unsigned index){
+    for(auto array : light_database)
+        for(auto it = array.second.begin() ; it != array.second.end() ; it++){
+            if((*it)->getID() == index){
+                AbstractLight* temp = *it ; 
+                array.second.erase(it);
+                delete temp ;
+                return true ;  
+            }
+        }
+    return false; 
+}
+
+AbstractLight* LightingDatabase::getLightFromID(const unsigned id) const {
+    for(auto array : light_database)
+        for(auto it = array.second.begin(); it != array.second.end(); it++)
+            if((*it)->getID() == id)
+                return *it ;
+    return nullptr; 
+}
+
+bool LightingDatabase::updateLight(const unsigned id , const LightData& data){
+    AbstractLight *l = getLightFromID(id);
+    if(!l)
+        return false;
+    l->updateLightData(data);  
+    return true; 
 }
 
 const std::vector<AbstractLight*>& LightingDatabase::getLightsArrayByType(AbstractLight::TYPE type) {

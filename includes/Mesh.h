@@ -51,7 +51,7 @@ public:
 	 * 
 	 * @param parent Parent object in the scene graph 
 	 */
-	Mesh(SceneNodeInterface* parent = nullptr);
+	Mesh(ISceneNode* parent = nullptr);
 
 	/**
 	 * @brief Copy constructor
@@ -66,7 +66,7 @@ public:
 	 * @param obj Geometry data
 	 * @param mat Material data
 	 */
-	Mesh(const Object3D& obj , const Material& mat , SceneNodeInterface* parent = nullptr); 
+	Mesh(const Object3D& obj , const Material& mat , ISceneNode* parent = nullptr); 
 	
 	/**
 	 * @brief Construct a new Mesh object with a name , geometry , and material
@@ -75,7 +75,7 @@ public:
 	 * @param obj Geometry data
 	 * @param mat Material data
 	 */
-	Mesh(const std::string& name , const Object3D& obj , const Material& mat , SceneNodeInterface* parent = nullptr); 
+	Mesh(const std::string& name , const Object3D& obj , const Material& mat , ISceneNode* parent = nullptr); 
 
 	/**
 	 * @brief Construct a new Mesh object
@@ -85,7 +85,7 @@ public:
 	 * @param mat Mesh material
 	 * @param shader Shader used
 	 */
-	Mesh(const std::string& name , const Object3D& obj , const Material& mat , Shader* shader , SceneNodeInterface* parent = nullptr);
+	Mesh(const std::string& name , const Object3D& obj , const Material& mat , Shader* shader , ISceneNode* parent = nullptr);
 
 	/**
 	 * @brief Construct a new Mesh object
@@ -95,7 +95,7 @@ public:
 	 * @param mat Mesh material
 	 * @param shader Shader used
 	 */
-	Mesh(const std::string& name , const Object3D&& obj , const Material& mat , Shader* shader , SceneNodeInterface* parent = nullptr); 
+	Mesh(const std::string& name , const Object3D&& obj , const Material& mat , Shader* shader , ISceneNode* parent = nullptr); 
 	
 	/**
 	 * @brief Destroy the Mesh object
@@ -309,7 +309,7 @@ public:
 	 * @brief Construct a new Cube  Mesh object
 	 * 
 	 */
-	CubeMesh(SceneNodeInterface* parent = nullptr); 
+	CubeMesh(ISceneNode* parent = nullptr); 
 
 	/**
 	 * @brief 
@@ -346,7 +346,7 @@ public:
 	 * @brief Construct a new Cube Map Mesh object
 	 * 
 	 */
-	CubeMapMesh(SceneNodeInterface* parent = nullptr); 
+	CubeMapMesh(ISceneNode* parent = nullptr); 
 
 
 	/**
@@ -372,7 +372,7 @@ public:
 	 * 
 	 * @param parent 
 	 */
-	QuadMesh(SceneNodeInterface* parent = nullptr);
+	QuadMesh(ISceneNode* parent = nullptr);
 	
 	/**
 	 * @brief Destroy the Quad Mesh object
@@ -437,7 +437,7 @@ public:
 	 * @brief Construct a new Bounding Box Mesh object
 	 * @param parent Predecessor in the scene graph 
 	 */
-	BoundingBoxMesh(SceneNodeInterface* parent = nullptr); 
+	BoundingBoxMesh(ISceneNode* parent = nullptr); 
 
 	/**
 	 * @brief Construct a new Bounding Box Mesh object

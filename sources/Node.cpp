@@ -2,37 +2,37 @@
 #include <algorithm>
 
 
-void SceneNodeInterface::resetLocalModelMatrix(){
+void ISceneNode::resetLocalModelMatrix(){
     local_transformation = glm::mat4(1.f); 
 }
 
-bool SceneNodeInterface::isLeaf() const {
+bool INode::isLeaf() const {
     return children.empty();
 }
 
-bool SceneNodeInterface::isRoot() const {
+bool INode::isRoot() const {
     if(parents.empty())
         return true; 
     else{
-        for(SceneNodeInterface* A : parents)
+        for(INode* A : parents)
             if(A != nullptr)
                 return false;
         return true;
     }
 }
 
-void SceneNodeInterface::emptyParents(){
+void INode::emptyParents(){
     parents.clear(); 
 }
 
-void SceneNodeInterface::emptyChildren(){
+void INode::emptyChildren(){
     children.clear(); 
 }
 /**************************************************************************************************************************************/
 
-SceneTreeNode::SceneTreeNode(SceneNodeInterface *_parent , SceneHierarchyInterface* _owner){
+SceneTreeNode::SceneTreeNode(ISceneNode *_parent , ISceneHierarchy* _owner){
     if(_parent != nullptr){
-        std::vector<SceneNodeInterface*> ret = {_parent} ; 
+        std::vector<INode*> ret = {_parent} ; 
         setParents(ret);
     }
     setHierarchyOwner(_owner);  
@@ -41,7 +41,7 @@ SceneTreeNode::SceneTreeNode(SceneNodeInterface *_parent , SceneHierarchyInterfa
     name = "Generic-Hierarchy-Node";  
 }
 
-SceneTreeNode::SceneTreeNode(const std::string& _name , const glm::mat4& transformation , SceneNodeInterface *parent , SceneHierarchyInterface* owner ) : SceneTreeNode(parent , owner){
+SceneTreeNode::SceneTreeNode(const std::string& _name , const glm::mat4& transformation , ISceneNode *parent , ISceneHierarchy* owner ) : SceneTreeNode(parent , owner){
     name = _name ; 
     local_transformation = transformation ; 
 }
@@ -67,7 +67,7 @@ SceneTreeNode::~SceneTreeNode(){
  * 
  * @return a pointer to a SceneNodeInterface object, specifically the root node of the scene tree.
  */
-SceneNodeInterface* SceneTreeNode::returnRoot() {
+ISceneNode* SceneTreeNode::returnRoot() {
     parents.erase(std::remove(parents.begin() , parents.end() , nullptr) , parents.end()); 
     SceneTreeNode* iterator = getParent(); 
     if(iterator == nullptr)
@@ -103,7 +103,7 @@ SceneTreeNode& SceneTreeNode::operator=(const SceneTreeNode& copy){
     return *this; 
 }
 
-void SceneTreeNode::setParents(std::vector<SceneNodeInterface*> &nodes){
+void SceneTreeNode::setParents(std::vector<INode*> &nodes){
     if(!nodes.empty()){
         parents.clear(); 
         parents.push_back(nodes[0]); 
@@ -112,26 +112,26 @@ void SceneTreeNode::setParents(std::vector<SceneNodeInterface*> &nodes){
     }
 }
 
-void SceneTreeNode::setParent(SceneNodeInterface* node){
+void SceneTreeNode::setParent(INode* node){
     if(node != nullptr){
-        std::vector<SceneNodeInterface*> ret = {node}; 
+        std::vector<INode*> ret = {node}; 
         setParents(ret); 
     }
 }
 
 SceneTreeNode* SceneTreeNode::getParent() const {
     if(!parents.empty())
-        return static_cast<SceneTreeNode*>(parents[0]);
+        return dynamic_cast<SceneTreeNode*>(parents[0]);
     else
         return nullptr;  
 }
 
-void SceneTreeNode::addChildNode(SceneNodeInterface* node){
+void SceneTreeNode::addChildNode(INode* node){
     if(node){
         bool contains = std::find(children.begin() , children.end() , node) != children.end();  
         if(!contains){
             children.push_back(node);
-            std::vector<SceneNodeInterface*> ret = {this}; 
+            std::vector<INode*> ret = {this}; 
             node->setParents(ret); 
         }
     }

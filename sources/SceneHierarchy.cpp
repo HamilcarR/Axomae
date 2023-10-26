@@ -4,21 +4,21 @@
 
 
 
-void SceneHierarchyInterface::setAsRootChild(SceneNodeInterface* node){
+void ISceneHierarchy::setAsRootChild(INode* node){
     if(root != nullptr)
         root->addChildNode(node); 
 }
 
-void SceneHierarchyInterface::updateOwner(){
+void ISceneHierarchy::updateOwner(){
     if(root != nullptr){
-        auto scene_update_owner = [](SceneNodeInterface* node , SceneHierarchyInterface* owner){
+        auto scene_update_owner = [](INode* node , ISceneHierarchy* owner){
             node->setHierarchyOwner(owner); 
         };
         dfs(root , scene_update_owner , this); 
     }
 }
 
-void SceneHierarchyInterface::clear(){
+void ISceneHierarchy::clear(){
     for(auto A : generic_nodes_to_delete){
         delete A ; 
     }
@@ -27,7 +27,7 @@ void SceneHierarchyInterface::clear(){
 
 /*******************************************************************************************************************************************************************/
 
-SceneTree::SceneTree(SceneNodeInterface* node){
+SceneTree::SceneTree(ISceneNode* node){
     root = node;
 }
 
@@ -53,9 +53,10 @@ SceneTree& SceneTree::operator=(const SceneTree& copy){
 
 void SceneTree::updateAccumulatedTransformations(){
     if(root != nullptr){
-        auto recompute_matrices = [](SceneNodeInterface* node){
+        auto recompute_matrices = [](INode* n){
+            ISceneNode* node = static_cast<ISceneNode*>(n); 
             if(!node->isRoot()){
-                glm::mat4 new_accum = node->getParents()[0]->computeFinalTransformation();
+                glm::mat4 new_accum = static_cast<ISceneNode*>(node->getParents()[0])->computeFinalTransformation();
                 node->setAccumulatedModelMatrix(new_accum);
             }
             else
@@ -65,29 +66,29 @@ void SceneTree::updateAccumulatedTransformations(){
     }
 }
 
-void SceneTree::pushNewRoot(SceneNodeInterface* new_root){
+void SceneTree::pushNewRoot(INode* new_root){
     if(root != new_root){
         if(root == nullptr)
             root = new_root; 
         else{
-            SceneNodeInterface* temp = root;
+            INode* temp = root;
             new_root->emptyChildren();  
             new_root->addChildNode(root); 
             new_root->emptyParents(); 
             root = new_root ; 
-            std::vector<SceneNodeInterface*> new_parent = {new_root}; 
+            std::vector<INode*> new_parent = {new_root}; 
             temp->setParents(new_parent); 
         }
         updateOwner() ; 
     }
 }
 
-std::vector<SceneNodeInterface*> SceneTree::findByName(const std::string& name){
-    auto lambda_search_name = [](SceneNodeInterface* node , const std::string& name , std::vector<SceneNodeInterface*> &collection){
+std::vector<INode*> SceneTree::findByName(const std::string& name){
+    auto lambda_search_name = [](INode* node , const std::string& name , std::vector<INode*> &collection){
         if(node->getName() == name)
             collection.push_back(node); 
     };
-    std::vector<SceneNodeInterface*> collection ; 
+    std::vector<INode*> collection ; 
     dfs(root , lambda_search_name , name , collection);
     return collection ;  
 }

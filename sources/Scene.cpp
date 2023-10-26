@@ -160,7 +160,7 @@ void Scene::drawBoundingBoxes(){
     }
 }
 
-std::vector<SceneNodeInterface*> Scene::getNodeByName(const std::string& name){
+std::vector<INode*> Scene::getNodeByName(const std::string& name){
     return scene_tree.findByName(name); 
 }
 

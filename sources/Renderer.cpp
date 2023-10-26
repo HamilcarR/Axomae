@@ -115,10 +115,10 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scen
 	scene->setLightDatabasePointer(light_database); 
 	scene->setCameraPointer(scene_camera); 
 	light_database->clearDatabase();
-	scene->updateTree(); 
-	AbstractLight *L1 = new SpotLight(glm::vec3(-55 , 90 , -5) , glm::vec3(0.f) , glm::vec3(1.f , 1.f , 0.9f), 12.f , 102000.f , scene_camera); 
-    AbstractLight *L2 = new PointLight(glm::vec3(0 , 20 , -2) , glm::vec3(0.875f , 0.257f , 0.184f), glm::vec3(1.f , 0.0045 , 0.0075) , 200.f , L1); 
-	AbstractLight *L3 = new DirectionalLight(glm::vec3(1 , 1 , 0) , glm::vec3(1.f , 1.f , 1.f) , 1.5f , scene_camera); 
+	scene->updateTree(); 	
+	//AbstractLight *L1 = new SpotLight(glm::vec3(-55 , 90 , -5) , glm::vec3(0.f) , glm::vec3(1.f , 1.f , 0.9f), 12.f , 102000.f , scene_camera); 
+    //AbstractLight *L2 = new PointLight(glm::vec3(0 , 20 , -2) , glm::vec3(0.875f , 0.257f , 0.184f), glm::vec3(1.f , 0.0045 , 0.0075) , 200.f , L1); 
+	//AbstractLight *L3 = new DirectionalLight(glm::vec3(1 , 1 , 0) , glm::vec3(1.f , 1.f , 1.f) , 1.5f , scene_camera); 
 	//light_database->addLight(L1); 
 	//light_database->addLight(L2);
 	//light_database->addLight(L3); 

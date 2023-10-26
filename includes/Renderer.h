@@ -220,6 +220,13 @@ public:
 	 */
 	void displayBoundingBoxes(bool display);
 
+	/**
+	 * @brief Retrieves the current final scene reference
+	 * 
+	 * @return const Scene& 
+	 */
+	const Scene& getConstScene() const {return *scene; }
+
 	template<class Func , class ...Args>
 	void execCallback(Func&& function , Renderer* instance , Args&& ...args){
 		function(instance , std::forward<Args>(args)...); 

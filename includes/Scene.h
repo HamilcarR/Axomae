@@ -143,7 +143,7 @@ public:
      * @param name String the method should look for in the scene tree. 
      * @return SceneNodeInterface* Node having the name "name" or nullptr.
      */
-    std::vector<SceneNodeInterface*> getNodeByName(const std::string& name) ;
+    std::vector<INode*> getNodeByName(const std::string& name) ;
 
     /**
      * @brief 
@@ -170,6 +170,12 @@ public:
      */
     void displayBoundingBoxes(bool display){display_bbox = display; } 
 
+    /**
+     * @brief Get reference on the scene tree
+     * 
+     * @return const SceneTree& 
+     */
+    const SceneTree& getConstSceneTreeRef() const { return scene_tree;}
 private:
     /**
      * @brief Sort transparent elements by distance and store their position in sorted_transparent_meshes

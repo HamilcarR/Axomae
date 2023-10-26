@@ -307,11 +307,11 @@ inline glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from){ //https://stackoverf
  * 
  * @return a pointer to a random node of the tree... Root can be determined from any point of the tree , by using the method SceneNodeInterface::returnRoot()
  */
-SceneNodeInterface* fillTreeData(aiNode *ai_node , const std::vector<Mesh*>& mesh_lookup , SceneNodeInterface* parent , std::vector<SceneNodeInterface*> &node_deletion){
+ISceneNode* fillTreeData(aiNode *ai_node , const std::vector<Mesh*>& mesh_lookup , ISceneNode* parent , std::vector<ISceneNode*> &node_deletion){
 	if(ai_node != nullptr){
 		std::string name = ai_node->mName.C_Str();
 		glm::mat4 transformation = aiMatrix4x4ToGlm(ai_node->mTransformation);
-		std::vector<SceneNodeInterface*> add_node ; 
+		std::vector<ISceneNode*> add_node ; 
 		if(ai_node->mNumMeshes == 0){
 			add_node.push_back(SceneNodeBuilder::buildEmptyNode(parent));
 			node_deletion.push_back(add_node[0]); 
@@ -327,7 +327,7 @@ SceneNodeInterface* fillTreeData(aiNode *ai_node , const std::vector<Mesh*>& mes
 		for(auto A : add_node){
 			A->setLocalModelMatrix(transformation);
 			A->setName(name);
-			std::vector<SceneNodeInterface*> parents_array = {parent}; 
+			std::vector<INode*> parents_array = {parent}; 
 			A->setParents(parents_array); 	
 		}
 		for(unsigned i = 0 ; i < ai_node->mNumChildren ; i++)
@@ -351,10 +351,10 @@ SceneNodeInterface* fillTreeData(aiNode *ai_node , const std::vector<Mesh*>& mes
 SceneTree generateSceneTree(const aiScene* modelScene , const std::vector<Mesh*> &node_lookup){	
 	aiNode *ai_root = modelScene->mRootNode ;
 	SceneTree scene_tree;
-	std::vector<SceneNodeInterface*> node_deletion ;
-	SceneNodeInterface* node = fillTreeData(ai_root , node_lookup , nullptr , node_deletion);
+	std::vector<ISceneNode*> node_deletion ;
+	ISceneNode* node = fillTreeData(ai_root , node_lookup , nullptr , node_deletion);
 	assert (node != nullptr) ;  
-	node = node->returnRoot(); 
+	node = dynamic_cast<ISceneNode*>(node->returnRoot()); 
 	scene_tree.setRoot(node); 
 	scene_tree.updateAccumulatedTransformations(); 
 	return scene_tree; 

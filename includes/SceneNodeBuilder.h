@@ -23,22 +23,23 @@ class SceneNodeBuilder {
 public: 
     
     template<class... Args>
-    static SceneNodeInterface* buildCamera(SceneNodeInterface* parent, Args&&... args){
+    static ISceneNode* buildCamera(ISceneNode* parent, Args&&... args){
         return new Camera(std::forward<Args>(args)... , parent);
     } 
     
     template<class... Args>
-    static SceneNodeInterface* buildEmptyNode(SceneNodeInterface* parent, Args&&... args){
+    static ISceneNode* buildEmptyNode(ISceneNode* parent, Args&&... args){
         return new SceneTreeNode(std::forward<Args>(args)... , parent);
     } 
 
     template<class... Args>
-    static SceneNodeInterface* buildMesh(SceneNodeInterface* parent, Args&&... args){
+    static ISceneNode* buildMesh(ISceneNode* parent, Args&&... args){
         return new Mesh(std::forward<Args>(args)... , parent);
     } 
 
-    template<class... Args>
-    static SceneNodeInterface* buildLight(AbstractLight::TYPE type , SceneNodeInterface* parent, Args&&... args){
+    //! maybe delete ? can't see this becoming that useful 
+    template<AbstractLight::TYPE type , class... Args>
+    static ISceneNode* buildLight(ISceneNode* parent, Args&&... args){
         switch(type){
             case AbstractLight::POINT:
                 return new PointLight(std::forward<Args>(args)... , parent); 

@@ -2,7 +2,7 @@
 #include "../includes/PerformanceLogger.h"
 
 
-Mesh::Mesh(SceneNodeInterface* parent):SceneTreeNode(parent){
+Mesh::Mesh(ISceneNode* parent):SceneTreeNode(parent){
 	mesh_initialized = false;
 	face_culling_enabled = false;
 	depth_mask_enabled = false; 
@@ -22,21 +22,21 @@ Mesh::Mesh(const Mesh& copy) : SceneTreeNode(copy){
 	shader_program = copy.shader_program; 
 }
 
-Mesh::Mesh(const Object3D& geo , const Material& mat , SceneNodeInterface* parent ) : Mesh(parent){
+Mesh::Mesh(const Object3D& geo , const Material& mat , ISceneNode* parent ) : Mesh(parent){
 	geometry = geo; 
 	material = mat;
 	name = "uninitialized mesh"  ;
 	shader_program = nullptr ; 
 }
 
-Mesh::Mesh(const std::string& n , const Object3D& geo , const Material& mat  , SceneNodeInterface* parent ) : Mesh(parent){
+Mesh::Mesh(const std::string& n , const Object3D& geo , const Material& mat  , ISceneNode* parent ) : Mesh(parent){
 	geometry = geo; 
 	material = mat;
 	name = n ; 
 	shader_program = nullptr ; 
 }
 
-Mesh::Mesh(const std::string& n , const Object3D& geo , const Material& mat , Shader* shader, SceneNodeInterface* parent ) : Mesh(parent){
+Mesh::Mesh(const std::string& n , const Object3D& geo , const Material& mat , Shader* shader, ISceneNode* parent ) : Mesh(parent){
 	geometry = geo ;
 	material = mat ; 
 	name = n ; 
@@ -44,7 +44,7 @@ Mesh::Mesh(const std::string& n , const Object3D& geo , const Material& mat , Sh
 	material.setShaderPointer(shader); 
 }
 
-Mesh::Mesh(const std::string& n , const Object3D&& geo , const Material& mat , Shader* shader, SceneNodeInterface* parent ) : Mesh(parent){  
+Mesh::Mesh(const std::string& n , const Object3D&& geo , const Material& mat , Shader* shader, ISceneNode* parent ) : Mesh(parent){  
 	geometry = std::move(geo); 
 	material = mat ; 
 	name = n ; 
@@ -173,7 +173,7 @@ void Mesh::setDepthFunc(DEPTHFUNC func){
 }
 
 /*****************************************************************************************************************/
-CubeMesh::CubeMesh(SceneNodeInterface* parent) : Mesh(parent) {
+CubeMesh::CubeMesh(ISceneNode* parent) : Mesh(parent) {
 	std::vector<float> vertices = { 
 		-1 , -1 , -1 	,  // 0
 		1 , -1 , -1 	,  // 1
@@ -245,7 +245,7 @@ void CubeMesh::preRenderSetup(){
 
 
 /*****************************************************************************************************************/
-CubeMapMesh::CubeMapMesh(SceneNodeInterface* parent) : CubeMesh(parent) {
+CubeMapMesh::CubeMapMesh(ISceneNode* parent) : CubeMesh(parent) {
 		name="CubeMap" ;
 }
 
@@ -271,7 +271,7 @@ glm::mat4 CubeMapMesh::computeFinalTransformation(){
 	return accumulated_transformation; 
 }
 /*****************************************************************************************************************/
-QuadMesh::QuadMesh(SceneNodeInterface* parent): Mesh(parent){
+QuadMesh::QuadMesh(ISceneNode* parent): Mesh(parent){
 	std::vector<float> vertices = {  
 		-1.0f, -1.0f, 0.f, 
 		-1.0f, 1.0f, 0.f ,  
@@ -342,7 +342,7 @@ void FrameBufferMesh::preRenderSetup(){
 
 /*****************************************************************************************************************/
 
-BoundingBoxMesh::BoundingBoxMesh(SceneNodeInterface* parent):Mesh(parent){
+BoundingBoxMesh::BoundingBoxMesh(ISceneNode* parent):Mesh(parent){
 
 }
 

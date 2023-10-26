@@ -200,7 +200,8 @@ Controller::Controller( QWidget *parent) : QMainWindow(parent) {
 	_UI.setupUi(this);
 	connect_all_slots(); 
 	_UI.progressBar->setValue(0);
-	viewer_3d = _UI.renderer_view; 
+	viewer_3d = _UI.renderer_view;
+	renderer_scene_list = _UI.renderer_scene_list;  
 	image_session_pointers::greyscale = nullptr; 
 	image_session_pointers::albedo = nullptr; 
 	image_session_pointers::height = nullptr; 
@@ -662,9 +663,11 @@ bool Controller::import_3DOBJ(){
 		auto struct_holder =  loader.load(filename.toStdString().c_str());
 		std::vector<Mesh*> scene = struct_holder.first;
 		SceneSelector *instance = SceneSelector::getInstance(); 
-		_UI.renderer_view->setNewScene(struct_holder); 
+		viewer_3d->setNewScene(struct_holder); 
 		instance->setScene(scene);
-		_UI.meshes_list->setList(scene) ; 	
+		_UI.meshes_list->setList(scene) ; 
+		const SceneTree& scene_hierarchy = viewer_3d->getConstRenderer().getConstScene().getConstSceneTreeRef(); 
+		_UI.renderer_scene_list->setScene(scene_hierarchy); 
 	//	std::thread(ImageManager::project_uv_normals, scene[0]->geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()).detach();  //TODO : optimize and re enable	
 		return true ; 
 	}

@@ -3,8 +3,8 @@
 
 
 
-AbstractLight::AbstractLight(SceneNodeInterface *parent) : SceneTreeNode(parent){
-
+AbstractLight::AbstractLight(ISceneNode *parent) : SceneTreeNode(parent){
+    id = 0 ; 
 } 
 
 
@@ -20,10 +20,22 @@ void AbstractLight::updateShaderData(Shader* shader_program , glm::mat4& modelvi
     }
 }
 
+void AbstractLight::updateLightData(const LightData& data){
+    if(data.checkUpdateFlag(LightData::POSITION_UPDATE))
+        setPosition(data.position); 
+    if(data.checkUpdateFlag(LightData::AMBIANT_UPDATE))
+        setAmbiantColor(data.ambiant_col); 
+    if(data.checkUpdateFlag(LightData::DIFFUSE_UPDATE))
+        setDiffuseColor(data.diffuse_col); 
+    if(data.checkUpdateFlag(LightData::SPECULAR_UPDATE))
+        setSpecularColor(data.specular_col); 
+    if(data.checkUpdateFlag(LightData::INTENSITY_UPDATE))
+        setIntensity(data.intensity); 
+}
 
 /*****************************************************************************************************************/
-
-DirectionalLight::DirectionalLight(SceneNodeInterface* parent) : AbstractLight(parent){
+/* Here , position is actually the direction ... */
+DirectionalLight::DirectionalLight(ISceneNode* parent) : AbstractLight(parent){
     position = glm::vec3(0.f); 
     type = DIRECTIONAL; 
     intensity = 0.f ; 
@@ -34,7 +46,7 @@ DirectionalLight::DirectionalLight(SceneNodeInterface* parent) : AbstractLight(p
 }
 
 
-DirectionalLight::DirectionalLight(glm::vec3 _position , glm::vec3 _ambientColor , glm::vec3 _diffuseColor , glm::vec3 _specularColor , float _intensity , SceneNodeInterface *parent):DirectionalLight(parent){
+DirectionalLight::DirectionalLight(glm::vec3 _position , glm::vec3 _ambientColor , glm::vec3 _diffuseColor , glm::vec3 _specularColor , float _intensity , ISceneNode *parent):DirectionalLight(parent){
     specularColor = _specularColor ;
     ambientColor = _ambientColor ;  
     diffuseColor = _diffuseColor ; 
@@ -44,12 +56,16 @@ DirectionalLight::DirectionalLight(glm::vec3 _position , glm::vec3 _ambientColor
 
 }
 
-DirectionalLight::DirectionalLight(glm::vec3 _position , glm::vec3 color , float _intensity , SceneNodeInterface *parent):DirectionalLight(parent){
+DirectionalLight::DirectionalLight(glm::vec3 _position , glm::vec3 color , float _intensity , ISceneNode *parent):DirectionalLight(parent){
     position = _position ; 
     specularColor = color ; 
     diffuseColor = color ; 
     ambientColor = color ;
     intensity = _intensity ; 
+}
+
+DirectionalLight::DirectionalLight(const LightData& data , ISceneNode* parent) : DirectionalLight(data.direction , data.ambiant_col , data.diffuse_col , data.specular_col , data.intensity , parent){ 
+
 }
 
 DirectionalLight::~DirectionalLight(){
@@ -62,9 +78,16 @@ void DirectionalLight::updateShaderData(Shader* shader , glm::mat4& view , unsig
     AbstractLight::updateShaderData(shader , modelview , index); 
 }
 
+
+void DirectionalLight::updateLightData(const LightData& data){
+    AbstractLight::updateLightData(data); 
+    if(data.checkUpdateFlag(LightData::DIRECTION_UPDATE))
+        setPosition(data.direction);
+} 
+
 /*****************************************************************************************************************/
 
-PointLight::PointLight(SceneNodeInterface* parent) : AbstractLight(parent){
+PointLight::PointLight(ISceneNode* parent) : AbstractLight(parent){
     position = glm::vec3(0.f); 
     type = POINT; 
     intensity = 0.f ; 
@@ -76,7 +99,7 @@ PointLight::PointLight(SceneNodeInterface* parent) : AbstractLight(parent){
 }
 
 
-PointLight::PointLight(glm::vec3 _position , glm::vec3 _ambientColor , glm::vec3 _diffuseColor , glm::vec3 _specularColor , glm::vec3 _attenuation ,  float _intensity , SceneNodeInterface *parent ):PointLight(parent){
+PointLight::PointLight(glm::vec3 _position , glm::vec3 _ambientColor , glm::vec3 _diffuseColor , glm::vec3 _specularColor , glm::vec3 _attenuation ,  float _intensity , ISceneNode *parent ):PointLight(parent){
     specularColor = _specularColor ;
     ambientColor = _ambientColor ;  
     diffuseColor = _diffuseColor ; 
@@ -87,13 +110,17 @@ PointLight::PointLight(glm::vec3 _position , glm::vec3 _ambientColor , glm::vec3
 
 }
 
-PointLight::PointLight(glm::vec3 _position , glm::vec3 color , glm::vec3 _attenuation , float _intensity , SceneNodeInterface* parent):PointLight(parent){
+PointLight::PointLight(glm::vec3 _position , glm::vec3 color , glm::vec3 _attenuation , float _intensity , ISceneNode* parent):PointLight(parent){
     position = _position ; 
     specularColor = color ; 
     diffuseColor = color ; 
     ambientColor = color ;
     intensity = _intensity ; 
     attenuation = _attenuation ; 
+}
+
+PointLight::PointLight(const LightData& data , ISceneNode* parent):PointLight(data.position , data.ambiant_col , data.diffuse_col , data.specular_col , data.attenuation , data.intensity , parent){
+
 }
 
 PointLight::~PointLight(){
@@ -113,11 +140,16 @@ void PointLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned in
     AbstractLight::updateShaderData(shader , modelview , index); 
 }
 
+void PointLight::updateLightData(const LightData& data){
+    AbstractLight::updateLightData(data); 
+    if(data.checkUpdateFlag(LightData::ATTENUATION_UPDATE))
+        setAttenuation(data.attenuation); 
+}
 
 /*****************************************************************************************************************/
 
 
-SpotLight::SpotLight(SceneNodeInterface *parent):AbstractLight(parent){
+SpotLight::SpotLight(ISceneNode *parent):AbstractLight(parent){
     position = glm::vec3(0.f); 
     type = SPOT;  
     theta = 0.f ; 
@@ -129,7 +161,7 @@ SpotLight::SpotLight(SceneNodeInterface *parent):AbstractLight(parent){
     light_struct_name = std::string(uniform_name_str_lighting_spot_struct_name) ;  
 }
 
-SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _color , float _cutoff_angle , float _intensity , SceneNodeInterface *parent):SpotLight(parent){
+SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _color , float _cutoff_angle , float _intensity , ISceneNode *parent):SpotLight(parent){
     position = _position ; 
     specularColor = _color ; 
     diffuseColor = _color ; 
@@ -139,7 +171,7 @@ SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _col
     direction = _direction ;  
 }
 
-SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _ambient , glm::vec3 _diffuse , glm::vec3 _specular , float _angle , float _intensity , SceneNodeInterface *parent):SpotLight(parent){
+SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _ambient , glm::vec3 _diffuse , glm::vec3 _specular , float _angle , float _intensity , ISceneNode *parent):SpotLight(parent){
     specularColor = _specular ;
     ambientColor = _ambient ;  
     diffuseColor = _diffuse ; 
@@ -147,6 +179,9 @@ SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _amb
     intensity = _intensity ;
     theta = _angle ;
     direction = _direction ; 
+}
+
+SpotLight::SpotLight(const LightData& data , ISceneNode* parent):SpotLight(data.position , data.direction , data.ambiant_col , data.diffuse_col , data.specular_col , data.theta , data.intensity , parent){
 
 }
 
@@ -164,9 +199,13 @@ void SpotLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned int
     AbstractLight::updateShaderData(shader , modelview , index); 
 }
 
-
-
-
+void SpotLight::updateLightData(const LightData& data){
+    AbstractLight::updateLightData(data); 
+    if(data.checkUpdateFlag(LightData::DIRECTION_UPDATE))
+        setDirection(data.direction);
+    if(data.checkUpdateFlag(LightData::THETA_UPDATE))
+        setAngle(data.theta);  
+}
 
 
 
