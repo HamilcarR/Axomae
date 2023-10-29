@@ -1616,7 +1616,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                   </widget>
                                  </item>
                                  <item>
-                                  <widget class="QDoubleSpinBox" name="renderer_lighting_PointLights_intensity"/>
+                                  <widget class="QDoubleSpinBox" name="dspinbox_renderer_lighting_PointLights_intensity"/>
                                  </item>
                                 </layout>
                                </widget>
@@ -1881,21 +1881,21 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                   </widget>
                                  </item>
                                  <item>
-                                  <widget class="QDoubleSpinBox" name="renderer_lighting_DirectionalLights_intensity"/>
+                                  <widget class="QDoubleSpinBox" name="dspinbox_renderer_lighting_DirectionalLights_intensity"/>
                                  </item>
                                 </layout>
                                </widget>
                               </widget>
                              </item>
                              <item>
-                              <widget class="QPushButton" name="button_renderer_lighting_PointLights_add_2">
+                              <widget class="QPushButton" name="button_renderer_lighting_DirectionalLights_add">
                                <property name="text">
                                 <string>Add</string>
                                </property>
                               </widget>
                              </item>
                              <item>
-                              <widget class="QPushButton" name="button_renderer_lighting_PointLights_delete_2">
+                              <widget class="QPushButton" name="button_renderer_lighting_DirectionalLights_delete">
                                <property name="text">
                                 <string>Delete</string>
                                </property>
@@ -2084,7 +2084,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                   </widget>
                                  </item>
                                  <item>
-                                  <widget class="QDoubleSpinBox" name="renderer_lighting_SpotLights_intensity"/>
+                                  <widget class="QDoubleSpinBox" name="dspinbox_renderer_lighting_SpotLights_intensity"/>
                                  </item>
                                 </layout>
                                </widget>
@@ -2113,7 +2113,26 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                     </widget>
                                    </item>
                                    <item row="2" column="0">
-                                    <widget class="QDial" name="dial_renderer_lighting_SpotLights_angle"/>
+                                    <widget class="QDial" name="dial_renderer_lighting_SpotLights_angle">
+                                     <property name="sizePolicy">
+                                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                       <horstretch>0</horstretch>
+                                       <verstretch>0</verstretch>
+                                      </sizepolicy>
+                                     </property>
+                                     <property name="maximum">
+                                      <number>180</number>
+                                     </property>
+                                     <property name="orientation">
+                                      <enum>Qt::Horizontal</enum>
+                                     </property>
+                                     <property name="invertedAppearance">
+                                      <bool>false</bool>
+                                     </property>
+                                     <property name="invertedControls">
+                                      <bool>false</bool>
+                                     </property>
+                                    </widget>
                                    </item>
                                   </layout>
                                  </item>
