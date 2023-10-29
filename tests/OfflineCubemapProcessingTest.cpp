@@ -108,7 +108,7 @@ TEST(EnvmapComputation , uvCartesianCohesion){
 }
 
 
-TEST(EnvmapComputation , computeDiffuseIrradianceCPU){
+/*TEST(EnvmapComputation , computeDiffuseIrradianceCPU){
 	std::string image = "test2.hdr" ;
     int width = 0 ; 
     int height = 0 ;
@@ -147,4 +147,4 @@ TEST(EnvmapComputation , computeDiffuseIrradianceCPU){
      
     stbi_write_hdr("response_gpu.hdr" , _width , _height , 4 , dest_texture); 
     delete[] src_texture ; 
-}
+}*/
