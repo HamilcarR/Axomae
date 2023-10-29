@@ -226,6 +226,7 @@ public:
 	 * @return const Scene& 
 	 */
 	const Scene& getConstScene() const {return *scene; }
+	Scene& getScene() {return *scene;}
 
 	template<class Func , class ...Args>
 	void execCallback(Func&& function , Renderer* instance , Args&& ...args){

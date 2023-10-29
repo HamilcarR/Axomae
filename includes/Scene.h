@@ -176,6 +176,7 @@ public:
      * @return const SceneTree& 
      */
     const SceneTree& getConstSceneTreeRef() const { return scene_tree;}
+    SceneTree& getSceneTreeRef() {return scene_tree;}
 private:
     /**
      * @brief Sort transparent elements by distance and store their position in sorted_transparent_meshes

@@ -92,3 +92,7 @@ std::vector<INode*> SceneTree::findByName(const std::string& name){
     dfs(root , lambda_search_name , name , collection);
     return collection ;  
 }
+
+void SceneTree::updateHierarchy(){
+
+}

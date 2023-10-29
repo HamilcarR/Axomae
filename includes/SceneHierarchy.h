@@ -57,6 +57,11 @@ public:
      * @param node 
      */
     void setAsRootChild(INode* node); 
+
+    /**
+     * @brief This method will update the hierarchy given a list of nodes. Only the descendants of these nodes will be updated.  
+     */
+    virtual void updateHierarchy() = 0 ;  
     
     /**
      * @brief Traverse the scene structure, and set their owner of each node to this structure
@@ -105,13 +110,13 @@ public:
     void dfs(INode* begin ,F func, Args&& ...args);
 
     template<class F , class ...Args>
-    void dfs(const INode* begin ,F func, Args&& ...args) const ;
+    void dfsConst(const INode* begin ,F func, Args&& ...args) const ;
 
     template<class F , class ...Args>
     void bfs(INode* begin , F func , Args&& ...args); 
    
     template<class F , class ...Args>
-    void bfs(const INode* begin , F func , Args&& ...args) const; 
+    void bfsConst(const INode* begin , F func , Args&& ...args) const; 
    
 private:
     
@@ -127,13 +132,13 @@ private:
     void dfsTraverse(INode* node ,F func , Args&& ...args); 
 
     template<class F , class ...Args>
-    void dfsTraverse(const INode* node ,F func , Args&& ...args) const ; 
+    void dfsConstTraverse(const INode* node ,F func , Args&& ...args) const ; 
 
     template<class F , class ...Args>
     void bfsTraverse(INode* node ,F func , Args&& ...args); 
 
     template<class F , class ...Args>
-    void bfsTraverse(const INode* node ,F func , Args&& ...args) const ;
+    void bfsConstTraverse(const INode* node ,F func , Args&& ...args) const ;
 
 protected:
     INode* root;       /*<Root of the hierarchy*/
@@ -148,19 +153,20 @@ private:
 /*******************************************************************************************************************************************************************/
 
 class SceneTree : public ISceneHierarchy{
+     
 public:
     SceneTree(ISceneNode* root = nullptr); 
     SceneTree(const SceneTree& copy);
+    virtual ~SceneTree(); 
     virtual void createGenericRootNode() override ;
     virtual SceneTree& operator=(const SceneTree& copy);
     virtual void updateAccumulatedTransformations() override;
     virtual void pushNewRoot(INode* new_root);
     virtual std::vector<INode*> findByName(const std::string& name) override; 
-    virtual ~SceneTree(); 
+    virtual void updateHierarchy() override ;
 
 private:
-
-
+    bool node_updated ; 
 };
 
 
@@ -195,14 +201,14 @@ void ISceneHierarchy::dfsTraverse(INode* node , F func, Args&& ...args){
     }
 
 template<class F , class ...Args>
-void ISceneHierarchy::dfs(const INode* begin , F func , Args&& ...args) const{
+void ISceneHierarchy::dfsConst(const INode* begin , F func , Args&& ...args) const{
     if((const_iterator = begin) != nullptr){
         dfsTraverse(const_iterator , func , std::forward<Args>(args)...);
     }
 }
 
 template<class F , class ...Args>
-void ISceneHierarchy::dfsTraverse(const INode* node , F func, Args&& ...args) const {
+void ISceneHierarchy::dfsConstTraverse(const INode* node , F func, Args&& ...args) const {
         if(node != nullptr){
             func(node , std::forward<Args>(args)...);
             for(const INode* child : node->getChildren())
@@ -230,14 +236,14 @@ void ISceneHierarchy::bfsTraverse(INode* node , F func, Args&& ...args){
     }
 
 template<class F , class ...Args>
-void ISceneHierarchy::bfs(const INode* begin , F func , Args&& ...args) const {
+void ISceneHierarchy::bfsConst(const INode* begin , F func , Args&& ...args) const {
     if((const_iterator = begin) != nullptr){
         bfsTraverse(const_iterator , func , std::forward<Args>(args)...);
     }
 }
 
 template<class F , class ...Args>
-void ISceneHierarchy::bfsTraverse(const INode* node , F func, Args&& ...args) const {
+void ISceneHierarchy::bfsConstTraverse(const INode* node , F func, Args&& ...args) const {
     if(node != nullptr){
             if(node->isRoot())
                 func(node , std::forward<Args>(args)...);

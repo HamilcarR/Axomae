@@ -105,7 +105,7 @@ SceneTreeNode& SceneTreeNode::operator=(const SceneTreeNode& copy){
 
 void SceneTreeNode::setParents(std::vector<INode*> &nodes){
     if(!nodes.empty()){
-        parents.clear(); 
+        parents.clear(); //!check if leak ?  
         parents.push_back(nodes[0]); 
         if(parents[0] != nullptr)
             parents[0]->addChildNode(this); 
