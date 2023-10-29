@@ -24,59 +24,66 @@ public:
     std::string name ; 
 };
 
-
+//TODO: [AX-57] implement a visitor node for icon attributions to scene elements
 class SceneListView : virtual public QTreeWidget{
 public:
     SceneListView(QWidget* parent = nullptr) : QTreeWidget(parent)
     {
-        
     }
 
     virtual ~SceneListView()
     {
     }
 
-    virtual void clear(){
-        for(QTreeWidgetItemIterator it(this) ; *it ; it++){
-            QTreeWidgetItem *item = *it ; 
-            delete item ; 
-        } 
+    virtual void emptyTree(){
+        clear(); 
+        items.clear(); 
+        node_lookup.clear(); 
     }
 
-    virtual void setScene(const SceneTree& scene){
-       clear(); 
-       const INode* root_node = scene.getRootNode(); 
-       auto layout_nodes_lambda = [](const INode* node , 
-                                    const SceneTree& scene , 
+    INode* getSceneNode(const NodeItem* searched){
+        if(!searched)
+            return nullptr; 
+        for(auto pair : node_lookup){
+            if(searched == pair.second)
+                return pair.first;
+        }
+        return nullptr; 
+    }
+
+    virtual void setScene(SceneTree& scene){
+        emptyTree();
+        INode* root_node = scene.getRootNode(); 
+        auto layout_nodes_lambda = [](INode* node , 
+                                    SceneTree& scene , 
                                     SceneListView& scene_view_list , 
                                     std::vector<NodeItem*> &r_items , 
-                                    std::map<const ISceneNode* ,  NodeItem*> &equiv_table)
+                                    std::map<ISceneNode* ,  NodeItem*> &equiv_table)
         {
             if(node == scene.getRootNode()){
                 NodeItem *root = new NodeItem(node->getName() , QTreeWidgetItem::Type);
                 root->setItemText(0);
                 scene_view_list.addTopLevelItem(root);  
                 r_items.push_back(root);
-                std::pair<const ISceneNode* , NodeItem*> node_treewidget_pair(static_cast<const ISceneNode*>(node) , root); 
+                std::pair<ISceneNode* , NodeItem*> node_treewidget_pair(static_cast<ISceneNode*>(node) , root); 
                 equiv_table.insert(node_treewidget_pair); 
             }
-            else{
-                
-                const ISceneNode* parent_inode = static_cast<ISceneNode*>(node->getParents()[0]); 
+            else{ 
+                ISceneNode* parent_inode = static_cast<ISceneNode*>(node->getParents()[0]); 
                 NodeItem* parent_nodeitem = equiv_table[parent_inode]; 
                 NodeItem *current = new NodeItem(node->getName() , QTreeWidgetItem::Type , parent_nodeitem);
                 current->setItemText(0);
                 r_items.push_back(current);
-                std::pair<const ISceneNode* , NodeItem*> node_treewidget_pair(static_cast<const ISceneNode*>(node), current);
+                std::pair<ISceneNode* , NodeItem*> node_treewidget_pair(static_cast<ISceneNode*>(node), current);
                 equiv_table.insert(node_treewidget_pair);  
             }
         };
-        std::map<const ISceneNode* , NodeItem*> equiv_table;
-        scene.dfs(root_node ,layout_nodes_lambda , scene , *this , items , equiv_table);   
+        scene.dfs(root_node ,layout_nodes_lambda , scene , *this , items , node_lookup);  
     } 
 
 private:
-    std::vector<NodeItem*> items ; //Only used to simply keep track of elements in the tree.
+    std::vector<NodeItem*> items ; //Only used to simply keep track of elements in the tree. 
+    std::map<ISceneNode* , NodeItem*> node_lookup ; /*<Keeps track of the NodeItems and their corresponding INodes*/ //no need to deallocate anything here. 
 };
 
 
