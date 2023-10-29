@@ -197,18 +197,25 @@ namespace image_session_pointers {
 HeapManagement *Controller::_MemManagement = new HeapManagement;
 
 Controller::Controller( QWidget *parent) : QMainWindow(parent) {
-	_UI.setupUi(this);
-	connect_all_slots(); 
+	_UI.setupUi(this);	
 	_UI.progressBar->setValue(0);
 	viewer_3d = _UI.renderer_view;
-	renderer_scene_list = _UI.renderer_scene_list;  
+	renderer_scene_list = _UI.renderer_scene_list ; 
+	light_controller = std::make_unique<LightController>(_UI); 
+	light_controller->setup(viewer_3d , renderer_scene_list); 	
+	/* Undo pointers setup*/
 	image_session_pointers::greyscale = nullptr; 
 	image_session_pointers::albedo = nullptr; 
 	image_session_pointers::height = nullptr; 
 	image_session_pointers::normalmap = nullptr;
 	image_session_pointers::dudv = nullptr; 
-	LoggerConfigDataStruct log_struct = configuration.generateLoggerConfigDataStruct();  
+	
+	/*Logging configuration*/
+	LoggerConfigDataStruct log_struct = configuration.generateLoggerConfigDataStruct();  	
 	LOGCONFIG(log_struct); 
+	
+	/*At last , we setup all slots and signals*/	
+	connect_all_slots();
 }
 
 Controller::~Controller() {
@@ -256,6 +263,7 @@ SDL_Surface* Controller::copy_surface(SDL_Surface *src) {
 	else
 		return nullptr; 
 }
+//! replace by constexpr function here
 /**************************************************************************************************************/
 QGraphicsView* Controller::get_corresponding_view(IMAGETYPE type) {
 	switch(type){
@@ -360,7 +368,7 @@ bool Controller::set_corresponding_session_pointer(image_type<SDL_Surface> *imag
 	return true; 
 }
 
-
+//!
 
 
 /**************************************************************************************************************/
@@ -413,6 +421,7 @@ void Controller::connect_all_slots() {
 	QObject::connect(_UI.rasterize_display_bbox_checkbox , SIGNAL(toggled(bool)), this , SLOT(set_display_boundingbox(bool))); 
 
 	/*Renderer tab -> Lighting -> Point lights*/
+	light_controller->connect_all_slots(); 
 }
 
 
@@ -666,7 +675,7 @@ bool Controller::import_3DOBJ(){
 		viewer_3d->setNewScene(struct_holder); 
 		instance->setScene(scene);
 		_UI.meshes_list->setList(scene) ; 
-		const SceneTree& scene_hierarchy = viewer_3d->getConstRenderer().getConstScene().getConstSceneTreeRef(); 
+		SceneTree& scene_hierarchy = viewer_3d->getRenderer().getScene().getSceneTreeRef();
 		_UI.renderer_scene_list->setScene(scene_hierarchy); 
 	//	std::thread(ImageManager::project_uv_normals, scene[0]->geometry , _UI.uv_width->value() , _UI.uv_height->value() , _UI.tangent_space->isChecked()).detach();  //TODO : optimize and re enable	
 		return true ; 

@@ -6,6 +6,7 @@
 #include <QtWidgets/qmainwindow.h>
 
 #include "Window.h"
+#include "LightControllerUI.h"
 #include "../Form Files/ui_test.h"
 #include "SceneSelector.h" 
 #include "Config.h"
@@ -301,6 +302,7 @@ private:
 	ImageImporter *_importer; 
 	ApplicationConfig configuration ; 	
 	SceneListView *renderer_scene_list ; 
+	std::unique_ptr<LightController> light_controller ; 
 };
 
 
