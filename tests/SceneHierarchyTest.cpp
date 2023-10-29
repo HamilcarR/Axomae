@@ -160,3 +160,13 @@ TEST(DFSTest , findName){
     } 
 
 }
+
+TEST(BFSTEST , leafCountBFS){
+    SceneTreeBuilder builder; 
+    builder.buildSceneTree(TEST_TREE_MAX_DEPTH , TEST_TREE_MAX_NODE_DEGREE);
+    SceneTree *tree = builder.getTreePointer();
+    unsigned i = 0 ; 
+    tree->bfs(tree->getRootNode() , &PseudoFunctors::testLeafCount , &i);
+    EXPECT_EQ(i , builder.getLeafCount()); 
+}
+
