@@ -23,7 +23,7 @@ public:
         INTENSITY_UPDATE = 1 << 7 , 
         THETA_UPDATE = 1 << 8 
     };
-
+    ISceneNode* parent; 
     glm::vec3 position ; 
     glm::vec3 direction ; 
     glm::vec3 attenuation ;
@@ -33,7 +33,8 @@ public:
     float intensity; 
     float theta; 
     uint16_t update_flags = 0; 
-
+    
+    /*Helper functions */
     void enableUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag){
         update_flags |= flag ;     
     }
@@ -46,6 +47,15 @@ public:
         return update_flags & flag ; 
     }
 
+    void asPbrColor(uint8_t red , uint8_t green , uint8_t blue){
+        diffuse_col = glm::vec3(red , green , blue);
+        specular_col = glm::vec3(red , green , blue);
+        ambiant_col = glm::vec3(red , green , blue);   
+    }
+    
+    void loadAttenuation(float cste , float lin , float quad){
+        attenuation = glm::vec3(cste , lin , quad); 
+    }
 };
 
 
@@ -242,7 +252,7 @@ protected:
      * @param light_data Light data . Will only take into account data that are related to directional lights
      * @param parent Predecessor in the scene graph . 
      */
-    DirectionalLight(const LightData& light_data , ISceneNode *parent);
+    DirectionalLight(const LightData& light_data);
 
 public:
     
@@ -314,7 +324,7 @@ protected:
      * @param data 
      * @param parent 
      */
-    PointLight(const LightData& data , ISceneNode* parent); 
+    PointLight(const LightData& data); 
 
 public:
 
@@ -388,7 +398,7 @@ protected:
      * @param data 
      * @param ancestor 
      */
-    SpotLight(const LightData& data , ISceneNode* ancestor);
+    SpotLight(const LightData& data);
 public:
     /**
      * @brief 

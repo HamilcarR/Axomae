@@ -64,7 +64,7 @@ DirectionalLight::DirectionalLight(glm::vec3 _position , glm::vec3 color , float
     intensity = _intensity ; 
 }
 
-DirectionalLight::DirectionalLight(const LightData& data , ISceneNode* parent) : DirectionalLight(data.direction , data.ambiant_col , data.diffuse_col , data.specular_col , data.intensity , parent){ 
+DirectionalLight::DirectionalLight(const LightData& data) : DirectionalLight(data.direction , data.ambiant_col , data.diffuse_col , data.specular_col , data.intensity , data.parent){ 
 
 }
 
@@ -119,7 +119,7 @@ PointLight::PointLight(glm::vec3 _position , glm::vec3 color , glm::vec3 _attenu
     attenuation = _attenuation ; 
 }
 
-PointLight::PointLight(const LightData& data , ISceneNode* parent):PointLight(data.position , data.ambiant_col , data.diffuse_col , data.specular_col , data.attenuation , data.intensity , parent){
+PointLight::PointLight(const LightData& data):PointLight(data.position , data.ambiant_col , data.diffuse_col , data.specular_col , data.attenuation , data.intensity , data.parent){
 
 }
 
@@ -181,7 +181,7 @@ SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _amb
     direction = _direction ; 
 }
 
-SpotLight::SpotLight(const LightData& data , ISceneNode* parent):SpotLight(data.position , data.direction , data.ambiant_col , data.diffuse_col , data.specular_col , data.theta , data.intensity , parent){
+SpotLight::SpotLight(const LightData& data):SpotLight(data.position , data.direction , data.ambiant_col , data.diffuse_col , data.specular_col , data.theta , data.intensity , data.parent){
 
 }
 
