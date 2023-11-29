@@ -89,18 +89,26 @@ void GLViewer::wheelEvent(QWheelEvent *event){
 }
 
 void GLViewer::mousePressEvent(QMouseEvent *event){
-	QOpenGLWidget::mousePressEvent(event);
 	MouseState *mouse = renderer->getMouseStatePointer();
+	QOpenGLWidget::mousePressEvent(event);
 	switch (event->button()){
 	case Qt::LeftButton:
-		mouse->left_button_clicked = true;
-		mouse->left_button_released = false;
-		renderer->onLeftClick();
+		if(!renderer->eventQueueEmpty(Renderer::ON_LEFT_CLICK))
+			renderer->onLeftClick();
+		else{
+			mouse->left_button_clicked = true;
+			mouse->left_button_released = false;
+			renderer->onLeftClick();
+		}
 		break;
 	case Qt::RightButton:
-		mouse->right_button_clicked = true;
-		mouse->right_button_released = false;
-		renderer->onRightClick();
+		if(mouse->busy)
+			renderer->onRightClick();
+		else{
+			mouse->right_button_clicked = true;
+			mouse->right_button_released = false;
+			renderer->onRightClick();
+		}
 		break;
 	default:
 		break;
@@ -109,18 +117,26 @@ void GLViewer::mousePressEvent(QMouseEvent *event){
 }
 
 void GLViewer::mouseReleaseEvent(QMouseEvent *event){
-	QOpenGLWidget::mouseReleaseEvent(event);
 	MouseState *mouse = renderer->getMouseStatePointer();
+	QOpenGLWidget::mouseReleaseEvent(event);
 	switch (event->button()){
 	case Qt::LeftButton:
-		mouse->left_button_clicked = false;
-		mouse->left_button_released = true;
-		renderer->onLeftClickRelease();
+		if(!renderer->eventQueueEmpty(Renderer::ON_LEFT_CLICK))
+			renderer->onLeftClickRelease(); 
+		else{
+			mouse->left_button_clicked = false;
+			mouse->left_button_released = true;
+			renderer->onLeftClickRelease();
+		}
 		break;
 	case Qt::RightButton:
-		mouse->right_button_clicked = false;
-		mouse->right_button_released = true;
-		renderer->onRightClickRelease();
+		if(mouse->busy)
+			renderer->onRightClickRelease();
+		else{
+			mouse->right_button_clicked = false;
+			mouse->right_button_released = true;
+			renderer->onRightClickRelease();
+		}
 		break;
 	default:
 		break;

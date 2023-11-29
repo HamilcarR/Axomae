@@ -1581,8 +1581,11 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                    </item>
                                    <item row="4" column="1">
                                     <widget class="QSpinBox" name="spinbox_renderer_lighting_PointLights_colors_red">
+                                     <property name="toolTipDuration">
+                                      <number>-1</number>
+                                     </property>
                                      <property name="readOnly">
-                                      <bool>true</bool>
+                                      <bool>false</bool>
                                      </property>
                                      <property name="maximum">
                                       <number>255</number>
@@ -1616,7 +1619,14 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                   </widget>
                                  </item>
                                  <item>
-                                  <widget class="QDoubleSpinBox" name="dspinbox_renderer_lighting_PointLights_intensity"/>
+                                  <widget class="QDoubleSpinBox" name="dspinbox_renderer_lighting_PointLights_intensity">
+                                   <property name="decimals">
+                                    <number>3</number>
+                                   </property>
+                                   <property name="maximum">
+                                    <double>10000.000000000000000</double>
+                                   </property>
+                                  </widget>
                                  </item>
                                 </layout>
                                </widget>
@@ -1630,7 +1640,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                    <item row="3" column="0">
                                     <widget class="QDoubleSpinBox" name="dspinbox_renderer_lighting_PointLights_Attenuation_linear">
                                      <property name="decimals">
-                                      <number>9</number>
+                                      <number>4</number>
                                      </property>
                                      <property name="maximum">
                                       <double>10000000000000.000000000000000</double>
@@ -1647,7 +1657,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                    <item row="5" column="0">
                                     <widget class="QDoubleSpinBox" name="dspinbox_renderer_lighting_PointLights_Attenuation_quadratic">
                                      <property name="decimals">
-                                      <number>9</number>
+                                      <number>4</number>
                                      </property>
                                      <property name="maximum">
                                       <double>10000000000000.000000000000000</double>
@@ -1657,7 +1667,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                    <item row="1" column="0">
                                     <widget class="QDoubleSpinBox" name="dspinbox_renderer_lighting_PointLights_Attenuation_constant">
                                      <property name="decimals">
-                                      <number>9</number>
+                                      <number>4</number>
                                      </property>
                                      <property name="maximum">
                                       <double>10000000000000.000000000000000</double>

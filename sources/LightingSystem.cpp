@@ -4,7 +4,8 @@
 
 
 AbstractLight::AbstractLight(ISceneNode *parent) : SceneTreeNode(parent){
-    id = 0 ; 
+    id = 0 ;
+     
 } 
 
 
@@ -65,7 +66,7 @@ DirectionalLight::DirectionalLight(glm::vec3 _position , glm::vec3 color , float
 }
 
 DirectionalLight::DirectionalLight(const LightData& data) : DirectionalLight(data.direction , data.ambiant_col , data.diffuse_col , data.specular_col , data.intensity , data.parent){ 
-
+    setName(data.name); 
 }
 
 DirectionalLight::~DirectionalLight(){
@@ -120,7 +121,7 @@ PointLight::PointLight(glm::vec3 _position , glm::vec3 color , glm::vec3 _attenu
 }
 
 PointLight::PointLight(const LightData& data):PointLight(data.position , data.ambiant_col , data.diffuse_col , data.specular_col , data.attenuation , data.intensity , data.parent){
-
+    setName(data.name); 
 }
 
 PointLight::~PointLight(){
@@ -182,7 +183,7 @@ SpotLight::SpotLight(glm::vec3 _position , glm::vec3 _direction , glm::vec3 _amb
 }
 
 SpotLight::SpotLight(const LightData& data):SpotLight(data.position , data.direction , data.ambiant_col , data.diffuse_col , data.specular_col , data.theta , data.intensity , data.parent){
-
+    setName(data.name); 
 }
 
 void SpotLight::updateShaderData(Shader* shader , glm::mat4& view , unsigned int index) {

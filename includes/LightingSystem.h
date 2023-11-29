@@ -32,6 +32,7 @@ public:
     glm::vec3 ambiant_col ; 
     float intensity; 
     float theta; 
+    std::string name; 
     uint16_t update_flags = 0; 
     
     /*Helper functions */

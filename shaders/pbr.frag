@@ -1,5 +1,5 @@
 #version 460 core
-#define MAX_LIGHTS 10
+#define MAX_LIGHTS 20
 #define PI 3.1415926538
 #define EPSILON 0.0001
 

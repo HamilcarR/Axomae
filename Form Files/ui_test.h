@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'test.ui'
 **
-** Created by: Qt User Interface Compiler version 6.5.1
+** Created by: Qt User Interface Compiler version 6.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -21,6 +21,7 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
@@ -32,10 +33,12 @@
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTreeView>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include "../includes/GLViewer.h"
 #include "../includes/MeshListView.h"
+#include "../includes/SceneListView.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -56,10 +59,22 @@ public:
     QGridLayout *gridLayout_2;
     QProgressBar *progressBar;
     QVBoxLayout *verticalLayout;
+    QGridLayout *gridLayout;
+    QGridLayout *gridLayout_4;
+    QTabWidget *workspace;
+    QWidget *texture;
+    QGridLayout *gridLayout_9;
+    QGridLayout *gridLayout_5;
+    QGridLayout *gridLayout_10;
+    QGraphicsView *height_image;
+    QGraphicsView *greyscale_image;
+    QGraphicsView *dudv_image;
+    QGraphicsView *diffuse_image;
+    QGraphicsView *normal_image;
+    QVBoxLayout *verticalLayout_21;
     QTabWidget *renderMaterials;
     QWidget *functions;
     QVBoxLayout *verticalLayout_2;
-    QCheckBox *use_gpu;
     QHBoxLayout *horizontalLayout_2;
     QPushButton *undo_button;
     QPushButton *redo_button;
@@ -112,9 +127,26 @@ public:
     QVBoxLayout *verticalLayout_6;
     QDoubleSpinBox *factor_dudv;
     QSlider *factor_slider_dudv;
-    QWidget *renderer_options;
-    QGridLayout *gridLayout_18;
-    QGridLayout *gridLayout_16;
+    QWidget *tab_3;
+    QHBoxLayout *horizontalLayout_4;
+    QHBoxLayout *horizontalLayout_3;
+    QVBoxLayout *verticalLayout_25;
+    QTabWidget *tabWidget_3;
+    QWidget *tab_4;
+    QHBoxLayout *horizontalLayout_5;
+    QHBoxLayout *horizontalLayout;
+    QGroupBox *groupBox;
+    QVBoxLayout *verticalLayout_15;
+    QGridLayout *gridLayout_3;
+    QLabel *label_3;
+    QSpinBox *uv_height;
+    QLabel *label_4;
+    QSpinBox *uv_width;
+    QPushButton *bake_texture;
+    QGraphicsView *cubemap_render_view;
+    QWidget *gl_renderer;
+    QGridLayout *gridLayout_6;
+    GLViewer *renderer_view;
     QTabWidget *tabWidget;
     QWidget *PostProTab;
     QVBoxLayout *verticalLayout_10;
@@ -142,32 +174,98 @@ public:
     QGridLayout *gridLayout_19;
     QCheckBox *rasterize_display_bbox_checkbox;
     QWidget *tab_2;
-    QWidget *Tools;
-    QGroupBox *groupBox;
-    QVBoxLayout *verticalLayout_15;
-    QRadioButton *tangent_space;
-    QGridLayout *gridLayout_3;
-    QLabel *label_3;
-    QSpinBox *uv_height;
-    QLabel *label_4;
-    QSpinBox *uv_width;
-    QPushButton *bake_texture;
-    QWidget *widget;
-    QGridLayout *gridLayout;
-    QGridLayout *gridLayout_4;
-    QTabWidget *renderer_tab;
-    QWidget *texture;
-    QGridLayout *gridLayout_9;
-    QGridLayout *gridLayout_5;
-    QGridLayout *gridLayout_10;
-    QGraphicsView *height_image;
-    QGraphicsView *greyscale_image;
-    QGraphicsView *normal_image;
-    QGraphicsView *diffuse_image;
-    QGraphicsView *dudv_image;
-    QWidget *gl_renderer;
-    QGridLayout *gridLayout_6;
-    GLViewer *renderer_view;
+    QGridLayout *gridLayout_18;
+    QGridLayout *gridLayout_16;
+    QTreeView *renderer_lighting_lightlist;
+    QTabWidget *tab_renderer_lighting;
+    QWidget *tab_9;
+    QVBoxLayout *verticalLayout_23;
+    QVBoxLayout *verticalLayout_22;
+    QGroupBox *groupBox_9;
+    QVBoxLayout *verticalLayout_19;
+    QTabWidget *tabWidget_4;
+    QWidget *tab_7;
+    QVBoxLayout *verticalLayout_20;
+    QGridLayout *gridLayout_20;
+    QSlider *hslider_renderer_lighting_PointLights_colors_red;
+    QLabel *label_7;
+    QLabel *label_8;
+    QSpinBox *spinbox_renderer_lighting_PointLights_colors_green;
+    QSlider *hslider_renderer_lighting_PointLights_colors_blue;
+    QSlider *hslider_renderer_lighting_PointLights_colors_green;
+    QSpinBox *spinbox_renderer_lighting_PointLights_colors_red;
+    QSpinBox *spinbox_renderer_lighting_PointLights_colors_blue;
+    QLabel *label_9;
+    QLabel *label_16;
+    QDoubleSpinBox *dspinbox_renderer_lighting_PointLights_intensity;
+    QWidget *tab_8;
+    QGridLayout *gridLayout_23;
+    QGridLayout *gridLayout_22;
+    QDoubleSpinBox *dspinbox_renderer_lighting_PointLights_Attenuation_linear;
+    QLabel *label_11;
+    QDoubleSpinBox *dspinbox_renderer_lighting_PointLights_Attenuation_quadratic;
+    QDoubleSpinBox *dspinbox_renderer_lighting_PointLights_Attenuation_constant;
+    QLabel *label_10;
+    QLabel *label_12;
+    QPushButton *button_renderer_lighting_PointLights_add;
+    QPushButton *button_renderer_lighting_PointLights_delete;
+    QWidget *tab_12;
+    QVBoxLayout *verticalLayout_28;
+    QVBoxLayout *verticalLayout_27;
+    QGroupBox *groupBox_10;
+    QVBoxLayout *verticalLayout_24;
+    QTabWidget *tabWidget_6;
+    QWidget *tab_13;
+    QVBoxLayout *verticalLayout_26;
+    QGridLayout *gridLayout_21;
+    QLabel *label_13;
+    QSpinBox *spinbox_renderer_lighting_DirectionalLights_colors_blue;
+    QLabel *label_14;
+    QSlider *hslider_renderer_lighting_DirectionalLights_colors_blue;
+    QSlider *hslider_renderer_lighting_DirectionalLights_colors_green;
+    QSpinBox *spinbox_renderer_lighting_DirectionalLight_colors_red;
+    QSpinBox *spinbox_renderer_lighting_DirectionalLights_colors_green;
+    QSlider *hslider_renderer_lighting_DirectionalLights_colors_red;
+    QLabel *label_15;
+    QLabel *label_17;
+    QDoubleSpinBox *dspinbox_renderer_lighting_DirectionalLights_intensity;
+    QPushButton *button_renderer_lighting_DirectionalLights_add;
+    QPushButton *button_renderer_lighting_DirectionalLights_delete;
+    QWidget *tab_11;
+    QGridLayout *gridLayout_28;
+    QGridLayout *gridLayout_27;
+    QGroupBox *groupBox_11;
+    QVBoxLayout *verticalLayout_29;
+    QTabWidget *tabWidget_7;
+    QWidget *tab_15;
+    QVBoxLayout *verticalLayout_30;
+    QGridLayout *gridLayout_24;
+    QSlider *hslider_renderer_lighting_SpotLights_colors_red;
+    QLabel *label_18;
+    QLabel *label_19;
+    QSpinBox *spinbox_renderer_lighting_SpotLights_colors_green;
+    QSlider *hslider_renderer_lighting_SpotLights_colors_blue;
+    QSlider *hslider_renderer_lighting_SpotLights_colors_green;
+    QSpinBox *spinbox_renderer_lighting_SpotLights_colors_red;
+    QSpinBox *spinbox_renderer_lighting_SpotLights_colors_blue;
+    QLabel *label_20;
+    QLabel *label_21;
+    QDoubleSpinBox *dspinbox_renderer_lighting_SpotLights_intensity;
+    QWidget *tab_16;
+    QGridLayout *gridLayout_25;
+    QGridLayout *gridLayout_26;
+    QLabel *label_23;
+    QDoubleSpinBox *dspinbox_renderer_lighting_SpotLights_angle;
+    QDial *dial_renderer_lighting_SpotLights_angle;
+    QPushButton *button_renderer_lighting_SpotLights_add;
+    QPushButton *button_renderer_lighting_SpotLights_delete;
+    QWidget *tab_10;
+    QWidget *tab_6;
+    QHBoxLayout *horizontalLayout_6;
+    QVBoxLayout *verticalLayout_12;
+    QGroupBox *groupBox_7;
+    QGroupBox *groupBox_6;
+    SceneListView *renderer_scene_list;
     QWidget *uv_editor;
     QGridLayout *gridLayout_17;
     QGridLayout *gridLayout_14;
@@ -177,6 +275,10 @@ public:
     QPushButton *previous_mesh_button;
     QGridLayout *gridLayout_15;
     QGraphicsView *uv_projection;
+    QWidget *rt_renderer;
+    QGridLayout *gridLayout_30;
+    QGridLayout *gridLayout_29;
+    QCheckBox *use_gpu;
     QMenuBar *menubar;
     QMenu *menuFiles;
     QMenu *menuEdit;
@@ -188,7 +290,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
-        MainWindow->resize(1528, 900);
+        MainWindow->resize(1528, 934);
         QPalette palette;
         QBrush brush(QColor(255, 255, 255, 255));
         brush.setStyle(Qt::SolidPattern);
@@ -314,13 +416,85 @@ public:
         progressBar->setObjectName("progressBar");
         progressBar->setValue(24);
 
-        gridLayout_2->addWidget(progressBar, 1, 0, 1, 2);
+        gridLayout_2->addWidget(progressBar, 2, 0, 1, 4);
 
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setSizeConstraint(QLayout::SetMaximumSize);
         verticalLayout->setContentsMargins(-1, -1, 0, -1);
-        renderMaterials = new QTabWidget(centralwidget);
+        gridLayout = new QGridLayout();
+        gridLayout->setObjectName("gridLayout");
+        gridLayout_4 = new QGridLayout();
+        gridLayout_4->setObjectName("gridLayout_4");
+        workspace = new QTabWidget(centralwidget);
+        workspace->setObjectName("workspace");
+        sizePolicy.setHeightForWidth(workspace->sizePolicy().hasHeightForWidth());
+        workspace->setSizePolicy(sizePolicy);
+        workspace->setTabShape(QTabWidget::Rounded);
+        workspace->setMovable(false);
+        workspace->setTabBarAutoHide(false);
+        texture = new QWidget();
+        texture->setObjectName("texture");
+        gridLayout_9 = new QGridLayout(texture);
+        gridLayout_9->setObjectName("gridLayout_9");
+        gridLayout_5 = new QGridLayout();
+        gridLayout_5->setObjectName("gridLayout_5");
+        gridLayout_10 = new QGridLayout();
+        gridLayout_10->setObjectName("gridLayout_10");
+        height_image = new QGraphicsView(texture);
+        height_image->setObjectName("height_image");
+        height_image->setFrameShape(QFrame::NoFrame);
+        height_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContentsOnFirstShow);
+
+        gridLayout_10->addWidget(height_image, 0, 1, 1, 1);
+
+        greyscale_image = new QGraphicsView(texture);
+        greyscale_image->setObjectName("greyscale_image");
+        greyscale_image->setFrameShape(QFrame::NoFrame);
+        greyscale_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContentsOnFirstShow);
+        greyscale_image->setDragMode(QGraphicsView::NoDrag);
+
+        gridLayout_10->addWidget(greyscale_image, 0, 0, 1, 1);
+
+
+        gridLayout_5->addLayout(gridLayout_10, 0, 2, 1, 1);
+
+        dudv_image = new QGraphicsView(texture);
+        dudv_image->setObjectName("dudv_image");
+        dudv_image->setFrameShape(QFrame::NoFrame);
+        dudv_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        dudv_image->setDragMode(QGraphicsView::ScrollHandDrag);
+
+        gridLayout_5->addWidget(dudv_image, 3, 2, 1, 1);
+
+        diffuse_image = new QGraphicsView(texture);
+        diffuse_image->setObjectName("diffuse_image");
+        diffuse_image->setFrameShape(QFrame::NoFrame);
+        diffuse_image->setFrameShadow(QFrame::Sunken);
+        diffuse_image->setLineWidth(1);
+        diffuse_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        diffuse_image->setDragMode(QGraphicsView::ScrollHandDrag);
+        diffuse_image->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+
+        gridLayout_5->addWidget(diffuse_image, 0, 1, 1, 1);
+
+        normal_image = new QGraphicsView(texture);
+        normal_image->setObjectName("normal_image");
+        normal_image->setFrameShape(QFrame::NoFrame);
+        normal_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        normal_image->setDragMode(QGraphicsView::ScrollHandDrag);
+
+        gridLayout_5->addWidget(normal_image, 3, 1, 1, 1);
+
+
+        gridLayout_9->addLayout(gridLayout_5, 1, 2, 1, 1);
+
+        verticalLayout_21 = new QVBoxLayout();
+        verticalLayout_21->setObjectName("verticalLayout_21");
+
+        gridLayout_9->addLayout(verticalLayout_21, 1, 0, 1, 1);
+
+        renderMaterials = new QTabWidget(texture);
         renderMaterials->setObjectName("renderMaterials");
         QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Preferred);
         sizePolicy1.setHorizontalStretch(0);
@@ -337,40 +511,19 @@ public:
         functions->setObjectName("functions");
         verticalLayout_2 = new QVBoxLayout(functions);
         verticalLayout_2->setObjectName("verticalLayout_2");
-        use_gpu = new QCheckBox(functions);
-        use_gpu->setObjectName("use_gpu");
-        QIcon icon;
-        icon.addFile(QString::fromUtf8(":/new/prefix1/nvidia-cuda21.png"), QSize(), QIcon::Normal, QIcon::Off);
-        use_gpu->setIcon(icon);
-        use_gpu->setIconSize(QSize(32, 16));
-
-        verticalLayout_2->addWidget(use_gpu);
-
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName("horizontalLayout_2");
         undo_button = new QPushButton(functions);
         undo_button->setObjectName("undo_button");
-        QIcon icon1;
-        QString iconThemeName = QString::fromUtf8("go-previous");
-        if (QIcon::hasThemeIcon(iconThemeName)) {
-            icon1 = QIcon::fromTheme(iconThemeName);
-        } else {
-            icon1.addFile(QString::fromUtf8("."), QSize(), QIcon::Normal, QIcon::Off);
-        }
-        undo_button->setIcon(icon1);
+        QIcon icon(QIcon::fromTheme(QString::fromUtf8("go-previous")));
+        undo_button->setIcon(icon);
 
         horizontalLayout_2->addWidget(undo_button);
 
         redo_button = new QPushButton(functions);
         redo_button->setObjectName("redo_button");
-        QIcon icon2;
-        iconThemeName = QString::fromUtf8("go-next");
-        if (QIcon::hasThemeIcon(iconThemeName)) {
-            icon2 = QIcon::fromTheme(iconThemeName);
-        } else {
-            icon2.addFile(QString::fromUtf8("."), QSize(), QIcon::Normal, QIcon::Off);
-        }
-        redo_button->setIcon(icon2);
+        QIcon icon1(QIcon::fromTheme(QString::fromUtf8("go-next")));
+        redo_button->setIcon(icon1);
 
         horizontalLayout_2->addWidget(redo_button);
 
@@ -644,14 +797,124 @@ public:
         verticalLayout_2->addWidget(dudv_opt);
 
         renderMaterials->addTab(functions, QString());
-        renderer_options = new QWidget();
-        renderer_options->setObjectName("renderer_options");
-        gridLayout_18 = new QGridLayout(renderer_options);
-        gridLayout_18->setObjectName("gridLayout_18");
-        gridLayout_16 = new QGridLayout();
-        gridLayout_16->setObjectName("gridLayout_16");
-        tabWidget = new QTabWidget(renderer_options);
+
+        gridLayout_9->addWidget(renderMaterials, 1, 1, 1, 1);
+
+        workspace->addTab(texture, QString());
+        tab_3 = new QWidget();
+        tab_3->setObjectName("tab_3");
+        horizontalLayout_4 = new QHBoxLayout(tab_3);
+        horizontalLayout_4->setObjectName("horizontalLayout_4");
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName("horizontalLayout_3");
+        verticalLayout_25 = new QVBoxLayout();
+        verticalLayout_25->setObjectName("verticalLayout_25");
+        verticalLayout_25->setSizeConstraint(QLayout::SetMinimumSize);
+        tabWidget_3 = new QTabWidget(tab_3);
+        tabWidget_3->setObjectName("tabWidget_3");
+        QSizePolicy sizePolicy5(QSizePolicy::Maximum, QSizePolicy::Expanding);
+        sizePolicy5.setHorizontalStretch(0);
+        sizePolicy5.setVerticalStretch(0);
+        sizePolicy5.setHeightForWidth(tabWidget_3->sizePolicy().hasHeightForWidth());
+        tabWidget_3->setSizePolicy(sizePolicy5);
+        tab_4 = new QWidget();
+        tab_4->setObjectName("tab_4");
+        horizontalLayout_5 = new QHBoxLayout(tab_4);
+        horizontalLayout_5->setObjectName("horizontalLayout_5");
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName("horizontalLayout");
+        groupBox = new QGroupBox(tab_4);
+        groupBox->setObjectName("groupBox");
+        QSizePolicy sizePolicy6(QSizePolicy::Maximum, QSizePolicy::Maximum);
+        sizePolicy6.setHorizontalStretch(0);
+        sizePolicy6.setVerticalStretch(0);
+        sizePolicy6.setHeightForWidth(groupBox->sizePolicy().hasHeightForWidth());
+        groupBox->setSizePolicy(sizePolicy6);
+        verticalLayout_15 = new QVBoxLayout(groupBox);
+        verticalLayout_15->setObjectName("verticalLayout_15");
+        gridLayout_3 = new QGridLayout();
+        gridLayout_3->setObjectName("gridLayout_3");
+        label_3 = new QLabel(groupBox);
+        label_3->setObjectName("label_3");
+
+        gridLayout_3->addWidget(label_3, 1, 0, 1, 1);
+
+        uv_height = new QSpinBox(groupBox);
+        uv_height->setObjectName("uv_height");
+        uv_height->setMinimum(50);
+        uv_height->setMaximum(8096);
+        uv_height->setValue(500);
+
+        gridLayout_3->addWidget(uv_height, 1, 1, 1, 1);
+
+        label_4 = new QLabel(groupBox);
+        label_4->setObjectName("label_4");
+
+        gridLayout_3->addWidget(label_4, 0, 0, 1, 1);
+
+        uv_width = new QSpinBox(groupBox);
+        uv_width->setObjectName("uv_width");
+        uv_width->setMinimum(50);
+        uv_width->setMaximum(8096);
+        uv_width->setValue(500);
+
+        gridLayout_3->addWidget(uv_width, 0, 1, 1, 1);
+
+
+        verticalLayout_15->addLayout(gridLayout_3);
+
+        bake_texture = new QPushButton(groupBox);
+        bake_texture->setObjectName("bake_texture");
+
+        verticalLayout_15->addWidget(bake_texture);
+
+
+        horizontalLayout->addWidget(groupBox);
+
+
+        horizontalLayout_5->addLayout(horizontalLayout);
+
+        tabWidget_3->addTab(tab_4, QString());
+
+        verticalLayout_25->addWidget(tabWidget_3);
+
+
+        horizontalLayout_3->addLayout(verticalLayout_25);
+
+        cubemap_render_view = new QGraphicsView(tab_3);
+        cubemap_render_view->setObjectName("cubemap_render_view");
+        sizePolicy.setHeightForWidth(cubemap_render_view->sizePolicy().hasHeightForWidth());
+        cubemap_render_view->setSizePolicy(sizePolicy);
+
+        horizontalLayout_3->addWidget(cubemap_render_view);
+
+
+        horizontalLayout_4->addLayout(horizontalLayout_3);
+
+        workspace->addTab(tab_3, QString());
+        gl_renderer = new QWidget();
+        gl_renderer->setObjectName("gl_renderer");
+        sizePolicy2.setHeightForWidth(gl_renderer->sizePolicy().hasHeightForWidth());
+        gl_renderer->setSizePolicy(sizePolicy2);
+        gridLayout_6 = new QGridLayout(gl_renderer);
+        gridLayout_6->setObjectName("gridLayout_6");
+        renderer_view = new GLViewer(gl_renderer);
+        renderer_view->setObjectName("renderer_view");
+        renderer_view->setEnabled(true);
+        sizePolicy.setHeightForWidth(renderer_view->sizePolicy().hasHeightForWidth());
+        renderer_view->setSizePolicy(sizePolicy);
+        renderer_view->setMouseTracking(true);
+        renderer_view->setAcceptDrops(true);
+
+        gridLayout_6->addWidget(renderer_view, 2, 1, 1, 1);
+
+        tabWidget = new QTabWidget(gl_renderer);
         tabWidget->setObjectName("tabWidget");
+        QSizePolicy sizePolicy7(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy7.setHorizontalStretch(0);
+        sizePolicy7.setVerticalStretch(0);
+        sizePolicy7.setHeightForWidth(tabWidget->sizePolicy().hasHeightForWidth());
+        tabWidget->setSizePolicy(sizePolicy7);
         tabWidget->setTabPosition(QTabWidget::North);
         tabWidget->setTabShape(QTabWidget::Rounded);
         tabWidget->setElideMode(Qt::ElideNone);
@@ -664,11 +927,11 @@ public:
         verticalLayout_10->setObjectName("verticalLayout_10");
         groupBox_2 = new QGroupBox(PostProTab);
         groupBox_2->setObjectName("groupBox_2");
-        QSizePolicy sizePolicy5(QSizePolicy::Preferred, QSizePolicy::Maximum);
-        sizePolicy5.setHorizontalStretch(0);
-        sizePolicy5.setVerticalStretch(0);
-        sizePolicy5.setHeightForWidth(groupBox_2->sizePolicy().hasHeightForWidth());
-        groupBox_2->setSizePolicy(sizePolicy5);
+        QSizePolicy sizePolicy8(QSizePolicy::Preferred, QSizePolicy::Maximum);
+        sizePolicy8.setHorizontalStretch(0);
+        sizePolicy8.setVerticalStretch(0);
+        sizePolicy8.setHeightForWidth(groupBox_2->sizePolicy().hasHeightForWidth());
+        groupBox_2->setSizePolicy(sizePolicy8);
         groupBox_2->setFocusPolicy(Qt::NoFocus);
         groupBox_2->setAutoFillBackground(false);
         groupBox_2->setFlat(false);
@@ -707,11 +970,8 @@ public:
 
         groupBox_4 = new QGroupBox(groupBox_2);
         groupBox_4->setObjectName("groupBox_4");
-        QSizePolicy sizePolicy6(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy6.setHorizontalStretch(0);
-        sizePolicy6.setVerticalStretch(0);
-        sizePolicy6.setHeightForWidth(groupBox_4->sizePolicy().hasHeightForWidth());
-        groupBox_4->setSizePolicy(sizePolicy6);
+        sizePolicy7.setHeightForWidth(groupBox_4->sizePolicy().hasHeightForWidth());
+        groupBox_4->setSizePolicy(sizePolicy7);
         verticalLayout_18 = new QVBoxLayout(groupBox_4);
         verticalLayout_18->setObjectName("verticalLayout_18");
         set_standard_post_p = new QRadioButton(groupBox_4);
@@ -747,8 +1007,11 @@ public:
         verticalLayout_9->setObjectName("verticalLayout_9");
         groupBox_3 = new QGroupBox(tab_5);
         groupBox_3->setObjectName("groupBox_3");
-        sizePolicy5.setHeightForWidth(groupBox_3->sizePolicy().hasHeightForWidth());
-        groupBox_3->setSizePolicy(sizePolicy5);
+        QSizePolicy sizePolicy9(QSizePolicy::Minimum, QSizePolicy::Maximum);
+        sizePolicy9.setHorizontalStretch(0);
+        sizePolicy9.setVerticalStretch(0);
+        sizePolicy9.setHeightForWidth(groupBox_3->sizePolicy().hasHeightForWidth());
+        groupBox_3->setSizePolicy(sizePolicy9);
         verticalLayout_11 = new QVBoxLayout(groupBox_3);
         verticalLayout_11->setObjectName("verticalLayout_11");
         rasterize_point_button = new QRadioButton(groupBox_3);
@@ -768,8 +1031,8 @@ public:
 
         groupBox_5 = new QGroupBox(groupBox_3);
         groupBox_5->setObjectName("groupBox_5");
-        sizePolicy5.setHeightForWidth(groupBox_5->sizePolicy().hasHeightForWidth());
-        groupBox_5->setSizePolicy(sizePolicy5);
+        sizePolicy8.setHeightForWidth(groupBox_5->sizePolicy().hasHeightForWidth());
+        groupBox_5->setSizePolicy(sizePolicy8);
         gridLayout_19 = new QGridLayout(groupBox_5);
         gridLayout_19->setObjectName("gridLayout_19");
         rasterize_display_bbox_checkbox = new QCheckBox(groupBox_5);
@@ -786,153 +1049,544 @@ public:
         tabWidget->addTab(tab_5, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName("tab_2");
+        gridLayout_18 = new QGridLayout(tab_2);
+        gridLayout_18->setObjectName("gridLayout_18");
+        gridLayout_16 = new QGridLayout();
+        gridLayout_16->setObjectName("gridLayout_16");
+        renderer_lighting_lightlist = new QTreeView(tab_2);
+        renderer_lighting_lightlist->setObjectName("renderer_lighting_lightlist");
+
+        gridLayout_16->addWidget(renderer_lighting_lightlist, 1, 2, 1, 1);
+
+        tab_renderer_lighting = new QTabWidget(tab_2);
+        tab_renderer_lighting->setObjectName("tab_renderer_lighting");
+        QSizePolicy sizePolicy10(QSizePolicy::Expanding, QSizePolicy::Maximum);
+        sizePolicy10.setHorizontalStretch(0);
+        sizePolicy10.setVerticalStretch(0);
+        sizePolicy10.setHeightForWidth(tab_renderer_lighting->sizePolicy().hasHeightForWidth());
+        tab_renderer_lighting->setSizePolicy(sizePolicy10);
+        tab_renderer_lighting->setTabPosition(QTabWidget::North);
+        tab_renderer_lighting->setTabShape(QTabWidget::Rounded);
+        tab_renderer_lighting->setElideMode(Qt::ElideNone);
+        tab_renderer_lighting->setDocumentMode(true);
+        tab_renderer_lighting->setTabBarAutoHide(false);
+        tab_9 = new QWidget();
+        tab_9->setObjectName("tab_9");
+        verticalLayout_23 = new QVBoxLayout(tab_9);
+        verticalLayout_23->setObjectName("verticalLayout_23");
+        verticalLayout_22 = new QVBoxLayout();
+        verticalLayout_22->setObjectName("verticalLayout_22");
+        groupBox_9 = new QGroupBox(tab_9);
+        groupBox_9->setObjectName("groupBox_9");
+        sizePolicy10.setHeightForWidth(groupBox_9->sizePolicy().hasHeightForWidth());
+        groupBox_9->setSizePolicy(sizePolicy10);
+        groupBox_9->setFocusPolicy(Qt::NoFocus);
+        groupBox_9->setAcceptDrops(false);
+        groupBox_9->setAutoFillBackground(false);
+        groupBox_9->setFlat(false);
+        groupBox_9->setCheckable(false);
+        groupBox_9->setChecked(false);
+        verticalLayout_19 = new QVBoxLayout(groupBox_9);
+        verticalLayout_19->setObjectName("verticalLayout_19");
+        tabWidget_4 = new QTabWidget(groupBox_9);
+        tabWidget_4->setObjectName("tabWidget_4");
+        sizePolicy6.setHeightForWidth(tabWidget_4->sizePolicy().hasHeightForWidth());
+        tabWidget_4->setSizePolicy(sizePolicy6);
+        tabWidget_4->setDocumentMode(false);
+        tabWidget_4->setTabsClosable(false);
+        tabWidget_4->setTabBarAutoHide(false);
+        tab_7 = new QWidget();
+        tab_7->setObjectName("tab_7");
+        verticalLayout_20 = new QVBoxLayout(tab_7);
+        verticalLayout_20->setObjectName("verticalLayout_20");
+        gridLayout_20 = new QGridLayout();
+        gridLayout_20->setObjectName("gridLayout_20");
+        hslider_renderer_lighting_PointLights_colors_red = new QSlider(tab_7);
+        hslider_renderer_lighting_PointLights_colors_red->setObjectName("hslider_renderer_lighting_PointLights_colors_red");
+        sizePolicy6.setHeightForWidth(hslider_renderer_lighting_PointLights_colors_red->sizePolicy().hasHeightForWidth());
+        hslider_renderer_lighting_PointLights_colors_red->setSizePolicy(sizePolicy6);
+        hslider_renderer_lighting_PointLights_colors_red->setMaximum(255);
+        hslider_renderer_lighting_PointLights_colors_red->setValue(0);
+        hslider_renderer_lighting_PointLights_colors_red->setOrientation(Qt::Horizontal);
+
+        gridLayout_20->addWidget(hslider_renderer_lighting_PointLights_colors_red, 4, 0, 1, 1);
+
+        label_7 = new QLabel(tab_7);
+        label_7->setObjectName("label_7");
+
+        gridLayout_20->addWidget(label_7, 3, 0, 1, 1);
+
+        label_8 = new QLabel(tab_7);
+        label_8->setObjectName("label_8");
+
+        gridLayout_20->addWidget(label_8, 5, 0, 1, 1);
+
+        spinbox_renderer_lighting_PointLights_colors_green = new QSpinBox(tab_7);
+        spinbox_renderer_lighting_PointLights_colors_green->setObjectName("spinbox_renderer_lighting_PointLights_colors_green");
+        spinbox_renderer_lighting_PointLights_colors_green->setReadOnly(true);
+        spinbox_renderer_lighting_PointLights_colors_green->setMaximum(255);
+
+        gridLayout_20->addWidget(spinbox_renderer_lighting_PointLights_colors_green, 6, 1, 1, 1);
+
+        hslider_renderer_lighting_PointLights_colors_blue = new QSlider(tab_7);
+        hslider_renderer_lighting_PointLights_colors_blue->setObjectName("hslider_renderer_lighting_PointLights_colors_blue");
+        sizePolicy6.setHeightForWidth(hslider_renderer_lighting_PointLights_colors_blue->sizePolicy().hasHeightForWidth());
+        hslider_renderer_lighting_PointLights_colors_blue->setSizePolicy(sizePolicy6);
+        hslider_renderer_lighting_PointLights_colors_blue->setMaximum(255);
+        hslider_renderer_lighting_PointLights_colors_blue->setOrientation(Qt::Horizontal);
+
+        gridLayout_20->addWidget(hslider_renderer_lighting_PointLights_colors_blue, 8, 0, 1, 1);
+
+        hslider_renderer_lighting_PointLights_colors_green = new QSlider(tab_7);
+        hslider_renderer_lighting_PointLights_colors_green->setObjectName("hslider_renderer_lighting_PointLights_colors_green");
+        sizePolicy6.setHeightForWidth(hslider_renderer_lighting_PointLights_colors_green->sizePolicy().hasHeightForWidth());
+        hslider_renderer_lighting_PointLights_colors_green->setSizePolicy(sizePolicy6);
+        hslider_renderer_lighting_PointLights_colors_green->setMaximum(255);
+        hslider_renderer_lighting_PointLights_colors_green->setOrientation(Qt::Horizontal);
+
+        gridLayout_20->addWidget(hslider_renderer_lighting_PointLights_colors_green, 6, 0, 1, 1);
+
+        spinbox_renderer_lighting_PointLights_colors_red = new QSpinBox(tab_7);
+        spinbox_renderer_lighting_PointLights_colors_red->setObjectName("spinbox_renderer_lighting_PointLights_colors_red");
+        spinbox_renderer_lighting_PointLights_colors_red->setToolTipDuration(-1);
+        spinbox_renderer_lighting_PointLights_colors_red->setReadOnly(false);
+        spinbox_renderer_lighting_PointLights_colors_red->setMaximum(255);
+
+        gridLayout_20->addWidget(spinbox_renderer_lighting_PointLights_colors_red, 4, 1, 1, 1);
+
+        spinbox_renderer_lighting_PointLights_colors_blue = new QSpinBox(tab_7);
+        spinbox_renderer_lighting_PointLights_colors_blue->setObjectName("spinbox_renderer_lighting_PointLights_colors_blue");
+        spinbox_renderer_lighting_PointLights_colors_blue->setReadOnly(true);
+        spinbox_renderer_lighting_PointLights_colors_blue->setMaximum(255);
+
+        gridLayout_20->addWidget(spinbox_renderer_lighting_PointLights_colors_blue, 8, 1, 1, 1);
+
+        label_9 = new QLabel(tab_7);
+        label_9->setObjectName("label_9");
+
+        gridLayout_20->addWidget(label_9, 7, 0, 1, 1);
+
+
+        verticalLayout_20->addLayout(gridLayout_20);
+
+        label_16 = new QLabel(tab_7);
+        label_16->setObjectName("label_16");
+
+        verticalLayout_20->addWidget(label_16);
+
+        dspinbox_renderer_lighting_PointLights_intensity = new QDoubleSpinBox(tab_7);
+        dspinbox_renderer_lighting_PointLights_intensity->setObjectName("dspinbox_renderer_lighting_PointLights_intensity");
+        dspinbox_renderer_lighting_PointLights_intensity->setDecimals(3);
+        dspinbox_renderer_lighting_PointLights_intensity->setMaximum(10000.000000000000000);
+
+        verticalLayout_20->addWidget(dspinbox_renderer_lighting_PointLights_intensity);
+
+        tabWidget_4->addTab(tab_7, QString());
+        tab_8 = new QWidget();
+        tab_8->setObjectName("tab_8");
+        gridLayout_23 = new QGridLayout(tab_8);
+        gridLayout_23->setObjectName("gridLayout_23");
+        gridLayout_22 = new QGridLayout();
+        gridLayout_22->setObjectName("gridLayout_22");
+        dspinbox_renderer_lighting_PointLights_Attenuation_linear = new QDoubleSpinBox(tab_8);
+        dspinbox_renderer_lighting_PointLights_Attenuation_linear->setObjectName("dspinbox_renderer_lighting_PointLights_Attenuation_linear");
+        dspinbox_renderer_lighting_PointLights_Attenuation_linear->setDecimals(4);
+        dspinbox_renderer_lighting_PointLights_Attenuation_linear->setMaximum(10000000000000.000000000000000);
+
+        gridLayout_22->addWidget(dspinbox_renderer_lighting_PointLights_Attenuation_linear, 3, 0, 1, 1);
+
+        label_11 = new QLabel(tab_8);
+        label_11->setObjectName("label_11");
+
+        gridLayout_22->addWidget(label_11, 2, 0, 1, 1);
+
+        dspinbox_renderer_lighting_PointLights_Attenuation_quadratic = new QDoubleSpinBox(tab_8);
+        dspinbox_renderer_lighting_PointLights_Attenuation_quadratic->setObjectName("dspinbox_renderer_lighting_PointLights_Attenuation_quadratic");
+        dspinbox_renderer_lighting_PointLights_Attenuation_quadratic->setDecimals(4);
+        dspinbox_renderer_lighting_PointLights_Attenuation_quadratic->setMaximum(10000000000000.000000000000000);
+
+        gridLayout_22->addWidget(dspinbox_renderer_lighting_PointLights_Attenuation_quadratic, 5, 0, 1, 1);
+
+        dspinbox_renderer_lighting_PointLights_Attenuation_constant = new QDoubleSpinBox(tab_8);
+        dspinbox_renderer_lighting_PointLights_Attenuation_constant->setObjectName("dspinbox_renderer_lighting_PointLights_Attenuation_constant");
+        dspinbox_renderer_lighting_PointLights_Attenuation_constant->setDecimals(4);
+        dspinbox_renderer_lighting_PointLights_Attenuation_constant->setMaximum(10000000000000.000000000000000);
+
+        gridLayout_22->addWidget(dspinbox_renderer_lighting_PointLights_Attenuation_constant, 1, 0, 1, 1);
+
+        label_10 = new QLabel(tab_8);
+        label_10->setObjectName("label_10");
+
+        gridLayout_22->addWidget(label_10, 0, 0, 1, 1);
+
+        label_12 = new QLabel(tab_8);
+        label_12->setObjectName("label_12");
+
+        gridLayout_22->addWidget(label_12, 4, 0, 1, 1);
+
+
+        gridLayout_23->addLayout(gridLayout_22, 0, 0, 1, 1);
+
+        tabWidget_4->addTab(tab_8, QString());
+
+        verticalLayout_19->addWidget(tabWidget_4);
+
+        button_renderer_lighting_PointLights_add = new QPushButton(groupBox_9);
+        button_renderer_lighting_PointLights_add->setObjectName("button_renderer_lighting_PointLights_add");
+
+        verticalLayout_19->addWidget(button_renderer_lighting_PointLights_add);
+
+        button_renderer_lighting_PointLights_delete = new QPushButton(groupBox_9);
+        button_renderer_lighting_PointLights_delete->setObjectName("button_renderer_lighting_PointLights_delete");
+
+        verticalLayout_19->addWidget(button_renderer_lighting_PointLights_delete);
+
+
+        verticalLayout_22->addWidget(groupBox_9);
+
+
+        verticalLayout_23->addLayout(verticalLayout_22);
+
+        tab_renderer_lighting->addTab(tab_9, QString());
+        tab_12 = new QWidget();
+        tab_12->setObjectName("tab_12");
+        verticalLayout_28 = new QVBoxLayout(tab_12);
+        verticalLayout_28->setObjectName("verticalLayout_28");
+        verticalLayout_27 = new QVBoxLayout();
+        verticalLayout_27->setObjectName("verticalLayout_27");
+        groupBox_10 = new QGroupBox(tab_12);
+        groupBox_10->setObjectName("groupBox_10");
+        sizePolicy10.setHeightForWidth(groupBox_10->sizePolicy().hasHeightForWidth());
+        groupBox_10->setSizePolicy(sizePolicy10);
+        groupBox_10->setFocusPolicy(Qt::NoFocus);
+        groupBox_10->setAcceptDrops(false);
+        groupBox_10->setAutoFillBackground(false);
+        groupBox_10->setFlat(false);
+        groupBox_10->setCheckable(false);
+        groupBox_10->setChecked(false);
+        verticalLayout_24 = new QVBoxLayout(groupBox_10);
+        verticalLayout_24->setObjectName("verticalLayout_24");
+        tabWidget_6 = new QTabWidget(groupBox_10);
+        tabWidget_6->setObjectName("tabWidget_6");
+        sizePolicy6.setHeightForWidth(tabWidget_6->sizePolicy().hasHeightForWidth());
+        tabWidget_6->setSizePolicy(sizePolicy6);
+        tabWidget_6->setDocumentMode(false);
+        tabWidget_6->setTabsClosable(false);
+        tabWidget_6->setTabBarAutoHide(false);
+        tab_13 = new QWidget();
+        tab_13->setObjectName("tab_13");
+        verticalLayout_26 = new QVBoxLayout(tab_13);
+        verticalLayout_26->setObjectName("verticalLayout_26");
+        gridLayout_21 = new QGridLayout();
+        gridLayout_21->setObjectName("gridLayout_21");
+        label_13 = new QLabel(tab_13);
+        label_13->setObjectName("label_13");
+
+        gridLayout_21->addWidget(label_13, 3, 0, 1, 1);
+
+        spinbox_renderer_lighting_DirectionalLights_colors_blue = new QSpinBox(tab_13);
+        spinbox_renderer_lighting_DirectionalLights_colors_blue->setObjectName("spinbox_renderer_lighting_DirectionalLights_colors_blue");
+        spinbox_renderer_lighting_DirectionalLights_colors_blue->setReadOnly(true);
+        spinbox_renderer_lighting_DirectionalLights_colors_blue->setMaximum(255);
+
+        gridLayout_21->addWidget(spinbox_renderer_lighting_DirectionalLights_colors_blue, 8, 1, 1, 1);
+
+        label_14 = new QLabel(tab_13);
+        label_14->setObjectName("label_14");
+
+        gridLayout_21->addWidget(label_14, 5, 0, 1, 1);
+
+        hslider_renderer_lighting_DirectionalLights_colors_blue = new QSlider(tab_13);
+        hslider_renderer_lighting_DirectionalLights_colors_blue->setObjectName("hslider_renderer_lighting_DirectionalLights_colors_blue");
+        sizePolicy6.setHeightForWidth(hslider_renderer_lighting_DirectionalLights_colors_blue->sizePolicy().hasHeightForWidth());
+        hslider_renderer_lighting_DirectionalLights_colors_blue->setSizePolicy(sizePolicy6);
+        hslider_renderer_lighting_DirectionalLights_colors_blue->setMaximum(255);
+        hslider_renderer_lighting_DirectionalLights_colors_blue->setOrientation(Qt::Horizontal);
+
+        gridLayout_21->addWidget(hslider_renderer_lighting_DirectionalLights_colors_blue, 8, 0, 1, 1);
+
+        hslider_renderer_lighting_DirectionalLights_colors_green = new QSlider(tab_13);
+        hslider_renderer_lighting_DirectionalLights_colors_green->setObjectName("hslider_renderer_lighting_DirectionalLights_colors_green");
+        sizePolicy6.setHeightForWidth(hslider_renderer_lighting_DirectionalLights_colors_green->sizePolicy().hasHeightForWidth());
+        hslider_renderer_lighting_DirectionalLights_colors_green->setSizePolicy(sizePolicy6);
+        hslider_renderer_lighting_DirectionalLights_colors_green->setMaximum(255);
+        hslider_renderer_lighting_DirectionalLights_colors_green->setOrientation(Qt::Horizontal);
+
+        gridLayout_21->addWidget(hslider_renderer_lighting_DirectionalLights_colors_green, 6, 0, 1, 1);
+
+        spinbox_renderer_lighting_DirectionalLight_colors_red = new QSpinBox(tab_13);
+        spinbox_renderer_lighting_DirectionalLight_colors_red->setObjectName("spinbox_renderer_lighting_DirectionalLight_colors_red");
+        spinbox_renderer_lighting_DirectionalLight_colors_red->setReadOnly(true);
+        spinbox_renderer_lighting_DirectionalLight_colors_red->setMaximum(255);
+
+        gridLayout_21->addWidget(spinbox_renderer_lighting_DirectionalLight_colors_red, 4, 1, 1, 1);
+
+        spinbox_renderer_lighting_DirectionalLights_colors_green = new QSpinBox(tab_13);
+        spinbox_renderer_lighting_DirectionalLights_colors_green->setObjectName("spinbox_renderer_lighting_DirectionalLights_colors_green");
+        spinbox_renderer_lighting_DirectionalLights_colors_green->setReadOnly(true);
+        spinbox_renderer_lighting_DirectionalLights_colors_green->setMaximum(255);
+
+        gridLayout_21->addWidget(spinbox_renderer_lighting_DirectionalLights_colors_green, 6, 1, 1, 1);
+
+        hslider_renderer_lighting_DirectionalLights_colors_red = new QSlider(tab_13);
+        hslider_renderer_lighting_DirectionalLights_colors_red->setObjectName("hslider_renderer_lighting_DirectionalLights_colors_red");
+        sizePolicy6.setHeightForWidth(hslider_renderer_lighting_DirectionalLights_colors_red->sizePolicy().hasHeightForWidth());
+        hslider_renderer_lighting_DirectionalLights_colors_red->setSizePolicy(sizePolicy6);
+        hslider_renderer_lighting_DirectionalLights_colors_red->setMaximum(255);
+        hslider_renderer_lighting_DirectionalLights_colors_red->setValue(0);
+        hslider_renderer_lighting_DirectionalLights_colors_red->setOrientation(Qt::Horizontal);
+
+        gridLayout_21->addWidget(hslider_renderer_lighting_DirectionalLights_colors_red, 4, 0, 1, 1);
+
+        label_15 = new QLabel(tab_13);
+        label_15->setObjectName("label_15");
+
+        gridLayout_21->addWidget(label_15, 7, 0, 1, 1);
+
+
+        verticalLayout_26->addLayout(gridLayout_21);
+
+        label_17 = new QLabel(tab_13);
+        label_17->setObjectName("label_17");
+
+        verticalLayout_26->addWidget(label_17);
+
+        dspinbox_renderer_lighting_DirectionalLights_intensity = new QDoubleSpinBox(tab_13);
+        dspinbox_renderer_lighting_DirectionalLights_intensity->setObjectName("dspinbox_renderer_lighting_DirectionalLights_intensity");
+
+        verticalLayout_26->addWidget(dspinbox_renderer_lighting_DirectionalLights_intensity);
+
+        tabWidget_6->addTab(tab_13, QString());
+
+        verticalLayout_24->addWidget(tabWidget_6);
+
+        button_renderer_lighting_DirectionalLights_add = new QPushButton(groupBox_10);
+        button_renderer_lighting_DirectionalLights_add->setObjectName("button_renderer_lighting_DirectionalLights_add");
+
+        verticalLayout_24->addWidget(button_renderer_lighting_DirectionalLights_add);
+
+        button_renderer_lighting_DirectionalLights_delete = new QPushButton(groupBox_10);
+        button_renderer_lighting_DirectionalLights_delete->setObjectName("button_renderer_lighting_DirectionalLights_delete");
+
+        verticalLayout_24->addWidget(button_renderer_lighting_DirectionalLights_delete);
+
+
+        verticalLayout_27->addWidget(groupBox_10);
+
+
+        verticalLayout_28->addLayout(verticalLayout_27);
+
+        tab_renderer_lighting->addTab(tab_12, QString());
+        tab_11 = new QWidget();
+        tab_11->setObjectName("tab_11");
+        gridLayout_28 = new QGridLayout(tab_11);
+        gridLayout_28->setObjectName("gridLayout_28");
+        gridLayout_27 = new QGridLayout();
+        gridLayout_27->setObjectName("gridLayout_27");
+        groupBox_11 = new QGroupBox(tab_11);
+        groupBox_11->setObjectName("groupBox_11");
+        sizePolicy10.setHeightForWidth(groupBox_11->sizePolicy().hasHeightForWidth());
+        groupBox_11->setSizePolicy(sizePolicy10);
+        groupBox_11->setFocusPolicy(Qt::NoFocus);
+        groupBox_11->setAcceptDrops(false);
+        groupBox_11->setAutoFillBackground(false);
+        groupBox_11->setFlat(false);
+        groupBox_11->setCheckable(false);
+        groupBox_11->setChecked(false);
+        verticalLayout_29 = new QVBoxLayout(groupBox_11);
+        verticalLayout_29->setObjectName("verticalLayout_29");
+        tabWidget_7 = new QTabWidget(groupBox_11);
+        tabWidget_7->setObjectName("tabWidget_7");
+        sizePolicy6.setHeightForWidth(tabWidget_7->sizePolicy().hasHeightForWidth());
+        tabWidget_7->setSizePolicy(sizePolicy6);
+        tabWidget_7->setDocumentMode(false);
+        tabWidget_7->setTabsClosable(false);
+        tabWidget_7->setTabBarAutoHide(false);
+        tab_15 = new QWidget();
+        tab_15->setObjectName("tab_15");
+        verticalLayout_30 = new QVBoxLayout(tab_15);
+        verticalLayout_30->setObjectName("verticalLayout_30");
+        gridLayout_24 = new QGridLayout();
+        gridLayout_24->setObjectName("gridLayout_24");
+        hslider_renderer_lighting_SpotLights_colors_red = new QSlider(tab_15);
+        hslider_renderer_lighting_SpotLights_colors_red->setObjectName("hslider_renderer_lighting_SpotLights_colors_red");
+        sizePolicy6.setHeightForWidth(hslider_renderer_lighting_SpotLights_colors_red->sizePolicy().hasHeightForWidth());
+        hslider_renderer_lighting_SpotLights_colors_red->setSizePolicy(sizePolicy6);
+        hslider_renderer_lighting_SpotLights_colors_red->setMaximum(255);
+        hslider_renderer_lighting_SpotLights_colors_red->setValue(0);
+        hslider_renderer_lighting_SpotLights_colors_red->setOrientation(Qt::Horizontal);
+
+        gridLayout_24->addWidget(hslider_renderer_lighting_SpotLights_colors_red, 4, 0, 1, 1);
+
+        label_18 = new QLabel(tab_15);
+        label_18->setObjectName("label_18");
+
+        gridLayout_24->addWidget(label_18, 3, 0, 1, 1);
+
+        label_19 = new QLabel(tab_15);
+        label_19->setObjectName("label_19");
+
+        gridLayout_24->addWidget(label_19, 5, 0, 1, 1);
+
+        spinbox_renderer_lighting_SpotLights_colors_green = new QSpinBox(tab_15);
+        spinbox_renderer_lighting_SpotLights_colors_green->setObjectName("spinbox_renderer_lighting_SpotLights_colors_green");
+        spinbox_renderer_lighting_SpotLights_colors_green->setReadOnly(true);
+        spinbox_renderer_lighting_SpotLights_colors_green->setMaximum(255);
+
+        gridLayout_24->addWidget(spinbox_renderer_lighting_SpotLights_colors_green, 6, 1, 1, 1);
+
+        hslider_renderer_lighting_SpotLights_colors_blue = new QSlider(tab_15);
+        hslider_renderer_lighting_SpotLights_colors_blue->setObjectName("hslider_renderer_lighting_SpotLights_colors_blue");
+        sizePolicy6.setHeightForWidth(hslider_renderer_lighting_SpotLights_colors_blue->sizePolicy().hasHeightForWidth());
+        hslider_renderer_lighting_SpotLights_colors_blue->setSizePolicy(sizePolicy6);
+        hslider_renderer_lighting_SpotLights_colors_blue->setMaximum(255);
+        hslider_renderer_lighting_SpotLights_colors_blue->setOrientation(Qt::Horizontal);
+
+        gridLayout_24->addWidget(hslider_renderer_lighting_SpotLights_colors_blue, 8, 0, 1, 1);
+
+        hslider_renderer_lighting_SpotLights_colors_green = new QSlider(tab_15);
+        hslider_renderer_lighting_SpotLights_colors_green->setObjectName("hslider_renderer_lighting_SpotLights_colors_green");
+        sizePolicy6.setHeightForWidth(hslider_renderer_lighting_SpotLights_colors_green->sizePolicy().hasHeightForWidth());
+        hslider_renderer_lighting_SpotLights_colors_green->setSizePolicy(sizePolicy6);
+        hslider_renderer_lighting_SpotLights_colors_green->setMaximum(255);
+        hslider_renderer_lighting_SpotLights_colors_green->setOrientation(Qt::Horizontal);
+
+        gridLayout_24->addWidget(hslider_renderer_lighting_SpotLights_colors_green, 6, 0, 1, 1);
+
+        spinbox_renderer_lighting_SpotLights_colors_red = new QSpinBox(tab_15);
+        spinbox_renderer_lighting_SpotLights_colors_red->setObjectName("spinbox_renderer_lighting_SpotLights_colors_red");
+        spinbox_renderer_lighting_SpotLights_colors_red->setReadOnly(true);
+        spinbox_renderer_lighting_SpotLights_colors_red->setMaximum(255);
+
+        gridLayout_24->addWidget(spinbox_renderer_lighting_SpotLights_colors_red, 4, 1, 1, 1);
+
+        spinbox_renderer_lighting_SpotLights_colors_blue = new QSpinBox(tab_15);
+        spinbox_renderer_lighting_SpotLights_colors_blue->setObjectName("spinbox_renderer_lighting_SpotLights_colors_blue");
+        spinbox_renderer_lighting_SpotLights_colors_blue->setReadOnly(true);
+        spinbox_renderer_lighting_SpotLights_colors_blue->setMaximum(255);
+
+        gridLayout_24->addWidget(spinbox_renderer_lighting_SpotLights_colors_blue, 8, 1, 1, 1);
+
+        label_20 = new QLabel(tab_15);
+        label_20->setObjectName("label_20");
+
+        gridLayout_24->addWidget(label_20, 7, 0, 1, 1);
+
+
+        verticalLayout_30->addLayout(gridLayout_24);
+
+        label_21 = new QLabel(tab_15);
+        label_21->setObjectName("label_21");
+
+        verticalLayout_30->addWidget(label_21);
+
+        dspinbox_renderer_lighting_SpotLights_intensity = new QDoubleSpinBox(tab_15);
+        dspinbox_renderer_lighting_SpotLights_intensity->setObjectName("dspinbox_renderer_lighting_SpotLights_intensity");
+
+        verticalLayout_30->addWidget(dspinbox_renderer_lighting_SpotLights_intensity);
+
+        tabWidget_7->addTab(tab_15, QString());
+        tab_16 = new QWidget();
+        tab_16->setObjectName("tab_16");
+        gridLayout_25 = new QGridLayout(tab_16);
+        gridLayout_25->setObjectName("gridLayout_25");
+        gridLayout_26 = new QGridLayout();
+        gridLayout_26->setObjectName("gridLayout_26");
+        label_23 = new QLabel(tab_16);
+        label_23->setObjectName("label_23");
+
+        gridLayout_26->addWidget(label_23, 0, 0, 1, 1);
+
+        dspinbox_renderer_lighting_SpotLights_angle = new QDoubleSpinBox(tab_16);
+        dspinbox_renderer_lighting_SpotLights_angle->setObjectName("dspinbox_renderer_lighting_SpotLights_angle");
+        dspinbox_renderer_lighting_SpotLights_angle->setDecimals(9);
+        dspinbox_renderer_lighting_SpotLights_angle->setMaximum(10000000000000.000000000000000);
+
+        gridLayout_26->addWidget(dspinbox_renderer_lighting_SpotLights_angle, 1, 0, 1, 1);
+
+        dial_renderer_lighting_SpotLights_angle = new QDial(tab_16);
+        dial_renderer_lighting_SpotLights_angle->setObjectName("dial_renderer_lighting_SpotLights_angle");
+        QSizePolicy sizePolicy11(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy11.setHorizontalStretch(0);
+        sizePolicy11.setVerticalStretch(0);
+        sizePolicy11.setHeightForWidth(dial_renderer_lighting_SpotLights_angle->sizePolicy().hasHeightForWidth());
+        dial_renderer_lighting_SpotLights_angle->setSizePolicy(sizePolicy11);
+        dial_renderer_lighting_SpotLights_angle->setMaximum(180);
+        dial_renderer_lighting_SpotLights_angle->setOrientation(Qt::Horizontal);
+        dial_renderer_lighting_SpotLights_angle->setInvertedAppearance(false);
+        dial_renderer_lighting_SpotLights_angle->setInvertedControls(false);
+
+        gridLayout_26->addWidget(dial_renderer_lighting_SpotLights_angle, 2, 0, 1, 1);
+
+
+        gridLayout_25->addLayout(gridLayout_26, 0, 0, 1, 1);
+
+        tabWidget_7->addTab(tab_16, QString());
+
+        verticalLayout_29->addWidget(tabWidget_7);
+
+        button_renderer_lighting_SpotLights_add = new QPushButton(groupBox_11);
+        button_renderer_lighting_SpotLights_add->setObjectName("button_renderer_lighting_SpotLights_add");
+
+        verticalLayout_29->addWidget(button_renderer_lighting_SpotLights_add);
+
+        button_renderer_lighting_SpotLights_delete = new QPushButton(groupBox_11);
+        button_renderer_lighting_SpotLights_delete->setObjectName("button_renderer_lighting_SpotLights_delete");
+
+        verticalLayout_29->addWidget(button_renderer_lighting_SpotLights_delete);
+
+
+        gridLayout_27->addWidget(groupBox_11, 0, 0, 1, 1);
+
+
+        gridLayout_28->addLayout(gridLayout_27, 0, 0, 1, 1);
+
+        tab_renderer_lighting->addTab(tab_11, QString());
+        tab_10 = new QWidget();
+        tab_10->setObjectName("tab_10");
+        tab_renderer_lighting->addTab(tab_10, QString());
+
+        gridLayout_16->addWidget(tab_renderer_lighting, 3, 2, 1, 1);
+
+
+        gridLayout_18->addLayout(gridLayout_16, 1, 0, 1, 1);
+
         tabWidget->addTab(tab_2, QString());
+        tab_6 = new QWidget();
+        tab_6->setObjectName("tab_6");
+        horizontalLayout_6 = new QHBoxLayout(tab_6);
+        horizontalLayout_6->setObjectName("horizontalLayout_6");
+        verticalLayout_12 = new QVBoxLayout();
+        verticalLayout_12->setObjectName("verticalLayout_12");
+        groupBox_7 = new QGroupBox(tab_6);
+        groupBox_7->setObjectName("groupBox_7");
 
-        gridLayout_16->addWidget(tabWidget, 0, 0, 1, 1);
+        verticalLayout_12->addWidget(groupBox_7);
 
+        groupBox_6 = new QGroupBox(tab_6);
+        groupBox_6->setObjectName("groupBox_6");
 
-        gridLayout_18->addLayout(gridLayout_16, 0, 0, 1, 1);
-
-        renderMaterials->addTab(renderer_options, QString());
-        Tools = new QWidget();
-        Tools->setObjectName("Tools");
-        groupBox = new QGroupBox(Tools);
-        groupBox->setObjectName("groupBox");
-        groupBox->setGeometry(QRect(0, 20, 139, 129));
-        verticalLayout_15 = new QVBoxLayout(groupBox);
-        verticalLayout_15->setObjectName("verticalLayout_15");
-        tangent_space = new QRadioButton(groupBox);
-        tangent_space->setObjectName("tangent_space");
-
-        verticalLayout_15->addWidget(tangent_space);
-
-        gridLayout_3 = new QGridLayout();
-        gridLayout_3->setObjectName("gridLayout_3");
-        label_3 = new QLabel(groupBox);
-        label_3->setObjectName("label_3");
-
-        gridLayout_3->addWidget(label_3, 1, 0, 1, 1);
-
-        uv_height = new QSpinBox(groupBox);
-        uv_height->setObjectName("uv_height");
-        uv_height->setMinimum(50);
-        uv_height->setMaximum(8096);
-        uv_height->setValue(500);
-
-        gridLayout_3->addWidget(uv_height, 1, 1, 1, 1);
-
-        label_4 = new QLabel(groupBox);
-        label_4->setObjectName("label_4");
-
-        gridLayout_3->addWidget(label_4, 0, 0, 1, 1);
-
-        uv_width = new QSpinBox(groupBox);
-        uv_width->setObjectName("uv_width");
-        uv_width->setMinimum(50);
-        uv_width->setMaximum(8096);
-        uv_width->setValue(500);
-
-        gridLayout_3->addWidget(uv_width, 0, 1, 1, 1);
+        verticalLayout_12->addWidget(groupBox_6);
 
 
-        verticalLayout_15->addLayout(gridLayout_3);
+        horizontalLayout_6->addLayout(verticalLayout_12);
 
-        bake_texture = new QPushButton(groupBox);
-        bake_texture->setObjectName("bake_texture");
+        tabWidget->addTab(tab_6, QString());
 
-        verticalLayout_15->addWidget(bake_texture);
+        gridLayout_6->addWidget(tabWidget, 2, 0, 1, 1);
 
-        renderMaterials->addTab(Tools, QString());
-        widget = new QWidget();
-        widget->setObjectName("widget");
-        renderMaterials->addTab(widget, QString());
+        renderer_scene_list = new SceneListView(gl_renderer);
+        renderer_scene_list->setObjectName("renderer_scene_list");
+        sizePolicy5.setHeightForWidth(renderer_scene_list->sizePolicy().hasHeightForWidth());
+        renderer_scene_list->setSizePolicy(sizePolicy5);
+        renderer_scene_list->setAnimated(true);
+        renderer_scene_list->setHeaderHidden(false);
+        renderer_scene_list->setColumnCount(1);
+        renderer_scene_list->header()->setCascadingSectionResizes(false);
 
-        verticalLayout->addWidget(renderMaterials);
+        gridLayout_6->addWidget(renderer_scene_list, 2, 2, 1, 1);
 
-
-        gridLayout_2->addLayout(verticalLayout, 0, 0, 1, 1);
-
-        gridLayout = new QGridLayout();
-        gridLayout->setObjectName("gridLayout");
-        gridLayout_4 = new QGridLayout();
-        gridLayout_4->setObjectName("gridLayout_4");
-        renderer_tab = new QTabWidget(centralwidget);
-        renderer_tab->setObjectName("renderer_tab");
-        sizePolicy.setHeightForWidth(renderer_tab->sizePolicy().hasHeightForWidth());
-        renderer_tab->setSizePolicy(sizePolicy);
-        renderer_tab->setTabShape(QTabWidget::Triangular);
-        renderer_tab->setMovable(false);
-        renderer_tab->setTabBarAutoHide(false);
-        texture = new QWidget();
-        texture->setObjectName("texture");
-        gridLayout_9 = new QGridLayout(texture);
-        gridLayout_9->setObjectName("gridLayout_9");
-        gridLayout_5 = new QGridLayout();
-        gridLayout_5->setObjectName("gridLayout_5");
-        gridLayout_10 = new QGridLayout();
-        gridLayout_10->setObjectName("gridLayout_10");
-        height_image = new QGraphicsView(texture);
-        height_image->setObjectName("height_image");
-        height_image->setFrameShape(QFrame::NoFrame);
-        height_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContentsOnFirstShow);
-
-        gridLayout_10->addWidget(height_image, 0, 1, 1, 1);
-
-        greyscale_image = new QGraphicsView(texture);
-        greyscale_image->setObjectName("greyscale_image");
-        greyscale_image->setFrameShape(QFrame::NoFrame);
-        greyscale_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContentsOnFirstShow);
-        greyscale_image->setDragMode(QGraphicsView::NoDrag);
-
-        gridLayout_10->addWidget(greyscale_image, 0, 0, 1, 1);
-
-
-        gridLayout_5->addLayout(gridLayout_10, 0, 2, 1, 1);
-
-        normal_image = new QGraphicsView(texture);
-        normal_image->setObjectName("normal_image");
-        normal_image->setFrameShape(QFrame::NoFrame);
-        normal_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-        normal_image->setDragMode(QGraphicsView::ScrollHandDrag);
-
-        gridLayout_5->addWidget(normal_image, 3, 1, 1, 1);
-
-        diffuse_image = new QGraphicsView(texture);
-        diffuse_image->setObjectName("diffuse_image");
-        diffuse_image->setFrameShape(QFrame::NoFrame);
-        diffuse_image->setFrameShadow(QFrame::Sunken);
-        diffuse_image->setLineWidth(1);
-        diffuse_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-        diffuse_image->setDragMode(QGraphicsView::ScrollHandDrag);
-        diffuse_image->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-
-        gridLayout_5->addWidget(diffuse_image, 0, 1, 1, 1);
-
-        dudv_image = new QGraphicsView(texture);
-        dudv_image->setObjectName("dudv_image");
-        dudv_image->setFrameShape(QFrame::NoFrame);
-        dudv_image->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-        dudv_image->setDragMode(QGraphicsView::ScrollHandDrag);
-
-        gridLayout_5->addWidget(dudv_image, 3, 2, 1, 1);
-
-
-        gridLayout_9->addLayout(gridLayout_5, 1, 1, 1, 1);
-
-        renderer_tab->addTab(texture, QString());
-        gl_renderer = new QWidget();
-        gl_renderer->setObjectName("gl_renderer");
-        sizePolicy2.setHeightForWidth(gl_renderer->sizePolicy().hasHeightForWidth());
-        gl_renderer->setSizePolicy(sizePolicy2);
-        gridLayout_6 = new QGridLayout(gl_renderer);
-        gridLayout_6->setObjectName("gridLayout_6");
-        renderer_view = new GLViewer(gl_renderer);
-        renderer_view->setObjectName("renderer_view");
-        renderer_view->setMouseTracking(true);
-
-        gridLayout_6->addWidget(renderer_view, 0, 0, 1, 1);
-
-        renderer_tab->addTab(gl_renderer, QString());
+        workspace->addTab(gl_renderer, QString());
         uv_editor = new QWidget();
         uv_editor->setObjectName("uv_editor");
         sizePolicy.setHeightForWidth(uv_editor->sizePolicy().hasHeightForWidth());
@@ -954,9 +1608,6 @@ public:
         gridLayout_8->setObjectName("gridLayout_8");
         next_mesh_button = new QPushButton(uv_editor);
         next_mesh_button->setObjectName("next_mesh_button");
-        QSizePolicy sizePolicy7(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sizePolicy7.setHorizontalStretch(0);
-        sizePolicy7.setVerticalStretch(0);
         sizePolicy7.setHeightForWidth(next_mesh_button->sizePolicy().hasHeightForWidth());
         next_mesh_button->setSizePolicy(sizePolicy7);
 
@@ -992,15 +1643,37 @@ public:
 
         gridLayout_17->addLayout(gridLayout_15, 0, 0, 1, 1);
 
-        renderer_tab->addTab(uv_editor, QString());
+        workspace->addTab(uv_editor, QString());
+        rt_renderer = new QWidget();
+        rt_renderer->setObjectName("rt_renderer");
+        gridLayout_30 = new QGridLayout(rt_renderer);
+        gridLayout_30->setObjectName("gridLayout_30");
+        gridLayout_29 = new QGridLayout();
+        gridLayout_29->setObjectName("gridLayout_29");
 
-        gridLayout_4->addWidget(renderer_tab, 0, 0, 1, 1);
+        gridLayout_30->addLayout(gridLayout_29, 0, 0, 1, 1);
+
+        workspace->addTab(rt_renderer, QString());
+
+        gridLayout_4->addWidget(workspace, 0, 0, 1, 1);
 
 
         gridLayout->addLayout(gridLayout_4, 1, 0, 1, 1);
 
 
-        gridLayout_2->addLayout(gridLayout, 0, 1, 1, 1);
+        verticalLayout->addLayout(gridLayout);
+
+
+        gridLayout_2->addLayout(verticalLayout, 1, 0, 1, 1);
+
+        use_gpu = new QCheckBox(centralwidget);
+        use_gpu->setObjectName("use_gpu");
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8(":/new/prefix1/nvidia-cuda21.png"), QSize(), QIcon::Normal, QIcon::Off);
+        use_gpu->setIcon(icon2);
+        use_gpu->setIconSize(QSize(32, 16));
+
+        gridLayout_2->addWidget(use_gpu, 0, 0, 1, 1);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -1037,10 +1710,15 @@ public:
         retranslateUi(MainWindow);
         QObject::connect(actionExit, &QAction::triggered, MainWindow, qOverload<>(&QMainWindow::close));
 
-        renderMaterials->setCurrentIndex(1);
-        tabWidget_2->setCurrentIndex(2);
+        workspace->setCurrentIndex(2);
+        renderMaterials->setCurrentIndex(0);
+        tabWidget_2->setCurrentIndex(0);
+        tabWidget_3->setCurrentIndex(0);
         tabWidget->setCurrentIndex(2);
-        renderer_tab->setCurrentIndex(1);
+        tab_renderer_lighting->setCurrentIndex(0);
+        tabWidget_4->setCurrentIndex(0);
+        tabWidget_6->setCurrentIndex(0);
+        tabWidget_7->setCurrentIndex(0);
         previous_mesh_button->setDefault(false);
 
 
@@ -1060,7 +1738,6 @@ public:
         actionUndo->setText(QCoreApplication::translate("MainWindow", "&Undo                            ", nullptr));
         actionRedo->setText(QCoreApplication::translate("MainWindow", "&Redo", nullptr));
         actionImport_3D_model->setText(QCoreApplication::translate("MainWindow", "Import &3D model", nullptr));
-        use_gpu->setText(QCoreApplication::translate("MainWindow", "Use GPU", nullptr));
         undo_button->setText(QCoreApplication::translate("MainWindow", "undo", nullptr));
         redo_button->setText(QCoreApplication::translate("MainWindow", "redo", nullptr));
         greyscale_opt->setTitle(QCoreApplication::translate("MainWindow", "Greyscale options", nullptr));
@@ -1093,6 +1770,16 @@ public:
         compute_dudv->setText(QCoreApplication::translate("MainWindow", "Compute distortion map", nullptr));
         nmap_factor_opt_2->setTitle(QCoreApplication::translate("MainWindow", "Factor", nullptr));
         renderMaterials->setTabText(renderMaterials->indexOf(functions), QCoreApplication::translate("MainWindow", "Texture Tools", nullptr));
+        workspace->setTabText(workspace->indexOf(texture), QCoreApplication::translate("MainWindow", "Normal Mapping", nullptr));
+#if QT_CONFIG(whatsthis)
+        workspace->setTabWhatsThis(workspace->indexOf(texture), QCoreApplication::translate("MainWindow", "Display current loaded image", nullptr));
+#endif // QT_CONFIG(whatsthis)
+        groupBox->setTitle(QCoreApplication::translate("MainWindow", "Irradiance Dimensions", nullptr));
+        label_3->setText(QCoreApplication::translate("MainWindow", "Texture height", nullptr));
+        label_4->setText(QCoreApplication::translate("MainWindow", "Texture width", nullptr));
+        bake_texture->setText(QCoreApplication::translate("MainWindow", "Bake", nullptr));
+        tabWidget_3->setTabText(tabWidget_3->indexOf(tab_4), QCoreApplication::translate("MainWindow", "Irradiance map", nullptr));
+        workspace->setTabText(workspace->indexOf(tab_3), QCoreApplication::translate("MainWindow", "Cube Mapping", nullptr));
         groupBox_2->setTitle(QCoreApplication::translate("MainWindow", "Camera", nullptr));
         label_5->setText(QCoreApplication::translate("MainWindow", "Gamma", nullptr));
         label_6->setText(QCoreApplication::translate("MainWindow", "Exposure", nullptr));
@@ -1110,26 +1797,55 @@ public:
         groupBox_5->setTitle(QCoreApplication::translate("MainWindow", "Bounding Boxes", nullptr));
         rasterize_display_bbox_checkbox->setText(QCoreApplication::translate("MainWindow", "Display", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_5), QCoreApplication::translate("MainWindow", "Rasterization", nullptr));
+        groupBox_9->setTitle(QCoreApplication::translate("MainWindow", "Configuration", nullptr));
+        label_7->setText(QCoreApplication::translate("MainWindow", "Red", nullptr));
+        label_8->setText(QCoreApplication::translate("MainWindow", "Green", nullptr));
+        label_9->setText(QCoreApplication::translate("MainWindow", "Blue", nullptr));
+        label_16->setText(QCoreApplication::translate("MainWindow", "Intensity", nullptr));
+        tabWidget_4->setTabText(tabWidget_4->indexOf(tab_7), QCoreApplication::translate("MainWindow", "Colors", nullptr));
+        label_11->setText(QCoreApplication::translate("MainWindow", "Linear", nullptr));
+        label_10->setText(QCoreApplication::translate("MainWindow", "Constant", nullptr));
+        label_12->setText(QCoreApplication::translate("MainWindow", "Quadratic", nullptr));
+        tabWidget_4->setTabText(tabWidget_4->indexOf(tab_8), QCoreApplication::translate("MainWindow", "Attenuation", nullptr));
+        button_renderer_lighting_PointLights_add->setText(QCoreApplication::translate("MainWindow", "Add", nullptr));
+        button_renderer_lighting_PointLights_delete->setText(QCoreApplication::translate("MainWindow", "Delete", nullptr));
+        tab_renderer_lighting->setTabText(tab_renderer_lighting->indexOf(tab_9), QCoreApplication::translate("MainWindow", "Point Lights", nullptr));
+        groupBox_10->setTitle(QCoreApplication::translate("MainWindow", "Configuration", nullptr));
+        label_13->setText(QCoreApplication::translate("MainWindow", "Red", nullptr));
+        label_14->setText(QCoreApplication::translate("MainWindow", "Green", nullptr));
+        label_15->setText(QCoreApplication::translate("MainWindow", "Blue", nullptr));
+        label_17->setText(QCoreApplication::translate("MainWindow", "Intensity", nullptr));
+        tabWidget_6->setTabText(tabWidget_6->indexOf(tab_13), QCoreApplication::translate("MainWindow", "Colors", nullptr));
+        button_renderer_lighting_DirectionalLights_add->setText(QCoreApplication::translate("MainWindow", "Add", nullptr));
+        button_renderer_lighting_DirectionalLights_delete->setText(QCoreApplication::translate("MainWindow", "Delete", nullptr));
+        tab_renderer_lighting->setTabText(tab_renderer_lighting->indexOf(tab_12), QCoreApplication::translate("MainWindow", "Directional Lights", nullptr));
+        groupBox_11->setTitle(QCoreApplication::translate("MainWindow", "Configuration", nullptr));
+        label_18->setText(QCoreApplication::translate("MainWindow", "Red", nullptr));
+        label_19->setText(QCoreApplication::translate("MainWindow", "Green", nullptr));
+        label_20->setText(QCoreApplication::translate("MainWindow", "Blue", nullptr));
+        label_21->setText(QCoreApplication::translate("MainWindow", "Intensity", nullptr));
+        tabWidget_7->setTabText(tabWidget_7->indexOf(tab_15), QCoreApplication::translate("MainWindow", "Colors", nullptr));
+        label_23->setText(QCoreApplication::translate("MainWindow", "Angle", nullptr));
+        tabWidget_7->setTabText(tabWidget_7->indexOf(tab_16), QCoreApplication::translate("MainWindow", "Options", nullptr));
+        button_renderer_lighting_SpotLights_add->setText(QCoreApplication::translate("MainWindow", "Add", nullptr));
+        button_renderer_lighting_SpotLights_delete->setText(QCoreApplication::translate("MainWindow", "Delete", nullptr));
+        tab_renderer_lighting->setTabText(tab_renderer_lighting->indexOf(tab_11), QCoreApplication::translate("MainWindow", "Spot Lights", nullptr));
+        tab_renderer_lighting->setTabText(tab_renderer_lighting->indexOf(tab_10), QCoreApplication::translate("MainWindow", "Area Lights", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QCoreApplication::translate("MainWindow", "Lighting", nullptr));
-        renderMaterials->setTabText(renderMaterials->indexOf(renderer_options), QCoreApplication::translate("MainWindow", "Renderer", nullptr));
-        groupBox->setTitle(QCoreApplication::translate("MainWindow", "Baking texture dimensions", nullptr));
-        tangent_space->setText(QCoreApplication::translate("MainWindow", "Tangent space", nullptr));
-        label_3->setText(QCoreApplication::translate("MainWindow", "Texture height", nullptr));
-        label_4->setText(QCoreApplication::translate("MainWindow", "Texture width", nullptr));
-        bake_texture->setText(QCoreApplication::translate("MainWindow", "Bake", nullptr));
-        renderMaterials->setTabText(renderMaterials->indexOf(Tools), QCoreApplication::translate("MainWindow", "Baking Tools", nullptr));
-        renderMaterials->setTabText(renderMaterials->indexOf(widget), QCoreApplication::translate("MainWindow", "Materials", nullptr));
-        renderer_tab->setTabText(renderer_tab->indexOf(texture), QCoreApplication::translate("MainWindow", "textures", nullptr));
-#if QT_CONFIG(whatsthis)
-        renderer_tab->setTabWhatsThis(renderer_tab->indexOf(texture), QCoreApplication::translate("MainWindow", "Display current loaded image", nullptr));
-#endif // QT_CONFIG(whatsthis)
-        renderer_tab->setTabText(renderer_tab->indexOf(gl_renderer), QCoreApplication::translate("MainWindow", "renderer", nullptr));
+        groupBox_7->setTitle(QCoreApplication::translate("MainWindow", "Object Transformations", nullptr));
+        groupBox_6->setTitle(QCoreApplication::translate("MainWindow", "Geometry ", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_6), QCoreApplication::translate("MainWindow", "Scene", nullptr));
+        QTreeWidgetItem *___qtreewidgetitem = renderer_scene_list->headerItem();
+        ___qtreewidgetitem->setText(0, QCoreApplication::translate("MainWindow", "Scene", nullptr));
+        workspace->setTabText(workspace->indexOf(gl_renderer), QCoreApplication::translate("MainWindow", "Renderer", nullptr));
 #if QT_CONFIG(tooltip)
         meshes_list->setToolTip(QCoreApplication::translate("MainWindow", "<html><head/><body><p>List all meshes names in the 3D model</p></body></html>", nullptr));
 #endif // QT_CONFIG(tooltip)
         next_mesh_button->setText(QCoreApplication::translate("MainWindow", "Next", nullptr));
         previous_mesh_button->setText(QCoreApplication::translate("MainWindow", "Previous", nullptr));
-        renderer_tab->setTabText(renderer_tab->indexOf(uv_editor), QCoreApplication::translate("MainWindow", "UV editor", nullptr));
+        workspace->setTabText(workspace->indexOf(uv_editor), QCoreApplication::translate("MainWindow", "UV editor", nullptr));
+        workspace->setTabText(workspace->indexOf(rt_renderer), QCoreApplication::translate("MainWindow", "RT Renderer", nullptr));
+        use_gpu->setText(QCoreApplication::translate("MainWindow", "GPGPU", nullptr));
         menuFiles->setTitle(QCoreApplication::translate("MainWindow", "Fi&les", nullptr));
         menuEdit->setTitle(QCoreApplication::translate("MainWindow", "Edit", nullptr));
         menuTools->setTitle(QCoreApplication::translate("MainWindow", "Tools", nullptr));

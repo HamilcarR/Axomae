@@ -8,6 +8,7 @@
 
 class NodeItem : public QTreeWidgetItem {
     friend class SceneListView;
+    friend class NodeItemBuilder;
 public : 
     virtual ~NodeItem(){
     }
@@ -23,6 +24,15 @@ public :
 public:
     std::string name ; 
 };
+
+class NodeItemBuilder {
+public:
+    static NodeItem* buildNode(std::string name , int type , QTreeWidgetItem* parent = nullptr){
+        return new NodeItem(name , type , parent) ; 
+    }
+};
+
+
 
 //TODO: [AX-57] implement a visitor node for icon attributions to scene elements
 class SceneListView : virtual public QTreeWidget{
@@ -51,8 +61,16 @@ public:
         return nullptr; 
     }
 
+    NodeItem* getRoot() const { return items.empty() ? nullptr : items[0]; }
+    const NodeItem* getConstRoot() const {return items.empty() ? nullptr : items[0];}
+
+    void updateSceneList(){
+        setScene(*current_scene); 
+    } 
+
     virtual void setScene(SceneTree& scene){
         emptyTree();
+        current_scene = &scene; 
         INode* root_node = scene.getRootNode(); 
         auto layout_nodes_lambda = [](INode* node , 
                                     SceneTree& scene , 
@@ -84,6 +102,7 @@ public:
 private:
     std::vector<NodeItem*> items ; //Only used to simply keep track of elements in the tree. 
     std::map<ISceneNode* , NodeItem*> node_lookup ; /*<Keeps track of the NodeItems and their corresponding INodes*/ //no need to deallocate anything here. 
+    SceneTree* current_scene ; /*<Keeps track of the currently processed scene*/ 
 };
 
 

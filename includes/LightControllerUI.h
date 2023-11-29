@@ -21,6 +21,10 @@ public:
         viewer_3d = viewer ; 
         scene_list_view = list_view ;  
     }
+
+    template<AbstractLight::TYPE type> 
+    LightData loadFromUi() const ; 
+
 protected slots:
     void addPointLight();
     void deletePointLight();

@@ -42,14 +42,13 @@ struct MouseState{
 	bool right_button_released ; 
 	unsigned int previous_pos_x; 
 	unsigned int previous_pos_y ; 
-
+	bool busy ; 
 };
 
 
 struct ScreenSize{
 	unsigned int width ; 
 	unsigned int height ; 
-
 }; 
 
 

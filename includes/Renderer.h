@@ -1,6 +1,9 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include <any>
+#include <queue>
+
 #include "constants.h"
 #include "RendererEnums.h"
 #include "utils_3D.h"
@@ -30,10 +33,17 @@ class GLViewer;
  * @brief Renderer class definition
  * 
  */
-class Renderer {
-public:
-
-
+class Renderer : public QObject {
+	Q_OBJECT
+public:	
+	enum EVENT_TYPE : signed {
+		ON_LEFT_CLICK = 0 , 
+		ON_RIGHT_CLICK = 1 , 
+		ON_MOUSEWHEEL_CLICK = 2 , 
+		ON_MOUSEWHEEL_SCROLL_UP = 3 , 
+		ON_MOUSEWHEEL_SCROLL_DOWN = 4 ,   
+		};
+	
 	/**
 	 * @brief Construct a new Renderer object
 	 * 
@@ -96,6 +106,7 @@ public:
 	 * @see MouseState
 	 */
 	MouseState* getMouseStatePointer(){ return &mouse_state;} ;  
+	const MouseState* getConstMouseStatePointer() const {return &mouse_state;}
 	
 	/**
 	 * @brief Left click event behavior
@@ -227,10 +238,14 @@ public:
 	 */
 	const Scene& getConstScene() const {return *scene; }
 	Scene& getScene() {return *scene;}
+	
+	template<EVENT_TYPE type>
+	void pushEvent(RENDERER_CALLBACK_ENUM callback_enum , std::any data){
+		event_callback_stack[type].push(std::pair<RENDERER_CALLBACK_ENUM , std::any>(callback_enum , data));	
+	}
 
-	template<class Func , class ...Args>
-	void execCallback(Func&& function , Renderer* instance , Args&& ...args){
-		function(instance , std::forward<Args>(args)...); 
+	bool eventQueueEmpty(EVENT_TYPE type) const {
+		return event_callback_stack[type].empty(); 
 	}
 
 	/**
@@ -269,8 +284,19 @@ public:
 		else{
 			return;
 		}
-
 	}
+
+	template<class Func , class ...Args>
+	void execCallback(Func&& function , Renderer* instance , Args&& ...args){
+		function(instance , std::forward<Args>(args)...); 
+	}
+
+signals:
+	void sceneModified();
+
+
+
+
 
 public:
 	std::unique_ptr<Scene> scene ; 								/**<The scene to be rendered*/ 	
@@ -284,7 +310,11 @@ public:
 	ScreenSize screen_size ; 									/**<Dimensions of the renderer windows*/
 	unsigned int default_framebuffer_id ;						/**<In the case the GUI uses other contexts and other framebuffers , we use this variable to reset the rendering to the default framebuffer*/ 
 	GLViewer *gl_widget;
+private:
+	static const int event_num_size = ON_MOUSEWHEEL_SCROLL_DOWN + 1; 
+	std::queue<std::pair<RENDERER_CALLBACK_ENUM , std::any>> event_callback_stack[event_num_size] ; 	
 	
+
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include "../includes/Renderer.h"
 #include "../includes/Loader.h"
 #include "../includes/RenderPipeline.h"
+#include "../includes/LightBuilder.h"
 
 using namespace axomae ; 
 
@@ -116,12 +117,6 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scen
 	scene->setCameraPointer(scene_camera); 
 	light_database->clearDatabase();
 	scene->updateTree(); 	
-	//AbstractLight *L1 = new SpotLight(glm::vec3(-55 , 90 , -5) , glm::vec3(0.f) , glm::vec3(1.f , 1.f , 0.9f), 12.f , 102000.f , scene_camera); 
-    //AbstractLight *L2 = new PointLight(glm::vec3(0 , 20 , -2) , glm::vec3(0.875f , 0.257f , 0.184f), glm::vec3(1.f , 0.0045 , 0.0075) , 200.f , L1); 
-	//AbstractLight *L3 = new DirectionalLight(glm::vec3(1 , 1 , 0) , glm::vec3(1.f , 1.f , 1.f) , 1.5f , scene_camera); 
-	//light_database->addLight(L1); 
-	//light_database->addLight(L2);
-	//light_database->addLight(L3); 
 	scene->generateBoundingBoxes(resource_database->getShaderDatabase()->get(Shader::BOUNDING_BOX)); 		
 	start_draw = true ;
 	resource_database->getShaderDatabase()->initializeShaders(); 
@@ -129,7 +124,8 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh*> , SceneTree> &new_scen
 }
 
 void Renderer::onLeftClick(){
-	scene_camera->onLeftClick(); 
+	if(event_callback_stack[ON_LEFT_CLICK].empty())
+		scene_camera->onLeftClick(); 	
 }
 
 void Renderer::onRightClick(){
@@ -137,7 +133,29 @@ void Renderer::onRightClick(){
 }
 
 void Renderer::onLeftClickRelease(){
-	scene_camera->onLeftClickRelease(); 
+	if(!event_callback_stack[ON_LEFT_CLICK].empty()){
+		const auto to_process = event_callback_stack[ON_LEFT_CLICK].front(); 
+		if(to_process.first == ADD_ELEMENT_POINTLIGHT){
+			glm::mat4 inv_v = glm::inverse(scene_camera->getView()); 
+			glm::mat4 inv_p = glm::inverse(scene_camera->getProjection()); 
+			glm::vec4 w_space = glm::vec4(((float)mouse_state.pos_x * 2.f / (float)screen_size.width) - 1.f, 
+											1.f - (float)mouse_state.pos_y * 2.f / (float)screen_size.height , 1.f , 1.f);
+			
+			LightData data = std::any_cast<LightData>(to_process.second); 
+			w_space = inv_p * w_space ;
+			w_space = inv_v * w_space ;
+			glm::vec3 position = w_space / w_space.w ; 
+			position.z = 0.f ;  
+			data.position = glm::inverse(scene_camera->getSceneRotationMatrix()) * glm::vec4(position , 1.f) ; 
+			LOG(std::string("x:") + std::to_string(data.position.x) + std::string("  y:") + std::to_string(data.position.y) + std::string("  z:") + std::to_string(data.position.z) , LogLevel::INFO) ;
+			AbstractLight* point_light = LightBuilder::createPLight(data); 
+			executeMethod<ADD_ELEMENT_POINTLIGHT>(point_light); 
+			event_callback_stack[ON_LEFT_CLICK].pop();
+			emit sceneModified();
+		}
+	}
+	else
+		scene_camera->onLeftClickRelease(); 
 }
 
 void Renderer::onRightClickRelease(){

@@ -38,7 +38,8 @@ SceneTreeNode::SceneTreeNode(ISceneNode *_parent , ISceneHierarchy* _owner){
     setHierarchyOwner(_owner);  
     local_transformation = accumulated_transformation = glm::mat4(1.f); 
     mark = false ;
-    name = "Generic-Hierarchy-Node";  
+    name = "Generic-Hierarchy-Node";
+    updated = true ;  
 }
 
 SceneTreeNode::SceneTreeNode(const std::string& _name , const glm::mat4& transformation , ISceneNode *parent , ISceneHierarchy* owner ) : SceneTreeNode(parent , owner){
@@ -121,7 +122,7 @@ void SceneTreeNode::setParent(INode* node){
 
 SceneTreeNode* SceneTreeNode::getParent() const {
     if(!parents.empty())
-        return dynamic_cast<SceneTreeNode*>(parents[0]);
+        return static_cast<SceneTreeNode*>(parents[0]);
     else
         return nullptr;  
 }

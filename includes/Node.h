@@ -123,9 +123,16 @@ public:
      * @return ISceneNode* 
      */
     virtual INode* returnRoot() = 0;
-
+    
+    /**
+     * @brief Checks if the node has been updated
+     * 
+     * @return true 
+     */
+    virtual bool isUpdated() const {return updated;}
 protected:
     bool mark;                                /*<Generic mark , for graph traversal*/
+    bool updated;                             /*<Lets the owning structure know if node has been modified */
     std::string name;                         /*<Name of the node*/
     std::vector<INode*> parents ; /*<List of parents*/ 
     std::vector<INode*> children ; /*<List of children*/ 

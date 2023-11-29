@@ -3,7 +3,7 @@
 
 #include <functional>
 #include "Node.h"
-
+#include <QObject>
 
 /**
  * @file SceneGraph.h
@@ -15,7 +15,8 @@
  * @class ISceneHierarchy
  * 
  */
-class ISceneHierarchy {
+class ISceneHierarchy : public QObject{
+    Q_OBJECT 
 public:
     /**
      * @brief Set the Root object
@@ -61,7 +62,7 @@ public:
     /**
      * @brief This method will update the hierarchy given a list of nodes. Only the descendants of these nodes will be updated.  
      */
-    virtual void updateHierarchy() = 0 ;  
+    virtual void updatedHierarchy() = 0 ;  
     
     /**
      * @brief Traverse the scene structure, and set their owner of each node to this structure
@@ -140,6 +141,9 @@ private:
     template<class F , class ...Args>
     void bfsConstTraverse(const INode* node ,F func , Args&& ...args) const ;
 
+signals:
+    void modifiedStructureEvent();
+
 protected:
     INode* root;       /*<Root of the hierarchy*/
 private:
@@ -153,7 +157,7 @@ private:
 /*******************************************************************************************************************************************************************/
 
 class SceneTree : public ISceneHierarchy{
-     
+    
 public:
     SceneTree(ISceneNode* root = nullptr); 
     SceneTree(const SceneTree& copy);
@@ -163,7 +167,7 @@ public:
     virtual void updateAccumulatedTransformations() override;
     virtual void pushNewRoot(INode* new_root);
     virtual std::vector<INode*> findByName(const std::string& name) override; 
-    virtual void updateHierarchy() override ;
+    virtual void updatedHierarchy() override ;
 
 private:
     bool node_updated ; 

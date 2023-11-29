@@ -86,9 +86,9 @@ ArcballCamera::ArcballCamera(){
  * rendering.
  * @param radius The distance between the camera and the center of rotation in an arcball camera. It
  * determines how far the camera is from the object being viewed.
- * @param pointer The "pointer" parameter is a pointer to a MouseState object, which likely contains
+ * @param pointer The "pointer" parameter is a pointer to a MouseState object, which  contains
  * information about the current state of the mouse (e.g. position, button presses, etc.). This is
- * likely used by the ArcballCamera class to track user input and update the camera's
+ *  used by the ArcballCamera class to track user input and update the camera's
  * position/orientation accordingly
  */
 ArcballCamera::ArcballCamera(float deg , ScreenSize* screen  , float near , float far , float radius , MouseState* pointer): Camera( deg , screen, near , far , pointer) {

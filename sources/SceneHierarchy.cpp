@@ -93,6 +93,6 @@ std::vector<INode*> SceneTree::findByName(const std::string& name){
     return collection ;  
 }
 
-void SceneTree::updateHierarchy(){
-
+void SceneTree::updatedHierarchy(){
+    emit modifiedStructureEvent(); 
 }
