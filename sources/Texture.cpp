@@ -32,7 +32,7 @@ static std::map<Texture::TYPE, const char *> texture_type_c_str = {{Texture::DIF
 static void set_dummy_TextureData(TextureData *dummy) {
   dummy->width = DUMMY_TEXTURE_DIM;
   dummy->height = DUMMY_TEXTURE_DIM;
-  dummy->data = new uint32_t[dummy->width * dummy->height];
+  dummy->data.resize(dummy->width * dummy->height);
   for (unsigned i = 0; i < dummy->width * dummy->height; i++) {
     dummy->data[i] = DEFAULT_OPACITY_DUMMY_PIXEL_RGBA;
   }
@@ -49,7 +49,7 @@ static void set_dummy_TextureData(TextureData *dummy) {
 static void set_dummy_TextureData_normals(TextureData *dummy) {
   dummy->width = DUMMY_TEXTURE_DIM;
   dummy->height = DUMMY_TEXTURE_DIM;
-  dummy->data = new uint32_t[dummy->width * dummy->height];
+  dummy->data.resize(dummy->width * dummy->height);
   for (unsigned i = 0; i < DUMMY_TEXTURE_DIM * DUMMY_TEXTURE_DIM; i++)
     dummy->data[i] = DEFAULT_NORMAL_DUMMY_PIXEL_RGBA;
 }
@@ -77,12 +77,12 @@ void Texture::set(TextureData *texture) {
   clean();
   width = texture->width;
   height = texture->height;
-  if (texture->data) {
+  if (!texture->data.empty()) {
     data = new uint32_t[width * height];
     for (unsigned int i = 0; i < width * height; i++)
       data[i] = texture->data[i];
   }
-  if (texture->f_data) {
+  if (!texture->f_data.empty()) {
     f_data = new float[width * height * texture->nb_components];
     for (unsigned i = 0; i < width * height * texture->nb_components; i++)
       f_data[i] = texture->f_data[i];
@@ -511,13 +511,13 @@ void CubemapTexture::setCubeMapTextureData(TextureData *texture) {
   data = nullptr;
   mipmaps = texture->mipmaps;
   /* In case the raw data is in RGB-RGBA with 8 bits/channel*/
-  if (texture->data) {
+  if (!texture->data.empty()) {
     data = new uint32_t[width * height * 6];
     for (unsigned int i = 0; i < width * height * 6; i++)
       data[i] = texture->data[i];
   }
   /* In case raw data is 4 bytes float / channel */
-  if (texture->f_data) {
+  if (!texture->f_data.empty()) {
     f_data = new float[width * height * 6 * texture->nb_components];
     for (unsigned i = 0; i < width * height * 6 * texture->nb_components; i++)
       f_data[i] = texture->f_data[i];

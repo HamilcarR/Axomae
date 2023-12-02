@@ -255,9 +255,9 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
     envmap_tex_data.width = _width;
     envmap_tex_data.height = _height;
     envmap_tex_data.mipmaps = 0;
-    envmap_tex_data.f_data = new float[_width * _height * channels];
+    envmap_tex_data.f_data.resize(_width * _height * channels);
     envmap_tex_data.nb_components = channels;
-    std::memset(envmap_tex_data.f_data, 0, _width * _height * channels * sizeof(float));
+    std::memset(&envmap_tex_data.f_data[0], 0, _width * _height * channels * sizeof(float));
     unsigned index = 0;
     std::vector<std::shared_future<void>> futures;
     for (unsigned i = 1; i <= MAX_THREADS; i++) {

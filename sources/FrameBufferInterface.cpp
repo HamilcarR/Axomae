@@ -11,8 +11,6 @@ int FrameBufferInterface::setUpEmptyTexture(unsigned width,
   TextureData temp_empty_data_texture;
   temp_empty_data_texture.width = width;
   temp_empty_data_texture.height = height;
-  temp_empty_data_texture.data = nullptr;
-  temp_empty_data_texture.f_data = nullptr;
   temp_empty_data_texture.internal_format = internal_format;
   temp_empty_data_texture.data_format = data_format;
   temp_empty_data_texture.data_type = data_type;

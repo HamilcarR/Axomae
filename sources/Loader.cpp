@@ -64,7 +64,7 @@ static void copyTexels(TextureData *totexture, aiTexture *fromtexture) {
       unsigned int height = 0;
       totexture->width = width = fromtexture->mWidth;
       totexture->height = height = fromtexture->mHeight;
-      totexture->data = new uint32_t[totexture->width * totexture->height];
+      totexture->data.resize(totexture->width * totexture->height);
       for (unsigned int i = 0; i < width * height; i++) {
         uint8_t a = fromtexture->pcData[i].a;
         uint8_t r = fromtexture->pcData[i].r;
@@ -84,9 +84,9 @@ static void copyTexels(TextureData *totexture, aiTexture *fromtexture) {
       image = image.convertToFormat(QImage::Format_ARGB32);
       unsigned image_width = image.width();
       unsigned image_height = image.height();
-      totexture->data = new uint32_t[image_width * image_height];
-      memset(totexture->data, 0, image_width * image_height * sizeof(uint32_t));
-      uint8_t *dest_buffer = (uint8_t *)totexture->data;
+      totexture->data.resize(image_width * image_height);
+      memset(&totexture->data[0], 0, image_width * image_height * sizeof(uint32_t));
+      uint8_t *dest_buffer = (uint8_t *)&totexture->data[0];
       uint8_t *from_buffer = image.bits();
       async_copy_buffer(image_width, image_height, from_buffer, dest_buffer);
       totexture->width = image_width;
@@ -595,9 +595,9 @@ Mesh *Loader::generateCubeMap(bool is_glb) {
   cubemap.data_type = Texture::UBYTE;
   cubemap.width = left.width();
   cubemap.height = left.height();
-  cubemap.data = new uint32_t[cubemap.width * cubemap.height * 6];
+  cubemap.data.resize(cubemap.width * cubemap.height * 6);
   unsigned int k = 0;
-  uint32_t *pointer_on_cubemap_data = cubemap.data;
+  uint32_t *pointer_on_cubemap_data = &cubemap.data[0];
   std::vector<std::future<void>> threads_future;
   auto thread_lambda_func =
       [&array](unsigned i, uint32_t *pointer_on_cubemap_data, unsigned width, unsigned height) -> void {
@@ -652,8 +652,8 @@ EnvironmentMap2DTexture *Loader::loadHdrEnvmap() {
   envmap.internal_format = Texture::RGB32F;
   envmap.data_format = Texture::RGB;
   envmap.nb_components = channels;
-  envmap.f_data = new float[width * height * channels];
-  std::memcpy(envmap.f_data, hdr_data, width * height * channels * sizeof(float));
+  envmap.f_data.resize(width * height * channels);
+  std::memcpy(&envmap.f_data[0], hdr_data, width * height * channels * sizeof(float));
   /* Furnace test */
   /*for(unsigned i = 0 ; i < width * height * channels ; i++)
     envmap.f_data[i] = 1.f ; */
