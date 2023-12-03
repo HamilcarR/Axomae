@@ -1,5 +1,6 @@
 #ifndef LOGGER_H
 #define LOGGER_H
+#include "Axomae_macros.h"
 #include "Mutex.h"
 #include <chrono>
 #include <cstdlib>
