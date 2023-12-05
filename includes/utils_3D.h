@@ -1,11 +1,12 @@
 #ifndef UTILS_3D_H
 #define UTILS_3D_H
+// clang-format off
 
+#include <GL/glew.h>
 #include "DebugGL.h"
 #include "Object3D.h"
 #include "constants.h"
 #include <GL/gl.h>
-#include <GL/glew.h>
 #include <GL/glu.h>
 #include <glm/common.hpp>
 #include <glm/glm.hpp>
@@ -16,6 +17,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/vec3.hpp>
 #include <map>
+// clang-format on
 
 /*TODO : Create classes , implement clean up */
 namespace axomae {
