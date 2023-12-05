@@ -18,7 +18,7 @@
 
 namespace axomae {
   Loader::Loader() {
-    resource_database = ResourceDatabaseManager::getInstance();
+    resource_database = &ResourceDatabaseManager::getInstance();
   }
   Loader::~Loader() {}
 
@@ -241,7 +241,7 @@ namespace axomae {
    * The function loads shader files and adds them to a shader database.
    */
   void Loader::loadShaderDatabase() {
-    ShaderDatabase *shader_database = resource_database->getShaderDatabase();
+    ShaderDatabase *shader_database = &resource_database->getShaderDatabase();
     std::string vertex_shader = loadShader("../shaders/phong.vert");
     std::string fragment_shader = loadShader("../shaders/phong.frag");
     std::string vertex_shader_pbr = loadShader("../shaders/pbr.vert");
@@ -478,8 +478,8 @@ namespace axomae {
 
   std::pair<std::vector<Mesh *>, SceneTree> Loader::loadObjects(
       const char *file) {  // TODO! return scene data structure , with lights + meshes + cameras
-    TextureDatabase *texture_database = resource_database->getTextureDatabase();
-    ShaderDatabase *shader_database = resource_database->getShaderDatabase();
+    TextureDatabase *texture_database = &resource_database->getTextureDatabase();
+    ShaderDatabase *shader_database = &resource_database->getShaderDatabase();
     std::pair<std::vector<Mesh *>, SceneTree> objects;
     Assimp::Importer importer;
     std::mutex mesh_load_mutex;
@@ -533,8 +533,8 @@ namespace axomae {
    * @return A vector of Mesh pointers.
    */
   std::pair<std::vector<Mesh *>, SceneTree> Loader::load(const char *file) {
-    TextureDatabase *texture_database = resource_database->getTextureDatabase();
-    ShaderDatabase *shader_database = resource_database->getShaderDatabase();
+    TextureDatabase *texture_database = &resource_database->getTextureDatabase();
+    ShaderDatabase *shader_database = &resource_database->getShaderDatabase();
     texture_database->clean();
     shader_database->clean();
     loadShaderDatabase();
@@ -580,8 +580,8 @@ namespace axomae {
   Mesh *Loader::generateCubeMap(bool is_glb) {
     Mesh *cube_map = new CubeMapMesh();
     Material material;
-    ShaderDatabase *shader_database = resource_database->getShaderDatabase();
-    TextureDatabase *texture_database = resource_database->getTextureDatabase();
+    ShaderDatabase *shader_database = &resource_database->getShaderDatabase();
+    TextureDatabase *texture_database = &resource_database->getTextureDatabase();
     TextureData cubemap;
     QString skybox_folder = "castle";
     auto format = "jpg";
@@ -632,7 +632,7 @@ namespace axomae {
   }
 
   EnvironmentMap2DTexture *Loader::loadHdrEnvmap() {
-    TextureDatabase *texture_database = resource_database->getTextureDatabase();
+    TextureDatabase *texture_database = &resource_database->getTextureDatabase();
     std::string folder_night = "../Ressources/Skybox_Textures/HDR/Night_City/";
     std::string folder_forest = "../Ressources/Skybox_Textures/HDR/Forest/";
     std::string folder_park = "../Ressources/Skybox_Textures/HDR/Park/";

@@ -18,7 +18,7 @@ Renderer::Renderer() {
   mouse_state.previous_pos_y = 0;
   default_framebuffer_id = 0;
   light_database = new LightingDatabase();
-  resource_database = ResourceDatabaseManager::getInstance();
+  resource_database = &ResourceDatabaseManager::getInstance();
   Loader loader;
   loader.loadShaderDatabase();
   scene_camera = new ArcballCamera(45.f, &screen_size, 0.1f, 10000.f, 100.f, &mouse_state);
@@ -52,12 +52,12 @@ Renderer::~Renderer() {
 void Renderer::initialize() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-  resource_database->getShaderDatabase()->initializeShaders();
-  camera_framebuffer = std::make_unique<CameraFrameBuffer>(resource_database->getTextureDatabase(),
-                                                           resource_database->getShaderDatabase(),
+  resource_database->getShaderDatabase().initializeShaders();
+  camera_framebuffer = std::make_unique<CameraFrameBuffer>(&resource_database->getTextureDatabase(),
+                                                           &resource_database->getShaderDatabase(),
                                                            &screen_size,
                                                            &default_framebuffer_id);
-  render_pipeline = std::make_unique<RenderPipeline>(this, resource_database);
+  render_pipeline = std::make_unique<RenderPipeline>(this, &*resource_database);
   scene = std::make_unique<Scene>();
   camera_framebuffer->initializeFrameBuffer();
 }
@@ -119,9 +119,9 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh *>, SceneTree> &new_scen
   scene->setCameraPointer(scene_camera);
   light_database->clearDatabase();
   scene->updateTree();
-  scene->generateBoundingBoxes(resource_database->getShaderDatabase()->get(Shader::BOUNDING_BOX));
+  scene->generateBoundingBoxes(resource_database->getShaderDatabase().get(Shader::BOUNDING_BOX));
   start_draw = true;
-  resource_database->getShaderDatabase()->initializeShaders();
+  resource_database->getShaderDatabase().initializeShaders();
   camera_framebuffer->updateFrameBufferShader();
 }
 

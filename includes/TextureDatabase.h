@@ -121,6 +121,10 @@ class TextureDatabase : public RenderingDatabaseInterface<int, Texture> {
    */
   std::vector<std::pair<int, Texture *>> getTexturesByType(Texture::TYPE texture_type);
 
+  bool empty() {
+    return texture_database.empty();
+  }
+
  private:
   std::map<int, Texture *> texture_database; /**<Database of textures*/
 };

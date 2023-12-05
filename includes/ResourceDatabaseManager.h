@@ -18,7 +18,7 @@
  */
 class ResourceDatabaseManager {
  public:
-  static ResourceDatabaseManager *getInstance();
+  static ResourceDatabaseManager &getInstance();
 
   /**
    * @brief This method deletes the stored databases objects .
@@ -62,8 +62,8 @@ class ResourceDatabaseManager {
    *
    * @return TextureDatabase*
    */
-  TextureDatabase *getTextureDatabase() const {
-    return texture_database;
+  TextureDatabase &getTextureDatabase() const {
+    return *texture_database;
   }
 
   /**
@@ -71,9 +71,15 @@ class ResourceDatabaseManager {
    *
    * @return ShaderDatabase*
    */
-  ShaderDatabase *getShaderDatabase() const {
-    return shader_database;
+  ShaderDatabase &getShaderDatabase() const {
+    return *shader_database;
   }
+
+  /**
+   * @brief Destroy the Resource Database Manager object
+   *
+   */
+  virtual ~ResourceDatabaseManager();
 
  private:
   /**
@@ -81,12 +87,6 @@ class ResourceDatabaseManager {
    *
    */
   ResourceDatabaseManager();
-
-  /**
-   * @brief Destroy the Resource Database Manager object
-   *
-   */
-  virtual ~ResourceDatabaseManager();
 
   /**
    * @brief Construct a new Resource Database Manager object
@@ -102,9 +102,9 @@ class ResourceDatabaseManager {
   ResourceDatabaseManager operator=(const ResourceDatabaseManager &) = delete;
 
  private:
-  static ResourceDatabaseManager *instance; /*<Instance of this ResourceDatabaseManager*/
-  TextureDatabase *texture_database;        /*<Pointer on the texture database*/
-  ShaderDatabase *shader_database;          /*<Pointer on the shader database*/
+  static std::unique_ptr<ResourceDatabaseManager> instance; /*<Instance of this ResourceDatabaseManager*/
+  std::unique_ptr<TextureDatabase> texture_database;        /*<Pointer on the texture database*/
+  std::unique_ptr<ShaderDatabase> shader_database;          /*<Pointer on the shader database*/
 };
 
 #endif

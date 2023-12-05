@@ -1,17 +1,16 @@
 
 #include "../includes/ResourceDatabaseManager.h"
 
-ResourceDatabaseManager *ResourceDatabaseManager::instance = nullptr;
+std::unique_ptr<ResourceDatabaseManager> ResourceDatabaseManager::instance = nullptr;
 
-ResourceDatabaseManager *ResourceDatabaseManager::getInstance() {
+ResourceDatabaseManager &ResourceDatabaseManager::getInstance() {
   if (instance == nullptr)
-    instance = new ResourceDatabaseManager();
-  return instance;
+    instance = std::unique_ptr<ResourceDatabaseManager>(new ResourceDatabaseManager());
+  return *instance.get();
 }
 
 void ResourceDatabaseManager::destroyInstance() {
-  if (instance)
-    delete instance;
+  instance = nullptr;
 }
 
 void ResourceDatabaseManager::purge() {
@@ -22,15 +21,11 @@ void ResourceDatabaseManager::purge() {
 }
 
 ResourceDatabaseManager::ResourceDatabaseManager() {
-  texture_database = new TextureDatabase();
-  shader_database = new ShaderDatabase();
+  texture_database = std::make_unique<TextureDatabase>();
+  shader_database = std::make_unique<ShaderDatabase>();
 }
 
 ResourceDatabaseManager::~ResourceDatabaseManager() {
-  if (texture_database)
-    delete texture_database;
-  if (shader_database)
-    delete shader_database;
   shader_database = nullptr;
   texture_database = nullptr;
 }

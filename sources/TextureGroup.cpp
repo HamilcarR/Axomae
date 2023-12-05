@@ -3,9 +3,7 @@
 #include "../includes/Shader.h"
 
 TextureGroup::TextureGroup() {
-  texture_database =
-      ResourceDatabaseManager::getInstance()
-          ->getTextureDatabase();  // TODO : change this finally to reference the texture database directly
+  texture_database = &ResourceDatabaseManager::getInstance().getTextureDatabase();
   initialized = false;
 }
 
