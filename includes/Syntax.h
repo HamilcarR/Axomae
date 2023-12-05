@@ -1,91 +1,17 @@
 #ifndef SYNTAX_H
 #define SYNTAX_H
 
-
 namespace axomae {
 
-	class SyntaxTree{
+  class SyntaxTree {
 
-		public:
+   public:
+    SyntaxTree();
+    ~SyntaxTree();
 
-			SyntaxTree();
-			~SyntaxTree();
+   private:
+  };
 
-
-
-
-
-
-
-
-
-		private:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}  // namespace axomae
 
 #endif

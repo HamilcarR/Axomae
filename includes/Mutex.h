@@ -4,40 +4,38 @@
 
 /**
  * @file Mutex.h
- * This file implements classes for managing resource synchronization , and locks  
- * 
+ * This file implements classes for managing resource synchronization , and locks
+ *
  */
 
 /**
  * @class Mutex
- * @brief This class uses the RAII principle to lock / unlock the member mutex. So it should be used when a scope lock is needed.
+ * @brief This class uses the RAII principle to lock / unlock the member mutex. So it should be used when a scope lock
+ * is needed.
  */
-class Mutex : public GenericLockInterface{
-public:
-    class Lock {
-    public: 
-        explicit Lock(Mutex& _mutex); 
-        virtual~ Lock(); 
-    private:
-        Mutex& lock_mutex; 
-    }; 
+class Mutex : public GenericLockInterface {
+ public:
+  class Lock {
+   public:
+    explicit Lock(Mutex &_mutex);
+    virtual ~Lock();
 
-private:
+   private:
+    Mutex &lock_mutex;
+  };
 
-    /**
-     * @brief Lock the mutex
-     * 
-     */
-    virtual void lock(); 
+ private:
+  /**
+   * @brief Lock the mutex
+   *
+   */
+  virtual void lock();
 
-    /**
-     * @brief Unlock the mutex
-     * 
-     */
-    virtual void unlock(); 
-    
+  /**
+   * @brief Unlock the mutex
+   *
+   */
+  virtual void unlock();
 };
-
-
 
 #endif

@@ -15,7 +15,7 @@
 #define LOGCONFIG(config) LogFunctions::log_configure(config)
 
 namespace LogLevel {
-enum LOGENUMTYPE : unsigned { INFO, GLINFO, WARNING, ERROR, CRITICAL, DEBUG };
+  enum LOGENUMTYPE : unsigned { INFO, GLINFO, WARNING, ERROR, CRITICAL, DEBUG };
 };  // End namespace LogLevel
 
 struct LoggerConfigDataStruct {
@@ -25,12 +25,18 @@ struct LoggerConfigDataStruct {
 };
 
 namespace LogFunctions {
-void log_message(
-    const char *message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line);
-void log_message(
-    std::string message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line);
-void log_flush();
-void log_configure(const LoggerConfigDataStruct &config);
+  void log_message(const char *message,
+                   const LogLevel::LOGENUMTYPE level,
+                   const char *file,
+                   const char *function,
+                   unsigned int line);
+  void log_message(std::string message,
+                   const LogLevel::LOGENUMTYPE level,
+                   const char *file,
+                   const char *function,
+                   unsigned int line);
+  void log_flush();
+  void log_configure(const LoggerConfigDataStruct &config);
 };  // namespace LogFunctions
 /*****************************************************************************************************************************************************************************/
 class AbstractLogger {

@@ -1,7 +1,7 @@
 #ifndef GENERICLOCKINTERFACE_H
 #define GENERICLOCKINTERFACE_H
-#include <mutex>
 #include <cstdlib>
+#include <mutex>
 
 /**
  * @file GenericLockInterface.h
@@ -9,26 +9,16 @@
  */
 
 /**
- * @class GenericLockInterface 
- * 
+ * @class GenericLockInterface
+ *
  */
-class GenericLockInterface{
-public:
-    virtual void lock() = 0 ; 
-    virtual void unlock() = 0 ; 
+class GenericLockInterface {
+ public:
+  virtual void lock() = 0;
+  virtual void unlock() = 0;
 
-protected:
-    std::mutex mutex ; 
+ protected:
+  std::mutex mutex;
 };
-
-
-
-
-
-
-
-
-
-
 
 #endif

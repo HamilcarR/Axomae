@@ -1,108 +1,105 @@
 #ifndef LIGHTINGDATABASE_H
 #define LIGHTINGDATABASE_H
 
-#include "utils_3D.h"
 #include "LightingSystem.h"
-
-
+#include "utils_3D.h"
 
 /**
  * @file LightingDatabase.h
- * Database of lights used in the scene.  
- * 
+ * Database of lights used in the scene.
+ *
  */
-
-
 
 /**
  * @class LightingDatabase
  * @brief Class declaration of the light database system
  */
-class LightingDatabase{
-public:
-    /**
-     * @brief Construct a new Lighting Database object
-     * 
-     */
-    LightingDatabase(); 
-    
-    /**
-     * @brief Destroy the Lighting Database object
-     * 
-     */
-    virtual ~LightingDatabase(); 
+class LightingDatabase {
+ public:
+  /**
+   * @brief Construct a new Lighting Database object
+   *
+   */
+  LightingDatabase();
 
-    /**
-     * @brief Add a new light in the scene
-     * 
-     * @param light 
-     */
-    virtual bool addLight(AbstractLight* light); //Replace this by a light builder , and set Light constructors to private
+  /**
+   * @brief Destroy the Lighting Database object
+   *
+   */
+  virtual ~LightingDatabase();
 
-    /**
-     * @brief Remove specified light. 
-     * 
-     * @param light 
-     * @return false if not found 
-     */
-    virtual bool removeLight(AbstractLight* light); 
-    
-    /**
-     * @brief Remove light according to it's ID . 
-     * 
-     * @param id 
-     * @return true 
-     * @return false if not found 
-     */
-    virtual bool removeLight(const unsigned id);
-   
-    virtual bool updateLight(const unsigned id ,  const LightData& data);    
-    
-    /**
-     * @brief Get all lights of certain type
-     * 
-     * @param type Type of light we want
-     * @return const std::vector<AbstractLight*>& Collection of light pointers
-     */
-    const std::vector<AbstractLight*>& getLightsArrayByType(AbstractLight::TYPE type) ;
+  /**
+   * @brief Add a new light in the scene
+   *
+   * @param light
+   */
+  virtual bool addLight(
+      AbstractLight *light);  // Replace this by a light builder , and set Light constructors to private
 
-    /**
-     * @brief Deletes all pointers and the subsequent vector array of lights that matches the type
-     * 
-     * @param type Type to be deleted
-     */
-    void eraseLightsArray(AbstractLight::TYPE type); 
+  /**
+   * @brief Remove specified light.
+   *
+   * @param light
+   * @return false if not found
+   */
+  virtual bool removeLight(AbstractLight *light);
 
-    /**
-     * @brief Empty the whole database , and deletes all objects stored  
-     * 
-     */
-    void clearDatabase();
+  /**
+   * @brief Remove light according to it's ID .
+   *
+   * @param id
+   * @return true
+   * @return false if not found
+   */
+  virtual bool removeLight(const unsigned id);
 
-    /**
-     * @brief Update shader uniforms for all lights
-     * 
-     * @param shader Shader pointer to send data to 
-     * @param view  View matrix for light transformations
-     */
-    virtual void updateShadersData(Shader* shader , glm::mat4& view); 
-    /**
-     * @brief Update shader uniforms only for lights of "type" 
-     * 
-     * @param type Type of lights to send to the shader 
-     * @param shader Shader applied to the mesh 
-     * @param view View matrix for light transformations
-     */
-    virtual void updateShadersData(AbstractLight::TYPE type , Shader* shader , glm::mat4& view);
+  virtual bool updateLight(const unsigned id, const LightData &data);
 
-    AbstractLight* getLightFromID(const unsigned id) const ;
+  /**
+   * @brief Get all lights of certain type
+   *
+   * @param type Type of light we want
+   * @return const std::vector<AbstractLight*>& Collection of light pointers
+   */
+  const std::vector<AbstractLight *> &getLightsArrayByType(AbstractLight::TYPE type);
 
-protected:
-    void giveID(AbstractLight* light); 
-    std::map<AbstractLight::TYPE , std::vector<AbstractLight*>> light_database ;    /**<Map of all lights in the scene. The map key stored is the type of light*/
-    std::vector<unsigned int> free_id_list ;                                        /**<List of free IDs belonging to deleted lights*/ 
-    unsigned int last_id ; 
+  /**
+   * @brief Deletes all pointers and the subsequent vector array of lights that matches the type
+   *
+   * @param type Type to be deleted
+   */
+  void eraseLightsArray(AbstractLight::TYPE type);
 
+  /**
+   * @brief Empty the whole database , and deletes all objects stored
+   *
+   */
+  void clearDatabase();
+
+  /**
+   * @brief Update shader uniforms for all lights
+   *
+   * @param shader Shader pointer to send data to
+   * @param view  View matrix for light transformations
+   */
+  virtual void updateShadersData(Shader *shader, glm::mat4 &view);
+  /**
+   * @brief Update shader uniforms only for lights of "type"
+   *
+   * @param type Type of lights to send to the shader
+   * @param shader Shader applied to the mesh
+   * @param view View matrix for light transformations
+   */
+  virtual void updateShadersData(AbstractLight::TYPE type, Shader *shader, glm::mat4 &view);
+
+  AbstractLight *getLightFromID(const unsigned id) const;
+
+ protected:
+  void giveID(AbstractLight *light);
+  std::map<AbstractLight::TYPE, std::vector<AbstractLight *>>
+      light_database;                     /**<Map of all lights in the scene. The map key stored is the type of light*/
+  std::vector<unsigned int> free_id_list; /**<List of free IDs belonging to deleted lights*/
+  unsigned int last_id;
 };
 
 #endif

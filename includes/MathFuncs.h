@@ -3,9 +3,5 @@
 
 #include "constants.h"
 
-
-namespace axomae{
-
-
-}
+namespace axomae {}
 #endif

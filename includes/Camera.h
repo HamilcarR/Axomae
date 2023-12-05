@@ -43,7 +43,7 @@ class Camera : public SceneTreeNode {
    * @param pointer The "pointer" parameter is a pointer to a MouseState object, which is used to
    * track the state of the mouse (e.g. position, button clicks) for camera movement and control.
    */
-  Camera(float degrees, ScreenSize *screen, float clip_near, float clip_far, MouseState *pointer = nullptr);
+  Camera(float degrees, ScreenSize *screen, float clip_near, float clip_far, const MouseState *pointer = nullptr);
 
   /**
    * @brief Destroy the Camera object
@@ -200,22 +200,22 @@ class Camera : public SceneTreeNode {
   }
 
  protected:
-  TYPE type;                       /**<Camera type */
-  float near;                      /**<Near plane */
-  float far;                       /**<Far plane */
-  float fov;                       /**<FOV of the camera in degrees*/
-  glm::mat4 projection;            /**<Projection matrix */
-  glm::mat4 view;                  /**<View Matrix */
-  glm::mat4 view_projection;       /**<Projection x View product matrix */
-  glm::vec3 position;              /**<World space position of the camera */
-  glm::vec3 target;                /**<Target viewed by the camera */
-  glm::vec3 right;                 /**<Right vector computed */
-  glm::vec3 direction;             /**<Direction vector of the camera */
-  glm::vec3 camera_up;             /**<Up vector of the camera */
-  const glm::vec3 world_up;        /**<World space up vector */
-  MouseState *mouse_state_pointer; /**<Pointer on a MouseState structure keeping track of the mouse data*/
-  ScreenSize *ratio_dimensions;    /**<Pointer on a ScreenSize structure with fields giving informations about a width ,
-                                      and a height.*/
+  TYPE type;                             /**<Camera type */
+  float near;                            /**<Near plane */
+  float far;                             /**<Far plane */
+  float fov;                             /**<FOV of the camera in degrees*/
+  glm::mat4 projection;                  /**<Projection matrix */
+  glm::mat4 view;                        /**<View Matrix */
+  glm::mat4 view_projection;             /**<Projection x View product matrix */
+  glm::vec3 position;                    /**<World space position of the camera */
+  glm::vec3 target;                      /**<Target viewed by the camera */
+  glm::vec3 right;                       /**<Right vector computed */
+  glm::vec3 direction;                   /**<Direction vector of the camera */
+  glm::vec3 camera_up;                   /**<Up vector of the camera */
+  const glm::vec3 world_up;              /**<World space up vector */
+  const MouseState *mouse_state_pointer; /**<Pointer on a MouseState structure keeping track of the mouse data*/
+  ScreenSize *ratio_dimensions; /**<Pointer on a ScreenSize structure with fields giving informations about a width ,
+                                   and a height.*/
 };
 
 /**
@@ -242,7 +242,7 @@ class ArcballCamera : public Camera {
    * @param pointer Pointer to a MouseState object, contains information about the current state of the mouse (e.g.
    * position, button presses, etc.) .
    */
-  ArcballCamera(float degrees, ScreenSize *screen, float near, float far, float radius, MouseState *pointer);
+  ArcballCamera(float degrees, ScreenSize *screen, float near, float far, float radius, const MouseState *pointer);
   /**
    * @brief Destroy the Arcball Camera object
    *
@@ -350,7 +350,7 @@ class ArcballCamera : public Camera {
 class FreePerspectiveCamera : public Camera {
  public:
   FreePerspectiveCamera();
-  FreePerspectiveCamera(float degrees, ScreenSize *screen, float near, float far, MouseState *pointer = nullptr);
+  FreePerspectiveCamera(float degrees, ScreenSize *screen, float near, float far, const MouseState *pointer = nullptr);
   virtual ~FreePerspectiveCamera();
   virtual void onLeftClick() override;
   virtual void onRightClick() override;
