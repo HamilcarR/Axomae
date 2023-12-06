@@ -117,15 +117,23 @@ class FrameBufferInterface {
    * @param mipmaps Level of mipmaps for this texture
    * @return int Database ID of this texture
    */
-  virtual int setUpEmptyTexture(unsigned width,
-                                unsigned height,
-                                bool persistence,
-                                Texture::FORMAT internal_format,
-                                Texture::FORMAT data_format,
-                                Texture::FORMAT data_type,
-                                Texture::TYPE type,
-                                unsigned mipmaps = 0);
-
+  template<class TEXTYPE>
+  int setUpEmptyTexture(unsigned width,
+                        unsigned height,
+                        bool persistence,
+                        Texture::FORMAT internal_format,
+                        Texture::FORMAT data_format,
+                        Texture::FORMAT data_type,
+                        unsigned int mipmaps = 0) {
+    TextureData temp_empty_data_texture;
+    temp_empty_data_texture.width = width;
+    temp_empty_data_texture.height = height;
+    temp_empty_data_texture.internal_format = internal_format;
+    temp_empty_data_texture.data_format = data_format;
+    temp_empty_data_texture.data_type = data_type;
+    temp_empty_data_texture.mipmaps = mipmaps;
+    return texture_database->addTexture<TEXTYPE>(&temp_empty_data_texture, persistence);
+  }
   /**
    * @brief Calls setUpEmptyTexture() , with these args , and store the resulting texture to be rendered into in the
    * database
@@ -140,15 +148,21 @@ class FrameBufferInterface {
    * @param rendertype
    * @param mipmaps
    */
-  virtual void initializeFrameBufferTexture(GLFrameBuffer::INTERNAL_FORMAT color_attachment,
-                                            bool persistence,
-                                            Texture::FORMAT internal_format,
-                                            Texture::FORMAT data_format,
-                                            Texture::FORMAT data_type,
-                                            unsigned width,
-                                            unsigned height,
-                                            Texture::TYPE rendertype,
-                                            unsigned int mipmaps = 0);
+
+  template<class TEXTYPE>
+  void initializeFrameBufferTexture(GLFrameBuffer::INTERNAL_FORMAT color_attachment,
+                                    bool persistence,
+                                    Texture::FORMAT internal_format,
+                                    Texture::FORMAT data_format,
+                                    Texture::FORMAT data_type,
+                                    unsigned width,
+                                    unsigned height,
+                                    unsigned int mipmaps = 0) {
+
+    unsigned int texture_id = setUpEmptyTexture<TEXTYPE>(
+        width, height, persistence, internal_format, data_format, data_type, mipmaps);
+    fbo_attachment_texture_collection[color_attachment] = texture_database->get(texture_id);
+  }
 
  protected:
   GLFrameBuffer *gl_framebuffer_object;

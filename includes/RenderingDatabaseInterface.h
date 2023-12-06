@@ -60,7 +60,7 @@ class RenderingDatabaseInterface {
    * @param element Object to store
    * @param keep Keep the element between scene change
    */
-  virtual U add(T *element, bool keep) = 0;
+  // virtual U add(T *element, bool keep) = 0; //!replace with std::unique_ptr<T>
 
   /**
    * @brief Checks if database contains an object with specific ID .

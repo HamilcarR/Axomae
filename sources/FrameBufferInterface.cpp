@@ -1,23 +1,5 @@
 #include "../includes/FrameBufferInterface.h"
 
-int FrameBufferInterface::setUpEmptyTexture(unsigned width,
-                                            unsigned height,
-                                            bool persistence,
-                                            Texture::FORMAT internal_format,
-                                            Texture::FORMAT data_format,
-                                            Texture::FORMAT data_type,
-                                            Texture::TYPE type,
-                                            unsigned int mipmaps) {
-  TextureData temp_empty_data_texture;
-  temp_empty_data_texture.width = width;
-  temp_empty_data_texture.height = height;
-  temp_empty_data_texture.internal_format = internal_format;
-  temp_empty_data_texture.data_format = data_format;
-  temp_empty_data_texture.data_type = data_type;
-  temp_empty_data_texture.mipmaps = mipmaps;
-  return texture_database->addTexture(&temp_empty_data_texture, type, persistence);
-}
-
 FrameBufferInterface::FrameBufferInterface() {
   gl_framebuffer_object = nullptr;
   texture_dim = nullptr;
@@ -62,21 +44,6 @@ void FrameBufferInterface::unbindFrameBuffer() {
 void FrameBufferInterface::clean() {
   if (gl_framebuffer_object)
     gl_framebuffer_object->clean();
-}
-
-void FrameBufferInterface::initializeFrameBufferTexture(GLFrameBuffer::INTERNAL_FORMAT color_attachment,
-                                                        bool persistence,
-                                                        Texture::FORMAT internal_format,
-                                                        Texture::FORMAT data_format,
-                                                        Texture::FORMAT data_type,
-                                                        unsigned width,
-                                                        unsigned height,
-                                                        Texture::TYPE render_type,
-                                                        unsigned int mipmaps) {
-
-  unsigned int texture_id = setUpEmptyTexture(
-      width, height, persistence, internal_format, data_format, data_type, render_type, mipmaps);
-  fbo_attachment_texture_collection[color_attachment] = texture_database->get(texture_id);
 }
 
 void FrameBufferInterface::initializeFrameBuffer() {

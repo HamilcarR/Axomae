@@ -67,28 +67,19 @@ CubeMapMesh *RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_m
   FreePerspectiveCamera camera(90.f, &cam_dim, 0.1f, 2000.f);  // Generic camera
   std::pair<int, Texture *> query_envmap_result = texture_database->contains(hdri_map);
   int database_id_envmap = query_envmap_result.first;
-  if (query_envmap_result.second == nullptr)
-    database_id_envmap = texture_database->add(hdri_map, false);
   /* Generate a framebuffer that will render to a cubemap*/
-  RenderCubeMap cubemap_renderer_framebuffer = constructCubemapFbo(&tex_dim,
-                                                                   false,
-                                                                   GLFrameBuffer::COLOR0,
-                                                                   Texture::RGB32F,
-                                                                   Texture::RGB,
-                                                                   Texture::FLOAT,
-                                                                   Texture::CUBEMAP,
-                                                                   bake_shader);
+  RenderCubeMap cubemap_renderer_framebuffer = constructCubemapFbo<CubemapTexture>(
+      &tex_dim, false, GLFrameBuffer::COLOR0, Texture::RGB32F, Texture::RGB, Texture::FLOAT, bake_shader);
   Drawable cube_drawable = constructCube(bake_shader, database_id_envmap, Texture::ENVMAP2D, &camera);
   renderToCubemap(cube_drawable, cubemap_renderer_framebuffer, camera, tex_dim, default_dim);
   cube_drawable.clean();
   cubemap_renderer_framebuffer.clean();
   std::pair<int, Texture *> query_baked_cubemap_texture = texture_database->contains(
       cubemap_renderer_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
-  // query_baked_cubemap_texture.second->generateMipmap();
   /* Mesh to be returned */
   CubeMapMesh *cubemap = new CubeMapMesh();
   query_baked_cubemap_texture.second->generateMipmap();
-  cubemap->material.addTexture(query_baked_cubemap_texture.first, Texture::CUBEMAP);
+  cubemap->material.addTexture(query_baked_cubemap_texture.first);
   cubemap->setShader(shader_database->get(Shader::CUBEMAP));
   errorCheck(__FILE__, __LINE__);
   texture_database->remove(hdri_map);
@@ -122,14 +113,8 @@ int RenderPipeline::bakeIrradianceCubemap(int cube_envmap, unsigned width, unsig
   irrad_dim.height = height;
   default_dim.width = gl_widget->width();
   default_dim.height = gl_widget->height();
-  RenderCubeMap cubemap_irradiance_framebuffer = constructCubemapFbo(&irrad_dim,
-                                                                     false,
-                                                                     GLFrameBuffer::COLOR0,
-                                                                     Texture::RGB32F,
-                                                                     Texture::RGB,
-                                                                     Texture::FLOAT,
-                                                                     Texture::IRRADIANCE,
-                                                                     irradiance_shader);
+  RenderCubeMap cubemap_irradiance_framebuffer = constructCubemapFbo<IrradianceTexture>(
+      &irrad_dim, false, GLFrameBuffer::COLOR0, Texture::RGB32F, Texture::RGB, Texture::FLOAT, irradiance_shader);
   Drawable cube_drawable = constructCube(irradiance_shader, cube_envmap, Texture::CUBEMAP, &camera);
   renderToCubemap(cube_drawable, cubemap_irradiance_framebuffer, camera, irrad_dim, default_dim);
   cube_drawable.clean();
@@ -161,15 +146,14 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap,
   default_dim.width = gl_widget->width();
   default_dim.height = gl_widget->height();
   FreePerspectiveCamera camera(90.f, &cubemap_dim, 0.1f, 2000.f);
-  RenderCubeMap cubemap_prefilter_fbo = constructCubemapFbo(&resize_dim,
-                                                            false,
-                                                            GLFrameBuffer::COLOR0,
-                                                            Texture::RGB32F,
-                                                            Texture::RGB,
-                                                            Texture::FLOAT,
-                                                            Texture::CUBEMAP,
-                                                            prefilter_shader,
-                                                            max_mip_level);
+  RenderCubeMap cubemap_prefilter_fbo = constructCubemapFbo<CubemapTexture>(&resize_dim,
+                                                                            false,
+                                                                            GLFrameBuffer::COLOR0,
+                                                                            Texture::RGB32F,
+                                                                            Texture::RGB,
+                                                                            Texture::FLOAT,
+                                                                            prefilter_shader,
+                                                                            max_mip_level);
   Drawable cube_drawable = constructCube(prefilter_shader, cube_envmap, Texture::CUBEMAP, &camera);
   cubemap_prefilter_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0)->generateMipmap();
   cubemap_prefilter_fbo.bindFrameBuffer();
@@ -219,14 +203,8 @@ int RenderPipeline::generateBRDFLookupTexture(unsigned int width, unsigned int h
   BRDFLookupTableBakerShader *brdf_lut_shader = static_cast<BRDFLookupTableBakerShader *>(
       resource_database->getShaderDatabase().get(Shader::BRDF_LUT_BAKER));
   FreePerspectiveCamera camera(90.f, &camera_dim, 0.1f, 2000.f);
-  RenderQuadFBO quad_fbo = constructQuadFbo(&tex_dim,
-                                            false,
-                                            GLFrameBuffer::COLOR0,
-                                            Texture::RGB16F,
-                                            Texture::RG,
-                                            Texture::FLOAT,
-                                            Texture::BRDFLUT,
-                                            brdf_lut_shader);
+  RenderQuadFBO quad_fbo = constructQuadFbo<BRDFLookupTexture>(
+      &tex_dim, false, GLFrameBuffer::COLOR0, Texture::RGB16F, Texture::RG, Texture::FLOAT, brdf_lut_shader);
   Drawable quad_drawable = constructQuad(brdf_lut_shader, &camera);
   renderToQuad(quad_drawable, quad_fbo, camera, tex_dim, original_dim);
   quad_drawable.clean();
@@ -297,7 +275,7 @@ Drawable RenderPipeline::constructCube(Shader *shader, int database_texture_id, 
   assert(shader != nullptr);
   CubeMesh *cube = new CubeMesh();
   cube->setShader(shader);
-  cube->material.addTexture(database_texture_id, type);
+  cube->material.addTexture(database_texture_id);
   cube->setSceneCameraPointer(camera);
   return Drawable(cube);
 }
@@ -311,55 +289,50 @@ Drawable RenderPipeline::constructQuad(Shader *shader, Camera *camera) {
 }
 
 /********************************************************************************************************************************************************************************************************/
+template<class TEXTYPE>
 RenderCubeMap RenderPipeline::constructCubemapFbo(ScreenSize *dimensions,
                                                   bool persistence,
                                                   GLFrameBuffer::INTERNAL_FORMAT color_attachment,
                                                   Texture::FORMAT internal_format,
                                                   Texture::FORMAT data_format,
                                                   Texture::FORMAT data_type,
-                                                  Texture::TYPE type,
                                                   Shader *shader,
                                                   unsigned int mipmaps_level) {
+
   TextureDatabase *texture_database = &resource_database->getTextureDatabase();
   RenderCubeMap cubemap_fbo(texture_database, dimensions, renderer->getDefaultFrameBufferIdPointer());
-  cubemap_fbo.initializeFrameBufferTexture(color_attachment,
-                                           persistence,
-                                           internal_format,
-                                           data_format,
-                                           data_type,
-                                           dimensions->width,
-                                           dimensions->height,
-                                           type,
-                                           mipmaps_level);
+  cubemap_fbo.initializeFrameBufferTexture<TEXTYPE>(color_attachment,
+                                                    persistence,
+                                                    internal_format,
+                                                    data_format,
+                                                    data_type,
+                                                    dimensions->width,
+                                                    dimensions->height,
+                                                    mipmaps_level);
   if (!shader->isInitialized())
     shader->initializeShader();
   shader->bind();
-  cubemap_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0)->setGlData(shader);
+  auto fb_tpoint = cubemap_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0);
+  fb_tpoint->setGlData(shader);
   shader->release();
   cubemap_fbo.initializeFrameBuffer();
   errorCheck(__FILE__, __LINE__);
   return cubemap_fbo;
 }
 
+template<class TEXTYPE>
 RenderQuadFBO RenderPipeline::constructQuadFbo(ScreenSize *dimensions,
                                                bool persistence,
                                                GLFrameBuffer::INTERNAL_FORMAT color_attachment,
                                                Texture::FORMAT internal_format,
                                                Texture::FORMAT data_format,
                                                Texture::FORMAT data_type,
-                                               Texture::TYPE texture_type,
                                                Shader *shader) {
 
   TextureDatabase *texture_database = &resource_database->getTextureDatabase();
   RenderQuadFBO quad_fbo(texture_database, dimensions, renderer->getDefaultFrameBufferIdPointer());
-  quad_fbo.initializeFrameBufferTexture(color_attachment,
-                                        persistence,
-                                        internal_format,
-                                        data_format,
-                                        data_type,
-                                        dimensions->width,
-                                        dimensions->height,
-                                        texture_type);
+  quad_fbo.initializeFrameBufferTexture<TEXTYPE>(
+      color_attachment, persistence, internal_format, data_format, data_type, dimensions->width, dimensions->height);
   if (!shader->isInitialized())
     shader->initializeShader();
   shader->bind();

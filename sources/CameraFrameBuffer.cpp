@@ -30,14 +30,13 @@ void CameraFrameBuffer::updateFrameBufferShader() {
 }
 
 void CameraFrameBuffer::initializeFrameBuffer() {
-  initializeFrameBufferTexture(GLFrameBuffer::COLOR0,
-                               true,
-                               Texture::RGBA16F,
-                               Texture::BGRA,
-                               Texture::UBYTE,
-                               texture_dim->width,
-                               texture_dim->height,
-                               Texture::FRAMEBUFFER);
+  initializeFrameBufferTexture<FrameBufferTexture>(GLFrameBuffer::COLOR0,
+                                                   true,
+                                                   Texture::RGBA16F,
+                                                   Texture::BGRA,
+                                                   Texture::UBYTE,
+                                                   texture_dim->width,
+                                                   texture_dim->height);
   shader_framebuffer = static_cast<ScreenFrameBufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
   Texture *fbo_texture = fbo_attachment_texture_collection[GLFrameBuffer::COLOR0];
   auto database_texture_id = texture_database->contains(fbo_texture).first;

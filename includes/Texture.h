@@ -175,12 +175,16 @@ class Texture {
     return is_dummy;
   }
 
+  void setDummy(bool d) {
+    is_dummy = d;
+  }
+
   /**
    * @brief Checks if the texture has raw pixel data stored
    *
    */
-  virtual bool hasRawData() {
-    return data != nullptr;
+  virtual bool empty() {
+    return data.empty() && f_data.empty();
   }
 
   /**
@@ -233,10 +237,10 @@ class Texture {
   FORMAT internal_format; /**<Data layout format on the GPU*/
   FORMAT data_format;     /**<Raw texture data format*/
   FORMAT data_type;
-  unsigned int width;  /**<Width of the texture*/
-  unsigned int height; /**<Height of the texture*/
-  uint32_t *data;      /**<Raw data of the texture*/
-  float *f_data;
+  unsigned int width;         /**<Width of the texture*/
+  unsigned int height;        /**<Height of the texture*/
+  std::vector<uint32_t> data; /**<Raw data of the texture*/
+  std::vector<float> f_data;
   unsigned int sampler2D; /**<ID of the texture*/
   unsigned int mipmaps;   /**<Texture mipmaps level*/
   bool is_dummy;          /**<Check if the current texture is a dummy texture*/
@@ -1173,106 +1177,5 @@ class BRDFLookupTexture : public Texture {
 };
 
 /******************************************************************************************************************************************************************************************************************/
-
-/**
- * @class DummyDiffuseTexture
- * @brief Class implementing an empty diffuse texture
- */
-class DummyDiffuseTexture : public DiffuseTexture {
- public:
-  DummyDiffuseTexture();
-  virtual ~DummyDiffuseTexture();
-};
-
-/******************************************************************************************************************************************************************************************************************/
-
-/**
- * @class DummyNormalTexture
- * @brief Class implementing an empty normal texture
- *
- */
-class DummyNormalTexture : public NormalTexture {
- public:
-  DummyNormalTexture();
-  virtual ~DummyNormalTexture();
-};
-
-/******************************************************************************************************************************************************************************************************************/
-
-/**
- * @class DummyMetallicTexture
- * @brief Class implementing an empty Metallic texture
- *
- */
-class DummyMetallicTexture : public MetallicTexture {
- public:
-  DummyMetallicTexture();
-  virtual ~DummyMetallicTexture();
-};
-
-/******************************************************************************************************************************************************************************************************************/
-
-/**
- * @class DummyRoughnessTexture
- * @brief Class implementing an empty Roughness texture
- *
- */
-class DummyRoughnessTexture : public RoughnessTexture {
- public:
-  DummyRoughnessTexture();
-  virtual ~DummyRoughnessTexture();
-};
-
-/******************************************************************************************************************************************************************************************************************/
-
-/**
- * @class DummyAmbiantOcclusionTexture
- * @brief Class implementing an empty Ambiant Occlusion texture
- *
- */
-class DummyAmbiantOcclusionTexture : public AmbiantOcclusionTexture {
- public:
-  DummyAmbiantOcclusionTexture();
-  virtual ~DummyAmbiantOcclusionTexture();
-};
-
-/******************************************************************************************************************************************************************************************************************/
-
-/**
- * @class DummySpecularTexture
- * @brief Class implementing an empty Specular texture
- *
- */
-class DummySpecularTexture : public SpecularTexture {
- public:
-  DummySpecularTexture();
-  virtual ~DummySpecularTexture();
-};
-
-/******************************************************************************************************************************************************************************************************************/
-
-/**
- * @class DummyEmissiveTexture
- * @brief Class implementing an empty Emissive texture
- *
- */
-class DummyEmissiveTexture : public EmissiveTexture {
- public:
-  DummyEmissiveTexture();
-  virtual ~DummyEmissiveTexture();
-};
-
-/******************************************************************************************************************************************************************************************************************/
-
-/**
- * @class DummyOpacityTexture
- * @brief Class implementing an empty Opacity texture
- *
- */
-class DummyOpacityTexture : public OpacityTexture {
- public:
-  DummyOpacityTexture();
-  virtual ~DummyOpacityTexture();
-};
 
 #endif

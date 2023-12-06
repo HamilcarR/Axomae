@@ -40,7 +40,7 @@ class TextureGroup {
    * @param texture_database_index Database index of the texture
    * @param type Type of the texture
    */
-  virtual void addTexture(int texture_database_index, Texture::TYPE type);
+  virtual void addTexture(int texture_database_index);
 
   /**
    * @brief Initialize texture related GL functions and sets up corresponding uniforms

@@ -124,23 +124,22 @@ class RenderPipeline {
    * @param level Cubemap mipmap level
    * @return RenderCubeMap Constructed FBO
    */
+  template<class TEXTYPE>
   RenderCubeMap constructCubemapFbo(ScreenSize *dimensions,
                                     bool persistence,
                                     GLFrameBuffer::INTERNAL_FORMAT color_attachment,
                                     Texture::FORMAT internal_format,
                                     Texture::FORMAT data_format,
                                     Texture::FORMAT data_type,
-                                    Texture::TYPE texture_type,
                                     Shader *shader,
                                     unsigned level = 0);
-
+  template<class TEXTYPE>
   RenderQuadFBO constructQuadFbo(ScreenSize *dimensions,
                                  bool persistence,
                                  GLFrameBuffer::INTERNAL_FORMAT color_attachment,
                                  Texture::FORMAT internal_format,
                                  Texture::FORMAT data_format,
                                  Texture::FORMAT data_type,
-                                 Texture::TYPE texture_type,
                                  Shader *shader);
   /**
    * @brief

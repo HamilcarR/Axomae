@@ -29,13 +29,16 @@ static std::map<Texture::TYPE, const char *> texture_type_c_str = {{Texture::DIF
  * the width, height, and data of the TextureData struct pointed to by "dummy" to create a dummy
  * texture with a solid black color.
  */
-static void set_dummy_TextureData(TextureData *dummy) {
-  dummy->width = DUMMY_TEXTURE_DIM;
-  dummy->height = DUMMY_TEXTURE_DIM;
-  dummy->data.resize(dummy->width * dummy->height);
-  for (unsigned i = 0; i < dummy->width * dummy->height; i++) {
-    dummy->data[i] = DEFAULT_OPACITY_DUMMY_PIXEL_RGBA;
+static void set_dummy_TextureData(Texture *set_texture) {
+  TextureData dummy;
+  dummy.width = DUMMY_TEXTURE_DIM;
+  dummy.height = DUMMY_TEXTURE_DIM;
+  dummy.data.resize(dummy.width * dummy.height);
+  for (unsigned i = 0; i < dummy.width * dummy.height; i++) {
+    dummy.data[i] = DEFAULT_OPACITY_DUMMY_PIXEL_RGBA;
   }
+  set_texture->set(&dummy);
+  set_texture->setDummy(true);
 }
 
 /**
@@ -46,12 +49,15 @@ static void set_dummy_TextureData(TextureData *dummy) {
  * 255).
  */
 
-static void set_dummy_TextureData_normals(TextureData *dummy) {
-  dummy->width = DUMMY_TEXTURE_DIM;
-  dummy->height = DUMMY_TEXTURE_DIM;
-  dummy->data.resize(dummy->width * dummy->height);
+static void set_dummy_TextureData_normals(Texture *set_texture) {
+  TextureData dummy;
+  dummy.width = DUMMY_TEXTURE_DIM;
+  dummy.height = DUMMY_TEXTURE_DIM;
+  dummy.data.resize(dummy.width * dummy.height);
   for (unsigned i = 0; i < DUMMY_TEXTURE_DIM * DUMMY_TEXTURE_DIM; i++)
-    dummy->data[i] = DEFAULT_NORMAL_DUMMY_PIXEL_RGBA;
+    dummy.data[i] = DEFAULT_NORMAL_DUMMY_PIXEL_RGBA;
+  set_texture->set(&dummy);
+  set_texture->setDummy(true);
 }
 
 Texture::Texture() {
@@ -59,8 +65,6 @@ Texture::Texture() {
   is_dummy = false;
   width = 0;
   height = 0;
-  data = nullptr;
-  f_data = nullptr;
   sampler2D = 0;
   internal_format = RGBA;
   data_format = BGRA;
@@ -78,12 +82,12 @@ void Texture::set(TextureData *texture) {
   width = texture->width;
   height = texture->height;
   if (!texture->data.empty()) {
-    data = new uint32_t[width * height];
+    data.resize(width * height);
     for (unsigned int i = 0; i < width * height; i++)
       data[i] = texture->data[i];
   }
   if (!texture->f_data.empty()) {
-    f_data = new float[width * height * texture->nb_components];
+    f_data.resize(width * height * texture->nb_components);
     for (unsigned i = 0; i < width * height * texture->nb_components; i++)
       f_data[i] = texture->f_data[i];
   }
@@ -95,15 +99,6 @@ void Texture::set(TextureData *texture) {
 
 void Texture::clean() {
   cleanGlData();
-  if (data != nullptr)
-    delete data;
-  if (f_data)
-    delete f_data;
-  data = nullptr;
-  f_data = nullptr;
-  width = 0;
-  height = 0;
-  name = EMPTY;
 }
 
 void Texture::setTextureParametersOptions() {
@@ -116,7 +111,7 @@ void Texture::setTextureParametersOptions() {
 }
 
 void Texture::initializeTexture2D() {
-  glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, data);
+  glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, data.data());
   setTextureParametersOptions();
 }
 
@@ -149,17 +144,17 @@ DiffuseTexture::DiffuseTexture() {
 
 DiffuseTexture::~DiffuseTexture() {}
 
-DiffuseTexture::DiffuseTexture(TextureData *data) {
+DiffuseTexture::DiffuseTexture(TextureData *data) : Texture(data) {
   name = DIFFUSE;
-  if (data != nullptr)
-    set(data);
+  if (!data)
+    set_dummy_TextureData(this);
 }
 
 void DiffuseTexture::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
   glActiveTexture(GL_TEXTURE0 + DIFFUSE);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
-  if (data != nullptr)
+  if (!data.empty())
     Texture::initializeTexture2D();
   shader->setTextureUniforms(texture_type_c_str[name], name);
 }
@@ -178,14 +173,14 @@ void DiffuseTexture::set(TextureData *texture) {
   clean();
   width = texture->width;
   height = texture->height;
-  data = new uint32_t[width * height];
+  data.resize(width * height);
   data_format = static_cast<Texture::FORMAT>(texture->data_format);
   internal_format = static_cast<Texture::FORMAT>(texture->internal_format);
   data_type = static_cast<Texture::FORMAT>(texture->data_type);
   has_transparency = false;
   for (unsigned int i = 0; i < width * height; i++) {
     data[i] = texture->data[i];
-    if ((data[i] & 0xFF000000) != 0xFF000000)
+    if ((data[i] & 0xFF000000) != 0xFF000000)  // check for transparency
       has_transparency = true;
   }
 }
@@ -203,13 +198,15 @@ NormalTexture::~NormalTexture() {}
 
 NormalTexture::NormalTexture(TextureData *texture) : Texture(texture) {
   name = NORMAL;
+  if (data.empty())
+    set_dummy_TextureData_normals(this);
 }
 
 void NormalTexture::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
   glActiveTexture(GL_TEXTURE0 + NORMAL);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
-  if (data != nullptr)
+  if (!data.empty())
     Texture::initializeTexture2D();
   shader->setTextureUniforms(texture_type_c_str[name], name);
 }
@@ -237,13 +234,15 @@ MetallicTexture::~MetallicTexture() {}
 
 MetallicTexture::MetallicTexture(TextureData *data) : Texture(data) {
   name = METALLIC;
+  if (!data)
+    set_dummy_TextureData(this);
 }
 
 void MetallicTexture::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
   glActiveTexture(GL_TEXTURE0 + METALLIC);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
-  if (data != nullptr)
+  if (!data.empty())
     Texture::initializeTexture2D();
   shader->setTextureUniforms(texture_type_c_str[name], name);
 }
@@ -271,13 +270,15 @@ RoughnessTexture::~RoughnessTexture() {}
 
 RoughnessTexture::RoughnessTexture(TextureData *data) : Texture(data) {
   name = ROUGHNESS;
+  if (!data)
+    set_dummy_TextureData(this);
 }
 
 void RoughnessTexture::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
   glActiveTexture(GL_TEXTURE0 + ROUGHNESS);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
-  if (data != nullptr)
+  if (!data.empty())
     Texture::initializeTexture2D();
   shader->setTextureUniforms(texture_type_c_str[name], name);
 }
@@ -305,13 +306,15 @@ AmbiantOcclusionTexture::~AmbiantOcclusionTexture() {}
 
 AmbiantOcclusionTexture::AmbiantOcclusionTexture(TextureData *data) : Texture(data) {
   name = AMBIANTOCCLUSION;
+  if (!data)
+    set_dummy_TextureData(this);
 }
 
 void AmbiantOcclusionTexture::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
   glActiveTexture(GL_TEXTURE0 + AMBIANTOCCLUSION);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
-  if (data != nullptr)
+  if (!data.empty())
     Texture::initializeTexture2D();
   shader->setTextureUniforms(texture_type_c_str[name], name);
 }
@@ -339,13 +342,15 @@ SpecularTexture::~SpecularTexture() {}
 
 SpecularTexture::SpecularTexture(TextureData *data) : Texture(data) {
   name = SPECULAR;
+  if (!data)
+    set_dummy_TextureData(this);
 }
 
 void SpecularTexture::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
   glActiveTexture(GL_TEXTURE0 + SPECULAR);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
-  if (data != nullptr)
+  if (!data.empty())
     Texture::initializeTexture2D();
   shader->setTextureUniforms(texture_type_c_str[name], name);
 }
@@ -373,10 +378,12 @@ EmissiveTexture::~EmissiveTexture() {}
 
 EmissiveTexture::EmissiveTexture(TextureData *data) : Texture(data) {
   name = EMISSIVE;
+  if (!data)
+    set_dummy_TextureData(this);
 }
 
 void EmissiveTexture::initializeTexture2D() {
-  glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, data);
+  glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, data.data());
   glGenerateMipmap(GL_TEXTURE_2D);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -389,7 +396,7 @@ void EmissiveTexture::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
   glActiveTexture(GL_TEXTURE0 + EMISSIVE);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
-  if (data != nullptr)
+  if (!data.empty())
     initializeTexture2D();
   shader->setTextureUniforms(texture_type_c_str[name], name);
 }
@@ -417,13 +424,15 @@ OpacityTexture::~OpacityTexture() {}
 
 OpacityTexture::OpacityTexture(TextureData *data) : Texture(data) {
   name = OPACITY;
+  if (!data)
+    set_dummy_TextureData(this);
 }
 
 void OpacityTexture::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
   glActiveTexture(GL_TEXTURE0 + OPACITY);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
-  if (data != nullptr)
+  if (!data.empty())
     Texture::initializeTexture2D();
   shader->setTextureUniforms(texture_type_c_str[name], name);
 }
@@ -458,7 +467,7 @@ void GenericTexture2D::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
   glActiveTexture(GL_TEXTURE0 + texture_unit);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
-  if (data != nullptr)
+  if (!data.empty())
     Texture::initializeTexture2D();
   shader->setTextureUniforms(location_name, texture_unit);
 }
@@ -507,18 +516,16 @@ void CubemapTexture::setCubeMapTextureData(TextureData *texture) {
   internal_format = static_cast<Texture::FORMAT>(texture->internal_format);
   data_format = static_cast<Texture::FORMAT>(texture->data_format);
   data_type = static_cast<Texture::FORMAT>(texture->data_type);
-  f_data = nullptr;
-  data = nullptr;
   mipmaps = texture->mipmaps;
   /* In case the raw data is in RGB-RGBA with 8 bits/channel*/
   if (!texture->data.empty()) {
-    data = new uint32_t[width * height * 6];
+    data.resize(width * height * 6);
     for (unsigned int i = 0; i < width * height * 6; i++)
       data[i] = texture->data[i];
   }
   /* In case raw data is 4 bytes float / channel */
   if (!texture->f_data.empty()) {
-    f_data = new float[width * height * 6 * texture->nb_components];
+    f_data.resize(width * height * 6 * texture->nb_components);
     for (unsigned i = 0; i < width * height * 6 * texture->nb_components; i++)
       f_data[i] = texture->f_data[i];
   }
@@ -531,9 +538,9 @@ CubemapTexture::CubemapTexture(TextureData *data) : CubemapTexture() {
 }
 
 void CubemapTexture::initializeTexture2D() {
-  if (data)
+  if (!data.empty())
     for (unsigned int i = 1; i <= 6; i++) {
-      uint32_t *pointer_to_data = data + (i - 1) * width * height;
+      uint32_t *pointer_to_data = data.data() + (i - 1) * width * height;
       glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (i - 1),
                    0,
                    internal_format,
@@ -670,7 +677,7 @@ EnvironmentMap2DTexture::EnvironmentMap2DTexture(TextureData *data) : Texture(da
 EnvironmentMap2DTexture::~EnvironmentMap2DTexture() {}
 
 void EnvironmentMap2DTexture::initializeTexture2D() {
-  glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, f_data);
+  glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, f_data.data());
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -683,7 +690,7 @@ void EnvironmentMap2DTexture::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
   glActiveTexture(GL_TEXTURE0 + ENVMAP2D);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
-  if (f_data != nullptr)
+  if (!f_data.empty())
     EnvironmentMap2DTexture::initializeTexture2D();
   shader->setTextureUniforms(texture_type_c_str[name], name);
 }
@@ -720,7 +727,7 @@ FrameBufferTexture::FrameBufferTexture(TextureData *_data) : FrameBufferTexture(
     internal_format = static_cast<Texture::FORMAT>(_data->internal_format);
     data_format = static_cast<Texture::FORMAT>(_data->data_format);
     data_type = static_cast<Texture::FORMAT>(_data->data_type);
-    this->data = nullptr;
+    this->data.clear();
   }
 }
 
@@ -789,14 +796,14 @@ void BRDFLookupTexture::setGlData(Shader *shader) {
 }
 
 void BRDFLookupTexture::initializeTexture2D() {
-  if (!data) {
+  if (!data.empty()) {
     glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   } else {
-    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, f_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, f_data.data());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -807,98 +814,3 @@ void BRDFLookupTexture::initializeTexture2D() {
 const char *BRDFLookupTexture::getTextureTypeCStr() {
   return texture_type_c_str[BRDFLUT];
 }
-
-/****************************************************************************************************************************/
-DummyDiffuseTexture::DummyDiffuseTexture() {
-  name = DIFFUSE;
-  TextureData dummy;
-  set_dummy_TextureData(&dummy);
-  set(&dummy);
-  dummy.clean();
-  is_dummy = true;
-}
-
-DummyDiffuseTexture::~DummyDiffuseTexture() {}
-/****************************************************************************************************************************/
-DummyNormalTexture::DummyNormalTexture() {
-  name = NORMAL;
-  TextureData dummy;
-  set_dummy_TextureData_normals(&dummy);
-  set(&dummy);
-  dummy.clean();
-  is_dummy = true;
-}
-
-DummyNormalTexture::~DummyNormalTexture() {}
-
-/****************************************************************************************************************************/
-DummyMetallicTexture::DummyMetallicTexture() {
-  name = METALLIC;
-  TextureData dummy;
-  set_dummy_TextureData(&dummy);
-  set(&dummy);
-  dummy.clean();
-  is_dummy = true;
-}
-
-DummyMetallicTexture::~DummyMetallicTexture() {}
-
-/****************************************************************************************************************************/
-DummyRoughnessTexture::DummyRoughnessTexture() {
-  name = ROUGHNESS;
-  TextureData dummy;
-  set_dummy_TextureData(&dummy);
-  set(&dummy);
-  dummy.clean();
-  is_dummy = true;
-}
-
-DummyRoughnessTexture::~DummyRoughnessTexture() {}
-
-/****************************************************************************************************************************/
-DummySpecularTexture::DummySpecularTexture() {
-  name = SPECULAR;
-  TextureData dummy;
-  set_dummy_TextureData(&dummy);
-  set(&dummy);
-  dummy.clean();
-  is_dummy = true;
-}
-
-DummySpecularTexture::~DummySpecularTexture() {}
-
-/****************************************************************************************************************************/
-DummyAmbiantOcclusionTexture::DummyAmbiantOcclusionTexture() {
-  name = AMBIANTOCCLUSION;
-  TextureData dummy;
-  set_dummy_TextureData(&dummy);
-  set(&dummy);
-  dummy.clean();
-  is_dummy = true;
-}
-
-DummyAmbiantOcclusionTexture::~DummyAmbiantOcclusionTexture() {}
-
-/****************************************************************************************************************************/
-DummyEmissiveTexture::DummyEmissiveTexture() {
-  name = EMISSIVE;
-  TextureData dummy;
-  set_dummy_TextureData(&dummy);
-  set(&dummy);
-  dummy.clean();
-  is_dummy = true;
-}
-
-DummyEmissiveTexture::~DummyEmissiveTexture() {}
-
-/****************************************************************************************************************************/
-DummyOpacityTexture::DummyOpacityTexture() {
-  name = OPACITY;
-  TextureData dummy;
-  set_dummy_TextureData(&dummy);
-  set(&dummy);
-  dummy.clean();
-  is_dummy = true;
-}
-
-DummyOpacityTexture::~DummyOpacityTexture() {}

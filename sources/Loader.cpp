@@ -97,11 +97,11 @@ namespace axomae {
       }
     }
   }
-
-  static void loadTextureDummy(Material *material, Texture::TYPE type, TextureDatabase *texture_database) {
-    int index = texture_database->addTexture(nullptr, type, true, true);
+  template<class TEXTYPE>
+  static void loadTextureDummy(Material *material, TextureDatabase *texture_database) {
+    int index = texture_database->addTexture<TEXTYPE>(nullptr, true, true);
     LOG("Loading dummy texture at index : " + std::to_string(index), LogLevel::INFO);
-    material->addTexture(index, type);
+    material->addTexture(index);
   }
 
   /**
@@ -113,11 +113,11 @@ namespace axomae {
    * @param texture_string The name or index of the texture file to be loaded, stored as an aiString.
    * @param type The type of texture being loaded, which is of the enum type Texture::TYPE.
    */
+  template<class TEXTYPE>
   static void loadTexture(const aiScene *scene,
                           Material *material,
                           TextureData &texture,
                           aiString texture_string,
-                          Texture::TYPE type,
                           TextureDatabase *texture_database) {
     std::string texture_index_string = texture_string.C_Str();
     LOG("Texture type loaded : " + texture.name + " / GLB index is: " + texture_index_string, LogLevel::INFO);
@@ -126,11 +126,11 @@ namespace axomae {
       unsigned int texture_index_int = stoi(texture_index_string);
       if (!texture_database->contains(texture_index_int)) {
         copyTexels(&texture, scene->mTextures[texture_index_int]);
-        int index = texture_database->addTexture(&texture, type, false);
-        material->addTexture(index, type);
+        int index = texture_database->addTexture<TEXTYPE>(&texture, false);
+        material->addTexture(index);
         texture.clean();
       } else
-        material->addTexture(texture_index_int, type);
+        material->addTexture(texture_index_int);
     } else
       LOG("Loader can't load texture\n", LogLevel::WARNING);
   }
@@ -161,57 +161,54 @@ namespace axomae {
         specular_texture, occlusion_texture;  // we get indexes of embedded textures , since we will use GLB format
     if (material->GetTextureCount(aiTextureType_BASE_COLOR) > 0) {
       material->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE, &color_texture);
-      loadTexture(scene, &mesh_material, diffuse, color_texture, Texture::DIFFUSE, texture_database);
+      loadTexture<DiffuseTexture>(scene, &mesh_material, diffuse, color_texture, texture_database);
     } else
-      dummy_textures_type.push_back(Texture::DIFFUSE);
+      loadTextureDummy<DiffuseTexture>(&mesh_material, texture_database);
 
     if (material->GetTextureCount(aiTextureType_OPACITY) > 0) {
       mesh_material.setTransparency(true);
       material->GetTexture(aiTextureType_OPACITY, 0, &opacity_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture(scene, &mesh_material, opacity, opacity_texture, Texture::OPACITY, texture_database);
+      loadTexture<OpacityTexture>(scene, &mesh_material, opacity, opacity_texture, texture_database);
     } else
-      dummy_textures_type.push_back(Texture::OPACITY);
+      loadTextureDummy<OpacityTexture>(&mesh_material, texture_database);
 
     if (material->GetTextureCount(aiTextureType_METALNESS) > 0) {
       material->GetTexture(AI_MATKEY_METALLIC_TEXTURE, &metallic_texture);
-      loadTexture(scene, &mesh_material, metallic, metallic_texture, Texture::METALLIC, texture_database);
+      loadTexture<MetallicTexture>(scene, &mesh_material, metallic, metallic_texture, texture_database);
     } else
-      dummy_textures_type.push_back(Texture::METALLIC);
+      loadTextureDummy<MetallicTexture>(&mesh_material, texture_database);
 
     if (material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS) > 0) {
       material->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE, &roughness_texture);
-      loadTexture(scene, &mesh_material, roughness, roughness_texture, Texture::ROUGHNESS, texture_database);
+      loadTexture<RoughnessTexture>(scene, &mesh_material, roughness, roughness_texture, texture_database);
     } else
-      dummy_textures_type.push_back(Texture::ROUGHNESS);
+      loadTextureDummy<RoughnessTexture>(&mesh_material, texture_database);
 
     if (material->GetTextureCount(aiTextureType_NORMALS) > 0) {
       material->GetTexture(aiTextureType_NORMALS, 0, &normal_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture(scene, &mesh_material, normal, normal_texture, Texture::NORMAL, texture_database);
+      loadTexture<NormalTexture>(scene, &mesh_material, normal, normal_texture, texture_database);
     } else
-      dummy_textures_type.push_back(Texture::NORMAL);
+      loadTextureDummy<NormalTexture>(&mesh_material, texture_database);
 
     if (material->GetTextureCount(aiTextureType_LIGHTMAP) > 0) {
       material->GetTexture(aiTextureType_LIGHTMAP, 0, &occlusion_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture(
-          scene, &mesh_material, ambiantocclusion, occlusion_texture, Texture::AMBIANTOCCLUSION, texture_database);
+      loadTexture<AmbiantOcclusionTexture>(
+          scene, &mesh_material, ambiantocclusion, occlusion_texture, texture_database);
     } else
-      dummy_textures_type.push_back(Texture::AMBIANTOCCLUSION);
+      loadTextureDummy<AmbiantOcclusionTexture>(&mesh_material, texture_database);
 
     if (material->GetTextureCount(aiTextureType_SHEEN) > 0) {
       material->GetTexture(aiTextureType_SHEEN, 0, &specular_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture(scene, &mesh_material, specular, specular_texture, Texture::SPECULAR, texture_database);
+      loadTexture<SpecularTexture>(scene, &mesh_material, specular, specular_texture, texture_database);
     } else
-      dummy_textures_type.push_back(Texture::SPECULAR);
+      loadTextureDummy<SpecularTexture>(&mesh_material, texture_database);
 
     if (material->GetTextureCount(aiTextureType_EMISSIVE) > 0) {
       material->GetTexture(aiTextureType_EMISSIVE, 0, &emissive_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
       mesh_material.setEmissiveFactor(10.f);
-      loadTexture(scene, &mesh_material, emissive, emissive_texture, Texture::EMISSIVE, texture_database);
+      loadTexture<EmissiveTexture>(scene, &mesh_material, emissive, emissive_texture, texture_database);
     } else
-      dummy_textures_type.push_back(Texture::EMISSIVE);
-
-    for (auto it = dummy_textures_type.begin(); it != dummy_textures_type.end(); it++)
-      loadTextureDummy(&mesh_material, *it, texture_database);
+      loadTextureDummy<EmissiveTexture>(&mesh_material, texture_database);
 
     return mesh_material;
   }
@@ -623,8 +620,8 @@ namespace axomae {
       threads_future.push_back(
           std::async(thread_lambda_func, i, pointer_on_cubemap_data, cubemap.width, cubemap.height));
     std::for_each(threads_future.begin(), threads_future.end(), [](std::future<void> &it) { it.get(); });
-    unsigned index = texture_database->addTexture(&cubemap, Texture::CUBEMAP, false);
-    material.addTexture(index, Texture::CUBEMAP);
+    unsigned index = texture_database->addTexture<CubemapTexture>(&cubemap, false);
+    material.addTexture(index);
     cube_map->material = material;
     cube_map->setShader(shader_database->get(Shader::CUBEMAP));
     cubemap.clean();
@@ -660,7 +657,7 @@ namespace axomae {
     /* Furnace test */
     /*for(unsigned i = 0 ; i < width * height * channels ; i++)
       envmap.f_data[i] = 1.f ; */
-    int index = texture_database->addTexture(&envmap, Texture::ENVMAP2D);
+    int index = texture_database->addTexture<EnvironmentMap2DTexture>(&envmap);
     EnvironmentMap2DTexture *envmap_texture = dynamic_cast<EnvironmentMap2DTexture *>(texture_database->get(index));
     envmap.clean();
     if (envmap_texture)

@@ -46,6 +46,11 @@ class TextureDatabase : public RenderingDatabaseInterface<int, Texture> {
   /**
    * @brief Construct a texture of type "type" , and adds it to the database , as a reserved resource or a regular
    * resource.
+   * @note
+   * This method add textures to the database according to the "keep" criteria.
+   * The database map is sorted using two parts : the negative side from index -1 , going down , and the positive from
+   * index 0 going up. The negative side is reserved for special textures that don't get erased between scene
+   * changes(dummy textures , screen fbo texture). The positive side is freed between each scene change.
    * @param texture  Raw pixel data
    * @param type Type of the texture
    * @param keep_texture_after_clean In case a texture needs to stay between scene changes , this  value needs to be
@@ -53,10 +58,27 @@ class TextureDatabase : public RenderingDatabaseInterface<int, Texture> {
    * @param is_dummy Is the texture a dummy texture ?
    * @return int Index of the texture inside the database
    */
-  int addTexture(TextureData *texture,
-                 Texture::TYPE type,
-                 bool keep_texture_after_clean = false,
-                 bool is_dummy = false);
+  template<class TEXTYPE>
+  int addTexture(TextureData *texture, bool keep = false, bool is_dummy = false) {
+    int index = 0;
+    Mutex::Lock lock(mutex);
+    if (keep || is_dummy) {
+      index = -1;
+      while (texture_database[index] != nullptr) {
+        if (is_dummy && ISTYPE(TEXTYPE, decltype(*texture_database[index])))
+          return index;
+        index--;
+      }
+    } else
+      while (texture_database[index] != nullptr)
+        index++;
+
+    if (is_dummy)
+      texture = nullptr;
+    std::unique_ptr<TEXTYPE> tex = TextureBuilder::build<TEXTYPE>(texture);
+    texture_database[index] = std::move(tex);
+    return index;
+  }
 
   /**
    * @brief Get the texture at index
@@ -92,7 +114,7 @@ class TextureDatabase : public RenderingDatabaseInterface<int, Texture> {
    * @param keep True if texture is to be kept
    * @return int Database ID of the texture
    */
-  virtual int add(Texture *texture, bool keep) override;
+  virtual int add(std::unique_ptr<Texture> texture, bool keep);
 
   /**
    * @brief Checks if database contains this index
@@ -126,7 +148,7 @@ class TextureDatabase : public RenderingDatabaseInterface<int, Texture> {
   }
 
  private:
-  std::map<int, Texture *> texture_database; /**<Database of textures*/
+  std::map<int, std::unique_ptr<Texture>> texture_database; /**<Database of textures*/
 };
 
 #endif

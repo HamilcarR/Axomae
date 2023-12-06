@@ -51,10 +51,9 @@ class Material {
    * @brief Add a texture from the texture database to the material structure
    *
    * @param texture_database_index Index of the texture in the database map
-   * @param type Type of the texture to be added
    * @see Texture::TYPE
    */
-  virtual void addTexture(int texture_database_index, Texture::TYPE type);
+  void addTexture(int texture_database_index);
 
   /**
    * @brief Set the Emissive Factor object

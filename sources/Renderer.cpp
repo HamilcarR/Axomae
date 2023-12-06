@@ -105,10 +105,9 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh *>, SceneTree> &new_scen
   std::for_each(new_scene.first.begin(),
                 new_scene.first.end(),
                 [irradiance_tex_id, brdf_lut, prefiltered_cubemap, cube_envmap_id, cubemap_mesh, this](Mesh *m) {
-                  m->material.addTexture(irradiance_tex_id, Texture::IRRADIANCE);
-                  m->material.addTexture(prefiltered_cubemap, Texture::CUBEMAP);
-                  // m->material.addTexture(cube_envmap_id , Texture::CUBEMAP);
-                  m->material.addTexture(brdf_lut, Texture::BRDFLUT);
+                  m->material.addTexture(irradiance_tex_id);
+                  m->material.addTexture(prefiltered_cubemap);
+                  m->material.addTexture(brdf_lut);
                   m->setCubemapPointer(cubemap_mesh);
                 });
   assert(cubemap_mesh);

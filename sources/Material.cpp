@@ -35,8 +35,8 @@ void Material::setRefractiveIndexValue(float n1, float n2) {
     shader_program->setUniform(uniform_name_vec2_material_refractive_index, refractive_index);
 }
 
-void Material::addTexture(int index, Texture::TYPE type) {
-  textures_group.addTexture(index, type);
+void Material::addTexture(int index) {
+  textures_group.addTexture(index);
 }
 
 void Material::bind() {

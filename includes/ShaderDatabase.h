@@ -117,7 +117,7 @@ class ShaderDatabase : public RenderingDatabaseInterface<Shader::TYPE, Shader> {
    * @param keep Not used ... for now .
    * @return Shader::TYPE ID of the shader in database
    */
-  virtual Shader::TYPE add(Shader *shader, bool keep) override;
+  virtual Shader::TYPE add(Shader *shader, bool keep);
 
   /**
    * @brief Checks if the database contains this shader . returns a pair of it's ID and it's address
