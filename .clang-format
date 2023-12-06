@@ -1,0 +1,54 @@
+AlignAfterOpenBracket: "Align"
+AllowShortBlocksOnASingleLine: false
+
+BinPackArguments: false
+BinPackParameters: false
+
+ColumnLimit: 120
+
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+
+ConstructorInitializerIndentWidth: 4
+
+AccessModifierOffset: -1
+
+ContinuationIndentWidth: 4
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+    {
+        AfterClass: "false",
+        AfterControlStatement: "MultiLine",
+        AfterEnum: "false",
+        AfterFunction: "false",
+        AfterNamespace: "false",
+        AfterStruct: "false",
+        AfterUnion: "false",
+        BeforeCatch: "false",
+        BeforeElse: "false",
+        IndentBraces: "false",
+        AfterObjCDeclaration: "true",
+    }
+AlwaysBreakTemplateDeclarations: true
+
+IndentCaseLabels: true
+
+IndentPPDirectives: AfterHash
+NamespaceIndentation: All
+BreakBeforeTernaryOperators: false
+SpaceAfterTemplateKeyword: false
+FixNamespaceComments: true
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 2
+ReflowComments: true
+UseTab: Never
+TabWidth: 2
+IndentWidth: 2
+PenaltyReturnTypeOnItsOwnLine: 10000
+PenaltyBreakAssignment: 100
+AllowShortFunctionsOnASingleLine: Empty
+SortIncludes: true
+AlignEscapedNewlines: DontAlign
+AlwaysBreakBeforeMultilineStrings: true
+PenaltyBreakString: 1000000
