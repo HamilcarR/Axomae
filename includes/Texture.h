@@ -19,6 +19,10 @@ class Texture;
  *
  */
 class Texture {
+ protected:
+  Texture();
+  Texture(TextureData *tex);
+
  public:
   /**
    * @brief Internal format of textures
@@ -40,10 +44,6 @@ class Texture {
     FLOAT = GL_FLOAT          /**<4 byte float*/
   };
 
-  /**
-   * @brief
-   *
-   */
   enum TYPE : signed {
     GENERIC_CUBE = -3,    /**<Generic cubemap for general purpose */
     GENERIC = -2,         /**<Generic texture used for general purpose */
@@ -65,42 +65,12 @@ class Texture {
   };
 
   /**
-   * @brief Construct a new empty Texture object
-   *
-   */
-  Texture();
-
-  /**
-   * @brief Construct a new Texture object from texture data
-   *
-   * @param tex
-   */
-  Texture(TextureData *tex);
-
-  /**
-   * @brief Destroy the Texture object
-   *
-   */
-  virtual ~Texture();
-
-  /**
    * @brief Sets the raw data
    * @param texture A pointer to a TextureData object that contains information about the texture,
    * including its width, height, and pixel data.
    */
   virtual void set(TextureData *texture);
-
-  /**
-   * @brief Cleans the texture
-   *
-   */
   void clean();
-
-  /**
-   * @brief Get the Texture ID
-   *
-   * @return unsigned int
-   */
   unsigned int getSamplerID() {
     return sampler2D;
   }
@@ -115,36 +85,16 @@ class Texture {
     sampler2D = id;
   }
 
-  /**
-   * @brief Set the Texture Type object
-   *
-   * @param type Type of the texture
-   * @see Texture::TYPE
-   */
   void setTextureType(TYPE type) {
     name = type;
   }
 
-  /**
-   * @brief Get the Texture Type
-   *
-   * @return TYPE Type of the texture
-   * @see Texture::TYPE
-   */
   TYPE getTextureType() {
     return name;
   };
 
-  /**
-   * @brief Bind the texture using glBindTexture
-   *
-   */
   virtual void bindTexture() = 0;
 
-  /**
-   * @brief Unbind texture
-   *
-   */
   virtual void unbindTexture() = 0;
 
   /**
@@ -159,18 +109,8 @@ class Texture {
    */
   void cleanGlData();
 
-  /**
-   * @brief Set the New Size of the texture
-   *
-   * @param width
-   * @param height
-   */
   virtual void setNewSize(unsigned width, unsigned height);
 
-  /**
-   * @brief Checks if the texture is a dummy
-   * @return True if texture is dummy
-   */
   virtual bool isDummyTexture() {
     return is_dummy;
   }
@@ -187,28 +127,14 @@ class Texture {
     return data.empty() && f_data.empty();
   }
 
-  /**
-   * @brief Checks if the texture has been initialized
-   *
-   */
   virtual bool isInitialized() {
     return sampler2D != 0;
   }
 
-  /**
-   * @brief Set the number of mipmaps
-   *
-   * @param level
-   */
   virtual void setMipmapsLevel(unsigned level) {
     mipmaps = level;
   }
 
-  /**
-   * @brief Get the mip maps level number
-   *
-   * @return unsigned int
-   */
   virtual unsigned int getMipmapsLevel() {
     return mipmaps;
   }
@@ -226,10 +152,6 @@ class Texture {
    */
   virtual void initializeTexture2D();
 
-  /**
-   * @brief Set the Texture Parameters Options object
-   *
-   */
   virtual void setTextureParametersOptions();
 
  protected:
@@ -253,36 +175,12 @@ class Texture {
  *
  */
 class DiffuseTexture : public Texture {
- public:
-  /**
-   * @brief Construct a new Diffuse Texture object
-   *
-   */
+ protected:
   DiffuseTexture();
-
-  /**
-   * @brief Construct a new Diffuse Texture object from a TextureData object
-   *
-   * @param data Pointer on a TextureData object
-   */
   DiffuseTexture(TextureData *data);
 
-  /**
-   * @brief Destroy the Diffuse Texture object
-   *
-   */
-  virtual ~DiffuseTexture();
-
-  /**
-   * @brief Bind the texture using glBindTexture
-   *
-   */
+ public:
   virtual void bindTexture();
-
-  /**
-   * @brief Unbind texture
-   *
-   */
   virtual void unbindTexture();
 
   /**
@@ -324,27 +222,11 @@ class DiffuseTexture : public Texture {
  *
  */
 class NormalTexture : public Texture {
- public:
-  /**
-   * @brief Construct a new Normal Texture object
-   *
-   */
+ protected:
   NormalTexture();
-
-  /**
-   * @brief Construct a new Normal Texture object
-   *
-   * @param data Raw texture data
-   * @see TextureData
-   */
   NormalTexture(TextureData *data);
 
-  /**
-   * @brief Destroy the Normal Texture object
-   *
-   */
-  virtual ~NormalTexture();
-
+ public:
   /**
    * @brief Bind the texture using glBindTexture
    *
@@ -377,27 +259,11 @@ class NormalTexture : public Texture {
  *
  */
 class MetallicTexture : public Texture {
- public:
-  /**
-   * @brief Construct a new Metallic Texture object
-   *
-   */
+ protected:
   MetallicTexture();
-
-  /**
-   * @brief Construct a new Metallic Texture object
-   *
-   * @param data Raw texture data
-   * @see TextureData
-   */
   MetallicTexture(TextureData *data);
 
-  /**
-   * @brief Destroy the Metallic Texture object
-   *
-   */
-  virtual ~MetallicTexture();
-
+ public:
   /**
    * @brief Bind the texture using glBindTexture
    *
@@ -430,27 +296,11 @@ class MetallicTexture : public Texture {
  *
  */
 class RoughnessTexture : public Texture {
- public:
-  /**
-   * @brief Construct a new Roughness Texture object
-   *
-   */
+ protected:
   RoughnessTexture();
-
-  /**
-   * @brief Construct a new Roughness Texture object
-   *
-   * @param data Raw texture data
-   * @see TextureData
-   */
   RoughnessTexture(TextureData *data);
 
-  /**
-   * @brief Destroy the Roughness Texture object
-   *
-   */
-  virtual ~RoughnessTexture();
-
+ public:
   /**
    * @brief Bind the texture using glBindTexture
    *
@@ -483,27 +333,11 @@ class RoughnessTexture : public Texture {
  *
  */
 class AmbiantOcclusionTexture : public Texture {
- public:
-  /**
-   * @brief Construct a new Ambiant Occlusion Texture object
-   *
-   */
+ protected:
   AmbiantOcclusionTexture();
-
-  /**
-   * @brief Construct a new Ambiant Occlusion Texture object
-   *
-   * @param data Raw texture data
-   * @see TextureData
-   */
   AmbiantOcclusionTexture(TextureData *data);
 
-  /**
-   * @brief Destroy the Ambiant Occlusion Texture object
-   *
-   */
-  virtual ~AmbiantOcclusionTexture();
-
+ public:
   /**
    * @brief Bind the texture using glBindTexture
    *
@@ -536,27 +370,11 @@ class AmbiantOcclusionTexture : public Texture {
  *
  */
 class SpecularTexture : public Texture {
- public:
-  /**
-   * @brief Construct a new Specular Texture object
-   *
-   */
+ protected:
   SpecularTexture();
-
-  /**
-   * @brief Construct a new Specular Texture object
-   *
-   * @param data Raw texture data
-   * @see TextureData
-   */
   SpecularTexture(TextureData *data);
 
-  /**
-   * @brief Destroy the Specular Texture object
-   *
-   */
-  virtual ~SpecularTexture();
-
+ public:
   /**
    * @brief Bind the texture using glBindTexture
    *
@@ -589,33 +407,12 @@ class SpecularTexture : public Texture {
  *
  */
 class EmissiveTexture : public Texture {
- public:
-  /**
-   * @brief Construct a new Emissive Texture object
-   *
-   */
+ protected:
   EmissiveTexture();
-
-  /**
-   * @brief Construct a new Emissive Texture object
-   *
-   * @param data Raw texture data
-   * @see TextureData
-   */
   EmissiveTexture(TextureData *data);
 
-  /**
-   * @brief
-   *
-   */
+ public:
   void initializeTexture2D() override;
-
-  /**
-   * @brief Destroy the Emissive Texture object
-   *
-   */
-  virtual ~EmissiveTexture();
-
   /**
    * @brief Bind the texture using glBindTexture
    *
@@ -648,27 +445,11 @@ class EmissiveTexture : public Texture {
  *
  */
 class OpacityTexture : public Texture {
- public:
-  /**
-   * @brief Construct a new Opacity Texture object
-   *
-   */
+ protected:
   OpacityTexture();
-
-  /**
-   * @brief Construct a new Opacity Texture object
-   *
-   * @param data Raw texture data
-   * @see TextureData
-   */
   OpacityTexture(TextureData *data);
 
-  /**
-   * @brief Destroy the Opacity Texture object
-   *
-   */
-  virtual ~OpacityTexture();
-
+ public:
   /**
    * @brief Bind the texture using glBindTexture
    *
@@ -701,37 +482,12 @@ class OpacityTexture : public Texture {
  *
  */
 class GenericTexture2D : public Texture {
- public:
-  /**
-   * @brief Construct a new Generic Texture object
-   *
-   */
+ protected:
   GenericTexture2D();
-
-  /**
-   * @brief Construct a new Generic Texture object
-   *
-   * @param data Raw texture data
-   * @see TextureData
-   */
   GenericTexture2D(TextureData *data);
 
-  /**
-   * @brief Destroy the Generic Texture object
-   *
-   */
-  virtual ~GenericTexture2D();
-
-  /**
-   * @brief Bind the texture using glBindTexture
-   *
-   */
+ public:
   virtual void bindTexture();
-
-  /**
-   * @brief Unbind texture
-   *
-   */
   virtual void unbindTexture();
 
   /**
@@ -772,31 +528,16 @@ class GenericTexture2D : public Texture {
  *
  */
 class CubemapTexture : public Texture {
- public:
-  /**
-   * @brief Construct a new Cube Map Texture object
-   *
-   */
+ protected:
   CubemapTexture(FORMAT internal_format = RGBA,
                  FORMAT data_format = RGBA,
                  FORMAT data_type = UBYTE,
                  unsigned width = 0,
                  unsigned height = 0);
 
-  /**
-   * @brief Construct a new Cube Map Texture object
-   *
-   * @param data Texture raw data
-   * @see TextureData
-   */
   CubemapTexture(TextureData *data);
 
-  /**
-   * @brief Destroy the Cube Map Texture object
-   *
-   */
-  virtual ~CubemapTexture();
-
+ public:
   /*
    *
    * width * height is the size of one single face. The total size of the cubemap will be :
@@ -869,31 +610,16 @@ class CubemapTexture : public Texture {
 
 /******************************************************************************************************************************************************************************************************************/
 class GenericCubemapTexture : public CubemapTexture {
- public:
-  /**
-   * @brief Construct a new generic cube Map Texture object
-   *
-   */
+ protected:
   GenericCubemapTexture(FORMAT internal_format = RGBA,
                         FORMAT data_format = RGBA,
                         FORMAT data_type = UBYTE,
                         unsigned width = 0,
                         unsigned height = 0);
 
-  /**
-   * @brief Construct a new Cube Map Texture object
-   *
-   * @param data Texture raw data
-   * @see TextureData
-   */
   GenericCubemapTexture(TextureData *data);
 
-  /**
-   * @brief Destroy the Generic Cubemap Texture object
-   *
-   */
-  virtual ~GenericCubemapTexture();
-
+ public:
   /**
    * @brief Bind the texture using glBindTexture
    *
@@ -946,31 +672,16 @@ class GenericCubemapTexture : public CubemapTexture {
  *
  */
 class IrradianceTexture : public CubemapTexture {
- public:
-  /**
-   * @brief Construct an Irradiance cube map
-   *
-   */
+ protected:
   IrradianceTexture(FORMAT internal_format = RGB16F,
                     FORMAT data_format = RGB,
                     FORMAT data_type = FLOAT,
                     unsigned width = 0,
                     unsigned height = 0);
 
-  /**
-   * @brief Construct a new Cube Map Texture object
-   *
-   * @param data Texture raw data
-   * @see TextureData
-   */
   IrradianceTexture(TextureData *data);
 
-  /**
-   * @brief Destroy the Cube Map Texture object
-   *
-   */
-  virtual ~IrradianceTexture();
-
+ public:
   /**
    * @brief Get the texture's alias
    *
@@ -985,11 +696,7 @@ class IrradianceTexture : public CubemapTexture {
  *
  */
 class EnvironmentMap2DTexture : public Texture {
- public:
-  /**
-   * @brief Construct a new Cube Map Texture object
-   *
-   */
+ protected:
   EnvironmentMap2DTexture(FORMAT internal_format = RGB32F,
                           FORMAT data_format = RGB,
                           FORMAT data_type = FLOAT,
@@ -1004,16 +711,7 @@ class EnvironmentMap2DTexture : public Texture {
    */
   EnvironmentMap2DTexture(TextureData *data);
 
-  /**
-   * @brief Destroy the envmap texture
-   *
-   */
-  virtual ~EnvironmentMap2DTexture();
-
-  /**
-   * @brief
-   *
-   */
+ public:
   virtual void initializeTexture2D() override;
 
   /**
@@ -1048,13 +746,8 @@ class EnvironmentMap2DTexture : public Texture {
  *
  */
 class FrameBufferTexture : public Texture {
- public:
-  /**
-   * @brief Construct a new Frame Buffer Texure object
-   *
-   */
+ protected:
   FrameBufferTexture();
-
   /**
    * @brief Construct a new Frame Buffer Texture
    * Contains only width , and height... The rest of the TextureData parameter is not used,
@@ -1071,12 +764,7 @@ class FrameBufferTexture : public Texture {
    */
   FrameBufferTexture(unsigned width, unsigned height);
 
-  /**
-   * @brief Destroy the Frame Buffer Texure object
-   *
-   */
-  virtual ~FrameBufferTexture();
-
+ public:
   /**
    * @brief
    *
@@ -1121,26 +809,11 @@ class FrameBufferTexture : public Texture {
  * @class BRDFLookupTexture
  */
 class BRDFLookupTexture : public Texture {
- public:
-  /**
-   * @brief Construct a new BRDFLookupTexture object
-   *
-   */
+ protected:
   BRDFLookupTexture();
-
-  /**
-   * @brief Construct a new BRDFLookupTexture object
-   *
-   * @param data
-   */
   BRDFLookupTexture(TextureData *data);
 
-  /**
-   * @brief Destroy the BRDFLookupTexture object
-   *
-   */
-  virtual ~BRDFLookupTexture();
-
+ public:
   /**
    * @brief Binds the texture
    *

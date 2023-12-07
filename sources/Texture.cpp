@@ -75,8 +75,6 @@ Texture::Texture(TextureData *tex) : Texture() {
     set(tex);
 }
 
-Texture::~Texture() {}
-
 void Texture::set(TextureData *texture) {
   clean();
   width = texture->width;
@@ -142,8 +140,6 @@ DiffuseTexture::DiffuseTexture() {
   name = DIFFUSE;
 }
 
-DiffuseTexture::~DiffuseTexture() {}
-
 DiffuseTexture::DiffuseTexture(TextureData *data) : Texture(data) {
   name = DIFFUSE;
   if (!data)
@@ -194,8 +190,6 @@ NormalTexture::NormalTexture() {
   name = NORMAL;
 }
 
-NormalTexture::~NormalTexture() {}
-
 NormalTexture::NormalTexture(TextureData *texture) : Texture(texture) {
   name = NORMAL;
   if (data.empty())
@@ -229,8 +223,6 @@ const char *NormalTexture::getTextureTypeCStr() {
 MetallicTexture::MetallicTexture() {
   name = METALLIC;
 }
-
-MetallicTexture::~MetallicTexture() {}
 
 MetallicTexture::MetallicTexture(TextureData *data) : Texture(data) {
   name = METALLIC;
@@ -266,8 +258,6 @@ RoughnessTexture::RoughnessTexture() {
   name = ROUGHNESS;
 }
 
-RoughnessTexture::~RoughnessTexture() {}
-
 RoughnessTexture::RoughnessTexture(TextureData *data) : Texture(data) {
   name = ROUGHNESS;
   if (!data)
@@ -301,8 +291,6 @@ const char *RoughnessTexture::getTextureTypeCStr() {
 AmbiantOcclusionTexture::AmbiantOcclusionTexture() {
   name = AMBIANTOCCLUSION;
 }
-
-AmbiantOcclusionTexture::~AmbiantOcclusionTexture() {}
 
 AmbiantOcclusionTexture::AmbiantOcclusionTexture(TextureData *data) : Texture(data) {
   name = AMBIANTOCCLUSION;
@@ -338,8 +326,6 @@ SpecularTexture::SpecularTexture() {
   name = SPECULAR;
 }
 
-SpecularTexture::~SpecularTexture() {}
-
 SpecularTexture::SpecularTexture(TextureData *data) : Texture(data) {
   name = SPECULAR;
   if (!data)
@@ -373,8 +359,6 @@ const char *SpecularTexture::getTextureTypeCStr() {
 EmissiveTexture::EmissiveTexture() {
   name = EMISSIVE;
 }
-
-EmissiveTexture::~EmissiveTexture() {}
 
 EmissiveTexture::EmissiveTexture(TextureData *data) : Texture(data) {
   name = EMISSIVE;
@@ -420,8 +404,6 @@ OpacityTexture::OpacityTexture() {
   name = OPACITY;
 }
 
-OpacityTexture::~OpacityTexture() {}
-
 OpacityTexture::OpacityTexture(TextureData *data) : Texture(data) {
   name = OPACITY;
   if (!data)
@@ -456,8 +438,6 @@ const char *OpacityTexture::getTextureTypeCStr() {
 GenericTexture2D::GenericTexture2D() {
   name = GENERIC;
 }
-
-GenericTexture2D::~GenericTexture2D() {}
 
 GenericTexture2D::GenericTexture2D(TextureData *data) : Texture(data) {
   name = GENERIC;
@@ -506,8 +486,6 @@ CubemapTexture::CubemapTexture(
   height = _height;
   mipmaps = 0;
 }
-
-CubemapTexture::~CubemapTexture() {}
 
 void CubemapTexture::setCubeMapTextureData(TextureData *texture) {
   clean();
@@ -611,8 +589,6 @@ GenericCubemapTexture::GenericCubemapTexture(TextureData *data) : CubemapTexture
   name = GENERIC_CUBE;
 }
 
-GenericCubemapTexture::~GenericCubemapTexture() {}
-
 void GenericCubemapTexture::bindTexture() {
   glActiveTexture(GL_TEXTURE0 + texture_unit);
   glBindTexture(GL_TEXTURE_CUBE_MAP, sampler2D);
@@ -641,8 +617,6 @@ IrradianceTexture::IrradianceTexture(
     : CubemapTexture(_internal_format, _data_format, _data_type, _width, _height) {
   name = IRRADIANCE;
 }
-
-IrradianceTexture::~IrradianceTexture() {}
 
 IrradianceTexture::IrradianceTexture(TextureData *data) : IrradianceTexture() {
   name = IRRADIANCE;
@@ -673,8 +647,6 @@ EnvironmentMap2DTexture::EnvironmentMap2DTexture(
 EnvironmentMap2DTexture::EnvironmentMap2DTexture(TextureData *data) : Texture(data) {
   name = ENVMAP2D;
 }
-
-EnvironmentMap2DTexture::~EnvironmentMap2DTexture() {}
 
 void EnvironmentMap2DTexture::initializeTexture2D() {
   glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, f_data.data());
@@ -717,8 +689,6 @@ FrameBufferTexture::FrameBufferTexture() : Texture() {
   data_format = BGRA;
   data_type = UBYTE;
 }
-
-FrameBufferTexture::~FrameBufferTexture() {}
 
 FrameBufferTexture::FrameBufferTexture(TextureData *_data) : FrameBufferTexture() {
   if (_data != nullptr) {
@@ -775,8 +745,6 @@ BRDFLookupTexture::BRDFLookupTexture() : Texture() {
 BRDFLookupTexture::BRDFLookupTexture(TextureData *data) : Texture(data) {
   name = BRDFLUT;
 }
-
-BRDFLookupTexture::~BRDFLookupTexture() {}
 
 void BRDFLookupTexture::bindTexture() {
   glActiveTexture(GL_TEXTURE0 + name);
