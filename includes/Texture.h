@@ -14,6 +14,7 @@
 /******************************************************************************************************************************************************************************************************************/
 class Shader;
 class Texture;
+
 /**
  * @brief Texture class
  *
@@ -71,6 +72,7 @@ class Texture {
    */
   virtual void set(TextureData *texture);
   void clean();
+
   unsigned int getSamplerID() {
     return sampler2D;
   }
@@ -94,19 +96,8 @@ class Texture {
   };
 
   virtual void bindTexture() = 0;
-
   virtual void unbindTexture() = 0;
-
-  /**
-   * @brief Set the OpenGL texture data infos
-   *
-   */
   virtual void setGlData(Shader *shader) = 0;
-
-  /**
-   * @brief Release Opengl data
-   *
-   */
   void cleanGlData();
 
   virtual void setNewSize(unsigned width, unsigned height);
@@ -151,7 +142,6 @@ class Texture {
    *
    */
   virtual void initializeTexture2D();
-
   virtual void setTextureParametersOptions();
 
  protected:
@@ -182,13 +172,11 @@ class DiffuseTexture : public Texture {
  public:
   virtual void bindTexture();
   virtual void unbindTexture();
-
   /**
    * @brief Set the OpenGL texture data infos
    *
    */
   virtual void setGlData(Shader *shader);
-
   /**
    * @brief This overriden method will additionally check for the presence of transparency in the map.
    * If alpha < 1.f , the texture is considered as having transparency values.
@@ -197,10 +185,6 @@ class DiffuseTexture : public Texture {
    */
   virtual void set(TextureData *texture) override;
 
-  /**
-   * @brief Returns true if the texture contains alpha value < 1
-   *
-   */
   virtual bool hasTransparency() {
     return has_transparency;
   }
@@ -227,29 +211,9 @@ class NormalTexture : public Texture {
   NormalTexture(TextureData *data);
 
  public:
-  /**
-   * @brief Bind the texture using glBindTexture
-   *
-   */
   virtual void bindTexture();
-
-  /**
-   * @brief Unbind texture
-   *
-   */
   virtual void unbindTexture();
-
-  /**
-   * @brief Set the OpenGL texture data infos
-   *
-   */
   virtual void setGlData(Shader *shader);
-
-  /**
-   * @brief Get the texture string description
-   *
-   * @return C string
-   */
   static const char *getTextureTypeCStr();
 };
 
@@ -264,29 +228,9 @@ class MetallicTexture : public Texture {
   MetallicTexture(TextureData *data);
 
  public:
-  /**
-   * @brief Bind the texture using glBindTexture
-   *
-   */
   virtual void bindTexture();
-
-  /**
-   * @brief Unbind texture
-   *
-   */
   virtual void unbindTexture();
-
-  /**
-   * @brief Set the OpenGL texture data infos
-   *
-   */
   virtual void setGlData(Shader *shader);
-
-  /**
-   * @brief Get the texture string description
-   *
-   * @return C string
-   */
   static const char *getTextureTypeCStr();
 };
 
@@ -301,29 +245,9 @@ class RoughnessTexture : public Texture {
   RoughnessTexture(TextureData *data);
 
  public:
-  /**
-   * @brief Bind the texture using glBindTexture
-   *
-   */
   virtual void bindTexture();
-
-  /**
-   * @brief Unbind texture
-   *
-   */
   virtual void unbindTexture();
-
-  /**
-   * @brief Set the OpenGL texture data infos
-   *
-   */
   virtual void setGlData(Shader *shader);
-
-  /**
-   * @brief Get the texture string description
-   *
-   * @return C string
-   */
   static const char *getTextureTypeCStr();
 };
 
@@ -338,29 +262,9 @@ class AmbiantOcclusionTexture : public Texture {
   AmbiantOcclusionTexture(TextureData *data);
 
  public:
-  /**
-   * @brief Bind the texture using glBindTexture
-   *
-   */
   virtual void bindTexture();
-
-  /**
-   * @brief Unbind texture
-   *
-   */
   virtual void unbindTexture();
-
-  /**
-   * @brief Set the OpenGL texture data infos
-   *
-   */
   virtual void setGlData(Shader *shader);
-
-  /**
-   * @brief Get the texture string description
-   *
-   * @return C string
-   */
   static const char *getTextureTypeCStr();
 };
 
@@ -375,29 +279,9 @@ class SpecularTexture : public Texture {
   SpecularTexture(TextureData *data);
 
  public:
-  /**
-   * @brief Bind the texture using glBindTexture
-   *
-   */
   virtual void bindTexture();
-
-  /**
-   * @brief Unbind texture
-   *
-   */
   virtual void unbindTexture();
-
-  /**
-   * @brief Set the OpenGL texture data infos
-   *
-   */
   virtual void setGlData(Shader *shader);
-
-  /**
-   * @brief Get the texture string description
-   *
-   * @return C string
-   */
   static const char *getTextureTypeCStr();
 };
 
@@ -413,29 +297,9 @@ class EmissiveTexture : public Texture {
 
  public:
   void initializeTexture2D() override;
-  /**
-   * @brief Bind the texture using glBindTexture
-   *
-   */
   virtual void bindTexture();
-
-  /**
-   * @brief Unbind texture
-   *
-   */
   virtual void unbindTexture();
-
-  /**
-   * @brief Set the OpenGL texture data infos
-   *
-   */
   virtual void setGlData(Shader *shader);
-
-  /**
-   * @brief Get the texture string description
-   *
-   * @return C string
-   */
   static const char *getTextureTypeCStr();
 };
 
@@ -450,29 +314,9 @@ class OpacityTexture : public Texture {
   OpacityTexture(TextureData *data);
 
  public:
-  /**
-   * @brief Bind the texture using glBindTexture
-   *
-   */
   virtual void bindTexture();
-
-  /**
-   * @brief Unbind texture
-   *
-   */
   virtual void unbindTexture();
-
-  /**
-   * @brief Set the OpenGL texture data infos
-   *
-   */
   virtual void setGlData(Shader *shader);
-
-  /**
-   * @brief Get the texture string description
-   *
-   * @return C string
-   */
   static const char *getTextureTypeCStr();
 };
 
@@ -489,32 +333,9 @@ class GenericTexture2D : public Texture {
  public:
   virtual void bindTexture();
   virtual void unbindTexture();
-
-  /**
-   * @brief Set the OpenGL texture data infos
-   *
-   */
   virtual void setGlData(Shader *shader);
-
-  /**
-   * @brief Set the Texture Unit
-   *
-   * @param texture_unit
-   */
   virtual void setTextureUnit(unsigned int texture_unit);
-
-  /**
-   * @brief Set the Location Name object
-   *
-   * @param name
-   */
   virtual void setLocationName(std::string name);
-
-  /**
-   * @brief Get the texture string description
-   *
-   * @return C string
-   */
   const char *getTextureTypeCStr();
 
  protected:
@@ -554,57 +375,16 @@ class CubemapTexture : public Texture {
    * 	  6 x width² = FRONT => GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
    *!Note : If TextureData == nullptr , this will instead allocate an empty cubemap .
    */
-  /**
-   * @brief Initializes the cubemap texture data
-   *
-   */
+
   virtual void initializeTexture2D() override;
-
-  /**
-   * @brief Bind the texture using glBindTexture
-   *
-   */
   virtual void bindTexture();
-
-  /**
-   * @brief Unbind texture
-   *
-   */
   virtual void unbindTexture();
-
-  /**
-   * @brief Set the New Size object
-   *
-   * @param _width
-   * @param _height
-   */
   virtual void setNewSize(unsigned _width, unsigned _height) override;
-
-  /**
-   * @brief Set the OpenGL texture data infos
-   *
-   */
   virtual void setGlData(Shader *shader);
-
-  /**
-   * @brief Generate mipmaps for the cubemap
-   *
-   */
   virtual void generateMipmap() override;
-
-  /**
-   * @brief Get the texture string description
-   *
-   * @return C string
-   */
   static const char *getTextureTypeCStr();
 
  protected:
-  /**
-   * @brief Initialize the cubemap texture data
-   *
-   * @param texture
-   */
   virtual void setCubeMapTextureData(TextureData *texture);
 };
 
@@ -620,29 +400,9 @@ class GenericCubemapTexture : public CubemapTexture {
   GenericCubemapTexture(TextureData *data);
 
  public:
-  /**
-   * @brief Bind the texture using glBindTexture
-   *
-   */
   virtual void bindTexture();
-
-  /**
-   * @brief Unbind texture
-   *
-   */
   virtual void unbindTexture();
-
-  /**
-   * @brief Set the OpenGL texture data infos
-   *
-   */
   virtual void setGlData(Shader *shader);
-
-  /**
-   * @brief Get the texture string description
-   *
-   * @return C string
-   */
   const char *getTextureTypeCStr();
 
   void setTextureUnit(unsigned int tex_unit) {
@@ -682,11 +442,6 @@ class IrradianceTexture : public CubemapTexture {
   IrradianceTexture(TextureData *data);
 
  public:
-  /**
-   * @brief Get the texture's alias
-   *
-   * @return const char*
-   */
   const char *getTextureTypeCStr();
 };
 
@@ -703,42 +458,16 @@ class EnvironmentMap2DTexture : public Texture {
                           unsigned width = 0,
                           unsigned height = 0);
 
-  /**
-   * @brief Construct a new environment map Texture object
-   *
-   * @param data Texture raw data
-   * @see TextureData
-   */
   EnvironmentMap2DTexture(TextureData *data);
 
  public:
   virtual void initializeTexture2D() override;
-
-  /**
-   * @brief Bind the texture using glBindTexture
-   *
-   */
   virtual void bindTexture();
-
-  /**
-   * @brief Unbind texture
-   *
-   */
   virtual void unbindTexture();
-
-  /**
-   * @brief Set the OpenGL texture data infos
-   *
-   */
   virtual void setGlData(Shader *shader);
-
-  /**
-   * @brief Get the texture string description
-   *
-   * @return C string
-   */
   static const char *getTextureTypeCStr();
 };
+
 /******************************************************************************************************************************************************************************************************************/
 /**
  * @class FrameBufferTexture
@@ -755,46 +484,13 @@ class FrameBufferTexture : public Texture {
    *
    */
   FrameBufferTexture(TextureData *data);
-
-  /**
-   * @brief Construct a new Frame Buffer Texture
-   *
-   * @param width Width of the texture
-   * @param height Height of the texture
-   */
   FrameBufferTexture(unsigned width, unsigned height);
 
  public:
-  /**
-   * @brief
-   *
-   */
   virtual void bindTexture();
-
-  /**
-   * @brief
-   *
-   */
   virtual void unbindTexture();
-
-  /**
-   * @brief Set the Gl Data object
-   *
-   */
   virtual void setGlData(Shader *shader);
-
-  /**
-   * @brief
-   *
-   * @return * void
-   */
   virtual void initializeTexture2D() override;
-
-  /**
-   * @brief Get the Texture string name
-   *
-   * @return const char*
-   */
   static const char *getTextureTypeCStr();
 
  protected:
@@ -803,10 +499,11 @@ class FrameBufferTexture : public Texture {
 /******************************************************************************************************************************************************************************************************************/
 
 /**
- * @brief Pre baked texture storing the amount of specular reflection for a given triplets of (I , V , R) , where I is
+ * @class BRDFLookupTexture
+ * @brief PBR BRDF texture .
+ * @note Pre baked texture storing the amount of specular reflection for a given triplets of (I , V , R) , where I is
  * the incident light , V is the view direction , and R a roughness value . IE , for (X , Y) being the texture
  * coordinates , Y is a roughness scale , X <==> (I dot V) is the angle betweend the incident light and view direction.
- * @class BRDFLookupTexture
  */
 class BRDFLookupTexture : public Texture {
  protected:
@@ -814,36 +511,10 @@ class BRDFLookupTexture : public Texture {
   BRDFLookupTexture(TextureData *data);
 
  public:
-  /**
-   * @brief Binds the texture
-   *
-   */
   virtual void bindTexture();
-
-  /**
-   * @brief Unbinds the texture
-   *
-   */
   virtual void unbindTexture();
-
-  /**
-   * @brief Initializes the texture and gives it it's ID
-   *
-   * @param shader
-   */
   virtual void setGlData(Shader *shader);
-
-  /**
-   * @brief Initializes the filters of the texture
-   *
-   */
   virtual void initializeTexture2D() override;
-
-  /**
-   * @brief Get the Texture Type C Str object
-   *
-   * @return const char*
-   */
   static const char *getTextureTypeCStr();
 
  protected:
