@@ -2,6 +2,7 @@
 #define SHADERDATABASE_H
 #include "RenderingDatabaseInterface.h"
 #include "Shader.h"
+#include "ShaderFactory.h"
 #include "utils_3D.h"
 #include <map>
 
@@ -47,13 +48,19 @@ class ShaderDatabase : public RenderingDatabaseInterface<Shader::TYPE, Shader> {
    *
    * @param vertex_code A string containing the source code for the vertex shader.
    * @param fragment_code A string containing the source code for the fragment shader.
-   * @param type The type of shader being added to the shader database.
    *
    * @return Shader* Pointer to the constructed shader , or the existing one
    *
-   * @see Shader::TYPE
    */
-  Shader *addShader(const std::string vertex_code, const std::string fragment_code, const Shader::TYPE type);
+  template<class TYPE>
+  Shader *addShader(const std::string vertex_code, const std::string fragment_code) {
+    Mutex::Lock lock(mutex);
+    std::unique_ptr<TYPE> temp_shader = ShaderBuilder::build<TYPE>(vertex_code, fragment_code);
+    auto type = temp_shader->getType();
+    if (shader_database.find(type) == shader_database.end())
+      shader_database[type] = std::move(temp_shader);
+    return shader_database[type].get();
+  }
 
   /**
    * The function checks if a shader type exists in a shader database.
@@ -117,7 +124,7 @@ class ShaderDatabase : public RenderingDatabaseInterface<Shader::TYPE, Shader> {
    * @param keep Not used ... for now .
    * @return Shader::TYPE ID of the shader in database
    */
-  virtual Shader::TYPE add(Shader *shader, bool keep);
+  virtual Shader::TYPE add(std::unique_ptr<Shader> shader, bool keep);
 
   /**
    * @brief Checks if the database contains this shader . returns a pair of it's ID and it's address
@@ -128,8 +135,7 @@ class ShaderDatabase : public RenderingDatabaseInterface<Shader::TYPE, Shader> {
   virtual std::pair<Shader::TYPE, Shader *> contains(const Shader *shader) override;
 
  private:
- private:
-  std::map<Shader::TYPE, Shader *> shader_database; /**<std::map with unique shaders associated with their type*/
+  std::map<Shader::TYPE, std::unique_ptr<Shader>> shader_database;
 };
 
 #endif

@@ -66,8 +66,6 @@ Shader::Shader(const std::string vertex_code, const std::string fragment_code) :
   vertex_shader_txt = vertex_code;
 }
 
-Shader::~Shader() {}
-
 void Shader::enableAttributeArray(GLuint att) {
   glEnableVertexAttribArray(att);
 }
@@ -264,19 +262,15 @@ BlinnPhongShader::BlinnPhongShader(const std::string vertex_code, const std::str
   type = BLINN;
 }
 
-BlinnPhongShader::~BlinnPhongShader() {}
-
 /***********************************************************************************************************************************************************/
 
-CubeMapShader::CubeMapShader() : Shader() {
+CubemapShader::CubemapShader() : Shader() {
   type = CUBEMAP;
 }
 
-CubeMapShader::CubeMapShader(const std::string vertex, const std::string frag) : Shader(vertex, frag) {
+CubemapShader::CubemapShader(const std::string vertex, const std::string frag) : Shader(vertex, frag) {
   type = CUBEMAP;
 }
-
-CubeMapShader::~CubeMapShader() {}
 
 /***********************************************************************************************************************************************************/
 PBRShader::PBRShader() {
@@ -285,17 +279,16 @@ PBRShader::PBRShader() {
 PBRShader::PBRShader(const std::string vertex, const std::string frag) : Shader(vertex, frag) {
   type = PBR;
 }
-PBRShader::~PBRShader() {}
 
 /***********************************************************************************************************************************************************/
-ScreenFrameBufferShader::ScreenFrameBufferShader() : Shader() {
+ScreenFramebufferShader::ScreenFramebufferShader() : Shader() {
   type = SCREEN_FRAMEBUFFER;
   post_p_blurr = false;
   post_p_sharpen = false;
   post_p_edge = false;
 }
 
-ScreenFrameBufferShader::ScreenFrameBufferShader(const std::string vertex, const std::string frag)
+ScreenFramebufferShader::ScreenFramebufferShader(const std::string vertex, const std::string frag)
     : Shader(vertex, frag) {
   type = SCREEN_FRAMEBUFFER;
   post_p_blurr = false;
@@ -303,15 +296,13 @@ ScreenFrameBufferShader::ScreenFrameBufferShader(const std::string vertex, const
   post_p_edge = false;
 }
 
-ScreenFrameBufferShader::~ScreenFrameBufferShader() {}
-
-void ScreenFrameBufferShader::setPostProcessUniforms() {
+void ScreenFramebufferShader::setPostProcessUniforms() {
   setUniform(uniform_name_bool_blurr, post_p_blurr);
   setUniform(uniform_name_bool_edge, post_p_edge);
   setUniform(uniform_name_bool_sharpen, post_p_sharpen);
 }
 
-void ScreenFrameBufferShader::setPostProcess(POST_PROCESS_TYPE type) {
+void ScreenFramebufferShader::setPostProcess(POST_PROCESS_TYPE type) {
   switch (type) {
     case EDGE:
       post_p_edge = true;
@@ -345,8 +336,6 @@ BoundingBoxShader::BoundingBoxShader(const std::string vertex, const std::string
   type = BOUNDING_BOX;
 }
 
-BoundingBoxShader::~BoundingBoxShader() {}
-
 /***********************************************************************************************************************************************************/
 
 EnvmapCubemapBakerShader::EnvmapCubemapBakerShader() : Shader() {
@@ -357,8 +346,6 @@ EnvmapCubemapBakerShader::EnvmapCubemapBakerShader(const std::string vertex, con
     : Shader(vertex, fragment) {
   type = ENVMAP_CUBEMAP_CONVERTER;
 }
-
-EnvmapCubemapBakerShader::~EnvmapCubemapBakerShader() {}
 
 /***********************************************************************************************************************************************************/
 
@@ -371,8 +358,6 @@ IrradianceCubemapBakerShader::IrradianceCubemapBakerShader(const std::string ver
   type = IRRADIANCE_CUBEMAP_COMPUTE;
 }
 
-IrradianceCubemapBakerShader::~IrradianceCubemapBakerShader() {}
-
 /***********************************************************************************************************************************************************/
 
 EnvmapPrefilterBakerShader::EnvmapPrefilterBakerShader() : Shader() {
@@ -383,8 +368,6 @@ EnvmapPrefilterBakerShader::EnvmapPrefilterBakerShader(const std::string vertex_
     : Shader(vertex_code, fragment_code) {
   type = ENVMAP_PREFILTER;
 }
-
-EnvmapPrefilterBakerShader::~EnvmapPrefilterBakerShader() {}
 
 void EnvmapPrefilterBakerShader::setRoughnessValue(float roughness) {
   setUniform(uniform_name_float_cubemap_prefilter_roughness, roughness);
@@ -408,5 +391,3 @@ BRDFLookupTableBakerShader::BRDFLookupTableBakerShader(const std::string vertex_
     : Shader(vertex_code, fragment_code) {
   type = BRDF_LUT_BAKER;
 }
-
-BRDFLookupTableBakerShader::~BRDFLookupTableBakerShader() {}

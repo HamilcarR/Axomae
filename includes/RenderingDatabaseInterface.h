@@ -1,7 +1,7 @@
 #ifndef RENDERINGDATABASEINTERFACE_H
 #define RENDERINGDATABASEINTERFACE_H
 #include "Mutex.h"
-
+#include "constants.h"
 /**
  * @file RenderingDatabaseInterface.h
  * This file implements an interface for databases of objects , like , for example , light databases.
@@ -60,7 +60,7 @@ class RenderingDatabaseInterface {
    * @param element Object to store
    * @param keep Keep the element between scene change
    */
-  // virtual U add(T *element, bool keep) = 0; //!replace with std::unique_ptr<T>
+  virtual U add(std::unique_ptr<T> element, bool keep) = 0;
 
   /**
    * @brief Checks if database contains an object with specific ID .

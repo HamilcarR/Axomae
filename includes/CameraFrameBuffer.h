@@ -128,7 +128,7 @@ class CameraFrameBuffer : public FrameBufferInterface {
   Drawable *drawable_screen_quad;              /*<Drawable of the screen quad*/
   Mesh *mesh_screen_quad;                      /*<Pointer on the screen quad mesh*/
   ShaderDatabase *shader_database;             /*<Pointer on the shader database*/
-  ScreenFrameBufferShader *shader_framebuffer; /*<Post processing shader*/
+  ScreenFramebufferShader *shader_framebuffer; /*<Post processing shader*/
   float gamma;                                 /*<Gamma of the screen*/
   float exposure;                              /*<Exposure of the screen*/
 };

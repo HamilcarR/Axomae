@@ -2,6 +2,7 @@
 #define TEXTUREFACTORY_H
 
 #include "Axomae_macros.h"
+#include "Factory.h"
 #include "Texture.h"
 
 /**
@@ -27,11 +28,7 @@ class TextureBuilder {
   template<class TEXTYPE>
   static std::unique_ptr<TEXTYPE> build(TextureData *data) {
     ASSERT_SUBTYPE(Texture, TEXTYPE);
-    class PRVINTERFACE : public TEXTYPE {
-     public:
-      PRVINTERFACE(TextureData *data) : TEXTYPE(data) {}
-    };
-    return std::make_unique<PRVINTERFACE>(data);
+    return std::make_unique<PRVINTERFACE<TEXTYPE, TextureData *>>(data);
   }
 };
 

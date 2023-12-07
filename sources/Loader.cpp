@@ -254,16 +254,15 @@ namespace axomae {
     std::string fragment_irradiance_compute = loadShader("../shaders/irradiance_baker.frag");
     std::string fragment_envmap_prefilter = loadShader("../shaders/envmap_prefilter.frag");
     std::string fragment_brdf_lut_baker = loadShader("../shaders/brdf_lookup_table_baker.frag");
-    shader_database->addShader(vertex_shader_bouding_box, fragment_shader_bounding_box, Shader::BOUNDING_BOX);
-    shader_database->addShader(vertex_shader, fragment_shader, Shader::BLINN);
-    shader_database->addShader(vertex_shader_cubemap, fragment_shader_cubemap, Shader::CUBEMAP);
-    shader_database->addShader(vertex_shader_screen_fbo, fragment_shader_screen_fbo, Shader::SCREEN_FRAMEBUFFER);
-    shader_database->addShader(vertex_shader_pbr, fragment_shader_pbr, Shader::PBR);
-    shader_database->addShader(vertex_envmap_to_cubemap, fragment_envmap_to_cubemap, Shader::ENVMAP_CUBEMAP_CONVERTER);
-    shader_database->addShader(
-        vertex_envmap_to_cubemap, fragment_irradiance_compute, Shader::IRRADIANCE_CUBEMAP_COMPUTE);
-    shader_database->addShader(vertex_envmap_to_cubemap, fragment_envmap_prefilter, Shader::ENVMAP_PREFILTER);
-    shader_database->addShader(vertex_envmap_to_cubemap, fragment_brdf_lut_baker, Shader::BRDF_LUT_BAKER);
+    shader_database->addShader<BoundingBoxShader>(vertex_shader_bouding_box, fragment_shader_bounding_box);
+    shader_database->addShader<BlinnPhongShader>(vertex_shader, fragment_shader);
+    shader_database->addShader<CubemapShader>(vertex_shader_cubemap, fragment_shader_cubemap);
+    shader_database->addShader<ScreenFramebufferShader>(vertex_shader_screen_fbo, fragment_shader_screen_fbo);
+    shader_database->addShader<PBRShader>(vertex_shader_pbr, fragment_shader_pbr);
+    shader_database->addShader<EnvmapCubemapBakerShader>(vertex_envmap_to_cubemap, fragment_envmap_to_cubemap);
+    shader_database->addShader<IrradianceCubemapBakerShader>(vertex_envmap_to_cubemap, fragment_irradiance_compute);
+    shader_database->addShader<EnvmapPrefilterBakerShader>(vertex_envmap_to_cubemap, fragment_envmap_prefilter);
+    shader_database->addShader<BRDFLookupTableBakerShader>(vertex_envmap_to_cubemap, fragment_brdf_lut_baker);
   }
 
   /**
@@ -523,29 +522,6 @@ namespace axomae {
   }
 
   /**
-   * The function loads a file and generates a vector of meshes, including a cube map if applicable.
-   *
-   * @param file A pointer to a character array representing the file path of the 3D model to be loaded.
-   *
-   * @return A vector of Mesh pointers.
-   */
-  std::pair<std::vector<Mesh *>, SceneTree> Loader::load(const char *file) {
-    TextureDatabase *texture_database = &resource_database->getTextureDatabase();
-    ShaderDatabase *shader_database = &resource_database->getShaderDatabase();
-    texture_database->clean();
-    shader_database->clean();
-    loadShaderDatabase();
-    std::pair<std::vector<Mesh *>, SceneTree> scene = loadObjects(file);
-    /*Mesh* cube_map = generateCubeMap(false) ;
-    if(cube_map != nullptr){
-      scene.first.push_back(cube_map);
-      scene.second.setAsRootChild(cube_map);
-    }*/
-    errorCheck(__FILE__, __LINE__);
-    return scene;
-  }
-
-  /**
    * The function loads a shader from a file and returns it as a string.
    *
    * @param filename String representing the name of the file to be loaded.
@@ -666,6 +642,24 @@ namespace axomae {
       LOG("ENVMAP loading failed!\n", LogLevel::ERROR);
       return nullptr;
     }
+  }
+
+  /**
+   * The function loads a file and generates a vector of meshes, including a cube map if applicable.
+   *
+   * @param file A pointer to a character array representing the file path of the 3D model to be loaded.
+   *
+   * @return A vector of Mesh pointers.
+   */
+  std::pair<std::vector<Mesh *>, SceneTree> Loader::load(const char *file) {
+    TextureDatabase *texture_database = &resource_database->getTextureDatabase();
+    ShaderDatabase *shader_database = &resource_database->getShaderDatabase();
+    texture_database->clean();
+    shader_database->clean();
+    loadShaderDatabase();
+    std::pair<std::vector<Mesh *>, SceneTree> scene = loadObjects(file);
+    errorCheck(__FILE__, __LINE__);
+    return scene;
   }
 
 }  // namespace axomae

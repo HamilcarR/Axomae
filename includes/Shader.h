@@ -36,7 +36,7 @@ class Shader {
     BRDF_LUT_BAKER = 9              /**<Shader used to bake a BRDF lookup table*/
   };
 
- public:
+ protected:
   /**
    * @brief This is a constructor for a Shader class that sets the type to GENERIC.
    *
@@ -52,11 +52,7 @@ class Shader {
    */
   Shader(const std::string vertex_code, const std::string fragment_code);
 
-  /**
-   * @brief Destroy the Shader object
-   *
-   */
-  virtual ~Shader();
+ public:
   /**
    * @brief This function initializes a shader program by compiling and linking vertex and fragment shaders.
    *
@@ -363,39 +359,37 @@ class Shader {
 
 /***********************************************************************************************************************************************************/
 class BlinnPhongShader : public Shader {
- public:
+ protected:
   BlinnPhongShader();
   BlinnPhongShader(const std::string vertex_code, const std::string fragment_code);
-  virtual ~BlinnPhongShader();
 };
 
 /***********************************************************************************************************************************************************/
 
-class CubeMapShader : public Shader {
- public:
-  CubeMapShader();
-  CubeMapShader(const std::string vertex_code, const std::string fragment_code);
-  virtual ~CubeMapShader();
+class CubemapShader : public Shader {
+ protected:
+  CubemapShader();
+  CubemapShader(const std::string vertex_code, const std::string fragment_code);
 };
 
 /***********************************************************************************************************************************************************/
 class PBRShader : public Shader {
- public:
+ protected:
   PBRShader();
   PBRShader(const std::string vertex_code, const std::string fragment_code);
-  virtual ~PBRShader();
 };
 
 /***********************************************************************************************************************************************************/
 
-class ScreenFrameBufferShader : public Shader {
+class ScreenFramebufferShader : public Shader {
+ protected:
+  ScreenFramebufferShader();
+  ScreenFramebufferShader(const std::string vertex_code, const std::string fragment_code);
+
  public:
   enum POST_PROCESS_TYPE : signed { DEFAULT = -1, EDGE = 1, SHARPEN = 2, BLURR = 3 };
-  ScreenFrameBufferShader();
-  ScreenFrameBufferShader(const std::string vertex_code, const std::string fragment_code);
   void setPostProcess(POST_PROCESS_TYPE postp);
   void setPostProcessUniforms();
-  virtual ~ScreenFrameBufferShader();
 
  protected:
   bool post_p_edge;
@@ -406,49 +400,46 @@ class ScreenFrameBufferShader : public Shader {
 /***********************************************************************************************************************************************************/
 
 class BoundingBoxShader : public Shader {
- public:
+ protected:
   BoundingBoxShader();
   BoundingBoxShader(const std::string vertex_code, const std::string fragment_code);
-  virtual ~BoundingBoxShader();
 };
 
 /***********************************************************************************************************************************************************/
 
 class EnvmapCubemapBakerShader : public Shader {
- public:
+ protected:
   EnvmapCubemapBakerShader();
   EnvmapCubemapBakerShader(const std::string vertex_code, const std::string fragment_code);
-  virtual ~EnvmapCubemapBakerShader();
 };
 
 /***********************************************************************************************************************************************************/
 
 class IrradianceCubemapBakerShader : public Shader {
- public:
+ protected:
   IrradianceCubemapBakerShader();
   IrradianceCubemapBakerShader(const std::string vertex_code, const std::string fragment_code);
-  virtual ~IrradianceCubemapBakerShader();
 };
 
 /***********************************************************************************************************************************************************/
 
 class EnvmapPrefilterBakerShader : public Shader {
- public:
+ protected:
   EnvmapPrefilterBakerShader();
   EnvmapPrefilterBakerShader(const std::string vertex_code, const std::string fragment_code);
+
+ public:
   virtual void setRoughnessValue(float roughness);
   virtual void setCubeEnvmapResolution(unsigned int resolution);
   virtual void setSamplesCount(unsigned sample_count);
-  virtual ~EnvmapPrefilterBakerShader();
 };
 
 /***********************************************************************************************************************************************************/
 
 class BRDFLookupTableBakerShader : public Shader {
- public:
+ protected:
   BRDFLookupTableBakerShader();
   BRDFLookupTableBakerShader(const std::string vertex_code, const std::string fragment_code);
-  virtual ~BRDFLookupTableBakerShader();
 };
 
 #endif

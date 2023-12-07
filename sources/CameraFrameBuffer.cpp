@@ -24,7 +24,7 @@ CameraFrameBuffer::~CameraFrameBuffer() {
 }
 
 void CameraFrameBuffer::updateFrameBufferShader() {
-  shader_framebuffer = static_cast<ScreenFrameBufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
+  shader_framebuffer = static_cast<ScreenFramebufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
   assert(mesh_screen_quad);
   mesh_screen_quad->setShader(shader_framebuffer);
 }
@@ -37,7 +37,7 @@ void CameraFrameBuffer::initializeFrameBuffer() {
                                                    Texture::UBYTE,
                                                    texture_dim->width,
                                                    texture_dim->height);
-  shader_framebuffer = static_cast<ScreenFrameBufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
+  shader_framebuffer = static_cast<ScreenFramebufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
   Texture *fbo_texture = fbo_attachment_texture_collection[GLFrameBuffer::COLOR0];
   auto database_texture_id = texture_database->contains(fbo_texture).first;
   mesh_screen_quad = new FrameBufferMesh(database_texture_id, shader_framebuffer);
@@ -74,20 +74,20 @@ void CameraFrameBuffer::renderFrameBufferMesh() {
 
 void CameraFrameBuffer::setPostProcessEdge() {
   if (shader_framebuffer)
-    shader_framebuffer->setPostProcess(ScreenFrameBufferShader::EDGE);
+    shader_framebuffer->setPostProcess(ScreenFramebufferShader::EDGE);
 }
 
 void CameraFrameBuffer::setPostProcessDefault() {
   if (shader_framebuffer)
-    shader_framebuffer->setPostProcess(ScreenFrameBufferShader::DEFAULT);
+    shader_framebuffer->setPostProcess(ScreenFramebufferShader::DEFAULT);
 }
 
 void CameraFrameBuffer::setPostProcessBlurr() {
   if (shader_framebuffer)
-    shader_framebuffer->setPostProcess(ScreenFrameBufferShader::BLURR);
+    shader_framebuffer->setPostProcess(ScreenFramebufferShader::BLURR);
 }
 
 void CameraFrameBuffer::setPostProcessSharpen() {
   if (shader_framebuffer)
-    shader_framebuffer->setPostProcess(ScreenFrameBufferShader::SHARPEN);
+    shader_framebuffer->setPostProcess(ScreenFramebufferShader::SHARPEN);
 }

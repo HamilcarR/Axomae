@@ -1,7 +1,7 @@
 #ifndef SHADERFACTORY_H
 #define SHADERFACTORY_H
+#include "Factory.h"
 #include "Shader.h"
-
 /**
  * @file ShaderFactory.h
  * File defining the creation system for shaders
@@ -12,19 +12,8 @@
  * @brief Shader factory class definition
  *
  */
-class ShaderFactory {
+class ShaderBuilder {
  public:
-  /**
-   * @brief Construct a new ShaderFactory object
-   *
-   */
-  ShaderFactory();
-  /**
-   * @brief Destroy the Shader Factory object
-   *
-   */
-  virtual ~ShaderFactory();
-
   /**
    * @brief Constructs a shader of type "type" , using vertex_code and fragment_code
    *
@@ -35,7 +24,11 @@ class ShaderFactory {
    * @see Shader::TYPE
    * @see Shader
    */
-  static Shader *constructShader(std::string vertex_code, std::string fragment_code, Shader::TYPE type);
+  template<class TYPE>
+  static std::unique_ptr<TYPE> build(std::string vertex_code, std::string fragment_code) {
+    ASSERT_SUBTYPE(Shader, TYPE);
+    return std::make_unique<PRVINTERFACE<TYPE, std::string, std::string>>(vertex_code, fragment_code);
+  }
 };
 
 #endif
