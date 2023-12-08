@@ -1,10 +1,10 @@
 AlignAfterOpenBracket: "Align"
 AllowShortBlocksOnASingleLine: false
-
+AllowShortFunctionsOnASingleLine: All
 BinPackArguments: false
 BinPackParameters: false
 
-ColumnLimit: 120
+ColumnLimit: 200
 
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 
@@ -47,7 +47,6 @@ TabWidth: 2
 IndentWidth: 2
 PenaltyReturnTypeOnItsOwnLine: 10000
 PenaltyBreakAssignment: 100
-AllowShortFunctionsOnASingleLine: Empty
 SortIncludes: true
 AlignEscapedNewlines: DontAlign
 AlwaysBreakBeforeMultilineStrings: true
