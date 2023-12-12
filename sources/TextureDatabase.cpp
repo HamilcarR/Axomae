@@ -26,22 +26,22 @@ void TextureDatabase::clean() {
 }
 
 TextureDatabase::TextureDatabase() {}
-TextureDatabase::~TextureDatabase() {}
 
-Texture *TextureDatabase::get(const int index) {
+Texture *TextureDatabase::get(const int index) const {
   Mutex::Lock lock(mutex);
-  return texture_database[index].get();
+  auto it = texture_database.find(index);
+  return it == texture_database.end() ? nullptr : it->second.get();
 }
 
-bool TextureDatabase::contains(const int index) {
+bool TextureDatabase::contains(const int index) const {
   Mutex::Lock lock(mutex);
   return texture_database.find(index) != texture_database.end();
 }
 
-std::vector<std::pair<int, Texture *>> TextureDatabase::getTexturesByType(Texture::TYPE type) {
+std::vector<std::pair<int, Texture *>> TextureDatabase::getTexturesByType(Texture::TYPE type) const {
   std::vector<std::pair<int, Texture *>> type_collection;
   Mutex::Lock lock(mutex);
-  for (auto &A : texture_database) {
+  for (const auto &A : texture_database) {
     if (A.second->getTextureType() == type) {
       type_collection.push_back(std::pair<int, Texture *>(A.first, A.second.get()));
     }
@@ -66,9 +66,9 @@ int TextureDatabase::add(std::unique_ptr<Texture> texture, bool keep) {
   }
 }
 
-std::pair<int, Texture *> TextureDatabase::contains(const Texture *address) {
+std::pair<int, Texture *> TextureDatabase::contains(const Texture *address) const {
   Mutex::Lock lock(mutex);
-  for (auto &A : texture_database)
+  for (const auto &A : texture_database)
     if (A.second.get() == address)
       return std::pair(A.first, A.second.get());
   return std::pair(0, nullptr);

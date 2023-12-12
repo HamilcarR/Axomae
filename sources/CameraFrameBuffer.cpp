@@ -1,15 +1,13 @@
 #include "../includes/CameraFrameBuffer.h"
+#include "../includes/INodeFactory.h"
 #include "../includes/UniformNames.h"
-
 using namespace axomae;
 
-CameraFrameBuffer::CameraFrameBuffer(TextureDatabase *_texture_database,
-                                     ShaderDatabase *_shader_database,
-                                     ScreenSize *screen_size_pointer,
-                                     unsigned int *default_fbo_pointer)
-    : FrameBufferInterface(_texture_database, screen_size_pointer, default_fbo_pointer) {
-  texture_database = _texture_database;
-  shader_database = _shader_database;
+CameraFrameBuffer::CameraFrameBuffer(ResourceDatabaseManager &resource_database, ScreenSize *screen_size_pointer, unsigned int *default_fbo_pointer)
+    : FrameBufferInterface(&resource_database.getTextureDatabase(), screen_size_pointer, default_fbo_pointer),
+      shader_database(resource_database.getShaderDatabase()),
+      texture_database(resource_database.getTextureDatabase()),
+      node_database(resource_database.getNodeDatabase()) {
   gamma = 1.2f;
   exposure = 0.3f;
   gl_framebuffer_object = nullptr;
@@ -18,30 +16,23 @@ CameraFrameBuffer::CameraFrameBuffer(TextureDatabase *_texture_database,
   shader_framebuffer = nullptr;
 }
 
-CameraFrameBuffer::~CameraFrameBuffer() {
-  if (drawable_screen_quad)
-    delete drawable_screen_quad;
-}
+CameraFrameBuffer::~CameraFrameBuffer() {}
 
 void CameraFrameBuffer::updateFrameBufferShader() {
-  shader_framebuffer = static_cast<ScreenFramebufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
+  shader_framebuffer = static_cast<ScreenFramebufferShader *>(shader_database.get(Shader::SCREEN_FRAMEBUFFER));
   assert(mesh_screen_quad);
   mesh_screen_quad->setShader(shader_framebuffer);
 }
 
 void CameraFrameBuffer::initializeFrameBuffer() {
-  initializeFrameBufferTexture<FrameBufferTexture>(GLFrameBuffer::COLOR0,
-                                                   true,
-                                                   Texture::RGBA16F,
-                                                   Texture::BGRA,
-                                                   Texture::UBYTE,
-                                                   texture_dim->width,
-                                                   texture_dim->height);
-  shader_framebuffer = static_cast<ScreenFramebufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
+  initializeFrameBufferTexture<FrameBufferTexture>(
+      GLFrameBuffer::COLOR0, true, Texture::RGBA16F, Texture::BGRA, Texture::UBYTE, texture_dim->width, texture_dim->height);
+  shader_framebuffer = static_cast<ScreenFramebufferShader *>(shader_database.get(Shader::SCREEN_FRAMEBUFFER));
   Texture *fbo_texture = fbo_attachment_texture_collection[GLFrameBuffer::COLOR0];
-  auto database_texture_id = texture_database->contains(fbo_texture).first;
-  mesh_screen_quad = new FrameBufferMesh(database_texture_id, shader_framebuffer);
-  drawable_screen_quad = new Drawable(mesh_screen_quad);
+  auto database_texture_id = texture_database.contains(fbo_texture).first;
+  auto result = NodeBuilder::store<FrameBufferMesh>(node_database, true, database_texture_id, shader_framebuffer);
+  mesh_screen_quad = result.object;
+  drawable_screen_quad = std::make_unique<Drawable>(mesh_screen_quad);
   FrameBufferInterface::initializeFrameBuffer();
   bindFrameBuffer();
   gl_framebuffer_object->attachTexture2D(GLFrameBuffer::COLOR0, GLFrameBuffer::TEXTURE2D, fbo_texture->getSamplerID());

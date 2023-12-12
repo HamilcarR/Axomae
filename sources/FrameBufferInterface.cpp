@@ -7,9 +7,7 @@ FrameBufferInterface::FrameBufferInterface() {
   default_framebuffer_pointer = nullptr;
 }
 
-FrameBufferInterface::FrameBufferInterface(TextureDatabase *_texture_database,
-                                           ScreenSize *_texture_dim,
-                                           unsigned int *default_fbo)
+FrameBufferInterface::FrameBufferInterface(TextureDatabase *_texture_database, ScreenSize *_texture_dim, unsigned int *default_fbo)
     : FrameBufferInterface() {
   texture_dim = _texture_dim;
   texture_database = _texture_database;
@@ -17,9 +15,19 @@ FrameBufferInterface::FrameBufferInterface(TextureDatabase *_texture_database,
   assert(texture_dim != nullptr);
 }
 
-FrameBufferInterface::~FrameBufferInterface() {
-  if (gl_framebuffer_object != nullptr)
-    delete gl_framebuffer_object;
+FrameBufferInterface::~FrameBufferInterface() { gl_framebuffer_object = nullptr; }
+
+FrameBufferInterface::FrameBufferInterface(FrameBufferInterface &&move) noexcept {
+  std::swap(gl_framebuffer_object, move.gl_framebuffer_object);
+  texture_dim = move.texture_dim;
+  texture_database = move.texture_database;
+  fbo_attachment_texture_collection = move.fbo_attachment_texture_collection;
+  default_framebuffer_pointer = move.default_framebuffer_pointer;
+  move.gl_framebuffer_object = nullptr;
+  move.texture_dim = nullptr;
+  move.texture_database = nullptr;
+  move.fbo_attachment_texture_collection.clear();
+  move.default_framebuffer_pointer = nullptr;
 }
 
 void FrameBufferInterface::resize() {
@@ -47,7 +55,7 @@ void FrameBufferInterface::clean() {
 }
 
 void FrameBufferInterface::initializeFrameBuffer() {
-  gl_framebuffer_object = new GLFrameBuffer(
+  gl_framebuffer_object = std::make_unique<GLFrameBuffer>(
       texture_dim->width, texture_dim->height, GLRenderBuffer::DEPTH24_STENCIL8, default_framebuffer_pointer);
   gl_framebuffer_object->initializeBuffers();
 }

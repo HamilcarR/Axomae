@@ -3,9 +3,7 @@
 
 using namespace axomae;
 
-Scene::Scene() {
-  display_bbox = false;
-}
+Scene::Scene(ResourceDatabaseManager &rdm) : resource_manager(rdm) { display_bbox = false; }
 
 Scene::~Scene() {}
 
@@ -23,25 +21,28 @@ void Scene::setScene(std::pair<std::vector<Mesh *>, SceneTree> &to_copy) {
   scene_tree = to_copy.second;
   for (auto A : to_copy.first) {
     Scene::AABB mesh;
+    auto drawable = std::make_unique<Drawable>(A);
     mesh.aabb = BoundingBox(A->geometry.vertices);
-    mesh.drawable = new Drawable(A);
+    mesh.drawable = drawable.get();
     scene.push_back(mesh);
+    drawable_collection.push_back(std::move(drawable));
   }
 }
 
 void Scene::generateBoundingBoxes(Shader *box_shader) {
-  for (Scene::AABB scene_drawable : scene) {
+  for (Scene::AABB &scene_drawable : scene) {
     Mesh *mesh = scene_drawable.drawable->getMeshPointer();
-    BoundingBoxMesh *bbox_mesh = new BoundingBoxMesh(mesh, scene_drawable.aabb, box_shader);
-    Drawable *bbox_drawable = new Drawable(bbox_mesh);
-    bounding_boxes_array.push_back(bbox_drawable);
+    BoundingBoxMesh *bbox_mesh =
+        NodeBuilder::store<BoundingBoxMesh>(resource_manager.getNodeDatabase(), false, mesh, scene_drawable.aabb, box_shader).object;
+    auto bbox_drawable = std::make_unique<Drawable>(bbox_mesh);
+    bounding_boxes_array.push_back(bbox_drawable.get());
+    drawable_collection.push_back(std::move(bbox_drawable));
   }
 }
 
 std::vector<Drawable *> Scene::getOpaqueElements() const {
   std::vector<Drawable *> to_return;
-  Drawable *cubemap;
-  for (auto aabb : scene) {
+  for (auto &aabb : scene) {
     Drawable *A = aabb.drawable;
     Material *mat = A->getMaterialPointer();
     if (!mat->isTransparent())
@@ -52,7 +53,6 @@ std::vector<Drawable *> Scene::getOpaqueElements() const {
 
 std::vector<Drawable *> Scene::getSortedSceneByTransparency() {
   std::vector<Drawable *> to_return;
-  Drawable *cubemap;
   sorted_transparent_meshes.clear();
   for (auto aabb : scene) {
     Drawable *A = aabb.drawable;
@@ -67,9 +67,7 @@ std::vector<Drawable *> Scene::getSortedSceneByTransparency() {
       sorted_transparent_meshes[dist_to_camera] = A;
     }
   }
-  for (std::map<float, Drawable *>::reverse_iterator it = sorted_transparent_meshes.rbegin();
-       it != sorted_transparent_meshes.rend();
-       it++)
+  for (std::map<float, Drawable *>::reverse_iterator it = sorted_transparent_meshes.rbegin(); it != sorted_transparent_meshes.rend(); it++)
     to_return.push_back(it->second);
   return to_return;
 }
@@ -90,32 +88,17 @@ std::vector<Drawable *> Scene::getSortedTransparentElements() {
   std::vector<Drawable *> transparent_meshes;
   sorted_transparent_meshes.clear();
   sortTransparentElements();
-  for (std::map<float, Drawable *>::reverse_iterator it = sorted_transparent_meshes.rbegin();
-       it != sorted_transparent_meshes.rend();
-       it++)
+  for (std::map<float, Drawable *>::reverse_iterator it = sorted_transparent_meshes.rbegin(); it != sorted_transparent_meshes.rend(); it++)
     transparent_meshes.push_back(it->second);
   return transparent_meshes;
 }
 
-std::vector<Drawable *> Scene::getBoundingBoxElements() {
-  return bounding_boxes_array;
-}
+std::vector<Drawable *> Scene::getBoundingBoxElements() { return bounding_boxes_array; }
 
 void Scene::clear() {
-  for (unsigned int i = 0; i < scene.size(); i++)
-    if (scene[i].drawable != nullptr) {
-      scene[i].drawable->clean();
-
-      delete scene[i].drawable;
-    }
+  drawable_collection.clear();
   scene.clear();
   scene_tree.clear();
-  for (auto A : bounding_boxes_array) {
-    if (A) {
-      A->clean();
-      delete A;
-    }
-  }
   bounding_boxes_array.clear();
   sorted_transparent_meshes.clear();
 }
@@ -162,9 +145,7 @@ void Scene::drawBoundingBoxes() {
   }
 }
 
-std::vector<INode *> Scene::getNodeByName(const std::string &name) {
-  return scene_tree.findByName(name);
-}
+std::vector<INode *> Scene::getNodeByName(const std::string &name) { return scene_tree.findByName(name); }
 
 void Scene::setPolygonWireframe() {
   for (auto A : scene) {

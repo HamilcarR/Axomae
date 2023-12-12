@@ -235,8 +235,6 @@ class AbstractLight : public SceneTreeNode {
  */
 class DirectionalLight : public AbstractLight {
 
-  friend class LightBuilder;
-
  protected:
   /**
    * @brief Construct a new Directional Light object
@@ -264,12 +262,7 @@ class DirectionalLight : public AbstractLight {
    * @param intensity Intensity of the light
    * @param parent Predecessor in the scene graph
    */
-  DirectionalLight(glm::vec3 position,
-                   glm::vec3 ambientColor,
-                   glm::vec3 diffuseColor,
-                   glm::vec3 specularColor,
-                   float intensity,
-                   ISceneNode *parent = nullptr);
+  DirectionalLight(glm::vec3 position, glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float intensity, ISceneNode *parent = nullptr);
 
   /**
    * @brief Construct a new Directional Light
@@ -307,8 +300,6 @@ class DirectionalLight : public AbstractLight {
  */
 class PointLight : public AbstractLight {
 
-  friend class LightBuilder;
-
  protected:
   /**
    * @brief Construct a new Point Light object
@@ -328,11 +319,7 @@ class PointLight : public AbstractLight {
    * @param intensity Intensity of the light
    * @param parent Predecessor in the scene graph
    */
-  PointLight(glm::vec3 position,
-             glm::vec3 color,
-             glm::vec3 attenuation_components,
-             float intensity,
-             ISceneNode *parent = nullptr);
+  PointLight(glm::vec3 position, glm::vec3 color, glm::vec3 attenuation_components, float intensity, ISceneNode *parent = nullptr);
 
   /**
    * @brief Construct a new Point Light object
@@ -347,13 +334,7 @@ class PointLight : public AbstractLight {
    * @param intensity Intensity of the light
    * @param parent Predecessor in the scene graph
    */
-  PointLight(glm::vec3 position,
-             glm::vec3 ambientColor,
-             glm::vec3 diffuseColor,
-             glm::vec3 specularColor,
-             glm::vec3 attenuation_compnents,
-             float intensity,
-             ISceneNode *parent = nullptr);
+  PointLight(glm::vec3 position, glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, glm::vec3 attenuation_compnents, float intensity, ISceneNode *parent = nullptr);
 
   /**
    * @brief Construct a new Point Light object
@@ -395,8 +376,6 @@ class PointLight : public AbstractLight {
 
 class SpotLight : public AbstractLight {
 
-  friend class LightBuilder;
-
  protected:
   /**
    * @brief Construct a new Spot Light object
@@ -415,12 +394,7 @@ class SpotLight : public AbstractLight {
    * @param intensity
    * @param parent Predecessor in the scene graph
    */
-  SpotLight(glm::vec3 position,
-            glm::vec3 direction,
-            glm::vec3 color,
-            float cutoff_angle,
-            float intensity,
-            ISceneNode *parent = nullptr);
+  SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 color, float cutoff_angle, float intensity, ISceneNode *parent = nullptr);
 
   /**
    * @brief Construct a new Spot Light object
@@ -434,14 +408,7 @@ class SpotLight : public AbstractLight {
    * @param intensity
    * @param parent Predecessor in the scene graph
    */
-  SpotLight(glm::vec3 position,
-            glm::vec3 direction,
-            glm::vec3 ambient,
-            glm::vec3 diffuse,
-            glm::vec3 specular,
-            float cutoff_angle,
-            float intensity,
-            ISceneNode *parent = nullptr);
+  SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float cutoff_angle, float intensity, ISceneNode *parent = nullptr);
 
   /**
    * @brief Construct a new Spot Light object

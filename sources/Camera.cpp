@@ -2,8 +2,7 @@
 #include <cmath>
 
 constexpr float DELTA_ZOOM = 1.f;
-constexpr float ANGLE_EPSILON =
-    0.0001f;  // we use these to avoid nan values when angles or vector lengths become too small
+constexpr float ANGLE_EPSILON = 0.0001f;   // we use these to avoid nan values when angles or vector lengths become too small
 constexpr float VECTOR_EPSILON = 0.0001f;  //
 constexpr float PANNING_SENSITIVITY = 10.f;
 
@@ -47,8 +46,7 @@ void Camera::reset() {
 }
 
 void Camera::computeProjectionSpace() {
-  projection = glm::perspective(
-      glm::radians(fov), ((float)(ratio_dimensions->width)) / ((float)(ratio_dimensions->height)), near, far);
+  projection = glm::perspective(glm::radians(fov), ((float)(ratio_dimensions->width)) / ((float)(ratio_dimensions->height)), near, far);
 }
 
 void Camera::computeViewProjection() {
@@ -89,9 +87,7 @@ ArcballCamera::ArcballCamera() {
  *  used by the ArcballCamera class to track user input and update the camera's
  * position/orientation accordingly
  */
-ArcballCamera::ArcballCamera(
-    float deg, ScreenSize *screen, float near, float far, float radius, const MouseState *pointer)
-    : Camera(deg, screen, near, far, pointer) {
+ArcballCamera::ArcballCamera(float deg, ScreenSize *screen, float near, float far, float radius, const MouseState *pointer) : Camera(deg, screen, near, far, pointer) {
   reset();
   default_radius = radius;
   name = "Arcball-Camera";
@@ -113,8 +109,7 @@ void ArcballCamera::reset() {
   target = glm::vec3(0.f);
   panning_offset = glm::vec3(0);
   delta_position = glm::vec3(0.f);
-  translation = last_translation = scene_translation_matrix = scene_rotation_matrix = local_transformation = glm::mat4(
-      1.f);
+  translation = last_translation = scene_translation_matrix = scene_rotation_matrix = local_transformation = glm::mat4(1.f);
 }
 
 /**
@@ -200,10 +195,8 @@ static float get_z_axis(float x, float y, float radius) {
  */
 void ArcballCamera::movePosition() {
   if (mouse_state_pointer->left_button_clicked) {
-    ndc_mouse_position.x = ((cursor_position.x - (ratio_dimensions->width / 2)) / (ratio_dimensions->width / 2)) *
-                           radius;
-    ndc_mouse_position.y = (((ratio_dimensions->height / 2) - cursor_position.y) / (ratio_dimensions->height / 2)) *
-                           radius;
+    ndc_mouse_position.x = ((cursor_position.x - (ratio_dimensions->width / 2)) / (ratio_dimensions->width / 2)) * radius;
+    ndc_mouse_position.y = (((ratio_dimensions->height / 2) - cursor_position.y) / (ratio_dimensions->height / 2)) * radius;
     ndc_mouse_position.z = get_z_axis(ndc_mouse_position.x, ndc_mouse_position.y, radius);
     ndc_mouse_position = glm::normalize(ndc_mouse_position);
   }
@@ -219,10 +212,8 @@ void ArcballCamera::movePosition() {
  * Arcball camera when the left mouse button is clicked.
  */
 void ArcballCamera::onLeftClick() {
-  ndc_mouse_start_position.x = ((cursor_position.x - (ratio_dimensions->width / 2)) / (ratio_dimensions->width / 2)) *
-                               radius;
-  ndc_mouse_start_position.y = (((ratio_dimensions->height / 2) - cursor_position.y) / (ratio_dimensions->height / 2)) *
-                               radius;
+  ndc_mouse_start_position.x = ((cursor_position.x - (ratio_dimensions->width / 2)) / (ratio_dimensions->width / 2)) * radius;
+  ndc_mouse_start_position.y = (((ratio_dimensions->height / 2) - cursor_position.y) / (ratio_dimensions->height / 2)) * radius;
   ndc_mouse_start_position.z = get_z_axis(ndc_mouse_start_position.x, ndc_mouse_start_position.y, radius);
   ndc_mouse_start_position = glm::normalize(ndc_mouse_start_position);
 }
@@ -267,9 +258,7 @@ FreePerspectiveCamera::FreePerspectiveCamera() : Camera() {
   type = PERSPECTIVE;
 }
 
-FreePerspectiveCamera::FreePerspectiveCamera(
-    float deg, ScreenSize *screen, float near, float far, const MouseState *pointer)
-    : Camera(deg, screen, near, far, pointer) {
+FreePerspectiveCamera::FreePerspectiveCamera(float deg, ScreenSize *screen, float near, float far, const MouseState *pointer) : Camera(deg, screen, near, far, pointer) {
   type = PERSPECTIVE;
 }
 

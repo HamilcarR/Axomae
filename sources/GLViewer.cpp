@@ -28,9 +28,7 @@ void GLViewer::initializeGL() {
     GLenum err = glewInit();
     LOG("glew initialized!", LogLevel::INFO);
     if (err != GLEW_OK) {
-      LOG("failed to initialize glew with error : " +
-              std::string(reinterpret_cast<const char *>(glewGetErrorString(err))),
-          LogLevel::CRITICAL);
+      LOG("failed to initialize glew with error : " + std::string(reinterpret_cast<const char *>(glewGetErrorString(err))), LogLevel::CRITICAL);
       exit(EXIT_FAILURE);
     } else {
       glew_initialized = true;

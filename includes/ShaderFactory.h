@@ -1,6 +1,7 @@
 #ifndef SHADERFACTORY_H
 #define SHADERFACTORY_H
 #include "Factory.h"
+#include "ResourceDatabaseManager.h"
 #include "Shader.h"
 /**
  * @file ShaderFactory.h
@@ -13,6 +14,7 @@
  *
  */
 class ShaderBuilder {
+
  public:
   /**
    * @brief Constructs a shader of type "type" , using vertex_code and fragment_code
@@ -24,10 +26,19 @@ class ShaderBuilder {
    * @see Shader::TYPE
    * @see Shader
    */
-  template<class TYPE>
-  static std::unique_ptr<TYPE> build(std::string vertex_code, std::string fragment_code) {
+  template<class TYPE, class... Args>
+  static std::unique_ptr<TYPE> build(Args &&...args) {
     ASSERT_SUBTYPE(Shader, TYPE);
-    return std::make_unique<PRVINTERFACE<TYPE, std::string, std::string>>(vertex_code, fragment_code);
+    return std::make_unique<PRVINTERFACE<TYPE, Args...>>(std::forward<Args>(args)...);
+  }
+
+  template<class TYPE, class... Args>
+  static factory::Result<Shader::TYPE, TYPE> store(IResourceDB<Shader::TYPE, Shader> &database, bool keep, Args &&...args) {
+    ASSERT_SUBTYPE(Shader, TYPE);
+    std::unique_ptr<Shader> temp = std::make_unique<PRVINTERFACE<TYPE, Args...>>(std::forward<Args>(args)...);
+    TYPE *pointer = static_cast<TYPE *>(temp.get());
+    factory::Result<Shader::TYPE, TYPE> result = {database.add(std::move(temp), keep), pointer};
+    return result;
   }
 };
 

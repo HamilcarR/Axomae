@@ -30,17 +30,17 @@ namespace axomae {
       std::regex("nmap [0-9]+ () () (-gpu|-cpu)",
                  std::regex_constants::icase),  // generate normal map (from height map)
       std::regex("hmap [0-9]+ (-sobel|-prewitt|-scharr) (-repeat) (-gpu|-cpu)",
-                 std::regex_constants::icase),  // generate height map (from albedo texture)
+                 std::regex_constants::icase),                                          // generate height map (from albedo texture)
       std::regex("dudv [0-9]+ () (-repeat) (-gpu|-cpu)", std::regex_constants::icase),  // generate dudv map
       std::regex("save [0-9]+ (/?([a-zA-Z0-9]+)/?)*[a-zA-Z0-9]+.[a-zA-Z0-9]+",
-                 std::regex_constants::icase),                                               // save image on the disk
-      std::regex("contrast [0-9]+ [0-9]+ [a-z]+ (-gpu|-cpu)", std::regex_constants::icase),  // set contrast
-      std::regex("exit", std::regex_constants::icase),                                       // exit the app
-      std::regex("render [0-9]+ [0-9]+ [a-z]+", std::regex_constants::icase),  // render the texture on a mesh
+                 std::regex_constants::icase),                                                         // save image on the disk
+      std::regex("contrast [0-9]+ [0-9]+ [a-z]+ (-gpu|-cpu)", std::regex_constants::icase),            // set contrast
+      std::regex("exit", std::regex_constants::icase),                                                 // exit the app
+      std::regex("render [0-9]+ [0-9]+ [a-z]+", std::regex_constants::icase),                          // render the texture on a mesh
       std::regex("load (/?([a-zA-Z0-9]+)/?)*[a-zA-Z0-9]+.[a-zA-Z0-9]+", std::regex_constants::icase),  // load an image
-      std::regex("ls", std::regex_constants::icase),             // list all image ids
-      std::regex("select [0-9]+", std::regex_constants::icase),  // select image id as work image
-      std::regex("id", std::regex_constants::icase)              // check current image id
+      std::regex("ls", std::regex_constants::icase),                                                   // list all image ids
+      std::regex("select [0-9]+", std::regex_constants::icase),                                        // select image id as work image
+      std::regex("id", std::regex_constants::icase)                                                    // check current image id
   };
 
   /*******************************************************************************************************************************************************/
@@ -158,8 +158,7 @@ namespace axomae {
     a.push_back(w2);
     a.push_back(w3);
     a.push_back(w4);
-    if ((w2.compare("-prewitt") != 0 && w2.compare("-sobel") != 0 && w2.compare("-scharr") != 0) ||
-        !check_if_number(w1) || w3.compare("-repeat") != 0)
+    if ((w2.compare("-prewitt") != 0 && w2.compare("-sobel") != 0 && w2.compare("-scharr") != 0) || !check_if_number(w1) || w3.compare("-repeat") != 0)
       return {false, std::vector<std::string>()};
     return {true, a};
   }
@@ -206,8 +205,7 @@ namespace axomae {
     int prev_image_id = instance->getCurrentImageId();
     int image = images.size() - 1;
     while (loop) {
-      int _idCurrentImage = (instance->getCurrentImageId() == prev_image_id) ? prev_image_id :
-                                                                               instance->getCurrentImageId();
+      int _idCurrentImage = (instance->getCurrentImageId() == prev_image_id) ? prev_image_id : instance->getCurrentImageId();
       mutex_window_thread2.lock();
       if (instance->getDisplay() != nullptr && _idCurrentImage >= 0 && (unsigned int)_idCurrentImage < images.size())
         instance->getDisplay()->display_image(images[_idCurrentImage].first);
@@ -330,10 +328,7 @@ namespace axomae {
         std::string func = v.command_arguments[1];
         std::string bord = v.command_arguments[2];
         std::string device_choice = v.command_arguments[3];
-        uint8_t f = func.compare("-prewitt") == 0 ? AXOMAE_USE_PREWITT :
-                    func.compare("-sobel") == 0   ? AXOMAE_USE_SOBEL :
-                    func.compare("-scharr") == 0  ? AXOMAE_USE_SCHARR :
-                                                    0;
+        uint8_t f = func.compare("-prewitt") == 0 ? AXOMAE_USE_PREWITT : func.compare("-sobel") == 0 ? AXOMAE_USE_SOBEL : func.compare("-scharr") == 0 ? AXOMAE_USE_SCHARR : 0;
         uint8_t b = AXOMAE_REPEAT;
         if (device_choice.compare("-gpu") == 0)
           ImageManager::USE_GPU_COMPUTING();

@@ -19,8 +19,7 @@ GLGeometryBuffer::GLGeometryBuffer(const Object3D *geometry) : GLGeometryBuffer(
 GLGeometryBuffer::~GLGeometryBuffer() {}
 
 bool GLGeometryBuffer::isReady() const {
-  return vao && vertex_buffer && normal_buffer && index_buffer && texture_buffer && color_buffer && tangent_buffer &&
-         geometry;
+  return vao && vertex_buffer && normal_buffer && index_buffer && texture_buffer && color_buffer && tangent_buffer && geometry;
 }
 
 void GLGeometryBuffer::clean() {
@@ -104,10 +103,7 @@ void GLGeometryBuffer::fillBuffers() {
     bindTangentBuffer();
     glBufferData(GL_ARRAY_BUFFER, geometry->tangents.size() * sizeof(float), geometry->tangents.data(), GL_STATIC_DRAW);
     bindIndexBuffer();
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 geometry->indices.size() * sizeof(unsigned int),
-                 geometry->indices.data(),
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, geometry->indices.size() * sizeof(unsigned int), geometry->indices.data(), GL_STATIC_DRAW);
     errorCheck(__FILE__, __LINE__);
     buffers_filled = true;
   }

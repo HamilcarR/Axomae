@@ -68,11 +68,7 @@ class SceneListView : virtual public QTreeWidget {
     emptyTree();
     current_scene = &scene;
     INode *root_node = scene.getRootNode();
-    auto layout_nodes_lambda = [](INode *node,
-                                  SceneTree &scene,
-                                  SceneListView &scene_view_list,
-                                  std::vector<NodeItem *> &r_items,
-                                  std::map<ISceneNode *, NodeItem *> &equiv_table) {
+    auto layout_nodes_lambda = [](INode *node, SceneTree &scene, SceneListView &scene_view_list, std::vector<NodeItem *> &r_items, std::map<ISceneNode *, NodeItem *> &equiv_table) {
       if (node == scene.getRootNode()) {
         NodeItem *root = new NodeItem(node->getName(), QTreeWidgetItem::Type);
         root->setItemText(0);

@@ -1,5 +1,5 @@
 #include "../includes/SceneHierarchy.h"
-
+#include "../includes/INodeFactory.h"
 void ISceneHierarchy::setAsRootChild(INode *node) {
   if (root != nullptr)
     root->addChildNode(node);
@@ -12,18 +12,11 @@ void ISceneHierarchy::updateOwner() {
   }
 }
 
-void ISceneHierarchy::clear() {
-  for (auto A : generic_nodes_to_delete) {
-    delete A;
-  }
-  generic_nodes_to_delete.clear();
-}
+void ISceneHierarchy::clear() { root = nullptr; }
 
 /*******************************************************************************************************************************************************************/
 
-SceneTree::SceneTree(ISceneNode *node) {
-  root = node;
-}
+SceneTree::SceneTree(ISceneNode *node) { root = node; }
 
 SceneTree::SceneTree(const SceneTree &copy) {
   root = copy.getRootNode();
@@ -32,8 +25,9 @@ SceneTree::SceneTree(const SceneTree &copy) {
 
 SceneTree::~SceneTree() {}
 
-void SceneTree::createGenericRootNode() {
-  root = new SceneTreeNode();
+void SceneTree::createGenericRootNode(IResourceDB<int, INode> &database) {
+  if (!root)
+    root = NodeBuilder::store<SceneTreeNode>(database, false).object;
 }
 
 SceneTree &SceneTree::operator=(const SceneTree &copy) {
@@ -85,6 +79,4 @@ std::vector<INode *> SceneTree::findByName(const std::string &name) {
   return collection;
 }
 
-void SceneTree::updatedHierarchy() {
-  emit modifiedStructureEvent();
-}
+void SceneTree::updatedHierarchy() { emit modifiedStructureEvent(); }

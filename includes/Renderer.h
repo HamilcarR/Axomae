@@ -102,12 +102,8 @@ class Renderer : public QObject {
    * etc
    * @see MouseState
    */
-  MouseState *getMouseStatePointer() {
-    return &mouse_state;
-  };
-  const MouseState *getConstMouseStatePointer() const {
-    return &mouse_state;
-  }
+  MouseState *getMouseStatePointer() { return &mouse_state; };
+  const MouseState *getConstMouseStatePointer() const { return &mouse_state; }
 
   /**
    * @brief Left click event behavior
@@ -158,18 +154,14 @@ class Renderer : public QObject {
    *
    * @param id ID of the default framebuffer
    */
-  void setDefaultFrameBufferId(unsigned id) {
-    default_framebuffer_id = id;
-  }
+  void setDefaultFrameBufferId(unsigned id) { default_framebuffer_id = id; }
 
   /**
    * @brief Returns a pointer on the default framebuffer property
    *
    * @return unsigned*
    */
-  unsigned int *getDefaultFrameBufferIdPointer() {
-    return &default_framebuffer_id;
-  }
+  unsigned int *getDefaultFrameBufferIdPointer() { return &default_framebuffer_id; }
 
   /**
    * @brief Set the Gamma Value object
@@ -241,21 +233,15 @@ class Renderer : public QObject {
    *
    * @return const Scene&
    */
-  const Scene &getConstScene() const {
-    return *scene;
-  }
-  Scene &getScene() {
-    return *scene;
-  }
+  const Scene &getConstScene() const { return scene; }
+  Scene &getScene() { return scene; }
 
   template<EVENT_TYPE type>
   void pushEvent(RENDERER_CALLBACK_ENUM callback_enum, std::any data) {
     event_callback_stack[type].push(std::pair<RENDERER_CALLBACK_ENUM, std::any>(callback_enum, data));
   }
 
-  bool eventQueueEmpty(EVENT_TYPE type) const {
-    return event_callback_stack[type].empty();
-  }
+  bool eventQueueEmpty(EVENT_TYPE type) const { return event_callback_stack[type].empty(); }
 
   /**
    * @brief Executes a specific method according to the value of the callback flag
@@ -288,8 +274,6 @@ class Renderer : public QObject {
       displayBoundingBoxes(std::forward<Args>(args)...);
     else if constexpr (function_flag == SET_DISPLAY_RESET_CAMERA)
       resetSceneCamera(std::forward<Args>(args)...);
-    else if constexpr (function_flag == ADD_ELEMENT_POINTLIGHT)
-      light_database->addLight(std::forward<Args>(args)...);
     else {
       return;
     }
@@ -304,18 +288,18 @@ class Renderer : public QObject {
   void sceneModified();
 
  public:
-  std::unique_ptr<Scene> scene; /**<The scene to be rendered*/
   std::unique_ptr<RenderPipeline> render_pipeline;
   std::unique_ptr<CameraFrameBuffer> camera_framebuffer; /**<Main framebuffer attached to the view*/
   bool start_draw;                                       /**<If the renderer is ready to draw*/
   ResourceDatabaseManager
-      *resource_database;              /**<The main database containing a texture database , and a shader database*/
-  LightingDatabase *light_database;    /**<Light database object*/
+      &resource_database;              /**<The main database containing a texture database ,a node database for stored meshes and a shader database*/
+  Scene scene;                         /**<The scene to be rendered*/
   Camera *scene_camera;                /**<Pointer on the scene camera*/
   MouseState mouse_state;              /**<Pointer on the MouseState structure*/
   ScreenSize screen_size;              /**<Dimensions of the renderer windows*/
   unsigned int default_framebuffer_id; /**<In the case the GUI uses other contexts and other framebuffers , we use this
                                           variable to reset the rendering to the default framebuffer*/
+  LightingDatabase light_database;
   GLViewer *gl_widget;
 
  private:

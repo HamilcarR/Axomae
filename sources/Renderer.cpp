@@ -1,11 +1,9 @@
 #include "../includes/Renderer.h"
-#include "../includes/LightBuilder.h"
 #include "../includes/Loader.h"
 #include "../includes/RenderPipeline.h"
-
 using namespace axomae;
 
-Renderer::Renderer() {
+Renderer::Renderer() : resource_database(ResourceDatabaseManager::getInstance()), scene(resource_database) {
   start_draw = false;
   camera_framebuffer = nullptr;
   mouse_state.pos_x = 0;
@@ -17,11 +15,10 @@ Renderer::Renderer() {
   mouse_state.previous_pos_x = 0;
   mouse_state.previous_pos_y = 0;
   default_framebuffer_id = 0;
-  light_database = new LightingDatabase();
-  resource_database = &ResourceDatabaseManager::getInstance();
   Loader loader;
   loader.loadShaderDatabase();
-  scene_camera = new ArcballCamera(45.f, &screen_size, 0.1f, 10000.f, 100.f, &mouse_state);
+  scene_camera =
+      NodeBuilder::store<ArcballCamera>(resource_database.getNodeDatabase(), true, 45.f, &screen_size, 0.1f, 10000.f, 100.f, &mouse_state).object;
 }
 
 Renderer::Renderer(unsigned width, unsigned height, GLViewer *widget) : Renderer() {
@@ -33,37 +30,24 @@ Renderer::Renderer(unsigned width, unsigned height, GLViewer *widget) : Renderer
 Renderer::~Renderer() {
   if (camera_framebuffer)
     camera_framebuffer->clean();
-  if (scene)
-    scene->clear();
-  if (render_pipeline)
-    render_pipeline->clean();
-  if (resource_database) {
-    resource_database->purge();
-    resource_database->destroyInstance();
-  }
-  if (light_database) {
-    light_database->clearDatabase();
-    delete light_database;
-  }
-  delete scene_camera;
+  scene.clear();
+  render_pipeline->clean();
+  resource_database.purge();
+  light_database.clearDatabase();
   scene_camera = nullptr;
 }
 
 void Renderer::initialize() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-  resource_database->getShaderDatabase().initializeShaders();
-  camera_framebuffer = std::make_unique<CameraFrameBuffer>(&resource_database->getTextureDatabase(),
-                                                           &resource_database->getShaderDatabase(),
-                                                           &screen_size,
-                                                           &default_framebuffer_id);
-  render_pipeline = std::make_unique<RenderPipeline>(this, &*resource_database);
-  scene = std::make_unique<Scene>();
+  resource_database.getShaderDatabase().initializeShaders();
+  camera_framebuffer = std::make_unique<CameraFrameBuffer>(resource_database, &screen_size, &default_framebuffer_id);
+  render_pipeline = std::make_unique<RenderPipeline>(this, &resource_database);
   camera_framebuffer->initializeFrameBuffer();
 }
 
 bool Renderer::scene_ready() {
-  if (!scene->isReady())
+  if (!scene.isReady())
     return false;
   if (camera_framebuffer && !camera_framebuffer->getDrawable()->ready())
     return false;
@@ -74,7 +58,7 @@ bool Renderer::scene_ready() {
 bool Renderer::prep_draw() {
   if (start_draw && scene_ready()) {
     camera_framebuffer->startDraw();
-    scene->prepare_draw(scene_camera);
+    scene.prepare_draw(scene_camera);
     return true;
   } else {
     glClearColor(0, 0, 0, 1.f);
@@ -82,18 +66,18 @@ bool Renderer::prep_draw() {
   }
 }
 void Renderer::draw() {
-  scene->updateTree();
+  scene.updateTree();
   camera_framebuffer->bindFrameBuffer();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  scene->drawForwardTransparencyMode();
-  scene->drawBoundingBoxes();
+  scene.drawForwardTransparencyMode();
+  scene.drawBoundingBoxes();
   camera_framebuffer->unbindFrameBuffer();
   camera_framebuffer->renderFrameBufferMesh();
   errorCheck(__FILE__, __LINE__);
 }
 
 void Renderer::set_new_scene(std::pair<std::vector<Mesh *>, SceneTree> &new_scene) {
-  scene->clear();
+  scene.clear();
   Loader loader;
   EnvironmentMap2DTexture *env = loader.loadHdrEnvmap();  //! TODO in case we want to seek the cubemap to replace it's
                                                           //! texture with this , use visitor pattern in scene graph
@@ -113,14 +97,14 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh *>, SceneTree> &new_scen
   assert(cubemap_mesh);
   new_scene.first.push_back(cubemap_mesh);
   new_scene.second.pushNewRoot(cubemap_mesh);
-  scene->setScene(new_scene);
-  scene->setLightDatabasePointer(light_database);
-  scene->setCameraPointer(scene_camera);
-  light_database->clearDatabase();
-  scene->updateTree();
-  scene->generateBoundingBoxes(resource_database->getShaderDatabase().get(Shader::BOUNDING_BOX));
+  scene.setScene(new_scene);
+  scene.setLightDatabasePointer(&light_database);
+  scene.setCameraPointer(scene_camera);
+  light_database.clearDatabase();
+  scene.updateTree();
+  scene.generateBoundingBoxes(resource_database.getShaderDatabase().get(Shader::BOUNDING_BOX));
   start_draw = true;
-  resource_database->getShaderDatabase().initializeShaders();
+  resource_database.getShaderDatabase().initializeShaders();
   camera_framebuffer->updateFrameBufferShader();
 }
 
@@ -129,14 +113,12 @@ void Renderer::onLeftClick() {
     scene_camera->onLeftClick();
 }
 
-void Renderer::onRightClick() {
-  scene_camera->onRightClick();
-}
+void Renderer::onRightClick() { scene_camera->onRightClick(); }
 
 void Renderer::onLeftClickRelease() {
   if (!event_callback_stack[ON_LEFT_CLICK].empty()) {
     const auto to_process = event_callback_stack[ON_LEFT_CLICK].front();
-    if (to_process.first == ADD_ELEMENT_POINTLIGHT) {
+    if (to_process.first == ADD_ELEMENT_POINTLIGHT) {  // TODO : pack this in a class
       glm::mat4 inv_v = glm::inverse(scene_camera->getView());
       glm::mat4 inv_p = glm::inverse(scene_camera->getProjection());
       glm::vec4 w_space = glm::vec4(((float)mouse_state.pos_x * 2.f / (float)screen_size.width) - 1.f,
@@ -150,11 +132,10 @@ void Renderer::onLeftClickRelease() {
       glm::vec3 position = w_space / w_space.w;
       position.z = 0.f;
       data.position = glm::inverse(scene_camera->getSceneRotationMatrix()) * glm::vec4(position, 1.f);
-      LOG(std::string("x:") + std::to_string(data.position.x) + std::string("  y:") + std::to_string(data.position.y) +
-              std::string("  z:") + std::to_string(data.position.z),
+      LOG(std::string("x:") + std::to_string(data.position.x) + std::string("  y:") + std::to_string(data.position.y) + std::string("  z:") +
+              std::to_string(data.position.z),
           LogLevel::INFO);
-      AbstractLight *point_light = LightBuilder::createPLight(data);
-      executeMethod<ADD_ELEMENT_POINTLIGHT>(point_light);
+      NodeBuilder::store<PointLight>(resource_database.getNodeDatabase(), false, data);
       event_callback_stack[ON_LEFT_CLICK].pop();
       emit sceneModified();
     }
@@ -162,17 +143,11 @@ void Renderer::onLeftClickRelease() {
     scene_camera->onLeftClickRelease();
 }
 
-void Renderer::onRightClickRelease() {
-  scene_camera->onRightClickRelease();
-}
+void Renderer::onRightClickRelease() { scene_camera->onRightClickRelease(); }
 
-void Renderer::onScrollDown() {
-  scene_camera->zoomOut();
-}
+void Renderer::onScrollDown() { scene_camera->zoomOut(); }
 
-void Renderer::onScrollUp() {
-  scene_camera->zoomIn();
-}
+void Renderer::onScrollUp() { scene_camera->zoomIn(); }
 
 void Renderer::onResize(unsigned int width, unsigned int height) {
   screen_size.width = width;
@@ -231,29 +206,21 @@ void Renderer::resetSceneCamera() {
 }
 
 void Renderer::setRasterizerFill() {
-  if (scene) {
-    scene->setPolygonFill();
-    gl_widget->update();
-  }
+  scene.setPolygonFill();
+  gl_widget->update();
 }
 
 void Renderer::setRasterizerPoint() {
-  if (scene) {
-    scene->setPolygonPoint();
-    gl_widget->update();
-  }
+  scene.setPolygonPoint();
+  gl_widget->update();
 }
 
 void Renderer::setRasterizerWireframe() {
-  if (scene) {
-    scene->setPolygonWireframe();
-    gl_widget->update();
-  }
+  scene.setPolygonWireframe();
+  gl_widget->update();
 }
 
 void Renderer::displayBoundingBoxes(bool display) {
-  if (scene) {
-    scene->displayBoundingBoxes(display);
-    gl_widget->update();
-  }
+  scene.displayBoundingBoxes(display);
+  gl_widget->update();
 }

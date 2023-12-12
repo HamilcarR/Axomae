@@ -68,13 +68,12 @@ namespace axomae {
     }
     void addToHeap(image_type<SDL_Surface> a) {
       addToStack(a);
-      std::vector<image_type<SDL_Surface>>::iterator it = std::find_if(
-          SDLSurf_heap.begin(), SDLSurf_heap.end(), [a](image_type<SDL_Surface> b) {
-            if (a.imagetype == b.imagetype)
-              return true;
-            else
-              return false;
-          });
+      std::vector<image_type<SDL_Surface>>::iterator it = std::find_if(SDLSurf_heap.begin(), SDLSurf_heap.end(), [a](image_type<SDL_Surface> b) {
+        if (a.imagetype == b.imagetype)
+          return true;
+        else
+          return false;
+      });
       if (it != SDLSurf_heap.end()) {
         image_type<SDL_Surface> temp = *it;
         SDLSurf_heap.erase(it);
@@ -89,13 +88,12 @@ namespace axomae {
     }
 
     void addToHeap(image_type<QPaintDevice> a) {
-      std::vector<image_type<QPaintDevice>>::iterator it = std::find_if(
-          paintDevice_heap.begin(), paintDevice_heap.end(), [a](image_type<QPaintDevice> b) {
-            if (a.imagetype == b.imagetype)
-              return true;
-            else
-              return false;
-          });
+      std::vector<image_type<QPaintDevice>>::iterator it = std::find_if(paintDevice_heap.begin(), paintDevice_heap.end(), [a](image_type<QPaintDevice> b) {
+        if (a.imagetype == b.imagetype)
+          return true;
+        else
+          return false;
+      });
       if (it != paintDevice_heap.end()) {
         image_type<QPaintDevice> temp = *it;
         paintDevice_heap.erase(it);
@@ -106,13 +104,12 @@ namespace axomae {
     }
 
     void addToHeap(image_type<QGraphicsItem> a) {
-      std::vector<image_type<QGraphicsItem>>::iterator it = std::find_if(
-          graphicsItem_heap.begin(), graphicsItem_heap.end(), [a](image_type<QGraphicsItem> b) {
-            if (a.imagetype == b.imagetype)
-              return true;
-            else
-              return false;
-          });
+      std::vector<image_type<QGraphicsItem>>::iterator it = std::find_if(graphicsItem_heap.begin(), graphicsItem_heap.end(), [a](image_type<QGraphicsItem> b) {
+        if (a.imagetype == b.imagetype)
+          return true;
+        else
+          return false;
+      });
       if (it != graphicsItem_heap.end()) {
         image_type<QGraphicsItem> temp = *it;
         graphicsItem_heap.erase(it);
@@ -123,13 +120,12 @@ namespace axomae {
     }
 
     void addToHeap(image_type<QObject> a) {
-      std::vector<image_type<QObject>>::iterator it = std::find_if(
-          object_heap.begin(), object_heap.end(), [a](image_type<QObject> b) {
-            if (a.imagetype == b.imagetype)
-              return true;
-            else
-              return false;
-          });
+      std::vector<image_type<QObject>>::iterator it = std::find_if(object_heap.begin(), object_heap.end(), [a](image_type<QObject> b) {
+        if (a.imagetype == b.imagetype)
+          return true;
+        else
+          return false;
+      });
       if (it != object_heap.end()) {
         image_type<QObject> temp = *it;
         object_heap.erase(it);
@@ -267,14 +263,7 @@ namespace axomae {
     SDL_Surface *res;
     if (!src)
       return nullptr;
-    res = SDL_CreateRGBSurface(src->flags,
-                               src->w,
-                               src->h,
-                               src->format->BitsPerPixel,
-                               src->format->Rmask,
-                               src->format->Gmask,
-                               src->format->Bmask,
-                               src->format->Amask);
+    res = SDL_CreateRGBSurface(src->flags, src->w, src->h, src->format->BitsPerPixel, src->format->Rmask, src->format->Gmask, src->format->Bmask, src->format->Amask);
     if (res != nullptr) {
       SDL_BlitSurface(src, nullptr, res, nullptr);
       return res;
@@ -435,8 +424,7 @@ namespace axomae {
     QObject::connect(_UI.rasterize_fill_button, SIGNAL(pressed()), this, SLOT(set_rasterizer_fill()));
     QObject::connect(_UI.rasterize_point_button, SIGNAL(pressed()), this, SLOT(set_rasterizer_point()));
     QObject::connect(_UI.rasterize_wireframe_button, SIGNAL(pressed()), this, SLOT(set_rasterizer_wireframe()));
-    QObject::connect(
-        _UI.rasterize_display_bbox_checkbox, SIGNAL(toggled(bool)), this, SLOT(set_display_boundingbox(bool)));
+    QObject::connect(_UI.rasterize_display_bbox_checkbox, SIGNAL(toggled(bool)), this, SLOT(set_display_boundingbox(bool)));
 
     /*Renderer tab -> Lighting -> Point lights*/
     light_controller->connect_all_slots();
@@ -641,11 +629,10 @@ namespace axomae {
     SceneSelector *instance = SceneSelector::getInstance();
     Mesh *retrieved_mesh = instance->getCurrent();
     if (retrieved_mesh) {
-      SDL_Surface *surf = ImageManager::project_uv_normals(
-          retrieved_mesh->geometry,
-          _UI.uv_width->value(),
-          _UI.uv_height->value(),
-          true);  // TODO : change for managing the entire scene , maybe add scroll between different meshes
+      SDL_Surface *surf = ImageManager::project_uv_normals(retrieved_mesh->geometry,
+                                                           _UI.uv_width->value(),
+                                                           _UI.uv_height->value(),
+                                                           true);  // TODO : change for managing the entire scene , maybe add scroll between different meshes
       display_image(surf, PROJECTED_NMAP, true);
     }
   }
@@ -708,14 +695,10 @@ namespace axomae {
     SDL_Surface *copy = Controller::copy_surface(surface);
     if (copy != nullptr) {
       unsigned int factor = _UI.smooth_dial->value();
-      ImageManager::FILTER box_blur = _UI.box_blur_radio->isChecked() ? ImageManager::BOX_BLUR :
-                                                                        ImageManager::FILTER_NULL;
-      ImageManager::FILTER gaussian_blur_5_5 = _UI.gaussian_5_5_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_5_5 :
-                                                                                     ImageManager::FILTER_NULL;
-      ImageManager::FILTER gaussian_blur_3_3 = _UI.gaussian_3_3_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_3_3 :
-                                                                                     ImageManager::FILTER_NULL;
-      ImageManager::smooth_image(
-          copy, static_cast<ImageManager::FILTER>(box_blur | gaussian_blur_5_5 | gaussian_blur_3_3), factor);
+      ImageManager::FILTER box_blur = _UI.box_blur_radio->isChecked() ? ImageManager::BOX_BLUR : ImageManager::FILTER_NULL;
+      ImageManager::FILTER gaussian_blur_5_5 = _UI.gaussian_5_5_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_5_5 : ImageManager::FILTER_NULL;
+      ImageManager::FILTER gaussian_blur_3_3 = _UI.gaussian_3_3_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_3_3 : ImageManager::FILTER_NULL;
+      ImageManager::smooth_image(copy, static_cast<ImageManager::FILTER>(box_blur | gaussian_blur_5_5 | gaussian_blur_3_3), factor);
       display_image(copy, HEIGHT, true);
       image_session_pointers::height = copy;
     }
@@ -728,8 +711,7 @@ namespace axomae {
     if (copy != nullptr) {
       float factor = _UI.sharpen_float_box->value();
       ImageManager::FILTER sharpen = _UI.sharpen_radio->isChecked() ? ImageManager::SHARPEN : ImageManager::FILTER_NULL;
-      ImageManager::FILTER unsharp_masking = _UI.sharpen_masking_radio->isChecked() ? ImageManager::UNSHARP_MASKING :
-                                                                                      ImageManager::FILTER_NULL;
+      ImageManager::FILTER unsharp_masking = _UI.sharpen_masking_radio->isChecked() ? ImageManager::UNSHARP_MASKING : ImageManager::FILTER_NULL;
       ImageManager::sharpen_image(copy, static_cast<ImageManager::FILTER>(sharpen | unsharp_masking), factor);
       display_image(copy, HEIGHT, true);
       image_session_pointers::height = copy;

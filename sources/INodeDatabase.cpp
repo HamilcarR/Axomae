@@ -4,13 +4,10 @@ INodeDatabase::INodeDatabase() {}
 
 void INodeDatabase::clean() {
   Mutex::Lock lock(mutex);
-  auto lambda = [](std::pair<int, std::unique_ptr<INode>> p) -> bool {
-    if (p.first < 0)
-      return true;
-    else
-      return false;
-  };
-  database.erase(std::remove_if(database.begin(), database.end(), lambda), database.end());
+  for (const auto &A : database) {
+    if (A.first > 0)
+      database.erase(A.first);
+  }
 }
 
 void INodeDatabase::purge() {
@@ -18,10 +15,12 @@ void INodeDatabase::purge() {
   database.clear();
 }
 
-INode *INodeDatabase::get(const int id) {
+INode *INodeDatabase::get(const int id) const {
   Mutex::Lock lock(mutex);
-  return database[id].get();
+  NodeIdMap::const_iterator it = database.find(id);
+  return it == database.end() ? nullptr : it->second.get();
 }
+
 bool INodeDatabase::remove(const int id) {
   Mutex::Lock lock(mutex);
   if (database[id] != nullptr) {
@@ -58,13 +57,13 @@ int INodeDatabase::add(std::unique_ptr<INode> element, bool keep) {
     return index;
   }
 }
-bool INodeDatabase::contains(const int id) {
+bool INodeDatabase::contains(const int id) const {
   Mutex::Lock lock(mutex);
-  return database[id].get() != nullptr;
+  return database.find(id) != database.end();
 }
-std::pair<int, INode *> INodeDatabase::contains(const INode *element_address) {
+std::pair<int, INode *> INodeDatabase::contains(const INode *element_address) const {
   Mutex::Lock lock(mutex);
-  for (auto &A : database) {
+  for (const auto &A : database) {
     if (A.second.get() == element_address)
       return std::pair(A.first, A.second.get());
   }

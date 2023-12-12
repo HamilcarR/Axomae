@@ -1,13 +1,9 @@
 #include "../includes/Node.h"
 #include <algorithm>
 
-void ISceneNode::resetLocalModelMatrix() {
-  local_transformation = glm::mat4(1.f);
-}
+void ISceneNode::resetLocalModelMatrix() { local_transformation = glm::mat4(1.f); }
 
-bool INode::isLeaf() const {
-  return children.empty();
-}
+bool INode::isLeaf() const { return children.empty(); }
 
 bool INode::isRoot() const {
   if (parents.empty())
@@ -20,13 +16,9 @@ bool INode::isRoot() const {
   }
 }
 
-void INode::emptyParents() {
-  parents.clear();
-}
+void INode::emptyParents() { parents.clear(); }
 
-void INode::emptyChildren() {
-  children.clear();
-}
+void INode::emptyChildren() { children.clear(); }
 /**************************************************************************************************************************************/
 
 SceneTreeNode::SceneTreeNode(ISceneNode *_parent, ISceneHierarchy *_owner) {
@@ -41,10 +33,7 @@ SceneTreeNode::SceneTreeNode(ISceneNode *_parent, ISceneHierarchy *_owner) {
   updated = true;
 }
 
-SceneTreeNode::SceneTreeNode(const std::string &_name,
-                             const glm::mat4 &transformation,
-                             ISceneNode *parent,
-                             ISceneHierarchy *owner)
+SceneTreeNode::SceneTreeNode(const std::string &_name, const glm::mat4 &transformation, ISceneNode *parent, ISceneHierarchy *owner)
     : SceneTreeNode(parent, owner) {
   name = _name;
   local_transformation = transformation;
@@ -60,8 +49,6 @@ SceneTreeNode::SceneTreeNode(const SceneTreeNode &copy) {
   }
   setHierarchyOwner(copy.getHierarchyOwner());
 }
-
-SceneTreeNode::~SceneTreeNode() {}
 
 /**
  * The function returns the root node of a scene tree by traversing up the parent nodes until the root
@@ -106,7 +93,7 @@ SceneTreeNode &SceneTreeNode::operator=(const SceneTreeNode &copy) {
 
 void SceneTreeNode::setParents(std::vector<INode *> &nodes) {
   if (!nodes.empty()) {
-    parents.clear();  //! check if leak ?
+    parents.clear();
     parents.push_back(nodes[0]);
     if (parents[0] != nullptr)
       parents[0]->addChildNode(this);

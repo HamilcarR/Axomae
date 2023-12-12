@@ -2,7 +2,6 @@
 #define SHADERDATABASE_H
 #include "RenderingDatabaseInterface.h"
 #include "Shader.h"
-#include "ShaderFactory.h"
 #include "utils_3D.h"
 #include <map>
 
@@ -16,19 +15,13 @@
  * @brief ShaderDatabase class implementation
  *
  */
-class ShaderDatabase : public RenderingDatabaseInterface<Shader::TYPE, Shader> {
+class ShaderDatabase : public IResourceDB<Shader::TYPE, Shader> {
  public:
   /**
    * @brief Construct a new Shader Database object
    *
    */
   ShaderDatabase();
-
-  /**
-   * @brief Destroy the Shader Database object
-   *
-   */
-  virtual ~ShaderDatabase();
 
   /**
    * @brief Cleans the whole database , Deletes all shaders .
@@ -43,26 +36,6 @@ class ShaderDatabase : public RenderingDatabaseInterface<Shader::TYPE, Shader> {
   void purge() override;
 
   /**
-   * @brief This function constructs a shader and stores it in the shader database if it does not already exist and
-   * returns it.
-   *
-   * @param vertex_code A string containing the source code for the vertex shader.
-   * @param fragment_code A string containing the source code for the fragment shader.
-   *
-   * @return Shader* Pointer to the constructed shader , or the existing one
-   *
-   */
-  template<class TYPE>
-  Shader *addShader(const std::string vertex_code, const std::string fragment_code) {
-    Mutex::Lock lock(mutex);
-    std::unique_ptr<TYPE> temp_shader = ShaderBuilder::build<TYPE>(vertex_code, fragment_code);
-    auto type = temp_shader->getType();
-    if (shader_database.find(type) == shader_database.end())
-      shader_database[type] = std::move(temp_shader);
-    return shader_database[type].get();
-  }
-
-  /**
    * The function checks if a shader type exists in a shader database.
    *
    * @param type The parameter "type" is of type Shader::TYPE, which is an enumerated type representing
@@ -72,7 +45,7 @@ class ShaderDatabase : public RenderingDatabaseInterface<Shader::TYPE, Shader> {
    * @return The function `contains` returns a boolean value indicating whether the `shader_database`
    * contains a shader of the specified `type`.
    */
-  virtual bool contains(const Shader::TYPE type) override;
+  virtual bool contains(const Shader::TYPE type) const override;
 
   /**
    * This function returns a pointer to a shader object of a given type from a shader database, or
@@ -85,24 +58,8 @@ class ShaderDatabase : public RenderingDatabaseInterface<Shader::TYPE, Shader> {
    * @return a pointer to a Shader object of the specified type if it exists in the shader_database map.
    * If the shader of the specified type does not exist in the map, the function returns a null pointer.
    */
-  Shader *get(const Shader::TYPE type) override;
-
-  /**
-   * @brief
-   *
-   * @param type
-   * @return true
-   * @return false
-   */
+  Shader *get(const Shader::TYPE type) const override;
   virtual bool remove(const Shader::TYPE type);
-
-  /**
-   * @brief
-   *
-   * @param shader
-   * @return true
-   * @return false
-   */
   virtual bool remove(const Shader *shader);
 
   /**
@@ -132,7 +89,7 @@ class ShaderDatabase : public RenderingDatabaseInterface<Shader::TYPE, Shader> {
    * @param shader Shader to search
    * @return std::pair<Shader::TYPE , Shader*> Pair <ID , Shader*>. If nothing found , returns <Shader::EMPTY , nullptr>
    */
-  virtual std::pair<Shader::TYPE, Shader *> contains(const Shader *shader) override;
+  virtual std::pair<Shader::TYPE, Shader *> contains(const Shader *shader) const override;
 
  private:
   std::map<Shader::TYPE, std::unique_ptr<Shader>> shader_database;

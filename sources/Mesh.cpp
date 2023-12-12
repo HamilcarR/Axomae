@@ -35,8 +35,7 @@ Mesh::Mesh(const std::string &n, const Object3D &geo, const Material &mat, IScen
   shader_program = nullptr;
 }
 
-Mesh::Mesh(const std::string &n, const Object3D &geo, const Material &mat, Shader *shader, ISceneNode *parent)
-    : Mesh(parent) {
+Mesh::Mesh(const std::string &n, const Object3D &geo, const Material &mat, Shader *shader, ISceneNode *parent) : Mesh(parent) {
   geometry = geo;
   material = mat;
   name = n;
@@ -44,8 +43,7 @@ Mesh::Mesh(const std::string &n, const Object3D &geo, const Material &mat, Shade
   material.setShaderPointer(shader);
 }
 
-Mesh::Mesh(const std::string &n, const Object3D &&geo, const Material &mat, Shader *shader, ISceneNode *parent)
-    : Mesh(parent) {
+Mesh::Mesh(const std::string &n, const Object3D &&geo, const Material &mat, Shader *shader, ISceneNode *parent) : Mesh(parent) {
   geometry = std::move(geo);
   material = mat;
   name = n;

@@ -18,6 +18,7 @@ class ISceneHierarchy;
 class INode {
  public:
   virtual ~INode() {}
+
   /**
    * @brief Returns the array of children
    *
@@ -69,53 +70,41 @@ class INode {
    *
    * @param marked
    */
-  void setMark(bool marked) {
-    mark = marked;
-  }
+  void setMark(bool marked) { mark = marked; }
 
   /**
    * @brief Check if the current node is marked
    *
    */
-  bool isMarked() {
-    return mark;
-  }
+  bool isMarked() { return mark; }
 
   /**
    * @brief Set the Name of the node
    *
    * @param str
    */
-  void setName(std::string str) {
-    name = str;
-  }
+  void setName(std::string str) { name = str; }
 
   /**
    * @brief Get the Name of the node
    *
    * @return const std::string&
    */
-  const std::string &getName() const {
-    return name;
-  }
+  const std::string &getName() const { return name; }
 
   /**
    * @brief Specify the structure that owns this node
    *
    * @param _owner
    */
-  void setHierarchyOwner(ISceneHierarchy *_owner) {
-    owner = _owner;
-  }
+  void setHierarchyOwner(ISceneHierarchy *_owner) { owner = _owner; }
 
   /**
    * @brief Returns a pointer on the structure that owns this node
    *
    * @return SceneHierarchyInterface*
    */
-  ISceneHierarchy *getHierarchyOwner() const {
-    return owner;
-  }
+  ISceneHierarchy *getHierarchyOwner() const { return owner; }
 
   /**
    * @brief Check if node is root
@@ -137,9 +126,7 @@ class INode {
    *
    * @return true
    */
-  virtual bool isUpdated() const {
-    return updated;
-  }
+  virtual bool isUpdated() const { return updated; }
 
  protected:
   bool mark;                     /*<Generic mark , for graph traversal*/
@@ -148,6 +135,7 @@ class INode {
   std::vector<INode *> parents;  /*<List of parents*/
   std::vector<INode *> children; /*<List of children*/
   ISceneHierarchy *owner;        /*<Structure owning this hierarchy*/
+  int flag;                      /*<Flag indicate what operations need to be done on this node*/
 };
 
 /**
@@ -156,12 +144,6 @@ class INode {
  */
 class ISceneNode : public INode {
  public:
-  /**
-   * @brief Destroy the Scene Node Interface object
-   *
-   */
-  virtual ~ISceneNode() {}
-
   /**
    * @brief Compute the final model matrix , by multiplying the accumulated transformation with the local transformation
    *
@@ -174,18 +156,14 @@ class ISceneNode : public INode {
    *
    * @return const glm::mat4
    */
-  virtual const glm::mat4 getLocalModelMatrix() const {
-    return local_transformation;
-  }
+  virtual const glm::mat4 getLocalModelMatrix() const { return local_transformation; }
 
   /**
    * @brief Set the Local Model Matrix object
    *
    * @param matrix
    */
-  virtual void setLocalModelMatrix(const glm::mat4 matrix) {
-    local_transformation = matrix;
-  }
+  virtual void setLocalModelMatrix(const glm::mat4 matrix) { local_transformation = matrix; }
 
   /**
    * @brief Sets the local transformation to identity
@@ -198,18 +176,14 @@ class ISceneNode : public INode {
    *
    * @param matrix
    */
-  virtual void setAccumulatedModelMatrix(const glm::mat4 &matrix) {
-    accumulated_transformation = matrix;
-  }
+  virtual void setAccumulatedModelMatrix(const glm::mat4 &matrix) { accumulated_transformation = matrix; }
 
   /**
    * @brief Get the Accumulated Model Matrix
    *
    * @return const glm::mat4&
    */
-  virtual const glm::mat4 &getAccumulatedModelMatrix() const {
-    return accumulated_transformation;
-  }
+  virtual const glm::mat4 &getAccumulatedModelMatrix() const { return accumulated_transformation; }
 
  protected:
   glm::mat4 local_transformation;       /*<Local transformation of the node*/
@@ -224,7 +198,7 @@ class ISceneNode : public INode {
  * @brief Provides implementation for a scene tree node
  */
 class SceneTreeNode : public ISceneNode {
- public:
+ protected:
   /**
    * @brief Construct a new Scene Tree Node object
    *
@@ -241,23 +215,22 @@ class SceneTreeNode : public ISceneNode {
    * @param parent
    * @param owner
    */
-  SceneTreeNode(const std::string &name,
-                const glm::mat4 &transformation,
-                ISceneNode *parent = nullptr,
-                ISceneHierarchy *owner = nullptr);
+  SceneTreeNode(const std::string &name, const glm::mat4 &transformation, ISceneNode *parent = nullptr, ISceneHierarchy *owner = nullptr);
 
+  /**
+   * @brief Set the predecessor of this node in the scene tree . Note that only the first element of the vector is
+   * stored as parent , as this structure is a tree.
+   * @param parents Vector of predecessors . Only the first element is considered
+   */
+  virtual void setParents(std::vector<INode *> &parents) override;
+
+ public:
   /**
    * @brief Construct a new Scene Tree Node object
    *
    * @param copy SceneTreeNode copy
    */
   SceneTreeNode(const SceneTreeNode &copy);
-
-  /**
-   * @brief Destroy the Node
-   *
-   */
-  virtual ~SceneTreeNode();
 
   /**
    * @brief Computes the final model matrix of the object in world space
@@ -300,18 +273,14 @@ class SceneTreeNode : public ISceneNode {
    *
    * @return const std::vector<ISceneNode*>&
    */
-  virtual const std::vector<INode *> &getChildren() const {
-    return children;
-  };
+  virtual const std::vector<INode *> &getChildren() const { return children; };
 
   /**
    * @brief Get the parents of this node . In case this is a SceneTreeNode , the returned vector is of size 1
    *
    * @return std::vector<ISceneNode*>
    */
-  virtual const std::vector<INode *> &getParents() const {
-    return parents;
-  }
+  virtual const std::vector<INode *> &getParents() const { return parents; }
 
   /**
    * @brief Returns the root node of the tree
@@ -321,12 +290,6 @@ class SceneTreeNode : public ISceneNode {
   virtual ISceneNode *returnRoot();
 
  protected:
-  /**
-   * @brief Set the predecessor of this node in the scene tree . Note that only the first element of the vector is
-   * stored as parent , as this structure is a tree.
-   * @param parents Vector of predecessors . Only the first element is considered
-   */
-  virtual void setParents(std::vector<INode *> &parents) override;
 };
 
 /***************************************************************************************************************************************************/

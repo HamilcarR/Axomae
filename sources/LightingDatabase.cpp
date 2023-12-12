@@ -1,4 +1,5 @@
 #include "../includes/LightingDatabase.h"
+#include "../includes/ResourceDatabaseManager.h"
 #include "../includes/UniformNames.h"
 
 /* Sets up a new ID for the light if none is available , or give an old one that belonged to a former light*/
@@ -14,12 +15,26 @@ void LightingDatabase::giveID(AbstractLight *light) {
 
 LightingDatabase::LightingDatabase() {
   last_id = 0;
+  node_database = &ResourceDatabaseManager::getInstance().getNodeDatabase();
 }
 
 LightingDatabase::~LightingDatabase() {}
 
+bool LightingDatabase::addLight(int node_database_index) {
+  AbstractLight *light = static_cast<AbstractLight *>(node_database->get(node_database_index));
+  assert(light);
+  if (contains(light))
+    return false;
+  AbstractLight::TYPE type = light->getType();
+  light_database[type].push_back(light);
+  giveID(light);
+  return true;
+}
+
 bool LightingDatabase::addLight(AbstractLight *light) {
-  assert(light != nullptr);
+  assert(light);
+  if (contains(light))
+    return false;
   AbstractLight::TYPE type = light->getType();
   light_database[type].push_back(light);
   giveID(light);
@@ -32,7 +47,7 @@ bool LightingDatabase::removeLight(AbstractLight *light) {
     for (auto it = array.second.begin(); it != array.second.end(); it++) {
       if (*it == light) {
         array.second.erase(it);
-        delete light;
+        node_database->remove(static_cast<INode *>(*it));
         return true;
       }
     }
@@ -45,7 +60,7 @@ bool LightingDatabase::removeLight(const unsigned index) {
       if ((*it)->getID() == index) {
         AbstractLight *temp = *it;
         array.second.erase(it);
-        delete temp;
+        node_database->remove(static_cast<INode *>(*it));
         return true;
       }
     }
@@ -68,26 +83,11 @@ bool LightingDatabase::updateLight(const unsigned id, const LightData &data) {
   return true;
 }
 
-const std::vector<AbstractLight *> &LightingDatabase::getLightsArrayByType(AbstractLight::TYPE type) {
-  return light_database[type];
-}
+const std::vector<AbstractLight *> &LightingDatabase::getLightsArrayByType(AbstractLight::TYPE type) const { return light_database.at(type); }
 
-void LightingDatabase::eraseLightsArray(AbstractLight::TYPE type) {
-  auto arr = light_database[type];
-  for (AbstractLight *A : arr)
-    delete A;
-  light_database.erase(type);
-}
+void LightingDatabase::eraseLightsArray(AbstractLight::TYPE type) { light_database.erase(type); }
 
-void LightingDatabase::clearDatabase() {
-  for (auto it = light_database.begin(); it != light_database.end(); it++) {
-    auto type_array = light_database[it->first];
-    for (auto *A : type_array) {
-      delete A;
-    }
-  }
-  light_database.clear();
-}
+void LightingDatabase::clearDatabase() { light_database.clear(); }
 
 void LightingDatabase::updateShadersData(AbstractLight::TYPE type, Shader *shader, glm::mat4 &view) {
   std::vector<AbstractLight *> array = light_database[type];
@@ -113,4 +113,13 @@ void LightingDatabase::updateShadersData(Shader *shader, glm::mat4 &view) {
     }
     updateShadersData(it->first, shader, view);
   }
+}
+
+bool LightingDatabase::contains(AbstractLight *light) const {
+  for (const auto &A : light_database) {
+    for (const AbstractLight *B : A.second)
+      if (light == B)
+        return true;
+  }
+  return false;
 }

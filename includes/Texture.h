@@ -25,6 +25,8 @@ class Texture {
   Texture(TextureData *tex);
 
  public:
+  virtual ~Texture() {}
+
   /**
    * @brief Internal format of textures
    *
@@ -49,33 +51,37 @@ class Texture {
     GENERIC_CUBE = -3,    /**<Generic cubemap for general purpose */
     GENERIC = -2,         /**<Generic texture used for general purpose */
     EMPTY = -1,           /**<Designate an empty , non generated texture*/
-    FRAMEBUFFER = 1,      /**<A texture to be rendered and displayed as a custom framebuffer , by the screen*/
-    DIFFUSE = 2,          /**<Diffuse texture. In case the shader used is PBR , this is the albedo*/
+    FRAMEBUFFER = 1,      /**<A texture to be rendered and displayed as a custom
+                             framebuffer , by the screen*/
+    DIFFUSE = 2,          /**<Diffuse texture. In case the shader used is PBR , this is
+                             the albedo*/
     NORMAL = 3,           /**<A normal map texture. Stores normal data*/
-    METALLIC = 4,         /**<Metallic texture. Stores the amount of metallic property at a given texel.*/
+    METALLIC = 4,         /**<Metallic texture. Stores the amount of metallic property
+                             at a given texel.*/
     ROUGHNESS = 5,        /**<A roughness texture.*/
-    AMBIANTOCCLUSION = 6, /**<Ambiant occlusion texture. Occludes light contributions in some areas of the mesh */
+    AMBIANTOCCLUSION = 6, /**<Ambiant occlusion texture. Occludes light
+                             contributions in some areas of the mesh */
     SPECULAR = 7,         /**<Specular texture. In case of PBR , this texture may not be used*/
     EMISSIVE = 8,         /**<Emissive texture. This texture emits light */
     OPACITY = 9,          /**<Alpha blending map . Provides transparency data*/
-    CUBEMAP = 10,         /**<Environment map , in the form of a cubemap. Possesses mip maps for use in specular BRDF*/
-    ENVMAP2D = 11, /**<Raw 2D environment map , in equirectangular form. This texture is not used in the final draw loop
-                      , until it has been baked into a regular cubemap. */
-    IRRADIANCE = 12, /**<Irradiance map . Provides ambient lighting data to the PBR shaders. */
-    BRDFLUT = 13     /**<BRDF lookup texture. Stores reflection factor according to it's texture coordinates*/
+    CUBEMAP = 10,         /**<Environment map , in the form of a cubemap. Possesses mip
+                             maps for use in specular BRDF*/
+    ENVMAP2D = 11,        /**<Raw 2D environment map , in equirectangular form. This
+                             texture is not used in the final draw loop , until it has
+                             been baked into a regular cubemap. */
+    IRRADIANCE = 12,      /**<Irradiance map . Provides ambient lighting data to the
+                             PBR shaders. */
+    BRDFLUT = 13          /**<BRDF lookup texture. Stores reflection factor according to
+                             it's texture coordinates*/
   };
 
   /**
    * @brief Sets the raw data
-   * @param texture A pointer to a TextureData object that contains information about the texture,
-   * including its width, height, and pixel data.
+   * @param texture A pointer to a TextureData object that contains information
+   * about the texture, including its width, height, and pixel data.
    */
   virtual void set(TextureData *texture);
-  void clean();
-
-  unsigned int getSamplerID() {
-    return sampler2D;
-  }
+  unsigned int getSamplerID() { return sampler2D; }
 
   /**
    * @brief Set the texture's sampler ID .
@@ -83,58 +89,32 @@ class Texture {
    * In this case , the caller needs to free the sampler2D ID first.
    * @param id New Sampler2D id.
    */
-  void setSamplerID(unsigned int id) {
-    sampler2D = id;
-  }
-
-  void setTextureType(TYPE type) {
-    name = type;
-  }
-
-  TYPE getTextureType() {
-    return name;
-  };
-
-  virtual void bindTexture() = 0;
-  virtual void unbindTexture() = 0;
-  virtual void setGlData(Shader *shader) = 0;
-  void cleanGlData();
-
-  virtual void setNewSize(unsigned width, unsigned height);
-
-  virtual bool isDummyTexture() {
-    return is_dummy;
-  }
-
-  void setDummy(bool d) {
-    is_dummy = d;
-  }
+  void setSamplerID(unsigned int id) { sampler2D = id; }
+  void setTextureType(TYPE type) { name = type; }
+  TYPE getTextureType() { return name; };
+  virtual bool isDummyTexture() { return is_dummy; }
+  void setDummy(bool d) { is_dummy = d; }
 
   /**
    * @brief Checks if the texture has raw pixel data stored
    *
    */
-  virtual bool empty() {
-    return data.empty() && f_data.empty();
-  }
-
-  virtual bool isInitialized() {
-    return sampler2D != 0;
-  }
-
-  virtual void setMipmapsLevel(unsigned level) {
-    mipmaps = level;
-  }
-
-  virtual unsigned int getMipmapsLevel() {
-    return mipmaps;
-  }
-
+  virtual bool empty() { return data.empty() && f_data.empty(); }
+  virtual bool isInitialized() { return sampler2D != 0; }
+  virtual void setMipmapsLevel(unsigned level) { mipmaps = level; }
+  virtual unsigned int getMipmapsLevel() { return mipmaps; }
   /**
-   * @brief Generate mip maps , and set texture filters accordingly (LINEAR_MIPMAP_LINEAR)
+   * @brief Generate mip maps , and set texture filters accordingly
+   * (LINEAR_MIPMAP_LINEAR)
    *
    */
   virtual void generateMipmap();
+  virtual void bindTexture() = 0;
+  virtual void unbindTexture() = 0;
+  virtual void setGlData(Shader *shader) = 0;
+  void cleanGlData();
+  virtual void setNewSize(unsigned width, unsigned height);
+  void clean();
 
  protected:
   /**
@@ -178,16 +158,15 @@ class DiffuseTexture : public Texture {
    */
   virtual void setGlData(Shader *shader);
   /**
-   * @brief This overriden method will additionally check for the presence of transparency in the map.
-   * If alpha < 1.f , the texture is considered as having transparency values.
+   * @brief This overriden method will additionally check for the presence of
+   * transparency in the map. If alpha < 1.f , the texture is considered as
+   * having transparency values.
    *
    * @param texture Texture data to copy.
    */
   virtual void set(TextureData *texture) override;
 
-  virtual bool hasTransparency() {
-    return has_transparency;
-  }
+  virtual bool hasTransparency() { return has_transparency; }
 
   /**
    * @brief Get the texture string description
@@ -350,18 +329,15 @@ class GenericTexture2D : public Texture {
  */
 class CubemapTexture : public Texture {
  protected:
-  CubemapTexture(FORMAT internal_format = RGBA,
-                 FORMAT data_format = RGBA,
-                 FORMAT data_type = UBYTE,
-                 unsigned width = 0,
-                 unsigned height = 0);
+  CubemapTexture(FORMAT internal_format = RGBA, FORMAT data_format = RGBA, FORMAT data_type = UBYTE, unsigned width = 0, unsigned height = 0);
 
   CubemapTexture(TextureData *data);
 
  public:
   /*
    *
-   * width * height is the size of one single face. The total size of the cubemap will be :
+   * width * height is the size of one single face. The total size of the
+   *cubemap will be :
    *
    * 	6 x width x height x sizeof(uint32_t) bytes
    * with height = width .
@@ -373,7 +349,8 @@ class CubemapTexture : public Texture {
    * 	  4 x width² = BOTTOM => GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
    * 	  5 x width² = BACK => GL_TEXTURE_CUBE_MAP_POSITIVE_Z
    * 	  6 x width² = FRONT => GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
-   *!Note : If TextureData == nullptr , this will instead allocate an empty cubemap .
+   *!Note : If TextureData == nullptr , this will instead allocate an empty
+   *cubemap .
    */
 
   virtual void initializeTexture2D() override;
@@ -391,11 +368,7 @@ class CubemapTexture : public Texture {
 /******************************************************************************************************************************************************************************************************************/
 class GenericCubemapTexture : public CubemapTexture {
  protected:
-  GenericCubemapTexture(FORMAT internal_format = RGBA,
-                        FORMAT data_format = RGBA,
-                        FORMAT data_type = UBYTE,
-                        unsigned width = 0,
-                        unsigned height = 0);
+  GenericCubemapTexture(FORMAT internal_format = RGBA, FORMAT data_format = RGBA, FORMAT data_type = UBYTE, unsigned width = 0, unsigned height = 0);
 
   GenericCubemapTexture(TextureData *data);
 
@@ -405,21 +378,13 @@ class GenericCubemapTexture : public CubemapTexture {
   virtual void setGlData(Shader *shader);
   const char *getTextureTypeCStr();
 
-  void setTextureUnit(unsigned int tex_unit) {
-    texture_unit = tex_unit;
-  }
+  void setTextureUnit(unsigned int tex_unit) { texture_unit = tex_unit; }
 
-  void setLocationName(std::string loc_name) {
-    location_name = loc_name;
-  }
+  void setLocationName(std::string loc_name) { location_name = loc_name; }
 
-  unsigned int getTextureUnit() {
-    return texture_unit;
-  }
+  unsigned int getTextureUnit() { return texture_unit; }
 
-  std::string getLocationName() {
-    return location_name;
-  }
+  std::string getLocationName() { return location_name; }
 
  protected:
   unsigned int texture_unit;
@@ -433,11 +398,7 @@ class GenericCubemapTexture : public CubemapTexture {
  */
 class IrradianceTexture : public CubemapTexture {
  protected:
-  IrradianceTexture(FORMAT internal_format = RGB16F,
-                    FORMAT data_format = RGB,
-                    FORMAT data_type = FLOAT,
-                    unsigned width = 0,
-                    unsigned height = 0);
+  IrradianceTexture(FORMAT internal_format = RGB16F, FORMAT data_format = RGB, FORMAT data_type = FLOAT, unsigned width = 0, unsigned height = 0);
 
   IrradianceTexture(TextureData *data);
 
@@ -452,11 +413,8 @@ class IrradianceTexture : public CubemapTexture {
  */
 class EnvironmentMap2DTexture : public Texture {
  protected:
-  EnvironmentMap2DTexture(FORMAT internal_format = RGB32F,
-                          FORMAT data_format = RGB,
-                          FORMAT data_type = FLOAT,
-                          unsigned width = 0,
-                          unsigned height = 0);
+  EnvironmentMap2DTexture(
+      FORMAT internal_format = RGB32F, FORMAT data_format = RGB, FORMAT data_type = FLOAT, unsigned width = 0, unsigned height = 0);
 
   EnvironmentMap2DTexture(TextureData *data);
 
@@ -479,7 +437,8 @@ class FrameBufferTexture : public Texture {
   FrameBufferTexture();
   /**
    * @brief Construct a new Frame Buffer Texture
-   * Contains only width , and height... The rest of the TextureData parameter is not used,
+   * Contains only width , and height... The rest of the TextureData parameter
+   * is not used,
    * @param data TextureData parameter
    *
    */
@@ -501,9 +460,11 @@ class FrameBufferTexture : public Texture {
 /**
  * @class BRDFLookupTexture
  * @brief PBR BRDF texture .
- * @note Pre baked texture storing the amount of specular reflection for a given triplets of (I , V , R) , where I is
- * the incident light , V is the view direction , and R a roughness value . IE , for (X , Y) being the texture
- * coordinates , Y is a roughness scale , X <==> (I dot V) is the angle betweend the incident light and view direction.
+ * @note Pre baked texture storing the amount of specular reflection for a given
+ * triplets of (I , V , R) , where I is the incident light , V is the view
+ * direction , and R a roughness value . IE , for (X , Y) being the texture
+ * coordinates , Y is a roughness scale , X <==> (I dot V) is the angle betweend
+ * the incident light and view direction.
  */
 class BRDFLookupTexture : public Texture {
  protected:

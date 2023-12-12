@@ -26,25 +26,12 @@ class Drawable {
   Drawable();
 
   /**
-   * @brief Construct a new Drawable object from a Mesh
-   *
-   * @param mesh Reference to a mesh
-   */
-  Drawable(Mesh &mesh);
-
-  /**
    * @brief Construct a new Drawable object from a Mesh.
    * !NOTE : The mesh needs to be fully constructed before linking it to a Drawable . Shaders in particular should be
    * set .
    * @param mesh Pointer to a mesh
    */
   Drawable(Mesh *mesh);
-
-  /**
-   * @brief Destroy the Drawable object
-   *
-   */
-  virtual ~Drawable();
 
   /**
    * @brief Initialize gl buffers and Mesh data like materials and shaders
@@ -95,9 +82,7 @@ class Drawable {
    * @brief Returns the mesh
    *
    */
-  Mesh *getMeshPointer() {
-    return mesh_object;
-  }
+  Mesh *getMeshPointer() { return mesh_object; }
 
   /**
    * @brief Get the Mesh's Shader pointer

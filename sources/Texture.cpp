@@ -81,13 +81,11 @@ void Texture::set(TextureData *texture) {
   height = texture->height;
   if (!texture->data.empty()) {
     data.resize(width * height);
-    for (unsigned int i = 0; i < width * height; i++)
-      data[i] = texture->data[i];
+    data = texture->data;
   }
   if (!texture->f_data.empty()) {
     f_data.resize(width * height * texture->nb_components);
-    for (unsigned i = 0; i < width * height * texture->nb_components; i++)
-      f_data[i] = texture->f_data[i];
+    f_data = texture->f_data;
   }
   data_format = static_cast<Texture::FORMAT>(texture->data_format);
   internal_format = static_cast<Texture::FORMAT>(texture->internal_format);
@@ -95,9 +93,7 @@ void Texture::set(TextureData *texture) {
   mipmaps = texture->mipmaps;
 }
 
-void Texture::clean() {
-  cleanGlData();
-}
+void Texture::clean() { cleanGlData(); }
 
 void Texture::setTextureParametersOptions() {
   glGenerateMipmap(GL_TEXTURE_2D);
@@ -136,9 +132,7 @@ void Texture::cleanGlData() {
 }
 
 /****************************************************************************************************************************/
-DiffuseTexture::DiffuseTexture() {
-  name = DIFFUSE;
-}
+DiffuseTexture::DiffuseTexture() { name = DIFFUSE; }
 
 DiffuseTexture::DiffuseTexture(TextureData *data) : Texture(data) {
   name = DIFFUSE;
@@ -181,14 +175,10 @@ void DiffuseTexture::set(TextureData *texture) {
   }
 }
 
-const char *DiffuseTexture::getTextureTypeCStr() {
-  return texture_type_c_str[DIFFUSE];
-}
+const char *DiffuseTexture::getTextureTypeCStr() { return texture_type_c_str[DIFFUSE]; }
 
 /****************************************************************************************************************************/
-NormalTexture::NormalTexture() {
-  name = NORMAL;
-}
+NormalTexture::NormalTexture() { name = NORMAL; }
 
 NormalTexture::NormalTexture(TextureData *texture) : Texture(texture) {
   name = NORMAL;
@@ -215,14 +205,10 @@ void NormalTexture::unbindTexture() {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-const char *NormalTexture::getTextureTypeCStr() {
-  return texture_type_c_str[NORMAL];
-}
+const char *NormalTexture::getTextureTypeCStr() { return texture_type_c_str[NORMAL]; }
 
 /****************************************************************************************************************************/
-MetallicTexture::MetallicTexture() {
-  name = METALLIC;
-}
+MetallicTexture::MetallicTexture() { name = METALLIC; }
 
 MetallicTexture::MetallicTexture(TextureData *data) : Texture(data) {
   name = METALLIC;
@@ -249,14 +235,10 @@ void MetallicTexture::unbindTexture() {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-const char *MetallicTexture::getTextureTypeCStr() {
-  return texture_type_c_str[METALLIC];
-}
+const char *MetallicTexture::getTextureTypeCStr() { return texture_type_c_str[METALLIC]; }
 
 /****************************************************************************************************************************/
-RoughnessTexture::RoughnessTexture() {
-  name = ROUGHNESS;
-}
+RoughnessTexture::RoughnessTexture() { name = ROUGHNESS; }
 
 RoughnessTexture::RoughnessTexture(TextureData *data) : Texture(data) {
   name = ROUGHNESS;
@@ -283,14 +265,10 @@ void RoughnessTexture::unbindTexture() {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-const char *RoughnessTexture::getTextureTypeCStr() {
-  return texture_type_c_str[ROUGHNESS];
-}
+const char *RoughnessTexture::getTextureTypeCStr() { return texture_type_c_str[ROUGHNESS]; }
 
 /****************************************************************************************************************************/
-AmbiantOcclusionTexture::AmbiantOcclusionTexture() {
-  name = AMBIANTOCCLUSION;
-}
+AmbiantOcclusionTexture::AmbiantOcclusionTexture() { name = AMBIANTOCCLUSION; }
 
 AmbiantOcclusionTexture::AmbiantOcclusionTexture(TextureData *data) : Texture(data) {
   name = AMBIANTOCCLUSION;
@@ -317,14 +295,10 @@ void AmbiantOcclusionTexture::unbindTexture() {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-const char *AmbiantOcclusionTexture::getTextureTypeCStr() {
-  return texture_type_c_str[AMBIANTOCCLUSION];
-}
+const char *AmbiantOcclusionTexture::getTextureTypeCStr() { return texture_type_c_str[AMBIANTOCCLUSION]; }
 
 /****************************************************************************************************************************/
-SpecularTexture::SpecularTexture() {
-  name = SPECULAR;
-}
+SpecularTexture::SpecularTexture() { name = SPECULAR; }
 
 SpecularTexture::SpecularTexture(TextureData *data) : Texture(data) {
   name = SPECULAR;
@@ -351,14 +325,10 @@ void SpecularTexture::unbindTexture() {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-const char *SpecularTexture::getTextureTypeCStr() {
-  return texture_type_c_str[SPECULAR];
-}
+const char *SpecularTexture::getTextureTypeCStr() { return texture_type_c_str[SPECULAR]; }
 
 /****************************************************************************************************************************/
-EmissiveTexture::EmissiveTexture() {
-  name = EMISSIVE;
-}
+EmissiveTexture::EmissiveTexture() { name = EMISSIVE; }
 
 EmissiveTexture::EmissiveTexture(TextureData *data) : Texture(data) {
   name = EMISSIVE;
@@ -395,14 +365,10 @@ void EmissiveTexture::unbindTexture() {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-const char *EmissiveTexture::getTextureTypeCStr() {
-  return texture_type_c_str[EMISSIVE];
-}
+const char *EmissiveTexture::getTextureTypeCStr() { return texture_type_c_str[EMISSIVE]; }
 
 /****************************************************************************************************************************/
-OpacityTexture::OpacityTexture() {
-  name = OPACITY;
-}
+OpacityTexture::OpacityTexture() { name = OPACITY; }
 
 OpacityTexture::OpacityTexture(TextureData *data) : Texture(data) {
   name = OPACITY;
@@ -429,19 +395,13 @@ void OpacityTexture::unbindTexture() {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-const char *OpacityTexture::getTextureTypeCStr() {
-  return texture_type_c_str[OPACITY];
-}
+const char *OpacityTexture::getTextureTypeCStr() { return texture_type_c_str[OPACITY]; }
 
 /****************************************************************************************************************************/
 
-GenericTexture2D::GenericTexture2D() {
-  name = GENERIC;
-}
+GenericTexture2D::GenericTexture2D() { name = GENERIC; }
 
-GenericTexture2D::GenericTexture2D(TextureData *data) : Texture(data) {
-  name = GENERIC;
-}
+GenericTexture2D::GenericTexture2D(TextureData *data) : Texture(data) { name = GENERIC; }
 
 void GenericTexture2D::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
@@ -462,21 +422,14 @@ void GenericTexture2D::unbindTexture() {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-const char *GenericTexture2D::getTextureTypeCStr() {
-  return location_name.c_str();
-}
+const char *GenericTexture2D::getTextureTypeCStr() { return location_name.c_str(); }
 
-void GenericTexture2D::setTextureUnit(unsigned int tex_unit) {
-  texture_unit = tex_unit;
-}
+void GenericTexture2D::setTextureUnit(unsigned int tex_unit) { texture_unit = tex_unit; }
 
-void GenericTexture2D::setLocationName(std::string _name) {
-  location_name = _name;
-}
+void GenericTexture2D::setLocationName(std::string _name) { location_name = _name; }
 
 /****************************************************************************************************************************/
-CubemapTexture::CubemapTexture(
-    FORMAT _internal_format, FORMAT _data_format, FORMAT _data_type, unsigned _width, unsigned _height)
+CubemapTexture::CubemapTexture(FORMAT _internal_format, FORMAT _data_format, FORMAT _data_type, unsigned _width, unsigned _height)
     : Texture() {  //! Move arguments to Texture()
   name = CUBEMAP;
   internal_format = _internal_format;
@@ -519,21 +472,12 @@ void CubemapTexture::initializeTexture2D() {
   if (!data.empty())
     for (unsigned int i = 1; i <= 6; i++) {
       uint32_t *pointer_to_data = data.data() + (i - 1) * width * height;
-      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (i - 1),
-                   0,
-                   internal_format,
-                   width,
-                   height,
-                   0,
-                   data_format,
-                   data_type,
-                   pointer_to_data);
+      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (i - 1), 0, internal_format, width, height, 0, data_format, data_type, pointer_to_data);
       errorCheck(__FILE__, __LINE__);
     }
   else
     for (unsigned i = 0; i < 6; i++) {
-      glTexImage2D(
-          GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internal_format, width, height, 0, data_format, data_type, nullptr);
+      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internal_format, width, height, 0, data_format, data_type, nullptr);
       errorCheck(__FILE__, __LINE__);
     }
 
@@ -573,21 +517,16 @@ void CubemapTexture::setNewSize(unsigned w, unsigned h) {
   //! Implements this
 }
 
-const char *CubemapTexture::getTextureTypeCStr() {
-  return texture_type_c_str[CUBEMAP];
-}
+const char *CubemapTexture::getTextureTypeCStr() { return texture_type_c_str[CUBEMAP]; }
 
 /****************************************************************************************************************************/
 
-GenericCubemapTexture::GenericCubemapTexture(
-    FORMAT internal_format, FORMAT data_format, FORMAT data_type, unsigned width, unsigned height)
+GenericCubemapTexture::GenericCubemapTexture(FORMAT internal_format, FORMAT data_format, FORMAT data_type, unsigned width, unsigned height)
     : CubemapTexture(internal_format, data_format, data_type, width, height) {
   name = GENERIC_CUBE;
 }
 
-GenericCubemapTexture::GenericCubemapTexture(TextureData *data) : CubemapTexture(data) {
-  name = GENERIC_CUBE;
-}
+GenericCubemapTexture::GenericCubemapTexture(TextureData *data) : CubemapTexture(data) { name = GENERIC_CUBE; }
 
 void GenericCubemapTexture::bindTexture() {
   glActiveTexture(GL_TEXTURE0 + texture_unit);
@@ -607,13 +546,10 @@ void GenericCubemapTexture::setGlData(Shader *shader) {
   unbindTexture();
 }
 
-const char *GenericCubemapTexture::getTextureTypeCStr() {
-  return location_name.c_str();
-}
+const char *GenericCubemapTexture::getTextureTypeCStr() { return location_name.c_str(); }
 
 /****************************************************************************************************************************/
-IrradianceTexture::IrradianceTexture(
-    FORMAT _internal_format, FORMAT _data_format, FORMAT _data_type, unsigned _width, unsigned _height)
+IrradianceTexture::IrradianceTexture(FORMAT _internal_format, FORMAT _data_format, FORMAT _data_type, unsigned _width, unsigned _height)
     : CubemapTexture(_internal_format, _data_format, _data_type, _width, _height) {
   name = IRRADIANCE;
 }
@@ -624,17 +560,14 @@ IrradianceTexture::IrradianceTexture(TextureData *data) : IrradianceTexture() {
     setCubeMapTextureData(data);
 }
 
-const char *IrradianceTexture::getTextureTypeCStr() {
-  return texture_type_c_str[IRRADIANCE];
-}
+const char *IrradianceTexture::getTextureTypeCStr() { return texture_type_c_str[IRRADIANCE]; }
 
 /****************************************************************************************************************************/
 /* This is loaded from the disk as an .hdr image , with 4 bytes float for texel format on each channel...
  * note: make it generic so that we can generate it on the fly ?
  */
 
-EnvironmentMap2DTexture::EnvironmentMap2DTexture(
-    FORMAT _internal_format, FORMAT _data_format, FORMAT _data_type, unsigned _width, unsigned _height)
+EnvironmentMap2DTexture::EnvironmentMap2DTexture(FORMAT _internal_format, FORMAT _data_format, FORMAT _data_type, unsigned _width, unsigned _height)
     : Texture() {
   name = ENVMAP2D;
   internal_format = _internal_format;
@@ -644,9 +577,7 @@ EnvironmentMap2DTexture::EnvironmentMap2DTexture(
   height = _height;
 }
 
-EnvironmentMap2DTexture::EnvironmentMap2DTexture(TextureData *data) : Texture(data) {
-  name = ENVMAP2D;
-}
+EnvironmentMap2DTexture::EnvironmentMap2DTexture(TextureData *data) : Texture(data) { name = ENVMAP2D; }
 
 void EnvironmentMap2DTexture::initializeTexture2D() {
   glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, f_data.data());
@@ -677,9 +608,7 @@ void EnvironmentMap2DTexture::unbindTexture() {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-const char *EnvironmentMap2DTexture::getTextureTypeCStr() {
-  return texture_type_c_str[ENVMAP2D];
-}
+const char *EnvironmentMap2DTexture::getTextureTypeCStr() { return texture_type_c_str[ENVMAP2D]; }
 
 /****************************************************************************************************************************/
 
@@ -732,19 +661,13 @@ void FrameBufferTexture::unbindTexture() {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-const char *FrameBufferTexture::getTextureTypeCStr() {
-  return texture_type_c_str[FRAMEBUFFER];
-}
+const char *FrameBufferTexture::getTextureTypeCStr() { return texture_type_c_str[FRAMEBUFFER]; }
 
 /****************************************************************************************************************************/
 
-BRDFLookupTexture::BRDFLookupTexture() : Texture() {
-  name = BRDFLUT;
-}
+BRDFLookupTexture::BRDFLookupTexture() : Texture() { name = BRDFLUT; }
 
-BRDFLookupTexture::BRDFLookupTexture(TextureData *data) : Texture(data) {
-  name = BRDFLUT;
-}
+BRDFLookupTexture::BRDFLookupTexture(TextureData *data) : Texture(data) { name = BRDFLUT; }
 
 void BRDFLookupTexture::bindTexture() {
   glActiveTexture(GL_TEXTURE0 + name);
@@ -779,6 +702,4 @@ void BRDFLookupTexture::initializeTexture2D() {
   }
 }
 
-const char *BRDFLookupTexture::getTextureTypeCStr() {
-  return texture_type_c_str[BRDFLUT];
-}
+const char *BRDFLookupTexture::getTextureTypeCStr() { return texture_type_c_str[BRDFLUT]; }

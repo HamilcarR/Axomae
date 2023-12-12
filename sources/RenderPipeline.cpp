@@ -12,12 +12,8 @@ namespace camera_angles {
   const auto back = glm::lookAt(glm::vec3(0.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f));
   const auto front = glm::lookAt(glm::vec3(0.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f));
 }  // namespace camera_angles
-const std::vector<glm::mat4> views = {camera_angles::left,
-                                      camera_angles::right,
-                                      camera_angles::down,
-                                      camera_angles::up,
-                                      camera_angles::back,
-                                      camera_angles::front};
+const std::vector<glm::mat4> views = {
+    camera_angles::left, camera_angles::right, camera_angles::down, camera_angles::up, camera_angles::back, camera_angles::front};
 
 RenderPipeline::RenderPipeline(Renderer *_renderer, ResourceDatabaseManager *_resource_database) {
   renderer = _renderer;
@@ -44,10 +40,7 @@ void RenderPipeline::clean() {}
  * @return a pointer to a CubeMapMesh object.
  */
 // TODO: [AX-43] Fix memory leak in RenderPipeline
-CubeMapMesh *RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_map,
-                                                 unsigned width,
-                                                 unsigned height,
-                                                 GLViewer *gl_widget) {
+CubeMapMesh *RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_map, unsigned width, unsigned height, GLViewer *gl_widget) {
   LOG("Generating an environment cubemap", LogLevel::INFO);
   assert(resource_database != nullptr);
   assert(!resource_database->getTextureDatabase().empty());
@@ -77,7 +70,7 @@ CubeMapMesh *RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_m
   std::pair<int, Texture *> query_baked_cubemap_texture = texture_database->contains(
       cubemap_renderer_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
   /* Mesh to be returned */
-  CubeMapMesh *cubemap = new CubeMapMesh();
+  CubeMapMesh *cubemap = NodeBuilder::store<CubeMapMesh>(resource_database->getNodeDatabase(), false).object;
   query_baked_cubemap_texture.second->generateMipmap();
   cubemap->material.addTexture(query_baked_cubemap_texture.first);
   cubemap->setShader(shader_database->get(Shader::CUBEMAP));
@@ -146,14 +139,8 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap,
   default_dim.width = gl_widget->width();
   default_dim.height = gl_widget->height();
   FreePerspectiveCamera camera(90.f, &cubemap_dim, 0.1f, 2000.f);
-  RenderCubeMap cubemap_prefilter_fbo = constructCubemapFbo<CubemapTexture>(&resize_dim,
-                                                                            false,
-                                                                            GLFrameBuffer::COLOR0,
-                                                                            Texture::RGB32F,
-                                                                            Texture::RGB,
-                                                                            Texture::FLOAT,
-                                                                            prefilter_shader,
-                                                                            max_mip_level);
+  RenderCubeMap &&cubemap_prefilter_fbo = constructCubemapFbo<CubemapTexture>(
+      &resize_dim, false, GLFrameBuffer::COLOR0, Texture::RGB32F, Texture::RGB, Texture::FLOAT, prefilter_shader, max_mip_level);
   Drawable cube_drawable = constructCube(prefilter_shader, cube_envmap, Texture::CUBEMAP, &camera);
   cubemap_prefilter_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0)->generateMipmap();
   cubemap_prefilter_fbo.bindFrameBuffer();
@@ -203,7 +190,7 @@ int RenderPipeline::generateBRDFLookupTexture(unsigned int width, unsigned int h
   BRDFLookupTableBakerShader *brdf_lut_shader = static_cast<BRDFLookupTableBakerShader *>(
       resource_database->getShaderDatabase().get(Shader::BRDF_LUT_BAKER));
   FreePerspectiveCamera camera(90.f, &camera_dim, 0.1f, 2000.f);
-  RenderQuadFBO quad_fbo = constructQuadFbo<BRDFLookupTexture>(
+  RenderQuadFBO &&quad_fbo = constructQuadFbo<BRDFLookupTexture>(
       &tex_dim, false, GLFrameBuffer::COLOR0, Texture::RGB16F, Texture::RG, Texture::FLOAT, brdf_lut_shader);
   Drawable quad_drawable = constructQuad(brdf_lut_shader, &camera);
   renderToQuad(quad_drawable, quad_fbo, camera, tex_dim, original_dim);
@@ -273,7 +260,7 @@ void RenderPipeline::renderToQuad(Drawable &quad_drawable,
 /********************************************************************************************************************************************************************************************************/
 Drawable RenderPipeline::constructCube(Shader *shader, int database_texture_id, Texture::TYPE type, Camera *camera) {
   assert(shader != nullptr);
-  CubeMesh *cube = new CubeMesh();
+  CubeMesh *cube = NodeBuilder::store<CubeMesh>(resource_database->getNodeDatabase(), false).object;
   cube->setShader(shader);
   cube->material.addTexture(database_texture_id);
   cube->setSceneCameraPointer(camera);
@@ -282,7 +269,7 @@ Drawable RenderPipeline::constructCube(Shader *shader, int database_texture_id, 
 
 Drawable RenderPipeline::constructQuad(Shader *shader, Camera *camera) {
   assert(shader != nullptr);
-  QuadMesh *quad = new QuadMesh();
+  QuadMesh *quad = NodeBuilder::store<QuadMesh>(resource_database->getNodeDatabase(), false).object;
   quad->setShader(shader);
   quad->setSceneCameraPointer(camera);
   return Drawable(quad);
@@ -301,14 +288,8 @@ RenderCubeMap RenderPipeline::constructCubemapFbo(ScreenSize *dimensions,
 
   TextureDatabase *texture_database = &resource_database->getTextureDatabase();
   RenderCubeMap cubemap_fbo(texture_database, dimensions, renderer->getDefaultFrameBufferIdPointer());
-  cubemap_fbo.initializeFrameBufferTexture<TEXTYPE>(color_attachment,
-                                                    persistence,
-                                                    internal_format,
-                                                    data_format,
-                                                    data_type,
-                                                    dimensions->width,
-                                                    dimensions->height,
-                                                    mipmaps_level);
+  cubemap_fbo.initializeFrameBufferTexture<TEXTYPE>(
+      color_attachment, persistence, internal_format, data_format, data_type, dimensions->width, dimensions->height, mipmaps_level);
   if (!shader->isInitialized())
     shader->initializeShader();
   shader->bind();

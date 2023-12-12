@@ -41,13 +41,7 @@ DirectionalLight::DirectionalLight(ISceneNode *parent) : AbstractLight(parent) {
   light_struct_name = std::string(uniform_name_str_lighting_directional_struct_name);
 }
 
-DirectionalLight::DirectionalLight(glm::vec3 _position,
-                                   glm::vec3 _ambientColor,
-                                   glm::vec3 _diffuseColor,
-                                   glm::vec3 _specularColor,
-                                   float _intensity,
-                                   ISceneNode *parent)
-    : DirectionalLight(parent) {
+DirectionalLight::DirectionalLight(glm::vec3 _position, glm::vec3 _ambientColor, glm::vec3 _diffuseColor, glm::vec3 _specularColor, float _intensity, ISceneNode *parent) : DirectionalLight(parent) {
   specularColor = _specularColor;
   ambientColor = _ambientColor;
   diffuseColor = _diffuseColor;
@@ -56,8 +50,7 @@ DirectionalLight::DirectionalLight(glm::vec3 _position,
   type = DIRECTIONAL;
 }
 
-DirectionalLight::DirectionalLight(glm::vec3 _position, glm::vec3 color, float _intensity, ISceneNode *parent)
-    : DirectionalLight(parent) {
+DirectionalLight::DirectionalLight(glm::vec3 _position, glm::vec3 color, float _intensity, ISceneNode *parent) : DirectionalLight(parent) {
   position = _position;
   specularColor = color;
   diffuseColor = color;
@@ -65,9 +58,7 @@ DirectionalLight::DirectionalLight(glm::vec3 _position, glm::vec3 color, float _
   intensity = _intensity;
 }
 
-DirectionalLight::DirectionalLight(const LightData &data)
-    : DirectionalLight(
-          data.direction, data.ambiant_col, data.diffuse_col, data.specular_col, data.intensity, data.parent) {
+DirectionalLight::DirectionalLight(const LightData &data) : DirectionalLight(data.direction, data.ambiant_col, data.diffuse_col, data.specular_col, data.intensity, data.parent) {
   setName(data.name);
 }
 
@@ -98,13 +89,7 @@ PointLight::PointLight(ISceneNode *parent) : AbstractLight(parent) {
   light_struct_name = std::string(uniform_name_str_lighting_point_struct_name);
 }
 
-PointLight::PointLight(glm::vec3 _position,
-                       glm::vec3 _ambientColor,
-                       glm::vec3 _diffuseColor,
-                       glm::vec3 _specularColor,
-                       glm::vec3 _attenuation,
-                       float _intensity,
-                       ISceneNode *parent)
+PointLight::PointLight(glm::vec3 _position, glm::vec3 _ambientColor, glm::vec3 _diffuseColor, glm::vec3 _specularColor, glm::vec3 _attenuation, float _intensity, ISceneNode *parent)
     : PointLight(parent) {
   specularColor = _specularColor;
   ambientColor = _ambientColor;
@@ -115,9 +100,7 @@ PointLight::PointLight(glm::vec3 _position,
   attenuation = _attenuation;
 }
 
-PointLight::PointLight(
-    glm::vec3 _position, glm::vec3 color, glm::vec3 _attenuation, float _intensity, ISceneNode *parent)
-    : PointLight(parent) {
+PointLight::PointLight(glm::vec3 _position, glm::vec3 color, glm::vec3 _attenuation, float _intensity, ISceneNode *parent) : PointLight(parent) {
   position = _position;
   specularColor = color;
   diffuseColor = color;
@@ -126,14 +109,7 @@ PointLight::PointLight(
   attenuation = _attenuation;
 }
 
-PointLight::PointLight(const LightData &data)
-    : PointLight(data.position,
-                 data.ambiant_col,
-                 data.diffuse_col,
-                 data.specular_col,
-                 data.attenuation,
-                 data.intensity,
-                 data.parent) {
+PointLight::PointLight(const LightData &data) : PointLight(data.position, data.ambiant_col, data.diffuse_col, data.specular_col, data.attenuation, data.intensity, data.parent) {
   setName(data.name);
 }
 
@@ -172,13 +148,7 @@ SpotLight::SpotLight(ISceneNode *parent) : AbstractLight(parent) {
   light_struct_name = std::string(uniform_name_str_lighting_spot_struct_name);
 }
 
-SpotLight::SpotLight(glm::vec3 _position,
-                     glm::vec3 _direction,
-                     glm::vec3 _color,
-                     float _cutoff_angle,
-                     float _intensity,
-                     ISceneNode *parent)
-    : SpotLight(parent) {
+SpotLight::SpotLight(glm::vec3 _position, glm::vec3 _direction, glm::vec3 _color, float _cutoff_angle, float _intensity, ISceneNode *parent) : SpotLight(parent) {
   position = _position;
   specularColor = _color;
   diffuseColor = _color;
@@ -188,15 +158,7 @@ SpotLight::SpotLight(glm::vec3 _position,
   direction = _direction;
 }
 
-SpotLight::SpotLight(glm::vec3 _position,
-                     glm::vec3 _direction,
-                     glm::vec3 _ambient,
-                     glm::vec3 _diffuse,
-                     glm::vec3 _specular,
-                     float _angle,
-                     float _intensity,
-                     ISceneNode *parent)
-    : SpotLight(parent) {
+SpotLight::SpotLight(glm::vec3 _position, glm::vec3 _direction, glm::vec3 _ambient, glm::vec3 _diffuse, glm::vec3 _specular, float _angle, float _intensity, ISceneNode *parent) : SpotLight(parent) {
   specularColor = _specular;
   ambientColor = _ambient;
   diffuseColor = _diffuse;
@@ -206,15 +168,7 @@ SpotLight::SpotLight(glm::vec3 _position,
   direction = _direction;
 }
 
-SpotLight::SpotLight(const LightData &data)
-    : SpotLight(data.position,
-                data.direction,
-                data.ambiant_col,
-                data.diffuse_col,
-                data.specular_col,
-                data.theta,
-                data.intensity,
-                data.parent) {
+SpotLight::SpotLight(const LightData &data) : SpotLight(data.position, data.direction, data.ambiant_col, data.diffuse_col, data.specular_col, data.theta, data.intensity, data.parent) {
   setName(data.name);
 }
 

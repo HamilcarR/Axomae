@@ -88,8 +88,7 @@ class Mesh : public SceneTreeNode {
    * @param mat Mesh material
    * @param shader Shader used
    */
-  Mesh(
-      const std::string &name, const Object3D &&obj, const Material &mat, Shader *shader, ISceneNode *parent = nullptr);
+  Mesh(const std::string &name, const Object3D &&obj, const Material &mat, Shader *shader, ISceneNode *parent = nullptr);
 
   /**
    * @brief Destroy the Mesh object

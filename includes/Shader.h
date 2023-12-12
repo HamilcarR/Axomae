@@ -18,6 +18,7 @@
  */
 class Shader {
  public:
+  virtual ~Shader() {}
   /**
    * @brief Shader types enumeration
    *
@@ -64,18 +65,14 @@ class Shader {
    *
    * @param _type
    */
-  void setType(Shader::TYPE _type) {
-    type = _type;
-  }
+  void setType(Shader::TYPE _type) { type = _type; }
 
   /**
    * @brief Returns the Type of the shader
    *
    * @return Shader::TYPE
    */
-  Shader::TYPE getType() {
-    return type;
-  }
+  Shader::TYPE getType() { return type; }
 
   /**
    * @brief Recompiles the shader program
@@ -230,14 +227,9 @@ class Shader {
   }
 
   /**
-   * @brief
-   *
-   * @return true
-   * @return false
+   * @brief Checks if the shader program is valid
    */
-  bool isInitialized() const {
-    return shader_program != 0;
-  }
+  bool isInitialized() const { return shader_program != 0; }
 
   /**
    * @brief Convenience method for setUniform
@@ -342,9 +334,7 @@ class Shader {
    * @param view View matrix
    * @param model Model matrix
    */
-  void setModelViewProjectionMatricesUniforms(const glm::mat4 &projection,
-                                              const glm::mat4 &view,
-                                              const glm::mat4 &model);
+  void setModelViewProjectionMatricesUniforms(const glm::mat4 &projection, const glm::mat4 &view, const glm::mat4 &model);
 
  protected:
   TYPE type;                       /**<Type of the shader*/

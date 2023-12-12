@@ -7,13 +7,6 @@ Drawable::Drawable() {
   camera_pointer = nullptr;
 }
 
-Drawable::Drawable(Mesh &mesh) {
-  mesh_object = new Mesh(mesh);
-  camera_pointer = nullptr;
-  gl_buffers.setGeometryPointer(&mesh_object->geometry);
-  initialize();
-}
-
 Drawable::Drawable(Mesh *mesh) {
   assert(mesh != nullptr);
   if (mesh != nullptr) {
@@ -25,17 +18,12 @@ Drawable::Drawable(Mesh *mesh) {
   }
 }
 
-Drawable::~Drawable() {}
-
 void Drawable::clean() {
   gl_buffers.clean();
   mesh_object->clean();
-  delete mesh_object;
 }
 
-bool Drawable::ready() {
-  return gl_buffers.isReady();
-}
+bool Drawable::ready() { return gl_buffers.isReady(); }
 
 bool Drawable::initialize() {
   if (mesh_object == nullptr)

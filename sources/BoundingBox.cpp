@@ -39,9 +39,7 @@ BoundingBox::BoundingBox(const std::vector<float> &vertices) : BoundingBox() {
   /*
    * This lambda calculates asynchroneously the minimum/maximum coordinates of every meshes
    */
-  auto lambda_parallel_compute_bbox = [](const std::vector<float> &vertices,
-                                         unsigned min_index,
-                                         unsigned max_index) -> std::pair<glm::vec3, glm::vec3> {
+  auto lambda_parallel_compute_bbox = [](const std::vector<float> &vertices, unsigned min_index, unsigned max_index) -> std::pair<glm::vec3, glm::vec3> {
     float x_max, y_max, z_max;
     float x_min, y_min, z_min;
     x_max = y_max = z_max = -INT_MAX;
@@ -117,8 +115,7 @@ std::pair<std::vector<float>, std::vector<unsigned>> BoundingBox::getVertexArray
       min_coords.x, max_coords.y, min_coords.z,  // 6
       min_coords.x, min_coords.y, min_coords.z   // 7
   };
-  std::vector<unsigned> indices = {0, 1, 2, 0, 2, 3, 1, 4, 5, 1, 5, 2, 7, 6, 5, 7, 5, 4,
-                                   3, 6, 7, 3, 7, 0, 2, 5, 6, 2, 6, 3, 7, 4, 1, 7, 1, 0};
+  std::vector<unsigned> indices = {0, 1, 2, 0, 2, 3, 1, 4, 5, 1, 5, 2, 7, 6, 5, 7, 5, 4, 3, 6, 7, 3, 7, 0, 2, 5, 6, 2, 6, 3, 7, 4, 1, 7, 1, 0};
   return std::pair<std::vector<float>, std::vector<unsigned>>(vertices, indices);
 }
 

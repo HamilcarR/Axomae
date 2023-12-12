@@ -5,7 +5,7 @@
 #include "GLFrameBuffer.h"
 #include "Mesh.h"
 #include "ShaderDatabase.h"
-#include "Texture.h"
+#include "TextureFactory.h"
 
 /**
  * @file FrameBufferInterface.h
@@ -19,12 +19,7 @@
  */
 class FrameBufferInterface {
  public:
-  /**
-   * @brief Construct a new Frame Buffer Interface object
-   *
-   */
   FrameBufferInterface();
-
   /**
    * @brief Construct a new Frame Buffer Interface object
    *
@@ -33,15 +28,9 @@ class FrameBufferInterface {
    * @param default_fbo_id_pointer
    * @param rendertype
    */
-  FrameBufferInterface(TextureDatabase *texture_database,
-                       ScreenSize *texture_size,
-                       unsigned int *default_fbo_id_pointer = nullptr);
-
-  /**
-   * @brief Destroy the Frame Buffer Interface object
-   *
-   */
+  FrameBufferInterface(TextureDatabase *texture_database, ScreenSize *texture_size, unsigned int *default_fbo_id_pointer = nullptr);
   virtual ~FrameBufferInterface();
+  FrameBufferInterface(FrameBufferInterface &&move) noexcept;
 
   /**
    * @brief Resizes the textures used by the framebuffer .
@@ -55,9 +44,7 @@ class FrameBufferInterface {
    * @param pointer_on_texture_size Pointer on texture size
    *
    */
-  virtual void setTextureDimensions(ScreenSize *pointer_on_texture_size) {
-    texture_dim = pointer_on_texture_size;
-  }
+  virtual void setTextureDimensions(ScreenSize *pointer_on_texture_size) { texture_dim = pointer_on_texture_size; }
 
   /**
    * @brief Render to the texture stored inside the framebuffer
@@ -88,9 +75,7 @@ class FrameBufferInterface {
    *
    * @param id
    */
-  virtual void setDefaultFrameBufferIdPointer(unsigned *id) {
-    default_framebuffer_pointer = id;
-  }
+  virtual void setDefaultFrameBufferIdPointer(unsigned *id) { default_framebuffer_pointer = id; }
 
   /**
    * @brief Get the texture used for a color attachment.
@@ -132,7 +117,8 @@ class FrameBufferInterface {
     temp_empty_data_texture.data_format = data_format;
     temp_empty_data_texture.data_type = data_type;
     temp_empty_data_texture.mipmaps = mipmaps;
-    return texture_database->addTexture<TEXTYPE>(&temp_empty_data_texture, persistence);
+    factory::Result<int, TEXTYPE> result = TextureBuilder::store<TEXTYPE>(*texture_database, persistence, &temp_empty_data_texture);
+    return result.id;
   }
   /**
    * @brief Calls setUpEmptyTexture() , with these args , and store the resulting texture to be rendered into in the
@@ -159,13 +145,12 @@ class FrameBufferInterface {
                                     unsigned height,
                                     unsigned int mipmaps = 0) {
 
-    unsigned int texture_id = setUpEmptyTexture<TEXTYPE>(
-        width, height, persistence, internal_format, data_format, data_type, mipmaps);
+    unsigned int texture_id = setUpEmptyTexture<TEXTYPE>(width, height, persistence, internal_format, data_format, data_type, mipmaps);
     fbo_attachment_texture_collection[color_attachment] = texture_database->get(texture_id);
   }
 
  protected:
-  GLFrameBuffer *gl_framebuffer_object;
+  std::unique_ptr<GLFrameBuffer> gl_framebuffer_object;
   ScreenSize *texture_dim;
   TextureDatabase *texture_database;
   std::map<GLFrameBuffer::INTERNAL_FORMAT, Texture *> fbo_attachment_texture_collection;

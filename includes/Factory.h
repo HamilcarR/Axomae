@@ -5,7 +5,15 @@
 template<class TYPE, class... Args>
 class PRVINTERFACE : public TYPE {
  public:
-  PRVINTERFACE(Args... args) : TYPE(std::forward<Args>(args)...) {}
+  PRVINTERFACE(Args &&...args) : TYPE(std::forward<Args>(args)...) {}
 };
 
+namespace factory {
+  template<class IDTYPE, class OBJTYPE>
+  struct Result {
+    IDTYPE id;
+    OBJTYPE *object;
+  };
+
+};  // namespace factory
 #endif

@@ -25,16 +25,8 @@ struct LoggerConfigDataStruct {
 };
 
 namespace LogFunctions {
-  void log_message(const char *message,
-                   const LogLevel::LOGENUMTYPE level,
-                   const char *file,
-                   const char *function,
-                   unsigned int line);
-  void log_message(std::string message,
-                   const LogLevel::LOGENUMTYPE level,
-                   const char *file,
-                   const char *function,
-                   unsigned int line);
+  void log_message(const char *message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line);
+  void log_message(std::string message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line);
   void log_flush();
   void log_configure(const LoggerConfigDataStruct &config);
 };  // namespace LogFunctions
@@ -51,11 +43,7 @@ class AbstractLogger {
 /*****************************************************************************************************************************************************************************/
 class LogLine {
  public:
-  LogLine(const std::string &message,
-          const LogLevel::LOGENUMTYPE log_level = LogLevel::INFO,
-          const char *file = "",
-          const char *function = "",
-          const unsigned line = 0);
+  LogLine(const std::string &message, const LogLevel::LOGENUMTYPE log_level = LogLevel::INFO, const char *file = "", const char *function = "", const unsigned line = 0);
   virtual ~LogLine();
   const std::string &getMessage() {
     return message;
@@ -88,13 +76,8 @@ class Logger : virtual public AbstractLogger {
   Logger();
   virtual ~Logger();
   virtual void print() const;
-  void logMessage(const std::string &message,
-                  LogLevel::LOGENUMTYPE log_level,
-                  const char *filename,
-                  const char *function,
-                  unsigned line);
-  void logMessage(
-      const char *message, LogLevel::LOGENUMTYPE log_level, const char *filename, const char *function, unsigned line);
+  void logMessage(const std::string &message, LogLevel::LOGENUMTYPE log_level, const char *filename, const char *function, unsigned line);
+  void logMessage(const char *message, LogLevel::LOGENUMTYPE log_level, const char *filename, const char *function, unsigned line);
   void flush();
   void setPriority(LogLevel::LOGENUMTYPE _priority) {
     priority = _priority;

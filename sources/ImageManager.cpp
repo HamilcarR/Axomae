@@ -92,8 +92,7 @@ namespace axomae {
         }
       } break;
     }
-    RGB rgb = RGB(
-        static_cast<float>(red), static_cast<float>(green), static_cast<float>(blue), static_cast<float>(alpha));
+    RGB rgb = RGB(static_cast<float>(red), static_cast<float>(green), static_cast<float>(blue), static_cast<float>(alpha));
     return rgb;
   }
 
@@ -309,8 +308,7 @@ namespace axomae {
   /**************************************************************************************************************/
   uint32_t RGB::rgb_to_int() {
     uint32_t image = 0;
-    int b = static_cast<int>(std::round(blue)), g = static_cast<int>(std::round(green)),
-        r = static_cast<int>(std::round(red)), a = static_cast<int>(std::round(alpha));
+    int b = static_cast<int>(std::round(blue)), g = static_cast<int>(std::round(green)), r = static_cast<int>(std::round(red)), a = static_cast<int>(std::round(alpha));
     if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
       image = a | (b << 8) | (g << 16) | (r << 24);
     else
@@ -322,27 +320,19 @@ namespace axomae {
   template<typename T>
   static T compute_kernel_pixel(RGB **data, const T kernel[3][3], int i, int j, uint8_t flag) {
     if (flag == AXOMAE_RED) {
-      return data[i - 1][j - 1].red * kernel[0][0] + data[i][j - 1].red * kernel[0][1] +
-             data[i + 1][j - 1].red * kernel[0][2] + data[i - 1][j].red * kernel[1][0] + data[i][j].red * kernel[1][1] +
-             data[i + 1][j].red * kernel[1][2] + data[i - 1][j + 1].red * kernel[2][0] +
-             data[i][j + 1].red * kernel[2][1] + data[i + 1][j + 1].red * kernel[2][2];
+      return data[i - 1][j - 1].red * kernel[0][0] + data[i][j - 1].red * kernel[0][1] + data[i + 1][j - 1].red * kernel[0][2] + data[i - 1][j].red * kernel[1][0] + data[i][j].red * kernel[1][1] +
+             data[i + 1][j].red * kernel[1][2] + data[i - 1][j + 1].red * kernel[2][0] + data[i][j + 1].red * kernel[2][1] + data[i + 1][j + 1].red * kernel[2][2];
     } else if (flag == AXOMAE_BLUE) {
-      return data[i - 1][j - 1].blue * kernel[0][0] + data[i][j - 1].blue * kernel[0][1] +
-             data[i + 1][j - 1].blue * kernel[0][2] + data[i - 1][j].blue * kernel[1][0] +
-             data[i][j].blue * kernel[1][1] + data[i + 1][j].blue * kernel[1][2] +
-             data[i - 1][j + 1].blue * kernel[2][0] + data[i][j + 1].blue * kernel[2][1] +
-             data[i + 1][j + 1].blue * kernel[2][2];
+      return data[i - 1][j - 1].blue * kernel[0][0] + data[i][j - 1].blue * kernel[0][1] + data[i + 1][j - 1].blue * kernel[0][2] + data[i - 1][j].blue * kernel[1][0] +
+             data[i][j].blue * kernel[1][1] + data[i + 1][j].blue * kernel[1][2] + data[i - 1][j + 1].blue * kernel[2][0] + data[i][j + 1].blue * kernel[2][1] + data[i + 1][j + 1].blue * kernel[2][2];
     } else {
-      return data[i - 1][j - 1].green * kernel[0][0] + data[i][j - 1].green * kernel[0][1] +
-             data[i + 1][j - 1].green * kernel[0][2] + data[i - 1][j].green * kernel[1][0] +
-             data[i][j].green * kernel[1][1] + data[i + 1][j].green * kernel[1][2] +
-             data[i - 1][j + 1].green * kernel[2][0] + data[i][j + 1].green * kernel[2][1] +
+      return data[i - 1][j - 1].green * kernel[0][0] + data[i][j - 1].green * kernel[0][1] + data[i + 1][j - 1].green * kernel[0][2] + data[i - 1][j].green * kernel[1][0] +
+             data[i][j].green * kernel[1][1] + data[i + 1][j].green * kernel[1][2] + data[i - 1][j + 1].green * kernel[2][0] + data[i][j + 1].green * kernel[2][1] +
              data[i + 1][j + 1].green * kernel[2][2];
     }
   }
   template<typename T>
-  static RGB compute_generic_kernel_pixel(
-      const RGB **data, const unsigned int size, const T **kernel, const unsigned int x, const unsigned int y) {
+  static RGB compute_generic_kernel_pixel(const RGB **data, const unsigned int size, const T **kernel, const unsigned int x, const unsigned int y) {
     float r = 0, g = 0, b = 0;
     uint8_t middle = std::floor(size / 2);
     for (unsigned int i = 0; i < size; i++)
@@ -408,8 +398,7 @@ namespace axomae {
       for (int i = 1; i < w - 1; i++) {
         for (int j = 1; j < h - 1; j++) {
           if (border == AXOMAE_REPEAT) {
-            float setpix_h_red = 0, setpix_v_red = 0, setpix_h_green = 0, setpix_v_green = 0, setpix_v_blue = 0,
-                  setpix_h_blue = 0;
+            float setpix_h_red = 0, setpix_v_red = 0, setpix_h_green = 0, setpix_v_green = 0, setpix_v_blue = 0, setpix_h_blue = 0;
             setpix_h_red = compute_kernel_pixel(data, arr_h, i, j, AXOMAE_RED);
             setpix_v_red = compute_kernel_pixel(data, arr_v, i, j, AXOMAE_RED);
             setpix_h_green = compute_kernel_pixel(data, arr_h, i, j, AXOMAE_GREEN);
@@ -442,10 +431,7 @@ namespace axomae {
 
   template<typename T>
   RGB RGB::operator*(T arg) const {
-    RGB rgb = RGB(static_cast<float>(red * arg),
-                  static_cast<float>(green * arg),
-                  static_cast<float>(blue * arg),
-                  static_cast<float>(alpha * arg));
+    RGB rgb = RGB(static_cast<float>(red * arg), static_cast<float>(green * arg), static_cast<float>(blue * arg), static_cast<float>(alpha * arg));
     return rgb;
   }
 
@@ -675,10 +661,8 @@ namespace axomae {
   /***************************************************************************************************************/
   /* Get barycentric coordinates of I in triangle P1P2P3 */
   Vect3D barycentric_lerp(Point2D P1, Point2D P2, Point2D P3, Point2D I) {
-    float W1 = ((P2.y - P3.y) * (I.x - P3.x) + (P3.x - P2.x) * (I.y - P3.y)) /
-               ((P2.y - P3.y) * (P1.x - P3.x) + (P3.x - P2.x) * (P1.y - P3.y));
-    float W2 = ((P3.y - P1.y) * (I.x - P3.x) + (P1.x - P3.x) * (I.y - P3.y)) /
-               ((P2.y - P3.y) * (P1.x - P3.x) + (P3.x - P2.x) * (P1.y - P3.y));
+    float W1 = ((P2.y - P3.y) * (I.x - P3.x) + (P3.x - P2.x) * (I.y - P3.y)) / ((P2.y - P3.y) * (P1.x - P3.x) + (P3.x - P2.x) * (P1.y - P3.y));
+    float W2 = ((P3.y - P1.y) * (I.x - P3.x) + (P1.x - P3.x) * (I.y - P3.y)) / ((P2.y - P3.y) * (P1.x - P3.x) + (P3.x - P2.x) * (P1.y - P3.y));
     float W3 = 1 - W1 - W2;
     Vect3D v = {W1, W2, W3};
     return v;
@@ -686,8 +670,7 @@ namespace axomae {
 
   /***************************************************************************************************************/
   Vect3D tan_space_transform(Vect3D T, Vect3D BT, Vect3D N, Vect3D I) {
-    Vect3D result = {
-        I.x * BT.x + I.y * BT.y + I.z * BT.z, I.x * T.x + T.y * I.y + T.z * I.z, I.x * N.x + N.y * I.y + I.z * N.z};
+    Vect3D result = {I.x * BT.x + I.y * BT.y + I.z * BT.z, I.x * T.x + T.y * I.y + T.z * I.z, I.x * N.x + N.y * I.y + I.z * N.z};
     return result;
   }
 
@@ -716,9 +699,7 @@ namespace axomae {
     Vect3D C = barycentric_lerp(P1, P2, P3, I);
     if (C.x >= 0 && C.y >= 0 && C.z >= 0) {
       auto interpolate = [&C](Vect3D N1, Vect3D N2, Vect3D N3) {
-        Vect3D normal = {N1.x * C.x + N2.x * C.y + N3.x * C.z,
-                         N1.y * C.x + N2.y * C.y + N3.y * C.z,
-                         N1.z * C.x + N2.z * C.y + N3.z * C.z};
+        Vect3D normal = {N1.x * C.x + N2.x * C.y + N3.x * C.z, N1.y * C.x + N2.y * C.y + N3.y * C.z, N1.z * C.x + N2.z * C.y + N3.z * C.z};
         return normal;
       };
       if (tangent_space) {
@@ -766,8 +747,8 @@ namespace axomae {
 
     SDL_Surface *surf = SDL_CreateRGBSurface(0, width, height, 24, rmask, gmask, bmask, amask);
     assert(surf != nullptr);
-    bool tangents_empty = object.tangents.empty(), bitangents_empty = object.bitangents.empty(),
-         normals_empty = object.normals.empty(), uv_empty = object.uv.empty(), indices_empty = object.indices.empty();
+    bool tangents_empty = object.tangents.empty(), bitangents_empty = object.bitangents.empty(), normals_empty = object.normals.empty(), uv_empty = object.uv.empty(),
+         indices_empty = object.indices.empty();
     if (tangents_empty || normals_empty || uv_empty || indices_empty)
       return surf;
     /* TODO : Parallelize : each face = 1 thread ? */
@@ -777,25 +758,14 @@ namespace axomae {
       Point2D P2 = {object.uv[index[i + 1] * 2], object.uv[index[i + 1] * 2 + 1]};
       Point2D P3 = {object.uv[index[i + 2] * 2], object.uv[index[i + 2] * 2 + 1]};
       Vect3D N1 = {object.normals[index[i] * 3], object.normals[index[i] * 3 + 1], object.normals[index[i] * 3 + 2]};
-      Vect3D N2 = {
-          object.normals[index[i + 1] * 3], object.normals[index[i + 1] * 3 + 1], object.normals[index[i + 1] * 3 + 2]};
-      Vect3D N3 = {
-          object.normals[index[i + 2] * 3], object.normals[index[i + 2] * 3 + 1], object.normals[index[i + 2] * 3 + 2]};
-      Vect3D BT1 = {
-          object.bitangents[index[i] * 3], object.bitangents[index[i] * 3 + 1], object.bitangents[index[i] * 3 + 2]};
-      Vect3D BT2 = {object.bitangents[index[i + 1] * 3],
-                    object.bitangents[index[i + 1] * 3 + 1],
-                    object.bitangents[index[i + 1] * 3 + 2]};
-      Vect3D BT3 = {object.bitangents[index[i + 2] * 3],
-                    object.bitangents[index[i + 2] * 3 + 1],
-                    object.bitangents[index[i + 2] * 3 + 2]};
+      Vect3D N2 = {object.normals[index[i + 1] * 3], object.normals[index[i + 1] * 3 + 1], object.normals[index[i + 1] * 3 + 2]};
+      Vect3D N3 = {object.normals[index[i + 2] * 3], object.normals[index[i + 2] * 3 + 1], object.normals[index[i + 2] * 3 + 2]};
+      Vect3D BT1 = {object.bitangents[index[i] * 3], object.bitangents[index[i] * 3 + 1], object.bitangents[index[i] * 3 + 2]};
+      Vect3D BT2 = {object.bitangents[index[i + 1] * 3], object.bitangents[index[i + 1] * 3 + 1], object.bitangents[index[i + 1] * 3 + 2]};
+      Vect3D BT3 = {object.bitangents[index[i + 2] * 3], object.bitangents[index[i + 2] * 3 + 1], object.bitangents[index[i + 2] * 3 + 2]};
       Vect3D T1 = {object.tangents[index[i] * 3], object.tangents[index[i] * 3 + 1], object.tangents[index[i] * 3 + 2]};
-      Vect3D T2 = {object.tangents[index[i + 1] * 3],
-                   object.tangents[index[i + 1] * 3 + 1],
-                   object.tangents[index[i + 1] * 3 + 2]};
-      Vect3D T3 = {object.tangents[index[i + 2] * 3],
-                   object.tangents[index[i + 2] * 3 + 1],
-                   object.tangents[index[i + 2] * 3 + 2]};
+      Vect3D T2 = {object.tangents[index[i + 1] * 3], object.tangents[index[i + 1] * 3 + 1], object.tangents[index[i + 1] * 3 + 2]};
+      Vect3D T3 = {object.tangents[index[i + 2] * 3], object.tangents[index[i + 2] * 3 + 1], object.tangents[index[i + 2] * 3 + 2]};
       auto clamp_uv = [&](Point2D P) { /*check if UVs are correctly set in bounds ... if not , we use modulus*/
                                        if (P.x > 1.f)
                                          P.x = std::fmod(P.x, 1.f);
@@ -818,8 +788,7 @@ namespace axomae {
       int y_min = static_cast<int>(bounding_coords(P1.y, P2.y, P3.y, true));
       for (int x = x_min; x <= x_max; x++)
         for (int y = y_min; y <= y_max; y++) {
-          uint32_t val = compute_normals_set_pixels_rgb(
-              P1, P2, P3, N1, N2, N3, BT1, BT2, BT3, T1, T2, T3, x, y, x_min, y_min, x_max, y_max, tangent_space);
+          uint32_t val = compute_normals_set_pixels_rgb(P1, P2, P3, N1, N2, N3, BT1, BT2, BT3, T1, T2, T3, x, y, x_min, y_min, x_max, y_max, tangent_space);
           if (val != 0)
             set_pixel_color(surf, x, y, val);
         }
@@ -927,8 +896,7 @@ namespace axomae {
       for (unsigned int i = middle; i < width - middle; i++) {
         for (unsigned int j = middle; j < height - middle; j++) {
           RGB col;
-          col = compute_generic_kernel_pixel(
-              const_cast<const RGB **>(data), n, const_cast<const float **>(sharp), i, j);
+          col = compute_generic_kernel_pixel(const_cast<const RGB **>(data), n, const_cast<const float **>(sharp), i, j);
           col.clamp();
           set_pixel_color(surface, i, j, col.rgb_to_int());
         }

@@ -1,7 +1,7 @@
 #ifndef RESOURCEDATABASEMANAGER_H
 #define RESOURCEDATABASEMANAGER_H
 
-#include "RenderingDatabaseInterface.h"
+#include "INodeDatabase.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
 
@@ -21,65 +21,20 @@ class ResourceDatabaseManager {
   static ResourceDatabaseManager &getInstance();
 
   /**
-   * @brief This method deletes the stored databases objects .
-   * This method DOES NOT free the memory of what these databases contain. For this , use
-   * ResourceDatabaseManager::purge().
-   * @see ResourceDatabaseManager::purge()
-   */
-  void destroyInstance();
-
-  /**
    * @brief This method purges everything, deleting every resource stored , and the resources space taken GPU side
    * Additionally , will delete the singleton instance pointer , as well as the databases pointers.
    */
   void purge();
 
-  /**
-   * @brief Proceeds with a soft clean on the texture database
-   *
-   */
-  void cleanTextureDatabase() const;
-
-  /**
-   * @brief Proceeds with a soft clean on the shader database
-   *
-   */
-  void cleanShaderDatabase() const;
-
-  /**
-   * @brief Purge the entire texture database
-   *
-   */
-  void purgeTextureDatabase() const;
-
-  /**
-   * @brief Purge the entire shader database
-   *
-   */
-  void purgeShaderDatabase() const;
-  /**
-   * @brief Get the Texture Database object
-   *
-   * @return TextureDatabase*
-   */
-  TextureDatabase &getTextureDatabase() const {
-    return *texture_database;
-  }
-
-  /**
-   * @brief Get the Shader Database object
-   *
-   * @return ShaderDatabase*
-   */
-  ShaderDatabase &getShaderDatabase() const {
-    return *shader_database;
-  }
-
-  /**
-   * @brief Destroy the Resource Database Manager object
-   *
-   */
-  virtual ~ResourceDatabaseManager();
+  void cleanTextureDatabase();
+  void cleanShaderDatabase();
+  void cleanNodeDatabase();
+  void purgeTextureDatabase();
+  void purgeShaderDatabase();
+  void purgeNodeDatabase();
+  TextureDatabase &getTextureDatabase() const { return *texture_database; }
+  ShaderDatabase &getShaderDatabase() const { return *shader_database; }
+  INodeDatabase &getNodeDatabase() const { return *node_database; }
 
  private:
   /**
@@ -102,9 +57,9 @@ class ResourceDatabaseManager {
   ResourceDatabaseManager operator=(const ResourceDatabaseManager &) = delete;
 
  private:
-  static std::unique_ptr<ResourceDatabaseManager> instance; /*<Instance of this ResourceDatabaseManager*/
-  std::unique_ptr<TextureDatabase> texture_database;        /*<Pointer on the texture database*/
-  std::unique_ptr<ShaderDatabase> shader_database;          /*<Pointer on the shader database*/
+  std::unique_ptr<TextureDatabase> texture_database; /*<Pointer on the texture database*/
+  std::unique_ptr<ShaderDatabase> shader_database;   /*<Pointer on the shader database*/
+  std::unique_ptr<INodeDatabase> node_database;      /*<Pointer on the node database*/
 };
 
 #endif

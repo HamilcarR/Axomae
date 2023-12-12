@@ -1,19 +1,15 @@
 #include "../includes/LightControllerUI.h"
-#include "../includes/LightBuilder.h"
 #include "../includes/constants.h"
 
 void LightController::connect_all_slots() {
   QObject::connect(ui.button_renderer_lighting_PointLights_add, SIGNAL(pressed()), this, SLOT(addPointLight()));
   QObject::connect(ui.button_renderer_lighting_PointLights_delete, SIGNAL(pressed()), this, SLOT(deletePointLight()));
-  QObject::connect(
-      ui.button_renderer_lighting_DirectionalLights_add, SIGNAL(pressed()), this, SLOT(addDirectionalLight()));
-  QObject::connect(
-      ui.button_renderer_lighting_DirectionalLights_delete, SIGNAL(pressed()), this, SLOT(deleteDirectionalLight()));
+  QObject::connect(ui.button_renderer_lighting_DirectionalLights_add, SIGNAL(pressed()), this, SLOT(addDirectionalLight()));
+  QObject::connect(ui.button_renderer_lighting_DirectionalLights_delete, SIGNAL(pressed()), this, SLOT(deleteDirectionalLight()));
   QObject::connect(ui.button_renderer_lighting_SpotLights_add, SIGNAL(pressed()), this, SLOT(addSpotLight()));
   QObject::connect(ui.button_renderer_lighting_SpotLights_delete, SIGNAL(pressed()), this, SLOT(deleteSpotLight()));
 
-  QObject::connect(
-      &viewer_3d->getRenderer(), &Renderer::sceneModified, [this]() { scene_list_view->updateSceneList(); });
+  QObject::connect(&viewer_3d->getRenderer(), &Renderer::sceneModified, [this]() { scene_list_view->updateSceneList(); });
 }
 
 void LightController::addPointLight() {

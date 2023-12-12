@@ -10,11 +10,11 @@
 
 /**
  * @brief This class provides an interface of pure abstract methods to manage rendering objects databases
- * @class RenderingDatabaseInterface
+ * @class IResourceDB
  * @tparam T Class type of the object stored in the database
  */
 template<class U, class T>
-class RenderingDatabaseInterface {
+class IResourceDB {
  public:
   /**
    * @brief Proceeds with a soft clean of the database . The implementation depends on the class that inherits this ,
@@ -34,7 +34,7 @@ class RenderingDatabaseInterface {
    * @param id ID of the element
    * @return T* Pointer on the element
    */
-  virtual T *get(const U id) = 0;
+  virtual T *get(const U id) const = 0;
 
   /**
    * @brief Removes the element from a database , using it's ID
@@ -67,7 +67,7 @@ class RenderingDatabaseInterface {
    *
    * @param id ID of the element sought.
    */
-  virtual bool contains(const U id) = 0;
+  virtual bool contains(const U id) const = 0;
 
   /**
    * @brief Checks if the element is present , if element not present , returns nullptr
@@ -75,10 +75,10 @@ class RenderingDatabaseInterface {
    * @param element_address address of the element we check
    * @return T* Pointer on the element
    */
-  virtual std::pair<U, T *> contains(const T *element_address) = 0;
+  virtual std::pair<U, T *> contains(const T *element_address) const = 0;
 
  protected:
-  Mutex mutex; /*<Mutex used for thread safety*/
+  mutable Mutex mutex; /*<Mutex used for thread safety*/
 };
 
 #endif

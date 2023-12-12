@@ -80,10 +80,7 @@ class GLFrameBuffer : public GLBufferInterface {
    * @param texture_id
    * @param mipmap_level
    */
-  void attachTexture2D(INTERNAL_FORMAT color_attachment,
-                       TEXTURE_TARGET target,
-                       unsigned int texture_id,
-                       unsigned int mipmap_level = 0);
+  void attachTexture2D(INTERNAL_FORMAT color_attachment, TEXTURE_TARGET target, unsigned int texture_id, unsigned int mipmap_level = 0);
 
   /**
    * @brief Binds the framebuffer
@@ -119,11 +116,11 @@ class GLFrameBuffer : public GLBufferInterface {
   virtual void fillBuffers() override;
 
  protected:
-  TEXTURE_TARGET target_texture_type;      /*<Type of the target texture */
-  GLRenderBuffer *renderbuffer_object;     /*<Pointer on the renderbuffer */
-  unsigned int framebuffer_id;             /*<Framebuffer ID*/
-  unsigned int texture_id;                 /*<ID of the texture rendered to*/
-  unsigned int *pointer_on_default_fbo_id; /*<Pointer on default fbo variable*/
+  TEXTURE_TARGET target_texture_type;                  /*<Type of the target texture */
+  std::unique_ptr<GLRenderBuffer> renderbuffer_object; /*<Pointer on the renderbuffer */
+  unsigned int framebuffer_id;                         /*<Framebuffer ID*/
+  unsigned int texture_id;                             /*<ID of the texture rendered to*/
+  unsigned int *pointer_on_default_fbo_id;             /*<Pointer on default fbo variable*/
 };
 
 #endif

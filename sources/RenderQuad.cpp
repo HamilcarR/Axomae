@@ -7,8 +7,6 @@ RenderQuadFBO::RenderQuadFBO(TextureDatabase *database, ScreenSize *screen, unsi
   LOG("initialized cubemap", LogLevel::INFO);
 }
 
-RenderQuadFBO::~RenderQuadFBO() {}
-
 void RenderQuadFBO::renderToTexture(GLFrameBuffer::INTERNAL_FORMAT color_attachment) {
   Texture *tex = fbo_attachment_texture_collection[color_attachment];
   if (tex && tex->isInitialized())

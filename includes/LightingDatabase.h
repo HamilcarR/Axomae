@@ -1,68 +1,34 @@
 #ifndef LIGHTINGDATABASE_H
 #define LIGHTINGDATABASE_H
-
+#include "INodeDatabase.h"
 #include "LightingSystem.h"
 #include "utils_3D.h"
 
 /**
  * @file LightingDatabase.h
- * Database of lights used in the scene.
+ * Implements a database storing references to Lights .
  *
  */
 
 /**
  * @class LightingDatabase
- * @brief Class declaration of the light database system
+ * @note This class is non-owning. It only stores a pointer on an INode located in the Node database
+ * @see INodeDatabase
  */
 class LightingDatabase {
- public:
-  /**
-   * @brief Construct a new Lighting Database object
-   *
-   */
-  LightingDatabase();
+  using AbstractLightMap = std::map<AbstractLight::TYPE, std::vector<AbstractLight *>>;
 
-  /**
-   * @brief Destroy the Lighting Database object
-   *
-   */
+ public:
+  LightingDatabase();
   virtual ~LightingDatabase();
 
-  /**
-   * @brief Add a new light in the scene
-   *
-   * @param light
-   */
-  virtual bool addLight(
-      AbstractLight *light);  // Replace this by a light builder , and set Light constructors to private
-
-  /**
-   * @brief Remove specified light.
-   *
-   * @param light
-   * @return false if not found
-   */
+  virtual bool addLight(AbstractLight *light);
+  virtual bool addLight(int database_index);
   virtual bool removeLight(AbstractLight *light);
-
-  /**
-   * @brief Remove light according to it's ID .
-   *
-   * @param id
-   * @return true
-   * @return false if not found
-   */
   virtual bool removeLight(const unsigned id);
-
   virtual bool updateLight(const unsigned id, const LightData &data);
-
-  /**
-   * @brief Get all lights of certain type
-   *
-   * @param type Type of light we want
-   * @return const std::vector<AbstractLight*>& Collection of light pointers
-   */
-  const std::vector<AbstractLight *> &getLightsArrayByType(AbstractLight::TYPE type);
-
+  const std::vector<AbstractLight *> &getLightsArrayByType(AbstractLight::TYPE type) const;
+  virtual bool contains(AbstractLight *light) const;
   /**
    * @brief Deletes all pointers and the subsequent vector array of lights that matches the type
    *
@@ -96,9 +62,11 @@ class LightingDatabase {
 
  protected:
   void giveID(AbstractLight *light);
-  std::map<AbstractLight::TYPE, std::vector<AbstractLight *>>
-      light_database;                     /**<Map of all lights in the scene. The map key stored is the type of light*/
-  std::vector<unsigned int> free_id_list; /**<List of free IDs belonging to deleted lights*/
+
+ protected:
+  AbstractLightMap light_database; /**<Map of all lights in the scene. The map key stored is the type of light*/
+  INodeDatabase *node_database;
+  std::vector<unsigned int> free_id_list; /**<List of free IDs belonging to removed lights*/
   unsigned int last_id;
 };
 

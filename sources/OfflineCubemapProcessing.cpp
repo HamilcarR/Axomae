@@ -1,4 +1,1 @@
 #include "../includes/OfflineCubemapProcessing.h"
-
-
-

@@ -3,7 +3,6 @@
 
 #include "RenderingDatabaseInterface.h"
 #include "Texture.h"
-#include "TextureFactory.h"
 #include <map>
 /**
  * @file TextureDatabase.h
@@ -17,20 +16,13 @@
  * We use it to keep texture objects in one place , meshes will only reference the textures.
  *
  */
-class TextureDatabase : public RenderingDatabaseInterface<int, Texture> {
+class TextureDatabase : public IResourceDB<int, Texture> {
  public:
   /**
    * @brief Construct a new Texture Database object
    *
    */
   TextureDatabase();
-
-  /**
-   * @brief Destroy the Texture Database object
-   *
-   */
-  virtual ~TextureDatabase();
-
   /**
    * @brief Removes all elements from the database , except those marked "keep"
    *
@@ -44,49 +36,12 @@ class TextureDatabase : public RenderingDatabaseInterface<int, Texture> {
   void purge() override;
 
   /**
-   * @brief Construct a texture of type "type" , and adds it to the database , as a reserved resource or a regular
-   * resource.
-   * @note
-   * This method add textures to the database according to the "keep" criteria.
-   * The database map is sorted using two parts : the negative side from index -1 , going down , and the positive from
-   * index 0 going up. The negative side is reserved for special textures that don't get erased between scene
-   * changes(dummy textures , screen fbo texture). The positive side is freed between each scene change.
-   * @param texture  Raw pixel data
-   * @param type Type of the texture
-   * @param keep_texture_after_clean In case a texture needs to stay between scene changes , this  value needs to be
-   * true.
-   * @param is_dummy Is the texture a dummy texture ?
-   * @return int Index of the texture inside the database
-   */
-  template<class TEXTYPE>
-  int addTexture(TextureData *texture, bool keep = false, bool is_dummy = false) {
-    int index = 0;
-    Mutex::Lock lock(mutex);
-    if (keep || is_dummy) {
-      index = -1;
-      while (texture_database[index] != nullptr) {
-        if (is_dummy && ISTYPE(TEXTYPE, decltype(*texture_database[index])))
-          return index;
-        index--;
-      }
-    } else
-      while (texture_database[index] != nullptr)
-        index++;
-
-    if (is_dummy)
-      texture = nullptr;
-    std::unique_ptr<TEXTYPE> tex = TextureBuilder::build<TEXTYPE>(texture);
-    texture_database[index] = std::move(tex);
-    return index;
-  }
-
-  /**
    * @brief Get the texture at index
    *
    * @param index Index we want to retrieve
    * @return Texture* nullptr if nothing found , Texture at "index" else
    */
-  Texture *get(const int index) override;
+  Texture *get(const int index) const override;
 
   /**
    * @brief Removes a texture from the database using it's ID
@@ -122,7 +77,7 @@ class TextureDatabase : public RenderingDatabaseInterface<int, Texture> {
    * @param index Index to check
    * @return true If database contains "index"
    */
-  bool contains(const int index) override;
+  bool contains(const int index) const override;
 
   /**
    * @brief Checks if a texture is present in the database
@@ -131,7 +86,7 @@ class TextureDatabase : public RenderingDatabaseInterface<int, Texture> {
    * @return std::pair<int , Texture*> Pair of <ID  , Texture*>. If address is not present in the database , returns < 0
    * , nullptr> .
    */
-  std::pair<int, Texture *> contains(const Texture *address) override;
+  std::pair<int, Texture *> contains(const Texture *address) const override;
 
   /**
    * @brief Retrieve all textures of type "texture_type"
@@ -141,11 +96,9 @@ class TextureDatabase : public RenderingDatabaseInterface<int, Texture> {
    * @see Texture
    * @see Texture::TYPE
    */
-  std::vector<std::pair<int, Texture *>> getTexturesByType(Texture::TYPE texture_type);
+  std::vector<std::pair<int, Texture *>> getTexturesByType(Texture::TYPE texture_type) const;
 
-  bool empty() {
-    return texture_database.empty();
-  }
+  bool empty() const { return texture_database.empty(); }
 
  private:
   std::map<int, std::unique_ptr<Texture>> texture_database; /**<Database of textures*/

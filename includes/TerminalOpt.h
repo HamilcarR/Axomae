@@ -32,20 +32,7 @@ namespace axomae {
       "load"        // load an image
   };
 
-  enum : unsigned {
-    CHK_CURRENT_IMG = 11,
-    SELECT = 10,
-    LISTIDS = 9,
-    LOAD = 8,
-    RENDER = 7,
-    EXIT = 6,
-    CONTRAST = 5,
-    SAVE = 4,
-    DUDV = 3,
-    HMAP = 2,
-    NMAP = 1,
-    WIN = 0
-  };
+  enum : unsigned { CHK_CURRENT_IMG = 11, SELECT = 10, LISTIDS = 9, LOAD = 8, RENDER = 7, EXIT = 6, CONTRAST = 5, SAVE = 4, DUDV = 3, HMAP = 2, NMAP = 1, WIN = 0 };
   enum : unsigned { WIN_ARGS = 3 };
 
 #ifdef __unix__

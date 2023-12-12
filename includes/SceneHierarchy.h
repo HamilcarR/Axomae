@@ -2,9 +2,9 @@
 #define SCENEHIERARCHY_H
 
 #include "Node.h"
+#include "RenderingDatabaseInterface.h"
 #include <QObject>
 #include <functional>
-
 /**
  * @file SceneGraph.h
  * @brief This file implements the hierarchy system of a scene.
@@ -23,42 +23,34 @@ class ISceneHierarchy : public QObject {
    *
    * @param _root
    */
-  void setRoot(ISceneNode *_root) {
-    root = _root;
-  }
+  void setRoot(ISceneNode *_root) { root = _root; }
 
   /**
    * @brief Returns the iterator of the structure
    *
    * @return SceneNodeInterface*
    */
-  INode *getIterator() const {
-    return iterator;
-  }
+  INode *getIterator() const { return iterator; }
 
   /**
    * @brief Set the Iterator of the structure
    *
    * @param iter Iterator of type SceneNodeInterface*
    */
-  void setIterator(INode *iter) {
-    iterator = iter;
-  }
+  void setIterator(INode *iter) { iterator = iter; }
 
   /**
-   * @brief Create an empty root node
+   * @brief Create an empty root node , and stores it into the provided database.
    *
    */
-  virtual void createGenericRootNode() = 0;
+  virtual void createGenericRootNode(IResourceDB<int, INode> &database) = 0;
 
   /**
    * @brief Get the Root Node object
    *
    * @return SceneNodeInterface*
    */
-  INode *getRootNode() const {
-    return root;
-  }
+  INode *getRootNode() const { return root; }
 
   /**
    * @brief Set the node as a child of root
@@ -85,17 +77,6 @@ class ISceneHierarchy : public QObject {
    *
    */
   virtual void updateAccumulatedTransformations() = 0;
-
-  /**
-   * @brief Add node to the list of nodes that need to be deleted by the current structure.
-   * Specialized nodes like meshes , and lights , can be freed by their own scene structures. Empty generic nodes are
-   * deleted by the scene Tree/Graph structure.
-   *
-   * @param node Node to track for deletion.
-   */
-  virtual void addGenericNodeToDelete(INode *node) {
-    generic_nodes_to_delete.push_back(node);
-  }
 
   /**
    * @brief Free all generic nodes allocated and only generic nodes .
@@ -163,7 +144,6 @@ class ISceneHierarchy : public QObject {
  private:
   mutable INode *iterator; /*<Iterator to keep track of nodes in traversals*/
   mutable const INode *const_iterator;
-  std::vector<INode *> generic_nodes_to_delete; /*<Array of pointers on nodes that contain only a transformation*/
 };
 
 /*******************************************************************************************************************************************************************/
@@ -174,7 +154,7 @@ class SceneTree : public ISceneHierarchy {
   SceneTree(ISceneNode *root = nullptr);
   SceneTree(const SceneTree &copy);
   virtual ~SceneTree();
-  virtual void createGenericRootNode() override;
+  virtual void createGenericRootNode(IResourceDB<int, INode> &database) override;
   virtual SceneTree &operator=(const SceneTree &copy);
   virtual void updateAccumulatedTransformations() override;
   virtual void pushNewRoot(INode *new_root);

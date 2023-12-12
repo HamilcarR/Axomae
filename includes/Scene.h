@@ -4,8 +4,10 @@
 #include "BoundingBox.h"
 #include "Camera.h"
 #include "Drawable.h"
+#include "ResourceDatabaseManager.h"
 #include "SceneHierarchy.h"
 #include "utils_3D.h"
+
 /**
  * @file Scene.h
  * @brief File implementing classes and functions relative to how the scene is represented and how to manage it
@@ -30,7 +32,7 @@ class Scene {
    * @brief Construct a new Scene object
    *
    */
-  Scene();
+  Scene(ResourceDatabaseManager &manager);
 
   /**
    * @brief Destroy the Scene object
@@ -123,9 +125,7 @@ class Scene {
    * !Note : The class does not take care about freeing the database pointer .
    * @param database The pointer on the scene's lighting database.
    */
-  void setLightDatabasePointer(LightingDatabase *database) {
-    light_database = database;
-  }
+  void setLightDatabasePointer(LightingDatabase *database) { light_database = database; }
 
   /**
    * @brief Set the pointer on the camera used for the next render pass
@@ -171,21 +171,15 @@ class Scene {
    *
    * @param display
    */
-  void displayBoundingBoxes(bool display) {
-    display_bbox = display;
-  }
+  void displayBoundingBoxes(bool display) { display_bbox = display; }
 
   /**
    * @brief Get reference on the scene tree
    *
    * @return const SceneTree&
    */
-  const SceneTree &getConstSceneTreeRef() const {
-    return scene_tree;
-  }
-  SceneTree &getSceneTreeRef() {
-    return scene_tree;
-  }
+  const SceneTree &getConstSceneTreeRef() const { return scene_tree; }
+  SceneTree &getSceneTreeRef() { return scene_tree; }
 
  private:
   /**
@@ -195,14 +189,17 @@ class Scene {
   void sortTransparentElements();
 
  protected:
-  std::map<float, Drawable *>
-      sorted_transparent_meshes;                /*<Sorted collection of transparent meshes , by distance to the camera*/
-  std::vector<AABB> scene;                      /*<Meshes of the scene , and their computed bounding boxes*/
-  SceneTree scene_tree;                         /*<Scene tree containing a hierarchy of transformations*/
-  std::vector<Drawable *> bounding_boxes_array; /*<Array of bounding boxes*/
-  LightingDatabase *light_database;             /*<Light database pointer*/
-  Camera *scene_camera;                         /*<Pointer on the scene camera*/
+  std::map<float, Drawable *> sorted_transparent_meshes; /*<Sorted collection of transparent meshes , by distance to the camera*/
+  std::vector<AABB> scene;                               /*<Meshes of the scene , and their computed bounding boxes*/
+  SceneTree scene_tree;                                  /*<Scene tree containing a hierarchy of transformations*/
+  std::vector<Drawable *> bounding_boxes_array;          /*<Array of bounding boxes*/
+  LightingDatabase *light_database;                      /*<Light database pointer*/
+  ResourceDatabaseManager &resource_manager;
+  Camera *scene_camera; /*<Pointer on the scene camera*/
   bool display_bbox;
+
+ private:
+  std::vector<std::unique_ptr<Drawable>> drawable_collection;
 };
 
 #endif

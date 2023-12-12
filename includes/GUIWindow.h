@@ -22,16 +22,7 @@
  */
 
 namespace gui {
-  enum IMAGETYPE : unsigned {
-    GREYSCALE_LUMI = 1,
-    HEIGHT = 2,
-    NMAP = 3,
-    DUDV = 4,
-    ALBEDO = 5,
-    GREYSCALE_AVG = 6,
-    PROJECTED_NMAP = 7,
-    INVALID = 8
-  };
+  enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4, ALBEDO = 5, GREYSCALE_AVG = 6, PROJECTED_NMAP = 7, INVALID = 8 };
 }
 namespace axomae {
   class HeapManagement;

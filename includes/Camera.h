@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "INodeBuilder.h"
+#include "INodeFactory.h"
 #include "utils_3D.h"
 /**
  * @file Camera.h
@@ -70,45 +70,35 @@ class Camera : public SceneTreeNode {
    *
    * @return * glm::mat4
    */
-  virtual glm::mat4 getView() const {
-    return view;
-  }
+  virtual glm::mat4 getView() const { return view; }
 
   /**
    * @brief Set the new view matrix
    *
    * @param _view View Matrix
    */
-  virtual void setView(glm::mat4 _view) {
-    view = _view;
-  }
+  virtual void setView(glm::mat4 _view) { view = _view; }
 
   /**
    * @brief Set the target position
    *
    * @param _target Point that the camera will view
    */
-  virtual void setTarget(glm::vec3 _target) {
-    target = _target;
-  }
+  virtual void setTarget(glm::vec3 _target) { target = _target; }
 
   /**
    * @brief Get the product of (Projection x View) matrix
    *
    * @return glm::mat4
    */
-  virtual glm::mat4 getViewProjection() const {
-    return view_projection;
-  }
+  virtual glm::mat4 getViewProjection() const { return view_projection; }
 
   /**
    * @brief Get the Projection matrix
    *
    * @return glm::mat4
    */
-  virtual glm::mat4 getProjection() const {
-    return projection;
-  }
+  virtual glm::mat4 getProjection() const { return projection; }
 
   /**
    * @brief On left click event
@@ -163,18 +153,14 @@ class Camera : public SceneTreeNode {
    *
    * @return const glm::vec3&
    */
-  virtual const glm::vec3 &getPosition() const {
-    return position;
-  }
+  virtual const glm::vec3 &getPosition() const { return position; }
 
   /**
    * @brief Set the camera's new position
    *
    * @param new_pos New position
    */
-  virtual void setPosition(glm::vec3 new_pos) {
-    position = new_pos;
-  }
+  virtual void setPosition(glm::vec3 new_pos) { position = new_pos; }
 
   /**
    * @brief Get the rotation matrix of the scene
@@ -195,9 +181,7 @@ class Camera : public SceneTreeNode {
    *
    * @return Camera::TYPE
    */
-  TYPE getType() const {
-    return type;
-  }
+  TYPE getType() const { return type; }
 
  protected:
   TYPE type;                             /**<Camera type */
@@ -214,8 +198,8 @@ class Camera : public SceneTreeNode {
   glm::vec3 camera_up;                   /**<Up vector of the camera */
   const glm::vec3 world_up;              /**<World space up vector */
   const MouseState *mouse_state_pointer; /**<Pointer on a MouseState structure keeping track of the mouse data*/
-  ScreenSize *ratio_dimensions; /**<Pointer on a ScreenSize structure with fields giving informations about a width ,
-                                   and a height.*/
+  ScreenSize *ratio_dimensions;          /**<Pointer on a ScreenSize structure with fields giving informations about a width ,
+                                            and a height.*/
 };
 
 /**
