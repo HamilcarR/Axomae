@@ -57,9 +57,7 @@ void GLViewer::resizeGL(int w, int h) {
   renderer->onResize(width(), height());
 }
 
-void GLViewer::printInfo() {
-  std::cout << "Renderer info here : < >" << std::endl;
-}
+void GLViewer::printInfo() { std::cout << "Renderer info here : < >" << std::endl; }
 
 void GLViewer::mouseMoveEvent(QMouseEvent *event) {
   QOpenGLWidget::mouseMoveEvent(event);
@@ -140,9 +138,7 @@ void GLViewer::mouseReleaseEvent(QMouseEvent *event) {
   update();
 }
 
-void GLViewer::mouseDoubleClickEvent(QMouseEvent *event) {
-  QOpenGLWidget::mouseDoubleClickEvent(event);
-}
+void GLViewer::mouseDoubleClickEvent(QMouseEvent *event) { QOpenGLWidget::mouseDoubleClickEvent(event); }
 
 void GLViewer::setNewScene(std::pair<std::vector<Mesh *>, SceneTree> &new_scene) {
   makeCurrent();

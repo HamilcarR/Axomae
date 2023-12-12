@@ -62,9 +62,7 @@ void Camera::computeViewSpace() {
   view = glm::lookAt(position, target, camera_up);
 }
 /**********************************************************************************************************************************************/
-ArcballCamera::ArcballCamera() {
-  reset();
-}
+ArcballCamera::ArcballCamera() { reset(); }
 
 /**
  * This is a constructor for an ArcballCamera object that sets its properties and initializes its
@@ -87,7 +85,8 @@ ArcballCamera::ArcballCamera() {
  *  used by the ArcballCamera class to track user input and update the camera's
  * position/orientation accordingly
  */
-ArcballCamera::ArcballCamera(float deg, ScreenSize *screen, float near, float far, float radius, const MouseState *pointer) : Camera(deg, screen, near, far, pointer) {
+ArcballCamera::ArcballCamera(float deg, ScreenSize *screen, float near, float far, float radius, const MouseState *pointer)
+    : Camera(deg, screen, near, far, pointer) {
   reset();
   default_radius = radius;
   name = "Arcball-Camera";
@@ -165,13 +164,9 @@ void ArcballCamera::computeViewSpace() {
   view = glm::lookAt(position, target, world_up);
 }
 
-const glm::mat4 ArcballCamera::getSceneRotationMatrix() const {
-  return scene_rotation_matrix;
-}
+const glm::mat4 ArcballCamera::getSceneRotationMatrix() const { return scene_rotation_matrix; }
 
-const glm::mat4 ArcballCamera::getSceneTranslationMatrix() const {
-  return scene_translation_matrix;
-}
+const glm::mat4 ArcballCamera::getSceneTranslationMatrix() const { return scene_translation_matrix; }
 
 /**
  * The function calculates the z-axis value for a given x and y coordinate within a specified radius.
@@ -240,25 +235,20 @@ void ArcballCamera::onRightClick() {
 
 void ArcballCamera::onRightClickRelease() {}
 
-void ArcballCamera::updateZoom(float step) {
-  radius += step;
-}
+void ArcballCamera::updateZoom(float step) { radius += step; }
 
 void ArcballCamera::zoomIn() {
   if ((radius - DELTA_ZOOM) >= DELTA_ZOOM)
     updateZoom(-DELTA_ZOOM);
 }
 
-void ArcballCamera::zoomOut() {
-  updateZoom(DELTA_ZOOM);
-}
+void ArcballCamera::zoomOut() { updateZoom(DELTA_ZOOM); }
 
 /**********************************************************************************************************************************************/
-FreePerspectiveCamera::FreePerspectiveCamera() : Camera() {
-  type = PERSPECTIVE;
-}
+FreePerspectiveCamera::FreePerspectiveCamera() : Camera() { type = PERSPECTIVE; }
 
-FreePerspectiveCamera::FreePerspectiveCamera(float deg, ScreenSize *screen, float near, float far, const MouseState *pointer) : Camera(deg, screen, near, far, pointer) {
+FreePerspectiveCamera::FreePerspectiveCamera(float deg, ScreenSize *screen, float near, float far, const MouseState *pointer)
+    : Camera(deg, screen, near, far, pointer) {
   type = PERSPECTIVE;
 }
 
@@ -275,10 +265,6 @@ void FreePerspectiveCamera::onRightClickRelease() {}
 
 void FreePerspectiveCamera::zoomIn() {}
 void FreePerspectiveCamera::zoomOut() {}
-const glm::mat4 FreePerspectiveCamera::getSceneTranslationMatrix() const {
-  return glm::mat4(1.f);
-}
+const glm::mat4 FreePerspectiveCamera::getSceneTranslationMatrix() const { return glm::mat4(1.f); }
 
-const glm::mat4 FreePerspectiveCamera::getSceneRotationMatrix() const {
-  return glm::mat4(1.f);
-}
+const glm::mat4 FreePerspectiveCamera::getSceneRotationMatrix() const { return glm::mat4(1.f); }

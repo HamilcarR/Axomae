@@ -11,13 +11,9 @@ class NodeItem : public QTreeWidgetItem {
  public:
   virtual ~NodeItem() {}
 
-  NodeItem(std::string n, int type, QTreeWidgetItem *parent = nullptr) : QTreeWidgetItem(parent, type) {
-    name = n;
-  }
+  NodeItem(std::string n, int type, QTreeWidgetItem *parent = nullptr) : QTreeWidgetItem(parent, type) { name = n; }
 
-  virtual void setItemText(int column) {
-    QTreeWidgetItem::setText(column, QString(name.c_str()));
-  }
+  virtual void setItemText(int column) { QTreeWidgetItem::setText(column, QString(name.c_str())); }
 
  public:
   std::string name;
@@ -25,9 +21,7 @@ class NodeItem : public QTreeWidgetItem {
 
 class NodeItemBuilder {
  public:
-  static NodeItem *buildNode(std::string name, int type, QTreeWidgetItem *parent = nullptr) {
-    return new NodeItem(name, type, parent);
-  }
+  static NodeItem *buildNode(std::string name, int type, QTreeWidgetItem *parent = nullptr) { return new NodeItem(name, type, parent); }
 };
 
 // TODO: [AX-57] implement a visitor node for icon attributions to scene elements
@@ -53,22 +47,20 @@ class SceneListView : virtual public QTreeWidget {
     return nullptr;
   }
 
-  NodeItem *getRoot() const {
-    return items.empty() ? nullptr : items[0];
-  }
-  const NodeItem *getConstRoot() const {
-    return items.empty() ? nullptr : items[0];
-  }
+  NodeItem *getRoot() const { return items.empty() ? nullptr : items[0]; }
+  const NodeItem *getConstRoot() const { return items.empty() ? nullptr : items[0]; }
 
-  void updateSceneList() {
-    setScene(*current_scene);
-  }
+  void updateSceneList() { setScene(*current_scene); }
 
   virtual void setScene(SceneTree &scene) {
     emptyTree();
     current_scene = &scene;
     INode *root_node = scene.getRootNode();
-    auto layout_nodes_lambda = [](INode *node, SceneTree &scene, SceneListView &scene_view_list, std::vector<NodeItem *> &r_items, std::map<ISceneNode *, NodeItem *> &equiv_table) {
+    auto layout_nodes_lambda = [](INode *node,
+                                  SceneTree &scene,
+                                  SceneListView &scene_view_list,
+                                  std::vector<NodeItem *> &r_items,
+                                  std::map<ISceneNode *, NodeItem *> &equiv_table) {
       if (node == scene.getRootNode()) {
         NodeItem *root = new NodeItem(node->getName(), QTreeWidgetItem::Type);
         root->setItemText(0);

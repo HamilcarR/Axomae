@@ -56,9 +56,7 @@ class BoundingBox : public SceneTreeNode {
    *
    * @return glm::vec3 Center of the AABB
    */
-  virtual glm::vec3 getPosition() const {
-    return center;
-  }
+  virtual glm::vec3 getPosition() const { return center; }
 
   /**
    * @brief Compute the position of the AABB in view space.
@@ -66,9 +64,7 @@ class BoundingBox : public SceneTreeNode {
    * @param modelview Modelview matrix : Model x View
    * @return glm::vec4 Position of the AABB relative to the camera
    */
-  virtual glm::vec3 computeModelViewPosition(glm::mat4 modelview) const {
-    return glm::vec3(modelview * glm::vec4(center, 1.f));
-  }
+  virtual glm::vec3 computeModelViewPosition(glm::mat4 modelview) const { return glm::vec3(modelview * glm::vec4(center, 1.f)); }
 
   /**
    * @brief Returns the index + vertices array representatives of the bounding box
@@ -82,36 +78,28 @@ class BoundingBox : public SceneTreeNode {
    *
    * @return glm::vec3
    */
-  glm::vec3 getMaxCoords() const {
-    return max_coords;
-  }
+  glm::vec3 getMaxCoords() const { return max_coords; }
 
   /**
    * @brief Get the Min Coords object
    *
    * @return glm::vec3
    */
-  glm::vec3 getMinCoords() const {
-    return min_coords;
-  }
+  glm::vec3 getMinCoords() const { return min_coords; }
 
   /**
    * @brief Set the Max Coords object
    *
    * @param max
    */
-  void setMaxCoords(glm::vec3 max) {
-    max_coords = max;
-  }
+  void setMaxCoords(glm::vec3 max) { max_coords = max; }
 
   /**
    * @brief Set the Min Coords object
    *
    * @param min
    */
-  void setMinCoords(glm::vec3 min) {
-    min_coords = min;
-  }
+  void setMinCoords(glm::vec3 min) { min_coords = min; }
 
  private:
   glm::vec3 max_coords;

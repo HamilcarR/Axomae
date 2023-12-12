@@ -63,13 +63,9 @@ void Mesh::initializeGlData() {
   }
 }
 
-void Mesh::bindMaterials() {
-  material.bind();
-}
+void Mesh::bindMaterials() { material.bind(); }
 
-void Mesh::unbindMaterials() {
-  material.unbind();
-}
+void Mesh::unbindMaterials() { material.unbind(); }
 
 void Mesh::preRenderSetup() {
   setFaceCulling(true);
@@ -120,9 +116,7 @@ void Mesh::clean() {
   material.clean();
 }
 
-bool Mesh::isInitialized() {
-  return mesh_initialized;
-}
+bool Mesh::isInitialized() { return mesh_initialized; }
 
 void Mesh::setSceneCameraPointer(Camera *camera) {
   this->camera = camera;
@@ -130,25 +124,15 @@ void Mesh::setSceneCameraPointer(Camera *camera) {
     shader_program->setSceneCameraPointer(camera);
 }
 
-void Mesh::cullBackFace() {
-  glCullFace(GL_BACK);
-}
+void Mesh::cullBackFace() { glCullFace(GL_BACK); }
 
-void Mesh::cullFrontFace() {
-  glCullFace(GL_FRONT);
-}
+void Mesh::cullFrontFace() { glCullFace(GL_FRONT); }
 
-void Mesh::cullFrontAndBackFace() {
-  glCullFace(GL_FRONT_AND_BACK);
-}
+void Mesh::cullFrontAndBackFace() { glCullFace(GL_FRONT_AND_BACK); }
 
-void Mesh::afterRenderSetup() {
-  return;
-}
+void Mesh::afterRenderSetup() { return; }
 
-void Mesh::setPolygonDrawMode(RASTERMODE mode) {
-  polygon_mode = mode;
-}
+void Mesh::setPolygonDrawMode(RASTERMODE mode) { polygon_mode = mode; }
 
 void Mesh::setFaceCulling(bool value) {
   if (value) {
@@ -165,9 +149,7 @@ void Mesh::setDepthMask(bool val) {
   depth_mask_enabled = val;
 }
 
-void Mesh::setDepthFunc(DEPTHFUNC func) {
-  glDepthFunc(func);
-}
+void Mesh::setDepthFunc(DEPTHFUNC func) { glDepthFunc(func); }
 
 /*****************************************************************************************************************/
 CubeMesh::CubeMesh(ISceneNode *parent) : Mesh(parent) {
@@ -221,9 +203,7 @@ void CubeMesh::preRenderSetup() {
 }
 
 /*****************************************************************************************************************/
-CubeMapMesh::CubeMapMesh(ISceneNode *parent) : CubeMesh(parent) {
-  name = "CubeMap";
-}
+CubeMapMesh::CubeMapMesh(ISceneNode *parent) : CubeMesh(parent) { name = "CubeMap"; }
 
 CubeMapMesh::~CubeMapMesh() {}
 
@@ -274,9 +254,7 @@ void QuadMesh::preRenderSetup() {
 
 /*****************************************************************************************************************/
 
-FrameBufferMesh::FrameBufferMesh() : QuadMesh() {
-  name = "Custom screen framebuffer";
-}
+FrameBufferMesh::FrameBufferMesh() : QuadMesh() { name = "Custom screen framebuffer"; }
 
 FrameBufferMesh::FrameBufferMesh(int texture_index, Shader *_shader) : FrameBufferMesh() {
   shader_program = _shader;
@@ -337,6 +315,4 @@ void BoundingBoxMesh::preRenderSetup() {
   }
 }
 
-void BoundingBoxMesh::afterRenderSetup() {
-  glPolygonMode(GL_FRONT_AND_BACK, polygon_mode);
-}
+void BoundingBoxMesh::afterRenderSetup() { glPolygonMode(GL_FRONT_AND_BACK, polygon_mode); }

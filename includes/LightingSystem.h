@@ -35,17 +35,11 @@ class LightData {
   uint16_t update_flags = 0;
 
   /*Helper functions */
-  void enableUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag) {
-    update_flags |= flag;
-  }
+  void enableUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag) { update_flags |= flag; }
 
-  void disableUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag) {
-    update_flags &= ~flag;
-  }
+  void disableUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag) { update_flags &= ~flag; }
 
-  bool checkUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag) const {
-    return update_flags & flag;
-  }
+  bool checkUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag) const { return update_flags & flag; }
 
   void asPbrColor(uint8_t red, uint8_t green, uint8_t blue) {
     diffuse_col = glm::vec3(red, green, blue);
@@ -53,9 +47,7 @@ class LightData {
     ambiant_col = glm::vec3(red, green, blue);
   }
 
-  void loadAttenuation(float cste, float lin, float quad) {
-    attenuation = glm::vec3(cste, lin, quad);
-  }
+  void loadAttenuation(float cste, float lin, float quad) { attenuation = glm::vec3(cste, lin, quad); }
 };
 
 /**
@@ -86,88 +78,68 @@ class AbstractLight : public SceneTreeNode {
    *
    * @param pos glm::vec3 position
    */
-  virtual void setPosition(glm::vec3 pos) {
-    position = pos;
-  }
+  virtual void setPosition(glm::vec3 pos) { position = pos; }
 
   /**
    * @brief Set the Specular Color of the light
    *
    * @param col glm::vec3 color
    */
-  virtual void setSpecularColor(glm::vec3 col) {
-    specularColor = col;
-  }
+  virtual void setSpecularColor(glm::vec3 col) { specularColor = col; }
 
   /**
    * @brief Set the Ambiant Color
    *
    * @param col
    */
-  virtual void setAmbiantColor(glm::vec3 col) {
-    ambientColor = col;
-  }
+  virtual void setAmbiantColor(glm::vec3 col) { ambientColor = col; }
 
   /**
    * @brief Set the Diffuse Color
    *
    * @param col
    */
-  virtual void setDiffuseColor(glm::vec3 col) {
-    diffuseColor = col;
-  }
+  virtual void setDiffuseColor(glm::vec3 col) { diffuseColor = col; }
   /**
    * @brief Get the light's position
    *
    * @return glm::vec3
    */
-  virtual glm::vec3 getPosition() {
-    return position;
-  }
+  virtual glm::vec3 getPosition() { return position; }
 
   /**
    * @brief Get the Diffuse Color
    *
    * @return glm::vec3
    */
-  virtual glm::vec3 getDiffuseColor() {
-    return diffuseColor;
-  }
+  virtual glm::vec3 getDiffuseColor() { return diffuseColor; }
 
   /**
    * @brief Get the Ambiant Color
    *
    * @return glm::vec3
    */
-  virtual glm::vec3 getAmbiantColor() {
-    return ambientColor;
-  }
+  virtual glm::vec3 getAmbiantColor() { return ambientColor; }
 
   /**
    * @brief Get the Specular Color
    *
    * @return glm::vec3
    */
-  virtual glm::vec3 getSpecularColor() {
-    return specularColor;
-  }
+  virtual glm::vec3 getSpecularColor() { return specularColor; }
 
   /**
    * @brief Set the Intensity value
    *
    * @param s New intensity
    */
-  virtual void setIntensity(float s) {
-    intensity = s;
-  }
+  virtual void setIntensity(float s) { intensity = s; }
 
   /**
    * @brief Get the Intensity value
    *
    */
-  virtual float getIntensity() {
-    return intensity;
-  }
+  virtual float getIntensity() { return intensity; }
 
   /**
    * @brief Updates the uniforms values of lights in the shader
@@ -184,18 +156,14 @@ class AbstractLight : public SceneTreeNode {
    * @return TYPE
    * @see AbstractClass::TYPE
    */
-  virtual TYPE getType() {
-    return type;
-  }
+  virtual TYPE getType() { return type; }
 
   /**
    * @brief Returns the ID of the light
    *
    * @return unsigned int
    */
-  virtual unsigned int getID() {
-    return id;
-  }
+  virtual unsigned int getID() { return id; }
 
   /**
    * @brief Updates this light's internal data with new values
@@ -204,9 +172,7 @@ class AbstractLight : public SceneTreeNode {
    */
   virtual void updateLightData(const LightData &data);
 
-  void setID(const unsigned light_id) {
-    id = light_id;
-  }
+  void setID(const unsigned light_id) { id = light_id; }
 
  protected:
   /**
@@ -262,7 +228,8 @@ class DirectionalLight : public AbstractLight {
    * @param intensity Intensity of the light
    * @param parent Predecessor in the scene graph
    */
-  DirectionalLight(glm::vec3 position, glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float intensity, ISceneNode *parent = nullptr);
+  DirectionalLight(
+      glm::vec3 position, glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float intensity, ISceneNode *parent = nullptr);
 
   /**
    * @brief Construct a new Directional Light
@@ -334,7 +301,13 @@ class PointLight : public AbstractLight {
    * @param intensity Intensity of the light
    * @param parent Predecessor in the scene graph
    */
-  PointLight(glm::vec3 position, glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, glm::vec3 attenuation_compnents, float intensity, ISceneNode *parent = nullptr);
+  PointLight(glm::vec3 position,
+             glm::vec3 ambientColor,
+             glm::vec3 diffuseColor,
+             glm::vec3 specularColor,
+             glm::vec3 attenuation_compnents,
+             float intensity,
+             ISceneNode *parent = nullptr);
 
   /**
    * @brief Construct a new Point Light object
@@ -358,13 +331,9 @@ class PointLight : public AbstractLight {
    */
   virtual void updateShaderData(Shader *shader, glm::mat4 &view, unsigned int index) override;
 
-  glm::vec3 getAttenuation() const {
-    return attenuation;
-  }
+  glm::vec3 getAttenuation() const { return attenuation; }
 
-  void setAttenuation(glm::vec3 atten) {
-    attenuation = atten;
-  }
+  void setAttenuation(glm::vec3 atten) { attenuation = atten; }
 
   virtual void updateLightData(const LightData &data) override;
 
@@ -408,7 +377,14 @@ class SpotLight : public AbstractLight {
    * @param intensity
    * @param parent Predecessor in the scene graph
    */
-  SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float cutoff_angle, float intensity, ISceneNode *parent = nullptr);
+  SpotLight(glm::vec3 position,
+            glm::vec3 direction,
+            glm::vec3 ambient,
+            glm::vec3 diffuse,
+            glm::vec3 specular,
+            float cutoff_angle,
+            float intensity,
+            ISceneNode *parent = nullptr);
 
   /**
    * @brief Construct a new Spot Light object
@@ -428,13 +404,9 @@ class SpotLight : public AbstractLight {
 
   virtual void updateLightData(const LightData &data) override;
 
-  virtual void setDirection(glm::vec3 dir) {
-    direction = dir;
-  }
+  virtual void setDirection(glm::vec3 dir) { direction = dir; }
 
-  virtual void setAngle(float angle) {
-    theta = angle;
-  }
+  virtual void setAngle(float angle) { theta = angle; }
 
  protected:
   glm::vec3 direction;           /**<Direction of the light cone*/

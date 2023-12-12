@@ -36,12 +36,8 @@ class TextureNonPowerOfTwoDimensionsException : virtual public AxomaeGenericExce
 template<class T>
 class EnvmapProcessing : virtual public GenericTextureProcessing {
  public:
-  virtual bool isDimPowerOfTwo(int dimension) const override {
-    return (dimension & (dimension - 1)) == 0;
-  }
-  virtual bool isValidDim(int dimension) const override {
-    return !std::isnan(dimension) && dimension > 0;
-  }
+  virtual bool isDimPowerOfTwo(int dimension) const override { return (dimension & (dimension - 1)) == 0; }
+  virtual bool isValidDim(int dimension) const override { return !std::isnan(dimension) && dimension > 0; }
 
   /**
    * @brief Construct a texture from an envmap double HDR with 3 channels
@@ -74,9 +70,7 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
    *
    * @return const std::vector<glm::vec3>&
    */
-  const std::vector<glm::vec3> &getData() {
-    return data;
-  }
+  const std::vector<glm::vec3> &getData() { return data; }
 
   /**
    * @brief Computes Specular Prefiltered envmap
@@ -150,7 +144,11 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
    * @param point Coordinates of the point being computed.
    * @return * const T
    */
-  const glm::dvec3 bilinearInterpolate(const glm::dvec2 top_left, const glm::dvec2 top_right, const glm::dvec2 bottom_left, const glm::dvec2 bottom_right, const glm::dvec2 point) const {
+  const glm::dvec3 bilinearInterpolate(const glm::dvec2 top_left,
+                                       const glm::dvec2 top_right,
+                                       const glm::dvec2 bottom_left,
+                                       const glm::dvec2 bottom_right,
+                                       const glm::dvec2 point) const {
     const double u = (point.x - top_left.x) / (top_right.x - top_left.x);
     const double v = (point.y - top_left.y) / (bottom_left.y - top_left.y);
     const glm::dvec3 top_interp = (1 - u) * discreteSample(top_left.x, top_left.y) + u * discreteSample(top_right.x, top_right.y);
@@ -206,7 +204,8 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
    * @param use_importance_sampling True if using importance sampling.
    */
   template<typename D>
-  void launchAsyncDiffuseIrradianceCompute(const D delta, float *f_data, const unsigned width_begin, const unsigned width_end, const unsigned _width, const unsigned _height) const {
+  void launchAsyncDiffuseIrradianceCompute(
+      const D delta, float *f_data, const unsigned width_begin, const unsigned width_end, const unsigned _width, const unsigned _height) const {
     for (unsigned i = width_begin; i <= width_end; i++) {
       for (unsigned j = 0; j < _height; j++) {
         glm::dvec2 uv = glm::dvec2(pixelToUv(i, _width), pixelToUv(j, _height));
@@ -263,7 +262,8 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
   }
 
   template<class D>
-  inline glm::dvec3 computeIrradianceSingleTexel(const unsigned x, const unsigned y, const unsigned samples, const D tangent, const D bitangent, const D normal) const {
+  inline glm::dvec3 computeIrradianceSingleTexel(
+      const unsigned x, const unsigned y, const unsigned samples, const D tangent, const D bitangent, const D normal) const {
     glm::dvec3 random = spherical_math::pgc3d((unsigned)x, (unsigned)y, samples);
     double phi = 2 * PI * random.x;
     double theta = asin(sqrt(random.y));
@@ -285,7 +285,8 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
    * @return const glm::dvec3 Irradiance value texel
    */
   template<class D>
-  inline const glm::dvec3 computeIrradianceImportanceSampling(const D x, const D y, const D z, const unsigned _width, const unsigned _height, const unsigned total_samples) const {
+  inline const glm::dvec3 computeIrradianceImportanceSampling(
+      const D x, const D y, const D z, const unsigned _width, const unsigned _height, const unsigned total_samples) const {
     unsigned int samples = 0;
     glm::dvec3 irradiance = glm::dvec3(0.f);
     glm::dvec3 normal(x, y, z);

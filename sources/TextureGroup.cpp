@@ -14,9 +14,7 @@ TextureGroup::TextureGroup(const TextureGroup &texture_group) {
 
 TextureGroup::~TextureGroup() {}
 
-void TextureGroup::addTexture(int index) {
-  texture_collection.push_back(index);
-}
+void TextureGroup::addTexture(int index) { texture_collection.push_back(index); }
 
 Texture *TextureGroup::getTexturePointer(Texture::TYPE type) {
   for (int id : texture_collection) {

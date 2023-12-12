@@ -49,13 +49,9 @@ class GLViewer : public QOpenGLWidget {
    * @brief Returns the pointer on the renderer's instance
    *
    */
-  const Renderer &getConstRenderer() {
-    return *renderer;
-  }
+  const Renderer &getConstRenderer() { return *renderer; }
 
-  Renderer &getRenderer() {
-    return *renderer;
-  }
+  Renderer &getRenderer() { return *renderer; }
 
  protected:
   /**

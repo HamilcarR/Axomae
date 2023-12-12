@@ -39,9 +39,7 @@ class GLGeometryBuffer : public GLBufferInterface {
    *
    * @param geo Pointer on the current mesh geometry
    */
-  virtual void setGeometryPointer(const Object3D *geo) {
-    geometry = geo;
-  };
+  virtual void setGeometryPointer(const Object3D *geo) { geometry = geo; };
 
   /**
    * @brief Initialize glGenBuffers for all vertex attributes

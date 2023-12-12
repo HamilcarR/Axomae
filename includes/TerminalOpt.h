@@ -32,7 +32,20 @@ namespace axomae {
       "load"        // load an image
   };
 
-  enum : unsigned { CHK_CURRENT_IMG = 11, SELECT = 10, LISTIDS = 9, LOAD = 8, RENDER = 7, EXIT = 6, CONTRAST = 5, SAVE = 4, DUDV = 3, HMAP = 2, NMAP = 1, WIN = 0 };
+  enum : unsigned {
+    CHK_CURRENT_IMG = 11,
+    SELECT = 10,
+    LISTIDS = 9,
+    LOAD = 8,
+    RENDER = 7,
+    EXIT = 6,
+    CONTRAST = 5,
+    SAVE = 4,
+    DUDV = 3,
+    HMAP = 2,
+    NMAP = 1,
+    WIN = 0
+  };
   enum : unsigned { WIN_ARGS = 3 };
 
 #ifdef __unix__
@@ -86,19 +99,11 @@ namespace axomae {
 #endif
   }
 
-  static void print(const char *text, int8_t color, int8_t prompt) {
-    print(std::string(text), color, prompt);
-  }
-  static void print(char *text, int8_t color, int8_t prompt) {
-    print(std::string(text), color, prompt);
-  }
+  static void print(const char *text, int8_t color, int8_t prompt) { print(std::string(text), color, prompt); }
+  static void print(char *text, int8_t color, int8_t prompt) { print(std::string(text), color, prompt); }
 
-  static void print(const char *text, int8_t color) {
-    print(std::string(text), color);
-  }
-  static void print(char *text, int8_t color) {
-    print(std::string(text), color);
-  }
+  static void print(const char *text, int8_t color) { print(std::string(text), color); }
+  static void print(char *text, int8_t color) { print(std::string(text), color); }
 
   typedef std::vector<std::pair<std::shared_ptr<Window>, SDL_Event>> WindowsStack;
   typedef std::vector<std::pair<SDL_Surface *, std::string>> ImagesStack;
@@ -117,24 +122,12 @@ namespace axomae {
     }
 
     void process_command(std::string user_input);
-    std::vector<std::pair<SDL_Surface *, std::string>> getImages() {
-      return images;
-    }
-    std::vector<std::pair<std::shared_ptr<Window>, SDL_Event>> getWindows() {
-      return windows;
-    }
-    int getCurrentImageId() {
-      return _idCurrentImage;
-    }
-    void setDisplayNULL() {
-      _display_window = nullptr;
-    }
-    Window *getDisplay() {
-      return _display_window;
-    }
-    void setDisplay(Window *d) {
-      _display_window = d;
-    }
+    std::vector<std::pair<SDL_Surface *, std::string>> getImages() { return images; }
+    std::vector<std::pair<std::shared_ptr<Window>, SDL_Event>> getWindows() { return windows; }
+    int getCurrentImageId() { return _idCurrentImage; }
+    void setDisplayNULL() { _display_window = nullptr; }
+    Window *getDisplay() { return _display_window; }
+    void setDisplay(Window *d) { _display_window = d; }
     void exit();
     void setLoop(bool);
     bool getLoop();

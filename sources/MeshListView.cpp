@@ -4,9 +4,7 @@ using namespace axomae;
 
 MeshListView::MeshListView(QWidget *parent) : QListWidget(parent) {}
 
-MeshListView::~MeshListView() {
-  remove();
-}
+MeshListView::~MeshListView() { remove(); }
 
 void MeshListView::remove() {
   for (auto A : mesh_names_list) {

@@ -39,7 +39,8 @@ BoundingBox::BoundingBox(const std::vector<float> &vertices) : BoundingBox() {
   /*
    * This lambda calculates asynchroneously the minimum/maximum coordinates of every meshes
    */
-  auto lambda_parallel_compute_bbox = [](const std::vector<float> &vertices, unsigned min_index, unsigned max_index) -> std::pair<glm::vec3, glm::vec3> {
+  auto lambda_parallel_compute_bbox =
+      [](const std::vector<float> &vertices, unsigned min_index, unsigned max_index) -> std::pair<glm::vec3, glm::vec3> {
     float x_max, y_max, z_max;
     float x_min, y_min, z_min;
     x_max = y_max = z_max = -INT_MAX;

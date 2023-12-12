@@ -12,10 +12,7 @@ namespace axomae {
 
   {}
 
-  ImageImporter::~ImageImporter() {
-
-    SDL_FreeSurface(surf);
-  }
+  ImageImporter::~ImageImporter() { SDL_FreeSurface(surf); }
 
   /*************************************************************************************************************/
 
@@ -25,9 +22,7 @@ namespace axomae {
     return instance;
   }
   /**************************************************************************************************************/
-  void ImageImporter::close() {
-    delete instance;
-  }
+  void ImageImporter::close() { delete instance; }
 
   /**************************************************************************************************************/
 
@@ -39,8 +34,6 @@ namespace axomae {
   }
 
   /**************************************************************************************************************/
-  void ImageImporter::save_image(SDL_Surface *surface, const char *filename) {
-    SDL_SaveBMP(surface, filename);
-  }
+  void ImageImporter::save_image(SDL_Surface *surface, const char *filename) { SDL_SaveBMP(surface, filename); }
 
 }  // namespace axomae

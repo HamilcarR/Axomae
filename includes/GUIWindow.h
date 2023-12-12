@@ -35,9 +35,7 @@ namespace axomae {
     Controller(QWidget *parent = nullptr);
     ~Controller();
     void setApplicationConfig(const std::string &config_string);
-    Ui::MainWindow &getUi() {
-      return _UI;
-    }
+    Ui::MainWindow &getUi() { return _UI; }
     static HeapManagement *_MemManagement;
     static SDL_Surface *copy_surface(SDL_Surface *surface);
 

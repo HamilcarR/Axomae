@@ -60,9 +60,7 @@ class Material {
    *
    * @param factor New emissive factor
    */
-  virtual void setEmissiveFactor(float factor) {
-    emissive_factor = factor;
-  }
+  virtual void setEmissiveFactor(float factor) { emissive_factor = factor; }
 
   /**
    * @brief Bind the material data to the shader
@@ -92,9 +90,7 @@ class Material {
    * @brief Sets up the shader pointer used for the mesh
    *
    */
-  virtual void setShaderPointer(Shader *shader) {
-    shader_program = shader;
-  }
+  virtual void setShaderPointer(Shader *shader) { shader_program = shader; }
 
   /**
    * @brief Set the Refractive Index
@@ -129,9 +125,7 @@ class Material {
    *
    * @param transparency_value
    */
-  void setTransparency(float transparency_value) {
-    alpha_factor = 1.f - transparency_value;
-  }
+  void setTransparency(float transparency_value) { alpha_factor = 1.f - transparency_value; }
 
   /**
    * @brief Checks if the material has an opacity value != 0
@@ -145,72 +139,56 @@ class Material {
    *
    * @return TextureGroup
    */
-  TextureGroup getTextureGroup() const {
-    return textures_group;
-  }
+  TextureGroup getTextureGroup() const { return textures_group; }
 
   /**
    * @brief Get the Dielectric Factor value
    *
    * @return float
    */
-  float getDielectricFactor() const {
-    return dielectric_factor;
-  }
+  float getDielectricFactor() const { return dielectric_factor; }
 
   /**
    * @brief Get the Roughness Factor value
    *
    * @return float
    */
-  float getRoughnessFactor() const {
-    return roughness_factor;
-  }
+  float getRoughnessFactor() const { return roughness_factor; }
 
   /**
    * @brief Get the Transmission Factor value
    *
    * @return float
    */
-  float getTransmissionFactor() const {
-    return transmission_factor;
-  }
+  float getTransmissionFactor() const { return transmission_factor; }
 
   /**
    * @brief Get the Emissive Factor value
    *
    * @return float
    */
-  float getEmissiveFactor() const {
-    return emissive_factor;
-  }
+  float getEmissiveFactor() const { return emissive_factor; }
 
   /**
    * @brief Get the Alpha Factor value
    *
    * @return float
    */
-  float getAlphaFactor() const {
-    return alpha_factor;
-  }
+  float getAlphaFactor() const { return alpha_factor; }
 
   /**
    * @brief Get the Refractive Index value
    *
    * @return glm::vec2
    */
-  glm::vec2 getRefractiveIndex() const {
-    return refractive_index;
-  }
+  glm::vec2 getRefractiveIndex() const { return refractive_index; }
 
   /**
    * @brief Get the Shader Program object
    *
    * @return Shader*
    */
-  Shader *getShaderProgram() const {
-    return shader_program;
-  }
+  Shader *getShaderProgram() const { return shader_program; }
 
   /**
    * @brief Get the Transparency value
@@ -218,9 +196,7 @@ class Material {
    * @return true
    * @return false
    */
-  bool getTransparency() const {
-    return is_transparent;
-  }
+  bool getTransparency() const { return is_transparent; }
 
  protected:
   TextureGroup textures_group; /**<A structure of every type of texture to be bound*/

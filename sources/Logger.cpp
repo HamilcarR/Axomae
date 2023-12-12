@@ -10,14 +10,16 @@ static Logger logger_global;
 
 class LoggerOutputStreamException : virtual public AxomaeGenericException {
  public:
-  LoggerOutputStreamException() : AxomaeGenericException() {
-    saveErrorString("The output stream for the application logger system is undefined !");
-  }
+  LoggerOutputStreamException() : AxomaeGenericException() { saveErrorString("The output stream for the application logger system is undefined !"); }
   virtual ~LoggerOutputStreamException() {}
 };
 
-std::map<LogLevel::LOGENUMTYPE, std::string> level_str = {
-    {LogLevel::CRITICAL, "CRITICAL"}, {LogLevel::DEBUG, "DEBUG"}, {LogLevel::ERROR, "ERROR"}, {LogLevel::INFO, "INFO"}, {LogLevel::WARNING, "WARNING"}, {LogLevel::GLINFO, "OPENGL INFO"}};
+std::map<LogLevel::LOGENUMTYPE, std::string> level_str = {{LogLevel::CRITICAL, "CRITICAL"},
+                                                          {LogLevel::DEBUG, "DEBUG"},
+                                                          {LogLevel::ERROR, "ERROR"},
+                                                          {LogLevel::INFO, "INFO"},
+                                                          {LogLevel::WARNING, "WARNING"},
+                                                          {LogLevel::GLINFO, "OPENGL INFO"}};
 
 void LogFunctions::log_message(std::string message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line) {
   logger_global.logMessage(message, level, file, function, line);
@@ -27,15 +29,12 @@ void LogFunctions::log_message(const char *message, const LogLevel::LOGENUMTYPE 
   log_message(std::string(message), level, file, function, line);
 }
 
-void LogFunctions::log_flush() {
-  logger_global.flush();
-}
+void LogFunctions::log_flush() { logger_global.flush(); }
 
-void LogFunctions::log_configure(const LoggerConfigDataStruct &conf) {
-  logger_global.setLogSystemConfig(conf);
-}
+void LogFunctions::log_configure(const LoggerConfigDataStruct &conf) { logger_global.setLogSystemConfig(conf); }
 
-static std::string getFormatedLog(const std::string &message, const std::string &filename, const std::string &function, const unsigned line, LogLevel::LOGENUMTYPE level) {
+static std::string getFormatedLog(
+    const std::string &message, const std::string &filename, const std::string &function, const unsigned line, LogLevel::LOGENUMTYPE level) {
   std::string head = filename + ": At function: " + function + "() : At Line : " + std::to_string(line) + " ; " + LOG2STR(level) + " ; " + message;
   return head;
 }
@@ -58,9 +57,7 @@ LogLine::LogLine(const std::string &mes, const LogLevel::LOGENUMTYPE lev, const 
 
 LogLine::~LogLine() {}
 
-std::string LogLine::getFormattedLog() const {
-  return getFormatedLog(message, file, function, line, level);
-}
+std::string LogLine::getFormattedLog() const { return getFormatedLog(message, file, function, line, level); }
 
 void Logger::logMessage(const std::string &message, LogLevel::LOGENUMTYPE log_level, const char *file, const char *function, unsigned line) {
   Mutex::Lock lock(mutex);

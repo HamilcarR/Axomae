@@ -126,10 +126,7 @@ namespace axomae {
   }
 
   /*******************************************************************************************************************************************************/
-  static Validation<std::string> validate_command_contrast(std::string input) {
-
-    return {false, std::vector<std::string>()};
-  }
+  static Validation<std::string> validate_command_contrast(std::string input) { return {false, std::vector<std::string>()}; }
 
   /*******************************************************************************************************************************************************/
 
@@ -140,10 +137,7 @@ namespace axomae {
   }
 
   /*******************************************************************************************************************************************************/
-  static Validation<std::string> validate_command_nmap(std::string input) {
-
-    return {false, std::vector<std::string>()};
-  }
+  static Validation<std::string> validate_command_nmap(std::string input) { return {false, std::vector<std::string>()}; }
 
   /*******************************************************************************************************************************************************/
 
@@ -158,16 +152,14 @@ namespace axomae {
     a.push_back(w2);
     a.push_back(w3);
     a.push_back(w4);
-    if ((w2.compare("-prewitt") != 0 && w2.compare("-sobel") != 0 && w2.compare("-scharr") != 0) || !check_if_number(w1) || w3.compare("-repeat") != 0)
+    if ((w2.compare("-prewitt") != 0 && w2.compare("-sobel") != 0 && w2.compare("-scharr") != 0) || !check_if_number(w1) ||
+        w3.compare("-repeat") != 0)
       return {false, std::vector<std::string>()};
     return {true, a};
   }
 
   /*******************************************************************************************************************************************************/
-  static Validation<std::string> validate_command_render(std::string input) {
-
-    return {false, std::vector<std::string>()};
-  }
+  static Validation<std::string> validate_command_render(std::string input) { return {false, std::vector<std::string>()}; }
 
   /*******************************************************************************************************************************************************/
 
@@ -238,17 +230,10 @@ namespace axomae {
     mutex_window_thread2.unlock();
   }
 
-  bool ProgramStatus::getLoop() {
-    return loop;
-  }
-  ProgramStatus::~ProgramStatus() {
+  bool ProgramStatus::getLoop() { return loop; }
+  ProgramStatus::~ProgramStatus() { loop = false; }
 
-    loop = false;
-  }
-
-  void ProgramStatus::exit() {
-    delete instance;
-  }
+  void ProgramStatus::exit() { delete instance; }
 
   void ProgramStatus::create_window(int width, int height, const char *name) {
     if (_display_window == nullptr) {
@@ -328,7 +313,10 @@ namespace axomae {
         std::string func = v.command_arguments[1];
         std::string bord = v.command_arguments[2];
         std::string device_choice = v.command_arguments[3];
-        uint8_t f = func.compare("-prewitt") == 0 ? AXOMAE_USE_PREWITT : func.compare("-sobel") == 0 ? AXOMAE_USE_SOBEL : func.compare("-scharr") == 0 ? AXOMAE_USE_SCHARR : 0;
+        uint8_t f = func.compare("-prewitt") == 0 ? AXOMAE_USE_PREWITT :
+                    func.compare("-sobel") == 0   ? AXOMAE_USE_SOBEL :
+                    func.compare("-scharr") == 0  ? AXOMAE_USE_SCHARR :
+                                                    0;
         uint8_t b = AXOMAE_REPEAT;
         if (device_choice.compare("-gpu") == 0)
           ImageManager::USE_GPU_COMPUTING();

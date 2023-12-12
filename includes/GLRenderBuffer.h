@@ -84,18 +84,14 @@ class GLRenderBuffer : public GLBufferInterface {
    *
    * @return unsigned int ID of the RBO
    */
-  unsigned int getID() {
-    return renderbuffer_id;
-  }
+  unsigned int getID() { return renderbuffer_id; }
 
   /**
    * @brief Get the internal format value
    *
    * @return INTERNAL_FORMAT
    */
-  INTERNAL_FORMAT getFormat() {
-    return format;
-  }
+  INTERNAL_FORMAT getFormat() { return format; }
 
   /**
    * @brief Resizes the render buffer textures

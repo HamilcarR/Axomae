@@ -83,17 +83,16 @@ namespace axomae {
         SDLSurf_heap.push_back(a);
     }
 
-    void addToTemp(image_type<SDL_Surface> a) {
-      temp_surfaces.push_back(a);
-    }
+    void addToTemp(image_type<SDL_Surface> a) { temp_surfaces.push_back(a); }
 
     void addToHeap(image_type<QPaintDevice> a) {
-      std::vector<image_type<QPaintDevice>>::iterator it = std::find_if(paintDevice_heap.begin(), paintDevice_heap.end(), [a](image_type<QPaintDevice> b) {
-        if (a.imagetype == b.imagetype)
-          return true;
-        else
-          return false;
-      });
+      std::vector<image_type<QPaintDevice>>::iterator it = std::find_if(
+          paintDevice_heap.begin(), paintDevice_heap.end(), [a](image_type<QPaintDevice> b) {
+            if (a.imagetype == b.imagetype)
+              return true;
+            else
+              return false;
+          });
       if (it != paintDevice_heap.end()) {
         image_type<QPaintDevice> temp = *it;
         paintDevice_heap.erase(it);
@@ -104,12 +103,13 @@ namespace axomae {
     }
 
     void addToHeap(image_type<QGraphicsItem> a) {
-      std::vector<image_type<QGraphicsItem>>::iterator it = std::find_if(graphicsItem_heap.begin(), graphicsItem_heap.end(), [a](image_type<QGraphicsItem> b) {
-        if (a.imagetype == b.imagetype)
-          return true;
-        else
-          return false;
-      });
+      std::vector<image_type<QGraphicsItem>>::iterator it = std::find_if(
+          graphicsItem_heap.begin(), graphicsItem_heap.end(), [a](image_type<QGraphicsItem> b) {
+            if (a.imagetype == b.imagetype)
+              return true;
+            else
+              return false;
+          });
       if (it != graphicsItem_heap.end()) {
         image_type<QGraphicsItem> temp = *it;
         graphicsItem_heap.erase(it);
@@ -167,9 +167,7 @@ namespace axomae {
       }
     }
 
-    image_type<SDL_Surface> getLastSurface() {
-      return SDLSurf_heap.back();
-    }
+    image_type<SDL_Surface> getLastSurface() { return SDLSurf_heap.back(); }
 
    private:
     std::stack<image_type<SDL_Surface>> SDLSurf_stack;
@@ -227,9 +225,7 @@ namespace axomae {
     connect_all_slots();
   }
 
-  Controller::~Controller() {
-    delete _MemManagement;
-  }
+  Controller::~Controller() { delete _MemManagement; }
 
   void Controller::setApplicationConfig(const std::string &config_string) {
     configuration.setConfig(config_string);
@@ -263,7 +259,8 @@ namespace axomae {
     SDL_Surface *res;
     if (!src)
       return nullptr;
-    res = SDL_CreateRGBSurface(src->flags, src->w, src->h, src->format->BitsPerPixel, src->format->Rmask, src->format->Gmask, src->format->Bmask, src->format->Amask);
+    res = SDL_CreateRGBSurface(
+        src->flags, src->w, src->h, src->format->BitsPerPixel, src->format->Rmask, src->format->Gmask, src->format->Bmask, src->format->Amask);
     if (res != nullptr) {
       SDL_BlitSurface(src, nullptr, res, nullptr);
       return res;
@@ -629,10 +626,11 @@ namespace axomae {
     SceneSelector *instance = SceneSelector::getInstance();
     Mesh *retrieved_mesh = instance->getCurrent();
     if (retrieved_mesh) {
-      SDL_Surface *surf = ImageManager::project_uv_normals(retrieved_mesh->geometry,
-                                                           _UI.uv_width->value(),
-                                                           _UI.uv_height->value(),
-                                                           true);  // TODO : change for managing the entire scene , maybe add scroll between different meshes
+      SDL_Surface *surf = ImageManager::project_uv_normals(
+          retrieved_mesh->geometry,
+          _UI.uv_width->value(),
+          _UI.uv_height->value(),
+          true);  // TODO : change for managing the entire scene , maybe add scroll between different meshes
       display_image(surf, PROJECTED_NMAP, true);
     }
   }
@@ -667,14 +665,10 @@ namespace axomae {
   }
 
   /**************************************************************************************************************/
-  bool Controller::open_project() {
-    return false;
-  }
+  bool Controller::open_project() { return false; }
 
   /**************************************************************************************************************/
-  bool Controller::save_project() {
-    return false;
-  }
+  bool Controller::save_project() { return false; }
 
   /**************************************************************************************************************/
   bool Controller::save_image() {
@@ -813,9 +807,7 @@ namespace axomae {
   /**************************************************************************************************************/
   /*Protected utility methods*/
 
-  void Controller::update_smooth_factor(int factor) {
-    _UI.smooth_factor->setValue(factor);
-  }
+  void Controller::update_smooth_factor(int factor) { _UI.smooth_factor->setValue(factor); }
 
   /*
    * TODO: add custom QGraphicsView class , reimplement resizeEvent() to scale GraphicsView to window size */

@@ -12,9 +12,7 @@ GLGeometryBuffer::GLGeometryBuffer() {
   buffers_filled = false;
 }
 
-GLGeometryBuffer::GLGeometryBuffer(const Object3D *geometry) : GLGeometryBuffer() {
-  this->geometry = geometry;
-}
+GLGeometryBuffer::GLGeometryBuffer(const Object3D *geometry) : GLGeometryBuffer() { this->geometry = geometry; }
 
 GLGeometryBuffer::~GLGeometryBuffer() {}
 
@@ -51,42 +49,22 @@ void GLGeometryBuffer::initializeBuffers() {
   glGenBuffers(1, &index_buffer);
 }
 
-void GLGeometryBuffer::bind() {
-  bindVao();
-}
+void GLGeometryBuffer::bind() { bindVao(); }
 
-void GLGeometryBuffer::unbind() {
-  unbindVao();
-}
+void GLGeometryBuffer::unbind() { unbindVao(); }
 
-void GLGeometryBuffer::bindVao() {
-  glBindVertexArray(vao);
-}
+void GLGeometryBuffer::bindVao() { glBindVertexArray(vao); }
 
-void GLGeometryBuffer::bindVertexBuffer() {
-  glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-}
+void GLGeometryBuffer::bindVertexBuffer() { glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer); }
 
-void GLGeometryBuffer::bindNormalBuffer() {
-  glBindBuffer(GL_ARRAY_BUFFER, normal_buffer);
-}
-void GLGeometryBuffer::bindTextureBuffer() {
-  glBindBuffer(GL_ARRAY_BUFFER, texture_buffer);
-}
-void GLGeometryBuffer::bindColorBuffer() {
-  glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
-}
-void GLGeometryBuffer::bindIndexBuffer() {
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
-}
+void GLGeometryBuffer::bindNormalBuffer() { glBindBuffer(GL_ARRAY_BUFFER, normal_buffer); }
+void GLGeometryBuffer::bindTextureBuffer() { glBindBuffer(GL_ARRAY_BUFFER, texture_buffer); }
+void GLGeometryBuffer::bindColorBuffer() { glBindBuffer(GL_ARRAY_BUFFER, color_buffer); }
+void GLGeometryBuffer::bindIndexBuffer() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer); }
 
-void GLGeometryBuffer::bindTangentBuffer() {
-  glBindBuffer(GL_ARRAY_BUFFER, tangent_buffer);
-}
+void GLGeometryBuffer::bindTangentBuffer() { glBindBuffer(GL_ARRAY_BUFFER, tangent_buffer); }
 
-void GLGeometryBuffer::unbindVao() {
-  glBindVertexArray(0);
-}
+void GLGeometryBuffer::unbindVao() { glBindVertexArray(0); }
 
 // TODO: [AX-20] Provide methods to fill individual buffer , or to modify them
 void GLGeometryBuffer::fillBuffers() {

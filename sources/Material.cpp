@@ -18,7 +18,9 @@ Material::~Material() {}
 bool Material::isTransparent() {
   Texture *tex_opacity = textures_group.getTexturePointer(Texture::OPACITY);
   Texture *tex_diffuse = textures_group.getTexturePointer(Texture::DIFFUSE);
-  if (alpha_factor < 1.f || (tex_opacity && !tex_opacity->isDummyTexture()) || (tex_diffuse && static_cast<DiffuseTexture *>(tex_diffuse)->hasTransparency())) {
+  if (alpha_factor < 1.f || (tex_opacity && !tex_opacity->isDummyTexture()) ||
+      (tex_diffuse && static_cast<DiffuseTexture *>(tex_diffuse)->hasTransparency()))
+  {
     is_transparent = true;
     return true;
   } else {
@@ -33,9 +35,7 @@ void Material::setRefractiveIndexValue(float n1, float n2) {
     shader_program->setUniform(uniform_name_vec2_material_refractive_index, refractive_index);
 }
 
-void Material::addTexture(int index) {
-  textures_group.addTexture(index);
-}
+void Material::addTexture(int index) { textures_group.addTexture(index); }
 
 void Material::bind() {
   if (is_transparent) {
@@ -47,9 +47,7 @@ void Material::bind() {
   textures_group.bind();
 }
 
-void Material::unbind() {
-  disableBlend();
-}
+void Material::unbind() { disableBlend(); }
 
 /**
  * Initializes the material properties and sets the corresponding uniform values in the
@@ -71,18 +69,10 @@ void Material::initializeMaterial() {
   }
 }
 
-void Material::clean() {
-  textures_group.clean();
-}
+void Material::clean() { textures_group.clean(); }
 
-void Material::enableBlend() {
-  glEnable(GL_BLEND);
-}
+void Material::enableBlend() { glEnable(GL_BLEND); }
 
-void Material::disableBlend() {
-  glDisable(GL_BLEND);
-}
+void Material::disableBlend() { glDisable(GL_BLEND); }
 
-void Material::setBlendFunc(BLENDFUNC source_factor, BLENDFUNC dest_factor) {
-  glBlendFunc(source_factor, dest_factor);
-}
+void Material::setBlendFunc(BLENDFUNC source_factor, BLENDFUNC dest_factor) { glBlendFunc(source_factor, dest_factor); }

@@ -74,9 +74,7 @@ class TextureGroup {
    * @return true if the textures are ready to use
    * @return false if the textures are not ready to use
    */
-  bool isInitialized() const {
-    return initialized;
-  };
+  bool isInitialized() const { return initialized; };
 
   /**
    * @brief Checks if a texture of a certain type exists in the TextureGroup's collection
@@ -99,9 +97,7 @@ class TextureGroup {
    *
    * @return std::vector<int>
    */
-  const std::vector<int> &getTextureCollection() const {
-    return texture_collection;
-  }
+  const std::vector<int> &getTextureCollection() const { return texture_collection; }
 
   /**
    * @brief

@@ -40,7 +40,7 @@ INCLUDEPATH +=	/usr/include/SDL2 \
 		vendor/*.h \
 
 #QMAKE_DEFAULT_INCDIRS += -I/usr/include/c++/12
-QMAKE_CXXFLAGS += -std=c++17 -g -pg -Wall -pedantic -Wno-unused -O3 
+QMAKE_CXXFLAGS += -std=c++17 -g -pg -Wall -pedantic -Wno-unused 
 QMAKE_LIBDIR += $$CUDA_DIR/lib64
 LIBS+=-L/usr/local/cuda/lib64 -L/usr/lib64 -lSDL2 -ldl -lpthread -lSDL2_image -lassimp -lcudart -lcudadevrt -lcuda -lGLEW -lGLU -lglut -lGL -lgtest
 CUDA_LIBS += -L/usr/local/cuda/lib64 -L/usr/lib64 -lcudart -lcuda -lcudadevrt -lSDL2 

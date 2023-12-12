@@ -43,23 +43,17 @@ class AbstractLogger {
 /*****************************************************************************************************************************************************************************/
 class LogLine {
  public:
-  LogLine(const std::string &message, const LogLevel::LOGENUMTYPE log_level = LogLevel::INFO, const char *file = "", const char *function = "", const unsigned line = 0);
+  LogLine(const std::string &message,
+          const LogLevel::LOGENUMTYPE log_level = LogLevel::INFO,
+          const char *file = "",
+          const char *function = "",
+          const unsigned line = 0);
   virtual ~LogLine();
-  const std::string &getMessage() {
-    return message;
-  }
-  const std::string &getLoggedFile() {
-    return file;
-  }
-  const std::string &getFunctionName() {
-    return function;
-  }
-  unsigned getLine() {
-    return line;
-  }
-  LogLevel::LOGENUMTYPE &getLogLevel() {
-    return level;
-  }
+  const std::string &getMessage() { return message; }
+  const std::string &getLoggedFile() { return file; }
+  const std::string &getFunctionName() { return function; }
+  unsigned getLine() { return line; }
+  LogLevel::LOGENUMTYPE &getLogLevel() { return level; }
   std::string getFormattedLog() const;
 
  private:
@@ -79,12 +73,8 @@ class Logger : virtual public AbstractLogger {
   void logMessage(const std::string &message, LogLevel::LOGENUMTYPE log_level, const char *filename, const char *function, unsigned line);
   void logMessage(const char *message, LogLevel::LOGENUMTYPE log_level, const char *filename, const char *function, unsigned line);
   void flush();
-  void setPriority(LogLevel::LOGENUMTYPE _priority) {
-    priority = _priority;
-  }
-  void setLoggingStdout() {
-    stdout_logging = true;
-  }
+  void setPriority(LogLevel::LOGENUMTYPE _priority) { priority = _priority; }
+  void setLoggingStdout() { stdout_logging = true; }
   void setLogSystemConfig(const LoggerConfigDataStruct &conf);
 
  protected:

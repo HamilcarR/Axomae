@@ -21,19 +21,13 @@ void GLRenderBuffer::initializeBuffers() {
   errorCheck(__FILE__, __LINE__);
 }
 
-bool GLRenderBuffer::isReady() const {
-  return renderbuffer_id != 0;
-}
+bool GLRenderBuffer::isReady() const { return renderbuffer_id != 0; }
 
 void GLRenderBuffer::fillBuffers() {}
 
-void GLRenderBuffer::bind() {
-  glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer_id);
-}
+void GLRenderBuffer::bind() { glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer_id); }
 
-void GLRenderBuffer::unbind() {
-  glBindRenderbuffer(GL_RENDERBUFFER, 0);
-}
+void GLRenderBuffer::unbind() { glBindRenderbuffer(GL_RENDERBUFFER, 0); }
 
 void GLRenderBuffer::clean() {
   unbind();

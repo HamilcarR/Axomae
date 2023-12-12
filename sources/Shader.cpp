@@ -66,9 +66,7 @@ Shader::Shader(const std::string vertex_code, const std::string fragment_code) :
   vertex_shader_txt = vertex_code;
 }
 
-void Shader::enableAttributeArray(GLuint att) {
-  glEnableVertexAttribArray(att);
-}
+void Shader::enableAttributeArray(GLuint att) { glEnableVertexAttribArray(att); }
 
 void Shader::setAttributeBuffer(GLuint location, GLenum type, int offset, int tuplesize, int stride) {
   glVertexAttribPointer(location, tuplesize, type, GL_FALSE, stride, (void *)0);
@@ -88,9 +86,7 @@ void Shader::setTextureUniforms(std::string texture_name, int type) {
   setUniform(texture_name, static_cast<int>(type));
 }
 
-void Shader::setSceneCameraPointer(Camera *camera) {
-  camera_pointer = camera;
-}
+void Shader::setSceneCameraPointer(Camera *camera) { camera_pointer = camera; }
 
 void Shader::updateCamera() {
   if (camera_pointer != nullptr)
@@ -132,9 +128,7 @@ void Shader::setInverseModelMatrixUniform(const glm::mat4 &model) {
   setUniform(uniform_name_matrix_inverse_model, inverse_model);
 }
 
-void Shader::setModelMatrixUniform(const glm::mat4 &matrix) {
-  setUniform(uniform_name_matrix_model, matrix);
-}
+void Shader::setModelMatrixUniform(const glm::mat4 &matrix) { setUniform(uniform_name_matrix_model, matrix); }
 
 void Shader::setModelViewProjectionMatricesUniforms(const glm::mat4 &projection, const glm::mat4 &view, const glm::mat4 &model) {
   glm::mat4 mvp = projection * view * model;
@@ -162,37 +156,21 @@ void Shader::setModelViewProjection(const glm::mat4 &projection, const glm::mat4
   setModelViewProjectionMatricesUniforms(projection, view, model);
 }
 
-void Shader::setUniformValue(int location, const int value) {
-  glUniform1i(location, value);
-}
+void Shader::setUniformValue(int location, const int value) { glUniform1i(location, value); }
 
-void Shader::setUniformValue(int location, const float value) {
-  glUniform1f(location, value);
-}
+void Shader::setUniformValue(int location, const float value) { glUniform1f(location, value); }
 
-void Shader::setUniformValue(int location, const unsigned int value) {
-  glUniform1ui(location, value);
-}
+void Shader::setUniformValue(int location, const unsigned int value) { glUniform1ui(location, value); }
 
-void Shader::setUniformValue(int location, const glm::mat4 &matrix) {
-  glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
-}
+void Shader::setUniformValue(int location, const glm::mat4 &matrix) { glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix)); }
 
-void Shader::setUniformValue(int location, const glm::mat3 &matrix) {
-  glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
-}
+void Shader::setUniformValue(int location, const glm::mat3 &matrix) { glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix)); }
 
-void Shader::setUniformValue(int location, const glm::vec4 &value) {
-  glUniform4f(location, value.x, value.y, value.z, value.w);
-}
+void Shader::setUniformValue(int location, const glm::vec4 &value) { glUniform4f(location, value.x, value.y, value.z, value.w); }
 
-void Shader::setUniformValue(int location, const glm::vec3 &value) {
-  glUniform3f(location, value.x, value.y, value.z);
-}
+void Shader::setUniformValue(int location, const glm::vec3 &value) { glUniform3f(location, value.x, value.y, value.z); }
 
-void Shader::setUniformValue(int location, const glm::vec2 &value) {
-  glUniform2f(location, value.x, value.y);
-}
+void Shader::setUniformValue(int location, const glm::vec2 &value) { glUniform2f(location, value.x, value.y); }
 
 void Shader::initializeShader() {
   if (!is_initialized) {
@@ -230,13 +208,9 @@ void Shader::recompile() {
   initializeShader();
 }
 
-void Shader::bind() {
-  glUseProgram(shader_program);
-}
+void Shader::bind() { glUseProgram(shader_program); }
 
-void Shader::release() {
-  glUseProgram(0);
-}
+void Shader::release() { glUseProgram(0); }
 
 void Shader::clean() {
   if (shader_program != 0) {
@@ -251,9 +225,7 @@ void Shader::clean() {
 
 /***********************************************************************************************************************************************************/
 
-BlinnPhongShader::BlinnPhongShader() : Shader() {
-  type = BLINN;
-}
+BlinnPhongShader::BlinnPhongShader() : Shader() { type = BLINN; }
 
 BlinnPhongShader::BlinnPhongShader(const std::string vertex_code, const std::string fragment_code) : Shader(vertex_code, fragment_code) {
   type = BLINN;
@@ -261,21 +233,13 @@ BlinnPhongShader::BlinnPhongShader(const std::string vertex_code, const std::str
 
 /***********************************************************************************************************************************************************/
 
-CubemapShader::CubemapShader() : Shader() {
-  type = CUBEMAP;
-}
+CubemapShader::CubemapShader() : Shader() { type = CUBEMAP; }
 
-CubemapShader::CubemapShader(const std::string vertex, const std::string frag) : Shader(vertex, frag) {
-  type = CUBEMAP;
-}
+CubemapShader::CubemapShader(const std::string vertex, const std::string frag) : Shader(vertex, frag) { type = CUBEMAP; }
 
 /***********************************************************************************************************************************************************/
-PBRShader::PBRShader() {
-  type = PBR;
-}
-PBRShader::PBRShader(const std::string vertex, const std::string frag) : Shader(vertex, frag) {
-  type = PBR;
-}
+PBRShader::PBRShader() { type = PBR; }
+PBRShader::PBRShader(const std::string vertex, const std::string frag) : Shader(vertex, frag) { type = PBR; }
 
 /***********************************************************************************************************************************************************/
 ScreenFramebufferShader::ScreenFramebufferShader() : Shader() {
@@ -324,19 +288,13 @@ void ScreenFramebufferShader::setPostProcess(POST_PROCESS_TYPE type) {
 }
 /***********************************************************************************************************************************************************/
 
-BoundingBoxShader::BoundingBoxShader() : Shader() {
-  type = BOUNDING_BOX;
-}
+BoundingBoxShader::BoundingBoxShader() : Shader() { type = BOUNDING_BOX; }
 
-BoundingBoxShader::BoundingBoxShader(const std::string vertex, const std::string fragment) : Shader(vertex, fragment) {
-  type = BOUNDING_BOX;
-}
+BoundingBoxShader::BoundingBoxShader(const std::string vertex, const std::string fragment) : Shader(vertex, fragment) { type = BOUNDING_BOX; }
 
 /***********************************************************************************************************************************************************/
 
-EnvmapCubemapBakerShader::EnvmapCubemapBakerShader() : Shader() {
-  type = ENVMAP_CUBEMAP_CONVERTER;
-}
+EnvmapCubemapBakerShader::EnvmapCubemapBakerShader() : Shader() { type = ENVMAP_CUBEMAP_CONVERTER; }
 
 EnvmapCubemapBakerShader::EnvmapCubemapBakerShader(const std::string vertex, const std::string fragment) : Shader(vertex, fragment) {
   type = ENVMAP_CUBEMAP_CONVERTER;
@@ -344,41 +302,34 @@ EnvmapCubemapBakerShader::EnvmapCubemapBakerShader(const std::string vertex, con
 
 /***********************************************************************************************************************************************************/
 
-IrradianceCubemapBakerShader::IrradianceCubemapBakerShader() : Shader() {
-  type = IRRADIANCE_CUBEMAP_COMPUTE;
-}
-IrradianceCubemapBakerShader::IrradianceCubemapBakerShader(const std::string vertex_code, const std::string fragment_code) : Shader(vertex_code, fragment_code) {
+IrradianceCubemapBakerShader::IrradianceCubemapBakerShader() : Shader() { type = IRRADIANCE_CUBEMAP_COMPUTE; }
+IrradianceCubemapBakerShader::IrradianceCubemapBakerShader(const std::string vertex_code, const std::string fragment_code)
+    : Shader(vertex_code, fragment_code) {
   type = IRRADIANCE_CUBEMAP_COMPUTE;
 }
 
 /***********************************************************************************************************************************************************/
 
-EnvmapPrefilterBakerShader::EnvmapPrefilterBakerShader() : Shader() {
+EnvmapPrefilterBakerShader::EnvmapPrefilterBakerShader() : Shader() { type = ENVMAP_PREFILTER; }
+
+EnvmapPrefilterBakerShader::EnvmapPrefilterBakerShader(const std::string vertex_code, const std::string fragment_code)
+    : Shader(vertex_code, fragment_code) {
   type = ENVMAP_PREFILTER;
 }
 
-EnvmapPrefilterBakerShader::EnvmapPrefilterBakerShader(const std::string vertex_code, const std::string fragment_code) : Shader(vertex_code, fragment_code) {
-  type = ENVMAP_PREFILTER;
-}
-
-void EnvmapPrefilterBakerShader::setRoughnessValue(float roughness) {
-  setUniform(uniform_name_float_cubemap_prefilter_roughness, roughness);
-}
+void EnvmapPrefilterBakerShader::setRoughnessValue(float roughness) { setUniform(uniform_name_float_cubemap_prefilter_roughness, roughness); }
 
 void EnvmapPrefilterBakerShader::setCubeEnvmapResolution(unsigned int resolution) {
   setUniform(uniform_name_uint_prefilter_shader_envmap_resolution, resolution);
 }
 
-void EnvmapPrefilterBakerShader::setSamplesCount(unsigned int amount) {
-  setUniform(uniform_name_uint_prefilter_shader_samples_count, amount);
-}
+void EnvmapPrefilterBakerShader::setSamplesCount(unsigned int amount) { setUniform(uniform_name_uint_prefilter_shader_samples_count, amount); }
 
 /***********************************************************************************************************************************************************/
 
-BRDFLookupTableBakerShader::BRDFLookupTableBakerShader() : Shader() {
-  type = BRDF_LUT_BAKER;
-}
+BRDFLookupTableBakerShader::BRDFLookupTableBakerShader() : Shader() { type = BRDF_LUT_BAKER; }
 
-BRDFLookupTableBakerShader::BRDFLookupTableBakerShader(const std::string vertex_code, const std::string fragment_code) : Shader(vertex_code, fragment_code) {
+BRDFLookupTableBakerShader::BRDFLookupTableBakerShader(const std::string vertex_code, const std::string fragment_code)
+    : Shader(vertex_code, fragment_code) {
   type = BRDF_LUT_BAKER;
 }

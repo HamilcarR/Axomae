@@ -169,9 +169,7 @@ class Mesh : public SceneTreeNode {
    *
    * @return glm::mat4
    */
-  virtual const glm::mat4 getModelViewMatrix() {
-    return modelview_matrix;
-  }
+  virtual const glm::mat4 getModelViewMatrix() { return modelview_matrix; }
 
   /**
    * @brief Control the rasterization mode
@@ -224,9 +222,7 @@ class Mesh : public SceneTreeNode {
    *
    * @return Shader*
    */
-  Shader *getShader() {
-    return shader_program;
-  }
+  Shader *getShader() { return shader_program; }
 
   /**
    * @brief Set the Shader pointer in the mesh , and material
@@ -240,57 +236,41 @@ class Mesh : public SceneTreeNode {
    *
    * @return Material*
    */
-  Material *getMaterial() {
-    return &material;
-  }
+  Material *getMaterial() { return &material; }
 
   /**
    * @brief Get the Mesh Name
    *
    * @return std::string
    */
-  std::string getMeshName() {
-    return name;
-  }
+  std::string getMeshName() { return name; }
 
   /**
    * @brief Set the Mesh Name
    *
    * @param new_name
    */
-  void setMeshName(std::string new_name) {
-    name = new_name;
-  }
+  void setMeshName(std::string new_name) { name = new_name; }
 
   /**
    * @brief Get the geometry data of the mesh
    *
    * @return Object3D
    */
-  Object3D getGeometry() {
-    return geometry;
-  }
+  Object3D getGeometry() { return geometry; }
 
   /**
    * @brief Set the Geometry object
    *
    * @param _geometry
    */
-  void setGeometry(Object3D _geometry) {
-    geometry = _geometry;
-  }
+  void setGeometry(Object3D _geometry) { geometry = _geometry; }
 
-  void setCubemapPointer(Mesh *cubemap_pointer) {
-    cubemap_reference = cubemap_pointer;
-  }
+  void setCubemapPointer(Mesh *cubemap_pointer) { cubemap_reference = cubemap_pointer; }
 
-  void setDrawState(bool draw) {
-    is_drawn = draw;
-  }
+  void setDrawState(bool draw) { is_drawn = draw; }
 
-  bool isDrawn() {
-    return is_drawn;
-  }
+  bool isDrawn() { return is_drawn; }
 
  public:
   Object3D geometry; /**<3D Geometry of the mesh , vertex positions , UVs etc*/
@@ -469,9 +449,7 @@ class BoundingBoxMesh : public Mesh {
    */
   virtual ~BoundingBoxMesh();
 
-  virtual BoundingBox getBoundingBoxObject() {
-    return bounding_box;
-  }
+  virtual BoundingBox getBoundingBoxObject() { return bounding_box; }
 
  protected:
   BoundingBox bounding_box;

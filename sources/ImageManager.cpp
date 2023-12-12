@@ -308,7 +308,8 @@ namespace axomae {
   /**************************************************************************************************************/
   uint32_t RGB::rgb_to_int() {
     uint32_t image = 0;
-    int b = static_cast<int>(std::round(blue)), g = static_cast<int>(std::round(green)), r = static_cast<int>(std::round(red)), a = static_cast<int>(std::round(alpha));
+    int b = static_cast<int>(std::round(blue)), g = static_cast<int>(std::round(green)), r = static_cast<int>(std::round(red)),
+        a = static_cast<int>(std::round(alpha));
     if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
       image = a | (b << 8) | (g << 16) | (r << 24);
     else
@@ -320,15 +321,17 @@ namespace axomae {
   template<typename T>
   static T compute_kernel_pixel(RGB **data, const T kernel[3][3], int i, int j, uint8_t flag) {
     if (flag == AXOMAE_RED) {
-      return data[i - 1][j - 1].red * kernel[0][0] + data[i][j - 1].red * kernel[0][1] + data[i + 1][j - 1].red * kernel[0][2] + data[i - 1][j].red * kernel[1][0] + data[i][j].red * kernel[1][1] +
-             data[i + 1][j].red * kernel[1][2] + data[i - 1][j + 1].red * kernel[2][0] + data[i][j + 1].red * kernel[2][1] + data[i + 1][j + 1].red * kernel[2][2];
+      return data[i - 1][j - 1].red * kernel[0][0] + data[i][j - 1].red * kernel[0][1] + data[i + 1][j - 1].red * kernel[0][2] +
+             data[i - 1][j].red * kernel[1][0] + data[i][j].red * kernel[1][1] + data[i + 1][j].red * kernel[1][2] +
+             data[i - 1][j + 1].red * kernel[2][0] + data[i][j + 1].red * kernel[2][1] + data[i + 1][j + 1].red * kernel[2][2];
     } else if (flag == AXOMAE_BLUE) {
-      return data[i - 1][j - 1].blue * kernel[0][0] + data[i][j - 1].blue * kernel[0][1] + data[i + 1][j - 1].blue * kernel[0][2] + data[i - 1][j].blue * kernel[1][0] +
-             data[i][j].blue * kernel[1][1] + data[i + 1][j].blue * kernel[1][2] + data[i - 1][j + 1].blue * kernel[2][0] + data[i][j + 1].blue * kernel[2][1] + data[i + 1][j + 1].blue * kernel[2][2];
+      return data[i - 1][j - 1].blue * kernel[0][0] + data[i][j - 1].blue * kernel[0][1] + data[i + 1][j - 1].blue * kernel[0][2] +
+             data[i - 1][j].blue * kernel[1][0] + data[i][j].blue * kernel[1][1] + data[i + 1][j].blue * kernel[1][2] +
+             data[i - 1][j + 1].blue * kernel[2][0] + data[i][j + 1].blue * kernel[2][1] + data[i + 1][j + 1].blue * kernel[2][2];
     } else {
-      return data[i - 1][j - 1].green * kernel[0][0] + data[i][j - 1].green * kernel[0][1] + data[i + 1][j - 1].green * kernel[0][2] + data[i - 1][j].green * kernel[1][0] +
-             data[i][j].green * kernel[1][1] + data[i + 1][j].green * kernel[1][2] + data[i - 1][j + 1].green * kernel[2][0] + data[i][j + 1].green * kernel[2][1] +
-             data[i + 1][j + 1].green * kernel[2][2];
+      return data[i - 1][j - 1].green * kernel[0][0] + data[i][j - 1].green * kernel[0][1] + data[i + 1][j - 1].green * kernel[0][2] +
+             data[i - 1][j].green * kernel[1][0] + data[i][j].green * kernel[1][1] + data[i + 1][j].green * kernel[1][2] +
+             data[i - 1][j + 1].green * kernel[2][0] + data[i][j + 1].green * kernel[2][1] + data[i + 1][j + 1].green * kernel[2][2];
     }
   }
   template<typename T>
@@ -536,14 +539,10 @@ namespace axomae {
     }
   }
   /***************************************************************************************************************/
-  constexpr double radiant_to_degree(double rad) {
-    return rad * 180.f / M_PI;
-  }
+  constexpr double radiant_to_degree(double rad) { return rad * 180.f / M_PI; }
 
   /**************************************************************************************************************/
-  constexpr double get_pixel_height(double color_component) {
-    return (255 - color_component);
-  }
+  constexpr double get_pixel_height(double color_component) { return (255 - color_component); }
 
   /**************************************************************************************************************/
   void ImageManager::compute_normal_map(SDL_Surface *surface, double fact, float attenuation) {
@@ -747,8 +746,8 @@ namespace axomae {
 
     SDL_Surface *surf = SDL_CreateRGBSurface(0, width, height, 24, rmask, gmask, bmask, amask);
     assert(surf != nullptr);
-    bool tangents_empty = object.tangents.empty(), bitangents_empty = object.bitangents.empty(), normals_empty = object.normals.empty(), uv_empty = object.uv.empty(),
-         indices_empty = object.indices.empty();
+    bool tangents_empty = object.tangents.empty(), bitangents_empty = object.bitangents.empty(), normals_empty = object.normals.empty(),
+         uv_empty = object.uv.empty(), indices_empty = object.indices.empty();
     if (tangents_empty || normals_empty || uv_empty || indices_empty)
       return surf;
     /* TODO : Parallelize : each face = 1 thread ? */
@@ -788,7 +787,8 @@ namespace axomae {
       int y_min = static_cast<int>(bounding_coords(P1.y, P2.y, P3.y, true));
       for (int x = x_min; x <= x_max; x++)
         for (int y = y_min; y <= y_max; y++) {
-          uint32_t val = compute_normals_set_pixels_rgb(P1, P2, P3, N1, N2, N3, BT1, BT2, BT3, T1, T2, T3, x, y, x_min, y_min, x_max, y_max, tangent_space);
+          uint32_t val = compute_normals_set_pixels_rgb(
+              P1, P2, P3, N1, N2, N3, BT1, BT2, BT3, T1, T2, T3, x, y, x_min, y_min, x_max, y_max, tangent_space);
           if (val != 0)
             set_pixel_color(surf, x, y, val);
         }

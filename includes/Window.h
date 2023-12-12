@@ -15,21 +15,11 @@ namespace axomae {
     Window(const int width, const int height, const char *name);
     ~Window();
     void display_image(SDL_Surface *image);
-    void setEvent(SDL_Event &ev) {
-      event = ev;
-    }
-    SDL_Event &getEvent() {
-      return event;
-    }
-    SDL_Renderer *getRenderer() {
-      return renderer;
-    };
-    int getHeight() {
-      return height;
-    }
-    int getWidth() {
-      return width;
-    }
+    void setEvent(SDL_Event &ev) { event = ev; }
+    SDL_Event &getEvent() { return event; }
+    SDL_Renderer *getRenderer() { return renderer; };
+    int getHeight() { return height; }
+    int getWidth() { return width; }
     void cleanUp();
 
    private:

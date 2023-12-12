@@ -59,15 +59,9 @@ namespace axomae {
     static void set_contrast_sigmoid(SDL_Surface *image, int treshold);
     static void compute_normal_map(SDL_Surface *surface, double strength, float attenuation);
     static void compute_dudv(SDL_Surface *surface, double factor);
-    static void USE_GPU_COMPUTING() {
-      gpu = true;
-    }
-    static void USE_CPU_COMPUTING() {
-      gpu = false;
-    }
-    static bool USING_GPU() {
-      return gpu;
-    }
+    static void USE_GPU_COMPUTING() { gpu = true; }
+    static void USE_CPU_COMPUTING() { gpu = false; }
+    static bool USING_GPU() { return gpu; }
     static SDL_Surface *project_uv_normals(Object3D object, int width, int height, bool tangent_space);
     static void smooth_image(SDL_Surface *surf, FILTER filter, const unsigned int smooth_iterations);
     static void sharpen_image(SDL_Surface *surf, FILTER filter, const unsigned int sharpen_iterations);

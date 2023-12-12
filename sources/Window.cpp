@@ -13,9 +13,7 @@ namespace axomae {
     free_surface_texture = false;
   }
 
-  Window::~Window() {
-    cleanUp();
-  }
+  Window::~Window() { cleanUp(); }
 
   /*****************************************************************************************************************/
 
