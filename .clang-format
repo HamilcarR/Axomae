@@ -4,7 +4,7 @@ AllowShortFunctionsOnASingleLine: All
 BinPackArguments: false
 BinPackParameters: false
 
-ColumnLimit: 200
+ColumnLimit: 150
 
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 
