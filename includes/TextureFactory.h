@@ -33,12 +33,12 @@ class TextureBuilder {
   }
 
   template<class TEXTYPE, class... Args>
-  static factory::Result<int, TEXTYPE> store(IResourceDB<int, Texture> &database, bool keep, Args &&...args) {
+  static database::Result<int, TEXTYPE> store(IResourceDB<int, Texture> &database, bool keep, Args &&...args) {
     ASSERT_SUBTYPE(Texture, TEXTYPE);
     std::unique_ptr<Texture> temp = std::make_unique<PRVINTERFACE<TEXTYPE, Args...>>(std::forward<Args>(args)...);
-    TEXTYPE *pointer = static_cast<TEXTYPE *>(temp.get());
-    factory::Result<int, TEXTYPE> result = {database.add(std::move(temp), keep), pointer};
-    return result;
+    database::Result<int, Texture> result = database.add(std::move(temp), keep);
+    database::Result<int, TEXTYPE> cast = {result.id, static_cast<TEXTYPE *>(result.object)};
+    return cast;
   }
 };
 

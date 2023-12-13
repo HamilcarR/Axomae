@@ -117,7 +117,7 @@ class FrameBufferInterface {
     temp_empty_data_texture.data_format = data_format;
     temp_empty_data_texture.data_type = data_type;
     temp_empty_data_texture.mipmaps = mipmaps;
-    factory::Result<int, TEXTYPE> result = TextureBuilder::store<TEXTYPE>(*texture_database, persistence, &temp_empty_data_texture);
+    database::Result<int, TEXTYPE> result = TextureBuilder::store<TEXTYPE>(*texture_database, persistence, &temp_empty_data_texture);
     return result.id;
   }
   /**

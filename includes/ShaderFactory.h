@@ -33,12 +33,12 @@ class ShaderBuilder {
   }
 
   template<class TYPE, class... Args>
-  static factory::Result<Shader::TYPE, TYPE> store(IResourceDB<Shader::TYPE, Shader> &database, bool keep, Args &&...args) {
+  static database::Result<Shader::TYPE, TYPE> store(IResourceDB<Shader::TYPE, Shader> &database, bool keep, Args &&...args) {
     ASSERT_SUBTYPE(Shader, TYPE);
     std::unique_ptr<Shader> temp = std::make_unique<PRVINTERFACE<TYPE, Args...>>(std::forward<Args>(args)...);
-    TYPE *pointer = static_cast<TYPE *>(temp.get());
-    factory::Result<Shader::TYPE, TYPE> result = {database.add(std::move(temp), keep), pointer};
-    return result;
+    database::Result<Shader::TYPE, Shader> result = database.add(std::move(temp), keep);
+    database::Result<Shader::TYPE, TYPE> cast = {result.id, static_cast<TYPE *>(result.object)};
+    return cast;
   }
 };
 

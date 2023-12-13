@@ -81,7 +81,7 @@ class ShaderDatabase : public IResourceDB<Shader::TYPE, Shader> {
    * @param keep Not used ... for now .
    * @return Shader::TYPE ID of the shader in database
    */
-  virtual Shader::TYPE add(std::unique_ptr<Shader> shader, bool keep);
+  virtual database::Result<Shader::TYPE, Shader> add(std::unique_ptr<Shader> shader, bool keep);
 
   /**
    * @brief Checks if the database contains this shader . returns a pair of it's ID and it's address
@@ -89,7 +89,7 @@ class ShaderDatabase : public IResourceDB<Shader::TYPE, Shader> {
    * @param shader Shader to search
    * @return std::pair<Shader::TYPE , Shader*> Pair <ID , Shader*>. If nothing found , returns <Shader::EMPTY , nullptr>
    */
-  virtual std::pair<Shader::TYPE, Shader *> contains(const Shader *shader) const override;
+  virtual database::Result<Shader::TYPE, Shader> contains(const Shader *shader) const override;
 
  private:
   std::map<Shader::TYPE, std::unique_ptr<Shader>> shader_database;

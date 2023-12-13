@@ -8,12 +8,4 @@ class PRVINTERFACE : public TYPE {
   PRVINTERFACE(Args &&...args) : TYPE(std::forward<Args>(args)...) {}
 };
 
-namespace factory {
-  template<class IDTYPE, class OBJTYPE>
-  struct Result {
-    IDTYPE id;
-    OBJTYPE *object;
-  };
-
-};  // namespace factory
 #endif

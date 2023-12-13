@@ -38,23 +38,23 @@ void ShaderDatabase::recompile() {
     A.second->recompile();
 }
 
-Shader::TYPE ShaderDatabase::add(std::unique_ptr<Shader> shader, bool keep) {
+database::Result<Shader::TYPE, Shader> ShaderDatabase::add(std::unique_ptr<Shader> shader, bool keep) {
   Mutex::Lock lock(mutex);
   for (auto &A : shader_database)
     if (A.second.get() == shader.get())
-      return A.first;
+      return {A.first, A.second.get()};
   Shader::TYPE id = shader->getType();
   shader_database[id] = std::move(shader);
-  return id;
+  return {id, shader_database[id].get()};
 }
 
-std::pair<Shader::TYPE, Shader *> ShaderDatabase::contains(const Shader *shader) const {
+database::Result<Shader::TYPE, Shader> ShaderDatabase::contains(const Shader *shader) const {
   Mutex::Lock lock(mutex);
   for (const auto &A : shader_database) {
     if (A.second.get() == shader)
-      return std::pair(A.first, A.second.get());
+      return {A.first, A.second.get()};
   }
-  return std::pair(Shader::EMPTY, nullptr);
+  return {Shader::EMPTY, nullptr};
 }
 
 bool ShaderDatabase::remove(const Shader *shader) {

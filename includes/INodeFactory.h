@@ -44,12 +44,12 @@ class NodeBuilder {
    * @return int ID of the node in the database .
    */
   template<class NodeType, class... Args>
-  static factory::Result<int, NodeType> store(IResourceDB<int, INode> &database, bool keep, Args &&...args) {
+  static database::Result<int, NodeType> store(IResourceDB<int, INode> &database, bool keep, Args &&...args) {
     ASSERT_SUBTYPE(INode, NodeType);
     std::unique_ptr<NodeType> node = std::make_unique<PRVINTERFACE<NodeType, Args...>>(std::forward<Args>(args)...);
-    NodeType *pointer = static_cast<NodeType *>(node.get());
-    factory::Result<int, NodeType> result = {database.add(std::move(node), keep), pointer};
-    return result;
+    database::Result<int, INode> result = database.add(std::move(node), keep);
+    database::Result<int, NodeType> cast = {result.id, static_cast<NodeType *>(result.object)};
+    return cast;
   }
 };
 #endif

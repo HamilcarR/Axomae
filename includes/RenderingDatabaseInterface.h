@@ -8,6 +8,15 @@
  *
  */
 
+namespace database {
+  template<class IDTYPE, class OBJTYPE>
+  struct Result {
+    IDTYPE id;
+    OBJTYPE *object;
+  };
+
+};  // namespace database
+
 /**
  * @brief This class provides an interface of pure abstract methods to manage rendering objects databases
  * @class IResourceDB
@@ -60,7 +69,7 @@ class IResourceDB {
    * @param element Object to store
    * @param keep Keep the element between scene change
    */
-  virtual U add(std::unique_ptr<T> element, bool keep) = 0;
+  virtual database::Result<U, T> add(std::unique_ptr<T> element, bool keep) = 0;
 
   /**
    * @brief Checks if database contains an object with specific ID .
@@ -75,7 +84,7 @@ class IResourceDB {
    * @param element_address address of the element we check
    * @return T* Pointer on the element
    */
-  virtual std::pair<U, T *> contains(const T *element_address) const = 0;
+  virtual database::Result<U, T> contains(const T *element_address) const = 0;
 
  protected:
   mutable Mutex mutex; /*<Mutex used for thread safety*/

@@ -58,8 +58,8 @@ CubeMapMesh *RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_m
   tex_dim.width = width;
   tex_dim.height = height;
   FreePerspectiveCamera camera(90.f, &cam_dim, 0.1f, 2000.f);  // Generic camera
-  std::pair<int, Texture *> query_envmap_result = texture_database->contains(hdri_map);
-  int database_id_envmap = query_envmap_result.first;
+  database::Result<int, Texture> query_envmap_result = texture_database->contains(hdri_map);
+  int database_id_envmap = query_envmap_result.id;
   /* Generate a framebuffer that will render to a cubemap*/
   RenderCubeMap cubemap_renderer_framebuffer = constructCubemapFbo<CubemapTexture>(
       &tex_dim, false, GLFrameBuffer::COLOR0, Texture::RGB32F, Texture::RGB, Texture::FLOAT, bake_shader);
@@ -67,12 +67,12 @@ CubeMapMesh *RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_m
   renderToCubemap(cube_drawable, cubemap_renderer_framebuffer, camera, tex_dim, default_dim);
   cube_drawable.clean();
   cubemap_renderer_framebuffer.clean();
-  std::pair<int, Texture *> query_baked_cubemap_texture = texture_database->contains(
+  database::Result<int, Texture> query_baked_cubemap_texture = texture_database->contains(
       cubemap_renderer_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
   /* Mesh to be returned */
   CubeMapMesh *cubemap = NodeBuilder::store<CubeMapMesh>(resource_database->getNodeDatabase(), false).object;
-  query_baked_cubemap_texture.second->generateMipmap();
-  cubemap->material.addTexture(query_baked_cubemap_texture.first);
+  query_baked_cubemap_texture.object->generateMipmap();
+  cubemap->material.addTexture(query_baked_cubemap_texture.id);
   cubemap->setShader(shader_database->get(Shader::CUBEMAP));
   errorCheck(__FILE__, __LINE__);
   texture_database->remove(hdri_map);
@@ -112,11 +112,11 @@ int RenderPipeline::bakeIrradianceCubemap(int cube_envmap, unsigned width, unsig
   renderToCubemap(cube_drawable, cubemap_irradiance_framebuffer, camera, irrad_dim, default_dim);
   cube_drawable.clean();
   cubemap_irradiance_framebuffer.clean();
-  std::pair<int, Texture *> query_baked_irradiance_texture = texture_database->contains(
+  database::Result<int, Texture> query_baked_irradiance_texture = texture_database->contains(
       cubemap_irradiance_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
-  assert(query_baked_irradiance_texture.second);
+  assert(query_baked_irradiance_texture.object);
   errorCheck(__FILE__, __LINE__);
-  return query_baked_irradiance_texture.first;
+  return query_baked_irradiance_texture.id;
 }
 /********************************************************************************************************************************************************************************************************/
 
@@ -170,11 +170,11 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap,
   cube_drawable.clean();
   cubemap_prefilter_fbo.unbindFrameBuffer();
   cubemap_prefilter_fbo.clean();
-  std::pair<int, Texture *> query_prefiltered_cubemap_texture = texture_database->contains(
+  database::Result<int, Texture> query_prefiltered_cubemap_texture = texture_database->contains(
       cubemap_prefilter_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
   errorCheck(__FILE__, __LINE__);
-  assert(query_prefiltered_cubemap_texture.second);
-  return query_prefiltered_cubemap_texture.first;
+  assert(query_prefiltered_cubemap_texture.object);
+  return query_prefiltered_cubemap_texture.id;
 }
 
 /********************************************************************************************************************************************************************************************************/
@@ -196,11 +196,11 @@ int RenderPipeline::generateBRDFLookupTexture(unsigned int width, unsigned int h
   renderToQuad(quad_drawable, quad_fbo, camera, tex_dim, original_dim);
   quad_drawable.clean();
   quad_fbo.clean();
-  std::pair<int, Texture *> query_brdf_lut = resource_database->getTextureDatabase().contains(
+  database::Result<int, Texture> query_brdf_lut = resource_database->getTextureDatabase().contains(
       quad_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
   errorCheck(__FILE__, __LINE__);
-  assert(query_brdf_lut.second);
-  return query_brdf_lut.first;
+  assert(query_brdf_lut.object);
+  return query_brdf_lut.id;
 }
 
 /********************************************************************************************************************************************************************************************************/

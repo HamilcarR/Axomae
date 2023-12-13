@@ -69,7 +69,7 @@ class TextureDatabase : public IResourceDB<int, Texture> {
    * @param keep True if texture is to be kept
    * @return int Database ID of the texture
    */
-  virtual int add(std::unique_ptr<Texture> texture, bool keep);
+  virtual database::Result<int, Texture> add(std::unique_ptr<Texture> texture, bool keep);
 
   /**
    * @brief Checks if database contains this index
@@ -86,7 +86,7 @@ class TextureDatabase : public IResourceDB<int, Texture> {
    * @return std::pair<int , Texture*> Pair of <ID  , Texture*>. If address is not present in the database , returns < 0
    * , nullptr> .
    */
-  std::pair<int, Texture *> contains(const Texture *address) const override;
+  database::Result<int, Texture> contains(const Texture *address) const override;
 
   /**
    * @brief Retrieve all textures of type "texture_type"
@@ -96,7 +96,7 @@ class TextureDatabase : public IResourceDB<int, Texture> {
    * @see Texture
    * @see Texture::TYPE
    */
-  std::vector<std::pair<int, Texture *>> getTexturesByType(Texture::TYPE texture_type) const;
+  std::vector<database::Result<int, Texture>> getTexturesByType(Texture::TYPE texture_type) const;
 
   bool empty() const { return texture_database.empty(); }
 
