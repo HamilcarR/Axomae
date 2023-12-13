@@ -544,6 +544,7 @@ namespace axomae {
     envmap.nb_components = channels;
     envmap.f_data.resize(width * height * channels);
     std::memcpy(&envmap.f_data[0], hdr_data, width * height * channels * sizeof(float));
+    stbi_image_free(hdr_data);
     auto result = TextureBuilder::store<EnvironmentMap2DTexture>(texture_database, false, &envmap);
     if (!result.object)
       LOG("ENVMAP loading failed!\n", LogLevel::ERROR);
