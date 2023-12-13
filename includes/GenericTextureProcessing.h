@@ -33,12 +33,6 @@ class TextureData {
   }
 
   /**
-   * @brief Destroy the Texture Data object
-   *
-   */
-  ~TextureData() {}
-
-  /**
    * @brief Copy a texture
    *
    * Provides deep copy of the object , but doesn't do the cleanup for the copied object

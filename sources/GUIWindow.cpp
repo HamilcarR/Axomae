@@ -146,7 +146,6 @@ namespace axomae {
     }
 
     ~HeapManagement() {
-      SceneSelector::remove();
       clearStack();
       clearTempStack();
       for (image_type<SDL_Surface> a : temp_surfaces)
@@ -623,8 +622,8 @@ namespace axomae {
 
   // TODO: [AX-26] Optimize the normals projection on UVs in the UV tool
   void Controller::project_uv_normals() {
-    SceneSelector *instance = SceneSelector::getInstance();
-    Mesh *retrieved_mesh = instance->getCurrent();
+    SceneSelector &instance = SceneSelector::getInstance();
+    Mesh *retrieved_mesh = instance.getCurrent();
     if (retrieved_mesh) {
       SDL_Surface *surf = ImageManager::project_uv_normals(
           retrieved_mesh->geometry,
@@ -641,9 +640,9 @@ namespace axomae {
       Loader loader;
       auto struct_holder = loader.load(filename.toStdString().c_str());
       std::vector<Mesh *> scene = struct_holder.first;
-      SceneSelector *instance = SceneSelector::getInstance();
+      SceneSelector &instance = SceneSelector::getInstance();
       viewer_3d->setNewScene(struct_holder);
-      instance->setScene(scene);
+      instance.setScene(scene);
       _UI.meshes_list->setList(scene);
       SceneTree &scene_hierarchy = viewer_3d->getRenderer().getScene().getSceneTreeRef();
       _UI.renderer_scene_list->setScene(scene_hierarchy);
@@ -655,12 +654,12 @@ namespace axomae {
   }
   /**************************************************************************************************************/
   void Controller::next_mesh() {
-    SceneSelector::getInstance()->toNext();
+    SceneSelector::getInstance().toNext();
     project_uv_normals();
   }
   /**************************************************************************************************************/
   void Controller::previous_mesh() {
-    SceneSelector::getInstance()->toPrevious();
+    SceneSelector::getInstance().toPrevious();
     project_uv_normals();
   }
 

@@ -9,8 +9,6 @@ class NodeItem : public QTreeWidgetItem {
   friend class NodeItemBuilder;
 
  public:
-  virtual ~NodeItem() {}
-
   NodeItem(std::string n, int type, QTreeWidgetItem *parent = nullptr) : QTreeWidgetItem(parent, type) { name = n; }
 
   virtual void setItemText(int column) { QTreeWidgetItem::setText(column, QString(name.c_str())); }
@@ -28,8 +26,6 @@ class NodeItemBuilder {
 class SceneListView : virtual public QTreeWidget {
  public:
   SceneListView(QWidget *parent = nullptr) : QTreeWidget(parent) {}
-
-  virtual ~SceneListView() {}
 
   virtual void emptyTree() {
     clear();

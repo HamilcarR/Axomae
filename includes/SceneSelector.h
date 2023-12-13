@@ -10,8 +10,7 @@
 
 class SceneSelector {
  public:
-  static SceneSelector *getInstance();
-  static void remove();
+  static SceneSelector &getInstance();
   void setScene(std::vector<Mesh *> &meshes);
   void toNext();
   void toPrevious();
@@ -19,7 +18,6 @@ class SceneSelector {
 
  private:
   SceneSelector();
-  virtual ~SceneSelector();
   std::vector<Mesh *> scene;
   unsigned int mesh_index;
   static SceneSelector *instance;

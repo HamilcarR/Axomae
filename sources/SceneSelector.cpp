@@ -2,22 +2,12 @@
 
 using namespace axomae;
 
-SceneSelector *SceneSelector::instance = nullptr;
-
-SceneSelector *SceneSelector::getInstance() {
-  if (instance == nullptr)
-    instance = new SceneSelector();
+SceneSelector &SceneSelector::getInstance() {
+  static SceneSelector instance;
   return instance;
 }
 
-void SceneSelector::remove() {
-  if (instance != nullptr)
-    delete instance;
-  instance = nullptr;
-}
-
 SceneSelector::SceneSelector() {}
-SceneSelector::~SceneSelector() {}
 
 void SceneSelector::setScene(std::vector<Mesh *> &meshes) {
   scene = meshes;
