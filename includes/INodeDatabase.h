@@ -18,9 +18,9 @@ class INodeDatabase : public IResourceDB<int, INode> {
   database::Result<int, INode> add(std::unique_ptr<INode> element, bool keep = false) override;
   bool contains(const int id) const override;
   database::Result<int, INode> contains(const INode *element_address) const override;
+  const NodeIdMap &getConstData() const override { return database; }
 
  private:
-  NodeIdMap database;
 };
 
 #endif

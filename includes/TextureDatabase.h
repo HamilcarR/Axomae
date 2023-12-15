@@ -3,7 +3,6 @@
 
 #include "RenderingDatabaseInterface.h"
 #include "Texture.h"
-#include <map>
 /**
  * @file TextureDatabase.h
  * Class definition for the texture database
@@ -97,11 +96,10 @@ class TextureDatabase : public IResourceDB<int, Texture> {
    * @see Texture::TYPE
    */
   std::vector<database::Result<int, Texture>> getTexturesByType(Texture::TYPE texture_type) const;
-
-  bool empty() const { return texture_database.empty(); }
+  bool empty() const { return database.empty(); }
+  const std::map<int, std::unique_ptr<Texture>> &getConstData() const override { return database; }
 
  private:
-  std::map<int, std::unique_ptr<Texture>> texture_database; /**<Database of textures*/
 };
 
 #endif

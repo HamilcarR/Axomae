@@ -304,10 +304,10 @@ class OpacityTexture : public Texture {
  * @brief Generic texture class definition
  *
  */
-class GenericTexture2D : public Texture {
+class Generic2DTexture : public Texture {
  protected:
-  GenericTexture2D();
-  GenericTexture2D(TextureData *data);
+  Generic2DTexture();
+  Generic2DTexture(TextureData *data);
 
  public:
   virtual void bindTexture();

@@ -3,7 +3,6 @@
 #include "RenderingDatabaseInterface.h"
 #include "Shader.h"
 #include "utils_3D.h"
-#include <map>
 
 /**
  * @file ShaderDatabase.h
@@ -40,9 +39,9 @@ class ShaderDatabase : public IResourceDB<Shader::TYPE, Shader> {
    *
    * @param type The parameter "type" is of type Shader::TYPE, which is an enumerated type representing
    * different types of shaders (e.g. vertex shader, fragment shader, geometry shader, etc.). It is used
-   * to look up a shader in the shader_database map.
+   * to look up a shader in the database map.
    *
-   * @return The function `contains` returns a boolean value indicating whether the `shader_database`
+   * @return The function `contains` returns a boolean value indicating whether the `database`
    * contains a shader of the specified `type`.
    */
   virtual bool contains(const Shader::TYPE type) const override;
@@ -53,9 +52,9 @@ class ShaderDatabase : public IResourceDB<Shader::TYPE, Shader> {
    *
    * @param type The parameter "type" is of type Shader::TYPE, which is an enumerated type representing
    * different types of shaders (e.g. vertex shader, fragment shader, geometry shader, etc.). It is used
-   * to look up a shader in the shader_database map.
+   * to look up a shader in the database map.
    *
-   * @return a pointer to a Shader object of the specified type if it exists in the shader_database map.
+   * @return a pointer to a Shader object of the specified type if it exists in the database map.
    * If the shader of the specified type does not exist in the map, the function returns a null pointer.
    */
   Shader *get(const Shader::TYPE type) const override;
@@ -91,8 +90,9 @@ class ShaderDatabase : public IResourceDB<Shader::TYPE, Shader> {
    */
   virtual database::Result<Shader::TYPE, Shader> contains(const Shader *shader) const override;
 
+  const std::map<Shader::TYPE, std::unique_ptr<Shader>> &getConstData() const override { return database; }
+
  private:
-  std::map<Shader::TYPE, std::unique_ptr<Shader>> shader_database;
 };
 
 #endif

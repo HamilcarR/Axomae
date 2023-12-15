@@ -399,11 +399,11 @@ const char *OpacityTexture::getTextureTypeCStr() { return texture_type_c_str[OPA
 
 /****************************************************************************************************************************/
 
-GenericTexture2D::GenericTexture2D() { name = GENERIC; }
+Generic2DTexture::Generic2DTexture() { name = GENERIC; }
 
-GenericTexture2D::GenericTexture2D(TextureData *data) : Texture(data) { name = GENERIC; }
+Generic2DTexture::Generic2DTexture(TextureData *data) : Texture(data) { name = GENERIC; }
 
-void GenericTexture2D::setGlData(Shader *shader) {
+void Generic2DTexture::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
   glActiveTexture(GL_TEXTURE0 + texture_unit);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
@@ -412,21 +412,21 @@ void GenericTexture2D::setGlData(Shader *shader) {
   shader->setTextureUniforms(location_name, texture_unit);
 }
 
-void GenericTexture2D::bindTexture() {
+void Generic2DTexture::bindTexture() {
   glActiveTexture(GL_TEXTURE0 + texture_unit);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
 }
 
-void GenericTexture2D::unbindTexture() {
+void Generic2DTexture::unbindTexture() {
   glActiveTexture(GL_TEXTURE0 + texture_unit);
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-const char *GenericTexture2D::getTextureTypeCStr() { return location_name.c_str(); }
+const char *Generic2DTexture::getTextureTypeCStr() { return location_name.c_str(); }
 
-void GenericTexture2D::setTextureUnit(unsigned int tex_unit) { texture_unit = tex_unit; }
+void Generic2DTexture::setTextureUnit(unsigned int tex_unit) { texture_unit = tex_unit; }
 
-void GenericTexture2D::setLocationName(std::string _name) { location_name = _name; }
+void Generic2DTexture::setLocationName(std::string _name) { location_name = _name; }
 
 /****************************************************************************************************************************/
 CubemapTexture::CubemapTexture(FORMAT _internal_format, FORMAT _data_format, FORMAT _data_type, unsigned _width, unsigned _height)

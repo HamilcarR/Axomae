@@ -2,6 +2,7 @@
 #define RENDERINGDATABASEINTERFACE_H
 #include "Mutex.h"
 #include "constants.h"
+#include <map>
 /**
  * @file RenderingDatabaseInterface.h
  * This file implements an interface for databases of objects , like , for example , light databases.
@@ -86,8 +87,11 @@ class IResourceDB {
    */
   virtual database::Result<U, T> contains(const T *element_address) const = 0;
 
+  virtual const std::map<U, std::unique_ptr<T>> &getConstData() const = 0;
+
  protected:
-  mutable Mutex mutex; /*<Mutex used for thread safety*/
+  mutable Mutex mutex;
+  std::map<U, std::unique_ptr<T>> database;
 };
 
 #endif
