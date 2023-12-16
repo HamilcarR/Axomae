@@ -303,6 +303,7 @@ namespace axomae {
     ApplicationConfig configuration;
     SceneListView *renderer_scene_list;
     std::unique_ptr<LightController> light_controller;
+    ResourceDatabaseManager &resource_database;
   };
 
 }  // namespace axomae

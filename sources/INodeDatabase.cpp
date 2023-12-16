@@ -4,14 +4,22 @@ INodeDatabase::INodeDatabase() {}
 
 void INodeDatabase::clean() {
   Mutex::Lock lock(mutex);
-  for (const auto &A : database) {
-    if (A.first > 0)
-      database.erase(A.first);
+  std::vector<int> to_delete;
+  for (auto &A : database) {
+    if (A.first >= 0) {
+      A.second->clean();
+      to_delete.push_back(A.first);
+    }
+  }
+  for (const auto A : to_delete) {
+    database.erase(A);
   }
 }
 
 void INodeDatabase::purge() {
   Mutex::Lock lock(mutex);
+  for (auto &A : database)
+    A.second->clean();
   database.clear();
 }
 
@@ -24,6 +32,7 @@ INode *INodeDatabase::get(const int id) const {
 bool INodeDatabase::remove(const int id) {
   Mutex::Lock lock(mutex);
   if (database[id] != nullptr) {
+    database[id]->clean();
     database.erase(id);
     return true;
   }
@@ -33,6 +42,7 @@ bool INodeDatabase::remove(const INode *element) {
   Mutex::Lock lock(mutex);
   for (auto &A : database) {
     if (element == A.second.get()) {
+      A.second->clean();
       database.erase(A.first);
       return true;
     }

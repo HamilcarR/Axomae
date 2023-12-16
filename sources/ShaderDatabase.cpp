@@ -8,11 +8,14 @@ void ShaderDatabase::purge() { clean(); }
 
 void ShaderDatabase::clean() {
   Mutex::Lock lock(mutex);
+  std::vector<Shader::TYPE> to_delete;
   for (auto &A : database) {
     A.second->clean();
-    A.second = nullptr;
+    if (A.first >= 0)
+      to_delete.push_back(A.first);
   }
-  database.clear();
+  for (auto A : to_delete)
+    database.erase(A);
 }
 
 void ShaderDatabase::initializeShaders() {
@@ -41,7 +44,7 @@ void ShaderDatabase::recompile() {
 database::Result<Shader::TYPE, Shader> ShaderDatabase::add(std::unique_ptr<Shader> shader, bool keep) {
   Mutex::Lock lock(mutex);
   for (auto &A : database)
-    if (A.second.get() == shader.get())
+    if (A.second->getType() == shader->getType())
       return {A.first, A.second.get()};
   Shader::TYPE id = shader->getType();
   database[id] = std::move(shader);

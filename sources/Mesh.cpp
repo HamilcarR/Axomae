@@ -51,7 +51,7 @@ Mesh::Mesh(const std::string &n, const Object3D &&geo, const Material &mat, Shad
   material.setShaderPointer(shader);
 }
 
-Mesh::~Mesh() {}
+Mesh::~Mesh() { LOG("Deleted mesh : " + name, LogLevel::INFO); }
 
 void Mesh::initializeGlData() {
   if (shader_program != nullptr) {
@@ -112,6 +112,7 @@ void Mesh::releaseShaders() {
     shader_program->release();
 }
 void Mesh::clean() {
+  SceneTreeNode::clean();
   shader_program = nullptr;
   material.clean();
 }

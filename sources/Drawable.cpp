@@ -18,10 +18,7 @@ Drawable::Drawable(Mesh *mesh) {
   }
 }
 
-void Drawable::clean() {
-  gl_buffers.clean();
-  mesh_object->clean();
-}
+void Drawable::clean() { gl_buffers.clean(); }
 
 bool Drawable::ready() { return gl_buffers.isReady(); }
 

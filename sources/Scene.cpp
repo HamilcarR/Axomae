@@ -96,10 +96,15 @@ std::vector<Drawable *> Scene::getSortedTransparentElements() {
 std::vector<Drawable *> Scene::getBoundingBoxElements() { return bounding_boxes_array; }
 
 void Scene::clear() {
+
+  for (auto &A : drawable_collection)
+    A->clean();
+  for (auto &A : bounding_boxes_array)
+    A->clean();
+  bounding_boxes_array.clear();
   drawable_collection.clear();
   scene.clear();
   scene_tree.clear();
-  bounding_boxes_array.clear();
   sorted_transparent_meshes.clear();
 }
 

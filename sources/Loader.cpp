@@ -77,14 +77,16 @@ namespace axomae {
       else
       {
         QImage image;
-        uint8_t *buffer = new uint8_t[fromtexture->mWidth];
-        memcpy(buffer, fromtexture->pcData, fromtexture->mWidth);
-        image.loadFromData((const unsigned char *)buffer, fromtexture->mWidth);
+        // uint8_t *buffer = new uint8_t[fromtexture->mWidth];
+        std::vector<uint8_t> buffer;
+        buffer.resize(fromtexture->mWidth);
+        std::memcpy(buffer.data(), fromtexture->pcData, fromtexture->mWidth);
+        image.loadFromData((const unsigned char *)buffer.data(), fromtexture->mWidth);
         image = image.convertToFormat(QImage::Format_ARGB32);
         unsigned image_width = image.width();
         unsigned image_height = image.height();
         totexture->data.resize(image_width * image_height);
-        memset(&totexture->data[0], 0, image_width * image_height * sizeof(uint32_t));
+        std::memset(&totexture->data[0], 0, image_width * image_height * sizeof(uint32_t));
         uint8_t *dest_buffer = (uint8_t *)&totexture->data[0];
         uint8_t *from_buffer = image.bits();
         async_copy_buffer(image_width, image_height, from_buffer, dest_buffer);
@@ -246,7 +248,7 @@ namespace axomae {
     ShaderBuilder::store<BlinnPhongShader>(shader_database, true, vertex_shader, fragment_shader);
     ShaderBuilder::store<CubemapShader>(shader_database, true, vertex_shader_cubemap, fragment_shader_cubemap);
     ShaderBuilder::store<ScreenFramebufferShader>(shader_database, true, vertex_shader_screen_fbo, fragment_shader_screen_fbo);
-    ShaderBuilder::store<PBRShader>(shader_database, true, vertex_shader_pbr, fragment_shader_pbr);
+    ShaderBuilder::store<BRDFShader>(shader_database, true, vertex_shader_pbr, fragment_shader_pbr);
     ShaderBuilder::store<EnvmapCubemapBakerShader>(shader_database, true, vertex_envmap_to_cubemap, fragment_envmap_to_cubemap);
     ShaderBuilder::store<IrradianceCubemapBakerShader>(shader_database, true, vertex_envmap_to_cubemap, fragment_irradiance_compute);
     ShaderBuilder::store<EnvmapPrefilterBakerShader>(shader_database, true, vertex_envmap_to_cubemap, fragment_envmap_prefilter);
@@ -413,9 +415,9 @@ namespace axomae {
    *
    * @return a std::pair<unsigned, Object3D*>.
    */
-  std::pair<unsigned, Object3D *> geometry_fill_buffers(const aiScene *modelScene, unsigned i) {
+  std::pair<unsigned, std::unique_ptr<Object3D>> geometry_fill_buffers(const aiScene *modelScene, unsigned i) {
     const aiMesh *mesh = modelScene->mMeshes[i];
-    Object3D *object = new Object3D;
+    auto object = std::make_unique<Object3D>();
     auto size_dim3 = mesh->mNumVertices * 3;
     auto size_dim2 = mesh->mNumVertices * 2;
     auto size_dim3_indices = mesh->mNumFaces * 3;
@@ -436,7 +438,7 @@ namespace axomae {
     std::vector<std::shared_future<void>> shared_futures = {
         f_vertices.share(), f_normals.share(), f_bitangents.share(), f_tangents.share(), f_uv.share()};
     std::for_each(shared_futures.begin(), shared_futures.end(), [](std::shared_future<void> &it) -> void { it.wait(); });
-    return std::pair<unsigned, Object3D *>(i, object);
+    return std::pair<unsigned, std::unique_ptr<Object3D>>(i, std::move(object));
   };
 
   /**
@@ -460,10 +462,10 @@ namespace axomae {
     const aiScene *modelScene = importer.ReadFile(
         file, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs);
     if (modelScene != nullptr) {
-      std::vector<std::future<std::pair<unsigned, Object3D *>>> loaded_meshes_futures;
+      std::vector<std::future<std::pair<unsigned, std::unique_ptr<Object3D>>>> loaded_meshes_futures;
       std::vector<Material> material_array;
       std::vector<Mesh *> node_lookup_table;
-      Shader *shader_program = shader_database.get(Shader::PBR);
+      Shader *shader_program = shader_database.get(Shader::BRDF);
       node_lookup_table.resize(modelScene->mNumMeshes);
       material_array.resize(modelScene->mNumMeshes);
       for (unsigned int i = 0; i < modelScene->mNumMeshes; i++) {
@@ -476,9 +478,9 @@ namespace axomae {
         material_array[i] = loadMaterials(modelScene, ai_mat, texture_database, i).second;
       }
       for (auto it = loaded_meshes_futures.begin(); it != loaded_meshes_futures.end(); it++) {
-        std::pair<unsigned, Object3D *> geometry_loaded = it->get();
+        std::pair<unsigned, std::unique_ptr<Object3D>> geometry_loaded = it->get();
         unsigned mesh_index = geometry_loaded.first;
-        Object3D *geometry = geometry_loaded.second;
+        Object3D *geometry = geometry_loaded.second.get();
         const aiMesh *mesh = modelScene->mMeshes[mesh_index];
         const char *mesh_name = mesh->mName.C_Str();
         std::string name(mesh_name);
@@ -487,7 +489,6 @@ namespace axomae {
         LOG("object loaded : " + name, LogLevel::INFO);
         node_lookup_table[mesh_index] = mesh_result.object;
         objects.first.push_back(mesh_result.object);
-        delete geometry;
       }
       SceneTree scene_tree = generateSceneTree(modelScene, node_lookup_table);
       objects.second = scene_tree;

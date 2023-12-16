@@ -35,6 +35,12 @@ class ShaderBuilder {
   template<class TYPE, class... Args>
   static database::Result<Shader::TYPE, TYPE> store(IResourceDB<Shader::TYPE, Shader> &database, bool keep, Args &&...args) {
     ASSERT_SUBTYPE(Shader, TYPE);
+    constexpr Shader::TYPE type = shader_utils::get_type<TYPE>();
+    Shader *seek = database.get(type);
+    if (seek) {
+      database::Result<Shader::TYPE, TYPE> result = {type, static_cast<TYPE *>(seek)};
+      return result;
+    }
     std::unique_ptr<Shader> temp = std::make_unique<PRVINTERFACE<TYPE, Args...>>(std::forward<Args>(args)...);
     database::Result<Shader::TYPE, Shader> result = database.add(std::move(temp), keep);
     database::Result<Shader::TYPE, TYPE> cast = {result.id, static_cast<TYPE *>(result.object)};

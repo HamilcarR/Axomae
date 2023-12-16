@@ -28,7 +28,7 @@ class Shader {
     GENERIC = 0,                    /**<Undefined shader type*/
     BLINN = 1,                      /**<Blinn-Phong shader*/
     CUBEMAP = 2,                    /**<Shader used for displaying the environment map*/
-    PBR = 3,                        /**<PBR shader type*/
+    BRDF = 3,                       /**<PBR shader type*/
     SCREEN_FRAMEBUFFER = 4,         /**<Used for post processing*/
     BOUNDING_BOX = 5,               /**<Shader used for displaying bounding boxes of meshes*/
     ENVMAP_CUBEMAP_CONVERTER = 6,   /**<Shader used to bake an equirectangular environment map to a cubemap*/
@@ -363,10 +363,10 @@ class CubemapShader : public Shader {
 };
 
 /***********************************************************************************************************************************************************/
-class PBRShader : public Shader {
+class BRDFShader : public Shader {
  protected:
-  PBRShader();
-  PBRShader(const std::string vertex_code, const std::string fragment_code);
+  BRDFShader();
+  BRDFShader(const std::string vertex_code, const std::string fragment_code);
 };
 
 /***********************************************************************************************************************************************************/
@@ -431,5 +431,34 @@ class BRDFLookupTableBakerShader : public Shader {
   BRDFLookupTableBakerShader();
   BRDFLookupTableBakerShader(const std::string vertex_code, const std::string fragment_code);
 };
+
+/***********************************************************************************************************************************************************/
+
+namespace shader_utils {
+  template<class TYPE>
+  static constexpr Shader::TYPE get_type() {
+    if constexpr (ISTYPE(TYPE, BlinnPhongShader))
+      return Shader::BLINN;
+    else if constexpr (ISTYPE(TYPE, ScreenFramebufferShader))
+      return Shader::SCREEN_FRAMEBUFFER;
+    else if constexpr (ISTYPE(TYPE, CubemapShader))
+      return Shader::CUBEMAP;
+    else if constexpr (ISTYPE(TYPE, BoundingBoxShader))
+      return Shader::BOUNDING_BOX;
+    else if constexpr (ISTYPE(TYPE, EnvmapCubemapBakerShader))
+      return Shader::ENVMAP_CUBEMAP_CONVERTER;
+    else if constexpr (ISTYPE(TYPE, IrradianceCubemapBakerShader))
+      return Shader::IRRADIANCE_CUBEMAP_COMPUTE;
+    else if constexpr (ISTYPE(TYPE, BRDFLookupTableBakerShader))
+      return Shader::BRDF_LUT_BAKER;
+    else if constexpr (ISTYPE(TYPE, EnvmapPrefilterBakerShader))
+      return Shader::ENVMAP_PREFILTER;
+    else if constexpr (ISTYPE(TYPE, BRDFShader))
+      return Shader::BRDF;
+    else
+      return Shader::GENERIC;
+  }
+
+};  // namespace shader_utils
 
 #endif

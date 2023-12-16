@@ -202,7 +202,7 @@ namespace axomae {
 
   HeapManagement *Controller::_MemManagement = new HeapManagement;
 
-  Controller::Controller(QWidget *parent) : QMainWindow(parent) {
+  Controller::Controller(QWidget *parent) : QMainWindow(parent), resource_database(ResourceDatabaseManager::getInstance()) {
     _UI.setupUi(this);
     _UI.progressBar->setValue(0);
     viewer_3d = _UI.renderer_view;
@@ -637,6 +637,7 @@ namespace axomae {
   bool Controller::import_3DOBJ() {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
     if (!filename.isEmpty()) {
+      resource_database.clean();
       Loader loader;
       auto struct_holder = loader.load(filename.toStdString().c_str());
       std::vector<Mesh *> scene = struct_holder.first;

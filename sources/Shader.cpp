@@ -238,8 +238,8 @@ CubemapShader::CubemapShader() : Shader() { type = CUBEMAP; }
 CubemapShader::CubemapShader(const std::string vertex, const std::string frag) : Shader(vertex, frag) { type = CUBEMAP; }
 
 /***********************************************************************************************************************************************************/
-PBRShader::PBRShader() { type = PBR; }
-PBRShader::PBRShader(const std::string vertex, const std::string frag) : Shader(vertex, frag) { type = PBR; }
+BRDFShader::BRDFShader() { type = BRDF; }
+BRDFShader::BRDFShader(const std::string vertex, const std::string frag) : Shader(vertex, frag) { type = BRDF; }
 
 /***********************************************************************************************************************************************************/
 ScreenFramebufferShader::ScreenFramebufferShader() : Shader() {

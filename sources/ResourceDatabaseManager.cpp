@@ -11,6 +11,11 @@ void ResourceDatabaseManager::purge() {
   shader_database->purge();
   node_database->purge();
 }
+void ResourceDatabaseManager::clean() {
+  texture_database->clean();
+  shader_database->clean();
+  node_database->clean();
+}
 
 ResourceDatabaseManager::ResourceDatabaseManager() {
   texture_database = std::make_unique<TextureDatabase>();

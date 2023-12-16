@@ -1,8 +1,6 @@
 #include "../includes/Node.h"
 #include <algorithm>
 
-void ISceneNode::resetLocalModelMatrix() { local_transformation = glm::mat4(1.f); }
-
 bool INode::isLeaf() const { return children.empty(); }
 
 bool INode::isRoot() const {
@@ -19,6 +17,28 @@ bool INode::isRoot() const {
 void INode::emptyParents() { parents.clear(); }
 
 void INode::emptyChildren() { children.clear(); }
+
+void INode::clean() {
+  mark = false;
+  updated = false;
+  name = "";
+  emptyChildren();
+  emptyParents();
+  owner = nullptr;
+  flag = EMPTY;
+}
+
+/**************************************************************************************************************************************/
+
+void ISceneNode::resetLocalModelMatrix() { local_transformation = glm::mat4(1.f); }
+
+void ISceneNode::resetAccumulatedMatrix() { accumulated_transformation = glm::mat4(1.f); }
+
+void ISceneNode::clean() {
+  INode::clean();
+  resetLocalModelMatrix();
+  resetAccumulatedMatrix();
+}
 /**************************************************************************************************************************************/
 
 SceneTreeNode::SceneTreeNode(ISceneNode *_parent, ISceneHierarchy *_owner) {
@@ -125,4 +145,5 @@ void SceneTreeNode::addChildNode(INode *node) {
   }
 }
 
+void SceneTreeNode::clean() { ISceneNode::clean(); }
 /**************************************************************************************************************************************/

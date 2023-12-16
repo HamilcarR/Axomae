@@ -17,7 +17,9 @@ class ISceneHierarchy;
  */
 class INode {
  public:
-  virtual ~INode() {}
+  enum FLAG : signed { EMPTY = 0 };
+
+  virtual ~INode() = default;
 
   /**
    * @brief Returns the array of children
@@ -128,6 +130,12 @@ class INode {
    */
   virtual bool isUpdated() const { return updated; }
 
+  /**
+   * @brief Provides cleaning of various resources , API , IO , etc
+   *
+   */
+  virtual void clean();
+
  protected:
   bool mark;                     /*<Generic mark , for graph traversal*/
   bool updated;                  /*<Lets the owning structure know if node has been modified */
@@ -171,6 +179,7 @@ class ISceneNode : public INode {
    */
   virtual void resetLocalModelMatrix();
 
+  virtual void resetAccumulatedMatrix();
   /**
    * @brief Set the Accumulated Model Matrix
    *
@@ -184,6 +193,8 @@ class ISceneNode : public INode {
    * @return const glm::mat4&
    */
   virtual const glm::mat4 &getAccumulatedModelMatrix() const { return accumulated_transformation; }
+
+  virtual void clean();
 
  protected:
   glm::mat4 local_transformation;       /*<Local transformation of the node*/
@@ -288,6 +299,8 @@ class SceneTreeNode : public ISceneNode {
    * @return ISceneNode* Root node
    */
   virtual ISceneNode *returnRoot();
+
+  virtual void clean();
 
  protected:
 };

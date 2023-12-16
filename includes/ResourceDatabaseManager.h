@@ -25,7 +25,7 @@ class ResourceDatabaseManager {
    * Additionally , will delete the singleton instance pointer , as well as the databases pointers.
    */
   void purge();
-
+  void clean();
   void cleanTextureDatabase();
   void cleanShaderDatabase();
   void cleanNodeDatabase();

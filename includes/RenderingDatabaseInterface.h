@@ -86,7 +86,7 @@ class IResourceDB {
    * @return T* Pointer on the element
    */
   virtual database::Result<U, T> contains(const T *element_address) const = 0;
-
+  virtual bool empty() { return database.empty(); }
   virtual const std::map<U, std::unique_ptr<T>> &getConstData() const = 0;
 
  protected:
