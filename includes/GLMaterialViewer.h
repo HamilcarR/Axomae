@@ -1,4 +1,0 @@
-#ifndef GLMATERIALVIEWER_H
-#define GLMATERIALVIEWER_H
-
-#endif

@@ -1,60 +1,70 @@
 TEMPLATE = app
-TARGET = Axomae
+TARGET = Tests
+CONFIG += console \
+            debug \
+            warn_on 
 QT += widgets\
       gui\
-      openglwidgets
+      openglwidgets\
+      testlib
 	  
-CONFIG += debug \
-          warn_on \
-		  
 
-
-########################################################################################
-# Input
-OBJECTS_DIR = $$PWD/"generated files"
-MOC_DIR = $$PWD/moc
-RESOURCES += Ressources/Resource.qrc
-
+SRC = $$PWD/../sources
 INCLUDEPATH +=	/usr/include/SDL2 \
-		/usr/local/cuda/include \
-		/usr/include/glm \
-		/usr/include/GL\
-		$$PWD/vendor/stb \
+		        /usr/local/cuda/include \
+		        /usr/include/glm \
+		        /usr/include/GL\
+		        $$PWD/../vendor/stb
 
-include(sources/camera/camera.pri)
-include(sources/cmd/cmd.pri)
-include(sources/common/common.pri)
-include(sources/config/config.pri)
-include(sources/controller/controller.pri)
-include(sources/database/database.pri)
-include(sources/debug/debug.pri)
-include(sources/editor/editor.pri)
-include(sources/geometry/geometry.pri)
-include(sources/gpu/gpu.pri)
-include(sources/IO/IO.pri)
-include(sources/macro/macro.pri)
-include(sources/material/material.pri)
-include(sources/mesh/mesh.pri)
-include(sources/nova/nova.pri)
-include(sources/processing/processing.pri)
-include(sources/renderer/renderer.pri)
-include(sources/scene/scene.pri)
-include(sources/texture/texture.pri)
-include(sources/thread/thread.pri)
-include(sources/main/main.pri)
+
+
+
+HEADERS += $$PWD/Test.h
+SOURCES += $$PWD/Test.cpp
+TESTDATA += /usr/local/include/gtest
+
+
+
+include($$SRC/database/test/test_database.pri)
+include($$SRC/mesh/test/test_mesh.pri)
+include($$SRC/scene/test/test_scene.pri)
+include($$SRC/processing/test/test_processing.pri)
+
+
+include($$SRC/camera/camera.pri)
+include($$SRC/cmd/cmd.pri)
+include($$SRC/common/common.pri)
+include($$SRC/config/config.pri)
+include($$SRC/controller/controller.pri)
+include($$SRC/database/database.pri)
+include($$SRC/debug/debug.pri)
+include($$SRC/editor/editor.pri)
+include($$SRC/geometry/geometry.pri)
+include($$SRC/gpu/gpu.pri)
+include($$SRC/IO/IO.pri)
+include($$SRC/macro/macro.pri)
+include($$SRC/material/material.pri)
+include($$SRC/mesh/mesh.pri)
+include($$SRC/nova/nova.pri)
+include($$SRC/processing/processing.pri)
+include($$SRC/renderer/renderer.pri)
+include($$SRC/scene/scene.pri)
+include($$SRC/texture/texture.pri)
+include($$SRC/thread/thread.pri)
+include($$SRC/main/main.pri)
+
+
+
 
 ########################################################################################
 #Configure these env variables before compiling#
 DESTDIR += bin/
-#Linux rules#
-linux:{
-CUDA_DIR = /usr/local/cuda
 QMAKE_CC = gcc-12
 QMAKE_CXX = g++-12
 QMAKE_LINK = g++-12
+OBJECTS_DIR = $$PWD/"generated files"
+CUDA_DIR = /usr/local/cuda
 
-
-#QMAKE_DEFAULT_INCDIRS += -I/usr/include/c++/12
 QMAKE_CXXFLAGS += -std=c++17 -g -pg -Wall -pedantic -Wno-unused 
 QMAKE_LIBDIR += $$CUDA_DIR/lib64
 LIBS+=-L/usr/local/cuda/lib64 -L/usr/lib64 -lSDL2 -ldl -lpthread -lSDL2_image -lassimp -lcudart -lcudadevrt -lcuda -lGLEW -lGLU -lglut -lGL -lgtest
@@ -83,7 +93,13 @@ cuda.depend_command = nvcc -M $$CUDA_INC $$NVCCFLAGS ${QMAKE_FILE_NAME}
 # Tell Qt that we want add more stuff to the Makefile
 QMAKE_EXTRA_UNIX_COMPILERS += cuda
 
-}
+
 
 ########################################################################################
+
+
+
+
+
+
 
