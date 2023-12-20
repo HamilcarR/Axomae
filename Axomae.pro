@@ -8,6 +8,7 @@ CONFIG += debug \
           warn_on \
 		  
 
+system(./scripts/stringify.sh $(pwd) )
 
 ########################################################################################
 # Input
@@ -21,26 +22,7 @@ INCLUDEPATH +=	/usr/include/SDL2 \
 		/usr/include/GL\
 		$$PWD/vendor/stb \
 
-include(sources/camera/camera.pri)
-include(sources/cmd/cmd.pri)
-include(sources/common/common.pri)
-include(sources/config/config.pri)
-include(sources/controller/controller.pri)
-include(sources/database/database.pri)
-include(sources/debug/debug.pri)
-include(sources/editor/editor.pri)
-include(sources/geometry/geometry.pri)
-include(sources/gpu/gpu.pri)
-include(sources/IO/IO.pri)
-include(sources/macro/macro.pri)
-include(sources/material/material.pri)
-include(sources/mesh/mesh.pri)
-include(sources/nova/nova.pri)
-include(sources/processing/processing.pri)
-include(sources/renderer/renderer.pri)
-include(sources/scene/scene.pri)
-include(sources/texture/texture.pri)
-include(sources/thread/thread.pri)
+include(sources/modules.pri)
 include(sources/main/main.pri)
 
 ########################################################################################

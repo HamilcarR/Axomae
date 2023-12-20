@@ -1,7 +1,6 @@
 TEMPLATE = app
 TARGET = Tests
-CONFIG += console \
-            debug \
+CONFIG +=   debug \
             warn_on 
 QT += widgets\
       gui\
@@ -16,14 +15,10 @@ INCLUDEPATH +=	/usr/include/SDL2 \
 		        /usr/include/GL\
 		        $$PWD/../vendor/stb
 
-
-
-
 HEADERS += $$PWD/Test.h
 SOURCES += $$PWD/Test.cpp
 TESTDATA += /usr/local/include/gtest
-
-
+MOC_DIR = $$PWD/moc
 
 include($$SRC/database/test/test_database.pri)
 include($$SRC/mesh/test/test_mesh.pri)
@@ -31,30 +26,7 @@ include($$SRC/scene/test/test_scene.pri)
 include($$SRC/processing/test/test_processing.pri)
 
 
-include($$SRC/camera/camera.pri)
-include($$SRC/cmd/cmd.pri)
-include($$SRC/common/common.pri)
-include($$SRC/config/config.pri)
-include($$SRC/controller/controller.pri)
-include($$SRC/database/database.pri)
-include($$SRC/debug/debug.pri)
-include($$SRC/editor/editor.pri)
-include($$SRC/geometry/geometry.pri)
-include($$SRC/gpu/gpu.pri)
-include($$SRC/IO/IO.pri)
-include($$SRC/macro/macro.pri)
-include($$SRC/material/material.pri)
-include($$SRC/mesh/mesh.pri)
-include($$SRC/nova/nova.pri)
-include($$SRC/processing/processing.pri)
-include($$SRC/renderer/renderer.pri)
-include($$SRC/scene/scene.pri)
-include($$SRC/texture/texture.pri)
-include($$SRC/thread/thread.pri)
-include($$SRC/main/main.pri)
-
-
-
+include($$SRC/modules.pri)
 
 ########################################################################################
 #Configure these env variables before compiling#
@@ -62,7 +34,7 @@ DESTDIR += bin/
 QMAKE_CC = gcc-12
 QMAKE_CXX = g++-12
 QMAKE_LINK = g++-12
-OBJECTS_DIR = $$PWD/"generated files"
+OBJECTS_DIR = $$PWD/../"generated files"
 CUDA_DIR = /usr/local/cuda
 
 QMAKE_CXXFLAGS += -std=c++17 -g -pg -Wall -pedantic -Wno-unused 

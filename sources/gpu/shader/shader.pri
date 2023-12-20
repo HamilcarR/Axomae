@@ -6,3 +6,4 @@ HEADERS += $$PWD/Shader.h\
             
 
 INCLUDEPATH += $$PWD/../../common
+
