@@ -491,7 +491,7 @@ namespace axomae {
     std::string env = folder_night + "night_env.hdr";
     std::string hdr = folder_night + "night.hdr";
 
-    hdr = folder_forest + "Forest.hdr";
+    hdr = folder_night + "Night.hdr";
     TextureData envmap;
     int width, height, channels;
     float *hdr_data = stbi_loadf(hdr.c_str(), &width, &height, &channels, 0);
@@ -524,7 +524,6 @@ namespace axomae {
     TextureDatabase *texture_database = &resource_database->getTextureDatabase();
     ShaderDatabase *shader_database = &resource_database->getShaderDatabase();
     texture_database->clean();
-    shader_database->clean();
     std::pair<std::vector<Mesh *>, SceneTree> scene = loadObjects(file);
     errorCheck(__FILE__, __LINE__);
     return scene;

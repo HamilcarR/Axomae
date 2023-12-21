@@ -21,4 +21,3 @@ INCLUDEPATH += $$PWD/../../scene \
                  
 
 include($$PWD/shader/shader.pri)
-include($$PWD/cuda/cuda.pri)

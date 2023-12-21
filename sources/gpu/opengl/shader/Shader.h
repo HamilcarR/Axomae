@@ -372,6 +372,7 @@ class CubemapShader : public Shader {
 class BRDFShader : public Shader {
  protected:
   BRDFShader();
+  BRDFShader(std::string vertex_shader, std::string fragment_shader);
 };
 
 /***********************************************************************************************************************************************************/
@@ -397,6 +398,7 @@ class ScreenFramebufferShader : public Shader {
 class BoundingBoxShader : public Shader {
  protected:
   BoundingBoxShader();
+  BoundingBoxShader(std::string vertex_shader, std::string fragment_shader);
 };
 
 /***********************************************************************************************************************************************************/
@@ -404,6 +406,7 @@ class BoundingBoxShader : public Shader {
 class EnvmapCubemapBakerShader : public Shader {
  protected:
   EnvmapCubemapBakerShader();
+  EnvmapCubemapBakerShader(std::string vertex_shader, std::string fragment_shader);
 };
 
 /***********************************************************************************************************************************************************/
@@ -411,6 +414,7 @@ class EnvmapCubemapBakerShader : public Shader {
 class IrradianceCubemapBakerShader : public Shader {
  protected:
   IrradianceCubemapBakerShader();
+  IrradianceCubemapBakerShader(std::string vertex_shader, std::string fragment_shader);
 };
 
 /***********************************************************************************************************************************************************/
@@ -418,6 +422,7 @@ class IrradianceCubemapBakerShader : public Shader {
 class EnvmapPrefilterBakerShader : public Shader {
  protected:
   EnvmapPrefilterBakerShader();
+  EnvmapPrefilterBakerShader(std::string vertex_shader, std::string fragment_shader);
 
  public:
   virtual void setRoughnessValue(float roughness);
@@ -430,6 +435,7 @@ class EnvmapPrefilterBakerShader : public Shader {
 class BRDFLookupTableBakerShader : public Shader {
  protected:
   BRDFLookupTableBakerShader();
+  BRDFLookupTableBakerShader(std::string vertex_shader, std::string fragment_shader);
 };
 
 /***********************************************************************************************************************************************************/

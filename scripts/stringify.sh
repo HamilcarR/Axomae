@@ -24,3 +24,4 @@ if [ -f utils/fragment.h ]; then
 fi
 mv utils/temp_vertex.h utils/vertex.h
 mv utils/temp_fragment.h utils/fragment.h
+echo "Shaders generation done..."

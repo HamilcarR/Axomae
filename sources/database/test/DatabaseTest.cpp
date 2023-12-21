@@ -21,7 +21,7 @@ class DatabaseBuilderTest {
   }
 
   template<class TYPE>
-  database::Result<U, T> addShader(bool persistence, std::string vert_ex = "", std::string frag_ex = "") {
+  database::Result<U, T> addShader(bool persistence) {
     database::Result<U, TYPE> result = ShaderBuilder::store<TYPE>(database, persistence, vert_ex, frag_ex);
     database::Result<U, T> cast = {result.id, static_cast<T *>(result.object)};
     return cast;

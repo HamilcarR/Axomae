@@ -92,7 +92,6 @@ class ShaderDatabase : public IResourceDB<Shader::TYPE, Shader> {
   const std::map<Shader::TYPE, std::unique_ptr<Shader>> &getConstData() const override { return database; }
 
  private:
-  std::map<Shader::TYPE, Shader *> persistence_list;
 };
 
 #endif

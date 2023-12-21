@@ -11,16 +11,8 @@ void ShaderDatabase::purge() {
 }
 
 void ShaderDatabase::clean() {
-  Mutex::Lock lock(mutex);
-  std::vector<Shader::TYPE> to_delete;
-  for (auto &A : database) {
-    if (A.first >= 0) {
-      A.second->clean();
-      to_delete.push_back(A.first);
-    }
-  }
-  for (auto A : to_delete)
-    database.erase(A);
+  /*The shader database doesn't need a special clean-up method for now, we just load any shader needed and purge the database at the end of the
+   * program */
 }
 
 void ShaderDatabase::initializeShaders() {
@@ -41,10 +33,10 @@ void ShaderDatabase::recompile() {
     A.second->recompile();
 }
 
-database::Result<Shader::TYPE, Shader> ShaderDatabase::add(std::unique_ptr<Shader> shader, bool keep) {
+database::Result<Shader::TYPE, Shader> ShaderDatabase::add(std::unique_ptr<Shader> shader, bool /*keep*/) {
   Mutex::Lock lock(mutex);
   for (auto &A : database)
-    if (A.second->getType() == shader->getType())
+    if (A.first == shader->getType())
       return {A.first, A.second.get()};
   Shader::TYPE id = shader->getType();
   database[id] = std::move(shader);
