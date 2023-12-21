@@ -6,6 +6,7 @@
 #include "MeshListView.h"
 #include "Renderer.h"
 #include "SceneSelector.h"
+#include "ShaderFactory.h"
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsItem>
 #include <stack>
@@ -222,6 +223,18 @@ namespace axomae {
 
     /*At last , we setup all slots and signals*/
     connect_all_slots();
+
+    /* Load shaders for the realtime renderer*/
+    ShaderDatabase &shader_database = resource_database.getShaderDatabase();
+    ShaderBuilder::store<BoundingBoxShader>(shader_database, true);
+    ShaderBuilder::store<BlinnPhongShader>(shader_database, true);
+    ShaderBuilder::store<CubemapShader>(shader_database, true);
+    ShaderBuilder::store<ScreenFramebufferShader>(shader_database, true);
+    ShaderBuilder::store<BRDFShader>(shader_database, true);
+    ShaderBuilder::store<EnvmapCubemapBakerShader>(shader_database, true);
+    ShaderBuilder::store<IrradianceCubemapBakerShader>(shader_database, true);
+    ShaderBuilder::store<EnvmapPrefilterBakerShader>(shader_database, true);
+    ShaderBuilder::store<BRDFLookupTableBakerShader>(shader_database, true);
   }
 
   Controller::~Controller() { delete _MemManagement; }

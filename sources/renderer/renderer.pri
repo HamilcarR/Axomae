@@ -10,6 +10,6 @@ HEADERS += $$PWD/Drawable.h \
             $$PWD/RenderPipeline.h 
 
 INCLUDEPATH += $$PWD/../camera \
-                $$PWD/../gpu \
+                $$PWD/../gpu/opengl \
                 $$PWD/../mesh \
                 $$PWD/../texture

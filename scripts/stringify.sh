@@ -2,25 +2,25 @@
 
 PROJECT_DIR=$1
 echo $PROJECT_DIR
-cd $PROJECT_DIR/sources/gpu/shader/shaders
+cd $PROJECT_DIR/sources/gpu/opengl/shader
 
 echo "Executing stringify.sh ..."
 echo "Generating vertex shaders strings"
 for f in glsl/*.vert; do
-    xxd -i glsl/"${f##*/}" >>includes/temp_vertex.h
+    xxd -i glsl/"${f##*/}" >>utils/temp_vertex.h
 done
 
 echo "Generating fragment shaders strings"
 for f in glsl/*.frag; do
-    xxd -i glsl/"${f##*/}" >>includes/temp_fragment.h
+    xxd -i glsl/"${f##*/}" >>utils/temp_fragment.h
 done
 
-if [ -f includes/vertex.h ]; then
-    rm includes/vertex.h
+if [ -f utils/vertex.h ]; then
+    rm utils/vertex.h
 fi
 
-if [ -f includes/fragment.h ]; then
-    rm includes/fragment.h
+if [ -f utils/fragment.h ]; then
+    rm utils/fragment.h
 fi
-mv includes/temp_vertex.h includes/vertex.h
-mv includes/temp_fragment.h includes/fragment.h
+mv utils/temp_vertex.h utils/vertex.h
+mv utils/temp_fragment.h utils/fragment.h

@@ -17,8 +17,6 @@ Renderer::Renderer() : resource_database(ResourceDatabaseManager::getInstance())
   mouse_state.previous_pos_x = 0;
   mouse_state.previous_pos_y = 0;
   default_framebuffer_id = 0;
-  Loader loader;
-  loader.loadShaderDatabase();
   scene_camera =
       NodeBuilder::store<ArcballCamera>(resource_database.getNodeDatabase(), true, 45.f, &screen_size, 0.1f, 10000.f, 100.f, &mouse_state).object;
 }

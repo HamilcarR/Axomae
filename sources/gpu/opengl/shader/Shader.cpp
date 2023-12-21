@@ -1,6 +1,7 @@
 #include "Shader.h"
 #include "DebugGL.h"
 #include "UniformNames.h"
+#include "glsl.h"
 #include <QMatrix4x4>
 #include <cstring>
 #include <stdexcept>
@@ -11,6 +12,8 @@
  * Implements functions and methods relative to the shading
  *
  */
+
+using namespace shader_utils;
 
 static int success;
 static char infoLog[SHADER_ERROR_LOG_SIZE];
@@ -225,31 +228,17 @@ void Shader::clean() {
 
 /***********************************************************************************************************************************************************/
 
-BlinnPhongShader::BlinnPhongShader() : Shader() { type = BLINN; }
-
-BlinnPhongShader::BlinnPhongShader(const std::string vertex_code, const std::string fragment_code) : Shader(vertex_code, fragment_code) {
-  type = BLINN;
-}
+BlinnPhongShader::BlinnPhongShader() : Shader(glsl_utils::phong_vert(), glsl_utils::phong_frag()) { type = BLINN; }
 
 /***********************************************************************************************************************************************************/
 
-CubemapShader::CubemapShader() : Shader() { type = CUBEMAP; }
-
-CubemapShader::CubemapShader(const std::string vertex, const std::string frag) : Shader(vertex, frag) { type = CUBEMAP; }
+CubemapShader::CubemapShader() : Shader(glsl_utils::cubemap_vert(), glsl_utils::cubemap_frag()) { type = CUBEMAP; }
 
 /***********************************************************************************************************************************************************/
-BRDFShader::BRDFShader() { type = BRDF; }
-BRDFShader::BRDFShader(const std::string vertex, const std::string frag) : Shader(vertex, frag) { type = BRDF; }
+BRDFShader::BRDFShader() : Shader(glsl_utils::pbr_vert(), glsl_utils::pbr_frag()) { type = BRDF; }
 
 /***********************************************************************************************************************************************************/
-ScreenFramebufferShader::ScreenFramebufferShader() : Shader() {
-  type = SCREEN_FRAMEBUFFER;
-  post_p_blurr = false;
-  post_p_sharpen = false;
-  post_p_edge = false;
-}
-
-ScreenFramebufferShader::ScreenFramebufferShader(const std::string vertex, const std::string frag) : Shader(vertex, frag) {
+ScreenFramebufferShader::ScreenFramebufferShader() : Shader(glsl_utils::screen_fbo_vert(), glsl_utils::screen_fbo_frag()) {
   type = SCREEN_FRAMEBUFFER;
   post_p_blurr = false;
   post_p_sharpen = false;
@@ -288,32 +277,23 @@ void ScreenFramebufferShader::setPostProcess(POST_PROCESS_TYPE type) {
 }
 /***********************************************************************************************************************************************************/
 
-BoundingBoxShader::BoundingBoxShader() : Shader() { type = BOUNDING_BOX; }
-
-BoundingBoxShader::BoundingBoxShader(const std::string vertex, const std::string fragment) : Shader(vertex, fragment) { type = BOUNDING_BOX; }
+BoundingBoxShader::BoundingBoxShader() : Shader(glsl_utils::bbox_vert(), glsl_utils::bbox_frag()) { type = BOUNDING_BOX; }
 
 /***********************************************************************************************************************************************************/
 
-EnvmapCubemapBakerShader::EnvmapCubemapBakerShader() : Shader() { type = ENVMAP_CUBEMAP_CONVERTER; }
-
-EnvmapCubemapBakerShader::EnvmapCubemapBakerShader(const std::string vertex, const std::string fragment) : Shader(vertex, fragment) {
+EnvmapCubemapBakerShader::EnvmapCubemapBakerShader() : Shader(glsl_utils::envmap_bake_vert(), glsl_utils::envmap_bake_frag()) {
   type = ENVMAP_CUBEMAP_CONVERTER;
 }
 
 /***********************************************************************************************************************************************************/
 
-IrradianceCubemapBakerShader::IrradianceCubemapBakerShader() : Shader() { type = IRRADIANCE_CUBEMAP_COMPUTE; }
-IrradianceCubemapBakerShader::IrradianceCubemapBakerShader(const std::string vertex_code, const std::string fragment_code)
-    : Shader(vertex_code, fragment_code) {
+IrradianceCubemapBakerShader::IrradianceCubemapBakerShader() : Shader(glsl_utils::envmap_bake_vert(), glsl_utils::irradiance_baker_frag()) {
   type = IRRADIANCE_CUBEMAP_COMPUTE;
 }
 
 /***********************************************************************************************************************************************************/
 
-EnvmapPrefilterBakerShader::EnvmapPrefilterBakerShader() : Shader() { type = ENVMAP_PREFILTER; }
-
-EnvmapPrefilterBakerShader::EnvmapPrefilterBakerShader(const std::string vertex_code, const std::string fragment_code)
-    : Shader(vertex_code, fragment_code) {
+EnvmapPrefilterBakerShader::EnvmapPrefilterBakerShader() : Shader(glsl_utils::envmap_bake_vert(), glsl_utils::envmap_prefilter_frag()) {
   type = ENVMAP_PREFILTER;
 }
 
@@ -327,9 +307,6 @@ void EnvmapPrefilterBakerShader::setSamplesCount(unsigned int amount) { setUnifo
 
 /***********************************************************************************************************************************************************/
 
-BRDFLookupTableBakerShader::BRDFLookupTableBakerShader() : Shader() { type = BRDF_LUT_BAKER; }
-
-BRDFLookupTableBakerShader::BRDFLookupTableBakerShader(const std::string vertex_code, const std::string fragment_code)
-    : Shader(vertex_code, fragment_code) {
+BRDFLookupTableBakerShader::BRDFLookupTableBakerShader() : Shader(glsl_utils::envmap_bake_vert(), glsl_utils::brdf_lut_frag()) {
   type = BRDF_LUT_BAKER;
 }

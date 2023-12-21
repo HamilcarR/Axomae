@@ -1,9 +1,16 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include "Axomae_macros.h"
 #include "Camera.h"
 #include "Texture.h"
-#include "utils_3D.h"
+#include "init_3D.h"
+#include <glm/ext/matrix_float3x3.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
+#include <string>
 
 /**
  * @file Shader.h
@@ -17,7 +24,7 @@
  */
 class Shader {
  public:
-  virtual ~Shader() {}
+  virtual ~Shader() = default;
   /**
    * @brief Shader types enumeration
    *
@@ -350,7 +357,7 @@ class Shader {
 class BlinnPhongShader : public Shader {
  protected:
   BlinnPhongShader();
-  BlinnPhongShader(const std::string vertex_code, const std::string fragment_code);
+  BlinnPhongShader(std::string vertex_shader, std::string fragment_shader);
 };
 
 /***********************************************************************************************************************************************************/
@@ -358,14 +365,13 @@ class BlinnPhongShader : public Shader {
 class CubemapShader : public Shader {
  protected:
   CubemapShader();
-  CubemapShader(const std::string vertex_code, const std::string fragment_code);
+  CubemapShader(std::string vertex_shader, std::string fragment_shader);
 };
 
 /***********************************************************************************************************************************************************/
 class BRDFShader : public Shader {
  protected:
   BRDFShader();
-  BRDFShader(const std::string vertex_code, const std::string fragment_code);
 };
 
 /***********************************************************************************************************************************************************/
@@ -373,7 +379,7 @@ class BRDFShader : public Shader {
 class ScreenFramebufferShader : public Shader {
  protected:
   ScreenFramebufferShader();
-  ScreenFramebufferShader(const std::string vertex_code, const std::string fragment_code);
+  ScreenFramebufferShader(std::string vertex_shader, std::string fragment_shader);
 
  public:
   enum POST_PROCESS_TYPE : signed { DEFAULT = -1, EDGE = 1, SHARPEN = 2, BLURR = 3 };
@@ -391,7 +397,6 @@ class ScreenFramebufferShader : public Shader {
 class BoundingBoxShader : public Shader {
  protected:
   BoundingBoxShader();
-  BoundingBoxShader(const std::string vertex_code, const std::string fragment_code);
 };
 
 /***********************************************************************************************************************************************************/
@@ -399,7 +404,6 @@ class BoundingBoxShader : public Shader {
 class EnvmapCubemapBakerShader : public Shader {
  protected:
   EnvmapCubemapBakerShader();
-  EnvmapCubemapBakerShader(const std::string vertex_code, const std::string fragment_code);
 };
 
 /***********************************************************************************************************************************************************/
@@ -407,7 +411,6 @@ class EnvmapCubemapBakerShader : public Shader {
 class IrradianceCubemapBakerShader : public Shader {
  protected:
   IrradianceCubemapBakerShader();
-  IrradianceCubemapBakerShader(const std::string vertex_code, const std::string fragment_code);
 };
 
 /***********************************************************************************************************************************************************/
@@ -415,7 +418,6 @@ class IrradianceCubemapBakerShader : public Shader {
 class EnvmapPrefilterBakerShader : public Shader {
  protected:
   EnvmapPrefilterBakerShader();
-  EnvmapPrefilterBakerShader(const std::string vertex_code, const std::string fragment_code);
 
  public:
   virtual void setRoughnessValue(float roughness);
@@ -428,7 +430,6 @@ class EnvmapPrefilterBakerShader : public Shader {
 class BRDFLookupTableBakerShader : public Shader {
  protected:
   BRDFLookupTableBakerShader();
-  BRDFLookupTableBakerShader(const std::string vertex_code, const std::string fragment_code);
 };
 
 /***********************************************************************************************************************************************************/

@@ -5,6 +5,7 @@ HEADERS += $$PWD/OfflineCubemapProcessing.h \
             $$PWD/ImageManager.h \
 
 INCLUDEPATH += $$PWD/../gpu/cuda \
+                $$PWD/../gpu/opengl
                 $$PWD/../common \
 
                 

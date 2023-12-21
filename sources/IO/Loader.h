@@ -35,12 +35,6 @@ namespace axomae {
     Loader();
 
     /**
-     * @brief Destroy the Loader object
-     *
-     */
-    ~Loader();
-
-    /**
      * @brief Load a .glb file
      *
      * @param file Path of the 3D glb model
@@ -49,24 +43,18 @@ namespace axomae {
     std::pair<std::vector<Mesh *>, SceneTree> load(const char *file);
 
     /**
-     * @brief Loads a shader file into an std::string
+     * @brief Loads a text file , with new lines
      *
-     * @param filename Path of the shader
+     * @param filename Path of the file
      * @return std::string
      */
-    std::string loadShader(const char *filename);
+    std::string loadTextFile(const char *filename);
 
     /**
      * @brief Delete instance
      *
      */
     void close();
-
-    /**
-     * @brief Build the shaders and put them into the shader database
-     *
-     */
-    void loadShaderDatabase();
 
     /**
      * @brief Build an environment map Mesh.

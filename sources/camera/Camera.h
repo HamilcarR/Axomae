@@ -46,11 +46,6 @@ class Camera : public SceneTreeNode {
   Camera(float degrees, ScreenSize *screen, float clip_near, float clip_far, const MouseState *pointer = nullptr);
 
   /**
-   * @brief Destroy the Camera object
-   */
-  virtual ~Camera();
-
-  /**
    * @brief Calculates the view matrix
    */
   virtual void computeViewSpace();

@@ -6,6 +6,6 @@ HEADERS += $$PWD/Texture.h \
             $$PWD/TextureGroup.h \
             $$PWD/GenericTextureProcessing.h
 
-INCLUDEPATH += $$PWD/../gpu/shader \
+INCLUDEPATH += $$PWD/../gpu/opengl/shader \
                 $$PWD/../common \
                 $$PWD/../database

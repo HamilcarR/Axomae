@@ -21,7 +21,6 @@
 
 namespace axomae {
   Loader::Loader() { resource_database = &ResourceDatabaseManager::getInstance(); }
-  Loader::~Loader() {}
 
   Mutex mutex;
   constexpr unsigned int THREAD_POOL_SIZE = 8;
@@ -223,37 +222,6 @@ namespace axomae {
     float transparency_factor = loadTransparencyValue(material);
     mesh_material.setTransparency(transparency_factor);
     return std::pair<unsigned, Material>(id, mesh_material);
-  }
-
-  /**
-   * The function loads shader files and adds them to a shader database.
-   */
-  void Loader::loadShaderDatabase() {  // Static shaders ... Wont be needed after implementing polymorphic shaders
-    ShaderDatabase &shader_database = resource_database->getShaderDatabase();
-    std::string vertex_shader = loadShader("../shaders/phong.vert");
-    std::string fragment_shader = loadShader("../shaders/phong.frag");
-    std::string vertex_shader_pbr = loadShader("../shaders/pbr.vert");
-    std::string fragment_shader_pbr = loadShader("../shaders/pbr.frag");
-    std::string vertex_shader_cubemap = loadShader("../shaders/cubemap.vert");
-    std::string fragment_shader_cubemap = loadShader("../shaders/cubemap.frag");
-    std::string vertex_shader_bouding_box = loadShader("../shaders/bbox.vert");
-    std::string fragment_shader_bounding_box = loadShader("../shaders/bbox.frag");
-    std::string vertex_shader_screen_fbo = loadShader("../shaders/screen_fbo.vert");
-    std::string fragment_shader_screen_fbo = loadShader("../shaders/screen_fbo.frag");
-    std::string vertex_envmap_to_cubemap = loadShader("../shaders/envmap_bake.vert");
-    std::string fragment_envmap_to_cubemap = loadShader("../shaders/envmap_bake.frag");
-    std::string fragment_irradiance_compute = loadShader("../shaders/irradiance_baker.frag");
-    std::string fragment_envmap_prefilter = loadShader("../shaders/envmap_prefilter.frag");
-    std::string fragment_brdf_lut_baker = loadShader("../shaders/brdf_lookup_table_baker.frag");
-    ShaderBuilder::store<BoundingBoxShader>(shader_database, true, vertex_shader_bouding_box, fragment_shader_bounding_box);
-    ShaderBuilder::store<BlinnPhongShader>(shader_database, true, vertex_shader, fragment_shader);
-    ShaderBuilder::store<CubemapShader>(shader_database, true, vertex_shader_cubemap, fragment_shader_cubemap);
-    ShaderBuilder::store<ScreenFramebufferShader>(shader_database, true, vertex_shader_screen_fbo, fragment_shader_screen_fbo);
-    ShaderBuilder::store<BRDFShader>(shader_database, true, vertex_shader_pbr, fragment_shader_pbr);
-    ShaderBuilder::store<EnvmapCubemapBakerShader>(shader_database, true, vertex_envmap_to_cubemap, fragment_envmap_to_cubemap);
-    ShaderBuilder::store<IrradianceCubemapBakerShader>(shader_database, true, vertex_envmap_to_cubemap, fragment_irradiance_compute);
-    ShaderBuilder::store<EnvmapPrefilterBakerShader>(shader_database, true, vertex_envmap_to_cubemap, fragment_envmap_prefilter);
-    ShaderBuilder::store<BRDFLookupTableBakerShader>(shader_database, true, vertex_envmap_to_cubemap, fragment_brdf_lut_baker);
   }
 
   /**
@@ -500,22 +468,14 @@ namespace axomae {
     }
   }
 
-  /**
-   * The function loads a shader from a file and returns it as a string.
-   *
-   * @param filename String representing the name of the file to be loaded.
-   *
-   * @return The function `loadShader` returns a `std::string` which contains the text read from the file
-   * specified by the `filename` parameter.
-   */
-  std::string Loader::loadShader(const char *filename) {
+  std::string Loader::loadTextFile(const char *filename) {
     std::ifstream stream(filename);
     std::string buffer;
-    std::string shader_text;
+    std::string str_text;
     while (getline(stream, buffer))
-      shader_text = shader_text + buffer + "\n";
+      str_text = str_text + buffer + "\n";
     stream.close();
-    return shader_text;
+    return str_text;
   }
 
   // TODO: [AX-21] Provide a way to choose the skybox texture on the UI
@@ -565,7 +525,6 @@ namespace axomae {
     ShaderDatabase *shader_database = &resource_database->getShaderDatabase();
     texture_database->clean();
     shader_database->clean();
-    loadShaderDatabase();
     std::pair<std::vector<Mesh *>, SceneTree> scene = loadObjects(file);
     errorCheck(__FILE__, __LINE__);
     return scene;

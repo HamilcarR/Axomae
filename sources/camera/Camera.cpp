@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "constants.h"
 #include <cmath>
 
 constexpr float DELTA_ZOOM = 1.f;
@@ -32,8 +33,6 @@ Camera::Camera(float deg, ScreenSize *screen, float near, float far, const Mouse
   mouse_state_pointer = pointer;
   projection = glm::mat4(1.f);
 }
-
-Camera::~Camera() {}
 
 void Camera::reset() {
   projection = glm::mat4(1.f);
