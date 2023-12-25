@@ -31,7 +31,7 @@ void CameraFrameBuffer::initializeFrameBuffer() {
   Texture *fbo_texture = fbo_attachment_texture_collection[GLFrameBuffer::COLOR0];
   assert(texture_database.contains(fbo_texture).object);
   int database_texture_id = texture_database.contains(fbo_texture).id;
-  auto result = NodeBuilder::store<FrameBufferMesh>(node_database, true, database_texture_id, shader_framebuffer);
+  auto result = database::node::store<FrameBufferMesh>(node_database, true, database_texture_id, shader_framebuffer);
   mesh_screen_quad = result.object;
   drawable_screen_quad = std::make_unique<Drawable>(mesh_screen_quad);
   FrameBufferInterface::initializeFrameBuffer();

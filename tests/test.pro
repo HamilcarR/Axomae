@@ -20,13 +20,16 @@ SOURCES += $$PWD/Test.cpp
 TESTDATA += /usr/local/include/gtest
 MOC_DIR = $$PWD/moc
 
+
+
+include($$SRC/modules.pri)
 include($$SRC/database/test/test_database.pri)
 include($$SRC/mesh/test/test_mesh.pri)
 include($$SRC/scene/test/test_scene.pri)
 include($$SRC/processing/test/test_processing.pri)
 
 
-include($$SRC/modules.pri)
+
 
 ########################################################################################
 #Configure these env variables before compiling#

@@ -1,5 +1,6 @@
 #ifndef INCLUDES_CUH
 #define INCLUDES_CUH
+#include "Logger.h"
 #include "constants.h"
 #include "utils_3D.h"
 #include <cuda.h>

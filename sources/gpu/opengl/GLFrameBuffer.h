@@ -58,7 +58,7 @@ class GLFrameBuffer : public GLBufferInterface {
    * @brief Destroy the GLFrameBuffer object
    *
    */
-  virtual ~GLFrameBuffer();
+  virtual ~GLFrameBuffer() = default;
 
   /**
    * @brief Generates the framebuffer's ID.

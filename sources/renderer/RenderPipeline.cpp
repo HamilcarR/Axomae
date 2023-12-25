@@ -72,7 +72,7 @@ CubeMapMesh *RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_m
   database::Result<int, Texture> query_baked_cubemap_texture = texture_database->contains(
       cubemap_renderer_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
   /* Mesh to be returned */
-  CubeMapMesh *cubemap = NodeBuilder::store<CubeMapMesh>(resource_database->getNodeDatabase(), false).object;
+  CubeMapMesh *cubemap = database::node::store<CubeMapMesh>(resource_database->getNodeDatabase(), false).object;
   query_baked_cubemap_texture.object->generateMipmap();
   cubemap->material.addTexture(query_baked_cubemap_texture.id);
   cubemap->setShader(shader_database->get(Shader::CUBEMAP));
@@ -262,7 +262,7 @@ void RenderPipeline::renderToQuad(Drawable &quad_drawable,
 /********************************************************************************************************************************************************************************************************/
 Drawable RenderPipeline::constructCube(Shader *shader, int database_texture_id, Texture::TYPE type, Camera *camera) {
   assert(shader != nullptr);
-  CubeMesh *cube = NodeBuilder::store<CubeMesh>(resource_database->getNodeDatabase(), false).object;
+  CubeMesh *cube = database::node::store<CubeMesh>(resource_database->getNodeDatabase(), false).object;
   cube->setShader(shader);
   cube->material.addTexture(database_texture_id);
   cube->setSceneCameraPointer(camera);
@@ -271,7 +271,7 @@ Drawable RenderPipeline::constructCube(Shader *shader, int database_texture_id, 
 
 Drawable RenderPipeline::constructQuad(Shader *shader, Camera *camera) {
   assert(shader != nullptr);
-  QuadMesh *quad = NodeBuilder::store<QuadMesh>(resource_database->getNodeDatabase(), false).object;
+  QuadMesh *quad = database::node::store<QuadMesh>(resource_database->getNodeDatabase(), false).object;
   quad->setShader(shader);
   quad->setSceneCameraPointer(camera);
   return Drawable(quad);

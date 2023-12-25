@@ -1,7 +1,5 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
-#include "Logger.h"
-#include <SDL2/SDL.h>
 #include <chrono>
 #include <cmath>
 #include <cstdint>

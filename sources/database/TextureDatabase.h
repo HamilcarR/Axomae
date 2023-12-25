@@ -1,8 +1,11 @@
 #ifndef TEXTUREDATABASE_H
 #define TEXTUREDATABASE_H
 
+#include "Axomae_macros.h"
+#include "Factory.h"
 #include "RenderingDatabaseInterface.h"
 #include "Texture.h"
+
 /**
  * @file TextureDatabase.h
  * Class definition for the texture database
@@ -15,13 +18,13 @@
  * We use it to keep texture objects in one place , meshes will only reference the textures.
  *
  */
-class TextureDatabase : public IResourceDB<int, Texture> {
+class TextureDatabase final : public IResourceDB<int, Texture> {
  public:
   /**
    * @brief Construct a new Texture Database object
    *
    */
-  TextureDatabase();
+  TextureDatabase() = default;
   /**
    * @brief Removes all elements from the database , except those marked "keep"
    *
@@ -35,21 +38,13 @@ class TextureDatabase : public IResourceDB<int, Texture> {
   void purge() override;
 
   /**
-   * @brief Get the texture at index
-   *
-   * @param index Index we want to retrieve
-   * @return Texture* nullptr if nothing found , Texture at "index" else
-   */
-  Texture *get(const int index) const override;
-
-  /**
    * @brief Removes a texture from the database using it's ID
    *
    * @param index
    * @return true
    * @return false
    */
-  virtual bool remove(const int index);
+   bool remove(int index) override;
 
   /**
    * @brief Removes a texture from the database using it's address
@@ -58,7 +53,7 @@ class TextureDatabase : public IResourceDB<int, Texture> {
    * @return true If the texture has been found
    * @return false If the address is not in the database
    */
-  virtual bool remove(const Texture *texture);
+  bool remove(const Texture *texture) override;
 
   /**
    * @brief Add a texture object to the database . In case the object is already present , this method will return the
@@ -71,23 +66,6 @@ class TextureDatabase : public IResourceDB<int, Texture> {
   virtual database::Result<int, Texture> add(std::unique_ptr<Texture> texture, bool keep);
 
   /**
-   * @brief Checks if database contains this index
-   *
-   * @param index Index to check
-   * @return true If database contains "index"
-   */
-  bool contains(const int index) const override;
-
-  /**
-   * @brief Checks if a texture is present in the database
-   *
-   * @param address The texture this methods searches for.
-   * @return std::pair<int , Texture*> Pair of <ID  , Texture*>. If address is not present in the database , returns < 0
-   * , nullptr> .
-   */
-  database::Result<int, Texture> contains(const Texture *address) const override;
-
-  /**
    * @brief Retrieve all textures of type "texture_type"
    *
    * @param texture_type Type of the texture
@@ -96,10 +74,22 @@ class TextureDatabase : public IResourceDB<int, Texture> {
    * @see Texture::TYPE
    */
   std::vector<database::Result<int, Texture>> getTexturesByType(Texture::TYPE texture_type) const;
-  bool empty() const { return database.empty(); }
-  const std::map<int, std::unique_ptr<Texture>> &getConstData() const override { return database; }
+  bool empty() const override { return database_map.empty(); }
+  const std::map<int, std::unique_ptr<Texture>> &getConstData() const override { return database_map; }
 
  private:
 };
+
+namespace database::texture {
+
+  template<class TEXTYPE, class... Args>
+  static database::Result<int, TEXTYPE> store(IResourceDB<int, Texture> &database, bool keep, Args &&...args) {
+    ASSERT_SUBTYPE(Texture, TEXTYPE);
+    std::unique_ptr<Texture> temp = std::make_unique<PRVINTERFACE<TEXTYPE, Args...>>(std::forward<Args>(args)...);
+    database::Result<int, Texture> result = database.add(std::move(temp), keep);
+    database::Result<int, TEXTYPE> cast = {result.id, static_cast<TEXTYPE *>(result.object)};
+    return cast;
+  }
+};  // namespace database::texture
 
 #endif

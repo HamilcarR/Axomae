@@ -11,4 +11,4 @@ HEADERS += $$PWD/CmdArgs.h \
 INCLUDEPATH += $$PWD/../IO \
                 $$PWD/../processing \
                 $$PWD/../renderer \
-                $$PWD/../editor
+                $$PWD/../editor/cmd \

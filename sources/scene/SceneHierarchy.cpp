@@ -1,5 +1,7 @@
 #include "SceneHierarchy.h"
+#include "INodeDatabase.h"
 #include "INodeFactory.h"
+
 void ISceneHierarchy::setAsRootChild(INode *node) {
   if (root != nullptr)
     root->addChildNode(node);
@@ -27,7 +29,7 @@ SceneTree::~SceneTree() {}
 
 void SceneTree::createGenericRootNode(IResourceDB<int, INode> &database) {
   if (!root)
-    root = NodeBuilder::store<SceneTreeNode>(database, false).object;
+    root = database::node::store<SceneTreeNode>(database, false).object;
 }
 
 SceneTree &SceneTree::operator=(const SceneTree &copy) {

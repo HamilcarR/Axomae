@@ -1,6 +1,5 @@
 Checks: >
   cppcoreguidelines-*,
-  modernize-*
 
 
 CheckOptions:

@@ -3,6 +3,7 @@ SOURCES += $$PWD/ImageManager.cpp \
 
 HEADERS += $$PWD/OfflineCubemapProcessing.h \
             $$PWD/ImageManager.h \
+            $$PWD/image_utils.h 
 
 INCLUDEPATH += $$PWD/../gpu/cuda \
                 $$PWD/../gpu/opengl

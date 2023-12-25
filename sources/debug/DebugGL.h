@@ -1,6 +1,6 @@
 #ifndef DEBUGGL_H
 #define DEBUGGL_H
-
+#include "Logger.h"
 #include "constants.h"
 #include "init_3D.h"
 #include <iostream>

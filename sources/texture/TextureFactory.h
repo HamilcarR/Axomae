@@ -31,15 +31,6 @@ class TextureBuilder {
     ASSERT_SUBTYPE(Texture, TEXTYPE);
     return std::make_unique<PRVINTERFACE<TEXTYPE, Args...>>(std::forward<Args>(args)...);
   }
-
-  template<class TEXTYPE, class... Args>
-  static database::Result<int, TEXTYPE> store(IResourceDB<int, Texture> &database, bool keep, Args &&...args) {
-    ASSERT_SUBTYPE(Texture, TEXTYPE);
-    std::unique_ptr<Texture> temp = std::make_unique<PRVINTERFACE<TEXTYPE, Args...>>(std::forward<Args>(args)...);
-    database::Result<int, Texture> result = database.add(std::move(temp), keep);
-    database::Result<int, TEXTYPE> cast = {result.id, static_cast<TEXTYPE *>(result.object)};
-    return cast;
-  }
 };
 
 #endif

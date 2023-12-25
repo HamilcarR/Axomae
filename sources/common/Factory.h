@@ -1,7 +1,8 @@
 #ifndef FACTORY_H
 #define FACTORY_H
+#include "constants.h"
 
-/*Allows us to bypass private constructor access restriction from std::make_unique construction process*/
+/*Allows us to bypass private constructor for classes that we want to instantiate with std::make_unique*/
 template<class TYPE, class... Args>
 class PRVINTERFACE : public TYPE {
  public:

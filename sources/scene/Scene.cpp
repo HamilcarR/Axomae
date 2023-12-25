@@ -34,7 +34,7 @@ void Scene::generateBoundingBoxes(Shader *box_shader) {
   for (Scene::AABB &scene_drawable : scene) {
     Mesh *mesh = scene_drawable.drawable->getMeshPointer();
     BoundingBoxMesh *bbox_mesh =
-        NodeBuilder::store<BoundingBoxMesh>(resource_manager.getNodeDatabase(), false, mesh, scene_drawable.aabb, box_shader).object;
+        database::node::store<BoundingBoxMesh>(resource_manager.getNodeDatabase(), false, mesh, scene_drawable.aabb, box_shader).object;
     auto bbox_drawable = std::make_unique<Drawable>(bbox_mesh);
     bounding_boxes_array.push_back(bbox_drawable.get());
     drawable_collection.push_back(std::move(bbox_drawable));

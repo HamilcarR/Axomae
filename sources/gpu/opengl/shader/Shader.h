@@ -12,6 +12,7 @@
 #include <glm/ext/vector_float4.hpp>
 #include <string>
 
+// TODO : implement uniform buffer objects
 /**
  * @file Shader.h
  * Implements various Shader types , like phong shading , PBRs etc

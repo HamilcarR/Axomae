@@ -9,6 +9,7 @@
 #ifndef UI_MAIN_WINDOW_H
 #define UI_MAIN_WINDOW_H
 
+#include <HdrListView.h>
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtGui/QIcon>
@@ -33,7 +34,6 @@
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
-#include <QtWidgets/QTableView>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -269,7 +269,7 @@ public:
     GLViewer *renderer_view;
     QVBoxLayout *verticalLayout_31;
     SceneListView *renderer_scene_list;
-    QTableView *renderer_envmap_list;
+    EnvmapListDisplay *renderer_envmap_list;
     QWidget *uv_editor;
     QGridLayout *gridLayout_17;
     QGridLayout *gridLayout_14;
@@ -1594,14 +1594,13 @@ public:
 
         verticalLayout_31->addWidget(renderer_scene_list);
 
-        renderer_envmap_list = new QTableView(gl_renderer);
+        renderer_envmap_list = new EnvmapListDisplay(gl_renderer);
         renderer_envmap_list->setObjectName("renderer_envmap_list");
         sizePolicy5.setHeightForWidth(renderer_envmap_list->sizePolicy().hasHeightForWidth());
         renderer_envmap_list->setSizePolicy(sizePolicy5);
         renderer_envmap_list->setAcceptDrops(true);
         renderer_envmap_list->setFrameShape(QFrame::StyledPanel);
         renderer_envmap_list->setFrameShadow(QFrame::Sunken);
-        renderer_envmap_list->setGridStyle(Qt::SolidLine);
 
         verticalLayout_31->addWidget(renderer_envmap_list);
 

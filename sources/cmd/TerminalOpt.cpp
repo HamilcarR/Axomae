@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+// Old code , need refractoring
+
 namespace axomae {
 
   const int STRING_SIZE = 256;

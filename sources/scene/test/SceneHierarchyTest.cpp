@@ -17,7 +17,7 @@ class SceneTreeBuilder {
   virtual ~SceneTreeBuilder() {}
 
   void buildSceneTree(unsigned int depth, unsigned int max_degree) {
-    ISceneNode *root = NodeBuilder::store<SceneTreeNode>(database, false).object;
+    ISceneNode *root = database::node::store<SceneTreeNode>(database, false).object;
     root->setName("root");
     tree.setRoot(root);
     node_count++;
@@ -57,7 +57,7 @@ class SceneTreeBuilder {
     }
     int size_numbers = rand() % max_degree + 1;
     for (int i = 0; i < size_numbers; i++) {
-      ISceneNode *child = NodeBuilder::store<SceneTreeNode>(database, false, node).object;
+      ISceneNode *child = database::node::store<SceneTreeNode>(database, false, node).object;
       child->setName(std::string("child-") + std::to_string(depth) + std::string("-") + std::to_string(i));
       node_count++;
       buildRecursive(child, max_degree, depth - 1);

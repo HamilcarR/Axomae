@@ -1,9 +1,13 @@
-SOURCES += $$PWD/DatabaseTest.cpp \ 
+SOURCES += $$PWD/INodeDatabaseTest.cpp \
+            $$PWD/ShaderDatabaseTest.cpp \ 
+            $$PWD/TextureDatabaseTest.cpp \ 
+            $$PWD/ImageDatabaseTest.cpp \ 
 
+HEADERS += $$PWD/DatabaseBuilderTest.h \
 
-INCLUDEPATH +=  $$PWD/../../database \
+INCLUDEPATH +=  $$PWD/../ \
                 $$PWD/../../gpu/shader \
-                $$PWD/../../gpu \
+                $$PWD/../../gpu/opengl\
                 $$PWD/../../texture \
                 $$PWD/../../common \
                 $$PWD/../../thread \
@@ -12,3 +16,4 @@ INCLUDEPATH +=  $$PWD/../../database \
                 $$PWD/../../macro \
                 $$PWD/../../debug \
                 $$PWD/../../camera \
+                $$PWD/../../thread \

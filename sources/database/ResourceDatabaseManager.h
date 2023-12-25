@@ -2,6 +2,7 @@
 #define RESOURCEDATABASEMANAGER_H
 
 #include "INodeDatabase.h"
+#include "ImageDatabase.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
 
@@ -27,14 +28,17 @@ class ResourceDatabaseManager {
   void purge();
   void clean();
   void cleanTextureDatabase();
+  void cleanHdrDatabase();
   void cleanShaderDatabase();
   void cleanNodeDatabase();
   void purgeTextureDatabase();
+  void purgeHdrDatabase();
   void purgeShaderDatabase();
   void purgeNodeDatabase();
   TextureDatabase &getTextureDatabase() const { return *texture_database; }
   ShaderDatabase &getShaderDatabase() const { return *shader_database; }
   INodeDatabase &getNodeDatabase() const { return *node_database; }
+  ImageDatabase<float> &getHdrDatabase() const { return *hdr_database; }
 
  private:
   /**
@@ -57,9 +61,10 @@ class ResourceDatabaseManager {
   ResourceDatabaseManager operator=(const ResourceDatabaseManager &) = delete;
 
  private:
-  std::unique_ptr<TextureDatabase> texture_database; /*<Pointer on the texture database*/
-  std::unique_ptr<ShaderDatabase> shader_database;   /*<Pointer on the shader database*/
-  std::unique_ptr<INodeDatabase> node_database;      /*<Pointer on the node database*/
+  std::unique_ptr<TextureDatabase> texture_database;  /*<Pointer on the texture database*/
+  std::unique_ptr<ShaderDatabase> shader_database;    /*<Pointer on the shader database*/
+  std::unique_ptr<INodeDatabase> node_database;       /*<Pointer on the node database*/
+  std::unique_ptr<ImageDatabase<float>> hdr_database; /*<Raw HDR images database*/
 };
 
 #endif

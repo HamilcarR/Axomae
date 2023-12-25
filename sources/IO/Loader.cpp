@@ -5,12 +5,9 @@
 #include "PerformanceLogger.h"
 #include "ShaderFactory.h"
 #include "TextureFactory.h"
-#include <QBuffer>
 #include <QByteArray>
 #include <QImage>
 #include <fstream>
-#include <iostream>
-#include <unistd.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 /**
@@ -98,7 +95,7 @@ namespace axomae {
   }
   template<class TEXTYPE>
   static void loadTextureDummy(Material *material, TextureDatabase &texture_database) {
-    auto result = TextureBuilder::store<TEXTYPE>(texture_database, true, nullptr);
+    auto result = database::texture::store<TEXTYPE>(texture_database, true, nullptr);
     LOG("Loading dummy texture at index : " + std::to_string(result.id), LogLevel::INFO);
     material->addTexture(result.id);
   }
@@ -121,7 +118,7 @@ namespace axomae {
       unsigned int texture_index_int = stoi(texture_index_string);
       if (!texture_database.contains(texture_index_int)) {
         copyTexels(texture, scene->mTextures[texture_index_int]);
-        auto result = TextureBuilder::store<TEXTYPE>(texture_database, false, texture);
+        auto result = database::texture::store<TEXTYPE>(texture_database, false, texture);
         material->addTexture(result.id);
       } else
         material->addTexture(texture_index_int);
@@ -278,7 +275,7 @@ namespace axomae {
       std::vector<ISceneNode *> add_node;
       if (ai_node->mNumMeshes == 0) {
         ISceneNode *empty_node =
-            NodeBuilder::store<SceneTreeNode>(node_database, false, parent).object;  //* Empty node , no other goal than transformation node .
+            database::node::store<SceneTreeNode>(node_database, false, parent).object;  //* Empty node , no other goal than transformation node .
         add_node.push_back(empty_node);
       } else if (ai_node->mNumMeshes == 1)
         add_node.push_back(mesh_lookup[ai_node->mMeshes[0]]);
@@ -287,7 +284,7 @@ namespace axomae {
          nodes can contain multiples meshes , but SceneTreeNode can be a mesh.
         So we create a dummy node at position 0 in add_node to be the ancestors of the children
         nodes , while meshes will be attached to parent and without children.*/
-        NodeBuilder::store<SceneTreeNode>(node_database, false, parent);
+        database::node::store<SceneTreeNode>(node_database, false, parent);
         for (unsigned i = 0; i < ai_node->mNumMeshes; i++)
           add_node.push_back(mesh_lookup[ai_node->mMeshes[i]]);
       }
@@ -453,7 +450,7 @@ namespace axomae {
         const aiMesh *mesh = modelScene->mMeshes[mesh_index];
         const char *mesh_name = mesh->mName.C_Str();
         std::string name(mesh_name);
-        auto mesh_result = NodeBuilder::store<Mesh>(
+        auto mesh_result = database::node::store<Mesh>(
             node_database, false, name, std::move(*geometry), material_array[mesh_index], shader_program, nullptr);
         LOG("object loaded : " + name, LogLevel::INFO);
         node_lookup_table[mesh_index] = mesh_result.object;
@@ -482,6 +479,7 @@ namespace axomae {
 
   EnvironmentMap2DTexture *Loader::loadHdrEnvmap() {
     TextureDatabase &texture_database = resource_database->getTextureDatabase();
+    ImageDatabase<float> &hdr_database = resource_database->getHdrDatabase();
     std::string folder_night = "../Ressources/Skybox_Textures/HDR/Night_City/";
     std::string folder_forest = "../Ressources/Skybox_Textures/HDR/Forest/";
     std::string folder_park = "../Ressources/Skybox_Textures/HDR/Park/";
@@ -489,15 +487,15 @@ namespace axomae {
     std::string folder_sky = "../Ressources/Skybox_Textures/HDR/Sky/";
     std::string folder_street = "../Ressources/Skybox_Textures/HDR/Street/";
     std::string env = folder_night + "night_env.hdr";
-    std::string hdr = folder_night + "night.hdr";
+    std::string hdr = folder_night + "Night.hdr";
+    // hdr = folder_forest + "Forest.hdr";
 
-    hdr = folder_night + "Night.hdr";
-    TextureData envmap;
     int width, height, channels;
     float *hdr_data = stbi_loadf(hdr.c_str(), &width, &height, &channels, 0);
-
     if (stbi_failure_reason())
       LOG("STBI FAILED WITH :" + std::string(stbi_failure_reason()), LogLevel::ERROR);
+
+    TextureData envmap;
     envmap.width = static_cast<unsigned int>(width);
     envmap.height = static_cast<unsigned int>(height);
     envmap.data_type = Texture::FLOAT;
@@ -506,8 +504,15 @@ namespace axomae {
     envmap.nb_components = channels;
     envmap.f_data.resize(width * height * channels);
     std::memcpy(&envmap.f_data[0], hdr_data, width * height * channels * sizeof(float));
+
+    std::vector<float> image_data;
+    image_data.resize(width * height * channels);
+    for (int i = 0; i < width * height * channels; i++)
+      image_data[i] = hdr_data[i];
+    database::image::store<float>(hdr_database, false, image_data, width, height, channels);
+
     stbi_image_free(hdr_data);
-    auto result = TextureBuilder::store<EnvironmentMap2DTexture>(texture_database, false, &envmap);
+    auto result = database::texture::store<EnvironmentMap2DTexture>(texture_database, false, &envmap);
     if (!result.object)
       LOG("ENVMAP loading failed!\n", LogLevel::ERROR);
     return result.object;

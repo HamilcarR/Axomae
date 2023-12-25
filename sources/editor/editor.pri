@@ -1,21 +1,14 @@
 
-HEADERS +=  $$PWD/GLViewer.h\
-            $$PWD/MeshListView.h\
-            $$PWD/SceneListView.h\
-            $$PWD/SceneSelector.h\
-            $$PWD/MaterialViewer.h\
-            $$PWD/Window.h
-
-
-SOURCES +=  $$PWD/GLViewer.cpp\
-            $$PWD/MeshListView.cpp\
-            $$PWD/SceneSelector.cpp\
-            $$PWD/MaterialViewer.cpp\
-            $$PWD/Window.cpp
-
 
 FORMS += "$$PWD/Form/main_window.ui"
 
 UI_DIR += "$$PWD/Form/"
 
-INCLUDEPATH += $$PWD/
+
+
+
+include($$PWD/cmd/cmd.pri)
+include($$PWD/renderer/renderer.pri)
+include($$PWD/UV/UV.pri)
+include($$PWD/Form/Form.pri)
+include($$PWD/image/image.pri)

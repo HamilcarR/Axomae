@@ -18,7 +18,7 @@ Renderer::Renderer() : resource_database(ResourceDatabaseManager::getInstance())
   mouse_state.previous_pos_y = 0;
   default_framebuffer_id = 0;
   scene_camera =
-      NodeBuilder::store<ArcballCamera>(resource_database.getNodeDatabase(), true, 45.f, &screen_size, 0.1f, 10000.f, 100.f, &mouse_state).object;
+      database::node::store<ArcballCamera>(resource_database.getNodeDatabase(), true, 45.f, &screen_size, 0.1f, 10000.f, 100.f, &mouse_state).object;
 }
 
 Renderer::Renderer(unsigned width, unsigned height, GLViewer *widget) : Renderer() {
@@ -135,7 +135,7 @@ void Renderer::onLeftClickRelease() {
       LOG(std::string("x:") + std::to_string(data.position.x) + std::string("  y:") + std::to_string(data.position.y) + std::string("  z:") +
               std::to_string(data.position.z),
           LogLevel::INFO);
-      NodeBuilder::store<PointLight>(resource_database.getNodeDatabase(), false, data);
+      database::node::store<PointLight>(resource_database.getNodeDatabase(), false, data);
       event_callback_stack[ON_LEFT_CLICK].pop();
       emit sceneModified();
     }

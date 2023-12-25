@@ -1,6 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
-
+#include "Logger.h"
 #include "constants.h"
 
 /**

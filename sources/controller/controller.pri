@@ -5,3 +5,5 @@ HEADERS += $$PWD/GUIWindow.h \
             $$PWD/LightControllerUI.h
 
 INCLUDEPATH += $$PWD/../config \
+                $$PWD/../database \
+                $$PWD/../database/model \

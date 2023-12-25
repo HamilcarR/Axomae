@@ -5,63 +5,51 @@
 ShaderDatabase::ShaderDatabase() {}
 
 void ShaderDatabase::purge() {
-  for (auto &A : database)
+  Mutex::Lock lock(mutex);
+  for (auto &A : database_map)
     A.second->clean();
-  database.clear();
+  database_map.clear();
 }
 
 void ShaderDatabase::clean() {
-  /*The shader database doesn't need a special clean-up method for now, we just load any shader needed and purge the database at the end of the
-   * program */
+  // The shader database doesn't need a special clean-up method for now, we just load any shader needed and purge the database at the end of the
+  // program
+  return;
 }
 
 void ShaderDatabase::initializeShaders() {
   Mutex::Lock lock(mutex);
-  for (auto &A : database)
+  for (auto &A : database_map)
     A.second->initializeShader();
 }
 
 Shader *ShaderDatabase::get(const Shader::TYPE type) const {
   Mutex::Lock lock(mutex);
-  auto it = database.find(type);
-  return it == database.end() ? nullptr : it->second.get();
+  auto it = database_map.find(type);
+  return it == database_map.end() ? nullptr : it->second.get();
 }
 
 void ShaderDatabase::recompile() {
   Mutex::Lock lock(mutex);
-  for (auto &A : database)
+  for (auto &A : database_map)
     A.second->recompile();
 }
 
 database::Result<Shader::TYPE, Shader> ShaderDatabase::add(std::unique_ptr<Shader> shader, bool /*keep*/) {
   Mutex::Lock lock(mutex);
-  for (auto &A : database)
+  for (auto &A : database_map)
     if (A.first == shader->getType())
       return {A.first, A.second.get()};
   Shader::TYPE id = shader->getType();
-  database[id] = std::move(shader);
-  return {id, database[id].get()};
-}
-
-database::Result<Shader::TYPE, Shader> ShaderDatabase::contains(const Shader *shader) const {
-  Mutex::Lock lock(mutex);
-  for (const auto &A : database) {
-    if (A.second.get() == shader)
-      return {A.first, A.second.get()};
-  }
-  return {Shader::EMPTY, nullptr};
-}
-
-bool ShaderDatabase::contains(const Shader::TYPE type) const {
-  Mutex::Lock lock(mutex);
-  return database.find(type) != database.end();
+  database_map[id] = std::move(shader);
+  return {id, database_map[id].get()};
 }
 
 bool ShaderDatabase::remove(const Shader *shader) {
-  for (auto it = database.begin(); it != database.end(); it++) {
+  for (auto it = database_map.begin(); it != database_map.end(); it++) {
     if (shader == it->second.get()) {
       it->second.get()->clean();
-      database.erase(it);
+      database_map.erase(it);
     }
     return true;
   }
@@ -73,6 +61,6 @@ bool ShaderDatabase::remove(const Shader::TYPE type) {
   if (!shader)
     return false;
   shader->clean();
-  database.erase(type);
+  database_map.erase(type);
   return true;
 }

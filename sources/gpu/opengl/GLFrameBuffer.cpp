@@ -1,4 +1,5 @@
 #include "GLFrameBuffer.h"
+#include "Logger.h"
 
 GLFrameBuffer::GLFrameBuffer() {
   renderbuffer_object = nullptr;
@@ -14,8 +15,6 @@ GLFrameBuffer::GLFrameBuffer(
   target_texture_type = target_type;
   pointer_on_default_fbo_id = default_fbo_id_pointer;
 }
-
-GLFrameBuffer::~GLFrameBuffer() { renderbuffer_object = nullptr; }
 
 void GLFrameBuffer::attachTexture2D(INTERNAL_FORMAT color_attachment, TEXTURE_TARGET target, unsigned int texture_id, unsigned mip_level) {
   assert(texture_id != 0);

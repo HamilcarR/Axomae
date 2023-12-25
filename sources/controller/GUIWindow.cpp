@@ -26,6 +26,7 @@ namespace axomae {
   };
 
   // TODO: [AX-52] Fix memory leak at normal map generation when sliding the factor scale
+  /*To be refractored*/
   /*structure to keep track of pointers to destroy*/
   class HeapManagement {
    public:
@@ -226,15 +227,15 @@ namespace axomae {
 
     /* Load shaders for the realtime renderer*/
     ShaderDatabase &shader_database = resource_database.getShaderDatabase();
-    ShaderBuilder::store<BoundingBoxShader>(shader_database, true);
-    ShaderBuilder::store<BlinnPhongShader>(shader_database, true);
-    ShaderBuilder::store<CubemapShader>(shader_database, true);
-    ShaderBuilder::store<ScreenFramebufferShader>(shader_database, true);
-    ShaderBuilder::store<BRDFShader>(shader_database, true);
-    ShaderBuilder::store<EnvmapCubemapBakerShader>(shader_database, true);
-    ShaderBuilder::store<IrradianceCubemapBakerShader>(shader_database, true);
-    ShaderBuilder::store<EnvmapPrefilterBakerShader>(shader_database, true);
-    ShaderBuilder::store<BRDFLookupTableBakerShader>(shader_database, true);
+    database::shader::store<BoundingBoxShader>(shader_database, true);
+    database::shader::store<BlinnPhongShader>(shader_database, true);
+    database::shader::store<CubemapShader>(shader_database, true);
+    database::shader::store<ScreenFramebufferShader>(shader_database, true);
+    database::shader::store<BRDFShader>(shader_database, true);
+    database::shader::store<EnvmapCubemapBakerShader>(shader_database, true);
+    database::shader::store<IrradianceCubemapBakerShader>(shader_database, true);
+    database::shader::store<EnvmapPrefilterBakerShader>(shader_database, true);
+    database::shader::store<BRDFLookupTableBakerShader>(shader_database, true);
   }
 
   Controller::~Controller() { delete _MemManagement; }
