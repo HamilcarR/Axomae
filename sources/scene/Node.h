@@ -1,6 +1,7 @@
 #ifndef NODE_H
 #define NODE_H
 #include "utils_3D.h"
+#include "Logger.h"
 #include <memory>
 
 /**

@@ -17,7 +17,7 @@
  */
 
 namespace axomae {
-  Loader::Loader() { resource_database = &ResourceDatabaseManager::getInstance(); }
+  Loader::Loader() : resource_database(&ResourceDatabaseManager::getInstance()) {}
 
   Mutex mutex;
   constexpr unsigned int THREAD_POOL_SIZE = 8;
@@ -480,17 +480,14 @@ namespace axomae {
   EnvironmentMap2DTexture *Loader::loadHdrEnvmap() {
     TextureDatabase &texture_database = resource_database->getTextureDatabase();
     ImageDatabase<float> &hdr_database = resource_database->getHdrDatabase();
-    std::string folder_night = "../Ressources/Skybox_Textures/HDR/Night_City/";
-    std::string folder_forest = "../Ressources/Skybox_Textures/HDR/Forest/";
-    std::string folder_park = "../Ressources/Skybox_Textures/HDR/Park/";
-    std::string folder_snow = "../Ressources/Skybox_Textures/HDR/Snow/";
-    std::string folder_sky = "../Ressources/Skybox_Textures/HDR/Sky/";
-    std::string folder_street = "../Ressources/Skybox_Textures/HDR/Street/";
-    std::string env = folder_night + "night_env.hdr";
-    std::string hdr = folder_night + "Night.hdr";
-    // hdr = folder_forest + "Forest.hdr";
-
-    int width, height, channels;
+    std::string folder_night = "../Ressources/Skybox_Textures/HDR/Night_City/Night.hdr";
+    std::string folder_forest = "../Ressources/Skybox_Textures/HDR/Forest/Forest.hdr";
+    std::string folder_park = "../Ressources/Skybox_Textures/HDR/Park/Park.hdr";
+    std::string folder_snow = "../Ressources/Skybox_Textures/HDR/Snow/Snow.hdr";
+    std::string folder_sky = "../Ressources/Skybox_Textures/HDR/Sky/Sky.hdr";
+    std::string folder_street = "../Ressources/Skybox_Textures/HDR/Street/Street.hdr";
+    std::string hdr = folder_street;
+    int width = -1, height = -1, channels = -1;
     float *hdr_data = stbi_loadf(hdr.c_str(), &width, &height, &channels, 0);
     if (stbi_failure_reason())
       LOG("STBI FAILED WITH :" + std::string(stbi_failure_reason()), LogLevel::ERROR);
@@ -509,7 +506,13 @@ namespace axomae {
     image_data.resize(width * height * channels);
     for (int i = 0; i < width * height * channels; i++)
       image_data[i] = hdr_data[i];
-    database::image::store<float>(hdr_database, false, image_data, width, height, channels);
+
+    image::Metadata metadata;
+    metadata.channels = channels;
+    metadata.width = width;
+    metadata.height = height;
+    metadata.name = folder_street;
+    database::store<float>(hdr_database, false, image_data, metadata, width, height, channels);
 
     stbi_image_free(hdr_data);
     auto result = database::texture::store<EnvironmentMap2DTexture>(texture_database, false, &envmap);

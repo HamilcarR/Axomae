@@ -22,5 +22,6 @@ INCLUDEPATH += $$PWD/../common \
                 $$PWD/../scene \
                 $$PWD/../mesh \
                 $$PWD/../editor/image\
+                $$PWD/model\
 
 include($$PWD/model/model.pri)

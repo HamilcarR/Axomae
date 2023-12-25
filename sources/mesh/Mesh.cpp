@@ -15,12 +15,7 @@ Mesh::Mesh(ISceneNode *parent) : SceneTreeNode(parent) {
   modelview_matrix = glm::mat4(1.f);
 }
 
-Mesh::Mesh(const Mesh &copy) : SceneTreeNode(copy) {
-  geometry = copy.geometry;
-  material = copy.material;
-  name = copy.name;
-  shader_program = copy.shader_program;
-}
+
 
 Mesh::Mesh(const Object3D &geo, const Material &mat, ISceneNode *parent) : Mesh(parent) {
   geometry = geo;
@@ -52,7 +47,6 @@ Mesh::Mesh(const std::string &n, const Object3D &&geo, const Material &mat, Shad
   material.setShaderPointer(shader);
 }
 
-Mesh::~Mesh() { LOG("Deleted mesh : " + name, LogLevel::INFO); }
 
 void Mesh::initializeGlData() {
   if (shader_program != nullptr) {

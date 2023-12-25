@@ -46,12 +46,7 @@ class Mesh : public SceneTreeNode {
    */
   Mesh(ISceneNode *parent = nullptr);
 
-  /**
-   * @brief Copy constructor
-   *
-   * @param copy To be copied
-   */
-  Mesh(const Mesh &copy);
+
 
   /**
    * @brief Construct a new Mesh object from geometry and material
@@ -90,11 +85,7 @@ class Mesh : public SceneTreeNode {
    */
   Mesh(const std::string &name, const Object3D &&obj, const Material &mat, Shader *shader, ISceneNode *parent = nullptr);
 
-  /**
-   * @brief Destroy the Mesh object
-   *
-   */
-  virtual ~Mesh();
+
 
   /**
    * @brief Enable the mesh's material to render
