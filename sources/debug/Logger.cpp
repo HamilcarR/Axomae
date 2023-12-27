@@ -8,9 +8,9 @@
 
 static Logger logger_global;
 
-class LoggerOutputStreamException : virtual public AxomaeGenericException {
+class LoggerOutputStreamException : virtual public GenericException {
  public:
-  LoggerOutputStreamException() : AxomaeGenericException() { saveErrorString("The output stream for the application logger system is undefined !"); }
+  LoggerOutputStreamException() : GenericException() { saveErrorString("The output stream for the application logger system is undefined !"); }
   virtual ~LoggerOutputStreamException() {}
 };
 

@@ -1,7 +1,7 @@
 #ifndef LOADER_H
 #define LOADER_H
 
-#include <assert.h>
+#include <cassert>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -10,6 +10,8 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
+#include "EnvmapController.h"
+#include "GenericException.h"
 #include "Mesh.h"
 #include "ResourceDatabaseManager.h"
 #include "SceneHierarchy.h"
@@ -20,6 +22,33 @@
  * Implements a Loader class that will read mesh data and textures from disk
  *
  */
+
+namespace IO {
+  namespace exception {
+    class LoadImagePathException : public GenericException {
+     public:
+      explicit LoadImagePathException(const std::string &path) {
+        GenericException::saveErrorString(std::string("Failed loading the image : ") + path);
+      }
+    };
+
+    class LoadImageDimException : public GenericException {
+     public:
+      explicit LoadImageDimException(int width, int height) {
+        std::string dim = std::string("width : ") + std::to_string(width) + std::string(" height:") + std::to_string(height);
+        GenericException::saveErrorString(std::string("Image dimensions error: ") + dim);
+      }
+    };
+
+    class LoadImageChannelException : public GenericException {
+     public:
+      explicit LoadImageChannelException(int channels) {
+        std::string chan = std::string("channels number : ") + std::to_string(channels);
+        GenericException::saveErrorString(std::string("Image channel error: ") + chan);
+      }
+    };
+  }  // namespace exception
+}  // namespace IO
 
 namespace axomae {
 
@@ -51,18 +80,11 @@ namespace axomae {
     std::string loadTextFile(const char *filename);
 
     /**
-     * @brief Delete instance
-     *
+     * @brief Loads all meshes from the GLB file.
+     * @param filename GLB file path
+     * @return std::vector<Mesh*>
      */
-    void close();
-
-    /**
-     * @brief Build an environment map Mesh.
-     *
-     * @param is_glb_model Used to load a glb mesh as cubemap
-     * @return Mesh*
-     */
-    Mesh *generateCubeMap(bool is_glb_model);
+    std::pair<std::vector<Mesh *>, SceneTree> loadObjects(const char *filename);
 
     /**
      * @brief Loads an environment map from the disk
@@ -72,11 +94,9 @@ namespace axomae {
     EnvironmentMap2DTexture *loadHdrEnvmap();
 
     /**
-     * @brief Loads all meshes from the GLB file.
-     * @param filename GLB file path
-     * @return std::vector<Mesh*>
+     * @brief Loads an HDR image , and store it into it's database
      */
-    std::pair<std::vector<Mesh *>, SceneTree> loadObjects(const char *filename);
+    static void loadHdr(const char *path);
 
    protected:
     ResourceDatabaseManager *resource_database;

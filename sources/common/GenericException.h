@@ -2,12 +2,11 @@
 #define GENERICEXCEPTION_H
 #include <stdexcept>
 
-class AxomaeGenericException : virtual public std::exception {
+class GenericException : virtual public std::exception {
  public:
-  AxomaeGenericException() : std::exception() { this_error_string = std::string("The program has encountered an exception : \n"); }
-  virtual ~AxomaeGenericException() {}
+  GenericException() : std::exception() { this_error_string = std::string("The program has encountered an exception : \n"); }
 
-  virtual const char *what() const noexcept override { return this_error_string.c_str(); }
+  const char *what() const noexcept override { return this_error_string.c_str(); }
 
   virtual void saveErrorString(const std::string &string) {
     this_error_string += string;

@@ -203,30 +203,7 @@ namespace axomae {
   /**************************************************************************************************************/
 
   HeapManagement *Controller::_MemManagement = new HeapManagement;
-
-  Controller::Controller(QWidget *parent) : QMainWindow(parent), resource_database(ResourceDatabaseManager::getInstance()) {
-    _UI.setupUi(this);
-    _UI.progressBar->setValue(0);
-    viewer_3d = _UI.renderer_view;
-    renderer_scene_list = _UI.renderer_scene_list;
-    light_controller = std::make_unique<LightController>(_UI);
-    light_controller->setup(viewer_3d, renderer_scene_list);
-    /* Undo pointers setup*/
-    image_session_pointers::greyscale = nullptr;
-    image_session_pointers::albedo = nullptr;
-    image_session_pointers::height = nullptr;
-    image_session_pointers::normalmap = nullptr;
-    image_session_pointers::dudv = nullptr;
-
-    /*Logging configuration*/
-    LoggerConfigDataStruct log_struct = configuration.generateLoggerConfigDataStruct();
-    LOGCONFIG(log_struct);
-
-    /*At last , we setup all slots and signals*/
-    connect_all_slots();
-
-    /* Load shaders for the realtime renderer*/
-    ShaderDatabase &shader_database = resource_database.getShaderDatabase();
+  static void load_shader_database(ShaderDatabase &shader_database) {
     database::shader::store<BoundingBoxShader>(shader_database, true);
     database::shader::store<BlinnPhongShader>(shader_database, true);
     database::shader::store<CubemapShader>(shader_database, true);
@@ -236,6 +213,35 @@ namespace axomae {
     database::shader::store<IrradianceCubemapBakerShader>(shader_database, true);
     database::shader::store<EnvmapPrefilterBakerShader>(shader_database, true);
     database::shader::store<BRDFLookupTableBakerShader>(shader_database, true);
+  }
+
+  static void init_image_session_ptr() {
+    image_session_pointers::greyscale = nullptr;
+    image_session_pointers::albedo = nullptr;
+    image_session_pointers::height = nullptr;
+    image_session_pointers::normalmap = nullptr;
+    image_session_pointers::dudv = nullptr;
+  }
+
+  Controller::Controller(QWidget *parent) : QMainWindow(parent), resource_database(ResourceDatabaseManager::getInstance()) {
+    _UI.setupUi(this);
+    _UI.progressBar->setValue(0);
+    viewer_3d = _UI.renderer_view;
+    renderer_scene_list = _UI.renderer_scene_list;
+    light_controller = std::make_unique<LightController>(_UI);
+    light_controller->setup(viewer_3d, renderer_scene_list);
+    /* Undo pointers setup*/
+    init_image_session_ptr();
+    /*Logging configuration*/
+    LoggerConfigDataStruct log_struct = configuration.generateLoggerConfigDataStruct();
+    LOGCONFIG(log_struct);
+
+    /* Load shaders for the realtime renderer*/
+    ShaderDatabase &shader_database = resource_database.getShaderDatabase();
+    load_shader_database(shader_database);
+
+    /*At last , we setup all slots and signals*/
+    connect_all_slots();
   }
 
   Controller::~Controller() { delete _MemManagement; }
@@ -389,15 +395,20 @@ namespace axomae {
 
   /**************************************************************************************************************/
   void Controller::connect_all_slots() {
-    // TODO : replace this part by structures/classes + callbacks on function executed
+    // TODO : move code to their own module + Form
+
+    /*Main Window -> Toolbar menu -> Files*/
 
     QObject::connect(_UI.actionImport_image, SIGNAL(triggered()), this, SLOT(import_image()));
+    QObject::connect(_UI.actionSave_image, SIGNAL(triggered()), this, SLOT(save_image()));
+    QObject::connect(_UI.actionImport_Environment_Map, SIGNAL(triggered()), this, SLOT(import_envmap()));
+
     QObject::connect(_UI.use_average, SIGNAL(clicked()), this, SLOT(greyscale_average()));
     QObject::connect(_UI.use_luminance, SIGNAL(clicked()), this, SLOT(greyscale_luminance()));
     QObject::connect(_UI.use_scharr, SIGNAL(clicked()), this, SLOT(use_scharr()));
     QObject::connect(_UI.use_sobel, SIGNAL(clicked()), this, SLOT(use_sobel()));
     QObject::connect(_UI.use_prewitt, SIGNAL(clicked()), this, SLOT(use_prewitt()));
-    QObject::connect(_UI.actionSave_image, SIGNAL(triggered()), this, SLOT(save_image()));
+
     QObject::connect(_UI.actionUndo, SIGNAL(triggered()), this, SLOT(undo()));
     QObject::connect(_UI.actionRedo, SIGNAL(triggered()), this, SLOT(redo()));
     QObject::connect(_UI.undo_button, SIGNAL(clicked()), this, SLOT(undo()));
@@ -462,6 +473,16 @@ namespace axomae {
       delete temp;
       image_session_pointers::setAllNull();
       image_session_pointers::albedo = surf;
+      return true;
+    }
+  }
+  /**************************************************************************************************************/
+  bool Controller::import_envmap() {
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("HDR images (*.hdr)"));
+    if (filename.isEmpty())
+      return false;
+    else {
+      Loader::loadHdr(filename.toStdString().c_str());
       return true;
     }
   }

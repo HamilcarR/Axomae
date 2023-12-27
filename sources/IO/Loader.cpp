@@ -512,13 +512,34 @@ namespace axomae {
     metadata.width = width;
     metadata.height = height;
     metadata.name = folder_street;
-    database::store<float>(hdr_database, false, image_data, metadata, width, height, channels);
+    database::store<float>(hdr_database, false, image_data, metadata);
 
     stbi_image_free(hdr_data);
     auto result = database::texture::store<EnvironmentMap2DTexture>(texture_database, false, &envmap);
     if (!result.object)
       LOG("ENVMAP loading failed!\n", LogLevel::ERROR);
     return result.object;
+  }
+
+  void Loader::loadHdr(const char *path) {
+    int width = -1, height = -1, channels = -1;
+    float *data = stbi_loadf(path, &width, &height, &channels, 0);
+    if (stbi_failure_reason())
+      throw IO::exception::LoadImagePathException(path);
+    if (width <= 0 || height <= 0)
+      throw IO::exception::LoadImageDimException(width, height);
+    if (channels <= 0)
+      throw IO::exception::LoadImageChannelException(channels);
+    std::vector<float> image_data;
+    std::copy(data, data + (width * height * channels), std::back_inserter(image_data));
+    image::Metadata metadata;
+    metadata.channels = channels;
+    metadata.width = width;
+    metadata.height = height;
+    metadata.name = path;
+    auto &resource_database = ResourceDatabaseManager::getInstance();
+    auto &hdr_database = resource_database.getHdrDatabase();
+    database::store<float>(hdr_database, false, image_data, metadata);
   }
 
   /**

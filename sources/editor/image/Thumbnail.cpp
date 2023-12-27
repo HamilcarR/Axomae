@@ -7,7 +7,7 @@ float tone_mapping_channel(float channel) { return 1.f - std::exp(-channel * _ex
 float color_correction(float channel) { return powf(tone_mapping_channel(channel), 1.f / _gamma); }
 
 // TODO : Implement functional test
-Thumbnail::Thumbnail(std::vector<float> &rgb, int width, int height, bool /*normalize*/, int channels, int icon_width, int icon_height) {
+Thumbnail::Thumbnail(std::vector<float> &rgb, int width, int height, int channels, bool /*normalize*/, int icon_width, int icon_height) {
   assert(rgb.size() == static_cast<unsigned>(width * height * channels));
   QImage image(width, height, QImage::Format_RGB32);
   float max = 0;

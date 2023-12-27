@@ -46,7 +46,6 @@ namespace axomae {
      * @brief Loads an image from disk
      *
      * @return true if operation successful
-     * @return false if there was a problem
      */
     bool import_image();
 
@@ -54,9 +53,14 @@ namespace axomae {
      * @brief Loads a 3D GLB object
      *
      * @return true if operation successful
-     * @return false if there was a problem
      */
     bool import_3DOBJ();
+
+    /**
+     * @brief Loads an .hdr image and stores it in the HDR database
+     * @return false if operation successful
+     */
+    bool import_envmap();
 
     /**
      * @brief Opens an Axomae project

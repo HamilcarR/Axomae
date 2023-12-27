@@ -56,6 +56,7 @@ public:
     QAction *actionUndo;
     QAction *actionRedo;
     QAction *actionImport_3D_model;
+    QAction *actionImport_Environment_Map;
     QWidget *centralwidget;
     QGridLayout *gridLayout_2;
     QProgressBar *progressBar;
@@ -407,6 +408,8 @@ public:
         actionRedo->setObjectName("actionRedo");
         actionImport_3D_model = new QAction(MainWindow);
         actionImport_3D_model->setObjectName("actionImport_3D_model");
+        actionImport_Environment_Map = new QAction(MainWindow);
+        actionImport_Environment_Map->setObjectName("actionImport_Environment_Map");
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -1721,10 +1724,11 @@ public:
         menubar->addAction(menuTools->menuAction());
         menubar->addAction(menuHelp->menuAction());
         menuFiles->addAction(actionNew_Project);
-        menuFiles->addAction(actionImport_image);
-        menuFiles->addAction(actionImport_3D_model);
-        menuFiles->addAction(actionSave_image);
         menuFiles->addAction(actionSave_project);
+        menuFiles->addAction(actionImport_image);
+        menuFiles->addAction(actionSave_image);
+        menuFiles->addAction(actionImport_3D_model);
+        menuFiles->addAction(actionImport_Environment_Map);
         menuFiles->addAction(actionExit);
         menuEdit->addAction(actionUndo);
         menuEdit->addAction(actionRedo);
@@ -1761,7 +1765,9 @@ public:
         actionAxomae_version->setText(QCoreApplication::translate("MainWindow", "&Axomae version", nullptr));
         actionUndo->setText(QCoreApplication::translate("MainWindow", "&Undo                            ", nullptr));
         actionRedo->setText(QCoreApplication::translate("MainWindow", "&Redo", nullptr));
-        actionImport_3D_model->setText(QCoreApplication::translate("MainWindow", "Import &3D model", nullptr));
+        actionImport_3D_model->setText(QCoreApplication::translate("MainWindow", "Import &3D Model", nullptr));
+        actionImport_3D_model->setIconText(QCoreApplication::translate("MainWindow", "Import 3D model", nullptr));
+        actionImport_Environment_Map->setText(QCoreApplication::translate("MainWindow", "Import Environment Map", nullptr));
         undo_button->setText(QCoreApplication::translate("MainWindow", "undo", nullptr));
         redo_button->setText(QCoreApplication::translate("MainWindow", "redo", nullptr));
         greyscale_opt->setTitle(QCoreApplication::translate("MainWindow", "Greyscale options", nullptr));

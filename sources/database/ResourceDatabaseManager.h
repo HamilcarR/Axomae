@@ -38,7 +38,7 @@ class ResourceDatabaseManager {
   TextureDatabase &getTextureDatabase() const { return *texture_database; }
   ShaderDatabase &getShaderDatabase() const { return *shader_database; }
   INodeDatabase &getNodeDatabase() const { return *node_database; }
-  ImageDatabase<float> &getHdrDatabase() const { return *hdr_database; }
+  HdrImageDatabase &getHdrDatabase() const { return *hdr_database; }
 
  private:
   /**
@@ -61,10 +61,10 @@ class ResourceDatabaseManager {
   ResourceDatabaseManager operator=(const ResourceDatabaseManager &) = delete;
 
  private:
-  std::unique_ptr<TextureDatabase> texture_database;  /*<Pointer on the texture database*/
-  std::unique_ptr<ShaderDatabase> shader_database;    /*<Pointer on the shader database*/
-  std::unique_ptr<INodeDatabase> node_database;       /*<Pointer on the node database*/
-  std::unique_ptr<ImageDatabase<float>> hdr_database; /*<Raw HDR images database*/
+  std::unique_ptr<TextureDatabase> texture_database; /*<Pointer on the texture database*/
+  std::unique_ptr<ShaderDatabase> shader_database;   /*<Pointer on the shader database*/
+  std::unique_ptr<INodeDatabase> node_database;      /*<Pointer on the node database*/
+  std::unique_ptr<HdrImageDatabase> hdr_database;    /*<Raw HDR images database*/
 };
 
 #endif

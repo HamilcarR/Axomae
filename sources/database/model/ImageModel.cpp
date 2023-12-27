@@ -5,9 +5,12 @@ HdrImageModel::HdrImageModel(ImageDatabase<float> &db, QObject *parent) : QAbstr
   database.attach(*this);
 }
 
-int HdrImageModel::rowCount(const QModelIndex &parent) const { return 3; }
-
-int HdrImageModel::columnCount(const QModelIndex &parent) const { return 1; }
+int HdrImageModel::rowCount(const QModelIndex &parent) const {
+  if (!parent.isValid()) {
+    return database.size();
+  } else
+    return 0;
+}
 
 QVariant HdrImageModel::data(const QModelIndex &index, int role) const {
   if (!index.isValid())
@@ -28,15 +31,18 @@ QVariant HdrImageModel::data(const QModelIndex &index, int role) const {
       break;
     default:
       return {};
+      break;
   }
 }
 
 QVariant HdrImageModel::headerData(int section, Qt::Orientation orientation, int role) const {
-  if (role != Qt::DecorationRole)
+  if (role == Qt::DecorationRole) {
+    if (orientation == Qt::Vertical) {
+      return QString("Vertical");
+    } else
+      return QString("Horizontal");
+  } else
     return {};
-  if (orientation != Qt::Vertical)
-    return {};
-  return "name";
 }
 
 bool HdrImageModel::operator==(const ISubscriber<Message> &compare) const {
@@ -45,8 +51,4 @@ bool HdrImageModel::operator==(const ISubscriber<Message> &compare) const {
   return false;
 }
 
-void HdrImageModel::notified(observer::Data<Message> message) {
-  // beginResetModel();
-  // setData(index(message.data.index, 0), QIcon(message.data.value));
-  // endResetModel();
-}
+void HdrImageModel::notified(observer::Data<Message> message) { emit layoutChanged(); }
