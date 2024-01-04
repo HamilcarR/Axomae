@@ -1,8 +1,8 @@
 #ifndef CUBEMAPPROCESSING_CUH
 #define CUBEMAPPROCESSING_CUH
 #include "Includes.cuh"
-#include "Math.h"
 #include "PerformanceLogger.h"
+#include "math.h"
 #include <cmath>
 
 /**********************************************************************************************************************************************************************************/

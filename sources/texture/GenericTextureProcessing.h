@@ -9,7 +9,7 @@
  * than .hdr files
  *
  */
-class TextureData {
+class TextureData {  // TODO : Make this inherit RawImageHolder
  public:
   /**
    * @brief Rgb channels types

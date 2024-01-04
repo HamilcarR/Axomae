@@ -217,7 +217,7 @@ class SceneTreeNode : public ISceneNode {
    * @param parent Predecessor node in the scene hierarchy
    * @param owner The structure that owns this node
    */
-  SceneTreeNode(ISceneNode *parent = nullptr, ISceneHierarchy *owner = nullptr);
+  explicit SceneTreeNode(ISceneNode *parent = nullptr, ISceneHierarchy *owner = nullptr);
 
   /**
    * @brief Construct a new Scene Tree Node object
@@ -234,7 +234,7 @@ class SceneTreeNode : public ISceneNode {
    * stored as parent , as this structure is a tree.
    * @param parents Vector of predecessors . Only the first element is considered
    */
-  virtual void setParents(std::vector<INode *> &parents) override;
+   void setParents(std::vector<INode *> &parents) override;
 
  public:
   /**

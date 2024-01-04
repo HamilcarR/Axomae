@@ -1,5 +1,5 @@
 #include "OfflineCubemapProcessing.h"
-#include "Math.h"
+#include "math.h"
 #include "Test.h"
 
 #define f_rand rand() / ((float)RAND_MAX)

@@ -23,8 +23,6 @@ RenderPipeline::RenderPipeline(Renderer *_renderer, ResourceDatabaseManager *_re
   resource_database = _resource_database;
 }
 
-RenderPipeline::~RenderPipeline() {}
-
 void RenderPipeline::clean() {}
 /********************************************************************************************************************************************************************************************************/
 /**
@@ -51,7 +49,7 @@ CubeMapMesh *RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_m
   TextureDatabase *texture_database = &resource_database->getTextureDatabase();
   ShaderDatabase *shader_database = &resource_database->getShaderDatabase();
   Shader *bake_shader = shader_database->get(Shader::ENVMAP_CUBEMAP_CONVERTER);
-  ScreenSize tex_dim, cam_dim, default_dim;
+  ScreenSize tex_dim, cam_dim{}, default_dim{};
   /*Set up camera ratio + cubemap texture resolution*/
   default_dim.width = gl_widget->width();
   default_dim.height = gl_widget->height();

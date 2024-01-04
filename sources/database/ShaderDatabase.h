@@ -13,13 +13,13 @@
  * @brief ShaderDatabase class implementation
  *
  */
-class ShaderDatabase : public IResourceDB<Shader::TYPE, Shader> {
+class ShaderDatabase final : public IResourceDB<Shader::TYPE, Shader> {
  public:
   /**
    * @brief Construct a new Shader Database object
    *
    */
-  ShaderDatabase();
+  ShaderDatabase() = default;
 
   /**
    * @brief Cleans the whole database , Deletes all shaders .
@@ -33,43 +33,35 @@ class ShaderDatabase : public IResourceDB<Shader::TYPE, Shader> {
    */
   void purge() override;
 
-  /**
-   * This function returns a pointer to a shader object of a given type from a shader database, or
-   * nullptr if it does not exist.
-   *
-   * @param type The parameter "type" is of type Shader::TYPE, which is an enumerated type representing
-   * different types of shaders (e.g. vertex shader, fragment shader, geometry shader, etc.). It is used
-   * to look up a shader in the database map.
-   *
-   * @return a pointer to a Shader object of the specified type if it exists in the database map.
-   * If the shader of the specified type does not exist in the map, the function returns a null pointer.
-   */
-  Shader *get(const Shader::TYPE type) const override;
-  virtual bool remove(const Shader::TYPE type) override;
-  virtual bool remove(const Shader *shader) override;
+  bool remove(Shader::TYPE type) override;
+  bool remove(const Shader *shader) override;
 
   /**
    * @brief Recompile the database of shaders
    *
    */
-  virtual void recompile();
+  void recompile();
 
   /**
    * @brief Initialize the shaders
    *
    */
-  virtual void initializeShaders();
+  void initializeShaders();
 
   /**
-   * @brief Add a shader into the database
+   * @brief Add a shader into the database. Contrary to the method overriden , this version adds a shader only if it's type doesn't exist in the
+   * database. In case there's already a shader of a same type , it is returned instead.
    *
    * @param shader Shader object
-   * @param keep Not used ... for now .
    * @return Shader::TYPE ID of the shader in database
    */
-  virtual database::Result<Shader::TYPE, Shader> add(std::unique_ptr<Shader> shader, bool keep);
+  database::Result<Shader::TYPE, Shader> add(std::unique_ptr<Shader> shader, bool keep) override;
 
-  const std::map<Shader::TYPE, std::unique_ptr<Shader>> &getConstData() const override { return database_map; }
+  /**
+   * @brief This database stores only a static amount of shaders , each unique (for now) .
+   * Hence , this method will always return Shader::EMPTY , as shaders are already inserted according to their type id.
+   */
+  Shader::TYPE firstFreeId() const override;
 
  private:
 };
@@ -79,7 +71,7 @@ namespace database::shader {
   template<class TYPE, class... Args>
   static database::Result<Shader::TYPE, TYPE> store(IResourceDB<Shader::TYPE, Shader> &database, bool keep, Args &&...args) {
     ASSERT_SUBTYPE(Shader, TYPE);
-    constexpr Shader::TYPE type = shader_utils::get_type<TYPE>();
+    Shader::TYPE type = TYPE::getType_static();
     Shader *seek = database.get(type);
     if (seek) {
       database::Result<Shader::TYPE, TYPE> result = {type, static_cast<TYPE *>(seek)};

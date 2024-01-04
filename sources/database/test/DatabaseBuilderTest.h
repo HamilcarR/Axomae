@@ -2,6 +2,7 @@
 #define DATABASEBUILDERTEST_H
 #include "INodeDatabase.h"
 #include "ImageDatabase.h"
+#include "RenderingDatabaseInterface.h"
 #include "ShaderDatabase.h"
 #include "Test.h"
 #include "TextureDatabase.h"
@@ -12,31 +13,20 @@ template<class U, class T>
 class DatabaseBuilderTest {
  public:
   using ResultList = std::vector<database::Result<U, T>>;
+  using StorageMap = std::map<U, database::Storage<U, T>>;
+  explicit DatabaseBuilderTest(IResourceDB<U, T> &DB) : database(DB), stored(database.getConstData()) {}
+  ~DatabaseBuilderTest() = default;
+  DatabaseBuilderTest(const DatabaseBuilderTest &) = delete;
+  DatabaseBuilderTest(DatabaseBuilderTest &&) = delete;
+  DatabaseBuilderTest &operator=(DatabaseBuilderTest &&) = delete;
+  DatabaseBuilderTest &operator=(const DatabaseBuilderTest &) = delete;
 
-  DatabaseBuilderTest(IResourceDB<U, T> &DB) : database(DB), stored(database.getConstData()) { rand_init(); }
+  int getDatabaseSize() { return database.size(); }
+  const StorageMap &getStoredDatabase() { return stored; }
 
-  template<class TYPE>
-  database::Result<U, T> addTexture(bool persistence, TextureData *data) {
-    database::Result<U, TYPE> result = database::texture::store<TYPE>(database, persistence, data);
-    database::Result<U, T> cast = {result.id, static_cast<T *>(result.object)};
-    return cast;
-  }
-
-  template<class TYPE>
-  database::Result<U, T> addShader(bool persistence) {
-    database::Result<U, TYPE> result = database::shader::store<TYPE>(database, persistence);
-    database::Result<U, T> cast = {result.id, static_cast<T *>(result.object)};
-    return cast;
-  }
-
-  template<class TYPE>
-  database::Result<U, T> addNode(bool persistence) {
-    database::Result<U, TYPE> result = database::node::store<TYPE>(database, persistence);
-    database::Result<U, T> cast = {result.id, static_cast<T *>(result.object)};
-    return cast;
-  }
-
-  IResourceDB<U, T> &database;
-  const std::map<U, std::unique_ptr<T>> &stored;
+ public:
+  IResourceDB<U, T> &database{};
+  const StorageMap &stored{};
 };
+
 #endif

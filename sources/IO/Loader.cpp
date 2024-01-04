@@ -9,6 +9,7 @@
 #include <QImage>
 #include <fstream>
 #define STB_IMAGE_IMPLEMENTATION
+#include "axomae_utils.h"
 #include "stb_image.h"
 /**
  * @file Loader.cpp
@@ -21,7 +22,7 @@ namespace axomae {
 
   Mutex mutex;
   constexpr unsigned int THREAD_POOL_SIZE = 8;
-  void thread_copy_buffer(unsigned int start_index, unsigned int end_index, uint8_t *from, uint8_t *dest) {
+  void thread_copy_buffer(unsigned int start_index, unsigned int end_index, const uint8_t *from, uint8_t *dest) {
     for (unsigned i = start_index; i < end_index; i++)
       dest[i] = from[i];
   }
@@ -42,8 +43,8 @@ namespace axomae {
         range_max = i * thread_buffer_size + last_thread_job_size;
       future_results.push_back(std::async(thread_copy_buffer, range_min, range_max, from, dest));
     }
-    for (std::vector<std::future<void>>::iterator it = future_results.begin(); it != future_results.end(); it++)
-      it->get();
+    for (auto &future_result : future_results)
+      future_result.get();
   }
 
   /**
@@ -53,7 +54,7 @@ namespace axomae {
    * @param fromtexture The aiTexture object containing the texture data to be copied.
    */
   static void copyTexels(TextureData *totexture, aiTexture *fromtexture) {
-    if (totexture != nullptr) {
+    if (fromtexture != nullptr) {
       /* If mHeight != 0 , the texture is uncompressed , and we read it as is */
       if (fromtexture->mHeight != 0) {
         unsigned int width = 0;
@@ -74,7 +75,6 @@ namespace axomae {
       else
       {
         QImage image;
-        // uint8_t *buffer = new uint8_t[fromtexture->mWidth];
         std::vector<uint8_t> buffer;
         buffer.resize(fromtexture->mWidth);
         std::memcpy(buffer.data(), fromtexture->pcData, fromtexture->mWidth);
@@ -111,17 +111,20 @@ namespace axomae {
    */
   template<class TEXTYPE>
   static void loadTexture(
-      const aiScene *scene, Material *material, TextureData *texture, aiString texture_string, TextureDatabase &texture_database) {
+      const aiScene *scene, Material *material, TextureData *texture, const aiString &texture_string, TextureDatabase &texture_database) {
     std::string texture_index_string = texture_string.C_Str();
-    if (texture_index_string.size() != 0) {
-      texture_index_string = texture_index_string.substr(1);
-      unsigned int texture_index_int = stoi(texture_index_string);
-      if (!texture_database.contains(texture_index_int)) {
-        copyTexels(texture, scene->mTextures[texture_index_int]);
-        auto result = database::texture::store<TEXTYPE>(texture_database, false, texture);
+    if (!texture_index_string.empty()) {
+      texture_index_string = texture_index_string.substr(1);  // get rid of the '*' character at the beginning of the string id
+      texture->name = texture_index_string;
+      auto result = texture_database.getUniqueTexture(texture->name);  // Check if the name (the assimp texture id number) is present in the database.
+      if (result.object != nullptr) {
         material->addTexture(result.id);
-      } else
-        material->addTexture(texture_index_int);
+      } else {
+        int texture_index_int = stoi(texture_index_string);                                     // convert id to integer
+        copyTexels(texture, scene->mTextures[texture_index_int]);                               // read the image pixels and copy them to "texture"
+        auto result_add = database::texture::store<TEXTYPE>(texture_database, false, texture);  // add new ID
+        material->addTexture(result_add.id);
+      }
     } else
       LOG("Loader can't load texture\n", LogLevel::WARNING);
   }
@@ -218,7 +221,7 @@ namespace axomae {
     Material mesh_material = loadAllTextures(scene, material, texture_database);
     float transparency_factor = loadTransparencyValue(material);
     mesh_material.setTransparency(transparency_factor);
-    return std::pair<unsigned, Material>(id, mesh_material);
+    return {id, mesh_material};
   }
 
   /**
@@ -404,7 +407,7 @@ namespace axomae {
     std::vector<std::shared_future<void>> shared_futures = {
         f_vertices.share(), f_normals.share(), f_bitangents.share(), f_tangents.share(), f_uv.share()};
     std::for_each(shared_futures.begin(), shared_futures.end(), [](std::shared_future<void> &it) -> void { it.wait(); });
-    return std::pair<unsigned, std::unique_ptr<Object3D>>(i, std::move(object));
+    return {i, std::move(object)};
   };
 
   /**
@@ -461,7 +464,7 @@ namespace axomae {
       return objects;
     } else {
       LOG("Problem loading scene", LogLevel::ERROR);
-      return std::pair<std::vector<Mesh *>, SceneTree>();
+      return {};
     }
   }
 
@@ -512,7 +515,7 @@ namespace axomae {
     metadata.width = width;
     metadata.height = height;
     metadata.name = folder_street;
-    database::store<float>(hdr_database, false, image_data, metadata);
+    database::image::store<float>(hdr_database, false, image_data, metadata);
 
     stbi_image_free(hdr_data);
     auto result = database::texture::store<EnvironmentMap2DTexture>(texture_database, false, &envmap);
@@ -536,10 +539,13 @@ namespace axomae {
     metadata.channels = channels;
     metadata.width = width;
     metadata.height = height;
-    metadata.name = path;
+    std::string path_str(path);
+    std::string name = utils::string::tokenize(path_str, '/').back();
+    metadata.name = name;
+    metadata.color_corrected = false;
     auto &resource_database = ResourceDatabaseManager::getInstance();
     auto &hdr_database = resource_database.getHdrDatabase();
-    database::store<float>(hdr_database, false, image_data, metadata);
+    database::image::store<float>(hdr_database, false, image_data, metadata);
   }
 
   /**

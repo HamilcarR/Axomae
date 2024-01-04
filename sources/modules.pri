@@ -1,4 +1,3 @@
-# Project's modules , don't forget to add . 
 
 include(camera/camera.pri)
 include(cmd/cmd.pri)

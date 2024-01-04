@@ -62,7 +62,7 @@ static void set_dummy_TextureData_normals(Texture *set_texture) {
 }
 
 Texture::Texture() {
-  name = EMPTY;
+  type = EMPTY;
   is_dummy = false;
   width = 0;
   height = 0;
@@ -78,6 +78,7 @@ Texture::Texture(TextureData *tex) : Texture() {
 
 void Texture::set(TextureData *texture) {
   clean();
+  name = texture->name;
   width = texture->width;
   height = texture->height;
   if (!texture->data.empty()) {
@@ -133,10 +134,10 @@ void Texture::cleanGlData() {
 }
 
 /****************************************************************************************************************************/
-DiffuseTexture::DiffuseTexture() { name = DIFFUSE; }
+DiffuseTexture::DiffuseTexture() { type = DIFFUSE; }
 
 DiffuseTexture::DiffuseTexture(TextureData *data) : Texture(data) {
-  name = DIFFUSE;
+  type = DIFFUSE;
   if (!data)
     set_dummy_TextureData(this);
 }
@@ -147,7 +148,7 @@ void DiffuseTexture::setGlData(Shader *shader) {
   glBindTexture(GL_TEXTURE_2D, sampler2D);
   if (!data.empty())
     Texture::initializeTexture2D();
-  shader->setTextureUniforms(texture_type_c_str[name], name);
+  shader->setTextureUniforms(texture_type_c_str[type], type);
 }
 
 void DiffuseTexture::bindTexture() {
@@ -179,10 +180,10 @@ void DiffuseTexture::set(TextureData *texture) {
 const char *DiffuseTexture::getTextureTypeCStr() { return texture_type_c_str[DIFFUSE]; }
 
 /****************************************************************************************************************************/
-NormalTexture::NormalTexture() { name = NORMAL; }
+NormalTexture::NormalTexture() { type = NORMAL; }
 
 NormalTexture::NormalTexture(TextureData *texture) : Texture(texture) {
-  name = NORMAL;
+  type = NORMAL;
   if (data.empty())
     set_dummy_TextureData_normals(this);
 }
@@ -193,7 +194,7 @@ void NormalTexture::setGlData(Shader *shader) {
   glBindTexture(GL_TEXTURE_2D, sampler2D);
   if (!data.empty())
     Texture::initializeTexture2D();
-  shader->setTextureUniforms(texture_type_c_str[name], name);
+  shader->setTextureUniforms(texture_type_c_str[type], type);
 }
 
 void NormalTexture::bindTexture() {
@@ -209,10 +210,10 @@ void NormalTexture::unbindTexture() {
 const char *NormalTexture::getTextureTypeCStr() { return texture_type_c_str[NORMAL]; }
 
 /****************************************************************************************************************************/
-MetallicTexture::MetallicTexture() { name = METALLIC; }
+MetallicTexture::MetallicTexture() { type = METALLIC; }
 
 MetallicTexture::MetallicTexture(TextureData *data) : Texture(data) {
-  name = METALLIC;
+  type = METALLIC;
   if (!data)
     set_dummy_TextureData(this);
 }
@@ -223,7 +224,7 @@ void MetallicTexture::setGlData(Shader *shader) {
   glBindTexture(GL_TEXTURE_2D, sampler2D);
   if (!data.empty())
     Texture::initializeTexture2D();
-  shader->setTextureUniforms(texture_type_c_str[name], name);
+  shader->setTextureUniforms(texture_type_c_str[type], type);
 }
 
 void MetallicTexture::bindTexture() {
@@ -239,10 +240,10 @@ void MetallicTexture::unbindTexture() {
 const char *MetallicTexture::getTextureTypeCStr() { return texture_type_c_str[METALLIC]; }
 
 /****************************************************************************************************************************/
-RoughnessTexture::RoughnessTexture() { name = ROUGHNESS; }
+RoughnessTexture::RoughnessTexture() { type = ROUGHNESS; }
 
 RoughnessTexture::RoughnessTexture(TextureData *data) : Texture(data) {
-  name = ROUGHNESS;
+  type = ROUGHNESS;
   if (!data)
     set_dummy_TextureData(this);
 }
@@ -253,7 +254,7 @@ void RoughnessTexture::setGlData(Shader *shader) {
   glBindTexture(GL_TEXTURE_2D, sampler2D);
   if (!data.empty())
     Texture::initializeTexture2D();
-  shader->setTextureUniforms(texture_type_c_str[name], name);
+  shader->setTextureUniforms(texture_type_c_str[type], type);
 }
 
 void RoughnessTexture::bindTexture() {
@@ -269,10 +270,10 @@ void RoughnessTexture::unbindTexture() {
 const char *RoughnessTexture::getTextureTypeCStr() { return texture_type_c_str[ROUGHNESS]; }
 
 /****************************************************************************************************************************/
-AmbiantOcclusionTexture::AmbiantOcclusionTexture() { name = AMBIANTOCCLUSION; }
+AmbiantOcclusionTexture::AmbiantOcclusionTexture() { type = AMBIANTOCCLUSION; }
 
 AmbiantOcclusionTexture::AmbiantOcclusionTexture(TextureData *data) : Texture(data) {
-  name = AMBIANTOCCLUSION;
+  type = AMBIANTOCCLUSION;
   if (!data)
     set_dummy_TextureData(this);
 }
@@ -283,7 +284,7 @@ void AmbiantOcclusionTexture::setGlData(Shader *shader) {
   glBindTexture(GL_TEXTURE_2D, sampler2D);
   if (!data.empty())
     Texture::initializeTexture2D();
-  shader->setTextureUniforms(texture_type_c_str[name], name);
+  shader->setTextureUniforms(texture_type_c_str[type], type);
 }
 
 void AmbiantOcclusionTexture::bindTexture() {
@@ -299,10 +300,10 @@ void AmbiantOcclusionTexture::unbindTexture() {
 const char *AmbiantOcclusionTexture::getTextureTypeCStr() { return texture_type_c_str[AMBIANTOCCLUSION]; }
 
 /****************************************************************************************************************************/
-SpecularTexture::SpecularTexture() { name = SPECULAR; }
+SpecularTexture::SpecularTexture() { type = SPECULAR; }
 
 SpecularTexture::SpecularTexture(TextureData *data) : Texture(data) {
-  name = SPECULAR;
+  type = SPECULAR;
   if (!data)
     set_dummy_TextureData(this);
 }
@@ -313,7 +314,7 @@ void SpecularTexture::setGlData(Shader *shader) {
   glBindTexture(GL_TEXTURE_2D, sampler2D);
   if (!data.empty())
     Texture::initializeTexture2D();
-  shader->setTextureUniforms(texture_type_c_str[name], name);
+  shader->setTextureUniforms(texture_type_c_str[type], type);
 }
 
 void SpecularTexture::bindTexture() {
@@ -329,10 +330,10 @@ void SpecularTexture::unbindTexture() {
 const char *SpecularTexture::getTextureTypeCStr() { return texture_type_c_str[SPECULAR]; }
 
 /****************************************************************************************************************************/
-EmissiveTexture::EmissiveTexture() { name = EMISSIVE; }
+EmissiveTexture::EmissiveTexture() { type = EMISSIVE; }
 
 EmissiveTexture::EmissiveTexture(TextureData *data) : Texture(data) {
-  name = EMISSIVE;
+  type = EMISSIVE;
   if (!data)
     set_dummy_TextureData(this);
 }
@@ -353,7 +354,7 @@ void EmissiveTexture::setGlData(Shader *shader) {
   glBindTexture(GL_TEXTURE_2D, sampler2D);
   if (!data.empty())
     initializeTexture2D();
-  shader->setTextureUniforms(texture_type_c_str[name], name);
+  shader->setTextureUniforms(texture_type_c_str[type], type);
 }
 
 void EmissiveTexture::bindTexture() {
@@ -369,10 +370,10 @@ void EmissiveTexture::unbindTexture() {
 const char *EmissiveTexture::getTextureTypeCStr() { return texture_type_c_str[EMISSIVE]; }
 
 /****************************************************************************************************************************/
-OpacityTexture::OpacityTexture() { name = OPACITY; }
+OpacityTexture::OpacityTexture() { type = OPACITY; }
 
 OpacityTexture::OpacityTexture(TextureData *data) : Texture(data) {
-  name = OPACITY;
+  type = OPACITY;
   if (!data)
     set_dummy_TextureData(this);
 }
@@ -383,7 +384,7 @@ void OpacityTexture::setGlData(Shader *shader) {
   glBindTexture(GL_TEXTURE_2D, sampler2D);
   if (!data.empty())
     Texture::initializeTexture2D();
-  shader->setTextureUniforms(texture_type_c_str[name], name);
+  shader->setTextureUniforms(texture_type_c_str[type], type);
 }
 
 void OpacityTexture::bindTexture() {
@@ -400,9 +401,9 @@ const char *OpacityTexture::getTextureTypeCStr() { return texture_type_c_str[OPA
 
 /****************************************************************************************************************************/
 
-Generic2DTexture::Generic2DTexture() { name = GENERIC; }
+Generic2DTexture::Generic2DTexture() { type = GENERIC; }
 
-Generic2DTexture::Generic2DTexture(TextureData *data) : Texture(data) { name = GENERIC; }
+Generic2DTexture::Generic2DTexture(TextureData *data) : Texture(data) { type = GENERIC; }
 
 void Generic2DTexture::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
@@ -432,7 +433,7 @@ void Generic2DTexture::setLocationName(std::string _name) { location_name = _nam
 /****************************************************************************************************************************/
 CubemapTexture::CubemapTexture(FORMAT _internal_format, FORMAT _data_format, FORMAT _data_type, unsigned _width, unsigned _height)
     : Texture() {  //! Move arguments to Texture()
-  name = CUBEMAP;
+  type = CUBEMAP;
   internal_format = _internal_format;
   data_format = _data_format;
   data_type = _data_type;
@@ -464,7 +465,7 @@ void CubemapTexture::setCubeMapTextureData(TextureData *texture) {
 }
 
 CubemapTexture::CubemapTexture(TextureData *data) : CubemapTexture() {
-  name = CUBEMAP;
+  type = CUBEMAP;
   if (data)
     setCubeMapTextureData(data);
 }
@@ -500,17 +501,17 @@ void CubemapTexture::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
   bindTexture();
   initializeTexture2D();
-  shader->setTextureUniforms(texture_type_c_str[name], name);
+  shader->setTextureUniforms(texture_type_c_str[type], type);
   unbindTexture();
 }
 
 void CubemapTexture::bindTexture() {
-  glActiveTexture(GL_TEXTURE0 + name);
+  glActiveTexture(GL_TEXTURE0 + type);
   glBindTexture(GL_TEXTURE_CUBE_MAP, sampler2D);
 }
 
 void CubemapTexture::unbindTexture() {
-  glActiveTexture(GL_TEXTURE0 + name);
+  glActiveTexture(GL_TEXTURE0 + type);
   glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
@@ -524,10 +525,10 @@ const char *CubemapTexture::getTextureTypeCStr() { return texture_type_c_str[CUB
 
 GenericCubemapTexture::GenericCubemapTexture(FORMAT internal_format, FORMAT data_format, FORMAT data_type, unsigned width, unsigned height)
     : CubemapTexture(internal_format, data_format, data_type, width, height) {
-  name = GENERIC_CUBE;
+  type = GENERIC_CUBE;
 }
 
-GenericCubemapTexture::GenericCubemapTexture(TextureData *data) : CubemapTexture(data) { name = GENERIC_CUBE; }
+GenericCubemapTexture::GenericCubemapTexture(TextureData *data) : CubemapTexture(data) { type = GENERIC_CUBE; }
 
 void GenericCubemapTexture::bindTexture() {
   glActiveTexture(GL_TEXTURE0 + texture_unit);
@@ -552,11 +553,11 @@ const char *GenericCubemapTexture::getTextureTypeCStr() { return location_name.c
 /****************************************************************************************************************************/
 IrradianceTexture::IrradianceTexture(FORMAT _internal_format, FORMAT _data_format, FORMAT _data_type, unsigned _width, unsigned _height)
     : CubemapTexture(_internal_format, _data_format, _data_type, _width, _height) {
-  name = IRRADIANCE;
+  type = IRRADIANCE;
 }
 
 IrradianceTexture::IrradianceTexture(TextureData *data) : IrradianceTexture() {
-  name = IRRADIANCE;
+  type = IRRADIANCE;
   if (data)
     setCubeMapTextureData(data);
 }
@@ -570,7 +571,7 @@ const char *IrradianceTexture::getTextureTypeCStr() { return texture_type_c_str[
 
 EnvironmentMap2DTexture::EnvironmentMap2DTexture(FORMAT _internal_format, FORMAT _data_format, FORMAT _data_type, unsigned _width, unsigned _height)
     : Texture() {
-  name = ENVMAP2D;
+  type = ENVMAP2D;
   internal_format = _internal_format;
   data_format = _data_format;
   data_type = _data_type;
@@ -578,7 +579,7 @@ EnvironmentMap2DTexture::EnvironmentMap2DTexture(FORMAT _internal_format, FORMAT
   height = _height;
 }
 
-EnvironmentMap2DTexture::EnvironmentMap2DTexture(TextureData *data) : Texture(data) { name = ENVMAP2D; }
+EnvironmentMap2DTexture::EnvironmentMap2DTexture(TextureData *data) : Texture(data) { type = ENVMAP2D; }
 
 void EnvironmentMap2DTexture::initializeTexture2D() {
   glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, f_data.data());
@@ -596,7 +597,7 @@ void EnvironmentMap2DTexture::setGlData(Shader *shader) {
   glBindTexture(GL_TEXTURE_2D, sampler2D);
   if (!f_data.empty())
     EnvironmentMap2DTexture::initializeTexture2D();
-  shader->setTextureUniforms(texture_type_c_str[name], name);
+  shader->setTextureUniforms(texture_type_c_str[type], type);
 }
 
 void EnvironmentMap2DTexture::bindTexture() {
@@ -614,7 +615,7 @@ const char *EnvironmentMap2DTexture::getTextureTypeCStr() { return texture_type_
 /****************************************************************************************************************************/
 
 FrameBufferTexture::FrameBufferTexture() : Texture() {
-  name = FRAMEBUFFER;
+  type = FRAMEBUFFER;
   internal_format = RGBA16F;
   data_format = BGRA;
   data_type = UBYTE;
@@ -649,7 +650,7 @@ void FrameBufferTexture::setGlData(Shader *shader) {
   glActiveTexture(GL_TEXTURE0 + FRAMEBUFFER);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
   FrameBufferTexture::initializeTexture2D();
-  shader->setTextureUniforms(texture_type_c_str[name], name);
+  shader->setTextureUniforms(texture_type_c_str[type], type);
 }
 
 void FrameBufferTexture::bindTexture() {
@@ -666,17 +667,17 @@ const char *FrameBufferTexture::getTextureTypeCStr() { return texture_type_c_str
 
 /****************************************************************************************************************************/
 
-BRDFLookupTexture::BRDFLookupTexture() : Texture() { name = BRDFLUT; }
+BRDFLookupTexture::BRDFLookupTexture() : Texture() { type = BRDFLUT; }
 
-BRDFLookupTexture::BRDFLookupTexture(TextureData *data) : Texture(data) { name = BRDFLUT; }
+BRDFLookupTexture::BRDFLookupTexture(TextureData *data) : Texture(data) { type = BRDFLUT; }
 
 void BRDFLookupTexture::bindTexture() {
-  glActiveTexture(GL_TEXTURE0 + name);
+  glActiveTexture(GL_TEXTURE0 + type);
   glBindTexture(GL_TEXTURE_2D, sampler2D);
 }
 
 void BRDFLookupTexture::unbindTexture() {
-  glActiveTexture(GL_TEXTURE0 + name);
+  glActiveTexture(GL_TEXTURE0 + type);
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -684,7 +685,7 @@ void BRDFLookupTexture::setGlData(Shader *shader) {
   glGenTextures(1, &sampler2D);
   bindTexture();
   initializeTexture2D();
-  shader->setTextureUniforms(texture_type_c_str[name], name);
+  shader->setTextureUniforms(texture_type_c_str[type], type);
 }
 
 void BRDFLookupTexture::initializeTexture2D() {

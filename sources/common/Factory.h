@@ -6,7 +6,7 @@
 template<class TYPE, class... Args>
 class PRVINTERFACE : public TYPE {
  public:
-  PRVINTERFACE(Args &&...args) : TYPE(std::forward<Args>(args)...) {}
+  explicit PRVINTERFACE(Args &&...args) : TYPE(std::forward<Args>(args)...) {}
 };
 
 #endif

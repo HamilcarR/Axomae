@@ -6,20 +6,19 @@
 #include "Node.h"
 #include "RenderingDatabaseInterface.h"
 
-class INodeDatabase : public IResourceDB<int, INode> {
+class INodeDatabase final : public IResourceDB<int, INode> {
   using NodeIdMap = std::map<int, std::unique_ptr<INode>>;
 
  public:
-  INodeDatabase();
+  INodeDatabase() = default;
   void clean() override;
   void purge() override;
-  INode *get(const int id) const override;
-  bool remove(const int id) override;
+  INode *get(int id) const override;
+  bool remove(int id) override;
   bool remove(const INode *element) override;
-  database::Result<int, INode> add(std::unique_ptr<INode> element, bool keep = false) override;
-  bool contains(const int id) const override;
+  bool contains(int id) const override;
   database::Result<int, INode> contains(const INode *element_address) const override;
-  const NodeIdMap &getConstData() const override { return database_map; }
+  int firstFreeId() const override;
 
  private:
 };

@@ -1,94 +1,161 @@
 
 #include "DatabaseBuilderTest.h"
 
-/*Non persistent textures*/
-namespace texture_test {
+#define TYPE_LIST \
+  DiffuseTexture, NormalTexture, MetallicTexture, RoughnessTexture, AmbiantOcclusionTexture, SpecularTexture, EmissiveTexture, OpacityTexture, \
+      CubemapTexture, EnvironmentMap2DTexture, IrradianceTexture, BRDFLookupTexture, FrameBufferTexture, GenericCubemapTexture, Generic2DTexture, \
+      RoughnessTexture
 
-  static void fill(DatabaseBuilderTest<int, Texture>::ResultList &list,
-                   DatabaseBuilderTest<int, Texture> &texbuilder,
-                   bool persistence,
-                   TextureData &data,
-                   int &stored) {
-    list.push_back(texbuilder.addTexture<DiffuseTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<NormalTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<MetallicTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<RoughnessTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<AmbiantOcclusionTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<SpecularTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<EmissiveTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<OpacityTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<CubemapTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<EnvironmentMap2DTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<IrradianceTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<BRDFLookupTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<FrameBufferTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<GenericCubemapTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<Generic2DTexture>(persistence, &data));
-    list.push_back(texbuilder.addTexture<RoughnessTexture>(persistence, &data));
-    stored = list.size();  // Increment when adding new texture
+const int COUNT = 16;
+namespace texture_database_test {
+
+  template<class HEAD, class... TAIL>
+  constexpr void addTexture(IResourceDB<int, Texture> &database, TextureData *data) {
+    bool persistence = random_math::randb();
+    database::texture::store<HEAD>(database, persistence, data);
+    if constexpr (sizeof...(TAIL) > 0)
+      addTexture<TAIL...>(database, data);
+  }
+}  // namespace texture_database_test
+
+class TextureDatabaseTest final : public DatabaseBuilderTest<int, Texture> {
+ public:
+  explicit TextureDatabaseTest(IResourceDB<int, Texture> &db, int total) : DatabaseBuilderTest<int, Texture>(db) {
+    total = (total < COUNT) ? COUNT : total;
+    buildDatabase();
+  }
+  explicit TextureDatabaseTest(IResourceDB<int, Texture> &db) : DatabaseBuilderTest<int, Texture>(db) { buildDatabase(); }
+  template<class TYPE, class... Args>
+  database::Result<int, Texture> add(bool persistence, Args &&...args) {
+    auto result = database::texture::store<TYPE>(database, persistence, std::forward<Args>(args)...);
+    database::Result<int, Texture> cast = {result.id, static_cast<Texture *>(result.object)};
+    return cast;
   }
 
-};  // namespace texture_test
+  int getPersistentSize() {
+    int pers = 0;
+    for (auto &elem : stored) {
+      if (elem.second.isPersistent())
+        pers++;
+    }
+    return pers;
+  }
+
+  int getNonPersistentSize() {
+    int no_pers = 0;
+    for (auto &elem : stored) {
+      if (!elem.second.isPersistent())
+        no_pers++;
+    }
+    return no_pers;
+  }
+
+ private:
+  void buildDatabase() {
+    TextureData data;
+    texture_database_test::addTexture<TYPE_LIST>(database, &data);
+    total_size = database.size();
+    number_persistent = getPersistentSize();
+  }
+
+ public:
+  int total_size{0};
+  int number_persistent{0};
+};
 
 TEST(TextureDatabaseTest, add) {
   TextureDatabase database;
-  DatabaseBuilderTest<int, Texture> texbuilder(database);
-  DatabaseBuilderTest<int, Texture>::ResultList list;
-  TextureData data;
-  int size;  // number of textures stored
-  texture_test::fill(list, texbuilder, false, data, size);
-  EXPECT_EQ(texbuilder.stored.size(), size);  // Check if textures have been created and stored separately (no old texture returned)
-  for (auto &stored : texbuilder.stored)
-    EXPECT_GE(stored.first, 0);
-  list.clear();
-  TextureDatabase database2;
-  DatabaseBuilderTest<int, Texture> texbuilder2(database2);
-  texture_test::fill(list, texbuilder2, true, data, size);
-  for (auto &stored : texbuilder2.stored) {
-    EXPECT_LE(stored.first, -1);
-  }
+  TextureDatabaseTest test(database);
+  /* Check if all texture types have been created and stored*/
+  int sizeDB = test.getDatabaseSize();
+  int incremented = test.total_size;
+  EXPECT_EQ(sizeDB, incremented);
+  /* Textures with a non-empty name should be unique*/
+  TextureData data1, data2;
+  data1.name = std::string("texture1");
+  data2.name = std::string("texture2");
+  auto result1 = test.add<DiffuseTexture>(false, &data1);
+  auto result2 = test.add<DiffuseTexture>(false, &data2);
+  EXPECT_NE(result1, result2);
+  TextureData data3;
+  data3.name = std::string("texture1");
+  auto result3 = test.add<DiffuseTexture>(false, &data3);
+  EXPECT_EQ(result1, result3);
+
+  /* Dummy textures should be unique */
+  result1 = test.add<SpecularTexture>(false, nullptr);
+  result2 = test.add<SpecularTexture>(false, nullptr);
+  result3 = test.add<MetallicTexture>(false, nullptr);
+  EXPECT_EQ(result1, result2);
+  EXPECT_NE(result1, result3);
 }
 
 TEST(TextureDatabaseTest, contains) {
   TextureDatabase database;
-  DatabaseBuilderTest<int, Texture> texbuilder(database);
-  DatabaseBuilderTest<int, Texture>::ResultList list;
-  TextureData data;
-  int size;
-  texture_test::fill(list, texbuilder, false, data, size);
-  for (auto &stored : texbuilder.stored) {
-    database::Result<int, Texture> result = texbuilder.database.contains(stored.second.get());
-    EXPECT_EQ(result.object, stored.second.get());
-    EXPECT_EQ(result.id, stored.first);
-  }
-  database::Result<int, Texture> result = texbuilder.database.contains(nullptr);
-  EXPECT_EQ(result.object, nullptr);
+  TextureDatabaseTest test(database);
+  EXPECT_EQ(database.contains(nullptr).object, nullptr);
+  EXPECT_EQ(database.contains(database.size() + 1), false);
 }
 
 TEST(TextureDatabaseTest, remove) {
   TextureDatabase database;
-  DatabaseBuilderTest<int, Texture> texbuilder(database);
-  DatabaseBuilderTest<int, Texture>::ResultList list;
-  TextureData data;
-  int size;
-  texture_test::fill(list, texbuilder, false, data, size);
-  bool test = texbuilder.database.remove(list.size() + 1);
-  EXPECT_FALSE(test);
-  test = texbuilder.database.remove(nullptr);
-  EXPECT_FALSE(test);
-  for (auto elem : list)
-    EXPECT_TRUE(texbuilder.database.remove(elem.id));
+  TextureDatabaseTest test(database);
+  EXPECT_FALSE(database.remove(nullptr));
+  for (int i = 0; i < COUNT; i++) {
+    int pos = random_math::nrandi(0, COUNT - 1);
+    auto iterator = database.getConstData().find(pos);
+    bool contain = iterator != database.getConstData().end();
+    EXPECT_EQ(contain, database.remove(iterator->second.get()));
+  }
 }
 
 TEST(TextureDatabaseTest, get) {
   TextureDatabase database;
-  DatabaseBuilderTest<int, Texture> texbuilder(database);
-  DatabaseBuilderTest<int, Texture>::ResultList list;
-  TextureData data;
-  int size;
-  texture_test::fill(list, texbuilder, false, data, size);
-  for (auto elem : list) {
-    Texture *tex = texbuilder.database.get(elem.id);
-    EXPECT_EQ(tex, texbuilder.stored.at(elem.id).get());
+  TextureDatabaseTest test(database);
+  std::vector<Texture *> ptr_list;
+  for (const auto &elem : database.getConstData())
+    ptr_list.push_back(elem.second.get());
+  /* Checks that the database isn't modified */
+  int original_size = database.size();
+  for (int i = 0; i < database.size(); i++) {
+    database.get(i);
+    EXPECT_EQ(database.size(), original_size);
   }
+  EXPECT_EQ(ptr_list.size(), database.size());
+  int i = 0;
+  for (const auto &elem : ptr_list) {
+    EXPECT_EQ(database.get(i), elem);
+    i++;
+  }
+  Texture *ptr = database.get(-1);
+  EXPECT_EQ(ptr, nullptr);
+  ptr = database.get(database.size() + 1);
+  EXPECT_EQ(ptr, nullptr);
+  int pos = random_math::nrandi(0, COUNT - 1);
+  ptr = database.get(pos);
+  i = 0;
+  bool found = false;
+  for (const auto &elem : database.getConstData()) {
+    if (elem.first == pos) {
+      EXPECT_EQ(elem.second.get(), ptr);
+      found = true;
+    }
+  }
+  EXPECT_EQ(found, true);
+}
+
+TEST(TextureDatabaseTest, clean) {
+  TextureDatabase database;
+  TextureDatabaseTest test(database);
+  int persists = test.number_persistent;
+  database.clean();
+  int final_size = database.size();
+  EXPECT_EQ(final_size, persists);
+}
+
+TEST(TextureDatabaseTest, firstFreeId) {
+  TextureDatabase database;
+  TextureDatabaseTest test(database);
+  auto id = database.firstFreeId();
+  EXPECT_EQ(id, COUNT);
 }

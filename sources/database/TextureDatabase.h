@@ -8,80 +8,39 @@
 
 /**
  * @file TextureDatabase.h
- * Class definition for the texture database
  *
  */
 
 /**
  * @brief TextureDatabase class definition
- * The TextureDatabase class is a singleton that holds an std::map with unique key associated with a texture type
- * We use it to keep texture objects in one place , meshes will only reference the textures.
+ * GL texture database with no duplicates.
  *
  */
 class TextureDatabase final : public IResourceDB<int, Texture> {
  public:
-  /**
-   * @brief Construct a new Texture Database object
-   *
-   */
   TextureDatabase() = default;
-  /**
-   * @brief Removes all elements from the database , except those marked "keep"
-   *
-   */
   void clean() override;
-
-  /**
-   * @brief Deletes everything in the database
-   *
-   */
   void purge() override;
-
-  /**
-   * @brief Removes a texture from the database using it's ID
-   *
-   * @param index
-   * @return true
-   * @return false
-   */
-   bool remove(int index) override;
-
-  /**
-   * @brief Removes a texture from the database using it's address
-   *
-   * @param texture Texture to remove
-   * @return true If the texture has been found
-   * @return false If the address is not in the database
-   */
+  bool remove(int index) override;
   bool remove(const Texture *texture) override;
 
   /**
    * @brief Add a texture object to the database . In case the object is already present , this method will return the
-   * already present texture's id
+   * existing texture's id
    *
-   * @param texture Texture object to add
    * @param keep True if texture is to be kept
    * @return int Database ID of the texture
    */
-  virtual database::Result<int, Texture> add(std::unique_ptr<Texture> texture, bool keep);
-
-  /**
-   * @brief Retrieve all textures of type "texture_type"
-   *
-   * @param texture_type Type of the texture
-   * @return std::vector<std::pair<unsigned int , Texture*>> List of all textures matching "texture_type"
-   * @see Texture
-   * @see Texture::TYPE
-   */
+  database::Result<int, Texture> add(std::unique_ptr<Texture> texture, bool keep) override;
   std::vector<database::Result<int, Texture>> getTexturesByType(Texture::TYPE texture_type) const;
   bool empty() const override { return database_map.empty(); }
-  const std::map<int, std::unique_ptr<Texture>> &getConstData() const override { return database_map; }
-
+  int firstFreeId() const override;
+  database::Result<int, Texture> getUniqueTexture(const std::string &name) const;
  private:
+  std::map<std::string, int> unique_textures;
 };
 
 namespace database::texture {
-
   template<class TEXTYPE, class... Args>
   static database::Result<int, TEXTYPE> store(IResourceDB<int, Texture> &database, bool keep, Args &&...args) {
     ASSERT_SUBTYPE(Texture, TEXTYPE);

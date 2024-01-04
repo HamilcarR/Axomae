@@ -79,8 +79,9 @@ class Shader {
    *
    * @return Shader::TYPE
    */
-  Shader::TYPE getType() { return type; }
+  virtual Shader::TYPE getType() { return type; }
 
+  static Shader::TYPE getType_static() { return GENERIC; }
   /**
    * @brief Recompiles the shader program
    *
@@ -359,6 +360,9 @@ class BlinnPhongShader : public Shader {
  protected:
   BlinnPhongShader();
   BlinnPhongShader(std::string vertex_shader, std::string fragment_shader);
+
+ public:
+  static Shader::TYPE getType_static() { return BLINN; }
 };
 
 /***********************************************************************************************************************************************************/
@@ -367,6 +371,9 @@ class CubemapShader : public Shader {
  protected:
   CubemapShader();
   CubemapShader(std::string vertex_shader, std::string fragment_shader);
+
+ public:
+  static Shader::TYPE getType_static() { return CUBEMAP; }
 };
 
 /***********************************************************************************************************************************************************/
@@ -374,6 +381,9 @@ class BRDFShader : public Shader {
  protected:
   BRDFShader();
   BRDFShader(std::string vertex_shader, std::string fragment_shader);
+
+ public:
+  static Shader::TYPE getType_static() { return BRDF; }
 };
 
 /***********************************************************************************************************************************************************/
@@ -387,6 +397,7 @@ class ScreenFramebufferShader : public Shader {
   enum POST_PROCESS_TYPE : signed { DEFAULT = -1, EDGE = 1, SHARPEN = 2, BLURR = 3 };
   void setPostProcess(POST_PROCESS_TYPE postp);
   void setPostProcessUniforms();
+  static Shader::TYPE getType_static() { return SCREEN_FRAMEBUFFER; }
 
  protected:
   bool post_p_edge;
@@ -400,6 +411,9 @@ class BoundingBoxShader : public Shader {
  protected:
   BoundingBoxShader();
   BoundingBoxShader(std::string vertex_shader, std::string fragment_shader);
+
+ public:
+  static Shader::TYPE getType_static() { return BOUNDING_BOX; }
 };
 
 /***********************************************************************************************************************************************************/
@@ -408,6 +422,9 @@ class EnvmapCubemapBakerShader : public Shader {
  protected:
   EnvmapCubemapBakerShader();
   EnvmapCubemapBakerShader(std::string vertex_shader, std::string fragment_shader);
+
+ public:
+  static Shader::TYPE getType_static() { return ENVMAP_CUBEMAP_CONVERTER; }
 };
 
 /***********************************************************************************************************************************************************/
@@ -416,6 +433,9 @@ class IrradianceCubemapBakerShader : public Shader {
  protected:
   IrradianceCubemapBakerShader();
   IrradianceCubemapBakerShader(std::string vertex_shader, std::string fragment_shader);
+
+ public:
+  static Shader::TYPE getType_static() { return IRRADIANCE_CUBEMAP_COMPUTE; }
 };
 
 /***********************************************************************************************************************************************************/
@@ -429,6 +449,7 @@ class EnvmapPrefilterBakerShader : public Shader {
   virtual void setRoughnessValue(float roughness);
   virtual void setCubeEnvmapResolution(unsigned int resolution);
   virtual void setSamplesCount(unsigned sample_count);
+  static Shader::TYPE getType_static() { return ENVMAP_PREFILTER; }
 };
 
 /***********************************************************************************************************************************************************/
@@ -437,6 +458,9 @@ class BRDFLookupTableBakerShader : public Shader {
  protected:
   BRDFLookupTableBakerShader();
   BRDFLookupTableBakerShader(std::string vertex_shader, std::string fragment_shader);
+
+ public:
+  static Shader::TYPE getType_static() { return BRDF_LUT_BAKER; }
 };
 
 /***********************************************************************************************************************************************************/

@@ -5,11 +5,12 @@
 #include <string>
 namespace image {
   struct Metadata {
-    std::string name;
-    std::string format;
-    unsigned int height;
-    unsigned int width;
-    unsigned int channels;
+    std::string name{};
+    std::string format{};
+    unsigned int height{};
+    unsigned int width{};
+    unsigned int channels{};
+    bool color_corrected{};
   };
 
   template<class TYPE>
@@ -18,15 +19,16 @@ namespace image {
     RawImageHolder() = default;
     /*Will perform a move on assign*/
     RawImageHolder(const std::vector<TYPE> &assign, image::Metadata _metadata_) : metadata_(std::move(_metadata_)), data(assign) {
-      icon = Thumbnail(data, metadata_.width, metadata_.height, metadata_.channels, false);
+      icon = Thumbnail<TYPE>(data, metadata_.width, metadata_.height, metadata_.channels, !metadata_.color_corrected);
     }
-    QPixmap thumbnail() { return icon.icon; }
+    const QPixmap &thumbnail() { return icon.getIcon(); }
     Metadata metadata() { return metadata_; }
+    std::string name() { return metadata_.name; }
 
    public:
     Metadata metadata_;
     std::vector<TYPE> data;
-    Thumbnail icon;
+    Thumbnail<TYPE> icon;
   };
 }  // namespace image
 

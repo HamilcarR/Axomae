@@ -17,7 +17,7 @@ QVariant HdrImageModel::data(const QModelIndex &index, int role) const {
     return {};
   if (index.row() >= database.size())
     return {};
-  QPixmap p = database.getThumbnail(index.row());
+  const QPixmap &p = database.getThumbnail(index.row());
   image::Metadata metadata = database.getMetadata(index.row());
   switch (role) {
     case Qt::DecorationRole:

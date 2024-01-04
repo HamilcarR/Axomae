@@ -4,7 +4,12 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <map>
-#include <time.h>
+#include <ctime>
 #include <vector>
+#include "math.h"
+
+
+
+
 
 #endif

@@ -14,17 +14,92 @@
 
 namespace database {
   template<class IDTYPE, class OBJTYPE>
-  struct Result {
+  class Result {
+   public:
     IDTYPE id;
     OBJTYPE *object;
+    Result() : id{}, object(nullptr) {}
+    Result(IDTYPE id_, OBJTYPE *object_) : id(id_), object(object_) {}
+    Result(const Result &copy) : id(copy.id), object(copy.object) {}
+    Result(Result &&assign) noexcept : id(std::move(assign.id)), object(assign.object) {}
+    Result &operator=(Result &&assign) noexcept {
+      id = std::move(assign.id);
+      object = assign.object;
+      return *this;
+    }
+    Result &operator=(const Result &copy) {
+      if (this != &copy) {
+        id = copy.id;
+        object = copy.object;
+      }
+      return *this;
+    }
+    virtual ~Result() = default;
+
+    bool operator!=(const Result<IDTYPE, OBJTYPE> &compare) const {
+      bool eq = *this == compare;
+      return !eq;
+    }
+    bool operator==(const Result<IDTYPE, OBJTYPE> &compare) const { return id == compare.id && object == compare.object; }
   };
 
   // !Replace the whole negative id system bullshit with this :
   template<class U, class T>
-  struct Storage {
-    U id;
+  class Storage {
+   public:
+    Storage() {
+      valid = false;
+      persistent = false;
+      object = nullptr;
+    }
+    ~Storage() = default;
+    Storage(std::unique_ptr<T> object_, U id_, bool persistent_) {
+      object = std::move(object_);
+      id = id_;
+      persistent = persistent_;
+      valid = true;
+    }
+    Storage(const Storage &) = delete;
+    Storage &operator=(const Storage &) = delete;
+    Storage(Storage &&assign) noexcept {
+      id = assign.id;
+      object = std::move(assign.object);
+      persistent = assign.persistent;
+      valid = assign.valid;
+      assign.valid = false;
+    }
+
+    Storage &operator=(Storage &&assign) noexcept {
+      id = assign.id;
+      object = std::move(assign.object);
+      persistent = assign.persistent;
+      valid = assign.valid;
+      assign.valid = false;
+      return *this;
+    }
+
+    bool operator==(const Storage &compare) {
+      bool id_comp = id == compare.id;
+      bool obj_comp = object.get() == compare.object.get();
+      bool persist_comp = persistent == compare.persistent;
+      bool validity = valid == compare.valid;
+      return id_comp && obj_comp && persist_comp && validity;
+    }
+
+    T *get() const { return object.get(); }
+    void setId(U id_) { id = id_; }
+    void getId() const { return id; }
+
+    [[nodiscard]] bool isPersistent() const { return persistent; }
+    [[nodiscard]] bool isValid() const { return valid; }
+    void setPersistence(bool pers) { persistent = pers; }
+    void setValidity(bool validity) { valid = validity; }
+
+   private:
     std::unique_ptr<T> object;
+    U id;
     bool persistent;
+    bool valid;
   };
 
 };  // namespace database
@@ -32,19 +107,30 @@ namespace database {
 /**
  * @brief This class provides an interface of pure abstract methods to manage rendering objects databases
  * @class IResourceDB
+ * @tparam U Index of the stored object . Must be enum/numeric
  * @tparam T Class type of the object stored in the database
  */
 template<class U, class T>
 class IResourceDB {
+ protected:
   using DATABASE = std::map<U, database::Storage<U, T>>;
 
  public:
   /**
    * @brief Proceeds with a soft clean of the database . The implementation depends on the class that inherits this ,
-   * but this usually consists of only some objects being freed
+   * but this usually consists of only some objects being freed , according to their persistence.
    *
    */
-  virtual void clean() = 0;
+  virtual void clean() {
+    std::vector<typename DATABASE::const_iterator> delete_list;
+    for (typename DATABASE::const_iterator it = database_map.begin(); it != database_map.end(); it++) {
+      if (!it->second.isPersistent())
+        delete_list.push_back(it);
+    }
+    Mutex::Lock lock(mutex);
+    for (auto &elem : delete_list)
+      database_map.erase(elem);
+  }
 
   /**
    * @brief Proceeds with a complete purge of the database . Everything is freed .
@@ -62,7 +148,7 @@ class IResourceDB {
    */
   virtual T *get(const U id) const {
     Mutex::Lock lock(mutex);
-    typename std::map<U, std::unique_ptr<T>>::const_iterator it = database_map.find(id);
+    typename DATABASE::const_iterator it = database_map.find(id);
     return it == database_map.end() ? nullptr : it->second.get();
   }
 
@@ -75,7 +161,7 @@ class IResourceDB {
    */
   virtual bool remove(const U id) {
     Mutex::Lock lock(mutex);
-    typename std::map<U, std::unique_ptr<T>>::const_iterator it = database_map.find(id);
+    typename DATABASE::const_iterator it = database_map.find(id);
     if (it != database_map.end()) {
       database_map.erase(it);
       return true;
@@ -104,12 +190,25 @@ class IResourceDB {
   }
 
   /**
+   * @brief returns the first free ID of the map.
+   * @return U id
+   */
+  virtual U firstFreeId() const = 0;
+
+  /**
    * @brief Adds an element in the database
    *
    * @param element Object to store
    * @param keep Keep the element between scene change
    */
-  virtual database::Result<U, T> add(std::unique_ptr<T> element, bool keep) = 0;
+  virtual database::Result<U, T> add(std::unique_ptr<T> element, bool keep) {
+    T *ptr = element.get();
+    U ffid = firstFreeId();
+    database::Storage<U, T> storage(std::move(element), ffid, keep);
+    Mutex::Lock lock(mutex);
+    database_map[ffid] = std::move(storage);
+    return {ffid, ptr};
+  }
 
   /**
    * @brief Checks if database contains an object with specific ID .
@@ -122,10 +221,10 @@ class IResourceDB {
   }
 
   /**
-   * @brief Checks if the element is present , if element not present , returns nullptr
+   * @brief Checks if the element is present , if element not present , returns a Result with object = nullptr
    *
    * @param element_address address of the element we check
-   * @return T* Pointer on the element
+   * @return database::Result
    */
   virtual database::Result<U, T> contains(const T *element_address) const {
     Mutex::Lock lock(mutex);
@@ -140,11 +239,11 @@ class IResourceDB {
   }
   virtual bool empty() const { return database_map.empty(); }
   virtual int size() const { return database_map.size(); }
-  virtual const std::map<U, std::unique_ptr<T>> &getConstData() const = 0;
+  const DATABASE &getConstData() const { return database_map; }
 
  protected:
   mutable Mutex mutex;
-  std::map<U, std::unique_ptr<T>> database_map;
+  DATABASE database_map;
 };
 
 #endif

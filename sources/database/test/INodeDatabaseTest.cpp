@@ -3,81 +3,95 @@
 #include "DatabaseBuilderTest.h"
 #include "LightingSystem.h"
 #include "Mesh.h"
-namespace node_test {
 
-  static void fill(DatabaseBuilderTest<int, INode>::ResultList &list, DatabaseBuilderTest<int, INode> &builder, bool persistence, int &stored) {
-    list.push_back(builder.addNode<SceneTreeNode>(persistence));
-    list.push_back(builder.addNode<Mesh>(persistence));
-    list.push_back(builder.addNode<ArcballCamera>(persistence));
-    list.push_back(builder.addNode<FreePerspectiveCamera>(persistence));
-    list.push_back(builder.addNode<PointLight>(persistence));
-    list.push_back(builder.addNode<CubeMesh>(persistence));
-    list.push_back(builder.addNode<CubeMapMesh>(persistence));
-    list.push_back(builder.addNode<QuadMesh>(persistence));
-    list.push_back(builder.addNode<DirectionalLight>(persistence));
-    list.push_back(builder.addNode<SpotLight>(persistence));
-    list.push_back(builder.addNode<FrameBufferMesh>(persistence));
-    list.push_back(builder.addNode<BoundingBoxMesh>(persistence));
-    stored = list.size();  // Increment when adding new texture
+#define NODETYPE_LIST \
+  SceneTreeNode, Mesh, DirectionalLight, PointLight, SpotLight, BoundingBox, ArcballCamera, FreePerspectiveCamera, BoundingBoxMesh, CubeMesh, QuadMesh
+
+const int COUNT = 11;
+namespace node_database_test {
+  template<class HEAD, class... TAIL>
+  constexpr void addNode(IResourceDB<int, INode> &database) {
+    bool persistence = random_math::randb();
+    database::node::store<HEAD>(database, persistence);
+    if constexpr (sizeof...(TAIL) > 0)
+      addNode<TAIL...>(database);
   }
 
-};  // namespace node_test
+};  // namespace node_database_test
+
+class NodeDatabaseTest final : public DatabaseBuilderTest<int, INode> {
+ public:
+  explicit NodeDatabaseTest(INodeDatabase &db) : DatabaseBuilderTest<int, INode>(db) { buildDatabase(); }
+
+  template<class TYPE, class... Args>
+  database::Result<int, INode> addNode(INodeDatabase &database, bool persistence, Args &&...args) {
+    auto result = database::node::store<TYPE>(database, persistence, std::forward<Args>(args)...);
+    return {result.id, static_cast<INode *>(result.object)};
+  }
+
+ private:
+  void buildDatabase() { node_database_test::addNode<NODETYPE_LIST>(database); }
+};
 
 TEST(NodeDatabaseTest, add) {
   INodeDatabase database;
-  DatabaseBuilderTest<int, INode> builder(database);
-  DatabaseBuilderTest<int, INode>::ResultList list;
-  int size;
-  node_test::fill(list, builder, false, size);
-  EXPECT_EQ(builder.stored.size(), size);
-  for (auto &stored : builder.stored)
-    EXPECT_GE(stored.first, 0);
-  list.clear();
-  INodeDatabase database2;
-  DatabaseBuilderTest<int, INode> builder2(database2);
-  node_test::fill(list, builder2, true, size);
-  for (auto &stored : builder2.stored) {
-    EXPECT_LE(stored.first, -1);
-  }
+  NodeDatabaseTest test(database);
+  EXPECT_EQ(database.size(), COUNT);
+  test.addNode<Mesh>(database, true);
+  EXPECT_EQ(database.size(), COUNT + 1);
 }
 
 TEST(NodeDatabaseTest, contains) {
   INodeDatabase database;
-  DatabaseBuilderTest<int, INode> builder(database);
-  DatabaseBuilderTest<int, INode>::ResultList list;
-  int size;
-  node_test::fill(list, builder, false, size);
-  for (auto &stored : builder.stored) {
-    database::Result<int, INode> result = builder.database.contains(stored.second.get());
-    EXPECT_EQ(result.object, stored.second.get());
-    EXPECT_EQ(result.id, stored.first);
+  NodeDatabaseTest test(database);
+  const auto &map = database.getConstData();
+  for (const auto &elem : map) {
+    EXPECT_TRUE(database.contains(elem.first));
   }
-  database::Result<int, INode> result = builder.database.contains(nullptr);
-  EXPECT_EQ(result.object, nullptr);
+}
+
+static void test_all_remove(NodeDatabaseTest &test) {
+  for (int i = 0; i < test.getDatabaseSize(); i++) {
+    const auto it = test.database.getConstData().find(i);
+    INode *ptr = it->second.get();
+    EXPECT_TRUE(test.database.remove(i));
+    EXPECT_FALSE(test.database.remove(i));
+    EXPECT_FALSE(test.database.remove(ptr));
+  }
 }
 
 TEST(NodeDatabaseTest, remove) {
   INodeDatabase database;
-  DatabaseBuilderTest<int, INode> builder(database);
-  DatabaseBuilderTest<int, INode>::ResultList list;
-  int size;
-  node_test::fill(list, builder, false, size);
-  bool test = builder.database.remove(list.size() + 1);
-  EXPECT_FALSE(test);
-  test = builder.database.remove(nullptr);
-  EXPECT_FALSE(test);
-  for (auto elem : list)
-    EXPECT_TRUE(builder.database.remove(elem.id));
+  NodeDatabaseTest test(database);
+  EXPECT_FALSE(database.remove(-1));
+  EXPECT_FALSE(database.remove(database.size()));
+  EXPECT_FALSE(database.remove(nullptr));
+  test_all_remove(test);
+}
+
+static void test_all_get(NodeDatabaseTest &test) {
+  EXPECT_EQ(test.database.get(-1), nullptr);
+  const auto &map = test.database.getConstData();
+  for (const auto &elem : map) {
+    EXPECT_EQ(test.database.get(elem.first), elem.second.get());
+  }
 }
 
 TEST(NodeDatabaseTest, get) {
   INodeDatabase database;
-  DatabaseBuilderTest<int, INode> builder(database);
-  DatabaseBuilderTest<int, INode>::ResultList list;
-  int size;
-  node_test::fill(list, builder, false, size);
-  for (auto elem : list) {
-    INode *tex = builder.database.get(elem.id);
-    EXPECT_EQ(tex, builder.stored.at(elem.id).get());
-  }
+  NodeDatabaseTest test(database);
+  int size = database.size();
+  database.get(0);
+  EXPECT_EQ(size, database.size());
+  test_all_get(test);
+}
+
+TEST(NodeDatabaseTest, firstFreeId) {
+  INodeDatabase database;
+  NodeDatabaseTest test(database);
+  int ffid = database.firstFreeId();
+  EXPECT_EQ(ffid, COUNT);
+  database.remove(0);
+  ffid = database.firstFreeId();
+  EXPECT_EQ(ffid, 0);
 }

@@ -22,10 +22,10 @@ class Texture;
 class Texture {
  protected:
   Texture();
-  Texture(TextureData *tex);
+  explicit Texture(TextureData *tex);
 
  public:
-  virtual ~Texture() {}
+  virtual ~Texture() = default;
 
   /**
    * @brief Internal format of textures
@@ -81,7 +81,7 @@ class Texture {
    * about the texture, including its width, height, and pixel data.
    */
   virtual void set(TextureData *texture);
-  unsigned int getSamplerID() { return sampler2D; }
+  [[nodiscard]] unsigned int getSamplerID() const { return sampler2D; }
 
   /**
    * @brief Set the texture's sampler ID .
@@ -90,10 +90,11 @@ class Texture {
    * @param id New Sampler2D id.
    */
   void setSamplerID(unsigned int id) { sampler2D = id; }
-  void setTextureType(TYPE type) { name = type; }
-  TYPE getTextureType() { return name; };
+  void setTextureType(TYPE type_) { type = type_; }
+  TYPE getTextureType() { return type; };
   virtual bool isDummyTexture() { return is_dummy; }
   void setDummy(bool d) { is_dummy = d; }
+  [[nodiscard]] const std::string &getName() const { return name; }
 
   /**
    * @brief Checks if the texture has raw pixel data stored
@@ -125,7 +126,8 @@ class Texture {
   virtual void setTextureParametersOptions();
 
  protected:
-  TYPE name;              /**<Type of the texture*/
+  std::string name;       /**<Name of the texture*/
+  TYPE type;              /**<Type of the texture*/
   FORMAT internal_format; /**<Data layout format on the GPU*/
   FORMAT data_format;     /**<Raw texture data format*/
   FORMAT data_type;
@@ -164,7 +166,7 @@ class DiffuseTexture : public Texture {
    *
    * @param texture Texture data to copy.
    */
-  virtual void set(TextureData *texture) override;
+  void set(TextureData *texture) override;
 
   virtual bool hasTransparency() { return has_transparency; }
 

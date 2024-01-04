@@ -5,15 +5,13 @@
 #include "constants.h"
 #include <QModelIndex>
 #include <QVariant>
-namespace database {
 
-  namespace event {
-    struct IconUpdateMessage {
-      int index;
-      QPixmap value;
-      image::Metadata metadata;
-    };
-  }  // namespace event
-}  // namespace database
+namespace database::event {
+  struct IconUpdateMessage {
+    int index{};
+    QPixmap *value{};
+    image::Metadata metadata;
+  };
+}  // namespace database::event
 
 #endif

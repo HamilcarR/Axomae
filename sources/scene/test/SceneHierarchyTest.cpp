@@ -14,7 +14,7 @@ class SceneTreeBuilder {
     leaf_count = 0;
   }
 
-  virtual ~SceneTreeBuilder() {}
+  virtual ~SceneTreeBuilder() = default;
 
   void buildSceneTree(unsigned int depth, unsigned int max_degree) {
     ISceneNode *root = database::node::store<SceneTreeNode>(database, false).object;

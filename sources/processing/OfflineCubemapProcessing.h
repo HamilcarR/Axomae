@@ -2,9 +2,9 @@
 #define OFFLINECUBEMAPPROCESSING_H
 #include "GenericException.h"
 #include "GenericTextureProcessing.h"
-#include "Math.h"
 #include "Mutex.h"
 #include "PerformanceLogger.h"
+#include "math_utils.h"
 #include <fstream>
 #include <immintrin.h>
 #include <sstream>

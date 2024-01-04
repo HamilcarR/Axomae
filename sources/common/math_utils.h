@@ -1,5 +1,5 @@
-#ifndef MATH_H
-#define MATH_H
+#ifndef MATH_UTILS_H
+#define MATH_UTILS_H
 
 #include <glm/common.hpp>
 #include <glm/glm.hpp>
@@ -9,8 +9,39 @@
 #include <glm/gtx/projection.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/vec3.hpp>
+#include <random>
 
 constexpr double PI = 3.14159265358979323846264;
+
+namespace random_math {
+
+  inline std::mt19937 init_rand() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    return gen;
+  }
+  inline std::uniform_int_distribution<int> getUniformIntDistrib(int min, int max) { return std::uniform_int_distribution<int>(min, max); }
+
+  inline std::uniform_real_distribution<double> getUniformDoubleDistrib(double min, double max) {
+    return std::uniform_real_distribution<double>(min, max);
+  }
+
+  inline int nrandi(int n1, int n2) {
+    auto gen = init_rand();
+    auto distrib = getUniformIntDistrib(n1, n2);
+    return distrib(gen);
+  }
+
+  inline double nrandf(double n1, double n2) {
+    auto gen = init_rand();
+    auto distrib = getUniformDoubleDistrib(n1, n2);
+    return distrib(gen);
+  }
+
+  // coin flip
+  inline bool randb() { return nrandi(0, 1); }
+};  // namespace random_math
+
 namespace spherical_math {
   template<class T>
   inline const glm::dvec2 uvToSpherical(const T &u, const T &v) {
@@ -49,7 +80,7 @@ namespace spherical_math {
 
   inline const glm::dvec2 cartesianToSpherical(const glm::dvec3 &xyz) { return cartesianToSpherical(xyz.x, xyz.y, xyz.z); }
 
-};  // namespace spherical_math
+}  // namespace spherical_math
 
 namespace importance_sampling {
   inline glm::vec3 pgc3d(unsigned x, unsigned y, unsigned z) {
@@ -81,7 +112,7 @@ namespace importance_sampling {
     return glm::dvec3(double(i) / double(N), radicalInverse(i), radicalInverse(i ^ 0xAAAAAAAAu));
   }
 
-};  // namespace importance_sampling
+}  // namespace importance_sampling
 
 namespace texture_math {
 
@@ -95,6 +126,6 @@ namespace texture_math {
     return static_cast<unsigned>(coord * dim);
   }
 
-};  // namespace texture_math
+}  // namespace texture_math
 
 #endif

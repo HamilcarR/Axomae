@@ -23,13 +23,13 @@ class RenderPipeline {
    * @param renderer Pointer on the renderer object.
    * @param resource_database Pointer on the resource database system.
    */
-  RenderPipeline(Renderer *renderer = nullptr, ResourceDatabaseManager *resource_database = nullptr);
+  explicit RenderPipeline(Renderer *renderer = nullptr, ResourceDatabaseManager *resource_database = nullptr);
 
   /**
    * @brief Destroy the Render Pipeline object
    *
    */
-  virtual ~RenderPipeline();
+  virtual ~RenderPipeline() = default;
 
   /**
    * @brief This method will bake an Environment map into a cubemap.

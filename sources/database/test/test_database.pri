@@ -17,3 +17,4 @@ INCLUDEPATH +=  $$PWD/../ \
                 $$PWD/../../debug \
                 $$PWD/../../camera \
                 $$PWD/../../thread \
+                $$PWD/../../../test\

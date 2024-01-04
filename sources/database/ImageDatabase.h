@@ -32,33 +32,51 @@ class ImageDatabase : public IResourceDB<int, image::RawImageHolder<DATATYPE>>, 
  public:
   ImageDatabase() = default;
 
+  void purge() override {
+    BaseType::purge();
+    unique_elements.clear();
+  }
+
   void clean() override {
-    Mutex::Lock lock(BaseType::mutex);
-    std::vector<int> deletion;
-    for (const auto &A : BaseType::database_map) {
-      if (A.first >= 0)
-        deletion.push_back(A.first);
+    std::vector<typename BaseType::DATABASE::const_iterator> delete_list;
+    for (auto it = BaseType::database_map.begin(); it != BaseType::database_map.end(); it++) {
+      if (!it->second.isPersistent())
+        delete_list.push_back(it);
     }
-    for (int A : deletion)
-      BaseType::database_map.erase(A);
+    Mutex::Lock lock(BaseType::mutex);
+    for (auto &elem : delete_list) {
+      unique_elements.erase(elem->second.get()->name());
+      BaseType::database_map.erase(elem);
+    }
   }
 
   HolderResult add(HolderPointer element, bool keep) override {
-    Mutex::Lock lock(BaseType::mutex);
-    if (keep) {
-      int index = -1;
-      while (BaseType::database_map[index] != nullptr)
-        index--;
-      BaseType::database_map[index] = std::move(element);
-      return {index, BaseType::database_map[index].get()};
-    } else {
-      int index = 0;
-      while (BaseType::database_map[index] != nullptr)
-        index++;
-      BaseType::database_map[index] = std::move(element);
-      notify(observer::Data<Message>());
-      return {index, BaseType::database_map[index].get()};
+    auto it = unique_elements.find(element->metadata().name);
+    if (it != unique_elements.end() && !it->first.empty()) {
+      HolderResult result;
+      result.id = it->second;
+      result.object = BaseType::get(result.id);
+      assert(result.object != nullptr);
+      return result;
     }
+    auto elem = BaseType::add(std::move(element), keep);
+    notify(observer::Data<Message>());
+    unique_elements.insert(std::pair<std::string, int>(elem.object->metadata().name, elem.id));
+    return elem;
+  }
+
+  [[nodiscard]] int firstFreeId() const override {
+    int diff = 0;
+    if (BaseType ::database_map.begin()->first > 0)
+      return 0;
+    for (const auto &elem : BaseType::database_map) {
+      if (!elem.second.isValid())
+        return elem.first;
+      if ((elem.first - diff) > 1)
+        return (elem.first + diff) / 2;
+      diff = elem.first;
+    }
+    return BaseType::size();
   }
 
   [[nodiscard]] image::Metadata getMetadata(int index) const {
@@ -66,12 +84,10 @@ class ImageDatabase : public IResourceDB<int, image::RawImageHolder<DATATYPE>>, 
     return holder->metadata();
   }
 
-  [[nodiscard]] QPixmap getThumbnail(int index) const {
+  [[nodiscard]] const QPixmap &getThumbnail(int index) const {
     image::RawImageHolder<DATATYPE> *holder = BaseType::database_map.at(index).get();
     return holder->thumbnail();
   }
-
-  const HolderMap &getConstData() const override { return BaseType::database_map; }
 
   void notify(observer::Data<Message> data) const override {
     for (Subscriber *A : subscribers)
@@ -88,17 +104,27 @@ class ImageDatabase : public IResourceDB<int, image::RawImageHolder<DATATYPE>>, 
 
  private:
   std::vector<Subscriber *> subscribers;
+  std::map<std::string, int> unique_elements;  // map all unique images to avoid duplicates
 };
 
-namespace database {
+namespace database::image {
   template<class TYPE>
-  void store(IResourceDB<int, image::RawImageHolder<TYPE>> &database_, bool keep, std::vector<TYPE> &args, image::Metadata metadata) {
+  void store(IResourceDB<int, ::image::RawImageHolder<TYPE>> &database_, bool keep, std::vector<TYPE> &args, ::image::Metadata metadata) {
     ASSERT_IS_ARITHMETIC(TYPE);
-    auto raw_image = std::make_unique<image::RawImageHolder<TYPE>>(args, metadata);
+    auto raw_image = std::make_unique<::image::RawImageHolder<TYPE>>(args, metadata);
     database_.add(std::move(raw_image), keep);
   }
-}  // namespace database
+
+  template<class TYPE>
+  void store(IResourceDB<int, ::image::RawImageHolder<TYPE>> &database_, bool keep) {
+    ASSERT_IS_ARITHMETIC(TYPE);
+    auto raw_image = std::make_unique<::image::RawImageHolder<TYPE>>();
+    database_.add(std::move(raw_image), keep);
+  }
+
+}  // namespace database::image
 
 using HdrImageDatabase = ImageDatabase<float>;
+using RawImageDatabase = ImageDatabase<uint8_t>;
 
 #endif
