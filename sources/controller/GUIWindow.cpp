@@ -203,17 +203,6 @@ namespace axomae {
   /**************************************************************************************************************/
 
   HeapManagement *Controller::_MemManagement = new HeapManagement;
-  static void load_shader_database(ShaderDatabase &shader_database) {
-    database::shader::store<BoundingBoxShader>(shader_database, true);
-    database::shader::store<BlinnPhongShader>(shader_database, true);
-    database::shader::store<CubemapShader>(shader_database, true);
-    database::shader::store<ScreenFramebufferShader>(shader_database, true);
-    database::shader::store<BRDFShader>(shader_database, true);
-    database::shader::store<EnvmapCubemapBakerShader>(shader_database, true);
-    database::shader::store<IrradianceCubemapBakerShader>(shader_database, true);
-    database::shader::store<EnvmapPrefilterBakerShader>(shader_database, true);
-    database::shader::store<BRDFLookupTableBakerShader>(shader_database, true);
-  }
 
   static void init_image_session_ptr() {
     image_session_pointers::greyscale = nullptr;
@@ -235,10 +224,6 @@ namespace axomae {
     /*Logging configuration*/
     LoggerConfigDataStruct log_struct = configuration.generateLoggerConfigDataStruct();
     LOGCONFIG(log_struct);
-
-    /* Load shaders for the realtime renderer*/
-    ShaderDatabase &shader_database = resource_database.getShaderDatabase();
-    load_shader_database(shader_database);
 
     /*At last , we setup all slots and signals*/
     connect_all_slots();
@@ -482,7 +467,11 @@ namespace axomae {
     if (filename.isEmpty())
       return false;
     else {
-      Loader::loadHdr(filename.toStdString().c_str());
+      try {
+        Loader::loadHdr(filename.toStdString().c_str());  // try-catch
+      } catch (GenericException &e) {
+        LOG(e.what(), LogLevel::ERROR);
+      }
       return true;
     }
   }
@@ -672,7 +661,8 @@ namespace axomae {
   bool Controller::import_3DOBJ() {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
     if (!filename.isEmpty()) {
-      resource_database.clean();
+      resource_database.getNodeDatabase().clean();
+      resource_database.getTextureDatabase().clean();
       Loader loader;
       auto struct_holder = loader.load(filename.toStdString().c_str());
       std::vector<Mesh *> scene = struct_holder.first;
@@ -682,8 +672,6 @@ namespace axomae {
       _UI.meshes_list->setList(scene);
       SceneTree &scene_hierarchy = viewer_3d->getRenderer().getScene().getSceneTreeRef();
       _UI.renderer_scene_list->setScene(scene_hierarchy);
-      //	std::thread(ImageManager::project_uv_normals, scene[0]->geometry , _UI.uv_width->value() ,
-      //_UI.uv_height->value() , _UI.tangent_space->isChecked()).detach();  //TODO : optimize and re enable
       return true;
     }
     return false;

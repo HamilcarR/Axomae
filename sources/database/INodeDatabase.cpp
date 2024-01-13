@@ -60,17 +60,3 @@ database::Result<int, INode> INodeDatabase::contains(const INode *element_addres
   }
   return {-1, nullptr};
 }
-
-int INodeDatabase::firstFreeId() const {
-  int diff = 0;
-  if (database_map.begin()->first > 0)
-    return 0;
-  for (const auto &elem : database_map) {
-    if (!elem.second.isValid())
-      return elem.first;
-    if ((elem.first - diff) > 1)
-      return (elem.first + diff) / 2;
-    diff = elem.first;
-  }
-  return size();
-}

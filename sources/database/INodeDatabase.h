@@ -6,7 +6,7 @@
 #include "Node.h"
 #include "RenderingDatabaseInterface.h"
 
-class INodeDatabase final : public IResourceDB<int, INode> {
+class INodeDatabase final : public IntegerResourceDB<INode> {
   using NodeIdMap = std::map<int, std::unique_ptr<INode>>;
 
  public:
@@ -18,7 +18,6 @@ class INodeDatabase final : public IResourceDB<int, INode> {
   bool remove(const INode *element) override;
   bool contains(int id) const override;
   database::Result<int, INode> contains(const INode *element_address) const override;
-  int firstFreeId() const override;
 
  private:
 };

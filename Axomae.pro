@@ -21,6 +21,7 @@ INCLUDEPATH +=	/usr/include/SDL2 \
 		/usr/include/glm \
 		/usr/include/GL\
 		$$PWD/vendor/stb \
+		$$PWD/vendor/Optix \
 
 include(sources/modules.pri)
 include(sources/main/main.pri)
@@ -35,11 +36,12 @@ QMAKE_CC = gcc-12
 QMAKE_CXX = g++-12
 QMAKE_LINK = g++-12
 
-
+ASAN_FLAG = -fsanitize=address
+ASAN_LIB = -lasan
 #QMAKE_DEFAULT_INCDIRS += -I/usr/include/c++/12
-QMAKE_CXXFLAGS += -std=c++17 -g -pg -Wall -pedantic -Wno-unused 
+QMAKE_CXXFLAGS += -std=c++17 $$ASAN_FLAG -g -pg -Wall -pedantic -Wno-unused
 QMAKE_LIBDIR += $$CUDA_DIR/lib64
-LIBS+=-L/usr/local/cuda/lib64 -L/usr/lib64 -lSDL2 -ldl -lpthread -lSDL2_image -lassimp -lcudart -lcudadevrt -lcuda -lGLEW -lGLU -lglut -lGL -lgtest
+LIBS+= $$ASAN_LIB -L/usr/local/cuda/lib64 -L/usr/lib64 -lSDL2 -ldl -lpthread -lSDL2_image -lassimp -lcudart -lcudadevrt -lcuda -lGLEW -lGLU -lglut -lGL -lgtest
 CUDA_LIBS += -L/usr/local/cuda/lib64 -L/usr/lib64 -lcudart -lcuda -lcudadevrt -lSDL2 
 CUDA_ARCH = sm_75
 CUDA_INC = $$join(INCLUDEPATH,' -I','-I',' ')

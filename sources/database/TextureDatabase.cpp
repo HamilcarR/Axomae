@@ -11,20 +11,21 @@ void TextureDatabase::purge() {
   database_map.clear();
   unique_textures.clear();
 }
-struct DestroyList{
-    int id ;
-    std::string name;
+struct DestroyList {
+  int id;
+  std::string name;
 };
 void TextureDatabase::clean() {
   std::vector<DestroyList> to_destroy;
   Mutex::Lock lock(mutex);
-  for (auto & it : database_map)
+  for (auto &it : database_map)
     if (!it.second.isPersistent()) {
       it.second.get()->clean();
       it.second.setValidity(false);
-      to_destroy.push_back({it.first , it.second.get()->getName()});
+      DestroyList dest = {it.first, it.second.get()->getName()};
+      to_destroy.push_back(dest);
     }
-  for (const auto& elem : to_destroy) {
+  for (const auto &elem : to_destroy) {
     unique_textures.erase(elem.name);
     database_map.erase(elem.id);
   }
@@ -42,18 +43,12 @@ std::vector<database::Result<int, Texture>> TextureDatabase::getTexturesByType(T
   return type_collection;
 }
 
-/* will add real textures by pushing them into the first key available.
- * Dummy textures , on the other hand will only occupy one key , and the key will be returned if we try to add
- * one of the same type . This is for avoiding duplicates for dummies .
- * Persistence for dummies is always true .
- */
-
 database::Result<int, Texture> TextureDatabase::add(std::unique_ptr<Texture> texture, bool keep) {
   bool dummy = texture->isDummyTexture();
   Texture::TYPE type = texture->getTextureType();
   Texture *ptr = texture.get();
   std::string name = texture->getName();
-  /* Checks if the texture is present in the database by name*/
+  /* Checks if the texture is named and exists in the database (to avoid duplicates)*/
   if (!name.empty()) {
     auto it = unique_textures.find(name);
     if (it != unique_textures.end()) {
@@ -62,7 +57,8 @@ database::Result<int, Texture> TextureDatabase::add(std::unique_ptr<Texture> tex
       return {id, ptr};
     }
   }
-  /* Case for non dummy textures : create one when there's no texture with the same name , and save name + id in "unique_textures" map*/
+  /* If the texture is not named , we store it in a new slot :
+   * If it is not a dummy , looks for the first available slot */
   if (!dummy) {
     int id = firstFreeId();
     database::Storage<int, Texture> storage(std::move(texture), id, keep);
@@ -70,15 +66,19 @@ database::Result<int, Texture> TextureDatabase::add(std::unique_ptr<Texture> tex
     database_map[id] = std::move(storage);
     unique_textures.insert(std::pair<std::string, int>(name, id));
     return {id, ptr};
-  } else {
-    int id = 0;
+  }
+  /* If the texture is not named , and is a dummy , looks for a slot containing a dummy of the same type
+   * Returns it if found . Else , looks for the first available slot
+   */
+  else
+  {
     for (auto &elem : database_map) {
       if (elem.second.get()->getTextureType() == type && elem.second.get()->isDummyTexture())
         return {elem.first, elem.second.get()};
-      id++;
     }
+    int id = firstFreeId();
     Mutex::Lock lock(mutex);
-    database::Storage<int, Texture> storage(std::move(texture), id, true);  // always keep dummies
+    database::Storage<int, Texture> storage(std::move(texture), id, true);  // Persistence for dummies is always true.
     database_map[id] = std::move(storage);
     unique_textures.insert(std::pair<std::string, int>(name, id));
     return {id, ptr};
@@ -91,6 +91,7 @@ bool TextureDatabase::remove(const int index) {
   if (tex) {
     tex->clean();
     database_map.erase(index);
+    removeUniqueTextureReference(index);
     return true;
   }
   return false;
@@ -102,24 +103,13 @@ bool TextureDatabase::remove(const Texture *address) {
     if (address && it->second.get() == address) {
       it->second.get()->clean();
       database_map.erase(it);
+      removeUniqueTextureReference(it->first);
       return true;
     }
   }
   return false;
 }
 
-/*Replace invalid data with new values*/
-int TextureDatabase::firstFreeId() const {
-  int diff = 0;
-  for (const auto &elem : database_map) {
-    if (!elem.second.isValid())
-      return elem.first;
-    if ((elem.first - diff) > 1)
-      return (elem.first + diff) / 2;
-    diff = elem.first;
-  }
-  return size();
-}
 
 database::Result<int, Texture> TextureDatabase::getUniqueTexture(const std::string &name) const {
   auto it = unique_textures.find(name);
@@ -127,4 +117,12 @@ database::Result<int, Texture> TextureDatabase::getUniqueTexture(const std::stri
     return {it->second, get(it->second)};
   }
   return {0, nullptr};
+}
+bool TextureDatabase::removeUniqueTextureReference(int id) {
+  for (auto &elem : unique_textures)
+    if (elem.second == id) {
+      unique_textures.erase(elem.first);
+      return true;
+    }
+  return false;
 }

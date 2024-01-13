@@ -7,7 +7,7 @@ FrameBufferInterface::FrameBufferInterface() {
   default_framebuffer_pointer = nullptr;
 }
 
-FrameBufferInterface::FrameBufferInterface(TextureDatabase *_texture_database, ScreenSize *_texture_dim, unsigned int *default_fbo)
+FrameBufferInterface::FrameBufferInterface(TextureDatabase *_texture_database, Dim2 *_texture_dim, unsigned int *default_fbo)
     : FrameBufferInterface() {
   texture_dim = _texture_dim;
   texture_database = _texture_database;

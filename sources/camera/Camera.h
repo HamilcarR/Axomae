@@ -34,7 +34,7 @@ class Camera : public SceneTreeNode {
    * camera.
    *
    * @param degrees The field of view angle in degrees for the camera.
-   * @param screen A pointer to an object of type ScreenSize, which contains information about the size
+   * @param screen A pointer to an object of type Dim2, which contains information about the size
    * of the screen or window where the camera will be rendering.
    * @param clip_near The distance from the camera to the near clipping plane. Any objects closer to the
    * camera than this distance will not be visible.
@@ -43,7 +43,7 @@ class Camera : public SceneTreeNode {
    * @param pointer The "pointer" parameter is a pointer to a MouseState object, which is used to
    * track the state of the mouse (e.g. position, button clicks) for camera movement and control.
    */
-  Camera(float degrees, ScreenSize *screen, float clip_near, float clip_far, const MouseState *pointer = nullptr);
+  Camera(float degrees, Dim2 *screen, float clip_near, float clip_far, const MouseState *pointer = nullptr);
 
   /**
    * @brief Calculates the view matrix
@@ -193,8 +193,8 @@ class Camera : public SceneTreeNode {
   glm::vec3 camera_up;                   /**<Up vector of the camera */
   const glm::vec3 world_up;              /**<World space up vector */
   const MouseState *mouse_state_pointer; /**<Pointer on a MouseState structure keeping track of the mouse data*/
-  ScreenSize *ratio_dimensions;          /**<Pointer on a ScreenSize structure with fields giving informations about a width ,
-                                            and a height.*/
+  Dim2 *ratio_dimensions;                /**<Pointer on a Dim2 structure with fields giving informations about a width ,
+                                                  and a height.*/
 };
 
 /**
@@ -213,7 +213,7 @@ class ArcballCamera : public Camera {
    * @brief ArcballCamera Constructor
    *
    * @param degrees The field of view angle in degrees for the camera .
-   * @param screen The `screen` parameter is a pointer to an object of the `ScreenSize` class, which
+   * @param screen The `screen` parameter is a pointer to an object of the `Dim2` class, which
    * contains information about the size of the screen .
    * @param near The distance to the near clipping plane of the camera's frustum .
    * @param far The distance to the far clipping plane .
@@ -221,7 +221,7 @@ class ArcballCamera : public Camera {
    * @param pointer Pointer to a MouseState object, contains information about the current state of the mouse (e.g.
    * position, button presses, etc.) .
    */
-  ArcballCamera(float degrees, ScreenSize *screen, float near, float far, float radius, const MouseState *pointer);
+  ArcballCamera(float degrees, Dim2 *screen, float near, float far, float radius, const MouseState *pointer);
   /**
    * @brief Destroy the Arcball Camera object
    *
@@ -329,7 +329,7 @@ class ArcballCamera : public Camera {
 class FreePerspectiveCamera : public Camera {
  public:
   FreePerspectiveCamera();
-  FreePerspectiveCamera(float degrees, ScreenSize *screen, float near, float far, const MouseState *pointer = nullptr);
+  FreePerspectiveCamera(float degrees, Dim2 *screen, float near, float far, const MouseState *pointer = nullptr);
   virtual ~FreePerspectiveCamera();
   virtual void onLeftClick() override;
   virtual void onRightClick() override;

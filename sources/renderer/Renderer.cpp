@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include "DebugGL.h"
+#include "EnvmapTextureManager.h"
 #include "INodeFactory.h"
 #include "Loader.h"
 #include "RenderPipeline.h"
@@ -10,6 +11,7 @@ Renderer::Renderer() : resource_database(ResourceDatabaseManager::getInstance())
   camera_framebuffer = nullptr;
   mouse_state.pos_x = 0;
   mouse_state.pos_y = 0;
+  mouse_state.busy = false;
   mouse_state.left_button_clicked = false;
   mouse_state.left_button_released = true;
   mouse_state.right_button_clicked = false;
@@ -19,12 +21,16 @@ Renderer::Renderer() : resource_database(ResourceDatabaseManager::getInstance())
   default_framebuffer_id = 0;
   scene_camera =
       database::node::store<ArcballCamera>(resource_database.getNodeDatabase(), true, 45.f, &screen_size, 0.1f, 10000.f, 100.f, &mouse_state).object;
+  skybox_mesh = database::node::store<CubeMapMesh>(resource_database.getNodeDatabase(), true).object;
 }
 
 Renderer::Renderer(unsigned width, unsigned height, GLViewer *widget) : Renderer() {
   screen_size.width = width;
   screen_size.height = height;
   gl_widget = widget;
+  render_pipeline = std::make_unique<RenderPipeline>(default_framebuffer_id, *gl_widget, &resource_database);
+  envmap_manager = std::make_unique<EnvmapTextureManager>(
+      resource_database, screen_size, default_framebuffer_id, *render_pipeline, *skybox_mesh, scene);
 }
 
 Renderer::~Renderer() {
@@ -37,12 +43,28 @@ Renderer::~Renderer() {
   scene_camera = nullptr;
 }
 
+static void load_shader_database(ShaderDatabase &shader_database) {
+  database::shader::store<BoundingBoxShader>(shader_database, true);
+  database::shader::store<BlinnPhongShader>(shader_database, true);
+  database::shader::store<CubemapShader>(shader_database, true);
+  database::shader::store<ScreenFramebufferShader>(shader_database, true);
+  database::shader::store<BRDFShader>(shader_database, true);
+  database::shader::store<EnvmapCubemapBakerShader>(shader_database, true);
+  database::shader::store<IrradianceCubemapBakerShader>(shader_database, true);
+  database::shader::store<EnvmapPrefilterBakerShader>(shader_database, true);
+  database::shader::store<BRDFLookupTableBakerShader>(shader_database, true);
+}
+
 void Renderer::initialize() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+  /*Read shader + initialize them*/
+  ShaderDatabase &shader_database = resource_database.getShaderDatabase();
+  load_shader_database(shader_database);
   resource_database.getShaderDatabase().initializeShaders();
+  /*Initialize a reusable lut texture*/
+  envmap_manager->initializeLUT();
   camera_framebuffer = std::make_unique<CameraFrameBuffer>(resource_database, &screen_size, &default_framebuffer_id);
-  render_pipeline = std::make_unique<RenderPipeline>(this, &resource_database);
   camera_framebuffer->initializeFrameBuffer();
 }
 
@@ -77,26 +99,33 @@ void Renderer::draw() {
 }
 
 void Renderer::set_new_scene(std::pair<std::vector<Mesh *>, SceneTree> &new_scene) {
+  assert(skybox_mesh);
   scene.clear();
-  Loader loader;
-  EnvironmentMap2DTexture *env = loader.loadHdrEnvmap();  //! TODO in case we want to seek the cubemap to replace it's
-                                                          //! texture with this , use visitor pattern in scene graph
-  CubeMapMesh *cubemap_mesh = render_pipeline->bakeEnvmapToCubemap(env, 2048, 2048, gl_widget);
-  int cube_envmap_id = cubemap_mesh->material.getTextureGroup().getTextureCollection()[0];
-  int irradiance_tex_id = render_pipeline->bakeIrradianceCubemap(cube_envmap_id, 64, 64, gl_widget);
-  int prefiltered_cubemap = render_pipeline->preFilterEnvmap(cube_envmap_id, 2048, 512, 512, 10, 500, 2, gl_widget);
-  int brdf_lut = render_pipeline->generateBRDFLookupTexture(512, 512, gl_widget);
-  std::for_each(new_scene.first.begin(),
-                new_scene.first.end(),
-                [irradiance_tex_id, brdf_lut, prefiltered_cubemap, cube_envmap_id, cubemap_mesh, this](Mesh *m) {
-                  m->material.addTexture(irradiance_tex_id);
-                  m->material.addTexture(prefiltered_cubemap);
-                  m->material.addTexture(brdf_lut);
-                  m->setCubemapPointer(cubemap_mesh);
-                });
-  assert(cubemap_mesh);
-  new_scene.first.push_back(cubemap_mesh);
-  new_scene.second.pushNewRoot(cubemap_mesh);
+  TextureDatabase &texture_database = resource_database.getTextureDatabase();
+  int brdf_lut = envmap_manager->currentLutId();
+  if (!skybox_mesh->material.hasTextures()) {
+    int irradiance_tex_id = envmap_manager->currentIrradianceId();
+    int prefiltered_cubemap = envmap_manager->currentPrefilterId();
+    std::for_each(new_scene.first.begin(), new_scene.first.end(), [irradiance_tex_id, brdf_lut, prefiltered_cubemap, this](Mesh *m) {
+      m->material.addTexture(irradiance_tex_id);
+      m->material.addTexture(prefiltered_cubemap);
+      m->material.addTexture(brdf_lut);
+      m->setCubemapPointer(skybox_mesh);
+    });
+
+  } else {
+    int irradiance_tex_id = envmap_manager->currentIrradianceId();
+    int prefiltered_cubemap = envmap_manager->currentPrefilterId();
+    std::for_each(new_scene.first.begin(), new_scene.first.end(), [irradiance_tex_id, brdf_lut, prefiltered_cubemap, this](Mesh *m) {
+      m->material.addTexture(irradiance_tex_id);
+      m->material.addTexture(prefiltered_cubemap);
+      m->material.addTexture(brdf_lut);
+      m->setCubemapPointer(skybox_mesh);
+    });
+  }
+
+  new_scene.first.push_back(skybox_mesh);
+  new_scene.second.pushNewRoot(skybox_mesh);
   scene.setScene(new_scene);
   scene.setLightDatabasePointer(&light_database);
   scene.setCameraPointer(scene_camera);
@@ -113,7 +142,7 @@ void Renderer::onLeftClick() {
     scene_camera->onLeftClick();
 }
 
-void Renderer::onRightClick() { scene_camera->onRightClick(); }
+void Renderer::onRightClick() const { scene_camera->onRightClick(); }
 
 void Renderer::onLeftClickRelease() {
   if (!event_callback_stack[ON_LEFT_CLICK].empty()) {
@@ -143,11 +172,11 @@ void Renderer::onLeftClickRelease() {
     scene_camera->onLeftClickRelease();
 }
 
-void Renderer::onRightClickRelease() { scene_camera->onRightClickRelease(); }
+void Renderer::onRightClickRelease() const { scene_camera->onRightClickRelease(); }
 
-void Renderer::onScrollDown() { scene_camera->zoomOut(); }
+void Renderer::onScrollDown() const { scene_camera->zoomOut(); }
 
-void Renderer::onScrollUp() { scene_camera->zoomIn(); }
+void Renderer::onScrollUp() const { scene_camera->zoomIn(); }
 
 void Renderer::onResize(unsigned int width, unsigned int height) {
   screen_size.width = width;
@@ -156,49 +185,49 @@ void Renderer::onResize(unsigned int width, unsigned int height) {
     camera_framebuffer->resize();
 }
 
-void Renderer::setGammaValue(float value) {
+void Renderer::setGammaValue(float value) const {
   if (camera_framebuffer != nullptr) {
     camera_framebuffer->setGamma(value);
     gl_widget->update();
   }
 }
 
-void Renderer::setExposureValue(float value) {
+void Renderer::setExposureValue(float value) const {
   if (camera_framebuffer != nullptr) {
     camera_framebuffer->setExposure(value);
     gl_widget->update();
   }
 }
 
-void Renderer::setNoPostProcess() {
+void Renderer::setNoPostProcess() const {
   if (camera_framebuffer != nullptr) {
     camera_framebuffer->setPostProcessDefault();
     gl_widget->update();
   }
 }
 
-void Renderer::setPostProcessEdge() {
+void Renderer::setPostProcessEdge() const {
   if (camera_framebuffer != nullptr) {
     camera_framebuffer->setPostProcessEdge();
     gl_widget->update();
   }
 }
 
-void Renderer::setPostProcessSharpen() {
+void Renderer::setPostProcessSharpen() const {
   if (camera_framebuffer != nullptr) {
     camera_framebuffer->setPostProcessSharpen();
     gl_widget->update();
   }
 }
 
-void Renderer::setPostProcessBlurr() {
+void Renderer::setPostProcessBlurr() const {
   if (camera_framebuffer != nullptr) {
     camera_framebuffer->setPostProcessBlurr();
     gl_widget->update();
   }
 }
 
-void Renderer::resetSceneCamera() {
+void Renderer::resetSceneCamera() const {
   if (scene_camera != nullptr) {
     scene_camera->reset();
     gl_widget->update();

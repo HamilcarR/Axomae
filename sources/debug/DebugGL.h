@@ -10,7 +10,7 @@ inline void errorCheck(const char *filename, unsigned int line) {
   GLenum error = GL_NO_ERROR;
   error = glGetError();
   if (error != GL_NO_ERROR) {
-    std::string err = "GL API ERROR :" + error;
+    std::string err = std::string("GL API ERROR :") + std::to_string(error);
     LOG(err, LogLevel::ERROR);
   }
 }

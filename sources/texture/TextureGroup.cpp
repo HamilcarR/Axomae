@@ -2,17 +2,10 @@
 #include "ResourceDatabaseManager.h"
 #include "Shader.h"
 
-TextureGroup::TextureGroup() {
-  texture_database = &ResourceDatabaseManager::getInstance().getTextureDatabase();
-  initialized = false;
-}
+TextureGroup::TextureGroup() : texture_database(&ResourceDatabaseManager::getInstance().getTextureDatabase()), initialized(false) {}
 
-TextureGroup::TextureGroup(const TextureGroup &texture_group) {
-  texture_collection = texture_group.getTextureCollection();
-  initialized = texture_group.isInitialized();
-}
-
-TextureGroup::~TextureGroup() {}
+TextureGroup::TextureGroup(const TextureGroup &texture_group)
+    : texture_collection(texture_group.getTextureCollection()), initialized(texture_group.isInitialized()) {}
 
 void TextureGroup::addTexture(int index) { texture_collection.push_back(index); }
 
@@ -84,12 +77,25 @@ void TextureGroup::unbind() {
   }
 }
 
-/****************************************************************************************************************************/
-
 TextureGroup &TextureGroup::operator=(const TextureGroup &texture_group) {
   if (this != &texture_group) {
     texture_collection = texture_group.getTextureCollection();
     initialized = texture_group.isInitialized();
   }
   return *this;
+}
+
+bool TextureGroup::removeTexture(int id) {
+  auto it = std::find(texture_collection.begin(), texture_collection.end(), id);
+  if (it != texture_collection.end())
+    texture_collection.erase(it);
+}
+
+bool TextureGroup::removeTexture(Texture::TYPE type) {
+  std::vector collection = texture_database->getTexturesByType(type);
+  for (auto &elem : collection) {
+    auto it = std::find(texture_collection.begin(), texture_collection.end(), elem.id);
+    if (it != texture_collection.end())
+      texture_collection.erase(it);
+  }
 }

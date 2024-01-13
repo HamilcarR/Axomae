@@ -12,8 +12,8 @@ HEADERS += $$PWD/INodeDatabase.h \
             $$PWD/ShaderDatabase.h \
             $$PWD/TextureDatabase.h \ 
             $$PWD/ImageDatabase.h\
-            $$PWD/database_utils.h
-            
+            $$PWD/database_utils.h\
+
 
 INCLUDEPATH += $$PWD/../common \
                 $$PWD/../database \

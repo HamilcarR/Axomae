@@ -13,13 +13,11 @@ Material::Material() {
   is_transparent = false;
 }
 
-Material::~Material() {}
-
 bool Material::isTransparent() {
   Texture *tex_opacity = textures_group.getTexturePointer(Texture::OPACITY);
   Texture *tex_diffuse = textures_group.getTexturePointer(Texture::DIFFUSE);
   if (alpha_factor < 1.f || (tex_opacity && !tex_opacity->isDummyTexture()) ||
-      (tex_diffuse && static_cast<DiffuseTexture *>(tex_diffuse)->hasTransparency()))
+      (tex_diffuse && dynamic_cast<DiffuseTexture *>(tex_diffuse)->hasTransparency()))
   {
     is_transparent = true;
     return true;

@@ -5,19 +5,18 @@
 #include "constants.h"
 #include <QAbstractListModel>
 
-class HdrImageModel : public QAbstractListModel, public ISubscriber<database::event::IconUpdateMessage> {
+class HdrImageModel : public QAbstractListModel, public ISubscriber<database::event::ImageUpdateMessage *> {
 
   Q_OBJECT
 
-  using Message = database::event::IconUpdateMessage;
+  using Message = database::event::ImageUpdateMessage *;
 
  public:
   explicit HdrImageModel(ImageDatabase<float> &db, QObject *parent = nullptr);
-  int rowCount(const QModelIndex &parent) const;
-  QVariant data(const QModelIndex &index, int role) const override;
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-  bool operator==(const ISubscriber<Message> &compare) const final;
-  void notified(observer::Data<Message> data) override;
+  [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
+  [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
+  [[nodiscard]] QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+  void notified(observer::Data<Message> &data) override;
 
  protected:
   ImageDatabase<float> &database;

@@ -28,7 +28,7 @@ class FrameBufferInterface {
    * @param default_fbo_id_pointer
    * @param rendertype
    */
-  FrameBufferInterface(TextureDatabase *texture_database, ScreenSize *texture_size, unsigned int *default_fbo_id_pointer = nullptr);
+  FrameBufferInterface(TextureDatabase *texture_database, Dim2 *texture_size, unsigned int *default_fbo_id_pointer = nullptr);
   virtual ~FrameBufferInterface();
   FrameBufferInterface(FrameBufferInterface &&move) noexcept;
 
@@ -44,7 +44,7 @@ class FrameBufferInterface {
    * @param pointer_on_texture_size Pointer on texture size
    *
    */
-  virtual void setTextureDimensions(ScreenSize *pointer_on_texture_size) { texture_dim = pointer_on_texture_size; }
+  virtual void setTextureDimensions(Dim2 *pointer_on_texture_size) { texture_dim = pointer_on_texture_size; }
 
   /**
    * @brief Render to the texture stored inside the framebuffer
@@ -151,7 +151,7 @@ class FrameBufferInterface {
 
  protected:
   std::unique_ptr<GLFrameBuffer> gl_framebuffer_object;
-  ScreenSize *texture_dim;
+  Dim2 *texture_dim;
   TextureDatabase *texture_database;
   std::map<GLFrameBuffer::INTERNAL_FORMAT, Texture *> fbo_attachment_texture_collection;
   unsigned int *default_framebuffer_pointer;  //! use as argument in constructor , or getters and setters

@@ -29,12 +29,6 @@ class TextureGroup {
   TextureGroup(const TextureGroup &texture_group);
 
   /**
-   * @brief Destroy the Texture Group object
-   *
-   */
-  virtual ~TextureGroup();
-
-  /**
    * @brief Adds a texture to the collection
    *
    * @param texture_database_index Database index of the texture
@@ -74,7 +68,7 @@ class TextureGroup {
    * @return true if the textures are ready to use
    * @return false if the textures are not ready to use
    */
-  bool isInitialized() const { return initialized; };
+  [[nodiscard]] bool isInitialized() const { return initialized; };
 
   /**
    * @brief Checks if a texture of a certain type exists in the TextureGroup's collection
@@ -97,14 +91,10 @@ class TextureGroup {
    *
    * @return std::vector<int>
    */
-  const std::vector<int> &getTextureCollection() const { return texture_collection; }
+  [[nodiscard]] const std::vector<int> &getTextureCollection() const { return texture_collection; }
 
-  /**
-   * @brief
-   *
-   * @param texture_group
-   * @return TextureGroup&
-   */
+  [[nodiscard]] bool isEmpty() const { return texture_collection.empty(); }
+
   TextureGroup &operator=(const TextureGroup &texture_group);
 
   /**
@@ -113,9 +103,11 @@ class TextureGroup {
    */
   void synchronizeWithDatabaseState();
 
- public:
-  TextureDatabase *texture_database; /**<Pointer to the database texture*/
+  bool removeTexture(Texture::TYPE type);
+  bool removeTexture(int id);
+
  private:
+  TextureDatabase *texture_database{}; /**<Pointer to the database texture*/
   std::vector<int> texture_collection; /**<Array of Pointers to textures in the texture database*/
   bool initialized;                    /**<State of the textures*/
 };

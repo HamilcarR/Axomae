@@ -4,8 +4,8 @@
 #include "BoundingBox.h"
 #include "Camera.h"
 #include "Material.h"
+#include "Visitor.h"
 #include "Object3D.h"
-
 /**
  * @brief Mesh.h
  * Mesh class implementation
@@ -46,8 +46,6 @@ class Mesh : public SceneTreeNode {
    */
   Mesh(ISceneNode *parent = nullptr);
 
-
-
   /**
    * @brief Construct a new Mesh object from geometry and material
    *
@@ -84,8 +82,6 @@ class Mesh : public SceneTreeNode {
    * @param shader Shader used
    */
   Mesh(const std::string &name, const Object3D &&obj, const Material &mat, Shader *shader, ISceneNode *parent = nullptr);
-
-
 
   /**
    * @brief Enable the mesh's material to render
@@ -290,19 +286,13 @@ class CubeMesh : public Mesh {
    * @brief Construct a new Cube  Mesh object
    *
    */
-  CubeMesh(ISceneNode *parent = nullptr);
+  explicit CubeMesh(ISceneNode *parent = nullptr);
 
   /**
    * @brief
    *
    */
-  void preRenderSetup();
-
-  /**
-   * @brief Destroy the Cube  Mesh object
-   *
-   */
-  virtual ~CubeMesh();
+  void preRenderSetup() override;
 };
 
 /*****************************************************************************************************************/
@@ -325,19 +315,13 @@ class CubeMapMesh : public CubeMesh {
    * @brief Construct a new Cube Map Mesh object
    *
    */
-  CubeMapMesh(ISceneNode *parent = nullptr);
-
-  /**
-   * @brief Destroy the Cube Map Mesh object
-   *
-   */
-  virtual ~CubeMapMesh();
+  explicit CubeMapMesh(ISceneNode *parent = nullptr);
 
   /**
    * @brief Computes relevant matrices , and sets up the culling + depth states
    *
    */
-  virtual void preRenderSetup();
+  void preRenderSetup() override;
 };
 
 /*****************************************************************************************************************/
@@ -348,13 +332,7 @@ class QuadMesh : public Mesh {
    *
    * @param parent
    */
-  QuadMesh(ISceneNode *parent = nullptr);
-
-  /**
-   * @brief Destroy the Quad Mesh object
-   *
-   */
-  virtual ~QuadMesh();
+  explicit QuadMesh(ISceneNode *parent = nullptr);
 
   /**
    * @brief
@@ -389,13 +367,7 @@ class FrameBufferMesh : public QuadMesh {
    * @brief Computes relevant matrices , and sets up the culling + depth states
    *
    */
-  virtual void preRenderSetup();
-
-  /**
-   * @brief Destroy the Frame Buffer Mesh object
-   *
-   */
-  virtual ~FrameBufferMesh();
+  void preRenderSetup() override;
 };
 
 /*****************************************************************************************************************/
@@ -406,7 +378,7 @@ class BoundingBoxMesh : public Mesh {
    * @brief Construct a new Bounding Box Mesh object
    * @param parent Predecessor in the scene graph
    */
-  BoundingBoxMesh(ISceneNode *parent = nullptr);
+  explicit BoundingBoxMesh(ISceneNode *parent = nullptr);
 
   /**
    * @brief Construct a new Bounding Box Mesh object
@@ -427,18 +399,12 @@ class BoundingBoxMesh : public Mesh {
   /**
    * @see Mesh::afterRenderSetup()
    */
-  virtual void afterRenderSetup() override;
+  void afterRenderSetup() override;
   /**
    *
    * @see Mesh::preRenderSetup()
    */
-  virtual void preRenderSetup();
-
-  /**
-   * @brief Destroy the Bounding Box Mesh object
-   *
-   */
-  virtual ~BoundingBoxMesh();
+  void preRenderSetup() override;
 
   virtual BoundingBox getBoundingBoxObject() { return bounding_box; }
 

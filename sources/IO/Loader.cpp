@@ -483,18 +483,13 @@ namespace axomae {
   EnvironmentMap2DTexture *Loader::loadHdrEnvmap() {
     TextureDatabase &texture_database = resource_database->getTextureDatabase();
     ImageDatabase<float> &hdr_database = resource_database->getHdrDatabase();
-    std::string folder_night = "../Ressources/Skybox_Textures/HDR/Night_City/Night.hdr";
-    std::string folder_forest = "../Ressources/Skybox_Textures/HDR/Forest/Forest.hdr";
-    std::string folder_park = "../Ressources/Skybox_Textures/HDR/Park/Park.hdr";
-    std::string folder_snow = "../Ressources/Skybox_Textures/HDR/Snow/Snow.hdr";
-    std::string folder_sky = "../Ressources/Skybox_Textures/HDR/Sky/Sky.hdr";
     std::string folder_street = "../Ressources/Skybox_Textures/HDR/Street/Street.hdr";
     std::string hdr = folder_street;
     int width = -1, height = -1, channels = -1;
     float *hdr_data = stbi_loadf(hdr.c_str(), &width, &height, &channels, 0);
     if (stbi_failure_reason())
       LOG("STBI FAILED WITH :" + std::string(stbi_failure_reason()), LogLevel::ERROR);
-
+    /* THis part is replaced by EnvmapTextureManager */
     TextureData envmap;
     envmap.width = static_cast<unsigned int>(width);
     envmap.height = static_cast<unsigned int>(height);
@@ -504,7 +499,7 @@ namespace axomae {
     envmap.nb_components = channels;
     envmap.f_data.resize(width * height * channels);
     std::memcpy(&envmap.f_data[0], hdr_data, width * height * channels * sizeof(float));
-
+    /**************************************************/
     std::vector<float> image_data;
     image_data.resize(width * height * channels);
     for (int i = 0; i < width * height * channels; i++)
@@ -546,6 +541,7 @@ namespace axomae {
     auto &resource_database = ResourceDatabaseManager::getInstance();
     auto &hdr_database = resource_database.getHdrDatabase();
     database::image::store<float>(hdr_database, false, image_data, metadata);
+    stbi_image_free(data);
   }
 
   /**
@@ -557,7 +553,6 @@ namespace axomae {
    */
   std::pair<std::vector<Mesh *>, SceneTree> Loader::load(const char *file) {
     TextureDatabase *texture_database = &resource_database->getTextureDatabase();
-    ShaderDatabase *shader_database = &resource_database->getShaderDatabase();
     texture_database->clean();
     std::pair<std::vector<Mesh *>, SceneTree> scene = loadObjects(file);
     errorCheck(__FILE__, __LINE__);

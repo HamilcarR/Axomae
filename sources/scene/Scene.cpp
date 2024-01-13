@@ -176,3 +176,26 @@ void Scene::setPolygonFill() {
       tmp->setPolygonDrawMode(Mesh::FILL);
   }
 }
+
+std::vector<Mesh *> Scene::getMeshCollectionPtr() const {
+  std::vector<Mesh *> to_ret;
+  for (auto &elem : scene)
+    to_ret.push_back(elem.drawable->getMeshPointer());
+  return to_ret;
+}
+
+void Scene::switchEnvmap(int cubemap_id, int irradiance_id, int prefiltered_id, int /*lut_id*/) {
+  for (auto &elem : scene) {
+    Mesh *mesh = elem.drawable->getMeshPointer();
+    TextureGroup &texgroup = mesh->material.getTextureGroupRef();
+    if (mesh != scene_skybox) {
+      texgroup.removeTexture(Texture::IRRADIANCE);
+      texgroup.addTexture(irradiance_id);
+      texgroup.removeTexture(Texture::CUBEMAP);
+      texgroup.addTexture(prefiltered_id);
+    } else {
+      texgroup.removeTexture(Texture::CUBEMAP);
+      texgroup.addTexture(cubemap_id);
+    }
+  }
+}

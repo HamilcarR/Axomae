@@ -18,12 +18,12 @@ class CameraFrameBuffer : public FrameBufferInterface {
   /**
    * @brief Construct a new Camera Frame Buffer object
    * @param resource_database
-   * @param screen_size_pointer Pointer on a ScreenSize structure , containing informations about the dimensions of the
+   * @param screen_size_pointer Pointer on a Dim2 structure , containing informations about the dimensions of the
    * render surface
    * @param default_fbo_id Pointer on the ID of the default framebuffer . In the case of QT , this framebuffer is the
    * one used for the GUI interface (so , not 0)
    */
-  CameraFrameBuffer(ResourceDatabaseManager &resource_database, ScreenSize *screen_size_pointer, unsigned int *default_fbo_id);
+  CameraFrameBuffer(ResourceDatabaseManager &resource_database, Dim2 *screen_size_pointer, unsigned int *default_fbo_id);
 
   /**
    * @brief Destroy the Camera Frame Buffer object

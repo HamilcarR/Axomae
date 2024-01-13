@@ -1,7 +1,7 @@
 #ifndef NODE_H
 #define NODE_H
-#include "utils_3D.h"
 #include "Logger.h"
+#include "utils_3D.h"
 #include <memory>
 
 /**
@@ -234,7 +234,7 @@ class SceneTreeNode : public ISceneNode {
    * stored as parent , as this structure is a tree.
    * @param parents Vector of predecessors . Only the first element is considered
    */
-   void setParents(std::vector<INode *> &parents) override;
+  void setParents(std::vector<INode *> &parents) override;
 
  public:
   /**

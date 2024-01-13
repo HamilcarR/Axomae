@@ -154,12 +154,12 @@ class SceneTree : public ISceneHierarchy {
   SceneTree(ISceneNode *root = nullptr);
   SceneTree(const SceneTree &copy);
   virtual ~SceneTree();
-  virtual void createGenericRootNode(IResourceDB<int, INode> &database) override;
+  void createGenericRootNode(IResourceDB<int, INode> &database) override;
   virtual SceneTree &operator=(const SceneTree &copy);
-  virtual void updateAccumulatedTransformations() override;
+  void updateAccumulatedTransformations() override;
   virtual void pushNewRoot(INode *new_root);
-  virtual std::vector<INode *> findByName(const std::string &name) override;
-  virtual void updatedHierarchy() override;
+  std::vector<INode *> findByName(const std::string &name) override;
+  void updatedHierarchy() override;
 
  private:
   bool node_updated;

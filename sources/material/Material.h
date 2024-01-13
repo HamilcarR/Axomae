@@ -42,12 +42,6 @@ class Material {
   Material();
 
   /**
-   * @brief Destroy the Material object
-   *
-   */
-  virtual ~Material();
-
-  /**
    * @brief Add a texture from the texture database to the material structure
    *
    * @param texture_database_index Index of the texture in the database map
@@ -139,56 +133,56 @@ class Material {
    *
    * @return TextureGroup
    */
-  TextureGroup getTextureGroup() const { return textures_group; }
-
+  [[nodiscard]] TextureGroup getTextureGroup() const { return textures_group; }
+  [[nodiscard]] TextureGroup &getTextureGroupRef() { return textures_group; }
   /**
    * @brief Get the Dielectric Factor value
    *
    * @return float
    */
-  float getDielectricFactor() const { return dielectric_factor; }
+  [[nodiscard]] float getDielectricFactor() const { return dielectric_factor; }
 
   /**
    * @brief Get the Roughness Factor value
    *
    * @return float
    */
-  float getRoughnessFactor() const { return roughness_factor; }
+  [[nodiscard]] float getRoughnessFactor() const { return roughness_factor; }
 
   /**
    * @brief Get the Transmission Factor value
    *
    * @return float
    */
-  float getTransmissionFactor() const { return transmission_factor; }
+  [[nodiscard]] float getTransmissionFactor() const { return transmission_factor; }
 
   /**
    * @brief Get the Emissive Factor value
    *
    * @return float
    */
-  float getEmissiveFactor() const { return emissive_factor; }
+  [[nodiscard]] float getEmissiveFactor() const { return emissive_factor; }
 
   /**
    * @brief Get the Alpha Factor value
    *
    * @return float
    */
-  float getAlphaFactor() const { return alpha_factor; }
+  [[nodiscard]] float getAlphaFactor() const { return alpha_factor; }
 
   /**
    * @brief Get the Refractive Index value
    *
    * @return glm::vec2
    */
-  glm::vec2 getRefractiveIndex() const { return refractive_index; }
+  [[nodiscard]] glm::vec2 getRefractiveIndex() const { return refractive_index; }
 
   /**
    * @brief Get the Shader Program object
    *
    * @return Shader*
    */
-  Shader *getShaderProgram() const { return shader_program; }
+  [[nodiscard]] Shader *getShaderProgram() const { return shader_program; }
 
   /**
    * @brief Get the Transparency value
@@ -196,7 +190,9 @@ class Material {
    * @return true
    * @return false
    */
-  bool getTransparency() const { return is_transparent; }
+  [[nodiscard]] bool getTransparency() const { return is_transparent; }
+
+  [[nodiscard]] bool hasTextures() const { return !textures_group.isEmpty(); }
 
  protected:
   TextureGroup textures_group; /**<A structure of every type of texture to be bound*/

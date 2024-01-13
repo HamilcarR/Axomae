@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "CameraFrameBuffer.h"
 #include "Drawable.h"
+#include "EnvmapTextureManager.h"
 #include "GLViewer.h"
 #include "LightingDatabase.h"
 #include "Loader.h"
@@ -16,7 +17,6 @@
 #include "Scene.h"
 #include "constants.h"
 #include "utils_3D.h"
-
 /**
  * @file Renderer.h
  * Implementation of the renderer system
@@ -115,7 +115,7 @@ class Renderer : public QObject {
    * @brief Right click event behavior
    *
    */
-  void onRightClick();
+  void onRightClick() const;
 
   /**
    * @brief Left click release event behavior
@@ -127,19 +127,19 @@ class Renderer : public QObject {
    * @brief Right click release event behavior
    *
    */
-  void onRightClickRelease();
+  void onRightClickRelease() const;
 
   /**
    * @brief Scroll down event behavior
    *
    */
-  void onScrollDown();
+  void onScrollDown() const;
 
   /**
    * @brief Scroll up event behavior
    *
    */
-  void onScrollUp();
+  void onScrollUp() const;
 
   /**
    * @brief Set the new screen dimensions
@@ -168,41 +168,41 @@ class Renderer : public QObject {
    *
    * @param gamma
    */
-  void setGammaValue(float gamma);
+  void setGammaValue(float gamma) const;
 
   /**
    * @brief Set the Exposure Value object
    *
    * @param exposure
    */
-  void setExposureValue(float exposure);
+  void setExposureValue(float exposure) const;
 
   /**
    * @brief Set post process to default
    *
    */
-  void setNoPostProcess();
+  void setNoPostProcess() const;
 
   /**
    *	@brief  Set post process to edge
    */
-  void setPostProcessEdge();
+  void setPostProcessEdge() const;
 
   /**
    *	@brief  Set post process to sharpen
    */
-  void setPostProcessSharpen();
+  void setPostProcessSharpen() const;
 
   /**
    * @brief Set post process to blurr
    */
-  void setPostProcessBlurr();
+  void setPostProcessBlurr() const;
 
   /**
    * @brief Resets the scene camera to default position
    *
    */
-  void resetSceneCamera();
+  void resetSceneCamera() const;
 
   /**
    * @brief Display meshes in point clouds
@@ -286,21 +286,24 @@ class Renderer : public QObject {
 
  signals:
   void sceneModified();
+  void envmapSelected();
 
  public:
   std::unique_ptr<RenderPipeline> render_pipeline;
   std::unique_ptr<CameraFrameBuffer> camera_framebuffer; /**<Main framebuffer attached to the view*/
   bool start_draw;                                       /**<If the renderer is ready to draw*/
   ResourceDatabaseManager
-      &resource_database;              /**<The main database containing a texture database ,a node database for stored meshes and a shader database*/
-  Scene scene;                         /**<The scene to be rendered*/
-  Camera *scene_camera;                /**<Pointer on the scene camera*/
+      &resource_database; /**<The main database containing a texture database ,a node database for stored meshes and a shader database*/
+  Scene scene;            /**<The scene to be rendered*/
+  Camera *scene_camera;   /**<Pointer on the scene camera*/
+  CubeMapMesh *skybox_mesh;
   MouseState mouse_state;              /**<Pointer on the MouseState structure*/
-  ScreenSize screen_size;              /**<Dimensions of the renderer windows*/
+  Dim2 screen_size;                    /**<Dimensions of the renderer windows*/
   unsigned int default_framebuffer_id; /**<In the case the GUI uses other contexts and other framebuffers , we use this
                                           variable to reset the rendering to the default framebuffer*/
   LightingDatabase light_database;
   GLViewer *gl_widget;
+  std::unique_ptr<EnvmapTextureManager> envmap_manager;
 
  private:
   static const int event_num_size = ON_MOUSEWHEEL_SCROLL_DOWN + 1;

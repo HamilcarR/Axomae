@@ -16,7 +16,7 @@
  * GL texture database with no duplicates.
  *
  */
-class TextureDatabase final : public IResourceDB<int, Texture> {
+class TextureDatabase final : public IntegerResourceDB<Texture> {
  public:
   TextureDatabase() = default;
   void clean() override;
@@ -34,8 +34,9 @@ class TextureDatabase final : public IResourceDB<int, Texture> {
   database::Result<int, Texture> add(std::unique_ptr<Texture> texture, bool keep) override;
   std::vector<database::Result<int, Texture>> getTexturesByType(Texture::TYPE texture_type) const;
   bool empty() const override { return database_map.empty(); }
-  int firstFreeId() const override;
   database::Result<int, Texture> getUniqueTexture(const std::string &name) const;
+  bool removeUniqueTextureReference(int id);
+
  private:
   std::map<std::string, int> unique_textures;
 };

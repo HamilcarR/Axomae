@@ -13,6 +13,7 @@
  */
 
 namespace database {
+
   template<class IDTYPE, class OBJTYPE>
   class Result {
    public:
@@ -43,7 +44,6 @@ namespace database {
     bool operator==(const Result<IDTYPE, OBJTYPE> &compare) const { return id == compare.id && object == compare.object; }
   };
 
-  // !Replace the whole negative id system bullshit with this :
   template<class U, class T>
   class Storage {
    public:
@@ -144,7 +144,7 @@ class IResourceDB {
   /**
    * @brief Return a pointer on a single element , after a search using an ID .
    * @param id ID of the element
-   * @return T* Pointer on the element
+   * @return T* Pointer on the element or nullptr if not found
    */
   virtual T *get(const U id) const {
     Mutex::Lock lock(mutex);
@@ -189,11 +189,7 @@ class IResourceDB {
     return false;
   }
 
-  /**
-   * @brief returns the first free ID of the map.
-   * @return U id
-   */
-  virtual U firstFreeId() const = 0;
+  [[nodiscard]] virtual U firstFreeId() const = 0;
 
   /**
    * @brief Adds an element in the database
@@ -240,10 +236,48 @@ class IResourceDB {
   virtual bool empty() const { return database_map.empty(); }
   virtual int size() const { return database_map.size(); }
   const DATABASE &getConstData() const { return database_map; }
+  bool setPersistence(const U id, bool persistence = true) {
+    auto it = database_map.find(id);
+    if (it == database_map.end())
+      return false;
+    it->second.setPersistence(persistence);
+    return true;
+  }
 
  protected:
   mutable Mutex mutex;
   DATABASE database_map;
+};
+
+/* Some methods may have an ambiguous behavior depending on the type of the ID . this class provides a specialization of the
+ * firstFreeId() method for integers id based databases*/
+template<class T>
+class IntegerResourceDB : public IResourceDB<int, T> {
+  using BASETYPE = IResourceDB<int, T>;
+
+ public:
+  /**
+   * @brief returns the first free ID of the map.
+   *
+   * Returns either :
+   * 1) Slot in which storage is marked invalid .
+   * 2) "Hole" between two valid slots. (ex : 1 -- [no slot] -- 3 , returns 2)
+   * 3) Allocates new storage in the map .
+   * @return U id
+   */
+  [[nodiscard]] virtual int firstFreeId() const {
+    int diff = 0;
+    if (BASETYPE::database_map.begin()->first > 0)  // In case 0 is available.
+      return 0;
+    for (const auto &elem : BASETYPE::database_map) {
+      if (!elem.second.isValid())
+        return elem.first;
+      if ((elem.first - diff) > 1)
+        return (elem.first + diff) / 2;
+      diff = elem.first;
+    }
+    return BASETYPE::size();
+  }
 };
 
 #endif

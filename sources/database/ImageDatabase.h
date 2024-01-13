@@ -10,22 +10,38 @@
 #include <utility>
 
 template<class DATATYPE>
-class ImageDatabase : public IResourceDB<int, image::RawImageHolder<DATATYPE>>, public IPublisher<database::event::IconUpdateMessage> {
-  using BaseType = IResourceDB<int, image::RawImageHolder<DATATYPE>>;
+class ImageDatabase : public IntegerResourceDB<image::RawImageHolder<DATATYPE>>, private IPublisher<database::event::ImageUpdateMessage *> {
+  using BaseType = IntegerResourceDB<image::RawImageHolder<DATATYPE>>;
   using HolderPointer = std::unique_ptr<image::RawImageHolder<DATATYPE>>;
   using HolderResult = database::Result<int, image::RawImageHolder<DATATYPE>>;
   using HolderMap = std::map<int, std::unique_ptr<image::RawImageHolder<DATATYPE>>>;
-  using Message = database::event::IconUpdateMessage;
+  using Message = database::event::ImageUpdateMessage *;
   using Subscriber = ISubscriber<Message>;
 
  private:
-  void notifyIconUpdate(int index) {
-    Message message;
-    message.metadata = getMetadata(index);
-    message.index = index;
-    message.value = getThumbnail(index);
-    observer::Data<Message> data;
-    data.data = message;
+  void notifyImageSelected(int index) {
+    database::event::ImageSelectedMessage message;
+    message.setIndex(index);
+    observer::Data<Message> data{};
+    data.data = static_cast<Message>(&message);
+    notify(data);
+  }
+
+  void notifyImageDelete(int index) {
+    database::event::ImageDeleteMessage message;
+    message.setIndex(index);
+    observer::Data<Message> data{};
+    data.data = static_cast<Message>(&message);
+    notify(data);
+  }
+
+  void notifyImageAdd(int index) {
+    database::event::ImageAddMessage message;
+    message.setMetadata(getMetadata(index));
+    message.setIndex(index);
+    message.setThumbnail(&getThumbnail(index));
+    observer::Data<Message> data{};
+    data.data = static_cast<Message>(&message);
     notify(data);
   }
 
@@ -36,6 +52,7 @@ class ImageDatabase : public IResourceDB<int, image::RawImageHolder<DATATYPE>>, 
     BaseType::purge();
     unique_elements.clear();
   }
+  void isSelected(int index) { notifyImageSelected(index); }
 
   void clean() override {
     std::vector<typename BaseType::DATABASE::const_iterator> delete_list;
@@ -60,23 +77,9 @@ class ImageDatabase : public IResourceDB<int, image::RawImageHolder<DATATYPE>>, 
       return result;
     }
     auto elem = BaseType::add(std::move(element), keep);
-    notify(observer::Data<Message>());
+    notifyImageAdd(elem.id);
     unique_elements.insert(std::pair<std::string, int>(elem.object->metadata().name, elem.id));
     return elem;
-  }
-
-  [[nodiscard]] int firstFreeId() const override {
-    int diff = 0;
-    if (BaseType ::database_map.begin()->first > 0)
-      return 0;
-    for (const auto &elem : BaseType::database_map) {
-      if (!elem.second.isValid())
-        return elem.first;
-      if ((elem.first - diff) > 1)
-        return (elem.first + diff) / 2;
-      diff = elem.first;
-    }
-    return BaseType::size();
   }
 
   [[nodiscard]] image::Metadata getMetadata(int index) const {
@@ -89,7 +92,7 @@ class ImageDatabase : public IResourceDB<int, image::RawImageHolder<DATATYPE>>, 
     return holder->thumbnail();
   }
 
-  void notify(observer::Data<Message> data) const override {
+  void notify(observer::Data<Message> &data) const override {
     for (Subscriber *A : subscribers)
       A->notified(data);
   }

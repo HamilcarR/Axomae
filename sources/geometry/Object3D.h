@@ -4,7 +4,6 @@
 #include "constants.h"
 
 class Object3D {
-
  public:
   std::vector<float> vertices;       /*<Vertices array*/
   std::vector<float> uv;             /*<UV arrays of dimension 2*/
@@ -13,6 +12,16 @@ class Object3D {
   std::vector<float> bitangents;     /*<Bitangent of each vertex*/
   std::vector<float> tangents;       /*<Tangent of each vertex*/
   std::vector<unsigned int> indices; /*<Indices of the vertices buffer*/
+
+  void clean() {
+    vertices.clear();
+    uv.clear();
+    colors.clear();
+    normals.clear();
+    bitangents.clear();
+    tangents.clear();
+    indices.clear();
+  }
 };
 
 #endif

@@ -3,7 +3,7 @@
 #include "UniformNames.h"
 using namespace axomae;
 
-CameraFrameBuffer::CameraFrameBuffer(ResourceDatabaseManager &resource_database, ScreenSize *screen_size_pointer, unsigned int *default_fbo_pointer)
+CameraFrameBuffer::CameraFrameBuffer(ResourceDatabaseManager &resource_database, Dim2 *screen_size_pointer, unsigned int *default_fbo_pointer)
     : FrameBufferInterface(&resource_database.getTextureDatabase(), screen_size_pointer, default_fbo_pointer),
       shader_database(resource_database.getShaderDatabase()),
       texture_database(resource_database.getTextureDatabase()),

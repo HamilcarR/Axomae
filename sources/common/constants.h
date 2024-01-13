@@ -41,7 +41,7 @@ struct MouseState {
   bool busy;
 };
 
-struct ScreenSize {
+struct Dim2 {
   unsigned int width;
   unsigned int height;
 };

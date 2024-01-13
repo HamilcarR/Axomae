@@ -20,15 +20,11 @@ class ThumbnailDelegate : public QStyledItemDelegate {
 };
 
 class EnvmapListDisplay : public QListView {
+  Q_OBJECT
  public:
-  explicit EnvmapListDisplay(QWidget *parent = nullptr) : QListView(parent), database(ResourceDatabaseManager::getInstance().getHdrDatabase()) {
-    QListView::setModel(new HdrImageModel(database));
-    QListView::setItemDelegate(new ThumbnailDelegate(this));
-    QListView::setSelectionRectVisible(false);
-    setVerticalScrollBar(new QScrollBar(this));
-  }
-
-  void mousePressEvent(QMouseEvent * /*event*/) override { ; }
+  explicit EnvmapListDisplay(QWidget *parent = nullptr);
+ protected slots:
+  void itemClicked(const QModelIndex &index);
 
  protected:
   HdrImageDatabase &database;

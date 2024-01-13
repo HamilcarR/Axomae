@@ -172,6 +172,8 @@ class Scene {
    * @param display
    */
   void displayBoundingBoxes(bool display) { display_bbox = display; }
+  void setSkybox(Mesh *envmap_mesh) { scene_skybox = envmap_mesh; }
+  Mesh *getSkybox() const { return scene_skybox; }
 
   /**
    * @brief Get reference on the scene tree
@@ -180,6 +182,8 @@ class Scene {
    */
   const SceneTree &getConstSceneTreeRef() const { return scene_tree; }
   SceneTree &getSceneTreeRef() { return scene_tree; }
+  std::vector<Mesh *> getMeshCollectionPtr() const;
+  void switchEnvmap(int cubemap_id, int irradiance_id, int prefiltered_id, int lut_id);
 
  private:
   /**
@@ -196,6 +200,7 @@ class Scene {
   LightingDatabase *light_database;                      /*<Light database pointer*/
   ResourceDatabaseManager &resource_manager;
   Camera *scene_camera; /*<Pointer on the scene camera*/
+  Mesh *scene_skybox;
   bool display_bbox;
 
  private:

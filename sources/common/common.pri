@@ -6,7 +6,8 @@ HEADERS += $$PWD/constants.h \
             $$PWD/UniformNames.h \
             $$PWD/math_utils.h\
             $$PWD/Observer.h\
-            $$PWD/axomae_utils.h
+            $$PWD/axomae_utils.h\
+            $$PWD/Visitor.h
 
 
 

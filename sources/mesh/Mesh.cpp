@@ -15,8 +15,6 @@ Mesh::Mesh(ISceneNode *parent) : SceneTreeNode(parent) {
   modelview_matrix = glm::mat4(1.f);
 }
 
-
-
 Mesh::Mesh(const Object3D &geo, const Material &mat, ISceneNode *parent) : Mesh(parent) {
   geometry = geo;
   material = mat;
@@ -47,12 +45,11 @@ Mesh::Mesh(const std::string &n, const Object3D &&geo, const Material &mat, Shad
   material.setShaderPointer(shader);
 }
 
-
 void Mesh::initializeGlData() {
   if (shader_program != nullptr) {
-    shader_program->initializeShader();
+    shader_program->initializeShader();  // TODO :  move shader initialization away from mesh initialization
     shader_program->bind();
-    material.initializeMaterial();
+    material.initializeMaterial();  // TODO : move material initialization away from mesh initialization
     shader_program->release();
     mesh_initialized = true;
   }
@@ -110,6 +107,7 @@ void Mesh::clean() {
   SceneTreeNode::clean();
   shader_program = nullptr;
   material.clean();
+  geometry.clean();
 }
 
 bool Mesh::isInitialized() { return mesh_initialized; }
@@ -183,8 +181,6 @@ CubeMesh::CubeMesh(ISceneNode *parent) : Mesh(parent) {
   name = "Generic-Cube";
 }
 
-CubeMesh::~CubeMesh() {}
-
 void CubeMesh::preRenderSetup() {
   setFaceCulling(true);
   setDepthMask(true);
@@ -200,8 +196,6 @@ void CubeMesh::preRenderSetup() {
 
 /*****************************************************************************************************************/
 CubeMapMesh::CubeMapMesh(ISceneNode *parent) : CubeMesh(parent) { name = "CubeMap"; }
-
-CubeMapMesh::~CubeMapMesh() {}
 
 void CubeMapMesh::preRenderSetup() {
   setFaceCulling(false);
@@ -233,8 +227,6 @@ QuadMesh::QuadMesh(ISceneNode *parent) : Mesh(parent) {
   name = "Quad";
 }
 
-QuadMesh::~QuadMesh() {}
-
 void QuadMesh::preRenderSetup() {
   setFaceCulling(false);
   setDepthMask(true);
@@ -257,8 +249,6 @@ FrameBufferMesh::FrameBufferMesh(int texture_index, Shader *_shader) : FrameBuff
   material.setShaderPointer(shader_program);
   material.addTexture(texture_index);
 }
-
-FrameBufferMesh::~FrameBufferMesh() {}
 
 void FrameBufferMesh::preRenderSetup() {
   setFaceCulling(false);
@@ -292,8 +282,6 @@ BoundingBoxMesh::BoundingBoxMesh(Mesh *m, const BoundingBox &bbox, Shader *s) : 
   geometry.vertices = geom.first;
   geometry.indices = geom.second;
 }
-
-BoundingBoxMesh::~BoundingBoxMesh() {}
 
 void BoundingBoxMesh::preRenderSetup() {
   setFaceCulling(true);

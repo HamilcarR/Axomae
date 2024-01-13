@@ -17,7 +17,7 @@ Camera::Camera() : world_up(glm::vec3(0, 1, 0)) {
   type = EMPTY;
 }
 
-Camera::Camera(float deg, ScreenSize *screen, float near, float far, const MouseState *pointer) : Camera() {
+Camera::Camera(float deg, Dim2 *screen, float near, float far, const MouseState *pointer) : Camera() {
   type = EMPTY;
   position = glm::vec3(0, 0, -1.f);
   target = glm::vec3(0, 0, 0);
@@ -68,7 +68,7 @@ ArcballCamera::ArcballCamera() { reset(); }
  * radius.
  *
  * @param radians The field of view angle in deg for the camera.
- * @param screen The `screen` parameter is a pointer to an object of the `ScreenSize` class, which
+ * @param screen The `screen` parameter is a pointer to an object of the `Dim2` class, which
  * contains information about the size of the screen or window in which the camera will be used. This
  * information is typically used to calculate the aspect ratio of the screen, which is important for
  * rendering the scene correctly
@@ -84,7 +84,7 @@ ArcballCamera::ArcballCamera() { reset(); }
  *  used by the ArcballCamera class to track user input and update the camera's
  * position/orientation accordingly
  */
-ArcballCamera::ArcballCamera(float deg, ScreenSize *screen, float near, float far, float radius, const MouseState *pointer)
+ArcballCamera::ArcballCamera(float deg, Dim2 *screen, float near, float far, float radius, const MouseState *pointer)
     : Camera(deg, screen, near, far, pointer) {
   reset();
   default_radius = radius;
@@ -246,7 +246,7 @@ void ArcballCamera::zoomOut() { updateZoom(DELTA_ZOOM); }
 /**********************************************************************************************************************************************/
 FreePerspectiveCamera::FreePerspectiveCamera() : Camera() { type = PERSPECTIVE; }
 
-FreePerspectiveCamera::FreePerspectiveCamera(float deg, ScreenSize *screen, float near, float far, const MouseState *pointer)
+FreePerspectiveCamera::FreePerspectiveCamera(float deg, Dim2 *screen, float near, float far, const MouseState *pointer)
     : Camera(deg, screen, near, far, pointer) {
   type = PERSPECTIVE;
 }

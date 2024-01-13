@@ -18,18 +18,7 @@ class Renderer;
  */
 class RenderPipeline {
  public:
-  /**
-   * @brief Create a new RenderPipeline object
-   * @param renderer Pointer on the renderer object.
-   * @param resource_database Pointer on the resource database system.
-   */
-  explicit RenderPipeline(Renderer *renderer = nullptr, ResourceDatabaseManager *resource_database = nullptr);
-
-  /**
-   * @brief Destroy the Render Pipeline object
-   *
-   */
-  virtual ~RenderPipeline() = default;
+  explicit RenderPipeline(unsigned int &default_framebuffer_id, GLViewer &context, ResourceDatabaseManager *resource_database = nullptr);
 
   /**
    * @brief This method will bake an Environment map into a cubemap.
@@ -40,8 +29,9 @@ class RenderPipeline {
    * @param cubemap_mesh The main scene's cubemap mesh .
    * @param width Width of the texture baked
    * @param height Height of the texture baked
+   * @return Cubemap texture id
    */
-  CubeMapMesh *bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_map, unsigned width, unsigned height, GLViewer *gl_widget);
+  int bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_map, CubeMapMesh &cubemap_mesh, unsigned width, unsigned height, Dim2 default_dim);
 
   /**
    * @brief This method produces an irradiance texture , that it will store inside the texture database
@@ -49,10 +39,9 @@ class RenderPipeline {
    * @param cube_envmap Pre-computed Cubemap database index , from an environment map
    * @param width Width of the irradiance texture
    * @param height Height of the irradiance texture
-   * @param gl_widget Used to extract pertinent data.
    * @return int Irradiance texture database index
    */
-  int bakeIrradianceCubemap(int cube_envmap, unsigned width, unsigned height, GLViewer *gl_widget);
+  int bakeIrradianceCubemap(int cube_envmap, unsigned width, unsigned height, Dim2 default_dim);
 
   /**
    * @brief
@@ -70,7 +59,6 @@ class RenderPipeline {
    * @param mipmap_levels Mip maps level
    * @param base_sample Base amount of sampling .
    * @param factor_per_mip Factor of sampling per mip levels ... more samples for high roughness
-   * @param gl_widget
    * @return int Database ID of the mip mapped cubemap with roughness levels
    */
   int preFilterEnvmap(int cube_envmap_database_id,
@@ -80,9 +68,9 @@ class RenderPipeline {
                       unsigned int mipmap_levels,
                       unsigned int base_samples,
                       unsigned int factor_per_mip,
-                      GLViewer *gl_widget);
+                      Dim2 default_dim);
 
-  int generateBRDFLookupTexture(unsigned int width, unsigned int height, GLViewer *gl_widget);
+  int generateBRDFLookupTexture(unsigned int width, unsigned int height, Dim2 default_dim);
 
  protected:
   /**
@@ -120,7 +108,7 @@ class RenderPipeline {
    * @return RenderCubeMap Constructed FBO
    */
   template<class TEXTYPE>
-  RenderCubeMap constructCubemapFbo(ScreenSize *dimensions,
+  RenderCubeMap constructCubemapFbo(Dim2 *dimensions,
                                     bool persistence,
                                     GLFrameBuffer::INTERNAL_FORMAT color_attachment,
                                     Texture::FORMAT internal_format,
@@ -129,7 +117,7 @@ class RenderPipeline {
                                     Shader *shader,
                                     unsigned level = 0);
   template<class TEXTYPE>
-  RenderQuadFBO constructQuadFbo(ScreenSize *dimensions,
+  RenderQuadFBO constructQuadFbo(Dim2 *dimensions,
                                  bool persistence,
                                  GLFrameBuffer::INTERNAL_FORMAT color_attachment,
                                  Texture::FORMAT internal_format,
@@ -149,8 +137,8 @@ class RenderPipeline {
   void renderToCubemap(Drawable &cube_drawable,
                        RenderCubeMap &cubemap_framebuffer,
                        Camera &camera,
-                       const ScreenSize render_viewport,
-                       const ScreenSize origin_viewport,
+                       Dim2 render_viewport,
+                       Dim2 origin_viewport,
                        unsigned int mip_level = 0);
 
   /**
@@ -166,13 +154,14 @@ class RenderPipeline {
   void renderToQuad(Drawable &quad_drawable,
                     RenderQuadFBO &quad_framebuffer,
                     Camera &camera,
-                    const ScreenSize render_viewport,
-                    const ScreenSize origin_viewport,
+                    Dim2 render_viewport,
+                    Dim2 origin_viewport,
                     unsigned int mip_level = 0);
 
- protected:
-  Renderer *renderer;
+ private:
+  unsigned int &default_framebuffer_id;
   ResourceDatabaseManager *resource_database;
+  GLViewer &context;
 };
 
 #endif

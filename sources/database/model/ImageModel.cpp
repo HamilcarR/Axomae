@@ -22,16 +22,12 @@ QVariant HdrImageModel::data(const QModelIndex &index, int role) const {
   switch (role) {
     case Qt::DecorationRole:
       return p;
-      break;
     case Qt::DisplayRole:
       return QString(metadata.name.c_str());
-      break;
     case Qt::SizeHintRole:
       return p.size();
-      break;
     default:
       return {};
-      break;
   }
 }
 
@@ -45,10 +41,4 @@ QVariant HdrImageModel::headerData(int section, Qt::Orientation orientation, int
     return {};
 }
 
-bool HdrImageModel::operator==(const ISubscriber<Message> &compare) const {
-  if (this == &compare)
-    return true;
-  return false;
-}
-
-void HdrImageModel::notified(observer::Data<Message> message) { emit layoutChanged(); }
+void HdrImageModel::notified(observer::Data<Message> &message) { emit layoutChanged(); }
