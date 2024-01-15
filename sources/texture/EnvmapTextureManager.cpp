@@ -1,10 +1,13 @@
 #include "EnvmapTextureManager.h"
 #include "Axomae_macros.h"
+#include "Loader.h"
+#include "Logger.h"
 #include "Mesh.h"
 #include "RenderPipeline.h"
 #include "Scene.h"
+
+/* Use this for now , later we read config values from file*/
 static texture::envmap::EnvmapBakingConfig generate_config() {
-  /* Use this for now , later we read config values from file*/
   texture::envmap::EnvmapBakingConfig config{};
   config.skybox_dim.width = 2048;
   config.skybox_dim.height = 2048;
@@ -12,35 +15,44 @@ static texture::envmap::EnvmapBakingConfig generate_config() {
   config.irradiance_dim.height = 64;
   config.prefilter_dim.width = 512;
   config.prefilter_dim.height = 512;
-  config.base_env_dim_upscale = 4096;
+  config.base_env_dim_upscale = 2048;
   config.prefilter_mip_maps = 10;
-  config.base_samples = 500;
-  config.lut.width = 512;
-  config.lut.height = 512;
+  config.base_samples = 100;
+  config.lut.width = 256;
+  config.lut.height = 256;
   config.sampling_factor_per_mips = 2;
+  config.default_envmap_path = "test1.hdr";
   return config;
 }
 
-EnvmapTextureManager::EnvmapTextureManager(ResourceDatabaseManager &resource_database_,
-                                           Dim2 &screen_dimensions,
-                                           unsigned int &default_id,
-                                           RenderPipeline &rdp,
-                                           CubeMapMesh &mesh,
-                                           Scene &scene_)
+EnvmapTextureManager::EnvmapTextureManager(
+    ResourceDatabaseManager &resource_database_, Dim2 &screen_dimensions, unsigned int &default_id, RenderPipeline &rdp, Scene &scene_)
     : resource_database(resource_database_),
       screen_dim(screen_dimensions),
       cuda_process(false),
       default_framebuffer_id(default_id),
       render_pipeline(rdp),
-      skybox_mesh(mesh),
       scene(scene_) {
   resource_database.getHdrDatabase().attach(*this);
   config = generate_config();
+
+  skybox_mesh = &scene.getSkybox();
 }
 
 void EnvmapTextureManager::initializeLUT() {
+
+  /* Need to compute the LUT beforehand , because of the add event in the HDR database*/
   if (resource_database.getTextureDatabase().getTexturesByType(Texture::BRDFLUT).empty())
     resource_database.getTextureDatabase().setPersistence(render_pipeline.generateBRDFLookupTexture(config.lut.width, config.lut.height, screen_dim));
+  /*Adding the default envmap*/
+  if (resource_database.getHdrDatabase().empty()) {
+    try {
+      IO::Loader::loadHdr(config.default_envmap_path.c_str());
+      current = bakes_id.back();
+    } catch (GenericException &e) {
+      LOG(e.what(), LogLevel::ERROR);
+    }
+  }
 }
 
 void EnvmapTextureManager::notified(observer::Data<EnvmapTextureManager::Message *> &message) {
@@ -59,7 +71,7 @@ void EnvmapTextureManager::notified(observer::Data<EnvmapTextureManager::Message
 }
 
 void EnvmapTextureManager::updateCurrent(int index) {
-  assert(index < bakes_id.size());
+  assert(static_cast<unsigned>(index) < bakes_id.size());
   current = bakes_id[index];
   scene.switchEnvmap(current.cubemap_id, current.irradiance_id, current.prefiltered_id, current.lut_id);
 }
@@ -99,7 +111,7 @@ void EnvmapTextureManager::addToCollection(int index) {
   assert(result.object);
   if (!cuda_process) {
     texgroup.cubemap_id = render_pipeline.bakeEnvmapToCubemap(
-        result.object, skybox_mesh, config.skybox_dim.width, config.skybox_dim.height, screen_dim);
+        result.object, *skybox_mesh, config.skybox_dim.width, config.skybox_dim.height, screen_dim);
     texgroup.irradiance_id = render_pipeline.bakeIrradianceCubemap(
         texgroup.cubemap_id, config.irradiance_dim.width, config.irradiance_dim.height, screen_dim);
     texgroup.prefiltered_id = render_pipeline.preFilterEnvmap(texgroup.cubemap_id,
@@ -118,5 +130,4 @@ void EnvmapTextureManager::addToCollection(int index) {
   }
   texgroup.lut_id = texture_database.getTexturesByType(Texture::BRDFLUT)[0].id;
   bakes_id.push_back(texgroup);
-  current = texgroup;
 }

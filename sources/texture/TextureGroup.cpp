@@ -87,15 +87,22 @@ TextureGroup &TextureGroup::operator=(const TextureGroup &texture_group) {
 
 bool TextureGroup::removeTexture(int id) {
   auto it = std::find(texture_collection.begin(), texture_collection.end(), id);
-  if (it != texture_collection.end())
+  if (it != texture_collection.end()) {
     texture_collection.erase(it);
+    return true;
+  }
+  return false;
 }
 
 bool TextureGroup::removeTexture(Texture::TYPE type) {
   std::vector collection = texture_database->getTexturesByType(type);
+  bool val = false;
   for (auto &elem : collection) {
     auto it = std::find(texture_collection.begin(), texture_collection.end(), elem.id);
-    if (it != texture_collection.end())
+    if (it != texture_collection.end()) {
       texture_collection.erase(it);
+      val = true;
+    }
   }
+  return val;
 }

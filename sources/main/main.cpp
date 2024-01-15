@@ -74,15 +74,10 @@ int main(int argv, char **argc) {
 #endif
       }
       main_program_command->exit();
-    }  // else if (regex_match(mode, test)) {
-       // ::testing::InitGoogleTest(&argv, argc);
-       // auto a = RUN_ALL_TESTS();
-    // return a;
-    // }
-    else
-    {
+    } else {
       QApplication app(argv, argc);
       Controller win;
+      /* For future cmd arguments */
       std::string param_string = "";
       for (int i = 1; i < argv; i++)
         param_string += argc[i] + std::string(" ");

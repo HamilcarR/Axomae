@@ -17,7 +17,7 @@
  *
  */
 
-namespace axomae {
+namespace IO {
   Loader::Loader() : resource_database(&ResourceDatabaseManager::getInstance()) {}
 
   Mutex mutex;
@@ -559,4 +559,4 @@ namespace axomae {
     return scene;
   }
 
-}  // namespace axomae
+}  // namespace IO

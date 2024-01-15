@@ -116,6 +116,9 @@ class GLViewer : public QOpenGLWidget {
    */
   void wheelEvent(QWheelEvent *event) override;
 
+ public slots:
+  void onUpdateDrawEvent();
+
  private:
   std::unique_ptr<Renderer> renderer; /*<Pointer on the renderer of the scene*/
   bool glew_initialized;              /*<Check if context is initialized*/

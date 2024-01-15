@@ -57,15 +57,7 @@ int RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_map, CubeM
   database::Result<int, Texture> query_baked_cubemap_texture = texture_database.contains(
       cubemap_renderer_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
   query_baked_cubemap_texture.object->generateMipmap();
-  TextureGroup old_texgroup = cubemap.material.getTextureGroup();
-  for (auto &elem : old_texgroup.getTextureCollection())
-    texture_database.remove(elem);
-
-  cubemap.material.clean();
-  cubemap.material.addTexture(query_baked_cubemap_texture.id);
-  cubemap.setShader(shader_database.get(Shader::CUBEMAP));
   errorCheck(__FILE__, __LINE__);
-  texture_database.remove(hdri_map);
   return query_baked_cubemap_texture.id;
 }
 

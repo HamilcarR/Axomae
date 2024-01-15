@@ -48,9 +48,6 @@ namespace IO {
       }
     };
   }  // namespace exception
-}  // namespace IO
-
-namespace axomae {
 
   /**
    * @brief 3D Loader class
@@ -102,6 +99,6 @@ namespace axomae {
     ResourceDatabaseManager *resource_database;
   };
 
-}  // namespace axomae
+}  // namespace IO
 
 #endif

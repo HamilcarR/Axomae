@@ -32,13 +32,7 @@ class Scene {
    * @brief Construct a new Scene object
    *
    */
-  Scene(ResourceDatabaseManager &manager);
-
-  /**
-   * @brief Destroy the Scene object
-   *
-   */
-  virtual ~Scene();
+  explicit Scene(ResourceDatabaseManager &manager);
 
   /**
    * @brief Sets the scene
@@ -53,6 +47,8 @@ class Scene {
    * @return std::vector<Drawable*> Array of all opaque elements
    */
   virtual std::vector<Drawable *> getOpaqueElements() const;
+
+  void initialize();
 
   /**
    * @brief This method returns a vector of transparent meshes sorted in reverse order based on their
@@ -172,9 +168,8 @@ class Scene {
    * @param display
    */
   void displayBoundingBoxes(bool display) { display_bbox = display; }
-  void setSkybox(Mesh *envmap_mesh) { scene_skybox = envmap_mesh; }
-  Mesh *getSkybox() const { return scene_skybox; }
-
+  const CubeMapMesh &getConstSkybox() const { return *scene_skybox; }
+  CubeMapMesh &getSkybox() const { return *scene_skybox; }
   /**
    * @brief Get reference on the scene tree
    *
@@ -192,7 +187,7 @@ class Scene {
    */
   void sortTransparentElements();
 
- protected:
+ private:
   std::map<float, Drawable *> sorted_transparent_meshes; /*<Sorted collection of transparent meshes , by distance to the camera*/
   std::vector<AABB> scene;                               /*<Meshes of the scene , and their computed bounding boxes*/
   SceneTree scene_tree;                                  /*<Scene tree containing a hierarchy of transformations*/
@@ -200,10 +195,8 @@ class Scene {
   LightingDatabase *light_database;                      /*<Light database pointer*/
   ResourceDatabaseManager &resource_manager;
   Camera *scene_camera; /*<Pointer on the scene camera*/
-  Mesh *scene_skybox;
+  CubeMapMesh *scene_skybox;
   bool display_bbox;
-
- private:
   std::vector<std::unique_ptr<Drawable>> drawable_collection;
 };
 

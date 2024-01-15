@@ -4,9 +4,9 @@
 
 using namespace axomae;
 
-Scene::Scene(ResourceDatabaseManager &rdm) : resource_manager(rdm) { display_bbox = false; }
-
-Scene::~Scene() {}
+Scene::Scene(ResourceDatabaseManager &rdm) : resource_manager(rdm), display_bbox(false) {
+  scene_skybox = database::node::store<CubeMapMesh>(resource_manager.getNodeDatabase(), true).object;
+}
 
 void Scene::updateTree() {
   scene_tree.updateOwner();
@@ -18,10 +18,17 @@ void Scene::setCameraPointer(Camera *_scene_camera) {
   scene_tree.pushNewRoot(scene_camera);
 }
 
+void Scene::initialize() { scene_skybox->setShader(resource_manager.getShaderDatabase().get(Shader::CUBEMAP)); }
+
+inline void setUpIblData(TextureDatabase &texture_database, Mesh *mesh) {}
+
 void Scene::setScene(std::pair<std::vector<Mesh *>, SceneTree> &to_copy) {
+  to_copy.second.pushNewRoot(scene_skybox);
   scene_tree = to_copy.second;
-  for (auto A : to_copy.first) {
+  to_copy.first.push_back(scene_skybox);
+  for (Mesh *A : to_copy.first) {
     Scene::AABB mesh;
+    A->setCubemapPointer(scene_skybox);
     auto drawable = std::make_unique<Drawable>(A);
     mesh.aabb = BoundingBox(A->geometry.vertices);
     mesh.drawable = drawable.get();
@@ -62,7 +69,6 @@ std::vector<Drawable *> Scene::getSortedSceneByTransparency() {
       to_return.push_back(A);
     else {
       glm::mat4 modelview_matrix = A->getMeshPointer()->getModelViewMatrix();
-      // glm::mat4 modelview_matrix = A->getMeshPointer()->computeFinalTransformation() * scene_camera->getView();
       glm::vec3 updated_aabb_center = aabb.aabb.computeModelViewPosition(modelview_matrix);
       float dist_to_camera = glm::length(updated_aabb_center);
       sorted_transparent_meshes[dist_to_camera] = A;

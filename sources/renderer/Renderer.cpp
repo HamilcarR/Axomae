@@ -6,9 +6,7 @@
 #include "RenderPipeline.h"
 using namespace axomae;
 
-Renderer::Renderer() : resource_database(ResourceDatabaseManager::getInstance()), scene(resource_database) {
-  start_draw = false;
-  camera_framebuffer = nullptr;
+static void setUpMouseStates(MouseState &mouse_state) { /* TODO : Move to a proper mouse controller */
   mouse_state.pos_x = 0;
   mouse_state.pos_y = 0;
   mouse_state.busy = false;
@@ -18,10 +16,15 @@ Renderer::Renderer() : resource_database(ResourceDatabaseManager::getInstance())
   mouse_state.right_button_released = true;
   mouse_state.previous_pos_x = 0;
   mouse_state.previous_pos_y = 0;
-  default_framebuffer_id = 0;
+}
+
+Renderer::Renderer()
+    : camera_framebuffer(nullptr), start_draw(false), resource_database(ResourceDatabaseManager::getInstance()), default_framebuffer_id(0) {
+  setUpMouseStates(mouse_state);
   scene_camera =
       database::node::store<ArcballCamera>(resource_database.getNodeDatabase(), true, 45.f, &screen_size, 0.1f, 10000.f, 100.f, &mouse_state).object;
-  skybox_mesh = database::node::store<CubeMapMesh>(resource_database.getNodeDatabase(), true).object;
+
+  scene = std::make_unique<Scene>(ResourceDatabaseManager::getInstance());
 }
 
 Renderer::Renderer(unsigned width, unsigned height, GLViewer *widget) : Renderer() {
@@ -29,14 +32,13 @@ Renderer::Renderer(unsigned width, unsigned height, GLViewer *widget) : Renderer
   screen_size.height = height;
   gl_widget = widget;
   render_pipeline = std::make_unique<RenderPipeline>(default_framebuffer_id, *gl_widget, &resource_database);
-  envmap_manager = std::make_unique<EnvmapTextureManager>(
-      resource_database, screen_size, default_framebuffer_id, *render_pipeline, *skybox_mesh, scene);
+  envmap_manager = std::make_unique<EnvmapTextureManager>(resource_database, screen_size, default_framebuffer_id, *render_pipeline, *scene);
 }
 
 Renderer::~Renderer() {
   if (camera_framebuffer)
     camera_framebuffer->clean();
-  scene.clear();
+  scene->clear();
   render_pipeline->clean();
   resource_database.purge();
   light_database.clearDatabase();
@@ -63,13 +65,14 @@ void Renderer::initialize() {
   load_shader_database(shader_database);
   resource_database.getShaderDatabase().initializeShaders();
   /*Initialize a reusable lut texture*/
+  scene->initialize();
   envmap_manager->initializeLUT();
   camera_framebuffer = std::make_unique<CameraFrameBuffer>(resource_database, &screen_size, &default_framebuffer_id);
   camera_framebuffer->initializeFrameBuffer();
 }
 
 bool Renderer::scene_ready() {
-  if (!scene.isReady())
+  if (!scene->isReady())
     return false;
   if (camera_framebuffer && !camera_framebuffer->getDrawable()->ready())
     return false;
@@ -80,7 +83,7 @@ bool Renderer::scene_ready() {
 bool Renderer::prep_draw() {
   if (start_draw && scene_ready()) {
     camera_framebuffer->startDraw();
-    scene.prepare_draw(scene_camera);
+    scene->prepare_draw(scene_camera);
     return true;
   } else {
     glClearColor(0, 0, 0, 1.f);
@@ -88,50 +91,28 @@ bool Renderer::prep_draw() {
   }
 }
 void Renderer::draw() {
-  scene.updateTree();
+  scene->updateTree();
   camera_framebuffer->bindFrameBuffer();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  scene.drawForwardTransparencyMode();
-  scene.drawBoundingBoxes();
+  scene->drawForwardTransparencyMode();
+  scene->drawBoundingBoxes();
   camera_framebuffer->unbindFrameBuffer();
   camera_framebuffer->renderFrameBufferMesh();
   errorCheck(__FILE__, __LINE__);
 }
 
 void Renderer::set_new_scene(std::pair<std::vector<Mesh *>, SceneTree> &new_scene) {
-  assert(skybox_mesh);
-  scene.clear();
-  TextureDatabase &texture_database = resource_database.getTextureDatabase();
-  int brdf_lut = envmap_manager->currentLutId();
-  if (!skybox_mesh->material.hasTextures()) {
-    int irradiance_tex_id = envmap_manager->currentIrradianceId();
-    int prefiltered_cubemap = envmap_manager->currentPrefilterId();
-    std::for_each(new_scene.first.begin(), new_scene.first.end(), [irradiance_tex_id, brdf_lut, prefiltered_cubemap, this](Mesh *m) {
-      m->material.addTexture(irradiance_tex_id);
-      m->material.addTexture(prefiltered_cubemap);
-      m->material.addTexture(brdf_lut);
-      m->setCubemapPointer(skybox_mesh);
-    });
-
-  } else {
-    int irradiance_tex_id = envmap_manager->currentIrradianceId();
-    int prefiltered_cubemap = envmap_manager->currentPrefilterId();
-    std::for_each(new_scene.first.begin(), new_scene.first.end(), [irradiance_tex_id, brdf_lut, prefiltered_cubemap, this](Mesh *m) {
-      m->material.addTexture(irradiance_tex_id);
-      m->material.addTexture(prefiltered_cubemap);
-      m->material.addTexture(brdf_lut);
-      m->setCubemapPointer(skybox_mesh);
-    });
-  }
-
-  new_scene.first.push_back(skybox_mesh);
-  new_scene.second.pushNewRoot(skybox_mesh);
-  scene.setScene(new_scene);
-  scene.setLightDatabasePointer(&light_database);
-  scene.setCameraPointer(scene_camera);
+  scene->clear();
+  scene->setScene(new_scene);
+  scene->switchEnvmap(envmap_manager->currentCubemapId(),
+                      envmap_manager->currentIrradianceId(),
+                      envmap_manager->currentPrefilterId(),
+                      envmap_manager->currentLutId());
+  scene->setLightDatabasePointer(&light_database);
+  scene->setCameraPointer(scene_camera);
   light_database.clearDatabase();
-  scene.updateTree();
-  scene.generateBoundingBoxes(resource_database.getShaderDatabase().get(Shader::BOUNDING_BOX));
+  scene->updateTree();
+  scene->generateBoundingBoxes(resource_database.getShaderDatabase().get(Shader::BOUNDING_BOX));
   start_draw = true;
   resource_database.getShaderDatabase().initializeShaders();
   camera_framebuffer->updateFrameBufferShader();
@@ -235,21 +216,21 @@ void Renderer::resetSceneCamera() const {
 }
 
 void Renderer::setRasterizerFill() {
-  scene.setPolygonFill();
+  scene->setPolygonFill();
   gl_widget->update();
 }
 
 void Renderer::setRasterizerPoint() {
-  scene.setPolygonPoint();
+  scene->setPolygonPoint();
   gl_widget->update();
 }
 
 void Renderer::setRasterizerWireframe() {
-  scene.setPolygonWireframe();
+  scene->setPolygonWireframe();
   gl_widget->update();
 }
 
 void Renderer::displayBoundingBoxes(bool display) {
-  scene.displayBoundingBoxes(display);
+  scene->displayBoundingBoxes(display);
   gl_widget->update();
 }

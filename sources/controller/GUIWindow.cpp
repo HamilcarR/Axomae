@@ -213,17 +213,18 @@ namespace axomae {
   }
 
   Controller::Controller(QWidget *parent) : QMainWindow(parent), resource_database(ResourceDatabaseManager::getInstance()) {
+    /*Logging configuration*/
+    LoggerConfigDataStruct log_struct = configuration.generateLoggerConfigDataStruct();
+    LOGCONFIG(log_struct);
     _UI.setupUi(this);
     _UI.progressBar->setValue(0);
     viewer_3d = _UI.renderer_view;
     renderer_scene_list = _UI.renderer_scene_list;
+    _UI.renderer_envmap_list->setWidget(viewer_3d);
     light_controller = std::make_unique<LightController>(_UI);
     light_controller->setup(viewer_3d, renderer_scene_list);
     /* Undo pointers setup*/
     init_image_session_ptr();
-    /*Logging configuration*/
-    LoggerConfigDataStruct log_struct = configuration.generateLoggerConfigDataStruct();
-    LOGCONFIG(log_struct);
 
     /*At last , we setup all slots and signals*/
     connect_all_slots();
@@ -468,7 +469,7 @@ namespace axomae {
       return false;
     else {
       try {
-        Loader::loadHdr(filename.toStdString().c_str());  // try-catch
+        IO::Loader::loadHdr(filename.toStdString().c_str());
       } catch (GenericException &e) {
         LOG(e.what(), LogLevel::ERROR);
       }
@@ -663,7 +664,7 @@ namespace axomae {
     if (!filename.isEmpty()) {
       resource_database.getNodeDatabase().clean();
       resource_database.getTextureDatabase().clean();
-      Loader loader;
+      IO::Loader loader;
       auto struct_holder = loader.load(filename.toStdString().c_str());
       std::vector<Mesh *> scene = struct_holder.first;
       SceneSelector &instance = SceneSelector::getInstance();

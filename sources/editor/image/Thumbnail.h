@@ -21,13 +21,13 @@ class Thumbnail {
 
  public:
   Thumbnail() = default;
-
+  ~Thumbnail() = default;
   // TODO : Implement functional test
   Thumbnail(std::vector<T> &rgb, int width, int height, int channels, bool needs_color_correct) {
     ASSERT_IS_ARITHMETIC(T);
     assert(rgb.size() == static_cast<unsigned>(width * height * channels));
-    // QImage image(width, height, QImage::Format_RGB32);
-    image = std::make_unique<QImage>(width, height, QImage::Format_RGB32);
+    int final_channels = channels == 3 ? 4 : channels;
+    image_data.resize(width * height * final_channels);
     T max = 0;
     for (T i : rgb)
       max = std::max(max, i);
@@ -46,10 +46,13 @@ class Thumbnail {
           g = (rgb[(i * width + j) * channels + 1]) / max;
           b = (rgb[(i * width + j) * channels + 2]) / max;
         }
-        QColor color(static_cast<int>(r * 255.f), static_cast<int>(g * 255.f), static_cast<int>(b * 255.f), 255);
-        image->setPixelColor(j, i, color);
+        image_data[(i * width + j) * final_channels] = std::clamp(static_cast<int>(b * 255), 0, 255);
+        image_data[(i * width + j) * final_channels + 1] = std::clamp(static_cast<int>(g * 255), 0, 255);
+        image_data[(i * width + j) * final_channels + 2] = std::clamp(static_cast<int>(r * 255), 0, 255);
+        image_data[(i * width + j) * final_channels + 3] = 0;
       }
     }
+    image = std::make_unique<QImage>(image_data.data(), width, height, QImage::Format_RGB32);
     *image = image->scaled(100, 50, Qt::KeepAspectRatio);
   }
 
@@ -60,9 +63,24 @@ class Thumbnail {
     return *icon;
   }
 
+  Thumbnail &operator=(const Thumbnail &copy) = delete;
+  Thumbnail(const Thumbnail &copy) = delete;
+  Thumbnail &operator=(Thumbnail &&move) noexcept {
+    icon = std::move(move.icon);
+    image = std::move(move.image);
+    image_data = std::move(move.image_data);
+    return *this;
+  }
+  Thumbnail(Thumbnail &&move) noexcept {
+    icon = std::move(move.icon);
+    image = std::move(move.image);
+    image_data = std::move(move.image_data);
+  }
+
  private:
   std::unique_ptr<QPixmap> icon;
   std::unique_ptr<QImage> image;
+  std::vector<uint8_t> image_data;
 };
 
 #endif

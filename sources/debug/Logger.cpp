@@ -35,7 +35,7 @@ void LogFunctions::log_configure(const LoggerConfigDataStruct &conf) { logger_gl
 
 static std::string getFormatedLog(
     const std::string &message, const std::string &filename, const std::string &function, const unsigned line, LogLevel::LOGENUMTYPE level) {
-  std::string head = filename + ": At function: " + function + "() : At Line : " + std::to_string(line) + " ; " + LOG2STR(level) + " ; " + message;
+  std::string head = filename + ";" + function + "();" + std::to_string(line) + ";" + LOG2STR(level) + "==> " + message;
   return head;
 }
 

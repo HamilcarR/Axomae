@@ -33,6 +33,7 @@ namespace texture::envmap {
     int sampling_factor_per_mips;
     int base_samples;
     int base_env_dim_upscale;
+    std::string default_envmap_path;
   };
 }  // namespace texture::envmap
 
@@ -44,12 +45,8 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
   using Message = database::event::ImageUpdateMessage;
 
  public:
-  explicit EnvmapTextureManager(ResourceDatabaseManager &resource_db,
-                                Dim2 &screen_size,
-                                unsigned int &default_framebuffer_id,
-                                RenderPipeline &render_pipeline,
-                                CubeMapMesh &skybox_mesh,
-                                Scene &scene);
+  explicit EnvmapTextureManager(
+      ResourceDatabaseManager &resource_db, Dim2 &screen_size, unsigned int &default_framebuffer_id, RenderPipeline &render_pipeline, Scene &scene);
 
   ~EnvmapTextureManager() = default;
   EnvmapTextureManager(EnvmapTextureManager &copy) = delete;
@@ -83,7 +80,7 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
   bool cuda_process; /* Use cuda for baking*/
   unsigned int &default_framebuffer_id;
   RenderPipeline &render_pipeline;
-  CubeMapMesh &skybox_mesh; /*Mesh that will be operated on by this class*/
+  CubeMapMesh *skybox_mesh; /*skybox mesh that will be operated on by this class*/
   Scene &scene;
 };
 

@@ -41,12 +41,10 @@ class Renderer : public QObject {
     ON_MOUSEWHEEL_SCROLL_DOWN = 4,
   };
 
-  /**
-   * @brief Construct a new Renderer object
-   *
-   */
+ private:
   Renderer();
 
+ public:
   /**
    * @brief Construct a new Renderer object
    *
@@ -233,8 +231,8 @@ class Renderer : public QObject {
    *
    * @return const Scene&
    */
-  const Scene &getConstScene() const { return scene; }
-  Scene &getScene() { return scene; }
+  const Scene &getConstScene() const { return *scene; }
+  Scene &getScene() { return *scene; }
 
   template<EVENT_TYPE type>
   void pushEvent(RENDERER_CALLBACK_ENUM callback_enum, std::any data) {
@@ -293,16 +291,15 @@ class Renderer : public QObject {
   std::unique_ptr<CameraFrameBuffer> camera_framebuffer; /**<Main framebuffer attached to the view*/
   bool start_draw;                                       /**<If the renderer is ready to draw*/
   ResourceDatabaseManager
-      &resource_database; /**<The main database containing a texture database ,a node database for stored meshes and a shader database*/
-  Scene scene;            /**<The scene to be rendered*/
-  Camera *scene_camera;   /**<Pointer on the scene camera*/
-  CubeMapMesh *skybox_mesh;
-  MouseState mouse_state;              /**<Pointer on the MouseState structure*/
-  Dim2 screen_size;                    /**<Dimensions of the renderer windows*/
+      &resource_database;              /**<The main database containing a texture database ,a node database for stored meshes and a shader database*/
+  std::unique_ptr<Scene> scene;        /**<The scene to be rendered*/
+  Camera *scene_camera;                /**<Pointer on the scene camera*/
+  MouseState mouse_state{};            /**<Pointer on the MouseState structure*/
+  Dim2 screen_size{};                  /**<Dimensions of the renderer windows*/
   unsigned int default_framebuffer_id; /**<In the case the GUI uses other contexts and other framebuffers , we use this
                                           variable to reset the rendering to the default framebuffer*/
   LightingDatabase light_database;
-  GLViewer *gl_widget;
+  GLViewer *gl_widget{};
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
 
  private:
