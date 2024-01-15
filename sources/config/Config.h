@@ -14,8 +14,8 @@ class ApplicationConfig {
   ApplicationConfig();
   virtual ~ApplicationConfig();
   void setConfig(const std::string &param_string);
-  std::string getLogFile() const;
-  LoggerConfigDataStruct generateLoggerConfigDataStruct() const;
+  [[nodiscard]] std::string getLogFile() const;
+  [[nodiscard]] LoggerConfigDataStruct generateLoggerConfigDataStruct() const;
 
  private:
   bool is_config_init;

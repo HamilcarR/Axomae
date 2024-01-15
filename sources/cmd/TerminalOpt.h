@@ -12,13 +12,12 @@
 #  include <Windows.h>
 #endif
 
+// TODO :  code is from the stone age ... might need to delete
 namespace axomae {
 
   enum : unsigned { PROMPT0 = 0, PROMPT1 = 1, PROMPT2 = 2, PROMPT3 = 3 };
 
-  static const char *prompt[] = {">", " :", "=:", ">>"
-
-  };
+  static const char *prompt[] = {">", " :", "=:", ">>"};
 
   static const char *command[] = {
       "window",     // create a new window
