@@ -27,7 +27,6 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QSlider>
@@ -39,6 +38,7 @@
 #include <QtWidgets/QWidget>
 #include "GLViewer.h"
 #include "MeshListView.h"
+#include "ProgressStatusWidget.h"
 #include "SceneListView.h"
 
 QT_BEGIN_NAMESPACE
@@ -59,7 +59,7 @@ public:
     QAction *actionImport_Environment_Map;
     QWidget *centralwidget;
     QGridLayout *gridLayout_2;
-    QProgressBar *progressBar;
+    ProgressStatusWidget *progressBar;
     QVBoxLayout *verticalLayout;
     QGridLayout *gridLayout;
     QGridLayout *gridLayout_4;
@@ -419,7 +419,7 @@ public:
         centralwidget->setSizePolicy(sizePolicy);
         gridLayout_2 = new QGridLayout(centralwidget);
         gridLayout_2->setObjectName("gridLayout_2");
-        progressBar = new QProgressBar(centralwidget);
+        progressBar = new ProgressStatusWidget(centralwidget);
         progressBar->setObjectName("progressBar");
         progressBar->setValue(24);
 

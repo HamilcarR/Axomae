@@ -1,4 +1,9 @@
 
+HEADERS += $$PWD/ProgressStatusWidget.h\
+
+SOURCES += $$PWD/ProgressStatusWidget.cpp\
+
+
 
 FORMS += "$$PWD/Form/main_window.ui"
 

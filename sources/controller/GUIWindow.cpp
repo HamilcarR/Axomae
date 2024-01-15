@@ -1,10 +1,9 @@
 #include "GUIWindow.h"
-#include "GLViewer.h"
 #include "ImageImporter.h"
 #include "ImageManager.h"
 #include "Loader.h"
 #include "MeshListView.h"
-#include "Renderer.h"
+#include "ProgressStatusWidget.h"
 #include "SceneSelector.h"
 #include "ShaderFactory.h"
 #include <QtWidgets/QFileDialog>
@@ -217,7 +216,8 @@ namespace axomae {
     LoggerConfigDataStruct log_struct = configuration.generateLoggerConfigDataStruct();
     LOGCONFIG(log_struct);
     _UI.setupUi(this);
-    _UI.progressBar->setValue(0);
+    _UI.progressBar->setValue(90);
+    _UI.progressBar->setFormat("Text here : " + QString::number(20) + "%");
     viewer_3d = _UI.renderer_view;
     renderer_scene_list = _UI.renderer_scene_list;
     _UI.renderer_envmap_list->setWidget(viewer_3d);

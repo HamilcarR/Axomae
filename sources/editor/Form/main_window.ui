@@ -472,7 +472,7 @@
    </property>
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="2" column="0" colspan="4">
-     <widget class="QProgressBar" name="progressBar">
+     <widget class="ProgressStatusWidget" name="progressBar">
       <property name="value">
        <number>24</number>
       </property>
@@ -2525,6 +2525,11 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
    <class>EnvmapListDisplay</class>
    <extends>QListView</extends>
    <header location="global">HdrListView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ProgressStatusWidget</class>
+   <extends>QProgressBar</extends>
+   <header>ProgressStatusWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

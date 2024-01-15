@@ -3,31 +3,5 @@
         <file>nvidia-cuda21.png</file>
     </qresource>
 
-    <qresource prefix="/castle">
-    	<file alias="negx.jpg">Skybox_Textures/Sweden_Castle/negx.jpg</file>
-    	<file alias="negy.jpg">Skybox_Textures/Sweden_Castle/negy.jpg</file>
-    	<file alias="negz.jpg">Skybox_Textures/Sweden_Castle/negz.jpg</file>
-    	<file alias="posx.jpg">Skybox_Textures/Sweden_Castle/posx.jpg</file>
-    	<file alias="posy.jpg">Skybox_Textures/Sweden_Castle/posy.jpg</file>
-    	<file alias="posz.jpg">Skybox_Textures/Sweden_Castle/posz.jpg</file>
-	</qresource>
-    <qresource prefix="/sky">
-    	<file alias="negx.jpg">Skybox_Textures/Sky/negx.jpg</file>
-    	<file alias="negy.jpg">Skybox_Textures/Sky/negy.jpg</file>
-    	<file alias="negz.jpg">Skybox_Textures/Sky/negz.jpg</file>
-    	<file alias="posx.jpg">Skybox_Textures/Sky/posx.jpg</file>
-    	<file alias="posy.jpg">Skybox_Textures/Sky/posy.jpg</file>
-    	<file alias="posz.jpg">Skybox_Textures/Sky/posz.jpg</file>
-	</qresource>
-	<qresource prefix="/chapel">
-    	<file alias="negx.jpg">Skybox_Textures/Chapel/negx.jpg</file>
-    	<file alias="negy.jpg">Skybox_Textures/Chapel/negy.jpg</file>
-    	<file alias="negz.jpg">Skybox_Textures/Chapel/negz.jpg</file>
-    	<file alias="posx.jpg">Skybox_Textures/Chapel/posx.jpg</file>
-    	<file alias="posy.jpg">Skybox_Textures/Chapel/posy.jpg</file>
-    	<file alias="posz.jpg">Skybox_Textures/Chapel/posz.jpg</file>
-	</qresource>
-
-
 
 </RCC>
