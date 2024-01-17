@@ -18,8 +18,9 @@ namespace image {
    public:
     RawImageHolder() = default;
     /*Will perform a move on assign*/
-    RawImageHolder(const std::vector<TYPE> &assign, image::Metadata _metadata_) : metadata_(std::move(_metadata_)), data(assign) {
-      icon = Thumbnail<TYPE>(data, metadata_.width, metadata_.height, metadata_.channels, !metadata_.color_corrected);
+    RawImageHolder(const std::vector<TYPE> &assign, image::Metadata _metadata_, controller::ProgressStatus *status)
+        : metadata_(std::move(_metadata_)), data(assign) {
+      icon = Thumbnail<TYPE>(data, metadata_.width, metadata_.height, metadata_.channels, !metadata_.color_corrected, status);
     }
     const QPixmap &thumbnail() { return icon.getIcon(); }
     Metadata metadata() { return metadata_; }

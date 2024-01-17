@@ -1,6 +1,8 @@
 #include "INodeDatabase.h"
 #include <algorithm>
 
+INodeDatabase::INodeDatabase(controller::ProgressStatus *progress_manager_) { progress_manager = progress_manager_; }
+
 void INodeDatabase::clean() {
   Mutex::Lock lock(mutex);
   std::vector<int> to_delete;

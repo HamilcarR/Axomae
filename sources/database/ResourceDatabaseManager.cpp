@@ -21,12 +21,24 @@ void ResourceDatabaseManager::clean() {
   image_database->clean();
 }
 
-ResourceDatabaseManager::ResourceDatabaseManager() {
-  texture_database = std::make_unique<TextureDatabase>();
-  shader_database = std::make_unique<ShaderDatabase>();
-  node_database = std::make_unique<INodeDatabase>();
-  hdr_database = std::make_unique<ImageDatabase<float>>();
-  image_database = std::make_unique<ImageDatabase<uint8_t>>();
+ResourceDatabaseManager::ResourceDatabaseManager() {}
+
+void ResourceDatabaseManager::initializeDatabases(controller::ProgressStatus *progress_manager) {
+  progress_status = progress_manager;
+  texture_database = std::make_unique<TextureDatabase>(progress_status);
+  shader_database = std::make_unique<ShaderDatabase>(progress_status);
+  node_database = std::make_unique<INodeDatabase>(progress_status);
+  hdr_database = std::make_unique<ImageDatabase<float>>(progress_status);
+  image_database = std::make_unique<ImageDatabase<uint8_t>>(progress_status);
+}
+
+void ResourceDatabaseManager::setProgressManager(controller::ProgressStatus *progress_manager) {
+  progress_status = progress_manager;
+  texture_database->setProgressManager(progress_status);
+  shader_database->setProgressManager(progress_status);
+  node_database->setProgressManager(progress_status);
+  hdr_database->setProgressManager(progress_status);
+  image_database->setProgressManager(progress_status);
 }
 
 void ResourceDatabaseManager::cleanShaderDatabase() { shader_database->clean(); }

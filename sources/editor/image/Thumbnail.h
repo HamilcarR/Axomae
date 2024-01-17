@@ -1,10 +1,10 @@
 #ifndef THUMBNAIL_H
 #define THUMBNAIL_H
 #include "Axomae_macros.h"
+#include "OP_ProgressStatus.h"
 #include "constants.h"
 #include <QImageWriter>
 #include <QPixmap>
-
 /**
  * @file ThumbnailList.h
  *
@@ -23,7 +23,7 @@ class Thumbnail {
   Thumbnail() = default;
   ~Thumbnail() = default;
   // TODO : Implement functional test
-  Thumbnail(std::vector<T> &rgb, int width, int height, int channels, bool needs_color_correct) {
+  Thumbnail(std::vector<T> &rgb, int width, int height, int channels, bool needs_color_correct, controller::ProgressStatus *status = nullptr) {
     ASSERT_IS_ARITHMETIC(T);
     assert(rgb.size() == static_cast<unsigned>(width * height * channels));
     int final_channels = channels == 3 ? 4 : channels;
@@ -34,17 +34,25 @@ class Thumbnail {
     assert(max > 0);
     if (needs_color_correct)
       max = color_correction(max);
+    auto message = controller::progress_bar::generateData("Generating Environment map thumbnail", 0);
+    controller::ioperator::OpData<controller::progress_bar::ProgressBarTextFormat> pbar_format(message);
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
+        int index = (i * width + j) * channels;
+        if (status) {
+          float ratio_p = (float)index / (float)(width * height * channels);
+          pbar_format.data.percentage = static_cast<int>(ratio_p * 100);
+          status->op(&pbar_format);
+        }
         T r, g, b;
         if (needs_color_correct) {
-          r = (color_correction(rgb[(i * width + j) * channels])) / max;
-          g = (color_correction(rgb[(i * width + j) * channels + 1])) / max;
-          b = (color_correction(rgb[(i * width + j) * channels + 2])) / max;
+          r = (color_correction(rgb[index])) / max;
+          g = (color_correction(rgb[index + 1])) / max;
+          b = (color_correction(rgb[index + 2])) / max;
         } else {
-          r = (rgb[(i * width + j) * channels]) / max;
-          g = (rgb[(i * width + j) * channels + 1]) / max;
-          b = (rgb[(i * width + j) * channels + 2]) / max;
+          r = (rgb[index]) / max;
+          g = (rgb[index + 1]) / max;
+          b = (rgb[index + 2]) / max;
         }
         image_data[(i * width + j) * final_channels] = std::clamp(static_cast<int>(b * 255), 0, 255);
         image_data[(i * width + j) * final_channels + 1] = std::clamp(static_cast<int>(g * 255), 0, 255);
@@ -54,6 +62,7 @@ class Thumbnail {
     }
     image = std::make_unique<QImage>(image_data.data(), width, height, QImage::Format_RGB32);
     *image = image->scaled(100, 50, Qt::KeepAspectRatio);
+    status->reset();
   }
 
   [[nodiscard]] const QPixmap &getIcon() {

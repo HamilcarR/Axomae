@@ -3,12 +3,11 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-namespace axomae {
 
-  class ImageImporter
+// TODO : Old code , needs refactoring
+namespace IO {
 
-  {
-
+  class ImageImporter {
    public:
     static ImageImporter *getInstance();
     static void close();
@@ -22,6 +21,6 @@ namespace axomae {
     static ImageImporter *instance;
   };
 
-}  // namespace axomae
+}  // namespace IO
 
 #endif

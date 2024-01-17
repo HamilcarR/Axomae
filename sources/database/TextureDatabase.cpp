@@ -2,6 +2,8 @@
 #include "Mutex.h"
 #include <utility>
 
+TextureDatabase::TextureDatabase(controller::ProgressStatus *progress_manager_) { progress_manager = progress_manager_; }
+
 void TextureDatabase::purge() {
   Mutex::Lock lock(mutex);
   for (std::pair<const int, database::Storage<int, Texture>> &A : database_map) {
@@ -109,7 +111,6 @@ bool TextureDatabase::remove(const Texture *address) {
   }
   return false;
 }
-
 
 database::Result<int, Texture> TextureDatabase::getUniqueTexture(const std::string &name) const {
   auto it = unique_textures.find(name);

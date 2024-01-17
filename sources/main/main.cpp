@@ -14,6 +14,7 @@
 
 using namespace std;
 using namespace axomae;
+using namespace controller;
 
 void init_api() {
   if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {

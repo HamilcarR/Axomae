@@ -10,9 +10,10 @@
 #include <QtWidgets/QGraphicsItem>
 #include <stack>
 
-namespace axomae {
+// TODO : Very old code , need refactoring²
+namespace controller {
   using namespace gui;
-
+  using namespace axomae;
   constexpr float POSTP_SLIDER_DIV = 90.f;
   static double NORMAL_FACTOR = 1.;
   static float NORMAL_ATTENUATION = 1.56;
@@ -215,18 +216,31 @@ namespace axomae {
     /*Logging configuration*/
     LoggerConfigDataStruct log_struct = configuration.generateLoggerConfigDataStruct();
     LOGCONFIG(log_struct);
+
+    /*Initialize databases*/
+    resource_database.initializeDatabases();
+
+    /* UI elements initialization*/
     _UI.setupUi(this);
-    _UI.progressBar->setValue(90);
-    _UI.progressBar->setFormat("Text here : " + QString::number(20) + "%");
+
+    /* UI progress bar operator initialization for objects that need to show progress*/
+    _UI.progressBar->setValue(0);
+    progress_manager = std::make_unique<controller::ProgressStatus>(_UI.progressBar);
+    resource_database.setProgressManager(progress_manager.get());
+
+    /* Realtime renderer initialization*/
     viewer_3d = _UI.renderer_view;
     renderer_scene_list = _UI.renderer_scene_list;
     _UI.renderer_envmap_list->setWidget(viewer_3d);
+
+    /*Lighting GUI initialization*/
     light_controller = std::make_unique<LightController>(_UI);
     light_controller->setup(viewer_3d, renderer_scene_list);
+
     /* Undo pointers setup*/
     init_image_session_ptr();
 
-    /*At last , we setup all slots and signals*/
+    /*setup all slots and signals*/
     connect_all_slots();
   }
 
@@ -453,7 +467,7 @@ namespace axomae {
     {
       image_session_pointers::filename = filename.toStdString();
       ;
-      SDL_Surface *surf = ImageImporter::getInstance()->load_image(filename.toStdString().c_str());
+      SDL_Surface *surf = IO::ImageImporter::getInstance()->load_image(filename.toStdString().c_str());
       display_image(surf, ALBEDO, true);
       //_MemManagement->addToHeap({ surf , ALBEDO });
       delete temp;
@@ -696,7 +710,7 @@ namespace axomae {
 
   /**************************************************************************************************************/
   bool Controller::save_image() {
-    ImageImporter *inst = ImageImporter::getInstance();
+    IO::ImageImporter *inst = IO::ImageImporter::getInstance();
     QString filename = QFileDialog::getSaveFileName(this, tr("Save files"), "./", tr("All Files (*)"));
     if (image_session_pointers::height != nullptr)
       inst->save_image(image_session_pointers::height, (filename.toStdString() + "-height.bmp").c_str());
@@ -836,4 +850,4 @@ namespace axomae {
   /*
    * TODO: add custom QGraphicsView class , reimplement resizeEvent() to scale GraphicsView to window size */
 
-}  // namespace axomae
+}  // namespace controller

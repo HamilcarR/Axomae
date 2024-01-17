@@ -46,7 +46,7 @@ class ImageDatabase : public IntegerResourceDB<image::RawImageHolder<DATATYPE>>,
   }
 
  public:
-  ImageDatabase() = default;
+  explicit ImageDatabase(controller::ProgressStatus *progress_status = nullptr) { BaseType::progress_manager = progress_status; }
 
   void purge() override {
     BaseType::purge();
@@ -114,7 +114,7 @@ namespace database::image {
   template<class TYPE>
   void store(IResourceDB<int, ::image::RawImageHolder<TYPE>> &database_, bool keep, std::vector<TYPE> &args, ::image::Metadata metadata) {
     ASSERT_IS_ARITHMETIC(TYPE);
-    auto raw_image = std::make_unique<::image::RawImageHolder<TYPE>>(args, metadata);
+    auto raw_image = std::make_unique<::image::RawImageHolder<TYPE>>(args, metadata, database_.getProgressManager());
     database_.add(std::move(raw_image), keep);
   }
 

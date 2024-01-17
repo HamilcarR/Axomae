@@ -8,14 +8,24 @@
  * @brief API interface between a GUI element , and the logic interacting with it.
  */
 namespace controller {
+  namespace ioperator {
+    template<class T>
+    class OpData {
+     public:
+      explicit OpData(T data_) : data(data_) {}
+      T data;
+    };
 
-  template<class TYPE>
-  class IOperator {
-   public:
-    virtual bool op() const = 0;
+    template<class WIDGET_TYPE, class DATA_TYPE>
+    class IOperator {
+     public:
+      virtual bool op(ioperator::OpData<DATA_TYPE> *data) const = 0;
+      virtual void reset() const = 0;
+      virtual ~IOperator() = default;
 
-   protected:
-    TYPE *widget;
-  };
-};  // namespace controller
+     protected:
+      WIDGET_TYPE *widget;
+    };
+  }  // namespace ioperator
+}  // namespace controller
 #endif

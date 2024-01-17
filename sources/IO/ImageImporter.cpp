@@ -4,7 +4,7 @@
 #include <iostream>
 
 using namespace std;
-namespace axomae {
+namespace IO {
 
   ImageImporter *ImageImporter::instance = nullptr;
 
@@ -36,4 +36,4 @@ namespace axomae {
   /**************************************************************************************************************/
   void ImageImporter::save_image(SDL_Surface *surface, const char *filename) { SDL_SaveBMP(surface, filename); }
 
-}  // namespace axomae
+}  // namespace IO

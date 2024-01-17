@@ -18,7 +18,7 @@
  */
 class TextureDatabase final : public IntegerResourceDB<Texture> {
  public:
-  TextureDatabase() = default;
+  explicit TextureDatabase(controller::ProgressStatus *progress_manager = nullptr);
   void clean() override;
   void purge() override;
   bool remove(int index) override;

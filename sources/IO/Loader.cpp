@@ -20,7 +20,6 @@
 namespace IO {
   Loader::Loader() : resource_database(&ResourceDatabaseManager::getInstance()) {}
 
-  Mutex mutex;
   constexpr unsigned int THREAD_POOL_SIZE = 8;
   void thread_copy_buffer(unsigned int start_index, unsigned int end_index, const uint8_t *from, uint8_t *dest) {
     for (unsigned i = start_index; i < end_index; i++)
@@ -29,7 +28,7 @@ namespace IO {
 
   void async_copy_buffer(unsigned int width, unsigned int height, uint8_t *from, uint8_t *dest) {
     size_t total_buffer_size = width * height * sizeof(uint32_t);
-    size_t thread_buffer_size = total_buffer_size / THREAD_POOL_SIZE;  // TODO : implement the case where total_buffer_sze < THREAD_POOL_SIZE
+    size_t thread_buffer_size = total_buffer_size / THREAD_POOL_SIZE;
     uint8_t work_remainder = total_buffer_size % THREAD_POOL_SIZE;
     size_t last_thread_job_size = thread_buffer_size + work_remainder;
     size_t range_min = 0;
@@ -84,7 +83,7 @@ namespace IO {
         unsigned image_height = image.height();
         totexture->data.resize(image_width * image_height);
         std::memset(&totexture->data[0], 0, image_width * image_height * sizeof(uint32_t));
-        uint8_t *dest_buffer = (uint8_t *)&totexture->data[0];
+        uint8_t *dest_buffer = reinterpret_cast<uint8_t *>(&totexture->data[0]);
         uint8_t *from_buffer = image.bits();
         async_copy_buffer(image_width, image_height, from_buffer, dest_buffer);
         totexture->width = image_width;

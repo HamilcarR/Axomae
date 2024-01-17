@@ -3,9 +3,9 @@
 
 #include "INodeDatabase.h"
 #include "ImageDatabase.h"
+#include "OP_ProgressStatus.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
-
 /**
  * @file ResourceDatabaseManager.h
  * @brief This file implements a singleton containing resources databases, like textures and shaders databases
@@ -46,6 +46,9 @@ class ResourceDatabaseManager {  // TODO : Not the best design choice , replace 
   [[nodiscard]] HdrImageDatabase &getHdrDatabase() const { return *hdr_database; }
   [[nodiscard]] RawImageDatabase &getRawImgdatabase() const { return *image_database; }
 
+  void setProgressManager(controller::ProgressStatus *progress_manager);
+  void initializeDatabases(controller::ProgressStatus *progress_manager = nullptr);
+
  private:
   /**
    * @brief Construct a new Resource Database Manager object
@@ -60,6 +63,7 @@ class ResourceDatabaseManager {  // TODO : Not the best design choice , replace 
   std::unique_ptr<INodeDatabase> node_database;      /*<Pointer on the node database*/
   std::unique_ptr<HdrImageDatabase> hdr_database;    /*<Raw HDR images database*/
   std::unique_ptr<RawImageDatabase> image_database;  /*<Raw texture images database*/
+  controller::ProgressStatus *progress_status{};
 };
 
 #endif

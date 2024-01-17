@@ -1,6 +1,8 @@
 #include "ShaderDatabase.h"
 #include "Mutex.h"
 
+ShaderDatabase::ShaderDatabase(controller::ProgressStatus *progress_manager_) { progress_manager = progress_manager_; }
+
 void ShaderDatabase::purge() {
   Mutex::Lock lock(mutex);
   for (auto &A : database_map)

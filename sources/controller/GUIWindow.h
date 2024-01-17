@@ -24,7 +24,7 @@
 namespace gui {
   enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4, ALBEDO = 5, GREYSCALE_AVG = 6, PROJECTED_NMAP = 7, INVALID = 8 };
 }
-namespace axomae {
+namespace controller {
   class HeapManagement;
   class ImageImporter;
   template<typename T>
@@ -302,14 +302,15 @@ namespace axomae {
    private:
     Ui::MainWindow _UI;
     GLViewer *viewer_3d;
-    Window *_window;
+    axomae::Window *_window;
     ImageImporter *_importer;
     ApplicationConfig configuration;
     SceneListView *renderer_scene_list;
     std::unique_ptr<LightController> light_controller;
     ResourceDatabaseManager &resource_database;
+    std::unique_ptr<ProgressStatus> progress_manager;
   };
 
-}  // namespace axomae
+}  // namespace controller
 
 #endif

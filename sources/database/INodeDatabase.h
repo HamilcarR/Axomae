@@ -10,7 +10,7 @@ class INodeDatabase final : public IntegerResourceDB<INode> {
   using NodeIdMap = std::map<int, std::unique_ptr<INode>>;
 
  public:
-  INodeDatabase() = default;
+  explicit INodeDatabase(controller::ProgressStatus *progress_manager = nullptr);
   void clean() override;
   void purge() override;
   INode *get(int id) const override;

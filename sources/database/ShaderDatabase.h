@@ -19,7 +19,7 @@ class ShaderDatabase final : public IResourceDB<Shader::TYPE, Shader> {
    * @brief Construct a new Shader Database object
    *
    */
-  ShaderDatabase() = default;
+  explicit ShaderDatabase(controller::ProgressStatus *progress_manager = nullptr);
 
   /**
    * @brief Cleans the whole database , Deletes all shaders .

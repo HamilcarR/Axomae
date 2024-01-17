@@ -1,6 +1,7 @@
 #ifndef RENDERINGDATABASEINTERFACE_H
 #define RENDERINGDATABASEINTERFACE_H
 #include "Mutex.h"
+#include "OP_ProgressStatus.h"
 #include "constants.h"
 #include <map>
 /**
@@ -244,9 +245,13 @@ class IResourceDB {
     return true;
   }
 
+  [[nodiscard]] controller::ProgressStatus *getProgressManager() const { return progress_manager; }
+  void setProgressManager(controller::ProgressStatus *progress_m) { progress_manager = progress_m; }
+
  protected:
   mutable Mutex mutex;
   DATABASE database_map;
+  controller::ProgressStatus *progress_manager;
 };
 
 /* Some methods may have an ambiguous behavior depending on the type of the ID . this class provides a specialization of the
@@ -260,9 +265,9 @@ class IntegerResourceDB : public IResourceDB<int, T> {
    * @brief returns the first free ID of the map.
    *
    * Returns either :
-   * 1) Slot in which storage is marked invalid .
-   * 2) "Hole" between two valid slots. (ex : 1 -- [no slot] -- 3 , returns 2)
-   * 3) Allocates new storage in the map .
+   * 1) first slot in which storage is marked invalid .
+   * 2) first "Hole" between two valid slots. (ex : 1 -- [no slot] -- 3 , returns 2)
+   * 3) allocated new storage in the map , at the end.
    * @return U id
    */
   [[nodiscard]] virtual int firstFreeId() const {

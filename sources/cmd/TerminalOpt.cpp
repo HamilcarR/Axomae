@@ -269,7 +269,7 @@ namespace axomae {
       if (v.validated) {
         if (id >= 0 && (unsigned int)id < images.size()) {
           print(std::string("Saving..."), GREEN, PROMPT2);
-          ImageImporter::save_image(images[id].first, v.command_arguments[1].c_str());
+          IO::ImageImporter::save_image(images[id].first, v.command_arguments[1].c_str());
           print(std::string("Done."), GREEN, PROMPT2);
 
         } else {
@@ -283,7 +283,7 @@ namespace axomae {
       if (v.validated) {
         std::string a = std::string("File : " + v.command_arguments[0] + " loading...");
         print(a, GREEN);
-        ImageImporter *instance = ImageImporter::getInstance();
+        IO::ImageImporter *instance = IO::ImageImporter::getInstance();
         SDL_Surface *im = instance->load_image(static_cast<const char *>(v.command_arguments[0].c_str()));
         if (im)
           images.push_back(std::pair<SDL_Surface *, std::string>(im, v.command_arguments[0]));
