@@ -232,7 +232,10 @@ class Renderer : public QObject {
    * @return const Scene&
    */
   const Scene &getConstScene() const { return *scene; }
+
   Scene &getScene() { return *scene; }
+
+  RenderPipeline &getRenderPipeline() const { return *render_pipeline; }
 
   template<EVENT_TYPE type>
   void pushEvent(RENDERER_CALLBACK_ENUM callback_enum, std::any data) {

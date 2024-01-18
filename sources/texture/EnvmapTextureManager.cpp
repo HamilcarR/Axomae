@@ -15,9 +15,9 @@ static texture::envmap::EnvmapBakingConfig generate_config() {
   config.irradiance_dim.height = 64;
   config.prefilter_dim.width = 512;
   config.prefilter_dim.height = 512;
-  config.base_env_dim_upscale = 2048;
+  config.base_env_dim_upscale = 4096;
   config.prefilter_mip_maps = 10;
-  config.base_samples = 100;
+  config.base_samples = 500;
   config.lut.width = 256;
   config.lut.height = 256;
   config.sampling_factor_per_mips = 2;
@@ -47,7 +47,8 @@ void EnvmapTextureManager::initializeLUT() {
   /*Adding the default envmap*/
   if (resource_database.getHdrDatabase().empty()) {
     try {
-      IO::Loader::loadHdr(config.default_envmap_path.c_str());
+      IO::Loader loader(resource_database.getProgressManager());
+      loader.loadHdr(config.default_envmap_path.c_str());
       current = bakes_id.back();
     } catch (GenericException &e) {
       LOG(e.what(), LogLevel::ERROR);

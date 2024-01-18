@@ -16,7 +16,7 @@ class Renderer;
 /**
  * @class RenderPipeline
  */
-class RenderPipeline {
+class RenderPipeline : public controller::IProgressManager {
  public:
   explicit RenderPipeline(unsigned int &default_framebuffer_id, GLViewer &context, ResourceDatabaseManager *resource_database = nullptr);
 

@@ -34,14 +34,12 @@ class Thumbnail {
     assert(max > 0);
     if (needs_color_correct)
       max = color_correction(max);
-    auto message = controller::progress_bar::generateData("Generating Environment map thumbnail", 0);
-    controller::ioperator::OpData<controller::progress_bar::ProgressBarTextFormat> pbar_format(message);
+    auto pbar_format = controller::progress_bar::generateData("Generating Environment map thumbnail", 0);
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
         int index = (i * width + j) * channels;
         if (status) {
-          float ratio_p = (float)index / (float)(width * height * channels);
-          pbar_format.data.percentage = static_cast<int>(ratio_p * 100);
+          pbar_format.data.percentage = controller::progress_bar::computePercent((float)index, (float)(width * height * channels));
           status->op(&pbar_format);
         }
         T r, g, b;

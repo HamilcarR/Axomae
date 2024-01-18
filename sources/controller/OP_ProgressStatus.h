@@ -1,5 +1,6 @@
 #ifndef OP_PROGRESSSTATUS_H
 #define OP_PROGRESSSTATUS_H
+#include "Axomae_macros.h"
 #include "Operator.h"
 
 class ProgressStatusWidget;
@@ -10,12 +11,17 @@ namespace controller {
       std::string format;
       int percentage;
     };
-
-    inline ProgressBarTextFormat generateData(std::string message, int percentage) {
-      ProgressBarTextFormat format{};
-      format.percentage = percentage;
+    template<class T>
+    inline int computePercent(T current, T end) {
+      ASSERT_IS_ARITHMETIC(T);
+      return static_cast<int>(((float)current / (float)end) * 100);
+    }
+    inline ioperator::OpData<progress_bar::ProgressBarTextFormat> generateData(std::string message, int percentage) {
+      progress_bar::ProgressBarTextFormat format{};
       format.format = message;
-      return format;
+      format.percentage = percentage;
+      ioperator::OpData<progress_bar::ProgressBarTextFormat> data(format);
+      return data;
     }
   }  // namespace progress_bar
   class OP_ProgressStatus final : public ioperator::IOperator<ProgressStatusWidget, progress_bar::ProgressBarTextFormat> {
@@ -27,5 +33,16 @@ namespace controller {
   };
 
   using ProgressStatus = OP_ProgressStatus;
+
+  /* Use this interface for every object needing to communicate with a progress bar*/
+  class IProgressManager {
+   public:
+    virtual void setProgressManager(ProgressStatus *p_manager) { progress_manager = p_manager; }
+    virtual ProgressStatus *getProgressManager() { return progress_manager; }
+
+   protected:
+    ProgressStatus *progress_manager{};
+  };
+
 }  // namespace controller
 #endif

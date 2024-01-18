@@ -52,13 +52,13 @@ namespace IO {
   /**
    * @brief 3D Loader class
    */
-  class Loader {
+  class Loader : public controller::IProgressManager {
    public:
     /**
      * @brief Construct a new Loader object
      *
      */
-    Loader();
+    explicit Loader(controller::ProgressStatus *prgoress_status);
 
     /**
      * @brief Load a .glb file
@@ -84,18 +84,11 @@ namespace IO {
     std::pair<std::vector<Mesh *>, SceneTree> loadObjects(const char *filename);
 
     /**
-     * @brief Loads an environment map from the disk
-     *
-     * @return CubeMesh*
-     */
-    EnvironmentMap2DTexture *loadHdrEnvmap();
-
-    /**
      * @brief Loads an HDR image , and store it into it's database
      */
-    static void loadHdr(const char *path);
+    void loadHdr(const char *path);
 
-   protected:
+   private:
     ResourceDatabaseManager *resource_database;
   };
 

@@ -29,6 +29,8 @@ void RenderPipeline::clean() {}
 
 int RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_map, CubeMapMesh &cubemap, unsigned width, unsigned height, Dim2 default_dim_) {
   LOG("Generating an environment cubemap", LogLevel::INFO);
+  auto progress = controller::progress_bar::generateData("Generating cubemap texture", 0);
+  progress_manager->op(&progress);
   assert(resource_database != nullptr);
   assert(!resource_database->getTextureDatabase().empty());
   assert(hdri_map != nullptr);
@@ -58,6 +60,7 @@ int RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_map, CubeM
       cubemap_renderer_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
   query_baked_cubemap_texture.object->generateMipmap();
   errorCheck(__FILE__, __LINE__);
+  progress_manager->reset();
   return query_baked_cubemap_texture.id;
 }
 
@@ -77,6 +80,8 @@ int RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_map, CubeM
  */
 int RenderPipeline::bakeIrradianceCubemap(int cube_envmap, unsigned width, unsigned height, Dim2 default_dim_) {
   LOG("Generating an irradiance cubemap", LogLevel::INFO);
+  auto progress = controller::progress_bar::generateData("Generating diffuse environment map", 0);
+  progress_manager->op(&progress);
   context.makeCurrent();
   Dim2 irrad_dim{}, cam_dim{}, default_dim{};
   TextureDatabase *texture_database = &resource_database->getTextureDatabase();
@@ -99,6 +104,7 @@ int RenderPipeline::bakeIrradianceCubemap(int cube_envmap, unsigned width, unsig
       cubemap_irradiance_framebuffer.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
   assert(query_baked_irradiance_texture.object);
   errorCheck(__FILE__, __LINE__);
+  progress_manager->reset();
   return query_baked_irradiance_texture.id;
 }
 /********************************************************************************************************************************************************************************************************/
@@ -112,6 +118,8 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap,
                                     unsigned int factor_per_mip,
                                     Dim2 default_dim_) {
   LOG("Generating a prefiltered cubemap", LogLevel::INFO);
+  auto progress = controller::progress_bar::generateData("Generating specular environment map", 0);
+  progress_manager->op(&progress);
   context.makeCurrent();
   Dim2 cubemap_dim{}, default_dim{}, resize_dim{};
   auto *prefilter_shader = dynamic_cast<EnvmapPrefilterBakerShader *>(resource_database->getShaderDatabase().get(Shader::ENVMAP_PREFILTER));
@@ -147,7 +155,6 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap,
       glFinish();
     }
   }
-
   glViewport(0, 0, default_dim.width, default_dim.height);
   cube_drawable.unbind();
   cube_drawable.clean();
@@ -157,6 +164,7 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap,
       cubemap_prefilter_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
   errorCheck(__FILE__, __LINE__);
   assert(query_prefiltered_cubemap_texture.object);
+  progress_manager->reset();
   return query_prefiltered_cubemap_texture.id;
 }
 
@@ -164,6 +172,8 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap,
 
 int RenderPipeline::generateBRDFLookupTexture(unsigned int width, unsigned int height, Dim2 default_dim_) {
   context.makeCurrent();
+  auto pbar_status = controller::progress_bar::generateData("Generating BRDF look up table", 0);
+  progress_manager->op(&pbar_status);
   Dim2 tex_dim{}, camera_dim{}, original_dim{};
   tex_dim.width = width;
   tex_dim.height = height;
@@ -183,6 +193,7 @@ int RenderPipeline::generateBRDFLookupTexture(unsigned int width, unsigned int h
       quad_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
   errorCheck(__FILE__, __LINE__);
   assert(query_brdf_lut.object);
+  progress_manager->reset();
   return query_brdf_lut.id;
 }
 

@@ -23,22 +23,22 @@ void ResourceDatabaseManager::clean() {
 
 ResourceDatabaseManager::ResourceDatabaseManager() {}
 
-void ResourceDatabaseManager::initializeDatabases(controller::ProgressStatus *progress_manager) {
-  progress_status = progress_manager;
-  texture_database = std::make_unique<TextureDatabase>(progress_status);
-  shader_database = std::make_unique<ShaderDatabase>(progress_status);
-  node_database = std::make_unique<INodeDatabase>(progress_status);
-  hdr_database = std::make_unique<ImageDatabase<float>>(progress_status);
-  image_database = std::make_unique<ImageDatabase<uint8_t>>(progress_status);
+void ResourceDatabaseManager::initializeDatabases(controller::ProgressStatus *progress_manager_) {
+  progress_manager = progress_manager;
+  texture_database = std::make_unique<TextureDatabase>(progress_manager);
+  shader_database = std::make_unique<ShaderDatabase>(progress_manager);
+  node_database = std::make_unique<INodeDatabase>(progress_manager);
+  hdr_database = std::make_unique<ImageDatabase<float>>(progress_manager);
+  image_database = std::make_unique<ImageDatabase<uint8_t>>(progress_manager);
 }
 
-void ResourceDatabaseManager::setProgressManager(controller::ProgressStatus *progress_manager) {
-  progress_status = progress_manager;
-  texture_database->setProgressManager(progress_status);
-  shader_database->setProgressManager(progress_status);
-  node_database->setProgressManager(progress_status);
-  hdr_database->setProgressManager(progress_status);
-  image_database->setProgressManager(progress_status);
+void ResourceDatabaseManager::setProgressManager(controller::ProgressStatus *progress_manager_) {
+  progress_manager = progress_manager_;
+  texture_database->setProgressManager(progress_manager);
+  shader_database->setProgressManager(progress_manager);
+  node_database->setProgressManager(progress_manager);
+  hdr_database->setProgressManager(progress_manager);
+  image_database->setProgressManager(progress_manager);
 }
 
 void ResourceDatabaseManager::cleanShaderDatabase() { shader_database->clean(); }

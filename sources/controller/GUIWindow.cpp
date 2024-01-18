@@ -232,6 +232,7 @@ namespace controller {
     viewer_3d = _UI.renderer_view;
     renderer_scene_list = _UI.renderer_scene_list;
     _UI.renderer_envmap_list->setWidget(viewer_3d);
+    viewer_3d->getRenderer().getRenderPipeline().setProgressManager(progress_manager.get());
 
     /*Lighting GUI initialization*/
     light_controller = std::make_unique<LightController>(_UI);
@@ -483,7 +484,8 @@ namespace controller {
       return false;
     else {
       try {
-        IO::Loader::loadHdr(filename.toStdString().c_str());
+        IO::Loader loader(progress_manager.get());
+        loader.loadHdr(filename.toStdString().c_str());
       } catch (GenericException &e) {
         LOG(e.what(), LogLevel::ERROR);
       }
@@ -678,7 +680,7 @@ namespace controller {
     if (!filename.isEmpty()) {
       resource_database.getNodeDatabase().clean();
       resource_database.getTextureDatabase().clean();
-      IO::Loader loader;
+      IO::Loader loader(progress_manager.get());
       auto struct_holder = loader.load(filename.toStdString().c_str());
       std::vector<Mesh *> scene = struct_holder.first;
       SceneSelector &instance = SceneSelector::getInstance();
