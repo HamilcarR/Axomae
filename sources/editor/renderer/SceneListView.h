@@ -78,10 +78,9 @@ class SceneListView : virtual public QTreeWidget {
   }
 
  private:
-  std::vector<NodeItem *> items;  // Only used to simply keep track of elements in the tree.
-  std::map<ISceneNode *, NodeItem *> node_lookup;
-  /*<Keeps track of the NodeItems and their corresponding INodes*/  // no need to deallocate anything here.
-  SceneTree *current_scene;                                         /*<Keeps track of the currently processed scene*/
+  std::vector<NodeItem *> items;                  // Only used to keep track of elements in the tree.
+  std::map<ISceneNode *, NodeItem *> node_lookup; /*<Keeps track of the NodeItems and their corresponding INodes*/
+  SceneTree *current_scene;                       /*<Keeps track of the currently processed scene*/
 };
 
 #endif
