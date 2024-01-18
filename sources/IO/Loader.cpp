@@ -111,6 +111,8 @@ namespace IO {
         LOG("image of size " + std::to_string(totexture->width) + " x " + std::to_string(totexture->height) + " uncompressed ", LogLevel::INFO);
       }
     }
+    if (progress_manager)
+      progress_manager->reset();
   }
   template<class TEXTYPE>
   static void loadTextureDummy(Material *material, TextureDatabase &texture_database) {
