@@ -1,17 +1,14 @@
 #ifndef SYNTAX_H
 #define SYNTAX_H
+#include "constants.h"
+namespace cmd {
+  namespace syntax {
 
-namespace axomae {
+    class Validator {
+     public:
+      static bool validate(const char *cmd);
+    };
 
-  class SyntaxTree {
-
-   public:
-    SyntaxTree();
-    ~SyntaxTree();
-
-   private:
-  };
-
-}  // namespace axomae
-
+  }  // namespace syntax
+}  // namespace cmd
 #endif

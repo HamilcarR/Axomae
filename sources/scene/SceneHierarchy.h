@@ -15,8 +15,7 @@
  * @class ISceneHierarchy
  *
  */
-class ISceneHierarchy : public QObject {
-  Q_OBJECT
+class ISceneHierarchy {
  public:
   /**
    * @brief Set the Root object
@@ -135,9 +134,6 @@ class ISceneHierarchy : public QObject {
 
   template<class F, class... Args>
   void bfsConstTraverse(const INode *node, F func, Args &&...args) const;
-
- signals:
-  void modifiedStructureEvent();
 
  protected:
   INode *root; /*<Root of the hierarchy*/

@@ -1,5 +1,4 @@
-SOURCES += $$PWD/Syntax.cpp \
-            $$PWD/TerminalOpt.cpp
+SOURCES += $$PWD/TerminalOpt.cpp
 
 
 HEADERS += $$PWD/CmdArgs.h \
