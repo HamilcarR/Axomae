@@ -1,6 +1,6 @@
 #ifndef CUBEMAPPROCESSING_CUH
 #define CUBEMAPPROCESSING_CUH
-#include "Includes.cuh"
+#include "../../gpu/cuda/Includes.cuh"
 #include "PerformanceLogger.h"
 #include "math.h"
 #include <cmath>
@@ -90,17 +90,6 @@ namespace gpgpu_functions {
       cudaErrCheck(cudaDestroyTextureObject(texture_object));
       cudaErrCheck(cudaFreeArray(cuda_array));
     }
-
-    /*
-   static void GPU_compute_channel_irradiance(float* src_texture , unsigned src_texture_width , unsigned src_texture_height , float** dest_texture ,
-   unsigned dest_texture_width , unsigned dest_texture_height , unsigned samples){ float *D_src_texture; size_t pitch_src = src_texture_width *
-   sizeof(float); size_t pitch_dest = dest_texture_width * sizeof(float); cudaErrCheck(cudaMalloc((void**)&D_src_texture , src_texture_width *
-   src_texture_height * sizeof(float))); cudaErrCheck(cudaMemcpy(D_src_texture , src_texture , pitch_src * src_texture_height ,
-   cudaMemcpyHostToDevice)); cudaErrCheck(cudaMallocManaged((void**) dest_texture , dest_texture_height * pitch_dest));
-       gpgpu_kernel_call(gpgpu_device_compute_diffuse_irradiance , *dest_texture , D_src_texture , src_texture_width , src_texture_height ,
-   dest_texture_width , dest_texture_height , samples);
-   }
-   */
 
   };  // End namespace irradiance_mapping
 };    // End namespace gpgpu_functions

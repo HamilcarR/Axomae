@@ -9,6 +9,8 @@
 #include <string>
 #include <thread>
 
+/*VERY VERY VERY VERY OOOOOOOOLD CODE FROM THE PALEOLITHIC ERA : needs refact to new standards*/
+
 namespace axomae {
 
   using namespace std;

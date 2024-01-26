@@ -87,7 +87,7 @@ void EnvmapTextureManager::deleteFromCollection(int index) {
       bakes_id.erase(it);
 }
 
-static TextureData texture_metadata(image::RawImageHolder<float> *raw_image_data) {
+static TextureData texture_metadata(image::ThumbnailImageHolder<float> *raw_image_data) {
   TextureData envmap;
   envmap.width = raw_image_data->metadata().width;
   envmap.height = raw_image_data->metadata().height;
@@ -104,7 +104,7 @@ void EnvmapTextureManager::addToCollection(int index) {
   auto &texture_database = resource_database.getTextureDatabase();
   auto &image_database = resource_database.getHdrDatabase();
   texture::envmap::EnvmapTextureGroup texgroup{};
-  image::RawImageHolder<float> *raw_image_data = image_database.get(index);
+  image::ThumbnailImageHolder<float> *raw_image_data = image_database.get(index);
   assert(raw_image_data);
   texgroup.equirect_id = index;
   TextureData envmap = texture_metadata(raw_image_data);

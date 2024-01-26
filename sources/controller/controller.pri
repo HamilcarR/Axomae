@@ -8,9 +8,11 @@ HEADERS += $$PWD/GUIWindow.h \
             $$PWD/Operator.h \
             $$PWD/OP_ProgressStatus.h\
 
-
 INCLUDEPATH += $$PWD/../config \
                 $$PWD/../database \
                 $$PWD/../database/model \
                 $$PWD/../controller\
-                $$PWD/../editor\
+                $$PWD/../editor
+
+
+include($$PWD/cmd/cmd.pri)

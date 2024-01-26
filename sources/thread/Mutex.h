@@ -19,6 +19,10 @@ class Mutex : public GenericLockInterface {
    public:
     explicit Lock(Mutex &_mutex);
     virtual ~Lock();
+    Lock(const Lock &) = delete;
+    Lock(Lock &&) = delete;
+    Lock &operator=(const Lock &) = delete;
+    Lock &operator=(Lock &&) = delete;
 
    private:
     Mutex &lock_mutex;

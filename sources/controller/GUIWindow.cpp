@@ -213,9 +213,6 @@ namespace controller {
   }
 
   Controller::Controller(QWidget *parent) : QMainWindow(parent), resource_database(ResourceDatabaseManager::getInstance()) {
-    /*Logging configuration*/
-    LoggerConfigDataStruct log_struct = configuration.generateLoggerConfigDataStruct();
-    LOGCONFIG(log_struct);
 
     /*Initialize databases*/
     resource_database.initializeDatabases();
@@ -247,11 +244,7 @@ namespace controller {
 
   Controller::~Controller() { delete _MemManagement; }
 
-  void Controller::setApplicationConfig(const std::string &config_string) {
-    configuration.setConfig(config_string);
-    LoggerConfigDataStruct log_struct = configuration.generateLoggerConfigDataStruct();
-    LOGCONFIG(log_struct);
-  }
+  void Controller::setApplicationConfig(const ApplicationConfig &application) {}
 
   /**************************************************************************************************************/
   void Controller::display_image(SDL_Surface *surf, IMAGETYPE type, bool save_in_heap) {

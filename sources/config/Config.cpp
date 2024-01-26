@@ -2,9 +2,7 @@
 #include "Mutex.h"
 #include <memory>
 
-ApplicationConfig::ApplicationConfig() {}
-
-ApplicationConfig::~ApplicationConfig() {}
+ApplicationConfig::ApplicationConfig() { logger_conf = generateLoggerConfigDataStruct(); }
 
 std::string ApplicationConfig::getLogFile() const {
   time_t now = time(0);
@@ -19,23 +17,14 @@ std::string ApplicationConfig::getLogFile() const {
          std::to_string(m) + "_" + std::to_string(s);
 }
 
-void ApplicationConfig::setConfig(const std::string &param_string) { is_config_init = true; }
-
-LoggerConfigDataStruct ApplicationConfig::generateLoggerConfigDataStruct() const {
-  // TODO : generate from config file or command line options
-  if (!is_config_init) {
-    LoggerConfigDataStruct data;
-    data.log_filters = "";
-    data.log_level = LogLevel::INFO;
-    std::shared_ptr<std::ostream> out(&std::cout, [](std::ostream *) {});
-    data.write_destination = out;
-    return data;
-  } else {
-    LoggerConfigDataStruct data;
-    data.log_filters = "";
-    data.log_level = LogLevel::INFO;
-    std::shared_ptr<std::ostream> out(&std::cout, [](std::ostream *) {});
-    data.write_destination = out;
-    return data;
-  }
+LoggerConfigDataStruct ApplicationConfig::generateDefaultLoggerConfigDataStruct() const {
+  LoggerConfigDataStruct data;
+  data.log_filters = "";
+  data.log_level = LogLevel::INFO;
+  std::shared_ptr<std::ostream> out(&std::cout, [](std::ostream *) {});
+  data.write_destination = out;
+  data.enable_logging = false;
+  return data;
 }
+
+LoggerConfigDataStruct ApplicationConfig::generateLoggerConfigDataStruct() const { return logger_conf; }

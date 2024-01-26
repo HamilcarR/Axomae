@@ -10,11 +10,11 @@
 #include <utility>
 
 template<class DATATYPE>
-class ImageDatabase : public IntegerResourceDB<image::RawImageHolder<DATATYPE>>, private IPublisher<database::event::ImageUpdateMessage *> {
-  using BaseType = IntegerResourceDB<image::RawImageHolder<DATATYPE>>;
-  using HolderPointer = std::unique_ptr<image::RawImageHolder<DATATYPE>>;
-  using HolderResult = database::Result<int, image::RawImageHolder<DATATYPE>>;
-  using HolderMap = std::map<int, std::unique_ptr<image::RawImageHolder<DATATYPE>>>;
+class ImageDatabase : public IntegerResourceDB<image::ThumbnailImageHolder<DATATYPE>>, private IPublisher<database::event::ImageUpdateMessage *> {
+  using BaseType = IntegerResourceDB<image::ThumbnailImageHolder<DATATYPE>>;
+  using HolderPointer = std::unique_ptr<image::ThumbnailImageHolder<DATATYPE>>;
+  using HolderResult = database::Result<int, image::ThumbnailImageHolder<DATATYPE>>;
+  using HolderMap = std::map<int, std::unique_ptr<image::ThumbnailImageHolder<DATATYPE>>>;
   using Message = database::event::ImageUpdateMessage *;
   using Subscriber = ISubscriber<Message>;
 
@@ -83,12 +83,12 @@ class ImageDatabase : public IntegerResourceDB<image::RawImageHolder<DATATYPE>>,
   }
 
   [[nodiscard]] image::Metadata getMetadata(int index) const {
-    image::RawImageHolder<DATATYPE> *holder = BaseType::database_map.at(index).get();
+    image::ThumbnailImageHolder<DATATYPE> *holder = BaseType::database_map.at(index).get();
     return holder->metadata();
   }
 
   [[nodiscard]] const QPixmap &getThumbnail(int index) const {
-    image::RawImageHolder<DATATYPE> *holder = BaseType::database_map.at(index).get();
+    image::ThumbnailImageHolder<DATATYPE> *holder = BaseType::database_map.at(index).get();
     return holder->thumbnail();
   }
 
@@ -112,16 +112,16 @@ class ImageDatabase : public IntegerResourceDB<image::RawImageHolder<DATATYPE>>,
 
 namespace database::image {
   template<class TYPE>
-  void store(IResourceDB<int, ::image::RawImageHolder<TYPE>> &database_, bool keep, std::vector<TYPE> &args, ::image::Metadata metadata) {
+  void store(IResourceDB<int, ::image::ThumbnailImageHolder<TYPE>> &database_, bool keep, std::vector<TYPE> &args, ::image::Metadata metadata) {
     ASSERT_IS_ARITHMETIC(TYPE);
-    auto raw_image = std::make_unique<::image::RawImageHolder<TYPE>>(args, metadata, database_.getProgressManager());
+    auto raw_image = std::make_unique<::image::ThumbnailImageHolder<TYPE>>(args, metadata, database_.getProgressManager());
     database_.add(std::move(raw_image), keep);
   }
 
   template<class TYPE>
-  void store(IResourceDB<int, ::image::RawImageHolder<TYPE>> &database_, bool keep) {
+  void store(IResourceDB<int, ::image::ThumbnailImageHolder<TYPE>> &database_, bool keep) {
     ASSERT_IS_ARITHMETIC(TYPE);
-    auto raw_image = std::make_unique<::image::RawImageHolder<TYPE>>();
+    auto raw_image = std::make_unique<::image::ThumbnailImageHolder<TYPE>>();
     database_.add(std::move(raw_image), keep);
   }
 

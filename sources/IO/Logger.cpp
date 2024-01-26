@@ -21,18 +21,25 @@ std::map<LogLevel::LOGENUMTYPE, std::string> level_str = {{LogLevel::CRITICAL, "
                                                           {LogLevel::WARNING, "WARNING"},
                                                           {LogLevel::GLINFO, "OPENGL INFO"}};
 
-void LogFunctions::log_message(std::string message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line) {
-  logger_global.logMessage(message, level, file, function, line);
-}
+namespace LogFunctions {
+  void log_message(std::string message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line) {
+    logger_global.logMessage(message, level, file, function, line);
+  }
 
-void LogFunctions::log_message(const char *message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line) {
-  log_message(std::string(message), level, file, function, line);
-}
+  void log_message(const char *message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line) {
+    log_message(std::string(message), level, file, function, line);
+  }
 
-void LogFunctions::log_flush() { logger_global.flush(); }
+  void log_message(const char *message) { logger_global.logMessage(message); }
 
-void LogFunctions::log_configure(const LoggerConfigDataStruct &conf) { logger_global.setLogSystemConfig(conf); }
+  void log_flush() { logger_global.flush(); }
 
+  void log_configure(const LoggerConfigDataStruct &conf) { logger_global.setLogSystemConfig(conf); }
+
+  void log_enable() { logger_global.loggerState(true); }
+
+  void log_disable() { logger_global.loggerState(false); }
+}  // namespace LogFunctions
 static std::string getFormatedLog(
     const std::string &message, const std::string &filename, const std::string &function, const unsigned line, LogLevel::LOGENUMTYPE level) {
   std::string head = filename + ";" + function + "();" + std::to_string(line) + ";" + LOG2STR(level) + "==> " + message;
@@ -43,9 +50,7 @@ AbstractLogger::AbstractLogger() {}
 
 AbstractLogger::~AbstractLogger() {}
 
-Logger::Logger() : AbstractLogger() {}
-
-Logger::~Logger() {}
+Logger::Logger() : AbstractLogger() { enabled = true; }
 
 LogLine::LogLine(const std::string &mes, const LogLevel::LOGENUMTYPE lev, const char *_file, const char *_function, const unsigned _line) {
   message = mes;
@@ -55,19 +60,23 @@ LogLine::LogLine(const std::string &mes, const LogLevel::LOGENUMTYPE lev, const 
   function = _function;
 }
 
-LogLine::~LogLine() {}
-
 std::string LogLine::getFormattedLog() const { return getFormatedLog(message, file, function, line, level); }
 
 void Logger::logMessage(const std::string &message, LogLevel::LOGENUMTYPE log_level, const char *file, const char *function, unsigned line) {
   Mutex::Lock lock(mutex);
   LogLine elem(message, log_level, file, function, line);
   log_buffer.push_back(elem);
-  print();
+  if (enabled)
+    print();
 }
 
 void Logger::logMessage(const char *message, LogLevel::LOGENUMTYPE log_level, const char *file, const char *function, unsigned line) {
   logMessage(std::string(message), log_level, file, function, line);
+}
+
+void Logger::logMessage(const char *message) {
+  if (enabled)
+    *out << message;
 }
 
 void Logger::print() const {
@@ -92,4 +101,5 @@ void Logger::setLogSystemConfig(const LoggerConfigDataStruct &config) {
   filters = config.log_filters;
   priority = config.log_level;
   out = config.write_destination;
+  enabled = config.enable_logging;
 }

@@ -5,7 +5,7 @@
 
 /**
  * @file Operator.h
- * @brief API interface between a GUI element , and the logic interacting with it.
+ * @brief API interface between a GUI element / cmd line option , and the logic interacting with it.
  */
 namespace controller {
   namespace ioperator {
@@ -16,15 +16,22 @@ namespace controller {
       T data;
     };
 
-    template<class WIDGET_TYPE, class DATA_TYPE>
-    class IOperator {
+    template<class MODULE, class DATA_TYPE>
+    class OperatorInterface {
      public:
       virtual bool op(ioperator::OpData<DATA_TYPE> *data) const = 0;
-      virtual void reset() const = 0;
-      virtual ~IOperator() = default;
 
      protected:
-      WIDGET_TYPE *widget;
+      MODULE *module;
+    };
+
+    template<class MODULE, class DATA_TYPE>
+    class UiOperatorInterface : public OperatorInterface<MODULE, DATA_TYPE> {
+     public:
+      /**
+       * @brief Resets element to default state
+       */
+      virtual void reset() const = 0;
     };
   }  // namespace ioperator
 }  // namespace controller

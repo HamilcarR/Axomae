@@ -1,19 +1,18 @@
 #ifndef GUIWINDOW_H
 #define GUIWINDOW_H
 
-#include <QtWidgets/qapplication.h>
-#include <QtWidgets/qmainwindow.h>
-#include <QtWidgets/qpushbutton.h>
-
 #include "Config.h"
 #include "LightControllerUI.h"
 #include "Renderer.h"
 #include "SceneListView.h"
 #include "SceneSelector.h"
-#include "Window.h"
 #include "constants.h"
 #include "ui_main_window.h"
 #include "utils_3D.h"
+#include <QtWidgets/qapplication.h>
+#include <QtWidgets/qmainwindow.h>
+#include <QtWidgets/qpushbutton.h>
+#include <SDL2/SDL_surface.h>
 
 /**
  * @file GUIWindow.h
@@ -34,7 +33,7 @@ namespace controller {
    public:
     Controller(QWidget *parent = nullptr);
     ~Controller();
-    void setApplicationConfig(const std::string &config_string);
+    void setApplicationConfig(const ApplicationConfig &configuration);
     Ui::MainWindow &getUi() { return _UI; }
     static HeapManagement *_MemManagement;
     static SDL_Surface *copy_surface(SDL_Surface *surface);
@@ -302,9 +301,7 @@ namespace controller {
    private:
     Ui::MainWindow _UI;
     GLViewer *viewer_3d;
-    axomae::Window *_window;
     ImageImporter *_importer;
-    ApplicationConfig configuration;
     SceneListView *renderer_scene_list;
     std::unique_ptr<LightController> light_controller;
     ResourceDatabaseManager &resource_database;

@@ -9,4 +9,4 @@ INCLUDEPATH += $$PWD/../gpu/cuda \
                 $$PWD/../gpu/opengl
                 $$PWD/../common \
 
-                
+include($$PWD/cuda/cuda.pri)

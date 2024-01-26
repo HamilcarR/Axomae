@@ -1,0 +1,76 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+namespace controller{
+namespace cmd{
+    class API{
+        - config : ApplicationConfig
+        + void disableLogging()
+        + void enableLogging()
+        + void enableGui()
+        + void disableGui()
+        + void bakeTexture(const ENVMAPDATA& , bool)
+        + void enableGpu()
+        + void configure()
+        + void configureDefault()
+    }
+
+
+    class ProgramOptionManager{
+        - api : API
+        + bool processArgs(int , char**)
+        + ApplicationConfig& getConfig()
+    }
+}
+
+    namespace texturing{
+        struct ENVMAPDATA{
+            + path_input : string
+            + path_output : string
+            + width_output : uint
+            + height_output : uint
+            + channels : uint
+            + samples : uint
+            + width_input : uint
+            + height_input : uint
+            + data_input : vector<float>
+            + data_output : vector<float>
+        }
+    }
+}
+
+namespace LogLevel{
+    enum LOGENUMTYPE{
+        INFO
+        GLINFO
+        WARNING
+        ERROR
+        CRITICAL
+        DEBUG
+    }
+}
+
+
+class ApplicationConfig{
+    - logger_conf : LoggerConfigDataStruct
+    + bool getGuiState()
+    + void loggerSetState(bool)
+    + void setGuiLaunched(bool)
+    - is_config_init : bool
+    - launch_gui : bool
+}
+
+
+struct LoggerConfigDataStruct{
+    + log_level : LOGENUMTYPE
+    + write_destination:shared_ptr<ostream>
+    + log_filters:string
+    + enable_logging : bool
+}
+
+ProgramOptionManager o-- API
+ApplicationConfig --o API
+LoggerConfigDataStruct o-- LOGENUMTYPE
+ApplicationConfig o-- LoggerConfigDataStruct
+
+@enduml

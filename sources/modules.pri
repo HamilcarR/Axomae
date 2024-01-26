@@ -1,6 +1,5 @@
 
 include(camera/camera.pri)
-include(cmd/cmd.pri)
 include(common/common.pri)
 include(config/config.pri)
 include(controller/controller.pri)

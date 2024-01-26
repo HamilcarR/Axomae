@@ -19,21 +19,19 @@ constexpr glm::dvec3 BLACK = glm::dvec3(0);
 class TextureInvalidDimensionsException : virtual public GenericException {
  public:
   TextureInvalidDimensionsException() : GenericException() { saveErrorString("This texture has invalid dimensions. (negative or non numerical)"); }
-  virtual ~TextureInvalidDimensionsException() {}
 };
 
 class TextureNonPowerOfTwoDimensionsException : virtual public GenericException {
  public:
   TextureNonPowerOfTwoDimensionsException() : GenericException() { saveErrorString("This texture has dimensions that are not a power of two."); }
-  virtual ~TextureNonPowerOfTwoDimensionsException() {}
 };
 
 // TODO: [AX-51] Create generic texture processing class
 template<class T>
 class EnvmapProcessing : virtual public GenericTextureProcessing {
  public:
-  virtual bool isDimPowerOfTwo(int dimension) const override { return (dimension & (dimension - 1)) == 0; }
-  virtual bool isValidDim(int dimension) const override { return !std::isnan(dimension) && dimension > 0; }
+  bool isDimPowerOfTwo(int dimension) const override { return (dimension & (dimension - 1)) == 0; }
+  bool isValidDim(int dimension) const override { return dimension > 0; }
 
   /**
    * @brief Construct a texture from an envmap double HDR with 3 channels
@@ -42,7 +40,7 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
    * @param _width Pixel width size .
    * @param _height Pixel height size .
    */
-  EnvmapProcessing(const T *_data, const unsigned _width, const unsigned _height, const unsigned int num_channels = 3) {
+  EnvmapProcessing(const std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels = 3) {
 
     if (!isValidDim(_width) || !isValidDim(_height))
       throw TextureInvalidDimensionsException();
@@ -55,11 +53,6 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
       data.push_back(glm::vec3(_data[i], _data[i + 1], _data[i + 2]));
     }
   }
-  /**
-   * @brief Destroy the Envmap Processing object
-   *
-   */
-  virtual ~EnvmapProcessing() {}
 
   /**
    * @brief Returns the stored texture.
@@ -219,7 +212,6 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
 
   /**
    * @brief Bake an equirect envmap to an irradiance map
-   * @tparam D Type of the delta .
    * @param delta Size of the step if calculating irradiance using the integral all over the hemisphere , or number of
    * samples if using importance sampling.
    * @param use_importance_sampling Set to false to use a full integral over the hemisphere , using delta as step . True
@@ -227,35 +219,7 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
    * @return std::unique_ptr<TextureData> Texture data containing width , height , and double f_data about the newly
    * created map.
    */
-  template<typename D>
-  std::unique_ptr<TextureData> computeDiffuseIrradiance(const unsigned _width, const unsigned _height, const D delta) const {
-    if (!isValidDim(_width) || !isValidDim(_height))
-      throw TextureInvalidDimensionsException();
-    if (!isDimPowerOfTwo(_width) || !isDimPowerOfTwo(_height))
-      throw TextureNonPowerOfTwoDimensionsException();
-    TextureData envmap_tex_data;
-    envmap_tex_data.width = _width;
-    envmap_tex_data.height = _height;
-    envmap_tex_data.mipmaps = 0;
-    envmap_tex_data.f_data.resize(_width * _height * channels);
-    envmap_tex_data.nb_components = channels;
-    std::memset(&envmap_tex_data.f_data[0], 0, _width * _height * channels * sizeof(float));
-    unsigned index = 0;
-    std::vector<std::shared_future<void>> futures;
-    for (unsigned i = 1; i <= MAX_THREADS; i++) {
-      unsigned int width_max = (_width / MAX_THREADS) * i, width_min = width_max - (_width / MAX_THREADS);
-      if (i == MAX_THREADS)
-        width_max += _width % MAX_THREADS - 1;
-      auto lambda = [this, &envmap_tex_data](const D delta, const unsigned width_min, const unsigned width_max) {
-        this->launchAsyncDiffuseIrradianceCompute(delta, envmap_tex_data.f_data, width_min, width_max, envmap_tex_data.width, envmap_tex_data.height);
-      };
-      futures.push_back(std::async(std::launch::async, lambda, delta, width_min, width_max));
-    }
-    for (auto it = futures.begin(); it != futures.end(); it++) {
-      it->get();
-    }
-    return std::make_unique<TextureData>(envmap_tex_data);
-  }
+  std::unique_ptr<TextureData> computeDiffuseIrradiance(unsigned _width, unsigned _height, unsigned delta, bool gpu) const;
 
   template<class D>
   inline glm::dvec3 computeIrradianceSingleTexel(
@@ -307,7 +271,7 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
 
  private:
   static constexpr unsigned MAX_THREADS = 8;
-  mutable Mutex mutex;
+  mutable Mutex mutex;  // TODO : Create interface ILockable with mutex
 };
 
 #endif

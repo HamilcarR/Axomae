@@ -24,7 +24,7 @@ namespace controller {
       return data;
     }
   }  // namespace progress_bar
-  class OP_ProgressStatus final : public ioperator::IOperator<ProgressStatusWidget, progress_bar::ProgressBarTextFormat> {
+  class OP_ProgressStatus final : public ioperator::UiOperatorInterface<ProgressStatusWidget, progress_bar::ProgressBarTextFormat> {
 
    public:
     explicit OP_ProgressStatus(ProgressStatusWidget *progress_bar);

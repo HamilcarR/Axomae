@@ -27,9 +27,7 @@ namespace IO {
   namespace exception {
     class LoadImagePathException : public GenericException {
      public:
-      explicit LoadImagePathException(const std::string &path) {
-        GenericException::saveErrorString(std::string("Failed loading the image : ") + path);
-      }
+      explicit LoadImagePathException(const std::string &path) { GenericException::saveErrorString(std::string("Failed processing path : ") + path); }
     };
 
     class LoadImageDimException : public GenericException {
@@ -58,7 +56,7 @@ namespace IO {
      * @brief Construct a new Loader object
      *
      */
-    explicit Loader(controller::ProgressStatus *prgoress_status);
+    explicit Loader(controller::ProgressStatus *progress_status);
 
     /**
      * @brief Load a .glb file
@@ -84,9 +82,13 @@ namespace IO {
     std::pair<std::vector<Mesh *>, SceneTree> loadObjects(const char *filename);
 
     /**
-     * @brief Loads an HDR image , and store it into it's database
+     * @brief Loads an HDR image .
+     * @param store if true , stores the loaded data in the Image db .
+     * @return Image array
      */
-    void loadHdr(const char *path);
+    image::ImageHolder<float> loadHdr(const char *path, bool store = true);
+
+    void writeHdr(const char *path, const image::ImageHolder<float> &image);
 
    private:
     ResourceDatabaseManager *resource_database;

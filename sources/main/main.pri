@@ -4,5 +4,5 @@ INCLUDEPATH += $$PWD/../editor \
                 $$PWD/../IO\
                 $$PWD/../processing \
                 $$PWD/../controller \
-                $$PWD/../cmd
+                $$PWD/../controller/cmd\
                 

@@ -9,8 +9,11 @@
 #include <QImage>
 #include <fstream>
 #define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "axomae_utils.h"
 #include "stb_image.h"
+#include "stb_image_write.h"
+
 /**
  * @file Loader.cpp
  * Loader implementation
@@ -511,7 +514,7 @@ namespace IO {
     return str_text;
   }
 
-  void Loader::loadHdr(const char *path) {
+  image::ImageHolder<float> Loader::loadHdr(const char *path, bool store) {
     int width = -1, height = -1, channels = -1;
     float *data = stbi_loadf(path, &width, &height, &channels, 0);
     if (stbi_failure_reason())
@@ -523,11 +526,14 @@ namespace IO {
     std::vector<float> image_data;
     image_data.resize(width * height * channels);
     for (int i = 0; i < width * height * channels; i++) {
-      auto pbar_data = controller::progress_bar::generateData("Importing environment map", 0);
-      pbar_data.data.percentage = controller::progress_bar::computePercent(i, width * height * channels);
-      progress_manager->op(&pbar_data);
+      if (progress_manager) {
+        auto pbar_data = controller::progress_bar::generateData("Importing environment map", 0);
+        pbar_data.data.percentage = controller::progress_bar::computePercent(i, width * height * channels);
+        progress_manager->op(&pbar_data);
+      }
       image_data[i] = data[i];
     }
+
     image::Metadata metadata;
     metadata.channels = channels;
     metadata.width = width;
@@ -536,9 +542,13 @@ namespace IO {
     std::string name = utils::string::tokenize(path_str, '/').back();
     metadata.name = name;
     metadata.color_corrected = false;
-    auto &hdr_database = resource_database->getHdrDatabase();
-    database::image::store<float>(hdr_database, false, image_data, metadata);
+
+    if (store) {
+      auto &hdr_database = resource_database->getHdrDatabase();
+      database::image::store<float>(hdr_database, false, image_data, metadata);
+    }
     stbi_image_free(data);
+    return image::ImageHolder<float>(image_data, metadata);
   }
 
   /**
@@ -554,6 +564,17 @@ namespace IO {
     std::pair<std::vector<Mesh *>, SceneTree> scene = loadObjects(file);
     errorCheck(__FILE__, __LINE__);
     return scene;
+  }
+
+  void Loader::writeHdr(const char *path, const image::ImageHolder<float> &image) {
+    int n = stbi_write_hdr(path,
+                           static_cast<int>(image.metadata.width),
+                           static_cast<int>(image.metadata.height),
+                           static_cast<int>(image.metadata.channels),
+                           image.data.data());
+    if (n == 0) {
+      throw exception::LoadImagePathException(path);
+    }
   }
 
 }  // namespace IO

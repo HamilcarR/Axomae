@@ -1,22 +1,16 @@
+#include "CmdArgs.h"
+#include "GUIWindow.h"
+#include "ImageImporter.h"
+#include <boost/program_options.hpp>
 #include <cstdlib>
 #include <gtest/gtest.h>
 #include <iostream>
-#include <regex>
 #include <signal.h>
 #include <string>
-#include <thread>
-
-#include "GUIWindow.h"
-#include "ImageImporter.h"
-#include "ImageManager.h"
-#include "TerminalOpt.h"
-#include "Window.h"
-
 using namespace std;
 using namespace axomae;
-using namespace controller;
 
-void init_api() {
+void init_graphics() {
   if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
     cout << "SDL_Init problem : " << SDL_GetError() << endl;
   }
@@ -36,30 +30,49 @@ void sigsegv_handler(int signal) {
   abort();
 }
 
-void quit_api() {
+void cleanup() {
   IMG_Quit();
   SDL_Quit();
 }
 
 int main(int argv, char **argc) {
   signal(SIGSEGV, sigsegv_handler);
-  init_api();
+  ApplicationConfig configuration;
+  controller::cmd::API api;
+  controller::cmd::ProgramOptionsManager options_manager(api);
+  LoggerConfigDataStruct log_struct = configuration.generateDefaultLoggerConfigDataStruct();
+  api.configureDefault();
+  init_graphics();
   if (argv >= 2) {
-    QApplication app(argv, argc);
-    Controller win;
-    /* For future cmd arguments */
-    std::string param_string = "";
-    for (int i = 1; i < argv; i++)
-      param_string += argc[i] + std::string(" ");
-    win.setApplicationConfig(param_string);
-    win.show();
-    return app.exec();
+    try {
+      options_manager.processArgs(argv, argc);
+    } catch (const boost::program_options::error &e) {
+      std::cerr << e.what();
+      cleanup();
+      return EXIT_FAILURE;
+    }
+    configuration = api.getConfig();
+    LoggerConfigDataStruct log_conf = configuration.generateLoggerConfigDataStruct();
+    api.configure();
+    if (configuration.getGuiState()) {
+      QApplication app(argv, argc);
+      controller::Controller win;
+      win.setApplicationConfig(configuration);
+      win.show();
+      int ret = app.exec();
+      cleanup();
+      return ret;
+    } else {
+      cleanup();
+      return EXIT_FAILURE;
+    }
   } else {
     QApplication app(argv, argc);
-    Controller win;
+    controller::Controller win;
+    win.setApplicationConfig(configuration);
     win.show();
-    return app.exec();
+    int ret = app.exec();
+    cleanup();
+    return ret;
   }
-  quit_api();
-  return EXIT_SUCCESS;
 }
