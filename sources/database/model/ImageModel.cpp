@@ -1,13 +1,13 @@
 #include "ImageModel.h"
 #include "Image.h"
 #include <QStandardItem>
-HdrImageModel::HdrImageModel(ImageDatabase<float> &db, QObject *parent) : QAbstractListModel(parent), database(db), items_in_model(0) {
-  database.attach(*this);
+HdrImageModel::HdrImageModel(ImageDatabase<float> &db, QObject *parent) : QAbstractListModel(parent), database(&db), items_in_model(0) {
+  database->attach(*this);
 }
 
 int HdrImageModel::rowCount(const QModelIndex &parent) const {
   if (!parent.isValid()) {
-    return database.size();
+    return database->size();
   } else
     return 0;
 }
@@ -15,10 +15,10 @@ int HdrImageModel::rowCount(const QModelIndex &parent) const {
 QVariant HdrImageModel::data(const QModelIndex &index, int role) const {
   if (!index.isValid())
     return {};
-  if (index.row() >= database.size())
+  if (index.row() >= database->size())
     return {};
-  const QPixmap &p = database.getThumbnail(index.row());
-  image::Metadata metadata = database.getMetadata(index.row());
+  const QPixmap &p = database->getThumbnail(index.row());
+  image::Metadata metadata = database->getMetadata(index.row());
   switch (role) {
     case Qt::DecorationRole:
       return p;

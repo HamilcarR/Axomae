@@ -30,6 +30,9 @@ class IPublisher {
   virtual void notify(observer::Data<DATATYPE> &data) const = 0;
   virtual void attach(ISubscriber<DATATYPE> &subscriber) = 0;
   virtual void detach(ISubscriber<DATATYPE> &subscriber) = 0;
+
+ protected:
+  std::vector<ISubscriber<DATATYPE> *> subscribers;
 };
 
 #endif

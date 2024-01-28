@@ -106,7 +106,6 @@ class ImageDatabase : public IntegerResourceDB<image::ThumbnailImageHolder<DATAT
   }
 
  private:
-  std::vector<Subscriber *> subscribers;
   std::map<std::string, int> unique_elements;  // map all unique images to avoid duplicates
 };
 

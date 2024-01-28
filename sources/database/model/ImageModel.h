@@ -19,7 +19,7 @@ class HdrImageModel : public QAbstractListModel, public ISubscriber<database::ev
   void notified(observer::Data<Message> &data) override;
 
  protected:
-  ImageDatabase<float> &database;
+  ImageDatabase<float> *database;
   int items_in_model;
 };
 
