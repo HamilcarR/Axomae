@@ -1,8 +1,10 @@
 #ifndef GENERICTEXTUREPROCESSING_H
 #define GENERICTEXTUREPROCESSING_H
 
+#include "IAxObject.h"
 #include "constants.h"
 #include "init_3D.h"
+
 /**
  * @brief Class for raw binary data of textures
  * !Note : While using HDR envmap , the data format is still uint32_t , as we wont need to use any other texture format
@@ -125,7 +127,7 @@ class TextureData {  // TODO : Make this inherit RawImageHolder
 };
 
 /******************************************************************************************************************************************************************************************************************/
-class GenericTextureProcessing {
+class GenericTextureProcessing : public IAxObject {
  public:
   [[nodiscard]] virtual bool isDimPowerOfTwo(int dim) const = 0;
   [[nodiscard]] virtual bool isValidDim(int dim) const = 0;

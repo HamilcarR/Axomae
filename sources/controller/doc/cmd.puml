@@ -18,7 +18,7 @@ namespace cmd{
 
     class ProgramOptionManager{
         - api : API
-        + bool processArgs(int , char**)
+        + void processArgs(int , char**)
         + ApplicationConfig& getConfig()
     }
 }

@@ -1,9 +1,11 @@
 #ifndef RENDERINGDATABASEINTERFACE_H
 #define RENDERINGDATABASEINTERFACE_H
+#include "IAxObject.h"
 #include "Mutex.h"
 #include "OP_ProgressStatus.h"
 #include "constants.h"
 #include <map>
+
 /**
  * @file RenderingDatabaseInterface.h
  * This file implements an interface for databases of objects like textures and meshes.
@@ -15,6 +17,11 @@
 
 namespace database {
 
+  /**
+   * @brief A database query result
+   * @tparam IDTYPE ID type of the resource
+   * @tparam OBJTYPE Type of the resource
+   */
   template<class IDTYPE, class OBJTYPE>
   class Result {
    public:
@@ -45,21 +52,19 @@ namespace database {
     bool operator==(const Result<IDTYPE, OBJTYPE> &compare) const { return id == compare.id && object == compare.object; }
   };
 
+  /*************************************************************************************************************************************************/
+
+  /**
+   * @brief Stores objects inside the database
+   * @tparam U ID type
+   * @tparam T Obj type
+   */
   template<class U, class T>
   class Storage {
    public:
-    Storage() {
-      valid = false;
-      persistent = false;
-      object = nullptr;
-    }
+    Storage() : object(nullptr), persistent(false), valid(false) {}
     ~Storage() = default;
-    Storage(std::unique_ptr<T> object_, U id_, bool persistent_) {
-      object = std::move(object_);
-      id = id_;
-      persistent = persistent_;
-      valid = true;
-    }
+    Storage(std::unique_ptr<T> object_, U id_, bool persistent_) : object(std::move(object_)), id(id_), persistent(persistent_), valid(true) {}
     Storage(const Storage &) = delete;
     Storage &operator=(const Storage &) = delete;
     Storage(Storage &&assign) noexcept {
@@ -89,7 +94,7 @@ namespace database {
 
     T *get() const { return object.get(); }
     void setId(U id_) { id = id_; }
-    void getId() const { return id; }
+    U getId() const { return id; }
 
     [[nodiscard]] bool isPersistent() const { return persistent; }
     [[nodiscard]] bool isValid() const { return valid; }
@@ -112,7 +117,7 @@ namespace database {
  * @tparam T Class type of the object stored in the database
  */
 template<class U, class T>
-class IResourceDB {
+class IResourceDB : public IAxObject {
  protected:
   using DATABASE = std::map<U, database::Storage<U, T>>;
 
@@ -249,9 +254,8 @@ class IResourceDB {
   void setProgressManager(controller::ProgressStatus *progress_m) { progress_manager = progress_m; }
 
  protected:
-  mutable Mutex mutex;
   DATABASE database_map;
-  controller::ProgressStatus *progress_manager;
+  controller::ProgressStatus *progress_manager{};
 };
 
 /* Some methods may have an ambiguous behavior depending on the type of the ID . this class provides a specialization of the

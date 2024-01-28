@@ -11,7 +11,7 @@ namespace controller::cmd {
   class ProgramOptionsManager {
    public:
     explicit ProgramOptionsManager(API &api);
-    bool processArgs(int argv, char **argc);
+    void processArgs(int argv, char **argc);
 
    private:
     API &api;

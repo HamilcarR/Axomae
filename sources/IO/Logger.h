@@ -1,6 +1,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 #include "Axomae_macros.h"
+#include "ILockable.h"
 #include "Mutex.h"
 #include <chrono>
 #include <cstdlib>
@@ -37,14 +38,11 @@ namespace LogFunctions {
 }  // namespace LogFunctions
 
 /*****************************************************************************************************************************************************************************/
-class AbstractLogger {
+class AbstractLogger : public ILockable {
  public:
   AbstractLogger();
   virtual ~AbstractLogger();
   virtual void print() const = 0;
-
- protected:
-  mutable Mutex mutex;
 };
 /*****************************************************************************************************************************************************************************/
 class LogLine {

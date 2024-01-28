@@ -2,11 +2,14 @@
 #include <boost/program_options.hpp>
 #include <iostream>
 
+static const char *required_command_str = " [--bake , -b] or [--gui , -g]";
+
 namespace controller::cmd {
   namespace po = boost::program_options;
 
   ProgramOptionsManager::ProgramOptionsManager(API &api_) : api(api_) {}
 
+  /* Program options*/
   static void configOpts(po::variables_map &vm, API &api) {
     api.disableLogging();
     if (vm.count("verbose")) {
@@ -14,9 +17,6 @@ namespace controller::cmd {
     }
     if (vm.count("gpu")) {
       api.enableGpu();
-    }
-    if (vm.count("gui")) {
-      api.enableGui();
     }
   }
 
@@ -34,7 +34,7 @@ namespace controller::cmd {
     // clang-format on
   }
 
-  bool ProgramOptionsManager::processArgs(int argv, char **argc) {
+  void ProgramOptionsManager::processArgs(int argv, char **argc) {
     po::options_description descript("Options");
 
     /*Sets up program options*/
@@ -42,15 +42,22 @@ namespace controller::cmd {
     po::variables_map vm;
     po::store(po::parse_command_line(argv, argc, descript), vm);
     po::notify(vm);
+    bool command_valid = false;
     if (vm.count("help")) {
       std::cout << descript << "\n";
+      command_valid = true;
     }
-
     /* Order is important here , first the cases that only modify the ApplicationConfig*/
     configOpts(vm, api);
     api.configure();
     /* Cases that launch a process(task in the future)*/
+
+    if (vm.count("gui")) {
+      api.enableGui();
+      command_valid = true;
+    }
     if (vm.count("bake")) {
+      command_valid = true;
       const auto &opts = vm["bake"].as<std::vector<std::string>>();
       if (opts.size() != 6) {
         throw po::required_option("Option \"--bake\" missing argument");
@@ -63,6 +70,10 @@ namespace controller::cmd {
       envmap.path_input = std::string(opts[4]);
       envmap.path_output = std::string(opts[5]);
       api.bakeTexture(envmap);  // replace by tasking
+    }
+
+    if (!command_valid) {
+      throw po::required_option(required_command_str);
     }
     return true;
   }

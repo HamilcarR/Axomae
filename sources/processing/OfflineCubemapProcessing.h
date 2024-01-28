@@ -271,7 +271,6 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
 
  private:
   static constexpr unsigned MAX_THREADS = 8;
-  mutable Mutex mutex;  // TODO : Create interface ILockable with mutex
 };
 
 #endif

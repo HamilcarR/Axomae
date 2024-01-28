@@ -1,0 +1,133 @@
+@startuml
+
+
+skinparam groupInheritance 2
+
+interface IAxObject{}
+interface IPublisher<database::event::ImageUpdateMessage*>
+interface ISubscriber<database::event::ImageUpdateMessage*>
+namespace image{
+
+class ThumbnailImageHolder<T>{}
+class Metadata{}
+
+}
+
+namespace observer{
+class Data{}
+}
+
+
+namespace database{
+
+class Storage<U , T> {
+    - object : unique_ptr<T>
+    - id : U
+    - persistent : bool
+    - valid : bool
+    + T* get() const
+    + void setId(U id)
+    + U getId() const
+    + bool isPersistent() const
+    + bool isValid() const
+    + void setPersistence(bool)
+    + bool setValidity(bool)
+}
+
+class Result<U , T>{
+    + id : U
+    + object : T*
+}
+
+interface IResourceDB<U , T>{
+    {abstract} + void clean()
+    {abstract} + void purge()
+    {abstract} + T* get(const U) const
+    {abstract} + bool remove(const U)
+    {abstract} + bool remove(const T*)
+    {abstract} + U firstFreeId() const
+    {abstract} + Result<U,T> add(unique_ptr<T> , bool)
+    {abstract} + bool contains(const U)
+    {abstract} + Result<U , T> contains(const T*) const
+    {abstract} + bool empty() const
+    {abstract} + int size() const
+    {abstract} + const map<U , Storage<U , T>>& getConstData() const
+               + bool setPersistence(const U , bool)
+               - database_map : map<U , Storage<U , T>>
+}
+
+class IntegerResourceDB<T>{
+   {abstract} + int firstFreeId() const
+}
+
+class INodeDatabase{
+    + INodeDatabase(controller::ProgressStatus*)
+    + void clean()
+    + void purge()
+    + INode* get(int) const
+    + bool remove(int)
+    + bool remove(const INode*)
+    + bool contains(int)
+}
+
+class ShaderDatabase{
+    + ShaderDatabase((controller::ProgressStatus*)
+    + void clean()
+    + void purge()
+    + bool remove(Shader::TYPE)
+    + bool remove(const Shader*)
+    + bool contains(int)
+    + Shader::TYPE firstFreeId() const
+    + Result<Shader::TYPE, Shader> add(unique_ptr<Shader> , bool)
+    + void recompile()
+    + void initializeShaders()
+}
+
+class ImageDatabase<T>{
+    - unique_elements : map<string , int>
+    - subscribers : vector<ISubscriber<event::ImageUpdateMessage*>*>
+    + ImageDatabase(controller::ProgressStatus*)
+    - void notifyImageSelected(int)
+    - void notifyImageDelete(int)
+    - void notifyImageAdd(int)
+    + void clean()
+    + void purge()
+    + Result<int, image::ThumbnailImageHolder<T>> add(unique_ptr<image::ThumbnailImageHolder<T>> , bool)
+    + void isSelected(int)
+    + image::Metadata getMetadata(int) const
+    + const QPixmap& getThumbnail(int) const
+    + void attach(Subscriber&)
+    + void detach(Subscriber&)
+    + void notify(observer::Data<event::ImageUpdateMessage*>&) const
+}
+
+class TextureDatabase{
+    - unique_textures : map<string , int>
+    + TextureDatabase((controller::ProgressStatus*)
+    + void clean()
+    + void purge()
+    + bool remove(int)
+    + bool remove(const Texture*)
+    + Result<int , Texture> add(unique_ptr<Texture> , bool)
+    + vector<Result<int , Texture>> getTextureByType(Texture::TYPE) const
+    + bool empty() const
+    + Result<int , Texture> getUniqueTexture(const string&) const
+    + bool removeUniqueTextureReference(int)
+}
+
+
+}
+' end namespace database
+
+
+IAxObject <|-- IResourceDB
+IResourceDB <|-- IntegerResourceDB
+IResourceDB <|-- ShaderDatabase
+IntegerResourceDB <|-- INodeDatabase
+IntegerResourceDB <|-- TextureDatabase
+IntegerResourceDB <|-- ImageDatabase
+IPublisher <|-- ImageDatabase
+ImageDatabase "1" o-- "1..*" ISubscriber : notifies >
+
+
+@enduml
