@@ -75,7 +75,6 @@ namespace controller::cmd {
     if (!command_valid) {
       throw po::required_option(required_command_str);
     }
-    return true;
   }
 
 }  // namespace controller::cmd
