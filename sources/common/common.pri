@@ -8,7 +8,7 @@ HEADERS += $$PWD/constants.h \
             $$PWD/Observer.h\
             $$PWD/axomae_utils.h\
             $$PWD/Visitor.h \
-            $$PWD/IAxObject.h
+            $$PWD/IAxObject.h \
 
 
 

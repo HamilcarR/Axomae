@@ -20,25 +20,27 @@ void init_graphics() {
   }
 }
 
+void cleanup() {
+  IMG_Quit();
+  SDL_Quit();
+}
+
 void sigsegv_handler(int signal) {
   try {
     LOG("Application crash", LogLevel::CRITICAL);
     LOGFLUSH();
+    // Generate stack here
+    cleanup();
   } catch (const std::exception &e) {
     std::cerr << e.what();
   }
   abort();
 }
 
-void cleanup() {
-  IMG_Quit();
-  SDL_Quit();
-}
-
 int main(int argv, char **argc) {
   signal(SIGSEGV, sigsegv_handler);
   ApplicationConfig configuration;
-  controller::cmd::API api;
+  controller::cmd::API api(argv, argc);
   controller::cmd::ProgramOptionsManager options_manager(api);
   LoggerConfigDataStruct log_struct = configuration.generateDefaultLoggerConfigDataStruct();
   api.configureDefault();
@@ -64,7 +66,7 @@ int main(int argv, char **argc) {
       return ret;
     } else {
       cleanup();
-      return EXIT_FAILURE;
+      return EXIT_SUCCESS;
     }
   } else {
     QApplication app(argv, argc);

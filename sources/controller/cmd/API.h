@@ -13,7 +13,7 @@
 namespace controller::cmd {
   class API {
    public:
-    API();
+    explicit API(int &argv, char **argc);
 
     const ApplicationConfig &getConfig() { return config; }
     void disableLogging();
@@ -24,8 +24,11 @@ namespace controller::cmd {
     void enableGpu();
     void configure();
     void configureDefault();
+    void viewer(const std::string &file);
 
    private:
+    int *argv;
+    char **argc;
     ApplicationConfig config;
   };
 

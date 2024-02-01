@@ -16,11 +16,29 @@ namespace image {
   template<class TYPE>
   class ImageHolder {
    public:
-    explicit ImageHolder(const std::vector<TYPE> &img, image::Metadata &meta) : data(img), metadata(meta) {}
+    ImageHolder() = default;
+    ImageHolder(const std::vector<TYPE> &img, image::Metadata &meta) : data(img), metadata(meta) {}
+    virtual ~ImageHolder() = default;
+    ImageHolder(const ImageHolder<TYPE> &copy) {
+      data = copy.data;
+      metadata = copy.metadata;
+    }
+    ImageHolder(ImageHolder<TYPE> &&assign) noexcept {
+      data = std::move(assign.data);
+      metadata = std::move(assign.metadata);
+    }
+    ImageHolder<TYPE> &operator=(const ImageHolder<TYPE> &copy) {
+      data = copy.data;
+      metadata = copy.metadata;
+    }
+    ImageHolder<TYPE> &operator=(ImageHolder<TYPE> &&assign) noexcept {
+      data = std::move(assign.data);
+      metadata = std::move(assign.metadata);
+    }
 
    public:
-    std::vector<TYPE> data;
-    Metadata metadata;
+    std::vector<TYPE> data{};
+    Metadata metadata{};
   };
 
   template<class TYPE>

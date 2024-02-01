@@ -1,8 +1,12 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
+#include <algorithm>
+#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <cstdint>
+#include <cstdlib>
+#include <cstring>
 #include <ctime>
 #include <future>
 #include <iostream>

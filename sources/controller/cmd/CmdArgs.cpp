@@ -1,7 +1,7 @@
 #include "CmdArgs.h"
 #include <boost/program_options.hpp>
 #include <iostream>
-
+#include <regex>
 static const char *required_command_str = " [--bake , -b] or [--gui , -g]";
 
 namespace controller::cmd {
@@ -25,8 +25,9 @@ namespace controller::cmd {
     descript.add_options()
         ("help,h", "Prints this help message")
         ("verbose,v", "Turn on stdout logs")
-        ("gui,g", "Launch the editor")
+        ("editor,e", "Launch the editor")
         ("gpu" , "Enable GPGPU compute")
+        ("viewer" , po::value<std::string>(), "Open viewer for the specified file")
         ("bake,b",po::value<std::vector<std::string>>()->multitoken(),
         "Usage: \n\
         --bake [type] [width] [height] [samples] [path_in] [path_out]\n\
@@ -52,9 +53,14 @@ namespace controller::cmd {
     api.configure();
     /* Cases that launch a process(task in the future)*/
 
-    if (vm.count("gui")) {
+    if (vm.count("editor")) {
       api.enableGui();
       command_valid = true;
+    }
+    if (vm.count("viewer")) {
+      command_valid = true;
+      std::string file = std::string(vm["viewer"].as<std::string>());
+      api.viewer(file);
     }
     if (vm.count("bake")) {
       command_valid = true;
