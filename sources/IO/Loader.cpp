@@ -21,7 +21,9 @@
  */
 
 namespace IO {
-  Loader::Loader(controller::ProgressStatus *prog_stat) : resource_database(&ResourceDatabaseManager::getInstance()) { progress_manager = prog_stat; }
+  Loader::Loader(controller::ProgressStatus *prog_stat) : resource_database(&ResourceDatabaseManager::getInstance()) {
+    setProgressManager(prog_stat);
+  }
 
   constexpr unsigned int THREAD_POOL_SIZE = 8;
   void thread_copy_buffer(unsigned int start_index, unsigned int end_index, const uint8_t *from, uint8_t *dest) {
@@ -29,12 +31,7 @@ namespace IO {
       dest[i] = from[i];
   }
 
-  void async_copy_buffer(unsigned int width,
-                         unsigned int height,
-                         uint8_t *from,
-                         uint8_t *dest,
-                         controller::ProgressStatus *progress_manager,
-                         controller::ioperator::OpData<controller::progress_bar::ProgressBarTextFormat> *pbar_format) {
+  void async_copy_buffer(unsigned int width, unsigned int height, uint8_t *from, uint8_t *dest) {
     size_t total_buffer_size = width * height * sizeof(uint32_t);
     size_t thread_buffer_size = total_buffer_size / THREAD_POOL_SIZE;
     uint8_t work_remainder = total_buffer_size % THREAD_POOL_SIZE;
@@ -50,14 +47,8 @@ namespace IO {
         range_max = i * thread_buffer_size + last_thread_job_size;
       future_results.push_back(std::async(thread_copy_buffer, range_min, range_max, from, dest));
     }
-    size_t inc = 0;
     for (auto &future_result : future_results) {
-      if (progress_manager) {
-        pbar_format->data.percentage = controller::progress_bar::computePercent(inc, future_results.size());
-        progress_manager->op(pbar_format);
-      }
       future_result.get();
-      inc++;
     }
   }
 
@@ -70,21 +61,22 @@ namespace IO {
   static void copyTexels(TextureData *totexture,
                          aiTexture *fromtexture,
                          const std::string &texture_type,
-                         controller::ProgressStatus *progress_manager) {
-    auto pbar_format = controller::progress_bar::generateData(std::string("Loading ") + texture_type + " Texture", 0);
+                         controller::IProgressManager *progress_manager) {
     if (fromtexture != nullptr) {
       /* If mHeight != 0 , the texture is uncompressed , and we read it as is */
       if (fromtexture->mHeight != 0) {
         unsigned int width = 0;
         unsigned int height = 0;
+
         totexture->width = width = fromtexture->mWidth;
         totexture->height = height = fromtexture->mHeight;
         totexture->data.resize(totexture->width * totexture->height);
+
+        progress_manager->initProgress(std::string("Loading ") + texture_type + " Texture", static_cast<float>(width * height));
+        controller::ProgressManagerHelper progress_helper(progress_manager);
+
         for (unsigned int i = 0; i < width * height; i++) {
-          if (progress_manager) {
-            pbar_format.data.percentage = controller::progress_bar::computePercent(i, width * height);
-            progress_manager->op(&pbar_format);
-          }
+          progress_helper.notifyProgress(i);
           uint8_t a = fromtexture->pcData[i].a;
           uint8_t r = fromtexture->pcData[i].r;
           uint8_t g = fromtexture->pcData[i].g;
@@ -100,23 +92,26 @@ namespace IO {
         std::vector<uint8_t> buffer;
         buffer.resize(fromtexture->mWidth);
         std::memcpy(buffer.data(), fromtexture->pcData, fromtexture->mWidth);
+
         image.loadFromData((const unsigned char *)buffer.data(), fromtexture->mWidth);
         image = image.convertToFormat(QImage::Format_ARGB32);
+
         unsigned image_width = image.width();
         unsigned image_height = image.height();
         totexture->data.resize(image_width * image_height);
         std::memset(&totexture->data[0], 0, image_width * image_height * sizeof(uint32_t));
         uint8_t *dest_buffer = reinterpret_cast<uint8_t *>(&totexture->data[0]);
         uint8_t *from_buffer = image.bits();
-        async_copy_buffer(image_width, image_height, from_buffer, dest_buffer, progress_manager, &pbar_format);
+
+        async_copy_buffer(image_width, image_height, from_buffer, dest_buffer);
+
         totexture->width = image_width;
         totexture->height = image_height;
         LOG("image of size " + std::to_string(totexture->width) + " x " + std::to_string(totexture->height) + " uncompressed ", LogLevel::INFO);
       }
     }
-    if (progress_manager)
-      progress_manager->reset();
   }
+
   template<class TEXTYPE>
   static void loadTextureDummy(Material *material, TextureDatabase &texture_database) {
     auto result = database::texture::store<TEXTYPE>(texture_database, true, nullptr);
@@ -139,7 +134,7 @@ namespace IO {
                           TextureData *texture,
                           const aiString &texture_string,
                           TextureDatabase &texture_database,
-                          controller::ProgressStatus *progress_manager) {
+                          controller::IProgressManager *progress_manager) {
     std::string texture_index_string = texture_string.C_Str();
     std::string texture_type = texture->name;
     if (!texture_index_string.empty()) {
@@ -170,7 +165,7 @@ namespace IO {
   static Material loadAllTextures(const aiScene *scene,
                                   const aiMaterial *material,
                                   TextureDatabase &texture_database,
-                                  controller::ProgressStatus *progress_manager) {
+                                  controller::IProgressManager *progress_manager) {
     Material mesh_material;
     std::vector<Texture::TYPE> dummy_textures_type;
     TextureData diffuse, metallic, roughness, normal, ambiantocclusion, emissive, specular, opacity;
@@ -230,7 +225,6 @@ namespace IO {
 
     if (material->GetTextureCount(aiTextureType_EMISSIVE) > 0) {
       material->GetTexture(aiTextureType_EMISSIVE, 0, &emissive_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      mesh_material.setEmissiveFactor(10.f);
       loadTexture<EmissiveTexture>(scene, &mesh_material, &emissive, emissive_texture, texture_database, progress_manager);
     } else
       loadTextureDummy<EmissiveTexture>(&mesh_material, texture_database);
@@ -253,7 +247,7 @@ namespace IO {
                                               const aiMaterial *material,
                                               TextureDatabase &texture_database,
                                               unsigned id,
-                                              controller::ProgressStatus *progress_manager) {
+                                              controller::IProgressManager *progress_manager) {
     Material mesh_material = loadAllTextures(scene, material, texture_database, progress_manager);
     float transparency_factor = loadTransparencyValue(material);
     mesh_material.setTransparency(transparency_factor);
@@ -480,7 +474,7 @@ namespace IO {
                                                    i)  //*We launch multiple threads loading the geometry , and the main thread loads the materials
         );
         aiMaterial *ai_mat = modelScene->mMaterials[modelScene->mMeshes[i]->mMaterialIndex];
-        material_array[i] = loadMaterials(modelScene, ai_mat, texture_database, i, progress_manager).second;
+        material_array[i] = loadMaterials(modelScene, ai_mat, texture_database, i, this).second;
       }
       for (auto it = loaded_meshes_futures.begin(); it != loaded_meshes_futures.end(); it++) {
         std::pair<unsigned, std::unique_ptr<Object3D>> geometry_loaded = it->get();
@@ -525,12 +519,10 @@ namespace IO {
       throw IO::exception::LoadImageChannelException(channels);
     std::vector<float> image_data;
     image_data.resize(width * height * channels);
+    initProgress("Importing environment map", width * height * channels);
+    controller::ProgressManagerHelper helper(this);
     for (int i = 0; i < width * height * channels; i++) {
-      if (progress_manager) {
-        auto pbar_data = controller::progress_bar::generateData("Importing environment map", 0);
-        pbar_data.data.percentage = controller::progress_bar::computePercent(i, width * height * channels);
-        progress_manager->op(&pbar_data);
-      }
+      helper.notifyProgress(i);
       image_data[i] = data[i];
     }
 

@@ -66,7 +66,7 @@ void Renderer::initialize() {
   resource_database.getShaderDatabase().initializeShaders();
   /*Initialize a reusable lut texture*/
   scene->initialize();
-  envmap_manager->initializeLUT();
+  envmap_manager->initializeDefaultEnvmap();
   camera_framebuffer = std::make_unique<CameraFrameBuffer>(resource_database, &screen_size, &default_framebuffer_id);
   camera_framebuffer->initializeFrameBuffer();
 }

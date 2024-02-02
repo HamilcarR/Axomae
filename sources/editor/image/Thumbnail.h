@@ -1,6 +1,7 @@
 #ifndef THUMBNAIL_H
 #define THUMBNAIL_H
 #include "Axomae_macros.h"
+#include "IAxObject.h"
 #include "OP_ProgressStatus.h"
 #include "constants.h"
 #include "image_utils.h"
@@ -11,27 +12,17 @@
  *
  */
 template<typename T>
-class Thumbnail {
+class Thumbnail : public IAxObject {
  private:
  public:
   Thumbnail() = default;
   ~Thumbnail() = default;
   // TODO : Implement functional test
   Thumbnail(std::vector<T> &rgb, int width, int height, int channels, bool needs_color_correct, controller::ProgressStatus *status = nullptr) {
-    float progress = 1;
-    auto future_compute = std::async(std::launch::async,
-                                     [&]() { return hdr_utils::hdr2image(rgb, width, height, channels, needs_color_correct, &progress); });
-
-    auto pbar_format = controller::progress_bar::generateData("Generating Environment map thumbnail", 0);
-
-    // TODO : make this into interface
-    while (progress > 0) {
-      LOG(std::string("progress:") + std::to_string(progress), LogLevel::INFO);
-      pbar_format.data.percentage = static_cast<int>(progress);
-      status->op(&pbar_format);
-    }
-    status->reset();
-    image_data = future_compute.get();
+    initProgress(status, "Generating Environment map thumbnail", static_cast<float>(width * height * channels));
+    controller::ProgressManagerHelper helper(this);
+    image_data = hdr_utils::hdr2image(rgb, width, height, channels, needs_color_correct, &helper);
+    resetProgress();
     image = std::make_unique<QImage>(image_data.data(), width, height, QImage::Format_RGB32);
     *image = image->scaled(100, 50, Qt::KeepAspectRatio);
   }

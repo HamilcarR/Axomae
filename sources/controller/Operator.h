@@ -1,6 +1,7 @@
 
 #ifndef OPERATOR_H
 #define OPERATOR_H
+#include "ILockable.h"
 #include "constants.h"
 
 /**
@@ -17,7 +18,7 @@ namespace controller {
     };
 
     template<class MODULE, class DATA_TYPE>
-    class OperatorInterface {
+    class OperatorInterface : public ILockable {
      public:
       virtual bool op(ioperator::OpData<DATA_TYPE> *data) const = 0;
 

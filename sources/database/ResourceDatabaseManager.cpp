@@ -23,8 +23,7 @@ void ResourceDatabaseManager::clean() {
 
 ResourceDatabaseManager::ResourceDatabaseManager() {}
 
-void ResourceDatabaseManager::initializeDatabases(controller::ProgressStatus *progress_manager_) {
-  progress_manager = progress_manager;
+void ResourceDatabaseManager::initializeDatabases(controller::ProgressStatus *progress_manager) {
   texture_database = std::make_unique<TextureDatabase>(progress_manager);
   shader_database = std::make_unique<ShaderDatabase>(progress_manager);
   node_database = std::make_unique<INodeDatabase>(progress_manager);
@@ -32,8 +31,7 @@ void ResourceDatabaseManager::initializeDatabases(controller::ProgressStatus *pr
   image_database = std::make_unique<ImageDatabase<uint8_t>>(progress_manager);
 }
 
-void ResourceDatabaseManager::setProgressManager(controller::ProgressStatus *progress_manager_) {
-  progress_manager = progress_manager_;
+void ResourceDatabaseManager::setProgressManagerAllDb(controller::ProgressStatus *progress_manager) {
   texture_database->setProgressManager(progress_manager);
   shader_database->setProgressManager(progress_manager);
   node_database->setProgressManager(progress_manager);

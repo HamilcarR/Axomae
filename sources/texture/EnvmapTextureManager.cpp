@@ -39,7 +39,7 @@ EnvmapTextureManager::EnvmapTextureManager(
   skybox_mesh = &scene.getSkybox();
 }
 
-void EnvmapTextureManager::initializeLUT() {
+void EnvmapTextureManager::initializeDefaultEnvmap() {
 
   /* Need to compute the LUT beforehand , because of the add event in the HDR database*/
   if (resource_database.getTextureDatabase().getTexturesByType(Texture::BRDFLUT).empty())
@@ -47,7 +47,7 @@ void EnvmapTextureManager::initializeLUT() {
   /*Adding the default envmap*/
   if (resource_database.getHdrDatabase().empty()) {
     try {
-      IO::Loader loader(resource_database.getProgressManager());
+      IO::Loader loader(nullptr);
       loader.loadHdr(config.default_envmap_path.c_str());
       current = bakes_id.back();
     } catch (GenericException &e) {

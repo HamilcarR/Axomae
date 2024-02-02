@@ -54,7 +54,7 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
   EnvmapTextureManager &operator=(EnvmapTextureManager &copy) = delete;
   EnvmapTextureManager &operator=(EnvmapTextureManager &&move) = delete;
 
-  void initializeLUT();
+  void initializeDefaultEnvmap();
   void notified(observer::Data<Message *> &message) override;
 
   [[nodiscard]] int currentCubemapId() const { return current.cubemap_id; }

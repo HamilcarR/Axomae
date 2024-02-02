@@ -58,7 +58,8 @@ namespace hdr_utils {
    * Creates an RGBA image no matter the input
    * */
   template<class T>
-  std::vector<uint8_t> hdr2image(std::vector<T> &rgb, int width, int height, int channels, bool needs_color_correct, float *progress = nullptr) {
+  std::vector<uint8_t> hdr2image(
+      std::vector<T> &rgb, int width, int height, int channels, bool needs_color_correct, controller::ProgressManagerHelper *progress = nullptr) {
     ASSERT_IS_ARITHMETIC(T);
     assert(rgb.size() == static_cast<unsigned>(width * height * channels));
 
@@ -78,7 +79,7 @@ namespace hdr_utils {
       for (int j = 0; j < width; j++) {
         int index = (i * width + j) * channels;
         if (progress) {
-          *progress = (float)index * 100 / (float(width * height * channels));
+          progress->notifyProgress(static_cast<float>(index));
         }
         T r, g, b;
         if (needs_color_correct) {
@@ -96,8 +97,6 @@ namespace hdr_utils {
         image_data[(i * width + j) * final_channels + 3] = 0;
       }
     }
-    if (progress)
-      *progress = -1.f;
     return image_data;
   }
 

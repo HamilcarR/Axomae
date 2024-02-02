@@ -17,7 +17,7 @@
  * Every resource loaded using IO is managed from this class.
  *
  */
-class ResourceDatabaseManager final : public controller::IProgressManager {  // TODO : Not the best design choice , replace with proper class
+class ResourceDatabaseManager final {
  public:
   static ResourceDatabaseManager &getInstance();
   ResourceDatabaseManager(const ResourceDatabaseManager &) = delete;
@@ -46,7 +46,7 @@ class ResourceDatabaseManager final : public controller::IProgressManager {  // 
   [[nodiscard]] HdrImageDatabase &getHdrDatabase() const { return *hdr_database; }
   [[nodiscard]] RawImageDatabase &getRawImgdatabase() const { return *image_database; }
 
-  void setProgressManager(controller::ProgressStatus *progress_manager) override;
+  void setProgressManagerAllDb(controller::ProgressStatus *progress_manager);
   void initializeDatabases(controller::ProgressStatus *progress_manager = nullptr);
 
  private:

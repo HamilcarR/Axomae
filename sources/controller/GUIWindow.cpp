@@ -223,7 +223,7 @@ namespace controller {
     /* UI progress bar operator initialization for objects that need to show progress*/
     _UI.progressBar->setValue(0);
     progress_manager = std::make_unique<controller::ProgressStatus>(_UI.progressBar);
-    resource_database.setProgressManager(progress_manager.get());
+    resource_database.setProgressManagerAllDb(progress_manager.get());
 
     /* Realtime renderer initialization*/
     viewer_3d = _UI.renderer_view;
