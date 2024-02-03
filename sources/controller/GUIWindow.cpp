@@ -288,7 +288,7 @@ namespace controller {
         return _UI.height_image;
         break;
       case PROJECTED_NMAP:
-        return _UI.uv_projection;
+        return nullptr;
         break;
       case ALBEDO:
         return _UI.diffuse_image;
@@ -659,12 +659,11 @@ namespace controller {
     SceneSelector &instance = SceneSelector::getInstance();
     Mesh *retrieved_mesh = instance.getCurrent();
     if (retrieved_mesh) {
-      SDL_Surface *surf = ImageManager::project_uv_normals(
-          retrieved_mesh->geometry,
-          _UI.uv_width->value(),
-          _UI.uv_height->value(),
-          true);  // TODO : change for managing the entire scene , maybe add scroll between different meshes
-      display_image(surf, PROJECTED_NMAP, true);
+      QLabel *view = _UI.uv_projection;
+      std::vector<uint8_t> surf = ImageManager::project_uv_normals(retrieved_mesh->geometry, 900, 900, true);
+      QImage img(surf.data(), 900, 900, QImage::Format_RGB888);
+      QPixmap pix = QPixmap::fromImage(img);
+      view->setPixmap(pix);
     }
   }
   /**************************************************************************************************************/

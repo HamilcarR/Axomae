@@ -20,18 +20,19 @@ namespace controller {
 
   class TextureViewerController : public QWidget {
    public:
-    explicit TextureViewerController(image::ImageHolder<float> &tex, QWidget *parent = nullptr);
-
+    TextureViewerController();
+    TextureViewerController(image::ImageHolder<float> &tex, QWidget *parent = nullptr);
+    TextureViewerController(const std::vector<uint8_t> &image, int width, int height, int channels, QWidget *parent = nullptr);
     void resizeEvent(QResizeEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
    private:
     Ui::texture_viewer window{};
-    std::unique_ptr<CustomLabelImageTex> label;
-    std::unique_ptr<QImage> image;
-    std::vector<uint8_t> raw_data_uint;
-    image::ImageHolder<float> hdr_image;
-    std::string current_rgb;
+    std::unique_ptr<CustomLabelImageTex> label{};
+    std::unique_ptr<QImage> image{};
+    std::vector<uint8_t> raw_data_uint{};
+    image::ImageHolder<float> hdr_image{};
+    std::string current_rgb{};
   };
 
 }  // namespace controller

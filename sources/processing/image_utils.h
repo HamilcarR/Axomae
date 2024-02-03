@@ -1,10 +1,10 @@
-#ifndef IMAGES_H
-#define IMAGES_H
+#ifndef IMAGES_UTILS_H
+#define IMAGES_UTILS_H
 #include "Axomae_macros.h"
 
 namespace hdr_utils {
 
-  /* Disable strict aliasing warning on compilation */
+  /* Disable strict aliasing warning on compilation because those functions need type prunning */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
   inline void float2rgbe(unsigned char rgbe[4], float r, float g, float b) {

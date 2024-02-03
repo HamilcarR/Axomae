@@ -21,6 +21,23 @@ namespace controller {
     painter.drawText(0, this->height() - 1, current_rgb->c_str());
   }
   /************************************************************************************************************************************************************/
+
+  TextureViewerController::TextureViewerController() { window.setupUi(this); }
+
+  TextureViewerController::TextureViewerController(const std::vector<uint8_t> &image_, int width, int height, int channels, QWidget *parent)
+      : raw_data_uint(image_) {
+    window.setupUi(this);
+    if (channels == 3)
+      image = std::make_unique<QImage>(raw_data_uint.data(), width, height, QImage::Format_RGB888);
+    else if (channels == 4)
+      image = std::make_unique<QImage>(raw_data_uint.data(), width, height, QImage::Format_RGBA8888);
+    assert(channels == 3 || channels == 4);  // Other cases for later
+    label = std::make_unique<CustomLabelImageTex>(current_rgb, this);
+    label->setPixmap(QPixmap::fromImage(*image));
+    label->setScaledContents(true);
+    setMouseTracking(true);
+  }
+
   TextureViewerController::TextureViewerController(image::ImageHolder<float> &tex, QWidget *parent) : QWidget(parent), hdr_image(tex) {
     raw_data_uint = hdr_utils::hdr2image(tex.data, tex.metadata.width, tex.metadata.height, tex.metadata.channels, !tex.metadata.color_corrected);
     window.setupUi(this);

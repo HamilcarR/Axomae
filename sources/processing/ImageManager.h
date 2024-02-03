@@ -1,5 +1,6 @@
 #ifndef IMAGEMANAGER_H
 #define IMAGEMANAGER_H
+#include "GenericException.h"
 #include "Kernel.cuh"
 #include "Object3D.h"
 #include "constants.h"
@@ -9,8 +10,11 @@
 #include <cmath>
 #include <iostream>
 
+// TODO : Old code , Refactor
+
 namespace axomae {
 
+  // TODO : move to Image module
   class RGB {
    public:
     RGB();
@@ -22,6 +26,7 @@ namespace axomae {
     static RGB int_to_rgb(uint16_t value);
     double intensity();
     void invert_color();
+    bool operator==(const RGB &arg);
     template<typename T>
     RGB operator*(T arg) const;
     RGB operator+=(float arg) const;
@@ -63,7 +68,7 @@ namespace axomae {
     static void USE_GPU_COMPUTING() { gpu = true; }
     static void USE_CPU_COMPUTING() { gpu = false; }
     static bool USING_GPU() { return gpu; }
-    static SDL_Surface *project_uv_normals(Object3D object, int width, int height, bool tangent_space);
+    static std::vector<uint8_t> project_uv_normals(const Object3D &object, int width, int height, bool tangent_space);
     static void smooth_image(SDL_Surface *surf, FILTER filter, const unsigned int smooth_iterations);
     static void sharpen_image(SDL_Surface *surf, FILTER filter, const unsigned int sharpen_iterations);
 

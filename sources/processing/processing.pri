@@ -1,5 +1,6 @@
 SOURCES += $$PWD/ImageManager.cpp \
             $$PWD/OfflineCubemapProcessing.cpp \
+            $$PWD/ImageManager_UV.cpp
 
 HEADERS += $$PWD/OfflineCubemapProcessing.h \
             $$PWD/ImageManager.h \

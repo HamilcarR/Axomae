@@ -278,8 +278,8 @@ public:
     QGridLayout *gridLayout_8;
     QPushButton *next_mesh_button;
     QPushButton *previous_mesh_button;
-    QGridLayout *gridLayout_15;
-    QGraphicsView *uv_projection;
+    QGridLayout *LAYOUT_uv;
+    QLabel *uv_projection;
     QWidget *rt_renderer;
     QGridLayout *gridLayout_30;
     QGridLayout *gridLayout_29;
@@ -384,7 +384,7 @@ public:
         MainWindow->setPalette(palette);
         MainWindow->setStyleSheet(QString::fromUtf8("QMainWindow,QWidget {\n"
 "	background-color :rgb(42, 42, 42);\n"
-"	\n"
+"\n"
 "}\n"
 "\n"
 ""));
@@ -1653,22 +1653,19 @@ public:
 
         gridLayout_17->addLayout(gridLayout_14, 0, 2, 1, 1);
 
-        gridLayout_15 = new QGridLayout();
-        gridLayout_15->setObjectName("gridLayout_15");
-        gridLayout_15->setSizeConstraint(QLayout::SetDefaultConstraint);
-        uv_projection = new QGraphicsView(uv_editor);
+        LAYOUT_uv = new QGridLayout();
+        LAYOUT_uv->setObjectName("LAYOUT_uv");
+        LAYOUT_uv->setSizeConstraint(QLayout::SetDefaultConstraint);
+        uv_projection = new QLabel(uv_editor);
         uv_projection->setObjectName("uv_projection");
         sizePolicy.setHeightForWidth(uv_projection->sizePolicy().hasHeightForWidth());
         uv_projection->setSizePolicy(sizePolicy);
         uv_projection->setFrameShape(QFrame::NoFrame);
-        uv_projection->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContentsOnFirstShow);
-        uv_projection->setCacheMode(QGraphicsView::CacheNone);
-        uv_projection->setResizeAnchor(QGraphicsView::AnchorViewCenter);
 
-        gridLayout_15->addWidget(uv_projection, 0, 1, 1, 1);
+        LAYOUT_uv->addWidget(uv_projection, 0, 1, 1, 1);
 
 
-        gridLayout_17->addLayout(gridLayout_15, 0, 0, 1, 1);
+        gridLayout_17->addLayout(LAYOUT_uv, 0, 0, 1, 1);
 
         workspace->addTab(uv_editor, QString());
         rt_renderer = new QWidget();
