@@ -12,7 +12,6 @@
 
 namespace axomae {
 
-  using namespace std;
   bool ImageManager::gpu = false;
   static bool CHECK_IF_CUDA_AVAILABLE() {
     if (!ImageManager::USING_GPU())
@@ -130,20 +129,19 @@ namespace axomae {
     uint8_t green = color >> 16 & 0XFF;
     uint8_t blue = color >> 8 & 0XFF;
     uint8_t alpha = color & 0XFF;
-    cout << "red : " << to_string(red) << "\n"
-         << "green : " << to_string(green) << "\n"
-         << "blue : \n"
-         << to_string(blue) << "\n"
-         << "alpha : " << to_string(alpha) << "\n"
-         << endl;
+    std::cout << "red : " << std::to_string(red) << "\n"
+              << "green : " << std::to_string(green) << "\n"
+              << "blue : \n"
+              << std::to_string(blue) << "\n"
+              << "alpha : " << std::to_string(alpha) << "\n";
   }
 
   /**************************************************************************************************************/
 
   void ImageManager::display_info_surface(SDL_Surface *image) {
-    cout << "Bytes per pixel : " << to_string(image->format->BytesPerPixel) << endl;
-    cout << "Padding on X : " << to_string(image->format->padding[0]) << endl;
-    cout << "Padding on Y : " << to_string(image->format->padding[1]) << endl;
+    std::cout << "Bytes per pixel : " << std::to_string(image->format->BytesPerPixel) << "\n";
+    std::cout << "Padding on X : " << std::to_string(image->format->padding[0]) << "\n";
+    std::cout << "Padding on Y : " << std::to_string(image->format->padding[1]) << "\n";
   }
 
   /**************************************************************************************************************/
@@ -156,10 +154,10 @@ namespace axomae {
 
   /**************************************************************************************************************/
   void RGB::to_string() {
-    cout << "RED : " << std::to_string(red) << "\n";
-    cout << "GREEN : " << std::to_string(green) << "\n";
-    cout << "BLUE : " << std::to_string(blue) << "\n";
-    cout << "ALPHA : " << std::to_string(alpha) << "\n";
+    std::cout << "RED : " << std::to_string(red) << "\n";
+    std::cout << "GREEN : " << std::to_string(green) << "\n";
+    std::cout << "BLUE : " << std::to_string(blue) << "\n";
+    std::cout << "ALPHA : " << std::to_string(alpha) << "\n";
   }
 
   /**************************************************************************************************************/
@@ -589,11 +587,6 @@ namespace axomae {
           set_pixel_color(surface, i, j, col.rgb_to_int());
         }
       }
-      auto del = std::async(std::launch::async, [data, width, height]() {
-        for (int i = 0; i < width; i++)
-          delete[] data[i];
-        delete[] data;
-      });
     }
   }
 
@@ -638,11 +631,6 @@ namespace axomae {
         set_pixel_color(surface, i, j, col.rgb_to_int());
       }
     }
-    auto del = std::async(std::launch::async, [data, width, height]() {
-      for (int i = 0; i < width; i++)
-        delete[] data[i];
-      delete[] data;
-    });
   }
 
   /**************************************************************************************************************/
@@ -697,11 +685,6 @@ namespace axomae {
         delete[] blur[i];
       delete[] blur;
 
-      auto del = std::async(std::launch::async, [data, width, height]() {
-        for (int i = 0; i < width; i++)
-          delete[] data[i];
-        delete[] data;
-      });
       if (factor != 0)
         smooth_image(surface, filter, factor - 1);
     }
@@ -754,13 +737,6 @@ namespace axomae {
       for (int i = 0; i < n; i++)
         delete[] sharp[i];
       delete[] sharp;
-      auto del = std::async(std::launch::async, [data, width, height]() {
-        for (int i = 0; i < width; i++)
-          delete[] data[i];
-        delete[] data;
-      });
-      //	if(factor != 0)
-      //		sharpen_image(surface , filter , factor - 1);
     }
   }
 

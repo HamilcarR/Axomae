@@ -4,7 +4,7 @@
 #include "GenericTextureProcessing.h"
 #include "Mutex.h"
 #include "PerformanceLogger.h"
-#include "math_utils.h"
+#include "sources/common/math/math_utils.h"
 #include <fstream>
 #include <immintrin.h>
 #include <sstream>
@@ -171,7 +171,7 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
   template<class D>
   inline const glm::dvec3 uvSample(const D u, const D v) const {
     const glm::dvec2 wrap_uv = wrapAroundTexCoords(u, v);
-    const glm::dvec2 pixel_coords = glm::dvec2(texture_math::uvToPixel(wrap_uv.x, width), texture_math::uvToPixel(wrap_uv.y, height));
+    const glm::dvec2 pixel_coords = glm::dvec2(math::texture::uvToPixel(wrap_uv.x, width), math::texture::uvToPixel(wrap_uv.y, height));
     const glm::dvec2 top_left(std::floor(pixel_coords.x), std::floor(pixel_coords.y));
     const glm::dvec2 top_right(std::floor(pixel_coords.x) + 1, std::floor(pixel_coords.y));
     const glm::dvec2 bottom_left(std::floor(pixel_coords.x), std::floor(pixel_coords.y) + 1);
@@ -190,17 +190,16 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
    * @param width_begin X_min of the computation .
    * @param width_end X_max of the computation .
    * @param height Height of the original texture .
-   * @param use_importance_sampling True if using importance sampling.
    */
   template<typename D>
   void launchAsyncDiffuseIrradianceCompute(
       const D delta, float *f_data, const unsigned width_begin, const unsigned width_end, const unsigned _width, const unsigned _height) const {
     for (unsigned i = width_begin; i <= width_end; i++) {
       for (unsigned j = 0; j < _height; j++) {
-        glm::dvec2 uv = glm::dvec2(texture_math::pixelToUv(i, _width), texture_math::pixelToUv(j, _height));
-        const glm::dvec2 sph = spherical_math::uvToSpherical(uv.x, uv.y);
-        const glm::dvec2 sph_to_uv = spherical_math::sphericalToUv(sph);
-        const glm::dvec3 cart = spherical_math::sphericalToCartesian(sph.x, sph.y);
+        glm::dvec2 uv = glm::dvec2(math::texture::pixelToUv(i, _width), math::texture::pixelToUv(j, _height));
+        const glm::dvec2 sph = math::spherical::uvToSpherical(uv.x, uv.y);
+        const glm::dvec2 sph_to_uv = math::spherical::sphericalToUv(sph);
+        const glm::dvec3 cart = math::spherical::sphericalToCartesian(sph.x, sph.y);
         glm::dvec3 irrad = computeIrradianceImportanceSampling(cart.x, cart.y, cart.z, _width, _height, delta);
         unsigned index = (j * _width + i) * channels;
         f_data[index] = static_cast<float>(irrad.x);
@@ -214,8 +213,6 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
    * @brief Bake an equirect envmap to an irradiance map
    * @param delta Size of the step if calculating irradiance using the integral all over the hemisphere , or number of
    * samples if using importance sampling.
-   * @param use_importance_sampling Set to false to use a full integral over the hemisphere , using delta as step . True
-   * if we want to solve the integral using importance sampling.
    * @return std::unique_ptr<TextureData> Texture data containing width , height , and double f_data about the newly
    * created map.
    */
@@ -224,13 +221,13 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
   template<class D>
   inline glm::dvec3 computeIrradianceSingleTexel(
       const unsigned x, const unsigned y, const unsigned samples, const D tangent, const D bitangent, const D normal) const {
-    glm::dvec3 random = importance_sampling::pgc3d((unsigned)x, (unsigned)y, samples);
+    glm::dvec3 random = math::importance_sampling::pgc3d((unsigned)x, (unsigned)y, samples);
     double phi = 2 * PI * random.x;
     double theta = asin(sqrt(random.y));
-    glm::dvec3 uv_cart = spherical_math::sphericalToCartesian(phi, theta);
+    glm::dvec3 uv_cart = math::spherical::sphericalToCartesian(phi, theta);
     uv_cart = uv_cart.x * tangent + uv_cart.y * bitangent + uv_cart.z * normal;
-    auto spherical = spherical_math::cartesianToSpherical(uv_cart.x, uv_cart.y, uv_cart.z);
-    glm::dvec2 uvt = spherical_math::sphericalToUv(spherical.x, spherical.y);
+    auto spherical = math::spherical::cartesianToSpherical(uv_cart.x, uv_cart.y, uv_cart.z);
+    glm::dvec2 uvt = math::spherical::sphericalToUv(spherical.x, spherical.y);
     return uvSample(uvt.x, uvt.y);
   }
 
@@ -251,8 +248,8 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
     glm::dvec3 irradiance = glm::dvec3(0.f);
     glm::dvec3 normal(x, y, z);
     glm::dvec3 someVec = glm::dvec3(1.0, 0.0, 0.0);
-    glm::dvec2 uv = spherical_math::sphericalToUv(spherical_math::cartesianToSpherical(x, y, z));
-    glm::dvec2 pix = glm::dvec2(texture_math::uvToPixel(uv.x, _width), texture_math::uvToPixel(uv.y, _height));
+    glm::dvec2 uv = math::spherical::sphericalToUv(math::spherical::cartesianToSpherical(x, y, z));
+    glm::dvec2 pix = glm::dvec2(math::texture::uvToPixel(uv.x, _width), math::texture::uvToPixel(uv.y, _height));
     float dd = glm::dot(someVec, normal);
     glm::dvec3 tangent = glm::dvec3(0.0, 1.0, 0.0);
     if (1.0 - abs(dd) > 1e-6)

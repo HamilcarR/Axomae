@@ -1,7 +1,7 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
 #include "Node.h"
-#include "utils_3D.h"
+#include "sources/common/math/utils_3D.h"
 
 /**
  * @brief File implementing the bounding boxes calculations

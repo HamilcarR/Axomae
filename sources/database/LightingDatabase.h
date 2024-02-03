@@ -2,7 +2,7 @@
 #define LIGHTINGDATABASE_H
 #include "INodeDatabase.h"
 #include "LightingSystem.h"
-#include "utils_3D.h"
+#include "sources/common/math/utils_3D.h"
 
 /**
  * @file LightingDatabase.h

@@ -2,7 +2,9 @@
 #include "constants.h"
 #include "utils_3D.h"
 
-using namespace axomae;
+using namespace math::geometry;
+using RGB = axomae::RGB;
+using ImageManager = axomae::ImageManager;
 float bounding_coords(float x, float y, float z, bool min) {
   if (min) {
     if (x <= y)

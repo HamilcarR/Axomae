@@ -3,7 +3,7 @@
 
 #include "Node.h"
 #include "Shader.h"
-#include "utils_3D.h"
+#include "sources/common/math/utils_3D.h"
 
 /**
  * @file LightingSystem.h
