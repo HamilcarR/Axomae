@@ -6,7 +6,7 @@
 #include "Drawable.h"
 #include "ResourceDatabaseManager.h"
 #include "SceneHierarchy.h"
-#include "sources/common/math/utils_3D.h"
+#include "utils_3D.h"
 
 /**
  * @file Scene.h

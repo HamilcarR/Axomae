@@ -16,3 +16,4 @@ INCLUDEPATH += $$PWD/../debug \
 
 
 include($$PWD/math/math.pri)
+include($$PWD/image/image.pri)

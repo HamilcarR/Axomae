@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-// TODO : Old code , needs refactoring
+// TODO : Old code , refactor or delete
 namespace IO {
 
   class ImageImporter {

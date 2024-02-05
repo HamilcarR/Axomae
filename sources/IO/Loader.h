@@ -24,28 +24,6 @@
  */
 
 namespace IO {
-  namespace exception {
-    class LoadImagePathException : public GenericException {
-     public:
-      explicit LoadImagePathException(const std::string &path) { GenericException::saveErrorString(std::string("Failed processing path : ") + path); }
-    };
-
-    class LoadImageDimException : public GenericException {
-     public:
-      explicit LoadImageDimException(int width, int height) {
-        std::string dim = std::string("width : ") + std::to_string(width) + std::string(" height:") + std::to_string(height);
-        GenericException::saveErrorString(std::string("Image dimensions error: ") + dim);
-      }
-    };
-
-    class LoadImageChannelException : public GenericException {
-     public:
-      explicit LoadImageChannelException(int channels) {
-        std::string chan = std::string("channels number : ") + std::to_string(channels);
-        GenericException::saveErrorString(std::string("Image channel error: ") + chan);
-      }
-    };
-  }  // namespace exception
 
   /**
    * @brief 3D Loader class

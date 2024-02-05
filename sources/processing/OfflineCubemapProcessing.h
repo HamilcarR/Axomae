@@ -4,7 +4,7 @@
 #include "GenericTextureProcessing.h"
 #include "Mutex.h"
 #include "PerformanceLogger.h"
-#include "sources/common/math/math_utils.h"
+#include "math_utils.h"
 #include <fstream>
 #include <immintrin.h>
 #include <sstream>

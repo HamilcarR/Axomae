@@ -12,4 +12,5 @@ HEADERS += $$PWD/Drawable.h \
 INCLUDEPATH += $$PWD/../camera \
                 $$PWD/../gpu/opengl \
                 $$PWD/../mesh \
-                $$PWD/../texture
+                $$PWD/../texture \
+                $$PWD/../common \

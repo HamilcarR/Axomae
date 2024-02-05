@@ -1,5 +1,5 @@
 #include "ImageManager.h"
-
+#include "Rgb.h"
 #include <assert.h>
 #include <climits>
 #include <cstdlib>
@@ -12,6 +12,8 @@
 
 namespace axomae {
 
+  using namespace image;
+
   bool ImageManager::gpu = false;
   static bool CHECK_IF_CUDA_AVAILABLE() {
     if (!ImageManager::USING_GPU())
@@ -22,10 +24,6 @@ namespace axomae {
 
   template<typename T>
   static void replace_image(SDL_Surface *surface, T *image, unsigned int size, int bpp);
-  RGB::RGB() : red(0.), green(0.), blue(0.), alpha(0.) {}
-  RGB::RGB(float r, float g, float b) : red(r), green(g), blue(b), alpha(0) {}
-  RGB::RGB(float r, float g, float b, float a) : red(r), green(g), blue(b), alpha(a) {}
-  RGB::~RGB() {}
   ImageManager::ImageManager() {}
   ImageManager::~ImageManager() {}
 
@@ -41,7 +39,7 @@ namespace axomae {
   }
 
   /**************************************************************************************************************/
-  RGB ImageManager::get_pixel_color(SDL_Surface *surface, int x, int y) {
+  Rgb ImageManager::get_pixel_color(SDL_Surface *surface, int x, int y) {
     int bpp = surface->format->BytesPerPixel;
     uint8_t *color = (uint8_t *)(surface->pixels) + x * bpp + y * surface->pitch;
     float red = 0, blue = 0, green = 0, alpha = 0;
@@ -92,7 +90,7 @@ namespace axomae {
         }
       } break;
     }
-    RGB rgb = RGB(static_cast<float>(red), static_cast<float>(green), static_cast<float>(blue), static_cast<float>(alpha));
+    Rgb rgb = Rgb(static_cast<float>(red), static_cast<float>(green), static_cast<float>(blue), static_cast<float>(alpha));
     return rgb;
   }
 
@@ -146,18 +144,10 @@ namespace axomae {
 
   /**************************************************************************************************************/
 
-  void ImageManager::set_pixel_color(SDL_Surface *surface, RGB **arrayc, int w, int h) {
+  void ImageManager::set_pixel_color(SDL_Surface *surface, Rgb **arrayc, int w, int h) {
     for (int i = 0; i < w; i++)
       for (int j = 0; j < h; j++)
         set_pixel_color(surface, i, j, arrayc[i][j].rgb_to_int());
-  }
-
-  /**************************************************************************************************************/
-  void RGB::to_string() {
-    std::cout << "RED : " << std::to_string(red) << "\n";
-    std::cout << "GREEN : " << std::to_string(green) << "\n";
-    std::cout << "BLUE : " << std::to_string(blue) << "\n";
-    std::cout << "ALPHA : " << std::to_string(alpha) << "\n";
   }
 
   /**************************************************************************************************************/
@@ -169,7 +159,7 @@ namespace axomae {
     else
       for (int i = 0; i < image->w; i++)
         for (int j = 0; j < image->h; j++) {
-          RGB rgb = get_pixel_color(image, i, j);
+          Rgb rgb = get_pixel_color(image, i, j);
           rgb.red = (rgb.red + rgb.blue + rgb.green) / factor;
           rgb.green = rgb.red;
           rgb.blue = rgb.red;
@@ -237,7 +227,7 @@ namespace axomae {
       assert(image != nullptr);
       for (int i = 0; i < image->w; i++)
         for (int j = 0; j < image->h; j++) {
-          RGB rgb = get_pixel_color(image, i, j);
+          Rgb rgb = get_pixel_color(image, i, j);
           rgb.red = floor(rgb.red * 0.3 + rgb.blue * 0.11 + rgb.green * 0.59);
           rgb.green = rgb.red;
           rgb.blue = rgb.red;
@@ -248,77 +238,8 @@ namespace axomae {
   }
 
   /**************************************************************************************************************/
-  double RGB::intensity() {
-    double av = (red + green + blue) / 3;
-    return av / 255;
-  }
-
-  /**************************************************************************************************************/
-
-  void RGB::clamp() {
-    if (red > 255)
-      red = 255;
-    if (green > 255)
-      green = 255;
-    if (blue > 255)
-      blue = 255;
-    if (red < 0)
-      red = 0;
-    if (green < 0)
-      green = 0;
-    if (blue < 0)
-      blue = 0;
-  }
-
-  /**************************************************************************************************************/
-  RGB RGB::int_to_rgb(uint32_t val) {
-    RGB rgb = RGB();
-    if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-      rgb.red = static_cast<float>(val >> 24 & 0XFF);
-      rgb.green = static_cast<float>(val >> 16 & 0XFF);
-      rgb.blue = static_cast<float>(val >> 8 & 0XFF);
-      rgb.alpha = static_cast<float>(val & 0XFF);
-    } else {
-      rgb.alpha = static_cast<float>(val >> 24 & 0XFF);
-      rgb.blue = static_cast<float>(val >> 16 & 0XFF);
-      rgb.green = static_cast<float>(val >> 8 & 0XFF);
-      rgb.red = static_cast<float>(val & 0XFF);
-    }
-    return rgb;
-  }
-
-  /**************************************************************************************************************/
-  RGB RGB::int_to_rgb(uint16_t val) {
-    RGB rgb = RGB();
-    if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-      rgb.red = static_cast<float>(val >> 12 & 0XF);
-      rgb.green = static_cast<float>(val >> 8 & 0XF);
-      rgb.blue = static_cast<float>(val >> 4 & 0XF);
-      rgb.alpha = static_cast<float>(val & 0XF);
-    } else {
-      rgb.alpha = static_cast<float>(val >> 12 & 0XF);
-      rgb.blue = static_cast<float>(val >> 8 & 0XF);
-      rgb.green = static_cast<float>(val >> 4 & 0XF);
-      rgb.red = static_cast<float>(val & 0XF);
-    }
-    return rgb;
-  }
-
-  /**************************************************************************************************************/
-  uint32_t RGB::rgb_to_int() {
-    uint32_t image = 0;
-    int b = static_cast<int>(std::round(blue)), g = static_cast<int>(std::round(green)), r = static_cast<int>(std::round(red)),
-        a = static_cast<int>(std::round(alpha));
-    if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-      image = a | (b << 8) | (g << 16) | (r << 24);
-    else
-      image = r | (g << 8) | (b << 16) | (a << 24);
-    return image;
-  }
-
-  /**************************************************************************************************************/
   template<typename T>
-  static T compute_kernel_pixel(RGB **data, const T kernel[3][3], int i, int j, uint8_t flag) {
+  static T compute_kernel_pixel(Rgb **data, const T kernel[3][3], int i, int j, uint8_t flag) {
     if (flag == AXOMAE_RED) {
       return data[i - 1][j - 1].red * kernel[0][0] + data[i][j - 1].red * kernel[0][1] + data[i + 1][j - 1].red * kernel[0][2] +
              data[i - 1][j].red * kernel[1][0] + data[i][j].red * kernel[1][1] + data[i + 1][j].red * kernel[1][2] +
@@ -334,7 +255,7 @@ namespace axomae {
     }
   }
   template<typename T>
-  static RGB compute_generic_kernel_pixel(const RGB **data, const unsigned int size, const T **kernel, const unsigned int x, const unsigned int y) {
+  static Rgb compute_generic_kernel_pixel(const Rgb **data, const unsigned int size, const T **kernel, const unsigned int x, const unsigned int y) {
     float r = 0, g = 0, b = 0;
     uint8_t middle = std::floor(size / 2);
     for (unsigned int i = 0; i < size; i++)
@@ -345,7 +266,7 @@ namespace axomae {
         g += data[x + new_i][y + new_j].green * kernel_val;
         b += data[x + new_i][y + new_j].blue * kernel_val;
       }
-    return RGB(r, g, b);
+    return Rgb(r, g, b);
   }
 
   /**************************************************************************************************************/
@@ -362,14 +283,14 @@ namespace axomae {
       int w = surface->w;
       int h = surface->h;
       // thread this :
-      RGB **data = new RGB *[w];
+      Rgb **data = new Rgb *[w];
       for (int i = 0; i < w; i++)
-        data[i] = new RGB[h];
+        data[i] = new Rgb[h];
       float max_red = 0, max_blue = 0, max_green = 0;
       float min_red = 0, min_blue = 0, min_green = 0;
       for (int i = 0; i < w; i++) {
         for (int j = 0; j < h; j++) {
-          RGB rgb = get_pixel_color(surface, i, j);
+          Rgb rgb = get_pixel_color(surface, i, j);
           max_red = (rgb.red >= max_red) ? rgb.red : max_red;
           max_green = (rgb.green >= max_green) ? rgb.green : max_green;
           max_blue = (rgb.blue >= max_blue) ? rgb.blue : max_blue;
@@ -416,7 +337,7 @@ namespace axomae {
             float r = magnitude(setpix_v_red, setpix_h_red);
             float g = magnitude(setpix_v_green, setpix_h_green);
             float b = magnitude(setpix_v_blue, setpix_h_blue);
-            RGB rgb = RGB(r, g, b, 0);
+            Rgb rgb = Rgb(r, g, b, 0);
             set_pixel_color(surface, i, j, rgb.rgb_to_int());
           }
         }
@@ -430,57 +351,13 @@ namespace axomae {
   }
 
   /**************************************************************************************************************/
-
-  bool RGB::operator==(const RGB &rgb) { return red == rgb.red && green == rgb.green && blue == rgb.blue && alpha == rgb.alpha; }
-
-  template<typename T>
-  RGB RGB::operator*(T arg) const {
-    RGB rgb = RGB(static_cast<float>(red * arg), static_cast<float>(green * arg), static_cast<float>(blue * arg), static_cast<float>(alpha * arg));
-    return rgb;
-  }
-
-  RGB RGB::operator+=(float arg) const {
-    RGB rgb = RGB(red + arg, green + arg, blue + arg, alpha + arg);
-    return rgb;
-  }
-
-  RGB RGB::operator+=(RGB arg) const {
-    RGB rgb = RGB(red + arg.red, green + arg.green, blue + arg.blue, alpha + arg.alpha);
-    return rgb;
-  }
-
-  RGB RGB::operator+(RGB arg) const {
-    RGB rgb = RGB(red + arg.red, green + arg.green, blue + arg.blue, alpha + arg.alpha);
-    return rgb;
-  }
-
-  RGB RGB::operator/(float arg) const {
-    assert(arg > 0);
-    RGB rgb = RGB(red / arg, green / arg, blue / arg, alpha / arg);
-    return rgb;
-  }
-
-  RGB RGB::operator-(RGB arg) const {
-    RGB rgb = RGB(red - arg.red, green - arg.green, blue - arg.blue);
-    return rgb;
-  }
-
-  /**************************************************************************************************************/
-  void RGB::invert_color() {
-    red = abs(red - 255);
-    green = abs(green - 255);
-    blue = abs(blue - 255);
-    alpha = abs(alpha - 255);
-  }
-
-  /**************************************************************************************************************/
   max_colors *ImageManager::get_colors_max_variation(SDL_Surface *image) {
     max_colors *max_min = new max_colors;
     const int INT_MAXX = 0;
     int max_red = 0, max_green = 0, max_blue = 0, min_red = INT_MAX, min_blue = INT_MAX, min_green = INT_MAXX;
     for (int i = 0; i < image->w; i++) {
       for (int j = 0; j < image->h; j++) {
-        RGB rgb = get_pixel_color(image, i, j);
+        Rgb rgb = get_pixel_color(image, i, j);
         max_red = (rgb.red >= max_red) ? rgb.red : max_red;
         max_green = (rgb.green >= max_green) ? rgb.green : max_green;
         max_blue = (rgb.blue >= max_blue) ? rgb.blue : max_blue;
@@ -504,7 +381,7 @@ namespace axomae {
     max_colors *maxmin = get_colors_max_variation(image);
     for (int i = 0; i < image->w; i++) {
       for (int j = 0; j < image->h; j++) {
-        RGB col = get_pixel_color(image, i, j);
+        Rgb col = get_pixel_color(image, i, j);
         col.red = floor(truncate(correction_factor * (col.red - 128) + 128));
         col.green = floor(truncate(correction_factor * (col.green - 128) + 128));
         col.blue = floor(truncate(correction_factor * (col.blue - 128) + 128));
@@ -520,7 +397,7 @@ namespace axomae {
     const int val = 200;
     for (int i = 0; i < image->w; i++) {
       for (int j = 0; j < image->h; j++) {
-        RGB col = get_pixel_color(image, i, j);
+        Rgb col = get_pixel_color(image, i, j);
         col.red = col.red <= val ? 0 : 255;
         col.blue = col.blue <= val ? 0 : 255;
         col.green = col.green <= val ? 0 : 255;
@@ -534,7 +411,7 @@ namespace axomae {
   void ImageManager::set_contrast_sigmoid(SDL_Surface *image, int threshold) {
     for (int i = 0; i < image->w; i++) {
       for (int j = 0; j < image->h; j++) {
-        RGB color = get_pixel_color(image, i, j);
+        Rgb color = get_pixel_color(image, i, j);
         // RGB normalized = normalize_0_1(color);
       }
     }
@@ -553,9 +430,9 @@ namespace axomae {
     else {
       int height = surface->h;
       int width = surface->w;
-      RGB **data = new RGB *[width];
+      Rgb **data = new Rgb *[width];
       for (int i = 0; i < width; i++)
-        data[i] = new RGB[height];
+        data[i] = new Rgb[height];
       for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++)
           data[i][j] = get_pixel_color(surface, i, j);
@@ -583,7 +460,7 @@ namespace axomae {
           auto Nx = normalize(-1, 1, lerp(dy, ddy, 0.5));
           auto Ny = normalize(-1, 1, lerp(dx, ddx, 0.5));
           auto Nz = 255.0;  // the normal vector
-          RGB col = RGB(floor(truncate(Nx)), floor(truncate(Ny)), Nz);
+          Rgb col = Rgb(floor(truncate(Nx)), floor(truncate(Ny)), Nz);
           set_pixel_color(surface, i, j, col.rgb_to_int());
         }
       }
@@ -594,9 +471,9 @@ namespace axomae {
   void ImageManager::compute_dudv(SDL_Surface *surface, double factor) {
     int height = surface->h;
     int width = surface->w;
-    RGB **data = new RGB *[width];
+    Rgb **data = new Rgb *[width];
     for (int i = 0; i < width; i++)
-      data[i] = new RGB[height];
+      data[i] = new Rgb[height];
     for (int i = 0; i < width; i++) {
       for (int j = 0; j < height; j++)
         data[i][j] = get_pixel_color(surface, i, j);
@@ -608,14 +485,14 @@ namespace axomae {
         y = (j == 0) ? j + 1 : j - 1;
         a = (i == width - 1) ? width - 2 : i + 1;
         b = (j == height - 1) ? height - 2 : j + 1;
-        RGB col_left = data[i][y];
-        RGB col_right = data[i][b];
-        RGB col_up = data[x][j];
-        RGB col_down = data[a][j];
-        RGB col_up_right = data[x][b];
-        RGB col_up_left = data[x][y];
-        RGB col_down_left = data[a][y];
-        RGB col_down_right = data[a][b];
+        Rgb col_left = data[i][y];
+        Rgb col_right = data[i][b];
+        Rgb col_up = data[x][j];
+        Rgb col_down = data[a][j];
+        Rgb col_up_right = data[x][b];
+        Rgb col_up_left = data[x][y];
+        Rgb col_down_left = data[a][y];
+        Rgb col_down_right = data[a][b];
         double atten = 0.8;
         double dx_red = atten * (factor * (col_left.red - col_right.red) / 255);
         double dx_green = atten * (factor * (col_left.green - col_right.green) / 255);
@@ -627,7 +504,7 @@ namespace axomae {
         double ddy_red = atten * (factor * (col_up_left.red - col_down_right.red) / 255);
         auto red_var = normalize(-1, 1, lerp(dx_red + dy_red, ddx_red + ddy_red, 0.5));
         auto green_var = normalize(-1, 1, lerp(dx_green + dy_green, ddx_green + ddy_green, 0.5));
-        RGB col = RGB(truncate(red_var), truncate(green_var), 0.0);
+        Rgb col = Rgb(truncate(red_var), truncate(green_var), 0.0);
         set_pixel_color(surface, i, j, col.rgb_to_int());
       }
     }
@@ -638,9 +515,9 @@ namespace axomae {
     if (surface != nullptr) {
       int height = surface->h;
       int width = surface->w;
-      RGB **data = new RGB *[width];
+      Rgb **data = new Rgb *[width];
       for (int i = 0; i < width; i++)
-        data[i] = new RGB[height];
+        data[i] = new Rgb[height];
       for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++)
           data[i][j] = get_pixel_color(surface, i, j);
@@ -676,8 +553,8 @@ namespace axomae {
       unsigned int middle = std::floor(n / 2);
       for (unsigned int i = middle; i < width - middle; i++) {
         for (unsigned int j = middle; j < height - middle; j++) {
-          RGB col;
-          col = compute_generic_kernel_pixel(const_cast<const RGB **>(data), n, const_cast<const float **>(blur), i, j);
+          Rgb col;
+          col = compute_generic_kernel_pixel(const_cast<const Rgb **>(data), n, const_cast<const float **>(blur), i, j);
           set_pixel_color(surface, i, j, col.rgb_to_int());
         }
       }
@@ -694,9 +571,9 @@ namespace axomae {
     if (surface != nullptr) {
       int height = surface->h;
       int width = surface->w;
-      RGB **data = new RGB *[width];
+      Rgb **data = new Rgb *[width];
       for (int i = 0; i < width; i++)
-        data[i] = new RGB[height];
+        data[i] = new Rgb[height];
       for (int i = 0; i < width; i++)
         for (int j = 0; j < height; j++)
           data[i][j] = get_pixel_color(surface, i, j);
@@ -728,8 +605,8 @@ namespace axomae {
       unsigned int middle = std::floor(n / 2);
       for (unsigned int i = middle; i < width - middle; i++) {
         for (unsigned int j = middle; j < height - middle; j++) {
-          RGB col;
-          col = compute_generic_kernel_pixel(const_cast<const RGB **>(data), n, const_cast<const float **>(sharp), i, j);
+          Rgb col;
+          col = compute_generic_kernel_pixel(const_cast<const Rgb **>(data), n, const_cast<const float **>(sharp), i, j);
           col.clamp();
           set_pixel_color(surface, i, j, col.rgb_to_int());
         }

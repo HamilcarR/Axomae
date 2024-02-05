@@ -3,7 +3,7 @@
 
 #include "GenericTextureProcessing.h"
 #include "constants.h"
-#include "sources/common/math/utils_3D.h"
+#include "utils_3D.h"
 
 /**
  * @file Texture.h

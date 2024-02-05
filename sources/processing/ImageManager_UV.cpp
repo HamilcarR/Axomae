@@ -1,34 +1,36 @@
 #include "ImageManager.h"
+#include "Rgb.h"
 #include "constants.h"
 #include "utils_3D.h"
 
-class NoNormalsException : public GenericException {
- public:
-  NoNormalsException() : GenericException() { saveErrorString("This 3D model doesn't provide normals"); }
-};
+namespace exception {
+  class NoNormalsException : public GenericException {
+   public:
+    NoNormalsException() : GenericException() { saveErrorString("This 3D model doesn't provide normals"); }
+  };
 
-class NoTangentsException : public GenericException {
- public:
-  NoTangentsException() : GenericException() { saveErrorString("This 3D model doesn't provide tangents"); }
-};
+  class NoTangentsException : public GenericException {
+   public:
+    NoTangentsException() : GenericException() { saveErrorString("This 3D model doesn't provide tangents"); }
+  };
 
-class NoBitangentsException : public GenericException {
- public:
-  NoBitangentsException() : GenericException() { saveErrorString("This 3D model doesn't provide bitangents"); }
-};
+  class NoBitangentsException : public GenericException {
+   public:
+    NoBitangentsException() : GenericException() { saveErrorString("This 3D model doesn't provide bitangents"); }
+  };
 
-class NoUvException : public GenericException {
- public:
-  NoUvException() : GenericException() { saveErrorString("This 3D model doesn't provide UVs"); }
-};
+  class NoUvException : public GenericException {
+   public:
+    NoUvException() : GenericException() { saveErrorString("This 3D model doesn't provide UVs"); }
+  };
 
-class NoIndicesException : public GenericException {
- public:
-  NoIndicesException() : GenericException() { saveErrorString("This 3D model doesn't provide indices"); }
-};
+  class NoIndicesException : public GenericException {
+   public:
+    NoIndicesException() : GenericException() { saveErrorString("This 3D model doesn't provide indices"); }
+  };
+}  // namespace exception
 
 using namespace math::geometry;
-using RGB = axomae::RGB;
 using ImageManager = axomae::ImageManager;
 float bounding_coords(float x, float y, float z, bool min) {
   if (min) {
@@ -61,21 +63,21 @@ Vect3D tan_space_transform(Vect3D T, Vect3D BT, Vect3D N, Vect3D I) {
 }
 
 /***************************************************************************************************************/
-inline RGB compute_normals_set_pixels_rgb(Point2D P1,
-                                          Point2D P2,
-                                          Point2D P3,
-                                          Vect3D N1,
-                                          Vect3D N2,
-                                          Vect3D N3,
-                                          Vect3D BT1,
-                                          Vect3D BT2,
-                                          Vect3D BT3,
-                                          Vect3D T1,
-                                          Vect3D T2,
-                                          Vect3D T3,
-                                          int x,
-                                          int y,
-                                          bool tangent_space) {
+inline image::Rgb compute_normals_set_pixels_rgb(Point2D P1,
+                                                 Point2D P2,
+                                                 Point2D P3,
+                                                 Vect3D N1,
+                                                 Vect3D N2,
+                                                 Vect3D N3,
+                                                 Vect3D BT1,
+                                                 Vect3D BT2,
+                                                 Vect3D BT3,
+                                                 Vect3D T1,
+                                                 Vect3D T2,
+                                                 Vect3D T3,
+                                                 int x,
+                                                 int y,
+                                                 bool tangent_space) {
 
   Point2D I = {static_cast<float>(x), static_cast<float>(y)};
   Vect3D C = barycentric_lerp(P1, P2, P3, I);
@@ -94,36 +96,34 @@ inline RGB compute_normals_set_pixels_rgb(Point2D P1,
       N.normalize();
       normal = tan_space_transform(T, B, N, normal);
       normal.normalize();
-      RGB rgb = RGB((normal.x * 255 + 255) / 2, (normal.y * 255 + 255) / 2, (normal.z * 255 + 255) / 2, 0);
+      image::Rgb rgb = image::Rgb((normal.x * 255 + 255) / 2, (normal.y * 255 + 255) / 2, (normal.z * 255 + 255) / 2, 0);
       return rgb;
     } else {
       N1.normalize();
       N2.normalize();
       N3.normalize();
       Vect3D normal = interpolate(N1, N2, N3);
-      RGB rgb = RGB((normal.x * 255 + 255) / 2, (normal.y * 255 + 255) / 2, (normal.z * 255 + 255) / 2, 0);
+      image::Rgb rgb = image::Rgb((normal.x * 255 + 255) / 2, (normal.y * 255 + 255) / 2, (normal.z * 255 + 255) / 2, 0);
       return rgb;
     }
   } else {
-    return RGB(0, 0, 0);
+    return image::Rgb(0, 0, 0);
   }
 }
 
 void throwIfNotValid(const Object3D &object) {
   bool tangents_empty = object.tangents.empty(), bitangents_empty = object.bitangents.empty(), normals_empty = object.normals.empty(),
        uv_empty = object.uv.empty(), indices_empty = object.indices.empty();
-
   if (tangents_empty)
-    throw NoTangentsException();
+    throw exception::NoTangentsException();
   if (bitangents_empty)
-    throw NoBitangentsException();
-  if (normals_empty) {
-    throw NoNormalsException();
-  }
+    throw exception::NoBitangentsException();
+  if (normals_empty)
+    throw exception::NoNormalsException();
   if (uv_empty)
-    throw NoUvException();
+    throw exception::NoUvException();
   if (indices_empty)
-    throw NoIndicesException();
+    throw exception::NoIndicesException();
 }
 
 /***************************************************************************************************************/
@@ -185,9 +185,9 @@ std::vector<uint8_t> ImageManager::project_uv_normals(const Object3D &object, in
     int y_min = static_cast<int>(bounding_coords(P1.y, P2.y, P3.y, true));
     for (int x = x_min; x <= x_max; x++)
       for (int y = y_min; y <= y_max; y++) {
-        RGB val = compute_normals_set_pixels_rgb(P1, P2, P3, N1, N2, N3, BT1, BT2, BT3, T1, T2, T3, x, y, true);
+        image::Rgb val = compute_normals_set_pixels_rgb(P1, P2, P3, N1, N2, N3, BT1, BT2, BT3, T1, T2, T3, x, y, true);
         int idx = (y * width + x) * 3;
-        if (!(val == RGB(0, 0, 0))) {
+        if (!(val == image::Rgb(0, 0, 0))) {
           raw_img[idx] = static_cast<uint8_t>(val.red);
           raw_img[idx + 1] = static_cast<uint8_t>(val.green);
           raw_img[idx + 2] = static_cast<uint8_t>(val.blue);

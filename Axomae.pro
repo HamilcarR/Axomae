@@ -51,6 +51,8 @@ CONFIG(debug , debug|release):{
     TARGET = Axomae_debug
 }
 
+
+
 QMAKE_LIBDIR += $$CUDA_DIR/lib64
 LIBS+= -L/usr/local/cuda/lib64 -L/usr/lib64 -lboost_program_options -lSDL2 -ldl -lpthread -lSDL2_image -lassimp -lcudart -lcudadevrt -lcuda -lGLEW -lGLU -lglut -lGL
 CUDA_LIBS += -L/usr/local/cuda/lib64 -L/usr/lib64 -lcudart -lcuda -lcudadevrt -lSDL2

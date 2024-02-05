@@ -2,6 +2,7 @@
 #define PROGRESSSTATUS_H
 #include "constants.h"
 #include <QProgressBar>
+
 class ProgressStatusWidget : public QProgressBar {
   Q_OBJECT
  public:
@@ -13,5 +14,4 @@ class ProgressStatusWidget : public QProgressBar {
    */
   void display(std::string &format_text, int percentage);
 };
-
 #endif

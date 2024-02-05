@@ -1,18 +1,13 @@
-#include "Loader.h"
 #include "DebugGL.h"
 #include "INodeFactory.h"
+#include "Loader.h"
+#include "LoaderSharedExceptions.h"
 #include "Mutex.h"
 #include "PerformanceLogger.h"
 #include "ShaderFactory.h"
 #include "TextureFactory.h"
-#include <QByteArray>
-#include <QImage>
-#include <fstream>
-#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "axomae_utils.h"
-#include "stb_image.h"
-#include "stb_image_write.h"
+#include <QImage>
 
 /**
  * @file Loader.cpp
@@ -455,9 +450,9 @@ namespace IO {
     TextureDatabase &texture_database = resource_database->getTextureDatabase();
     ShaderDatabase &shader_database = resource_database->getShaderDatabase();
     INodeDatabase &node_database = resource_database->getNodeDatabase();
+
     std::pair<std::vector<Mesh *>, SceneTree> objects;
     Assimp::Importer importer;
-    std::mutex mesh_load_mutex;
     const aiScene *modelScene = importer.ReadFile(
         file, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs);
     if (modelScene != nullptr) {
@@ -498,51 +493,6 @@ namespace IO {
     }
   }
 
-  std::string Loader::loadTextFile(const char *filename) {
-    std::ifstream stream(filename);
-    std::string buffer;
-    std::string str_text;
-    while (getline(stream, buffer))
-      str_text = str_text + buffer + "\n";
-    stream.close();
-    return str_text;
-  }
-
-  image::ImageHolder<float> Loader::loadHdr(const char *path, bool store) {
-    int width = -1, height = -1, channels = -1;
-    float *data = stbi_loadf(path, &width, &height, &channels, 0);
-    if (stbi_failure_reason())
-      throw IO::exception::LoadImagePathException(path);
-    if (width <= 0 || height <= 0)
-      throw IO::exception::LoadImageDimException(width, height);
-    if (channels <= 0)
-      throw IO::exception::LoadImageChannelException(channels);
-    std::vector<float> image_data;
-    image_data.resize(width * height * channels);
-    initProgress("Importing environment map", width * height * channels);
-    controller::ProgressManagerHelper helper(this);
-    for (int i = 0; i < width * height * channels; i++) {
-      helper.notifyProgress(i);
-      image_data[i] = data[i];
-    }
-
-    image::Metadata metadata;
-    metadata.channels = channels;
-    metadata.width = width;
-    metadata.height = height;
-    std::string path_str(path);
-    std::string name = utils::string::tokenize(path_str, '/').back();
-    metadata.name = name;
-    metadata.color_corrected = false;
-
-    if (store) {
-      auto &hdr_database = resource_database->getHdrDatabase();
-      database::image::store<float>(hdr_database, false, image_data, metadata);
-    }
-    stbi_image_free(data);
-    return image::ImageHolder<float>(image_data, metadata);
-  }
-
   /**
    * The function loads a file and generates a vector of meshes, including a cube map if applicable.
    *
@@ -554,19 +504,7 @@ namespace IO {
     TextureDatabase *texture_database = &resource_database->getTextureDatabase();
     texture_database->clean();
     std::pair<std::vector<Mesh *>, SceneTree> scene = loadObjects(file);
-    errorCheck(__FILE__, __LINE__);
     return scene;
-  }
-
-  void Loader::writeHdr(const char *path, const image::ImageHolder<float> &image) {
-    int n = stbi_write_hdr(path,
-                           static_cast<int>(image.metadata.width),
-                           static_cast<int>(image.metadata.height),
-                           static_cast<int>(image.metadata.channels),
-                           image.data.data());
-    if (n == 0) {
-      throw exception::LoadImagePathException(path);
-    }
   }
 
 }  // namespace IO
