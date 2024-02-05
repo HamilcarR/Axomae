@@ -2,7 +2,7 @@
 #include "GenericException.h"
 #include "Loader.h"
 #include "OfflineCubemapProcessing.h"
-#include "TextureViewerController.h"
+#include "TextureViewerWidget.h"
 #include "constants.h"
 #include "image_utils.h"
 
@@ -24,7 +24,7 @@ namespace controller::cmd {
     try {
       image::ImageHolder<float> data = loader.loadHdr(file.c_str(), false);
       QApplication qapp(*argv, argc);
-      controller::TextureViewerController tex(data);
+      HdrTextureViewerWidget tex(data);
       tex.show();
       qapp.exec();
     } catch (const GenericException &e) {
@@ -48,7 +48,7 @@ namespace controller::cmd {
       image::ImageHolder<float> hdr(texture->f_data, metadata);
       loader.writeHdr(envmap.path_output.c_str(), hdr);
       QApplication qapp(*argv, argc);
-      controller::TextureViewerController tex(hdr);
+      HdrTextureViewerWidget tex(hdr);
       tex.show();
       qapp.exec();
     } catch (const GenericException &e) {

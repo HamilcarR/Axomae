@@ -2,5 +2,6 @@
 
 # Execute this script from the base repository. 
 
-qmake Axomae.pro
+arg=$1
+qmake Axomae.pro CONFIG+=$arg
 make -j8
