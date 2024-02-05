@@ -18,12 +18,10 @@ class Mesh;
 class MeshListView : public QListWidget {
  public:
   MeshListView(QWidget *parent = nullptr);
-  virtual ~MeshListView();
   void setList(const std::vector<Mesh *> &meshes);
-  void remove();
 
  private:
-  std::vector<QListWidgetItem *> mesh_names_list;
+  std::vector<std::unique_ptr<QListWidgetItem>> mesh_names_list;
 };
 
 #endif

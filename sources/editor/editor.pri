@@ -10,6 +10,9 @@ FORMS += $$PWD/Form/main_window.ui \
 
 UI_DIR += "$$PWD/Form/"
 
+INCLUDEPATH += $$PWD/../common/image\
+
+
 include($$PWD/renderer/renderer.pri)
 include($$PWD/UV/UV.pri)
 include($$PWD/Form/Form.pri)
