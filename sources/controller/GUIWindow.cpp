@@ -6,10 +6,10 @@
 #include "ProgressStatusWidget.h"
 #include "SceneSelector.h"
 #include "ShaderFactory.h"
+#include "TextureViewerWidget.h"
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsItem>
 #include <stack>
-
 // TODO : Very old code , need refactoring²
 namespace controller {
   using namespace gui;
@@ -240,6 +240,8 @@ namespace controller {
 
     /*setup all slots and signals*/
     connect_all_slots();
+
+    setMouseTracking(true);
   }
 
   Controller::~Controller() { delete _MemManagement; }
@@ -659,11 +661,13 @@ namespace controller {
     SceneSelector &instance = SceneSelector::getInstance();
     Mesh *retrieved_mesh = instance.getCurrent();
     if (retrieved_mesh) {
-      QLabel *view = _UI.uv_projection;
-      std::vector<uint8_t> surf = ImageManager::project_uv_normals(retrieved_mesh->geometry, 900, 900, true);
-      QImage img(surf.data(), 900, 900, QImage::Format_RGB888);
-      QPixmap pix = QPixmap::fromImage(img);
-      view->setPixmap(pix);
+      TextureViewerWidget *view = _UI.uv_projection;
+      try {
+        std::vector<uint8_t> surf = ImageManager::project_uv_normals(retrieved_mesh->geometry, 1000, 1000, true);
+        view->display(surf, 1000, 1000, 3);
+      } catch (const GenericException &e) {
+        LOG(e.what(), LogLevel::ERROR);
+      }
     }
   }
   /**************************************************************************************************************/

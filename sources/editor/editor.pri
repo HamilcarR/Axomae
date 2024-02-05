@@ -1,7 +1,9 @@
 
 HEADERS += $$PWD/ProgressStatusWidget.h\
+            $$PWD/TextureViewerWidget.h
 
 SOURCES += $$PWD/ProgressStatusWidget.cpp\
+            $$PWD/TextureViewerWidget.cpp
 
 FORMS += $$PWD/Form/main_window.ui \
          $$PWD/Form/texture_viewer.ui \

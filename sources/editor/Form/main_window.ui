@@ -2287,16 +2287,6 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                 <property name="sizeConstraint">
                  <enum>QLayout::SetDefaultConstraint</enum>
                 </property>
-                <item row="1" column="1">
-                 <widget class="MeshListView" name="meshes_list">
-                  <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;List all meshes names in the 3D model&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                  </property>
-                  <property name="frameShape">
-                   <enum>QFrame::NoFrame</enum>
-                  </property>
-                 </widget>
-                </item>
                 <item row="0" column="1">
                  <layout class="QGridLayout" name="gridLayout_8">
                   <item row="0" column="1">
@@ -2330,6 +2320,16 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                   </item>
                  </layout>
                 </item>
+                <item row="1" column="1">
+                 <widget class="MeshListView" name="meshes_list">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;List all meshes names in the 3D model&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </item>
               <item row="0" column="0">
@@ -2338,15 +2338,15 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                  <enum>QLayout::SetDefaultConstraint</enum>
                 </property>
                 <item row="0" column="1">
-                 <widget class="QLabel" name="uv_projection">
+                 <widget class="TextureViewerWidget" name="uv_projection" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <property name="frameShape">
-                   <enum>QFrame::NoFrame</enum>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -2521,6 +2521,12 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
    <class>ProgressStatusWidget</class>
    <extends>QProgressBar</extends>
    <header>ProgressStatusWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TextureViewerWidget</class>
+   <extends>QWidget</extends>
+   <header>TextureViewerWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

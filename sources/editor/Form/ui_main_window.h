@@ -40,6 +40,7 @@
 #include "MeshListView.h"
 #include "ProgressStatusWidget.h"
 #include "SceneListView.h"
+#include "TextureViewerWidget.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -274,12 +275,12 @@ public:
     QWidget *uv_editor;
     QGridLayout *gridLayout_17;
     QGridLayout *gridLayout_14;
-    MeshListView *meshes_list;
     QGridLayout *gridLayout_8;
     QPushButton *next_mesh_button;
     QPushButton *previous_mesh_button;
+    MeshListView *meshes_list;
     QGridLayout *LAYOUT_uv;
-    QLabel *uv_projection;
+    TextureViewerWidget *uv_projection;
     QWidget *rt_renderer;
     QGridLayout *gridLayout_30;
     QGridLayout *gridLayout_29;
@@ -1625,12 +1626,6 @@ public:
         gridLayout_14 = new QGridLayout();
         gridLayout_14->setObjectName("gridLayout_14");
         gridLayout_14->setSizeConstraint(QLayout::SetDefaultConstraint);
-        meshes_list = new MeshListView(uv_editor);
-        meshes_list->setObjectName("meshes_list");
-        meshes_list->setFrameShape(QFrame::NoFrame);
-
-        gridLayout_14->addWidget(meshes_list, 1, 1, 1, 1);
-
         gridLayout_8 = new QGridLayout();
         gridLayout_8->setObjectName("gridLayout_8");
         next_mesh_button = new QPushButton(uv_editor);
@@ -1650,17 +1645,23 @@ public:
 
         gridLayout_14->addLayout(gridLayout_8, 0, 1, 1, 1);
 
+        meshes_list = new MeshListView(uv_editor);
+        meshes_list->setObjectName("meshes_list");
+        meshes_list->setFrameShape(QFrame::NoFrame);
+
+        gridLayout_14->addWidget(meshes_list, 1, 1, 1, 1);
+
 
         gridLayout_17->addLayout(gridLayout_14, 0, 2, 1, 1);
 
         LAYOUT_uv = new QGridLayout();
         LAYOUT_uv->setObjectName("LAYOUT_uv");
         LAYOUT_uv->setSizeConstraint(QLayout::SetDefaultConstraint);
-        uv_projection = new QLabel(uv_editor);
+        uv_projection = new TextureViewerWidget(uv_editor);
         uv_projection->setObjectName("uv_projection");
         sizePolicy.setHeightForWidth(uv_projection->sizePolicy().hasHeightForWidth());
         uv_projection->setSizePolicy(sizePolicy);
-        uv_projection->setFrameShape(QFrame::NoFrame);
+        uv_projection->setMouseTracking(true);
 
         LAYOUT_uv->addWidget(uv_projection, 0, 1, 1, 1);
 
@@ -1865,11 +1866,11 @@ public:
         QTreeWidgetItem *___qtreewidgetitem = renderer_scene_list->headerItem();
         ___qtreewidgetitem->setText(0, QCoreApplication::translate("MainWindow", "Scene", nullptr));
         workspace->setTabText(workspace->indexOf(gl_renderer), QCoreApplication::translate("MainWindow", "Renderer", nullptr));
+        next_mesh_button->setText(QCoreApplication::translate("MainWindow", "Next", nullptr));
+        previous_mesh_button->setText(QCoreApplication::translate("MainWindow", "Previous", nullptr));
 #if QT_CONFIG(tooltip)
         meshes_list->setToolTip(QCoreApplication::translate("MainWindow", "<html><head/><body><p>List all meshes names in the 3D model</p></body></html>", nullptr));
 #endif // QT_CONFIG(tooltip)
-        next_mesh_button->setText(QCoreApplication::translate("MainWindow", "Next", nullptr));
-        previous_mesh_button->setText(QCoreApplication::translate("MainWindow", "Previous", nullptr));
         workspace->setTabText(workspace->indexOf(uv_editor), QCoreApplication::translate("MainWindow", "UV editor", nullptr));
         workspace->setTabText(workspace->indexOf(rt_renderer), QCoreApplication::translate("MainWindow", "RT Renderer", nullptr));
         use_gpu->setText(QCoreApplication::translate("MainWindow", "GPGPU", nullptr));

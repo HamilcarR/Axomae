@@ -58,8 +58,12 @@ namespace hdr_utils {
    * Creates an RGBA image no matter the input
    * */
   template<class T>
-  std::vector<uint8_t> hdr2image(
-      std::vector<T> &rgb, int width, int height, int channels, bool needs_color_correct, controller::ProgressManagerHelper *progress = nullptr) {
+  std::vector<uint8_t> hdr2image(const std::vector<T> &rgb,
+                                 int width,
+                                 int height,
+                                 int channels,
+                                 bool needs_color_correct,
+                                 controller::ProgressManagerHelper *progress = nullptr) {
     ASSERT_IS_ARITHMETIC(T);
     assert(rgb.size() == static_cast<unsigned>(width * height * channels));
 

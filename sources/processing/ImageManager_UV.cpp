@@ -2,6 +2,31 @@
 #include "constants.h"
 #include "utils_3D.h"
 
+class NoNormalsException : public GenericException {
+ public:
+  NoNormalsException() : GenericException() { saveErrorString("This 3D model doesn't provide normals"); }
+};
+
+class NoTangentsException : public GenericException {
+ public:
+  NoTangentsException() : GenericException() { saveErrorString("This 3D model doesn't provide tangents"); }
+};
+
+class NoBitangentsException : public GenericException {
+ public:
+  NoBitangentsException() : GenericException() { saveErrorString("This 3D model doesn't provide bitangents"); }
+};
+
+class NoUvException : public GenericException {
+ public:
+  NoUvException() : GenericException() { saveErrorString("This 3D model doesn't provide UVs"); }
+};
+
+class NoIndicesException : public GenericException {
+ public:
+  NoIndicesException() : GenericException() { saveErrorString("This 3D model doesn't provide indices"); }
+};
+
 using namespace math::geometry;
 using RGB = axomae::RGB;
 using ImageManager = axomae::ImageManager;
@@ -67,7 +92,7 @@ inline RGB compute_normals_set_pixels_rgb(Point2D P1,
       B.normalize();
       T.normalize();
       N.normalize();
-      normal = tan_space_transform(T, B, N, normal);  // TODO : provide a better algorithm for tang space
+      normal = tan_space_transform(T, B, N, normal);
       normal.normalize();
       RGB rgb = RGB((normal.x * 255 + 255) / 2, (normal.y * 255 + 255) / 2, (normal.z * 255 + 255) / 2, 0);
       return rgb;
@@ -84,40 +109,59 @@ inline RGB compute_normals_set_pixels_rgb(Point2D P1,
   }
 }
 
+void throwIfNotValid(const Object3D &object) {
+  bool tangents_empty = object.tangents.empty(), bitangents_empty = object.bitangents.empty(), normals_empty = object.normals.empty(),
+       uv_empty = object.uv.empty(), indices_empty = object.indices.empty();
+
+  if (tangents_empty)
+    throw NoTangentsException();
+  if (bitangents_empty)
+    throw NoBitangentsException();
+  if (normals_empty) {
+    throw NoNormalsException();
+  }
+  if (uv_empty)
+    throw NoUvException();
+  if (indices_empty)
+    throw NoIndicesException();
+}
+
 /***************************************************************************************************************/
 /** @brief Computes the normals at the position of each texel of a 3D model and displays them on the projected UV
  * This function allows us to check the distribution of normals across the mesh.
  * Returns std::vector of size width * height * 3 as we work with an RGB image .
  */
 std::vector<uint8_t> ImageManager::project_uv_normals(const Object3D &object, int width, int height, bool tangent_space) {
-
-  bool tangents_empty = object.tangents.empty(), bitangents_empty = object.bitangents.empty(), normals_empty = object.normals.empty(),
-       uv_empty = object.uv.empty(), indices_empty = object.indices.empty();
-  if (tangents_empty || normals_empty || uv_empty || indices_empty || bitangents_empty) {
-    LOG("Empty data array", LogLevel::ERROR);
-    return std::vector<uint8_t>();
+  try {
+    throwIfNotValid(object);
+  } catch (const GenericException &e) {
+    throw;
   }
 
   std::vector<uint8_t> raw_img;
   raw_img.resize(width * height * 3);
 
-  /*project normals on texture coordinates and interpolate them*/
+  /*project normals on texture coordinates and interpolate them between each vertex of a face*/
   for (unsigned int i = 0; i < object.indices.size(); i += 3) {
     const std::vector<unsigned int> &index = object.indices;
+    /* texture coordinates of each vertex in a face */
     Point2D P1 = {object.uv[index[i] * 2], object.uv[index[i] * 2 + 1]};
     Point2D P2 = {object.uv[index[i + 1] * 2], object.uv[index[i + 1] * 2 + 1]};
     Point2D P3 = {object.uv[index[i + 2] * 2], object.uv[index[i + 2] * 2 + 1]};
+    /* Normals of each vertex*/
     Vect3D N1 = {object.normals[index[i] * 3], object.normals[index[i] * 3 + 1], object.normals[index[i] * 3 + 2]};
     Vect3D N2 = {object.normals[index[i + 1] * 3], object.normals[index[i + 1] * 3 + 1], object.normals[index[i + 1] * 3 + 2]};
     Vect3D N3 = {object.normals[index[i + 2] * 3], object.normals[index[i + 2] * 3 + 1], object.normals[index[i + 2] * 3 + 2]};
+    /* bitangents */
     Vect3D BT1 = {object.bitangents[index[i] * 3], object.bitangents[index[i] * 3 + 1], object.bitangents[index[i] * 3 + 2]};
     Vect3D BT2 = {object.bitangents[index[i + 1] * 3], object.bitangents[index[i + 1] * 3 + 1], object.bitangents[index[i + 1] * 3 + 2]};
     Vect3D BT3 = {object.bitangents[index[i + 2] * 3], object.bitangents[index[i + 2] * 3 + 1], object.bitangents[index[i + 2] * 3 + 2]};
+    /* tangents */
     Vect3D T1 = {object.tangents[index[i] * 3], object.tangents[index[i] * 3 + 1], object.tangents[index[i] * 3 + 2]};
     Vect3D T2 = {object.tangents[index[i + 1] * 3], object.tangents[index[i + 1] * 3 + 1], object.tangents[index[i + 1] * 3 + 2]};
     Vect3D T3 = {object.tangents[index[i + 2] * 3], object.tangents[index[i + 2] * 3 + 1], object.tangents[index[i + 2] * 3 + 2]};
 
-    /*check if UVs are correctly set in bounds ... if not , we use modulus*/
+    /*check if UVs are correctly set in bounds ... if not , we clamp*/
     auto clamp_uv = [&](Point2D P) {
       if (P.x > 1.f)
         P.x = std::fmod(P.x, 1.f);
