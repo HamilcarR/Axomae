@@ -134,8 +134,9 @@ void HdrTextureViewerWidget::display(const std::vector<float> &img, int width, i
     image = std::make_unique<QImage>(raw_display_data.data(), width, height, QImage::Format_RGB888);
   else if (channels == 4)
     image = std::make_unique<QImage>(raw_display_data.data(), width, height, QImage::Format_RGBA8888);
-  assert(channels == 3 || channels == 4);  // Other cases for later
-  label = std::make_unique<CustomLabelImageTex>(rgb_under_mouse_str, this);
+  assert(channels == 3 || channels == 4);
+  if (!label)
+    label = std::make_unique<CustomLabelImageTex>(rgb_under_mouse_str, this);
   label->setPixmap(QPixmap::fromImage(*image));
 }
 
