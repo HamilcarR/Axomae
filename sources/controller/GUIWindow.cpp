@@ -854,7 +854,9 @@ namespace controller {
     if (!uv_editor_mesh_list)
       return;
     QList<QListWidgetItem *> selected_items = uv_editor_mesh_list->selectedItems();
-    int index = uv_editor_mesh_list->row(selected_items.at(0));
+    if (selected_items.empty())
+      return;
+    int index = uv_editor_mesh_list->row(selected_items.first());
     bool valid = uv_mesh_selector.setCurrent(index);
     if (valid)
       project_uv_normals();
