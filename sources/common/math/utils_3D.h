@@ -17,26 +17,28 @@ namespace math {
       }
     };
 
-    struct Vect3D {
-      float x;
-      float y;
-      float z;
-
+    class Vect3D {
+     public:
       friend std::ostream &operator<<(std::ostream &os, const Vect3D &v) {
         os << "(" << v.x << "," << v.y << "," << v.z << ")";
         return os;
       }
 
       void print() { std::cout << x << "     " << y << "      " << z << "\n"; }
-      float magnitude() { return std::sqrt(x * x + y * y + z * z); }
-      void normalize() {
+      inline float magnitude() { return std::sqrt(x * x + y * y + z * z); }
+      inline void normalize() {
         auto mag = this->magnitude();
         x = std::abs(x / mag);
         y = std::abs(y / mag);
         z = std::abs(z / mag);
       }
-      float dot(Vect3D V) { return x * V.x + y * V.y + z * V.z; }
+      inline float dot(Vect3D V) { return x * V.x + y * V.y + z * V.z; }
+
+      float x;
+      float y;
+      float z;
     };
+
   }  // namespace geometry
 }  // namespace math
 #endif
