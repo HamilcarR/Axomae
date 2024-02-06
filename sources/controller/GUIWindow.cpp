@@ -231,6 +231,10 @@ namespace controller {
     _UI.renderer_envmap_list->setWidget(viewer_3d);
     viewer_3d->getRenderer().getRenderPipeline().setProgressManager(progress_manager.get());
 
+    /* UV editor initialization*/
+    uv_editor_mesh_list = _UI.meshes_list;
+    uv_editor_mesh_list->setSceneSelector(&uv_mesh_selector);
+
     /*Lighting GUI initialization*/
     light_controller = std::make_unique<LightController>(_UI);
     light_controller->setup(viewer_3d, renderer_scene_list);
@@ -445,6 +449,9 @@ namespace controller {
 
     /*Renderer tab -> Lighting -> Point lights*/
     light_controller->connect_all_slots();
+
+    /*Renderer tab -> UV editor -> mesh list*/
+    QObject::connect(uv_editor_mesh_list, SIGNAL(itemSelectionChanged()), this, SLOT(select_uv_editor_item()));
   }
 
   /*SLOTS*/
@@ -658,8 +665,7 @@ namespace controller {
 
   // TODO: [AX-26] Optimize the normals projection on UVs in the UV tool
   void Controller::project_uv_normals() {
-    SceneSelector &instance = SceneSelector::getInstance();
-    Mesh *retrieved_mesh = instance.getCurrent();
+    Mesh *retrieved_mesh = uv_mesh_selector.getCurrent();
     if (retrieved_mesh) {
       TextureViewerWidget *view = _UI.uv_projection;
       try {
@@ -679,9 +685,8 @@ namespace controller {
       IO::Loader loader(progress_manager.get());
       auto struct_holder = loader.load(filename.toStdString().c_str());
       std::vector<Mesh *> scene = struct_holder.first;
-      SceneSelector &instance = SceneSelector::getInstance();
       viewer_3d->setNewScene(struct_holder);
-      instance.setScene(scene);
+      uv_mesh_selector.setScene(scene);
       _UI.meshes_list->setList(scene);
       SceneTree &scene_hierarchy = viewer_3d->getRenderer().getScene().getSceneTreeRef();
       _UI.renderer_scene_list->setScene(scene_hierarchy);
@@ -691,12 +696,14 @@ namespace controller {
   }
   /**************************************************************************************************************/
   void Controller::next_mesh() {
-    SceneSelector::getInstance().toNext();
+    uv_mesh_selector.toNext();
+    uv_editor_mesh_list->setSelected(uv_mesh_selector.getCurrentId());
     project_uv_normals();
   }
   /**************************************************************************************************************/
   void Controller::previous_mesh() {
-    SceneSelector::getInstance().toPrevious();
+    uv_mesh_selector.toPrevious();
+    uv_editor_mesh_list->setSelected(uv_mesh_selector.getCurrentId());
     project_uv_normals();
   }
 
@@ -841,7 +848,17 @@ namespace controller {
   }
 
   /**************************************************************************************************************/
-  /*Protected utility methods*/
+  /* SLOTS */
+
+  void Controller::select_uv_editor_item() {
+    if (!uv_editor_mesh_list)
+      return;
+    QList<QListWidgetItem *> selected_items = uv_editor_mesh_list->selectedItems();
+    int index = uv_editor_mesh_list->row(selected_items.at(0));
+    bool valid = uv_mesh_selector.setCurrent(index);
+    if (valid)
+      project_uv_normals();
+  }
 
   void Controller::update_smooth_factor(int factor) { _UI.smooth_factor->setValue(factor); }
 

@@ -4,8 +4,8 @@
 #include "BoundingBox.h"
 #include "Camera.h"
 #include "Material.h"
-#include "Visitor.h"
 #include "Object3D.h"
+#include "Visitor.h"
 /**
  * @brief Mesh.h
  * Mesh class implementation
@@ -230,7 +230,7 @@ class Mesh : public SceneTreeNode {
    *
    * @return std::string
    */
-  std::string getMeshName() { return name; }
+  const std::string &getMeshName() const { return name; }
 
   /**
    * @brief Set the Mesh Name

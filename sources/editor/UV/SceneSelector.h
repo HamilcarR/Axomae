@@ -10,17 +10,17 @@
 
 class SceneSelector {
  public:
-  static SceneSelector &getInstance();
+  SceneSelector();
   void setScene(std::vector<Mesh *> &meshes);
   void toNext();
   void toPrevious();
   Mesh *getCurrent();
+  bool setCurrent(int new_current_mesh);
+  int getCurrentId() { return current_mesh_index; }
 
  private:
-  SceneSelector();
-  std::vector<Mesh *> scene;
-  unsigned int mesh_index;
-  static SceneSelector *instance;
+  std::vector<Mesh *> scene{};
+  int current_mesh_index{};
 };
 
 #endif
