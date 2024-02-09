@@ -6,7 +6,7 @@
 #include "RenderPipeline.h"
 #include "Scene.h"
 
-/* Use this for now , later we read config values from file*/
+// TODO : read config values from file/cmd
 static texture::envmap::EnvmapBakingConfig generate_config() {
   texture::envmap::EnvmapBakingConfig config{};
   config.skybox_dim.width = 2048;

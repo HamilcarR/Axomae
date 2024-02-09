@@ -37,6 +37,8 @@ namespace IO {
 
   image::ImageHolder<float> Loader::loadHdr(const char *path, bool store) {
     int width = -1, height = -1, channels = -1;
+    controller::ProgressManagerHelper helper(this);
+    helper.notifyProgress(controller::ProgressManagerHelper::ZERO);
     float *data = stbi_loadf(path, &width, &height, &channels, 0);
     if (stbi_failure_reason())
       throw exception::LoadImagePathException(path);
@@ -45,13 +47,11 @@ namespace IO {
     if (channels <= 0)
       throw exception::LoadImageChannelException(channels);
     std::vector<float> image_data;
+    helper.notifyProgress(controller::ProgressManagerHelper::TWO_FOURTH);
     image_data.reserve(width * height * channels);
     initProgress("Importing environment map", width * height * channels);
-    controller::ProgressManagerHelper helper(this);
-    helper.notifyProgress(controller::ProgressManagerHelper::ZERO);
     for (int i = 0; i < width * height * channels; i++)
       image_data.push_back(data[i]);
-    helper.notifyProgress(controller::ProgressManagerHelper::COMPLETE);
     image::Metadata metadata;
     metadata.channels = channels;
     metadata.width = width;
@@ -61,12 +61,13 @@ namespace IO {
     std::string name = utils::string::tokenize(path_str, '/').back();
     metadata.name = name;
     metadata.color_corrected = false;
-
+    helper.notifyProgress(controller::ProgressManagerHelper::THREE_FOURTH);
     if (store) {
       auto &hdr_database = resource_database->getHdrDatabase();
       database::image::store<float>(hdr_database, false, image_data, metadata);
     }
     stbi_image_free(data);
+    helper.notifyProgress(controller::ProgressManagerHelper::COMPLETE);
     return image::ImageHolder<float>(image_data, metadata);
   }
 
