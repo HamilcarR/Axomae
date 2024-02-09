@@ -65,7 +65,7 @@ namespace controller {
     void change_nmap_attenuation(int atten);
     void compute_dudv();
     void change_dudv_nmap(int factor);
-    void compute_projection();
+    void cubemap_baking();
     void next_mesh();
     void previous_mesh();
     void project_uv_normals();

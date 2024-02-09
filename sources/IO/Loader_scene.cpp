@@ -1,8 +1,6 @@
-#include "DebugGL.h"
 #include "INodeFactory.h"
 #include "Loader.h"
 #include "LoaderSharedExceptions.h"
-#include "Mutex.h"
 #include "PerformanceLogger.h"
 #include "ShaderFactory.h"
 #include "TextureFactory.h"
@@ -453,8 +451,7 @@ namespace IO {
    * @return a pair containing a vector of Mesh pointers and a SceneTree object.
    */
 
-  std::pair<std::vector<Mesh *>, SceneTree> Loader::loadObjects(
-      const char *file) {  // TODO! return scene data structure , with lights + meshes + cameras
+  std::pair<std::vector<Mesh *>, SceneTree> Loader::loadObjects(const char *file) {
     ShaderDatabase &shader_database = resource_database->getShaderDatabase();
     INodeDatabase &node_database = resource_database->getNodeDatabase();
 

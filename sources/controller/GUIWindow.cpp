@@ -426,7 +426,7 @@ namespace controller {
     QObject::connect(_UI.factor_slider_dudv, SIGNAL(valueChanged(int)), this, SLOT(change_dudv_nmap(int)));
     QObject::connect(_UI.use_gpu, SIGNAL(clicked(bool)), this, SLOT(use_gpgpu(bool)));
 
-    QObject::connect(_UI.bake_texture, SIGNAL(clicked()), this, SLOT(compute_projection()));
+    QObject::connect(_UI.bake_texture, SIGNAL(clicked()), this, SLOT(cubemap_baking()));
     QObject::connect(_UI.actionImport_3D_model, SIGNAL(triggered()), this, SLOT(import_3DOBJ()));
 
     QObject::connect(_UI.next_mesh_button, SIGNAL(clicked()), this, SLOT(next_mesh()));
@@ -655,7 +655,7 @@ namespace controller {
   }
 
   /**************************************************************************************************************/
-  void Controller::compute_projection() {  // TODO : complete uv projection method , implement baking
+  void Controller::cubemap_baking() {  // TODO : complete uv projection method , implement baking
     int width = _UI.uv_width->value();
     int height = _UI.uv_height->value();
     width = 0;

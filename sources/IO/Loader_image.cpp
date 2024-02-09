@@ -45,14 +45,13 @@ namespace IO {
     if (channels <= 0)
       throw exception::LoadImageChannelException(channels);
     std::vector<float> image_data;
-    image_data.resize(width * height * channels);
+    image_data.reserve(width * height * channels);
     initProgress("Importing environment map", width * height * channels);
     controller::ProgressManagerHelper helper(this);
-    for (int i = 0; i < width * height * channels; i++) {
-      helper.notifyProgress(i);
-      image_data[i] = data[i];
-    }
-
+    helper.notifyProgress(controller::ProgressManagerHelper::ZERO);
+    for (int i = 0; i < width * height * channels; i++)
+      image_data.push_back(data[i]);
+    helper.notifyProgress(controller::ProgressManagerHelper::COMPLETE);
     image::Metadata metadata;
     metadata.channels = channels;
     metadata.width = width;

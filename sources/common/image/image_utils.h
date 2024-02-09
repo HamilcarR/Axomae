@@ -78,13 +78,12 @@ namespace hdr_utils {
     assert(max > 0);
     if (needs_color_correct)
       max = color_correction(max);
-
+    int index = 0;
+    if (progress)
+      progress->notifyProgress(controller::ProgressManagerHelper::ZERO);
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
-        int index = (i * width + j) * channels;
-        if (progress) {
-          progress->notifyProgress(static_cast<float>(index));
-        }
+        index = (i * width + j) * channels;
         T r, g, b;
         if (needs_color_correct) {
           r = (color_correction(rgb[index])) / max;
