@@ -2,35 +2,38 @@
 #include "Loader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "GenericException.h"
 #include "LoaderSharedExceptions.h"
 #include "axomae_utils.h"
 #include "stb_image.h"
 #include "stb_image_write.h"
+
+namespace exception {
+  class LoadImagePathException : public GenericException {
+   public:
+    explicit LoadImagePathException(const std::string &path) : GenericException() {
+      GenericException::saveErrorString(std::string("Failed processing path for image : ") + path);
+    }
+  };
+
+  class LoadImageDimException : public GenericException {
+   public:
+    explicit LoadImageDimException(int width, int height) : GenericException() {
+      std::string dim = std::string("width : ") + std::to_string(width) + std::string(" height:") + std::to_string(height);
+      GenericException::saveErrorString(std::string("Image dimensions error: ") + dim);
+    }
+  };
+
+  class LoadImageChannelException : public GenericException {
+   public:
+    explicit LoadImageChannelException(int channels) : GenericException() {
+      std::string chan = std::string("channels number : ") + std::to_string(channels);
+      GenericException::saveErrorString(std::string("Image channel error: ") + chan);
+    }
+  };
+}  // namespace exception
+
 namespace IO {
-  namespace exception {
-    class LoadImagePathException : public GenericException {
-     public:
-      explicit LoadImagePathException(const std::string &path) {
-        GenericException::saveErrorString(std::string("Failed processing path for image : ") + path);
-      }
-    };
-
-    class LoadImageDimException : public GenericException {
-     public:
-      explicit LoadImageDimException(int width, int height) {
-        std::string dim = std::string("width : ") + std::to_string(width) + std::string(" height:") + std::to_string(height);
-        GenericException::saveErrorString(std::string("Image dimensions error: ") + dim);
-      }
-    };
-
-    class LoadImageChannelException : public GenericException {
-     public:
-      explicit LoadImageChannelException(int channels) {
-        std::string chan = std::string("channels number : ") + std::to_string(channels);
-        GenericException::saveErrorString(std::string("Image channel error: ") + chan);
-      }
-    };
-  }  // namespace exception
 
   image::ImageHolder<float> Loader::loadHdr(const char *path, bool store) {
     int width = -1, height = -1, channels = -1;
@@ -54,6 +57,7 @@ namespace IO {
     metadata.channels = channels;
     metadata.width = width;
     metadata.height = height;
+    metadata.is_hdr = true;
     std::string path_str(path);
     std::string name = utils::string::tokenize(path_str, '/').back();
     metadata.name = name;

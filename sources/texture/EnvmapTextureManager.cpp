@@ -50,7 +50,7 @@ void EnvmapTextureManager::initializeDefaultEnvmap() {
       IO::Loader loader(nullptr);
       loader.loadHdr(config.default_envmap_path.c_str());
       current = bakes_id.back();
-    } catch (GenericException &e) {
+    } catch (const exception::GenericException &e) {
       LOG(e.what(), LogLevel::ERROR);
     }
   }

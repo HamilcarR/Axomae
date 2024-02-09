@@ -14,6 +14,7 @@ INCLUDEPATH += $$PWD/../../IO \
                 $$PWD/../../renderer \
                 $$PWD/../../controller \
                 $$PWD/../../common\
+                $$PWD/../../common/exception\
                 $$PWD/../../config\
                 $$PWD/../../editor\
 

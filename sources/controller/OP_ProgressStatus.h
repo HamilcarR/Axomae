@@ -46,7 +46,8 @@ namespace controller {
     void initProgress(const std::string &message, float target);
     void setProgressStatusText(const std::string &mes) { message = mes; }
     void resetProgress();
-    float &getCurrentRefVar() { return current; }
+    void setCurrent(float current_val) { current = current_val; }
+    float getTarget() { return target; }
 
    protected:
     ProgressStatus *progress_manager{};
@@ -57,12 +58,16 @@ namespace controller {
 
   /* Provide an object of this class to functions to avoid passing around an IProgressManager "this" pointers*/
   class ProgressManagerHelper {
+
    public:
-    explicit ProgressManagerHelper(IProgressManager *pm) : progress_helpee(pm) {}
+    enum PROGRESS_FLAG : unsigned { ZERO = 0, ONE_FOURTH = 1, TWO_FOURTH = 2, THREE_FOURTH = 3, COMPLETE = 4 };
+    explicit ProgressManagerHelper(IProgressManager *pm) : progress_manager(pm) {}
     void notifyProgress(float prog);
+    void notifyProgress(PROGRESS_FLAG flag);
+    void reset();
 
    private:
-    IProgressManager *progress_helpee;
+    IProgressManager *progress_manager;
   };
 }  // namespace controller
 #endif

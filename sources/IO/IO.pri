@@ -15,5 +15,6 @@ INCLUDEPATH += $$PWD/../vendor \
                 $$PWD/../gpu/opengl/shader \
                 $$PWD/../texture \
                 $$PWD/../common \
+                $$PWD/../common/exception \
                 $$PWD/../debug \
                 

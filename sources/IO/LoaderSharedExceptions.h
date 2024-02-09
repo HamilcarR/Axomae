@@ -2,16 +2,14 @@
 #define LOADERSHAREDEXCEPTIONS_H
 #include "GenericException.h"
 
-namespace IO {
-  namespace exception {
-    class LoadFilePathException : public GenericException {
-     public:
-      explicit LoadFilePathException(const std::string &path) {
-        GenericException::saveErrorString(std::string("Failed processing path for image : ") + path);
-      }
-    };
-  }  // namespace exception
+namespace exception {
+  class LoadFilePathException : public exception::GenericException {
+   public:
+    explicit LoadFilePathException(const std::string &path) {
+      GenericException::saveErrorString(std::string("Failed processing path for image : ") + path);
+    }
+  };
 
-}  // namespace IO
+}  // namespace exception
 
 #endif  // LOADERSHAREDEXCEPTIONS_H

@@ -1,7 +1,7 @@
 #ifndef API_H
 #define API_H
 #include "Config.h"
-#include "Operator.h"
+
 #include "api_namespaces.h"
 
 /**
@@ -18,13 +18,14 @@ namespace controller::cmd {
     const ApplicationConfig &getConfig() { return config; }
     void disableLogging();
     void enableLogging();
-    void enableGui();
-    void disableGui();
+    void enableEditor();
+    void disableEditor();
     void bakeTexture(const texturing::INPUTENVMAPDATA &data);
     void enableGpu();
     void configure();
     void configureDefault();
-    void viewer(const std::string &file);
+    void launchHdrTextureViewer(const std::string &file);
+    void setUvEditorOptions(const uv::UVEDITORDATA &data);
 
    private:
     int *argv;

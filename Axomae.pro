@@ -10,7 +10,7 @@ system(./scripts/stringify.sh $(pwd) )
 
 ########################################################################################
 # Input
-OBJECTS_DIR = $$PWD/"generated files"
+
 MOC_DIR = $$PWD/moc
 RESOURCES += Ressources/Resource.qrc
 
@@ -37,15 +37,17 @@ ASAN_FLAG = -fsanitize=address
 ASAN_LIB = -lasan
 #QMAKE_DEFAULT_INCDIRS += -I/usr/include/c++/12
 
-CONFIG(release , debug|release): {
-    QMAKE_CXXFLAGS += -std=c++17 -Wall -pedantic -Wno-unused -O3
+CONFIG(release , debug|release):{
+    OBJECTS_DIR = $$PWD/bin/release/"generated files"
+    QMAKE_CXXFLAGS += -std=c++17 -Wall -Wextra -pedantic -Wno-unused -O3
     CUDA_OPTI_FLAG = -Xptxas -O3 -use_fast_math
     QMAKE_LFLAGS_RELEASE += -flto
     TARGET = Axomae_release
 }
 
 CONFIG(debug , debug|release):{
-    QMAKE_CXXFLAGS += $$ASAN_FLAG -std=c++17 -g -pg -Wall -pedantic -Wno-unused
+    OBJECTS_DIR = $$PWD/bin/debug/"generated files"
+    QMAKE_CXXFLAGS += $$ASAN_FLAG -std=c++17 -g -pg -Wall -Wextra -pedantic -Wno-unused
     CUDA_OPTI_FLAG = -Xptxas -use_fast_math
     LIBS += $$ASAN_LIB
     TARGET = Axomae_debug

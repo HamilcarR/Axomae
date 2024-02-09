@@ -250,7 +250,7 @@ namespace controller {
 
   Controller::~Controller() { delete _MemManagement; }
 
-  void Controller::setApplicationConfig(const ApplicationConfig &application) {}
+  void Controller::setApplicationConfig(const ApplicationConfig &config) { global_application_config = config; }
 
   /**************************************************************************************************************/
   void Controller::display_image(SDL_Surface *surf, IMAGETYPE type, bool save_in_heap) {
@@ -488,8 +488,9 @@ namespace controller {
       try {
         IO::Loader loader(progress_manager.get());
         loader.loadHdr(filename.toStdString().c_str());
-      } catch (GenericException &e) {
+      } catch (exception::GenericException &e) {
         LOG(e.what(), LogLevel::ERROR);
+        return false;
       }
       return true;
     }
@@ -669,9 +670,12 @@ namespace controller {
     if (retrieved_mesh) {
       TextureViewerWidget *view = _UI.uv_projection;
       try {
-        std::vector<uint8_t> surf = ImageManager::project_uv_normals(retrieved_mesh->geometry, 1000, 1000, true);
-        view->display(surf, 1000, 1000, 3);
-      } catch (const GenericException &e) {
+        int width = global_application_config.getUvEditorResolutionWidth();
+        int height = global_application_config.getUvEditorResolutionHeight();
+        bool tangent = global_application_config.isUvEditorTangentSpace();
+        std::vector<uint8_t> surf = ImageManager::project_uv_normals(retrieved_mesh->geometry, width, height, tangent);
+        view->display(surf, width, height, 3);
+      } catch (const exception::GenericException &e) {
         LOG(e.what(), LogLevel::ERROR);
       }
     }
@@ -682,6 +686,7 @@ namespace controller {
     if (!filename.isEmpty()) {
       resource_database.getNodeDatabase().clean();
       resource_database.getTextureDatabase().clean();
+      resource_database.getRawImgdatabase().clean();
       IO::Loader loader(progress_manager.get());
       auto struct_holder = loader.load(filename.toStdString().c_str());
       std::vector<Mesh *> scene = struct_holder.first;

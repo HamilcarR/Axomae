@@ -4,7 +4,6 @@
 #include "OfflineCubemapProcessing.h"
 #include "TextureViewerWidget.h"
 #include "constants.h"
-#include "image_utils.h"
 
 namespace controller::cmd {
 
@@ -15,11 +14,11 @@ namespace controller::cmd {
 
   void API::disableLogging() { config.loggerSetState(false); }
   void API::enableLogging() { config.loggerSetState(true); }
-  void API::enableGui() { config.setGuiLaunched(true); }
-  void API::disableGui() { config.setGuiLaunched(false); }
+  void API::enableEditor() { config.setEditorLaunched(true); }
+  void API::disableEditor() { config.setEditorLaunched(false); }
   void API::enableGpu() { config.setGpu(true); }
 
-  void API::viewer(const std::string &file) {
+  void API::launchHdrTextureViewer(const std::string &file) {
     IO::Loader loader(nullptr);
     try {
       image::ImageHolder<float> data = loader.loadHdr(file.c_str(), false);
@@ -27,7 +26,7 @@ namespace controller::cmd {
       HdrTextureViewerWidget tex(data);
       tex.show();
       qapp.exec();
-    } catch (const GenericException &e) {
+    } catch (const exception::GenericException &e) {
       std::cerr << e.what();
     }
   }
@@ -51,8 +50,15 @@ namespace controller::cmd {
       HdrTextureViewerWidget tex(hdr);
       tex.show();
       qapp.exec();
-    } catch (const GenericException &e) {
+    } catch (const exception::GenericException &e) {
       std::cerr << e.what();
     }
   }
+
+  void API::setUvEditorOptions(const uv::UVEDITORDATA &data) {
+    config.setUvEditorNormalProjectionMode(data.projection_type == "tangent");
+    config.setUvEditorResolutionWidth(data.resolution_width);
+    config.setUvEditorResolutionHeight(data.resolution_height);
+  }
+
 }  // namespace controller::cmd

@@ -104,7 +104,7 @@ namespace controller {
    private:
     Ui::MainWindow _UI;
     GLViewer *viewer_3d;
-
+    ApplicationConfig global_application_config{};
     SceneListView *renderer_scene_list;
     std::unique_ptr<LightController> light_controller;
     ResourceDatabaseManager &resource_database;

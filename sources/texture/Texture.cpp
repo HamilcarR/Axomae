@@ -82,11 +82,9 @@ void Texture::set(TextureData *texture) {
   width = texture->width;
   height = texture->height;
   if (!texture->data.empty()) {
-    data.resize(width * height);
     data = texture->data;
   }
   if (!texture->f_data.empty()) {
-    f_data.resize(width * height * texture->nb_components);
     f_data = texture->f_data;
   }
   data_format = static_cast<Texture::FORMAT>(texture->data_format);

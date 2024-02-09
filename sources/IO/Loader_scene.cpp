@@ -9,13 +9,9 @@
 #include "axomae_utils.h"
 #include <QImage>
 
-/**
- * @file Loader.cpp
- * Loader implementation
- *
- */
-
 namespace IO {
+  namespace exception {}
+
   Loader::Loader(controller::ProgressStatus *prog_stat) : resource_database(&ResourceDatabaseManager::getInstance()) {
     setProgressManager(prog_stat);
   }
@@ -40,7 +36,7 @@ namespace IO {
       range_max = i * thread_buffer_size + thread_buffer_size;
       if (i == THREAD_POOL_SIZE - 1)
         range_max = i * thread_buffer_size + last_thread_job_size;
-      future_results.push_back(std::async(thread_copy_buffer, range_min, range_max, from, dest));
+      future_results.push_back(std::async(std::launch::async, thread_copy_buffer, range_min, range_max, from, dest));
     }
     for (auto &future_result : future_results) {
       future_result.get();
@@ -57,17 +53,17 @@ namespace IO {
                          aiTexture *fromtexture,
                          const std::string &texture_type,
                          controller::IProgressManager *progress_manager) {
+
     if (fromtexture != nullptr) {
       /* If mHeight != 0 , the texture is uncompressed , and we read it as is */
       if (fromtexture->mHeight != 0) {
         unsigned int width = 0;
         unsigned int height = 0;
-
         totexture->width = width = fromtexture->mWidth;
         totexture->height = height = fromtexture->mHeight;
         totexture->data.resize(totexture->width * totexture->height);
 
-        progress_manager->initProgress(std::string("Loading ") + texture_type + " Texture", static_cast<float>(width * height));
+        progress_manager->initProgress(std::string("Loading texture  ") + texture_type, static_cast<float>(width * height));
         controller::ProgressManagerHelper progress_helper(progress_manager);
 
         for (unsigned int i = 0; i < width * height; i++) {
@@ -85,23 +81,24 @@ namespace IO {
       {
         QImage image;
         std::vector<uint8_t> buffer;
-        buffer.resize(fromtexture->mWidth);
-        std::memcpy(buffer.data(), fromtexture->pcData, fromtexture->mWidth);
+        progress_manager->initProgress(std::string("Loading texture  ") + texture_type, static_cast<float>(fromtexture->mWidth));
+        controller::ProgressManagerHelper progress_helper(progress_manager);
+        progress_helper.notifyProgress(controller::ProgressManagerHelper::ONE_FOURTH);
 
-        image.loadFromData((const unsigned char *)buffer.data(), fromtexture->mWidth);
+        image.loadFromData((const unsigned char *)fromtexture->pcData, static_cast<int>(fromtexture->mWidth));
         image = image.convertToFormat(QImage::Format_ARGB32);
+        progress_helper.notifyProgress(controller::ProgressManagerHelper::THREE_FOURTH);
 
         unsigned image_width = image.width();
         unsigned image_height = image.height();
         totexture->data.resize(image_width * image_height);
-        std::memset(&totexture->data[0], 0, image_width * image_height * sizeof(uint32_t));
         uint8_t *dest_buffer = reinterpret_cast<uint8_t *>(&totexture->data[0]);
         uint8_t *from_buffer = image.bits();
-
         async_copy_buffer(image_width, image_height, from_buffer, dest_buffer);
-
+        progress_helper.notifyProgress(controller::ProgressManagerHelper::COMPLETE);
         totexture->width = image_width;
         totexture->height = image_height;
+        progress_helper.reset();
         LOG("image of size " + std::to_string(totexture->width) + " x " + std::to_string(totexture->height) + " uncompressed ", LogLevel::INFO);
       }
     }
@@ -128,10 +125,12 @@ namespace IO {
                           Material *material,
                           TextureData *texture,
                           const aiString &texture_string,
-                          TextureDatabase &texture_database,
+                          ResourceDatabaseManager &resource_manager,
                           controller::IProgressManager *progress_manager) {
     std::string texture_index_string = texture_string.C_Str();
     std::string texture_type = texture->name;
+    TextureDatabase &texture_database = resource_manager.getTextureDatabase();
+    RawImageDatabase &image_database = resource_manager.getRawImgdatabase();
     if (!texture_index_string.empty()) {
       texture_index_string = texture_index_string.substr(1);  // get rid of the '*' character at the beginning of the string id
       texture->name = texture_index_string;
@@ -142,6 +141,15 @@ namespace IO {
         int texture_index_int = stoi(texture_index_string);                                        // convert id to integer
         copyTexels(texture, scene->mTextures[texture_index_int], texture_type, progress_manager);  // read the image pixels and copy them to "texture"
         auto result_add = database::texture::store<TEXTYPE>(texture_database, false, texture);     // add new ID
+        image::Metadata metadata;
+        metadata.width = texture->width;
+        metadata.height = texture->height;
+        metadata.channels = 4;
+        metadata.is_hdr = false;
+        metadata.name = texture->name;
+
+        std::vector<uint8_t> bytearray(metadata.width * metadata.height * metadata.channels);
+        std::memcpy(bytearray.data(), texture->data.data(), metadata.width * metadata.height * metadata.channels);
         material->addTexture(result_add.id);
       }
     } else
@@ -159,7 +167,7 @@ namespace IO {
    */
   static Material loadAllTextures(const aiScene *scene,
                                   const aiMaterial *material,
-                                  TextureDatabase &texture_database,
+                                  ResourceDatabaseManager &resource_manager,
                                   controller::IProgressManager *progress_manager) {
     Material mesh_material;
     std::vector<Texture::TYPE> dummy_textures_type;
@@ -177,52 +185,52 @@ namespace IO {
         occlusion_texture;  // we get indexes of embedded textures , since we will use GLB format
     if (material->GetTextureCount(aiTextureType_BASE_COLOR) > 0) {
       material->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE, &color_texture);
-      loadTexture<DiffuseTexture>(scene, &mesh_material, &diffuse, color_texture, texture_database, progress_manager);
+      loadTexture<DiffuseTexture>(scene, &mesh_material, &diffuse, color_texture, resource_manager, progress_manager);
     } else
-      loadTextureDummy<DiffuseTexture>(&mesh_material, texture_database);
+      loadTextureDummy<DiffuseTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_OPACITY) > 0) {
       mesh_material.setTransparency(true);
       material->GetTexture(aiTextureType_OPACITY, 0, &opacity_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture<OpacityTexture>(scene, &mesh_material, &opacity, opacity_texture, texture_database, progress_manager);
+      loadTexture<OpacityTexture>(scene, &mesh_material, &opacity, opacity_texture, resource_manager, progress_manager);
     } else
-      loadTextureDummy<OpacityTexture>(&mesh_material, texture_database);
+      loadTextureDummy<OpacityTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_METALNESS) > 0) {
       material->GetTexture(AI_MATKEY_METALLIC_TEXTURE, &metallic_texture);
-      loadTexture<MetallicTexture>(scene, &mesh_material, &metallic, metallic_texture, texture_database, progress_manager);
+      loadTexture<MetallicTexture>(scene, &mesh_material, &metallic, metallic_texture, resource_manager, progress_manager);
     } else
-      loadTextureDummy<MetallicTexture>(&mesh_material, texture_database);
+      loadTextureDummy<MetallicTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS) > 0) {
       material->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE, &roughness_texture);
-      loadTexture<RoughnessTexture>(scene, &mesh_material, &roughness, roughness_texture, texture_database, progress_manager);
+      loadTexture<RoughnessTexture>(scene, &mesh_material, &roughness, roughness_texture, resource_manager, progress_manager);
     } else
-      loadTextureDummy<RoughnessTexture>(&mesh_material, texture_database);
+      loadTextureDummy<RoughnessTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_NORMALS) > 0) {
       material->GetTexture(aiTextureType_NORMALS, 0, &normal_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture<NormalTexture>(scene, &mesh_material, &normal, normal_texture, texture_database, progress_manager);
+      loadTexture<NormalTexture>(scene, &mesh_material, &normal, normal_texture, resource_manager, progress_manager);
     } else
-      loadTextureDummy<NormalTexture>(&mesh_material, texture_database);
+      loadTextureDummy<NormalTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_LIGHTMAP) > 0) {
       material->GetTexture(aiTextureType_LIGHTMAP, 0, &occlusion_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture<AmbiantOcclusionTexture>(scene, &mesh_material, &ambiantocclusion, occlusion_texture, texture_database, progress_manager);
+      loadTexture<AmbiantOcclusionTexture>(scene, &mesh_material, &ambiantocclusion, occlusion_texture, resource_manager, progress_manager);
     } else
-      loadTextureDummy<AmbiantOcclusionTexture>(&mesh_material, texture_database);
+      loadTextureDummy<AmbiantOcclusionTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_SHEEN) > 0) {
       material->GetTexture(aiTextureType_SHEEN, 0, &specular_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture<SpecularTexture>(scene, &mesh_material, &specular, specular_texture, texture_database, progress_manager);
+      loadTexture<SpecularTexture>(scene, &mesh_material, &specular, specular_texture, resource_manager, progress_manager);
     } else
-      loadTextureDummy<SpecularTexture>(&mesh_material, texture_database);
+      loadTextureDummy<SpecularTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_EMISSIVE) > 0) {
       material->GetTexture(aiTextureType_EMISSIVE, 0, &emissive_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture<EmissiveTexture>(scene, &mesh_material, &emissive, emissive_texture, texture_database, progress_manager);
+      loadTexture<EmissiveTexture>(scene, &mesh_material, &emissive, emissive_texture, resource_manager, progress_manager);
     } else
-      loadTextureDummy<EmissiveTexture>(&mesh_material, texture_database);
+      loadTextureDummy<EmissiveTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     return mesh_material;
   }
@@ -240,10 +248,10 @@ namespace IO {
 
   std::pair<unsigned, Material> loadMaterials(const aiScene *scene,
                                               const aiMaterial *material,
-                                              TextureDatabase &texture_database,
+                                              ResourceDatabaseManager &resource_manager,
                                               unsigned id,
                                               controller::IProgressManager *progress_manager) {
-    Material mesh_material = loadAllTextures(scene, material, texture_database, progress_manager);
+    Material mesh_material = loadAllTextures(scene, material, resource_manager, progress_manager);
     float transparency_factor = loadTransparencyValue(material);
     mesh_material.setTransparency(transparency_factor);
     return {id, mesh_material};
@@ -447,7 +455,6 @@ namespace IO {
 
   std::pair<std::vector<Mesh *>, SceneTree> Loader::loadObjects(
       const char *file) {  // TODO! return scene data structure , with lights + meshes + cameras
-    TextureDatabase &texture_database = resource_database->getTextureDatabase();
     ShaderDatabase &shader_database = resource_database->getShaderDatabase();
     INodeDatabase &node_database = resource_database->getNodeDatabase();
 
@@ -469,7 +476,7 @@ namespace IO {
                                                    i)  //*We launch multiple threads loading the geometry , and the main thread loads the materials
         );
         aiMaterial *ai_mat = modelScene->mMaterials[modelScene->mMeshes[i]->mMaterialIndex];
-        material_array[i] = loadMaterials(modelScene, ai_mat, texture_database, i, this).second;
+        material_array[i] = loadMaterials(modelScene, ai_mat, *resource_database, i, this).second;
       }
       for (auto it = loaded_meshes_futures.begin(); it != loaded_meshes_futures.end(); it++) {
         std::pair<unsigned, std::unique_ptr<Object3D>> geometry_loaded = it->get();

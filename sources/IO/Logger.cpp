@@ -8,7 +8,7 @@
 
 static Logger logger_global;
 
-class LoggerOutputStreamException : virtual public GenericException {
+class LoggerOutputStreamException : public exception::GenericException {
  public:
   LoggerOutputStreamException() : GenericException() { saveErrorString("The output stream for the application logger system is undefined !"); }
   virtual ~LoggerOutputStreamException() {}

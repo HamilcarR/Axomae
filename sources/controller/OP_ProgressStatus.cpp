@@ -54,11 +54,38 @@ namespace controller {
   /******************************************************************************************************************************************/
 
   void ProgressManagerHelper::notifyProgress(float prog) {
-    if (!progress_helpee)
+    if (!progress_manager)
       return;
-    float &rf = progress_helpee->getCurrentRefVar();
-    rf = prog;
-    progress_helpee->notifyProgress();
+    progress_manager->setCurrent(prog);
+    progress_manager->notifyProgress();
   }
+
+  void ProgressManagerHelper::notifyProgress(PROGRESS_FLAG prog) {
+    if (!progress_manager)
+      return;
+    float target = progress_manager->getTarget();
+    switch (prog) {
+      case ZERO:
+        notifyProgress(0);
+        break;
+      case ONE_FOURTH:
+        notifyProgress(target / 4);
+        break;
+      case TWO_FOURTH:
+        notifyProgress(target / 2);
+        break;
+      case THREE_FOURTH:
+        notifyProgress(target * 3 / 4);
+        break;
+      case COMPLETE:
+        notifyProgress(target);
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  void ProgressManagerHelper::reset() { notifyProgress(ZERO); }
 
 }  // namespace controller

@@ -1,5 +1,6 @@
 #include "CmdArgs.h"
 #include "GUIWindow.h"
+#include "GenericException.h"
 #include "ImageImporter.h"
 #include <boost/program_options.hpp>
 #include <cstdlib>
@@ -7,25 +8,23 @@
 #include <iostream>
 #include <signal.h>
 #include <string>
-using namespace std;
 using namespace axomae;
 
-void init_graphics() {
+static void init_graphics() {
   if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-    cout << "SDL_Init problem : " << SDL_GetError() << endl;
+    std::cout << "SDL_Init problem : " << SDL_GetError() << "\n";
   }
   if (!IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG)) {
-
-    cout << "IMG init problem : " << IMG_GetError() << endl;
+    std::cout << "IMG init problem : " << IMG_GetError() << "\n";
   }
 }
 
-void cleanup() {
+static void cleanup() {
   IMG_Quit();
   SDL_Quit();
 }
 
-void sigsegv_handler(int signal) {
+static void sigsegv_handler(int signal) {
   try {
     LOG("Application crash", LogLevel::CRITICAL);
     LOGFLUSH();
@@ -35,6 +34,12 @@ void sigsegv_handler(int signal) {
     std::cerr << e.what();
   }
   abort();
+}
+
+static int exception_cleanup(const char *except_error) {
+  std::cerr << except_error << "\n";
+  cleanup();
+  return EXIT_FAILURE;
 }
 
 int main(int argv, char **argc) {
@@ -49,9 +54,9 @@ int main(int argv, char **argc) {
     try {
       options_manager.processArgs(argv, argc);
     } catch (const boost::program_options::error &e) {
-      std::cerr << e.what();
-      cleanup();
-      return EXIT_FAILURE;
+      return exception_cleanup(e.what());
+    } catch (const exception::CatastrophicFailureException &e) {
+      return exception_cleanup(e.what());
     }
     configuration = api.getConfig();
     LoggerConfigDataStruct log_conf = configuration.generateLoggerConfigDataStruct();

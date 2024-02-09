@@ -32,7 +32,7 @@ namespace exception {
 
 using namespace math::geometry;
 using ImageManager = axomae::ImageManager;
-float bounding_coords(float x, float y, float z, bool min) {
+inline float bounding_coords(float x, float y, float z, bool min) {
   if (min) {
     if (x <= y)
       return x <= z ? x : z;
@@ -44,16 +44,6 @@ float bounding_coords(float x, float y, float z, bool min) {
     else
       return y >= z ? y : z;
   }
-}
-
-/***************************************************************************************************************/
-/* Get barycentric coordinates of I in triangle P1P2P3 */
-inline Vect3D barycentric_lerp(Point2D P1, Point2D P2, Point2D P3, Point2D I) {
-  float W1 = ((P2.y - P3.y) * (I.x - P3.x) + (P3.x - P2.x) * (I.y - P3.y)) / ((P2.y - P3.y) * (P1.x - P3.x) + (P3.x - P2.x) * (P1.y - P3.y));
-  float W2 = ((P3.y - P1.y) * (I.x - P3.x) + (P1.x - P3.x) * (I.y - P3.y)) / ((P2.y - P3.y) * (P1.x - P3.x) + (P3.x - P2.x) * (P1.y - P3.y));
-  float W3 = 1 - W1 - W2;
-  Vect3D v = {W1, W2, W3};
-  return v;
 }
 
 /***************************************************************************************************************/
@@ -80,7 +70,7 @@ inline image::Rgb compute_normals_set_pixels_rgb(Point2D P1,
                                                  bool tangent_space) {
 
   Point2D I = {static_cast<float>(x), static_cast<float>(y)};
-  Vect3D C = barycentric_lerp(P1, P2, P3, I);
+  Vect3D C = math::geometry::barycentric_lerp(P1, P2, P3, I);
   if (C.x >= 0 && C.y >= 0 && C.z >= 0) {
     auto interpolate = [&C](Vect3D N1, Vect3D N2, Vect3D N3) {
       Vect3D normal = {N1.x * C.x + N2.x * C.y + N3.x * C.z, N1.y * C.x + N2.y * C.y + N3.y * C.z, N1.z * C.x + N2.z * C.y + N3.z * C.z};
@@ -134,7 +124,7 @@ void throwIfNotValid(const Object3D &object) {
 std::vector<uint8_t> ImageManager::project_uv_normals(const Object3D &object, int width, int height, bool tangent_space) {
   try {
     throwIfNotValid(object);
-  } catch (const GenericException &e) {
+  } catch (const exception::GenericException &e) {
     throw;
   }
 
@@ -185,7 +175,7 @@ std::vector<uint8_t> ImageManager::project_uv_normals(const Object3D &object, in
     int y_min = static_cast<int>(bounding_coords(P1.y, P2.y, P3.y, true));
     for (int x = x_min; x <= x_max; x++)
       for (int y = y_min; y <= y_max; y++) {
-        image::Rgb val = compute_normals_set_pixels_rgb(P1, P2, P3, N1, N2, N3, BT1, BT2, BT3, T1, T2, T3, x, y, true);
+        image::Rgb val = compute_normals_set_pixels_rgb(P1, P2, P3, N1, N2, N3, BT1, BT2, BT3, T1, T2, T3, x, y, tangent_space);
         int idx = (y * width + x) * 3;
         if (!(val == image::Rgb(0, 0, 0))) {
           raw_img[idx] = static_cast<uint8_t>(val.red);
