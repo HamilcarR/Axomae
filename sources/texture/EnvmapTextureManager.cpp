@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include "RenderPipeline.h"
 #include "Scene.h"
+#include "texture_utils.h"
 
 // TODO : read config values from file/cmd
 static texture::envmap::EnvmapBakingConfig generate_config() {
@@ -33,9 +34,9 @@ EnvmapTextureManager::EnvmapTextureManager(
       default_framebuffer_id(default_id),
       render_pipeline(rdp),
       scene(scene_) {
+
   resource_database.getHdrDatabase().attach(*this);
   config = generate_config();
-
   skybox_mesh = &scene.getSkybox();
 }
 
@@ -44,7 +45,9 @@ void EnvmapTextureManager::initializeDefaultEnvmap() {
   /* Need to compute the LUT beforehand , because of the add event in the HDR database*/
   if (resource_database.getTextureDatabase().getTexturesByType(Texture::BRDFLUT).empty())
     resource_database.getTextureDatabase().setPersistence(render_pipeline.generateBRDFLookupTexture(config.lut.width, config.lut.height, screen_dim));
-  /*Adding the default envmap*/
+  /*Adding the default envmap :
+   * This needs to always have a default state
+   */
   if (resource_database.getHdrDatabase().empty()) {
     try {
       IO::Loader loader(nullptr);
@@ -105,7 +108,7 @@ void EnvmapTextureManager::addToCollection(int index) {
   auto &image_database = resource_database.getHdrDatabase();
   texture::envmap::EnvmapTextureGroup texgroup{};
   image::ThumbnailImageHolder<float> *raw_image_data = image_database.get(index);
-  assert(raw_image_data);
+  AX_ASSERT(raw_image_data);
   texgroup.equirect_id = index;
   TextureData envmap = texture_metadata(raw_image_data);
   auto result = database::texture::store<EnvironmentMap2DTexture>(texture_database, false, &envmap);
