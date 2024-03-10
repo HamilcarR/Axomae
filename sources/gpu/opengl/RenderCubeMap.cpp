@@ -1,4 +1,5 @@
 #include "RenderCubeMap.h"
+#include "Logger.h"
 
 RenderCubeMap::RenderCubeMap() {}
 

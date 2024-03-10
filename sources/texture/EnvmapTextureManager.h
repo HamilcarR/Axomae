@@ -39,7 +39,7 @@ namespace texture::envmap {
 
 /**
  * @class EnvmapTextureManager
- * @brief Tracks the current scene's envmap IDs , and generates new envmaps texture when an envmap is imported in an HDR database
+ * @brief Tracks the current scene's envmap IDs , and generates new envmaps textures and IDs when an envmap is imported in an HDR database
  */
 class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpdateMessage *> {
   using Message = database::event::ImageUpdateMessage;

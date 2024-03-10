@@ -1,10 +1,9 @@
 #ifndef FRAMEBUFFERINTERFACE_H
 #define FRAMEBUFFERINTERFACE_H
 
-#include "Drawable.h"
 #include "GLFrameBuffer.h"
-#include "Mesh.h"
 #include "ShaderDatabase.h"
+#include "TextureDatabase.h"
 #include "TextureFactory.h"
 
 /**
@@ -13,6 +12,7 @@
  *
  */
 
+class TextureDatabase;
 /**
  * @class FrameBufferInterface
  * This class implements a generic framebuffer

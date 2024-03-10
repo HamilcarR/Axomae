@@ -2,12 +2,9 @@
 #define SCENE_H
 
 #include "BoundingBox.h"
-#include "Camera.h"
-#include "Drawable.h"
+#include "Mesh.h"
 #include "ResourceDatabaseManager.h"
 #include "SceneHierarchy.h"
-#include "utils_3D.h"
-
 /**
  * @file Scene.h
  * @brief File implementing classes and functions relative to how the scene is represented and how to manage it
@@ -16,6 +13,11 @@
 
 // TODO: [AX-14] Add mouse picking
 // TODO: [AX-34] Add object lookup system
+
+class Camera;
+class Drawable;
+class Shader;
+class LightingDatabase;
 
 /**
  * @class This class manages all drawable meshes inside the scene and provides methods to sort them by types.

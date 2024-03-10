@@ -1,5 +1,5 @@
 #include "FrameBufferInterface.h"
-
+#include "TextureDatabase.h"
 FrameBufferInterface::FrameBufferInterface() {
   gl_framebuffer_object = nullptr;
   texture_dim = nullptr;

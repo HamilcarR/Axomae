@@ -1,7 +1,7 @@
 #ifndef TEXTUREVIEWERWIDGET_H
 #define TEXTUREVIEWERWIDGET_H
+#include "Form/ui_texture_viewer.h"
 #include "Image.h"
-#include "ui_texture_viewer.h"
 #include <QImage>
 #include <QLabel>
 #include <QMainWindow>

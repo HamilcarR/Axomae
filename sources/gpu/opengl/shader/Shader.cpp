@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "Camera.h"
 #include "DebugGL.h"
 #include "UniformNames.h"
 #include "glsl.h"

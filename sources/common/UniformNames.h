@@ -1,6 +1,8 @@
 #ifndef UNIFORMNAMES_H
 #define UNIFORMNAMES_H
 
+// TODO : move to respective files
+
 /*Shader matrix uniform names*/
 constexpr const char uniform_name_matrix_model[] = "MAT_MODEL";
 constexpr const char uniform_name_matrix_view[] = "MAT_VIEW";

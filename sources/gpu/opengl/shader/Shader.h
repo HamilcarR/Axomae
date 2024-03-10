@@ -2,7 +2,6 @@
 #define SHADER_H
 
 #include "Axomae_macros.h"
-#include "Camera.h"
 #include "Texture.h"
 #include "init_3D.h"
 #include <glm/ext/matrix_float3x3.hpp>
@@ -19,10 +18,8 @@
  *
  */
 
-/**
- * @brief shaders classes implementation
- *
- */
+class Camera;
+
 class Shader {
  public:
   virtual ~Shader() = default;

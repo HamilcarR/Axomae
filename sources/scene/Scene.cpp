@@ -1,6 +1,10 @@
 #include "Scene.h"
 #include "BoundingBox.h"
+#include "Camera.h"
+#include "Drawable.h"
 #include "INodeFactory.h"
+#include "Shader.h"
+#include "utils_3D.h"
 
 using namespace axomae;
 

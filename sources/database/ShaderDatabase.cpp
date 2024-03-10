@@ -43,7 +43,7 @@ database::Result<Shader::TYPE, Shader> ShaderDatabase::add(std::unique_ptr<Shade
   } else {
     Shader::TYPE type = shader->getType();
     Shader *ptr = shader.get();
-    database::Storage<Shader::TYPE, Shader> database(std::move(shader), shader->getType(), keep);
+    database::Storage<Shader::TYPE, Shader> database(std::move(shader), type, keep);
     database_map[type] = std::move(database);
     return {type, ptr};
   }

@@ -1,6 +1,7 @@
 #ifndef RENDERPIPELINE_H
 #define RENDERPIPELINE_H
-
+#include "Drawable.h"
+#include "Mesh.h"
 #include "RenderCubeMap.h"
 #include "RenderQuad.h"
 #include "ResourceDatabaseManager.h"

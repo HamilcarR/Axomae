@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-// TODO : Old code , refactor or delete
+// TODO : Old code , move to Loader_image.cpp
 namespace IO {
 
   class ImageImporter {

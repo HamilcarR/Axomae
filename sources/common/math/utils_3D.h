@@ -2,7 +2,6 @@
 #define UTILS_3D_H
 #include "constants.h"
 #include "math_utils.h"
-#include <map>
 
 namespace math {
   namespace geometry {

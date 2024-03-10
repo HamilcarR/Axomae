@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'main_window.ui'
 **
-** Created by: Qt User Interface Compiler version 6.6.1
+** Created by: Qt User Interface Compiler version 6.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -413,7 +413,7 @@ public:
         actionImport_Environment_Map->setObjectName("actionImport_Environment_Map");
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(centralwidget->sizePolicy().hasHeightForWidth());
@@ -504,7 +504,7 @@ public:
 
         renderMaterials = new QTabWidget(texture);
         renderMaterials->setObjectName("renderMaterials");
-        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Preferred);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(renderMaterials->sizePolicy().hasHeightForWidth());
@@ -541,7 +541,7 @@ public:
         greyscale_opt = new QGroupBox(functions);
         greyscale_opt->setObjectName("greyscale_opt");
         greyscale_opt->setEnabled(true);
-        QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(greyscale_opt->sizePolicy().hasHeightForWidth());
@@ -552,7 +552,7 @@ public:
         verticalLayout_8->setObjectName("verticalLayout_8");
         use_average = new QRadioButton(greyscale_opt);
         use_average->setObjectName("use_average");
-        QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        QSizePolicy sizePolicy3(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
         sizePolicy3.setHeightForWidth(use_average->sizePolicy().hasHeightForWidth());
@@ -722,7 +722,7 @@ public:
 
         nmap_factor_opt = new QGroupBox(normal_opt);
         nmap_factor_opt->setObjectName("nmap_factor_opt");
-        QSizePolicy sizePolicy4(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        QSizePolicy sizePolicy4(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
         sizePolicy4.setHeightForWidth(nmap_factor_opt->sizePolicy().hasHeightForWidth());
@@ -820,7 +820,7 @@ public:
         verticalLayout_25->setSizeConstraint(QLayout::SetMinimumSize);
         tabWidget_3 = new QTabWidget(tab_3);
         tabWidget_3->setObjectName("tabWidget_3");
-        QSizePolicy sizePolicy5(QSizePolicy::Maximum, QSizePolicy::Expanding);
+        QSizePolicy sizePolicy5(QSizePolicy::Policy::Maximum, QSizePolicy::Policy::Expanding);
         sizePolicy5.setHorizontalStretch(0);
         sizePolicy5.setVerticalStretch(0);
         sizePolicy5.setHeightForWidth(tabWidget_3->sizePolicy().hasHeightForWidth());
@@ -833,7 +833,7 @@ public:
         horizontalLayout->setObjectName("horizontalLayout");
         groupBox = new QGroupBox(tab_4);
         groupBox->setObjectName("groupBox");
-        QSizePolicy sizePolicy6(QSizePolicy::Maximum, QSizePolicy::Maximum);
+        QSizePolicy sizePolicy6(QSizePolicy::Policy::Maximum, QSizePolicy::Policy::Maximum);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
         sizePolicy6.setHeightForWidth(groupBox->sizePolicy().hasHeightForWidth());
@@ -908,7 +908,7 @@ public:
         gridLayout_6->setObjectName("gridLayout_6");
         tabWidget = new QTabWidget(gl_renderer);
         tabWidget->setObjectName("tabWidget");
-        QSizePolicy sizePolicy7(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        QSizePolicy sizePolicy7(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Minimum);
         sizePolicy7.setHorizontalStretch(0);
         sizePolicy7.setVerticalStretch(0);
         sizePolicy7.setHeightForWidth(tabWidget->sizePolicy().hasHeightForWidth());
@@ -925,7 +925,7 @@ public:
         verticalLayout_10->setObjectName("verticalLayout_10");
         groupBox_2 = new QGroupBox(PostProTab);
         groupBox_2->setObjectName("groupBox_2");
-        QSizePolicy sizePolicy8(QSizePolicy::Preferred, QSizePolicy::Maximum);
+        QSizePolicy sizePolicy8(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Maximum);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
         sizePolicy8.setHeightForWidth(groupBox_2->sizePolicy().hasHeightForWidth());
@@ -1005,7 +1005,7 @@ public:
         verticalLayout_9->setObjectName("verticalLayout_9");
         groupBox_3 = new QGroupBox(tab_5);
         groupBox_3->setObjectName("groupBox_3");
-        QSizePolicy sizePolicy9(QSizePolicy::Minimum, QSizePolicy::Maximum);
+        QSizePolicy sizePolicy9(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Maximum);
         sizePolicy9.setHorizontalStretch(0);
         sizePolicy9.setVerticalStretch(0);
         sizePolicy9.setHeightForWidth(groupBox_3->sizePolicy().hasHeightForWidth());
@@ -1058,7 +1058,7 @@ public:
 
         tab_renderer_lighting = new QTabWidget(tab_2);
         tab_renderer_lighting->setObjectName("tab_renderer_lighting");
-        QSizePolicy sizePolicy10(QSizePolicy::Expanding, QSizePolicy::Maximum);
+        QSizePolicy sizePolicy10(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Maximum);
         sizePolicy10.setHorizontalStretch(0);
         sizePolicy10.setVerticalStretch(0);
         sizePolicy10.setHeightForWidth(tab_renderer_lighting->sizePolicy().hasHeightForWidth());
@@ -1504,7 +1504,7 @@ public:
 
         dial_renderer_lighting_SpotLights_angle = new QDial(tab_16);
         dial_renderer_lighting_SpotLights_angle->setObjectName("dial_renderer_lighting_SpotLights_angle");
-        QSizePolicy sizePolicy11(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        QSizePolicy sizePolicy11(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
         sizePolicy11.setHorizontalStretch(0);
         sizePolicy11.setVerticalStretch(0);
         sizePolicy11.setHeightForWidth(dial_renderer_lighting_SpotLights_angle->sizePolicy().hasHeightForWidth());

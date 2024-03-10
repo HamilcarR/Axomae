@@ -1,6 +1,7 @@
 #ifndef CAMERAFRAMEBUFFER_H
 #define CAMERAFRAMEBUFFER_H
 
+#include "Drawable.h"
 #include "FrameBufferInterface.h"
 #include "ResourceDatabaseManager.h"
 
