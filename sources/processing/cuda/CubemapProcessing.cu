@@ -1,5 +1,9 @@
 #include "CubemapProcessing.cuh"
+#include "math.h"
 
+#ifdef USE_STATS_TIMER
+  #include "PerformanceLogger.h"
+#endif
 constexpr unsigned MAX_ITER_THREAD = 100;
 
 namespace spherical_math {
@@ -186,6 +190,7 @@ __host__ void gpgpu_functions::irradiance_mapping::gpgpu_kernel_call(
     const unsigned _height,
     const unsigned samples) {
 
+#ifdef USE_STATS_TIMER
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
@@ -207,4 +212,63 @@ __host__ void gpgpu_functions::irradiance_mapping::gpgpu_kernel_call(
   LOG("Diffuse irradiance kernel elapsed time : " + std::to_string(time), LogLevel::INFO);
   cudaEventDestroy(start);
   cudaEventDestroy(stop);
+#else
+  dim3 threads_per_blocks(32, 32);
+  dim3 blocks;
+  blocks.x = _width / threads_per_blocks.x;
+  blocks.y = _height / threads_per_blocks.y;
+  blocks.x++;
+  blocks.y++;
+  blocks.z = 1;
+  size_t shared_mem = threads_per_blocks.x * threads_per_blocks.y * sizeof(float);
+  device_function<<<blocks, threads_per_blocks, shared_mem>>>(D_result_buffer, texture, width, height, _width, _height, samples);
+#endif
+}
+
+
+
+
+void gpgpu_functions::irradiance_mapping::GPU_compute_irradiance(float *src_texture,
+                            unsigned src_texture_width,
+                            unsigned src_texture_height,
+                            unsigned channels,
+                            float **dest_texture,
+                            unsigned dest_texture_width,
+                            unsigned dest_texture_height,
+                            unsigned samples) {
+  cudaResourceDesc resource_descriptor;
+  std::memset(&resource_descriptor, 0, sizeof(resource_descriptor));
+  cudaTextureDesc texture_descriptor;
+  std::memset(&texture_descriptor, 0, sizeof(texture_descriptor));
+  cudaTextureObject_t texture_object = 0;
+  // Initialize Cuda array and copy to device
+  cudaArray_t cuda_array;
+  cudaChannelFormatDesc format_desc = cudaCreateChannelDesc(32, 32, 32, 32, cudaChannelFormatKindFloat);
+  size_t pitch = src_texture_width * channels * sizeof(float);
+  cudaErrCheck(cudaMallocArray(&cuda_array, &format_desc, src_texture_width, src_texture_height));
+  cudaErrCheck(cudaMemcpy2DToArray(
+      cuda_array, 0, 0, src_texture, pitch, src_texture_width * channels * sizeof(float), src_texture_height, cudaMemcpyHostToDevice));
+  // Initialize resource descriptors
+  resource_descriptor.resType = cudaResourceTypeArray;
+  resource_descriptor.res.array.array = cuda_array;
+  // Initialize texture descriptors
+  texture_descriptor.addressMode[0] = cudaAddressModeWrap;
+  texture_descriptor.addressMode[1] = cudaAddressModeWrap;
+  texture_descriptor.filterMode = cudaFilterModeLinear;
+  texture_descriptor.readMode = cudaReadModeElementType;
+  texture_descriptor.normalizedCoords = 1;
+  // Initialize texture object
+  cudaErrCheck(cudaCreateTextureObject(&texture_object, &resource_descriptor, &texture_descriptor, nullptr));
+  cudaErrCheck(cudaMallocManaged((void **)dest_texture, dest_texture_height * dest_texture_width * channels * sizeof(float)));
+  gpgpu_kernel_call(gpgpu_device_compute_diffuse_irradiance,
+                    *dest_texture,
+                    texture_object,
+                    src_texture_width,
+                    src_texture_height,
+                    dest_texture_width,
+                    dest_texture_height,
+                    samples);
+  cudaErrCheck(cudaDeviceSynchronize());
+  cudaErrCheck(cudaDestroyTextureObject(texture_object));
+  cudaErrCheck(cudaFreeArray(cuda_array));
 }
