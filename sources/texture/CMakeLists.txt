@@ -1,5 +1,4 @@
 add_library(ax_texture 
-    EnvmapTextureManager.cpp 
     Texture.cpp 
     TextureGroup.cpp
     texture_utils.cpp
@@ -7,14 +6,18 @@ add_library(ax_texture
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_texture)
 target_link_libraries(ax_texture 
-PUBLIC  
+PRIVATE
     ax_io
     ax_database
     ax_renderer
-    ax_mesh
     ax_debug
     ax_common
-    
+    ax_math
+    ax_shader
+    ax_thread
+    ax_macro
+    ax_controller
+    ax_opengl
 )
 target_include_directories(ax_texture 
 PUBLIC 

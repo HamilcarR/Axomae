@@ -6,7 +6,7 @@ add_library(ax_shader
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_shader)
 
 target_link_libraries(ax_shader 
-PUBLIC 
+PRIVATE
     ax_texture
 )
 

@@ -5,7 +5,7 @@ add_library(ax_mesh
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_mesh)
 target_link_libraries(ax_mesh 
-PUBLIC 
+PRIVATE
     ax_scene
 )
 target_include_directories(ax_mesh 

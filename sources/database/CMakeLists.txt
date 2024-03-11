@@ -5,12 +5,13 @@ add_library(ax_database
     ResourceDatabaseManager.cpp 
     ShaderDatabase.cpp 
     TextureDatabase.cpp
+    EnvmapTextureManager.cpp
     model/ImageModel.cpp
     )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_database)
 target_link_libraries(ax_database 
-PUBLIC
+PRIVATE
     ax_macro  
     ax_scene
     ax_editor

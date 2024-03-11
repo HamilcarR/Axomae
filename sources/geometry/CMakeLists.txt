@@ -4,7 +4,7 @@ add_library(ax_geometry
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_geometry)
 target_link_libraries(ax_geometry
-PUBLIC 
+PRIVATE
     ax_common
 )
 

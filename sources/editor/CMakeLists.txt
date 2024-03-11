@@ -1,6 +1,6 @@
 
 qt_wrap_ui(UI_FILES_LIST Form/texture_viewer.ui)
-
+qt_wrap_ui(UI_FILES_LIST Form/main_window.ui)
 add_library(ax_editor 
     ProgressStatusWidget.cpp 
     TextureViewerWidget.cpp
@@ -15,7 +15,7 @@ add_library(ax_editor
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_editor)
 target_link_libraries(ax_editor 
-PUBLIC 
+PRIVATE
     Qt6::Widgets
     Qt6::OpenGLWidgets
     ax_common

@@ -4,7 +4,7 @@ add_library(ax_image
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_image)
 target_link_libraries(ax_image 
-PUBLIC 
+PRIVATE
     ax_macro
 )
 

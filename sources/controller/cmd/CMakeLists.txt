@@ -4,10 +4,9 @@ add_library(ax_cmd
     CmdArgs.cpp
 )
 
-
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_cmd)
 target_link_libraries(ax_cmd 
-PUBLIC 
+PRIVATE
     ax_config
     Boost::program_options
     ax_io

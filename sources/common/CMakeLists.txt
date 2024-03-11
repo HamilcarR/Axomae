@@ -3,7 +3,10 @@ add_library(ax_common)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_common)
 target_link_libraries(ax_common 
-PUBLIC 
+PRIVATE 
+    ax_math
+    ax_image
+    ax_exceptions
     ax_thread
     ax_controller
 )

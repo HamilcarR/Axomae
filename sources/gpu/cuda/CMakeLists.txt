@@ -5,7 +5,7 @@ add_library(ax_gpu_cuda
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_gpu_cuda)
 target_link_libraries(ax_gpu_cuda
-PUBLIC 
+PRIVATE
     CUDA::cudart
     ax_io
 

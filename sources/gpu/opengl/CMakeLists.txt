@@ -10,7 +10,7 @@ add_library(ax_opengl
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_opengl)
 target_link_libraries(ax_opengl 
-PUBLIC
+PRIVATE
     ax_mesh
     ax_geometry
     OpenGL::GL
