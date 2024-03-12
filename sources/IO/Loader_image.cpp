@@ -4,7 +4,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "GenericException.h"
-#include "LoaderSharedExceptions.h"
 #include "axomae_utils.h"
 #include "stb_image.h"
 #include "stb_image_write.h"
@@ -37,19 +36,15 @@ namespace exception {
 namespace IO {
 
   image::ImageHolder<float> Loader::loadHdr(const char *path, bool store) {
-    int width = -1, height = -1, channels = -1;
-
     controller::ProgressManagerHelper helper(this);
     helper.notifyProgress(controller::ProgressManagerHelper::ZERO);
-    initProgress("Importing environment map", width * height * channels);
-
+    int width = -1, height = -1, channels = -1;
     float *data = stbi_loadf(path, &width, &height, &channels, 0);
-    if (stbi_failure_reason())
+    initProgress("Importing environment map", width * height * channels);
+    if (!data)
       throw exception::LoadImagePathException(path);
-    if (width <= 0 || height <= 0)
-      throw exception::LoadImageDimException(width, height);
-    if (channels <= 0)
-      throw exception::LoadImageChannelException(channels);
+    AX_ASSERT(width > 0 && height > 0);
+    AX_ASSERT(channels == 1 || channels == 2 || channels == 3 || channels == 4);
 
     std::vector<float> image_data{};
     image_data.reserve(width * height * channels);

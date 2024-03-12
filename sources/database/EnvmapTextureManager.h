@@ -70,6 +70,8 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
   void deleteFromCollection(int index);
   void addToCollection(int index);
 
+  void createFurnace();
+
  private:
   ResourceDatabaseManager &resource_database;
   std::vector<texture::envmap::EnvmapTextureGroup> bakes_id;

@@ -22,7 +22,6 @@ static texture::envmap::EnvmapBakingConfig generate_config() {
   config.lut.width = 256;
   config.lut.height = 256;
   config.sampling_factor_per_mips = 2;
-  config.default_envmap_path = "test1.hdr";
   return config;
 }
 
@@ -40,6 +39,19 @@ EnvmapTextureManager::EnvmapTextureManager(
   skybox_mesh = &scene.getSkybox();
 }
 
+void EnvmapTextureManager::createFurnace() {
+  std::vector<float> image_data(256 * 256 * 3, 1.f);
+  image::Metadata metadata;
+  metadata.name = "Furnace.hdr";
+  metadata.width = 256;
+  metadata.height = 256;
+  metadata.channels = 3;
+  metadata.color_corrected = true;
+  metadata.is_hdr = true;
+  HdrImageDatabase *hdr_database = resource_database.getHdrDatabase();
+  database::image::store<float>(*hdr_database, true, image_data, metadata);
+}
+
 void EnvmapTextureManager::initializeDefaultEnvmap() {
 
   /* Need to compute the LUT beforehand , because of the add event in the HDR database*/
@@ -53,11 +65,12 @@ void EnvmapTextureManager::initializeDefaultEnvmap() {
     try {
       IO::Loader loader(nullptr);
       loader.loadHdr(config.default_envmap_path.c_str());
-      current = bakes_id.back();
     } catch (const exception::GenericException &e) {
       LOG(e.what(), LogLevel::ERROR);
+      createFurnace();
     }
   }
+  current = bakes_id.back();
 }
 
 void EnvmapTextureManager::notified(observer::Data<EnvmapTextureManager::Message *> &message) {

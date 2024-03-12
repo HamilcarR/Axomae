@@ -41,6 +41,7 @@ PRIVATE
     ax_debug
 )
 
+set(AUTOGEN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/ax_editor_autogen/include")
 target_include_directories(ax_editor 
 PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -48,6 +49,9 @@ PUBLIC
     image
     renderer
     UV
+INTERFACE
+    ${AUTOGEN_INCLUDE_DIR}
+
 )
 
 

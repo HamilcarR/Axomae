@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.27)
 project(Axomae VERSION 1.0 LANGUAGES C CXX)
 
 # Custom variables
 set(AXOMAE_UI_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/sources/editor/Form")
 #****************************************************************************************************
 # Encode shaders as byte arrays 
-execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/stringify.sh ${CMAKE_CURRENT_SOURCE_DIR} )
+execute_process(COMMAND ${PROJECT_SOURCE_DIR}/scripts/stringify.sh ${PROJECT_SOURCE_DIR} )
 
 #****************************************************************************************************
 # Compilation

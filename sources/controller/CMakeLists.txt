@@ -24,11 +24,13 @@ PRIVATE
 
 
 )
-
+# AUTOUIC weirdly doesn't resolve ui includes
+set(AUTOGEN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/ax_controller_autogen/include")
 target_include_directories(ax_controller
 PUBLIC 
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_BINARY_DIR}/sources/editor
+INTERFACE
+        ${AUTOGEN_INCLUDE_DIR}
 )
 
 add_subdirectory(cmd)

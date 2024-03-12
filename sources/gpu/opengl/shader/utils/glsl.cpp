@@ -1,7 +1,6 @@
 #include "glsl.h"
 #include "fragment.h"
 #include "vertex.h"
-#include <cstdlib>
 
 static std::string construct_string(const unsigned char array[], unsigned size) { return std::string(array, array + size); }
 namespace shader_utils {
