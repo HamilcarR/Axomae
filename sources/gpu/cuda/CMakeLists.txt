@@ -1,14 +1,12 @@
-add_library(ax_gpu_cuda
-    Kernel.cu
-)
+add_library(ax_gpu_cuda)
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_gpu_cuda)
 target_link_libraries(ax_gpu_cuda
-PRIVATE
+PUBLIC
     CUDA::cudart
+PRIVATE
     ax_io
-
 )
 
 

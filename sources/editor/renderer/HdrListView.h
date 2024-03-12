@@ -29,7 +29,7 @@ class EnvmapListDisplay : public QListView {
   void itemClicked(const QModelIndex &index);
 
  protected:
-  HdrImageDatabase &database;
+  HdrImageDatabase *database;
   GLViewer *gl_widget{};
 
  private:

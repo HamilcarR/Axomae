@@ -684,9 +684,9 @@ namespace controller {
   bool Controller::import_3DOBJ() {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
     if (!filename.isEmpty()) {
-      resource_database.getNodeDatabase().clean();
-      resource_database.getTextureDatabase().clean();
-      resource_database.getRawImgdatabase().clean();
+      resource_database.getNodeDatabase()->clean();
+      resource_database.getTextureDatabase()->clean();
+      resource_database.getRawImgdatabase()->clean();
       IO::Loader loader(progress_manager.get());
       auto struct_holder = loader.load(filename.toStdString().c_str());
       std::vector<Mesh *> scene = struct_holder.first;

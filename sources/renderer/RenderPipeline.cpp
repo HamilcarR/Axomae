@@ -32,11 +32,11 @@ int RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_map, CubeM
   auto progress = controller::progress_bar::generateData("Generating cubemap texture", 0);
   progress_manager->op(&progress);
   assert(resource_database != nullptr);
-  assert(!resource_database->getTextureDatabase().empty());
+  assert(!resource_database->getTextureDatabase()->empty());
   assert(hdri_map != nullptr);
   context.makeCurrent();
-  TextureDatabase &texture_database = resource_database->getTextureDatabase();
-  ShaderDatabase &shader_database = resource_database->getShaderDatabase();
+  TextureDatabase &texture_database = *resource_database->getTextureDatabase();
+  ShaderDatabase &shader_database = *resource_database->getShaderDatabase();
   Shader *bake_shader = shader_database.get(Shader::ENVMAP_CUBEMAP_CONVERTER);
   Dim2 tex_dim{}, cam_dim{}, default_dim{};
   /*Set up camera ratio + cubemap texture resolution*/
@@ -84,8 +84,8 @@ int RenderPipeline::bakeIrradianceCubemap(int cube_envmap, unsigned width, unsig
   progress_manager->op(&progress);
   context.makeCurrent();
   Dim2 irrad_dim{}, cam_dim{}, default_dim{};
-  TextureDatabase *texture_database = &resource_database->getTextureDatabase();
-  ShaderDatabase *shader_database = &resource_database->getShaderDatabase();
+  TextureDatabase *texture_database = resource_database->getTextureDatabase();
+  ShaderDatabase *shader_database = resource_database->getShaderDatabase();
   Shader *irradiance_shader = shader_database->get(Shader::IRRADIANCE_CUBEMAP_COMPUTE);
   FreePerspectiveCamera camera(FOV, &cam_dim, NEAR, FAR);
   cam_dim.width = width;
@@ -122,8 +122,9 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap,
   progress_manager->op(&progress);
   context.makeCurrent();
   Dim2 cubemap_dim{}, default_dim{}, resize_dim{};
-  auto *prefilter_shader = dynamic_cast<EnvmapPrefilterBakerShader *>(resource_database->getShaderDatabase().get(Shader::ENVMAP_PREFILTER));
-  auto texture_database = &resource_database->getTextureDatabase();
+  EnvmapPrefilterBakerShader *prefilter_shader = dynamic_cast<EnvmapPrefilterBakerShader *>(
+      resource_database->getShaderDatabase()->get(Shader::ENVMAP_PREFILTER));
+  TextureDatabase *texture_database = resource_database->getTextureDatabase();
   cubemap_dim.width = width;
   cubemap_dim.height = height;
   resize_dim = cubemap_dim;
@@ -181,7 +182,7 @@ int RenderPipeline::generateBRDFLookupTexture(unsigned int width, unsigned int h
   camera_dim.height = 1;
   original_dim.width = default_dim_.width;
   original_dim.height = default_dim_.height;
-  auto *brdf_lut_shader = dynamic_cast<BRDFLookupTableBakerShader *>(resource_database->getShaderDatabase().get(Shader::BRDF_LUT_BAKER));
+  auto *brdf_lut_shader = dynamic_cast<BRDFLookupTableBakerShader *>(resource_database->getShaderDatabase()->get(Shader::BRDF_LUT_BAKER));
   FreePerspectiveCamera camera(FOV, &camera_dim, NEAR, FAR);
   RenderQuadFBO &&quad_fbo = constructQuadFbo<BRDFLookupTexture>(
       &tex_dim, false, GLFrameBuffer::COLOR0, Texture::RGB16F, Texture::RG, Texture::FLOAT, brdf_lut_shader);
@@ -189,7 +190,7 @@ int RenderPipeline::generateBRDFLookupTexture(unsigned int width, unsigned int h
   renderToQuad(quad_drawable, quad_fbo, camera, tex_dim, original_dim);
   quad_drawable.clean();
   quad_fbo.clean();
-  database::Result<int, Texture> query_brdf_lut = resource_database->getTextureDatabase().contains(
+  database::Result<int, Texture> query_brdf_lut = resource_database->getTextureDatabase()->contains(
       quad_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
   errorCheck(__FILE__, __LINE__);
   assert(query_brdf_lut.object);
@@ -254,7 +255,7 @@ void RenderPipeline::renderToQuad(Drawable &quad_drawable,
 /********************************************************************************************************************************************************************************************************/
 Drawable RenderPipeline::constructCube(Shader *shader, int database_texture_id, Texture::TYPE type, Camera *camera) {
   assert(shader != nullptr);
-  CubeMesh *cube = database::node::store<CubeMesh>(resource_database->getNodeDatabase(), false).object;
+  CubeMesh *cube = database::node::store<CubeMesh>(*resource_database->getNodeDatabase(), false).object;
   cube->setShader(shader);
   cube->material.addTexture(database_texture_id);
   cube->setSceneCameraPointer(camera);
@@ -263,7 +264,7 @@ Drawable RenderPipeline::constructCube(Shader *shader, int database_texture_id, 
 
 Drawable RenderPipeline::constructQuad(Shader *shader, Camera *camera) {
   assert(shader != nullptr);
-  QuadMesh *quad = database::node::store<QuadMesh>(resource_database->getNodeDatabase(), false).object;
+  QuadMesh *quad = database::node::store<QuadMesh>(*resource_database->getNodeDatabase(), false).object;
   quad->setShader(shader);
   quad->setSceneCameraPointer(camera);
   return {quad};
@@ -280,7 +281,7 @@ RenderCubeMap RenderPipeline::constructCubemapFbo(Dim2 *dimensions,
                                                   Shader *shader,
                                                   unsigned int mipmaps_level) {
 
-  TextureDatabase *texture_database = &resource_database->getTextureDatabase();
+  TextureDatabase *texture_database = resource_database->getTextureDatabase();
   RenderCubeMap cubemap_fbo(texture_database, dimensions, &default_framebuffer_id);
   cubemap_fbo.initializeFrameBufferTexture<TEXTYPE>(
       color_attachment, persistence, internal_format, data_format, data_type, dimensions->width, dimensions->height, mipmaps_level);
@@ -304,7 +305,7 @@ RenderQuadFBO RenderPipeline::constructQuadFbo(Dim2 *dimensions,
                                                Texture::FORMAT data_type,
                                                Shader *shader) {
 
-  TextureDatabase *texture_database = &resource_database->getTextureDatabase();
+  TextureDatabase *texture_database = resource_database->getTextureDatabase();
   RenderQuadFBO quad_fbo(texture_database, dimensions, &default_framebuffer_id);
   quad_fbo.initializeFrameBufferTexture<TEXTYPE>(
       color_attachment, persistence, internal_format, data_format, data_type, dimensions->width, dimensions->height);

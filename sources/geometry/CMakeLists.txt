@@ -1,6 +1,4 @@
-add_library(ax_geometry 
-    Object3D.cpp 
-)
+add_library(ax_geometry)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_geometry)
 target_link_libraries(ax_geometry

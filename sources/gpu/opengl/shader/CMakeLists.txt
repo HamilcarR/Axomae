@@ -8,6 +8,11 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ax_shader)
 target_link_libraries(ax_shader 
 PRIVATE
     ax_texture
+    ax_opengl
+    ax_camera
+    ax_scene
+    ax_debug
+
 )
 
 target_include_directories(ax_shader 

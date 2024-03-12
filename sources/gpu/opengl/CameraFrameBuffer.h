@@ -118,9 +118,9 @@ class CameraFrameBuffer : public FrameBufferInterface {
  protected:
   std::unique_ptr<Drawable> drawable_screen_quad; /*<Drawable of the screen quad*/
   Mesh *mesh_screen_quad;                         /*<Pointer on the screen quad mesh*/
-  ShaderDatabase &shader_database;                /*<Pointer on the shader database*/
-  TextureDatabase &texture_database;
-  INodeDatabase &node_database;
+  ShaderDatabase *shader_database;                /*<Pointer on the shader database*/
+  TextureDatabase *texture_database;
+  INodeDatabase *node_database;
   ScreenFramebufferShader *shader_framebuffer; /*<Post processing shader*/
   float gamma;                                 /*<Gamma of the screen*/
   float exposure;                              /*<Exposure of the screen*/

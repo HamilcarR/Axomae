@@ -1,14 +1,12 @@
 #include "ImageManager.h"
+#include "Axomae_macros.h"
+#include "Kernel.cuh"
 #include "Rgb.h"
+#include "constants.h"
+#include <SDL2/SDL.h>
 #include <assert.h>
-#include <climits>
-#include <cstdlib>
-#include <ctime>
-#include <future>
-#include <iostream>
-#include <string>
 
-/*VERY VERY VERY VERY OOOOOOOOLD CODE FROM THE PALEOLITHIC ERA : needs refact to new standards*/
+/*Very Old code , to be refactored */
 
 namespace axomae {
 

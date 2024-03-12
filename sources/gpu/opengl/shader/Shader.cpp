@@ -3,7 +3,6 @@
 #include "DebugGL.h"
 #include "UniformNames.h"
 #include "glsl.h"
-#include <QMatrix4x4>
 #include <cstring>
 #include <stdexcept>
 #define SHADER_ERROR_LOG_SIZE 512

@@ -3,7 +3,6 @@
 #include "GenericException.h"
 #include "GenericTextureProcessing.h"
 #include "Mutex.h"
-#include "PerformanceLogger.h"
 #include "math_utils.h"
 #include <fstream>
 #include <immintrin.h>

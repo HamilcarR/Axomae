@@ -10,8 +10,8 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-#include "EnvmapController.h"
 #include "GenericException.h"
+#include "Image.h"
 #include "Mesh.h"
 #include "ResourceDatabaseManager.h"
 #include "SceneHierarchy.h"

@@ -10,6 +10,19 @@ PRIVATE
     ax_config
     Boost::program_options
     ax_io
+    ax_database
+    ax_editor
+    ax_mesh
+    ax_scene
+    ax_camera
+    ax_material
+    ax_shader
+    ax_texture
+    ax_opengl
+    ax_geometry
+    ax_processing
+
+
 )
 
 target_include_directories(ax_cmd

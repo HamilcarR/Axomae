@@ -4,7 +4,7 @@
 using namespace axomae;
 
 CameraFrameBuffer::CameraFrameBuffer(ResourceDatabaseManager &resource_database, Dim2 *screen_size_pointer, unsigned int *default_fbo_pointer)
-    : FrameBufferInterface(&resource_database.getTextureDatabase(), screen_size_pointer, default_fbo_pointer),
+    : FrameBufferInterface(resource_database.getTextureDatabase(), screen_size_pointer, default_fbo_pointer),
       shader_database(resource_database.getShaderDatabase()),
       texture_database(resource_database.getTextureDatabase()),
       node_database(resource_database.getNodeDatabase()) {
@@ -19,7 +19,7 @@ CameraFrameBuffer::CameraFrameBuffer(ResourceDatabaseManager &resource_database,
 CameraFrameBuffer::~CameraFrameBuffer() {}
 
 void CameraFrameBuffer::updateFrameBufferShader() {
-  shader_framebuffer = static_cast<ScreenFramebufferShader *>(shader_database.get(Shader::SCREEN_FRAMEBUFFER));
+  shader_framebuffer = static_cast<ScreenFramebufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
   assert(mesh_screen_quad);
   mesh_screen_quad->setShader(shader_framebuffer);
 }
@@ -27,11 +27,11 @@ void CameraFrameBuffer::updateFrameBufferShader() {
 void CameraFrameBuffer::initializeFrameBuffer() {
   initializeFrameBufferTexture<FrameBufferTexture>(
       GLFrameBuffer::COLOR0, true, Texture::RGBA16F, Texture::BGRA, Texture::UBYTE, texture_dim->width, texture_dim->height);
-  shader_framebuffer = static_cast<ScreenFramebufferShader *>(shader_database.get(Shader::SCREEN_FRAMEBUFFER));
+  shader_framebuffer = static_cast<ScreenFramebufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
   Texture *fbo_texture = fbo_attachment_texture_collection[GLFrameBuffer::COLOR0];
-  assert(texture_database.contains(fbo_texture).object);
-  int database_texture_id = texture_database.contains(fbo_texture).id;
-  auto result = database::node::store<FrameBufferMesh>(node_database, true, database_texture_id, shader_framebuffer);
+  assert(texture_database->contains(fbo_texture).object);
+  int database_texture_id = texture_database->contains(fbo_texture).id;
+  auto result = database::node::store<FrameBufferMesh>(*node_database, true, database_texture_id, shader_framebuffer);
   mesh_screen_quad = result.object;
   drawable_screen_quad = std::make_unique<Drawable>(mesh_screen_quad);
   FrameBufferInterface::initializeFrameBuffer();

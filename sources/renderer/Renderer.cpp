@@ -22,7 +22,7 @@ Renderer::Renderer()
     : camera_framebuffer(nullptr), start_draw(false), resource_database(ResourceDatabaseManager::getInstance()), default_framebuffer_id(0) {
   setUpMouseStates(mouse_state);
   scene_camera =
-      database::node::store<ArcballCamera>(resource_database.getNodeDatabase(), true, 45.f, &screen_size, 0.1f, 10000.f, 100.f, &mouse_state).object;
+      database::node::store<ArcballCamera>(*resource_database.getNodeDatabase(), true, 45.f, &screen_size, 0.1f, 10000.f, 100.f, &mouse_state).object;
 
   scene = std::make_unique<Scene>(ResourceDatabaseManager::getInstance());
 }
@@ -61,9 +61,9 @@ void Renderer::initialize() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
   /*Read shader + initialize them*/
-  ShaderDatabase &shader_database = resource_database.getShaderDatabase();
+  ShaderDatabase &shader_database = *resource_database.getShaderDatabase();
   load_shader_database(shader_database);
-  resource_database.getShaderDatabase().initializeShaders();
+  shader_database.initializeShaders();
   /*Initialize a reusable lut texture*/
   scene->initialize();
   envmap_manager->initializeDefaultEnvmap();
@@ -112,9 +112,10 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh *>, SceneTree> &new_scen
   scene->setCameraPointer(scene_camera);
   light_database.clearDatabase();
   scene->updateTree();
-  scene->generateBoundingBoxes(resource_database.getShaderDatabase().get(Shader::BOUNDING_BOX));
+  ShaderDatabase *shader_database = resource_database.getShaderDatabase();
+  scene->generateBoundingBoxes(shader_database->get(Shader::BOUNDING_BOX));
   start_draw = true;
-  resource_database.getShaderDatabase().initializeShaders();
+  shader_database->initializeShaders();
   camera_framebuffer->updateFrameBufferShader();
 }
 
@@ -145,7 +146,7 @@ void Renderer::onLeftClickRelease() {
       LOG(std::string("x:") + std::to_string(data.position.x) + std::string("  y:") + std::to_string(data.position.y) + std::string("  z:") +
               std::to_string(data.position.z),
           LogLevel::INFO);
-      database::node::store<PointLight>(resource_database.getNodeDatabase(), false, data);
+      database::node::store<PointLight>(*resource_database.getNodeDatabase(), false, data);
       event_callback_stack[ON_LEFT_CLICK].pop();
       emit sceneModified();
     }

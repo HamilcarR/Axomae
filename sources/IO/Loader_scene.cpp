@@ -1,8 +1,10 @@
+#include "INodeDatabase.h"
 #include "INodeFactory.h"
 #include "Loader.h"
-#include "LoaderSharedExceptions.h"
-#include "PerformanceLogger.h"
+#include "ResourceDatabaseManager.h"
+#include "ShaderDatabase.h"
 #include "ShaderFactory.h"
+#include "TextureDatabase.h"
 #include "TextureFactory.h"
 #include "axomae_utils.h"
 #include <QImage>
@@ -103,8 +105,8 @@ namespace IO {
   }
 
   template<class TEXTYPE>
-  static void loadTextureDummy(Material *material, TextureDatabase &texture_database) {
-    auto result = database::texture::store<TEXTYPE>(texture_database, true, nullptr);
+  static void loadTextureDummy(Material *material, TextureDatabase *texture_database) {
+    auto result = database::texture::store<TEXTYPE>(*texture_database, true, nullptr);
     LOG("Loading dummy texture at index : " + std::to_string(result.id), LogLevel::INFO);
     material->addTexture(result.id);
   }
@@ -127,8 +129,8 @@ namespace IO {
                           controller::IProgressManager *progress_manager) {
     std::string texture_index_string = texture_string.C_Str();
     std::string texture_type = texture->name;
-    TextureDatabase &texture_database = resource_manager.getTextureDatabase();
-    RawImageDatabase &image_database = resource_manager.getRawImgdatabase();
+    TextureDatabase &texture_database = *resource_manager.getTextureDatabase();
+    RawImageDatabase &image_database = *resource_manager.getRawImgdatabase();
     if (!texture_index_string.empty()) {
       texture_index_string = texture_index_string.substr(1);  // get rid of the '*' character at the beginning of the string id
       texture->name = texture_index_string;
@@ -302,14 +304,14 @@ namespace IO {
    * method SceneNodeInterface::returnRoot()
    */
   ISceneNode *fillTreeData(aiNode *ai_node, const std::vector<Mesh *> &mesh_lookup, ISceneNode *parent) {
-    INodeDatabase &node_database = ResourceDatabaseManager::getInstance().getNodeDatabase();
+    INodeDatabase *node_database = ResourceDatabaseManager::getInstance().getNodeDatabase();
     if (ai_node != nullptr) {
       std::string name = ai_node->mName.C_Str();
       glm::mat4 transformation = aiMatrix4x4ToGlm(ai_node->mTransformation);
       std::vector<ISceneNode *> add_node;
       if (ai_node->mNumMeshes == 0) {
         ISceneNode *empty_node =
-            database::node::store<SceneTreeNode>(node_database, false, parent).object;  //* Empty node , no other goal than transformation node .
+            database::node::store<SceneTreeNode>(*node_database, false, parent).object;  //* Empty node , no other goal than transformation node .
         add_node.push_back(empty_node);
       } else if (ai_node->mNumMeshes == 1)
         add_node.push_back(mesh_lookup[ai_node->mMeshes[0]]);
@@ -318,7 +320,7 @@ namespace IO {
          nodes can contain multiples meshes , but SceneTreeNode can be a mesh.
         So we create a dummy node at position 0 in add_node to be the ancestors of the children
         nodes , while meshes will be attached to parent and without children.*/
-        database::node::store<SceneTreeNode>(node_database, false, parent);
+        database::node::store<SceneTreeNode>(*node_database, false, parent);
         for (unsigned i = 0; i < ai_node->mNumMeshes; i++)
           add_node.push_back(mesh_lookup[ai_node->mMeshes[i]]);
       }
@@ -452,8 +454,8 @@ namespace IO {
    */
 
   std::pair<std::vector<Mesh *>, SceneTree> Loader::loadObjects(const char *file) {
-    ShaderDatabase &shader_database = resource_database->getShaderDatabase();
-    INodeDatabase &node_database = resource_database->getNodeDatabase();
+    ShaderDatabase &shader_database = *resource_database->getShaderDatabase();
+    INodeDatabase &node_database = *resource_database->getNodeDatabase();
 
     std::pair<std::vector<Mesh *>, SceneTree> objects;
     Assimp::Importer importer;
@@ -505,7 +507,7 @@ namespace IO {
    * @return A vector of Mesh pointers.
    */
   std::pair<std::vector<Mesh *>, SceneTree> Loader::load(const char *file) {
-    TextureDatabase *texture_database = &resource_database->getTextureDatabase();
+    TextureDatabase *texture_database = resource_database->getTextureDatabase();
     texture_database->clean();
     std::pair<std::vector<Mesh *>, SceneTree> scene = loadObjects(file);
     return scene;

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.18)
 project(Axomae VERSION 1.0 LANGUAGES C CXX)
 
-
-
+# Custom variables
+set(AXOMAE_UI_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/sources/editor/Form")
 #****************************************************************************************************
 # Encode shaders as byte arrays 
 execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/stringify.sh ${CMAKE_CURRENT_SOURCE_DIR} )
@@ -78,14 +78,12 @@ endif()
 # Optix
 set(OPTIX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/vendor/Optix CACHE PATH "Optix include path")
 
-# .ui files paths 
-set(UI_FILES_LIST)
-
+# UI files path
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${AXOMAE_UI_LOCATION})
 #****************************************************************************************************
 
-# Project setup 
+# Project setup
 qt_standard_project_setup()
-set(CMAKE_AUTOUIC OFF)
 
 qt_add_executable(${PROJECT_NAME} sources/main/main.cpp)
 

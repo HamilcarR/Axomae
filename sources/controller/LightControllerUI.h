@@ -4,10 +4,9 @@
 #include "ui_main_window.h"
 
 /**
- * @brief
- * @class LightController
- *
+ * @brief Implements an event controller for the lighting panel
  */
+
 class LightController : public QObject {
   Q_OBJECT
  public:

@@ -1,20 +1,16 @@
 #ifndef IMAGEMANAGER_H
 #define IMAGEMANAGER_H
 #include "GenericException.h"
-#include "Kernel.cuh"
 #include "Object3D.h"
 #include "Rgb.h"
-#include "constants.h"
-#include <SDL2/SDL.h>
-#include <algorithm>
-#include <assert.h>
-#include <cmath>
-#include <iostream>
 
 // TODO : Old code , Refactor
 
+class SDL_Surface;
+
 namespace axomae {
 
+  struct max_colors;
   /***
    * @class ImageManager
    * @brief provides algorithms for image processing , like edge detection , greyscale conversion etc.

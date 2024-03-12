@@ -6,7 +6,7 @@ target_link_libraries(ax_common
 PRIVATE 
     ax_math
     ax_image
-    ax_exceptions
+    ax_exception
     ax_thread
     ax_controller
 )

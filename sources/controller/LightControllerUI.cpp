@@ -1,5 +1,7 @@
 #include "LightControllerUI.h"
+#include "Logger.h"
 #include "constants.h"
+// TODO : refactor for cleaner controller system
 
 void LightController::connect_all_slots() {
   QObject::connect(ui.button_renderer_lighting_PointLights_add, SIGNAL(pressed()), this, SLOT(addPointLight()));
@@ -8,16 +10,12 @@ void LightController::connect_all_slots() {
   QObject::connect(ui.button_renderer_lighting_DirectionalLights_delete, SIGNAL(pressed()), this, SLOT(deleteDirectionalLight()));
   QObject::connect(ui.button_renderer_lighting_SpotLights_add, SIGNAL(pressed()), this, SLOT(addSpotLight()));
   QObject::connect(ui.button_renderer_lighting_SpotLights_delete, SIGNAL(pressed()), this, SLOT(deleteSpotLight()));
-
   QObject::connect(&viewer_3d->getRenderer(), &Renderer::sceneModified, [this]() { scene_list_view->updateSceneList(); });
 }
 
 void LightController::addPointLight() {
   LightData data = loadFromUi<AbstractLight::POINT>();
-  // AbstractLight* light = LightBuilder::createPLight(data);
-  // viewer_3d->getRenderer().executeMethod<ADD_ELEMENT_POINTLIGHT>(light);
   viewer_3d->getRenderer().pushEvent<Renderer::ON_LEFT_CLICK>(RENDERER_CALLBACK_ENUM::ADD_ELEMENT_POINTLIGHT, data);
-  // scene_list_view->updateSceneList();
 }
 
 void LightController::deletePointLight() {}

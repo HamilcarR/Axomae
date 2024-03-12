@@ -6,10 +6,26 @@ add_library(ax_scene
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_scene)
 target_link_libraries(ax_scene 
-PRIVATE 
-    ax_material
-    ax_common
-    ax_math
+PUBLIC
+        ax_common
+        ax_math
+PRIVATE
+        ax_material
+        ax_mesh
+        ax_camera
+        ax_database
+        ax_shader
+        ax_texture
+        ax_thread
+        ax_opengl
+        ax_geometry
+        ax_renderer
+
+
+
+
+
+
 )
 target_include_directories(ax_scene 
 PUBLIC 

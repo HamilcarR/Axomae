@@ -1,4 +1,5 @@
 #include "Image.h"
+#include "ImageDatabase.h"
 #include "Loader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -67,8 +68,8 @@ namespace IO {
     metadata.color_corrected = false;
 
     if (store) {
-      auto &hdr_database = resource_database->getHdrDatabase();
-      database::image::store<float>(hdr_database, false, image_data, metadata);
+      HdrImageDatabase *hdr_database = resource_database->getHdrDatabase();
+      database::image::store<float>(*hdr_database, false, image_data, metadata);
     }
     stbi_image_free(data);
     helper.notifyProgress(controller::ProgressManagerHelper::COMPLETE);

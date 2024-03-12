@@ -1,9 +1,8 @@
 #ifndef NODE_H
 #define NODE_H
-#include "Logger.h"
+
 #include "utils_3D.h"
 #include <memory>
-
 /**
  * @file Node.h
  * Implements the node class in the scene

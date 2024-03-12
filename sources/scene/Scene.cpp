@@ -2,14 +2,16 @@
 #include "BoundingBox.h"
 #include "Camera.h"
 #include "Drawable.h"
-#include "INodeFactory.h"
+#include "INodeDatabase.h"
 #include "Shader.h"
+#include "ShaderDatabase.h"
+#include "TextureDatabase.h"
 #include "utils_3D.h"
 
 using namespace axomae;
 
 Scene::Scene(ResourceDatabaseManager &rdm) : resource_manager(rdm), display_bbox(false) {
-  scene_skybox = database::node::store<CubeMapMesh>(resource_manager.getNodeDatabase(), true).object;
+  scene_skybox = database::node::store<CubeMapMesh>(*resource_manager.getNodeDatabase(), true).object;
 }
 
 void Scene::updateTree() {
@@ -22,7 +24,7 @@ void Scene::setCameraPointer(Camera *_scene_camera) {
   scene_tree.pushNewRoot(scene_camera);
 }
 
-void Scene::initialize() { scene_skybox->setShader(resource_manager.getShaderDatabase().get(Shader::CUBEMAP)); }
+void Scene::initialize() { scene_skybox->setShader(resource_manager.getShaderDatabase()->get(Shader::CUBEMAP)); }
 
 inline void setUpIblData(TextureDatabase &texture_database, Mesh *mesh) {}
 
@@ -45,7 +47,7 @@ void Scene::generateBoundingBoxes(Shader *box_shader) {
   for (Scene::AABB &scene_drawable : scene) {
     Mesh *mesh = scene_drawable.drawable->getMeshPointer();
     BoundingBoxMesh *bbox_mesh =
-        database::node::store<BoundingBoxMesh>(resource_manager.getNodeDatabase(), false, mesh, scene_drawable.aabb, box_shader).object;
+        database::node::store<BoundingBoxMesh>(*resource_manager.getNodeDatabase(), false, mesh, scene_drawable.aabb, box_shader).object;
     auto bbox_drawable = std::make_unique<Drawable>(bbox_mesh);
     bounding_boxes_array.push_back(bbox_drawable.get());
     drawable_collection.push_back(std::move(bbox_drawable));

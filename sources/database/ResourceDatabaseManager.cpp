@@ -1,5 +1,10 @@
 
 #include "ResourceDatabaseManager.h"
+#include "INodeDatabase.h"
+#include "ImageDatabase.h"
+#include "OP_ProgressStatus.h"
+#include "ShaderDatabase.h"
+#include "TextureDatabase.h"
 
 ResourceDatabaseManager &ResourceDatabaseManager::getInstance() {
   static ResourceDatabaseManager instance;

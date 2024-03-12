@@ -2,7 +2,7 @@
 #include "ResourceDatabaseManager.h"
 #include "Shader.h"
 
-TextureGroup::TextureGroup() : texture_database(&ResourceDatabaseManager::getInstance().getTextureDatabase()), initialized(false) {}
+TextureGroup::TextureGroup() : texture_database(ResourceDatabaseManager::getInstance().getTextureDatabase()), initialized(false) {}
 
 TextureGroup::TextureGroup(const TextureGroup &texture_group)
     : texture_collection(texture_group.getTextureCollection()), initialized(texture_group.isInitialized()) {}

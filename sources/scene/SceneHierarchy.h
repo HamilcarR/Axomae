@@ -1,9 +1,7 @@
 #ifndef SCENEHIERARCHY_H
 #define SCENEHIERARCHY_H
-
 #include "Node.h"
 #include "RenderingDatabaseInterface.h"
-#include <QObject>
 #include <functional>
 /**
  * @file SceneGraph.h

@@ -14,6 +14,17 @@ PRIVATE
     ax_mesh
     ax_opengl
     ax_shader 
+    ax_geometry
+    ax_macro
+    ax_texture
+    ax_database
+    ax_material
+    ax_debug
+    ax_editor
+
+
+
+
 )
 
 

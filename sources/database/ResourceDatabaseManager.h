@@ -1,16 +1,26 @@
 #ifndef RESOURCEDATABASEMANAGER_H
 #define RESOURCEDATABASEMANAGER_H
 
-#include "INodeDatabase.h"
-#include "ImageDatabase.h"
-#include "OP_ProgressStatus.h"
-#include "ShaderDatabase.h"
-#include "TextureDatabase.h"
+#include <cstdint>
+#include <memory>
+
 /**
  * @file ResourceDatabaseManager.h
  * @brief This file implements a singleton containing resources databases, like textures and shaders databases
  *
  */
+
+class TextureDatabase;
+class ShaderDatabase;
+class INodeDatabase;
+template<class T>
+class ImageDatabase;
+using RawImageDatabase = ImageDatabase<uint8_t>;
+using HdrImageDatabase = ImageDatabase<float>;
+namespace controller {
+  class OP_ProgressStatus;
+  using ProgressStatus = OP_ProgressStatus;
+}  // namespace controller
 
 /**
  * @brief This class contains all databases relative to resources used by the renderer.
@@ -40,11 +50,11 @@ class ResourceDatabaseManager final {
   void purgeNodeDatabase();
   void cleanRawImgDatabase();
   void purgeRawImgDatabase();
-  [[nodiscard]] TextureDatabase &getTextureDatabase() const { return *texture_database; }
-  [[nodiscard]] ShaderDatabase &getShaderDatabase() const { return *shader_database; }
-  [[nodiscard]] INodeDatabase &getNodeDatabase() const { return *node_database; }
-  [[nodiscard]] HdrImageDatabase &getHdrDatabase() const { return *hdr_database; }
-  [[nodiscard]] RawImageDatabase &getRawImgdatabase() const { return *image_database; }
+  [[nodiscard]] TextureDatabase *getTextureDatabase() const { return texture_database.get(); }
+  [[nodiscard]] ShaderDatabase *getShaderDatabase() const { return shader_database.get(); }
+  [[nodiscard]] INodeDatabase *getNodeDatabase() const { return node_database.get(); }
+  [[nodiscard]] HdrImageDatabase *getHdrDatabase() const { return hdr_database.get(); }
+  [[nodiscard]] RawImageDatabase *getRawImgdatabase() const { return image_database.get(); }
 
   void setProgressManagerAllDb(controller::ProgressStatus *progress_manager);
   void initializeDatabases(controller::ProgressStatus *progress_manager = nullptr);

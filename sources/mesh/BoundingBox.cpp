@@ -1,5 +1,4 @@
 #include "BoundingBox.h"
-#include "PerformanceLogger.h"
 
 using namespace axomae;
 
@@ -34,7 +33,6 @@ BoundingBox::BoundingBox() {
 
 // TODO: [AX-12] Parallelize bounding box computation
 BoundingBox::BoundingBox(const std::vector<float> &vertices) : BoundingBox() {
-  PerformanceLogger log;
   center = glm::vec3(0, 0, 0);
   /*
    * This lambda calculates asynchroneously the minimum/maximum coordinates of every meshes

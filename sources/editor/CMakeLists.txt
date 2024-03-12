@@ -1,6 +1,6 @@
 
-qt_wrap_ui(UI_FILES_LIST Form/texture_viewer.ui)
-qt_wrap_ui(UI_FILES_LIST Form/main_window.ui)
+
+
 add_library(ax_editor 
     ProgressStatusWidget.cpp 
     TextureViewerWidget.cpp
@@ -9,19 +9,36 @@ add_library(ax_editor
     image/Thumbnail.cpp
     UV/MeshListView.cpp 
     UV/SceneSelector.cpp
-    ${UI_FILES_LIST}
 )
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_editor)
 target_link_libraries(ax_editor 
-PRIVATE
+PUBLIC
     Qt6::Widgets
     Qt6::OpenGLWidgets
     ax_common
     ax_database
     ax_macro
     ax_image
+    ax_math
+    ax_io
+    ax_config
+
+
+PRIVATE
+    ax_mesh
+    ax_scene
+    ax_thread
+    ax_controller
+    ax_camera
+    ax_material
+    ax_shader
+    ax_texture
+    ax_opengl
+    ax_geometry
+    ax_renderer
+    ax_debug
 )
 
 target_include_directories(ax_editor 
@@ -30,6 +47,7 @@ PUBLIC
     Form
     image
     renderer
-    UV 
+    UV
 )
+
 

@@ -15,7 +15,7 @@ void LightingDatabase::giveID(AbstractLight *light) {
 
 LightingDatabase::LightingDatabase() {
   last_id = 0;
-  node_database = &ResourceDatabaseManager::getInstance().getNodeDatabase();
+  node_database = ResourceDatabaseManager::getInstance().getNodeDatabase();
 }
 
 LightingDatabase::~LightingDatabase() {}
