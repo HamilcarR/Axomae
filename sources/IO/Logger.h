@@ -11,11 +11,13 @@
 #include <sstream>
 #include <vector>
 
-#define LOG(message, level) LogFunctions::log_message(message, level, __FILE__, __func__, __LINE__)
-#define LOGFLUSH() LogFunctions::log_flush()
-#define LOGCONFIG(config) LogFunctions::log_configure(config)
-#define LOGDISABLE() LogFunctions::log_disable()
-#define LOGENABLE() LogFunctions::log_enable()
+#define LOG(message, level) log_functions::log_message(message, level, __FILE__, __func__, __LINE__)
+#define LOGS(message) log_functions::log_message(message)
+#define LOGFLUSH() log_functions::log_flush()
+#define LOGCONFIG(config) log_functions::log_configure(config)
+#define LOGDISABLE() log_functions::log_disable()
+#define LOGENABLE() log_functions::log_enable()
+
 namespace LogLevel {
   enum LOGENUMTYPE : unsigned { INFO, GLINFO, WARNING, ERROR, CRITICAL, DEBUG };
 }  // End namespace LogLevel
@@ -27,7 +29,7 @@ struct LoggerConfigDataStruct {
   bool enable_logging;
 };
 
-namespace LogFunctions {
+namespace log_functions {
   void log_message(const char *message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line);
   void log_message(std::string message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line);
   void log_message(const char *message);
@@ -35,7 +37,7 @@ namespace LogFunctions {
   void log_configure(const LoggerConfigDataStruct &config);
   void log_disable();
   void log_enable();
-}  // namespace LogFunctions
+}  // namespace log_functions
 
 /*****************************************************************************************************************************************************************************/
 class AbstractLogger : public ILockable {

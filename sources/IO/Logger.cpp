@@ -2,16 +2,16 @@
 #include "GenericException.h"
 #include "Mutex.h"
 #include <map>
-
+#include <unordered_map>
 #define LOG2STR(level) level_str[level]
 #define STR2LOG(str) level_str.find(str)
 
-std::map<LogLevel::LOGENUMTYPE, std::string> level_str = {{LogLevel::CRITICAL, "CRITICAL"},
-                                                          {LogLevel::DEBUG, "DEBUG"},
-                                                          {LogLevel::ERROR, "ERROR"},
-                                                          {LogLevel::INFO, "INFO"},
-                                                          {LogLevel::WARNING, "WARNING"},
-                                                          {LogLevel::GLINFO, "OPENGL INFO"}};
+std::unordered_map<LogLevel::LOGENUMTYPE, std::string> level_str = {{LogLevel::CRITICAL, "CRITICAL"},
+                                                                    {LogLevel::DEBUG, "DEBUG"},
+                                                                    {LogLevel::ERROR, "ERROR"},
+                                                                    {LogLevel::INFO, "INFO"},
+                                                                    {LogLevel::WARNING, "WARNING"},
+                                                                    {LogLevel::GLINFO, "OPENGL INFO"}};
 
 static std::string getFormatedLog(
     const std::string &message, const std::string &filename, const std::string &function, const unsigned line, LogLevel::LOGENUMTYPE level) {
@@ -19,12 +19,15 @@ static std::string getFormatedLog(
   return head;
 }
 
+/***************************************************************************************************************************************************************/
+
 class LoggerOutputStreamException : public exception::GenericException {
  public:
   LoggerOutputStreamException() : GenericException() { saveErrorString("The output stream for the application logger system is undefined !"); }
   virtual ~LoggerOutputStreamException() {}
 };
 
+/***************************************************************************************************************************************************************/
 class LogLine {
  public:
   LogLine(const std::string &_message,
@@ -57,7 +60,7 @@ class LogLine {
   std::string function{};
   unsigned line;
 };
-
+/***************************************************************************************************************************************************************/
 class Logger : protected AbstractLogger {
  public:
   Logger() { enabled = true; }
@@ -76,7 +79,7 @@ class Logger : protected AbstractLogger {
 
   void logMessage(const char *message) {
     if (enabled)
-      *out << message;
+      *out << level_str[LogLevel::INFO] << message << "\n";
   }
 
   void print() const {
@@ -120,10 +123,11 @@ class Logger : protected AbstractLogger {
   std::shared_ptr<std::ostream> out;
   std::string filters{};
 };
+/***************************************************************************************************************************************************************/
 
 static Logger logger_global;
 
-namespace LogFunctions {
+namespace log_functions {
   void log_message(std::string message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line) {
     logger_global.logMessage(message, level, file, function, line);
   }
@@ -141,4 +145,4 @@ namespace LogFunctions {
   void log_enable() { logger_global.loggerState(true); }
 
   void log_disable() { logger_global.loggerState(false); }
-}  // namespace LogFunctions
+}  // namespace log_functions

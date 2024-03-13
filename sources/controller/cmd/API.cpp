@@ -67,7 +67,6 @@ namespace controller::cmd {
     else {
       std::cerr << "Wrong projection type.";
       config.flag |= CONF_UV_TSPACE;
-
       return;
     }
     config.setUvEditorResolutionWidth(data.resolution_width);

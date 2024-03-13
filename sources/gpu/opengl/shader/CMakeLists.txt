@@ -18,5 +18,12 @@ PRIVATE
 target_include_directories(ax_shader 
 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/utils
     utils
 )
+
+
+#****************************************************************************************************
+# Encode shaders as byte arrays
+execute_process(COMMAND ${PROJECT_SOURCE_DIR}/scripts/stringify.sh ${PROJECT_SOURCE_DIR} )
+

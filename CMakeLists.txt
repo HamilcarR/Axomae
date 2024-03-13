@@ -3,9 +3,6 @@ project(Axomae VERSION 1.0 LANGUAGES C CXX)
 
 # Custom variables
 set(AXOMAE_UI_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/sources/editor/Form")
-#****************************************************************************************************
-# Encode shaders as byte arrays 
-execute_process(COMMAND ${PROJECT_SOURCE_DIR}/scripts/stringify.sh ${PROJECT_SOURCE_DIR} )
 
 #****************************************************************************************************
 # Compilation
@@ -37,6 +34,7 @@ set(USE_ASAN "OFF" CACHE BOOL "Enable Address Sanitizer")
 if(USE_ASAN)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
     set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
+
 endif()
 
 set(USE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
