@@ -25,6 +25,7 @@
 
 class RenderPipeline;
 class GLViewer;
+class ApplicationConfig;
 
 /**
  * @brief Renderer class definition
@@ -45,26 +46,11 @@ class Renderer : public QObject {
   Renderer();
 
  public:
-  /**
-   * @brief Construct a new Renderer object
-   *
-   * @param width Width of the window
-   * @param height Height of the window
-   * @param widget
-   */
   Renderer(unsigned width, unsigned height, GLViewer *widget = nullptr);
 
-  /**
-   * @brief Destroy the Renderer object
-   *
-   */
   virtual ~Renderer();
 
-  /**
-   * @brief Initialize the renderer's basic characteristics , like depth , background colors etc
-   *
-   */
-  void initialize();
+  void initialize(ApplicationConfig *app_conf);
 
   /**
    * @brief Method setting up the meshes , and the scene camera
@@ -306,6 +292,7 @@ class Renderer : public QObject {
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
 
  private:
+  ApplicationConfig *global_config;
   static const int event_num_size = ON_MOUSEWHEEL_SCROLL_DOWN + 1;
   std::queue<std::pair<RENDERER_CALLBACK_ENUM, std::any>> event_callback_stack[event_num_size];
 };

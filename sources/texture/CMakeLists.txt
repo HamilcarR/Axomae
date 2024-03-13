@@ -9,7 +9,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ax_texture)
 target_link_libraries(ax_texture 
 PRIVATE
     ax_io
-
     ax_renderer
     ax_debug
     ax_common

@@ -2,12 +2,10 @@
 #define GLVIEWER_H
 
 #include "Mesh.h"
-#include "Renderer.h"
 #include "RendererEnums.h"
 #include "SceneHierarchy.h"
 #include "constants.h"
 #include "utils_3D.h"
-#include <QMouseEvent>
 #include <QOpenGLWidget>
 
 /**
@@ -16,6 +14,9 @@
  */
 
 class Renderer;
+class QMouseEvent;
+class ApplicationConfig;
+
 /**
  * @class GLViewer
  * This class implements methods for the drawing process
@@ -52,6 +53,8 @@ class GLViewer : public QOpenGLWidget {
   const Renderer &getConstRenderer() { return *renderer; }
 
   Renderer &getRenderer() { return *renderer; }
+
+  void setApplicationConfig(ApplicationConfig *app_conf) { global_application_config = app_conf; }
 
  protected:
   /**
@@ -122,6 +125,7 @@ class GLViewer : public QOpenGLWidget {
  private:
   std::unique_ptr<Renderer> renderer; /*<Pointer on the renderer of the scene*/
   bool glew_initialized;              /*<Check if context is initialized*/
+  ApplicationConfig *global_application_config{};
 };
 
 #endif

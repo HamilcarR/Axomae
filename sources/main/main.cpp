@@ -44,10 +44,9 @@ static int exception_cleanup(const char *except_error) {
 
 int main(int argv, char **argc) {
   signal(SIGSEGV, sigsegv_handler);
-  ApplicationConfig configuration;
+
   controller::cmd::API api(argv, argc);
   controller::cmd::ProgramOptionsManager options_manager(api);
-  LoggerConfigDataStruct log_struct = configuration.generateDefaultLoggerConfigDataStruct();
   api.configureDefault();
   init_graphics();
   if (argv >= 2) {
@@ -58,10 +57,9 @@ int main(int argv, char **argc) {
     } catch (const exception::CatastrophicFailureException &e) {
       return exception_cleanup(e.what());
     }
-    configuration = api.getConfig();
-    LoggerConfigDataStruct log_conf = configuration.generateLoggerConfigDataStruct();
     api.configure();
-    if (configuration.getGuiState()) {
+    const ApplicationConfig &configuration = api.getConfig();
+    if (configuration.flag & CONF_USE_EDITOR) {
       QApplication app(argv, argc);
       controller::Controller win;
       win.setApplicationConfig(configuration);
@@ -76,6 +74,8 @@ int main(int argv, char **argc) {
   } else {
     QApplication app(argv, argc);
     controller::Controller win;
+    api.configureDefault();
+    const ApplicationConfig &configuration = api.getConfig();
     win.setApplicationConfig(configuration);
     win.show();
     int ret = app.exec();

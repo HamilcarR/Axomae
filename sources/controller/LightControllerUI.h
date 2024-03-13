@@ -1,12 +1,12 @@
 #ifndef LIGHTCONTROLLERUI_H
 #define LIGHTCONTROLLERUI_H
 
+#include "LightingSystem.h"
 #include "ui_main_window.h"
 
 /**
  * @brief Implements an event controller for the lighting panel
  */
-
 class LightController : public QObject {
   Q_OBJECT
  public:

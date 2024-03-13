@@ -1,11 +1,12 @@
 #include "EnvmapTextureManager.h"
 #include "Axomae_macros.h"
+#include "Config.h"
 #include "Loader.h"
 #include "Logger.h"
 #include "Mesh.h"
 #include "RenderPipeline.h"
 #include "Scene.h"
-#include "texture_utils.h"
+
 
 // TODO : read config values from file/cmd
 static texture::envmap::EnvmapBakingConfig generate_config() {
@@ -52,7 +53,7 @@ void EnvmapTextureManager::createFurnace() {
   database::image::store<float>(*hdr_database, true, image_data, metadata);
 }
 
-void EnvmapTextureManager::initializeDefaultEnvmap() {
+void EnvmapTextureManager::initializeDefaultEnvmap(ApplicationConfig *conf) {
 
   /* Need to compute the LUT beforehand , because of the add event in the HDR database*/
   if (resource_database.getTextureDatabase()->getTexturesByType(Texture::BRDFLUT).empty())

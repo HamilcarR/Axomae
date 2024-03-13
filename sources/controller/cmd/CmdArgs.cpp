@@ -67,7 +67,7 @@ namespace controller::cmd {
         ("viewer" , po::value<std::string>(), "Open viewer for the specified file")
         ("uv" , po::value<std::vector<std::string>>()->multitoken() ,
         "Usage: \n\
-        --uv [tangent|model] [X resolution] [Y resolution]\n\
+        --uv [tangent|object] [X resolution] [Y resolution]\n\
         Launch the program with the uv editor set to these options")
         ("bake,b",po::value<std::vector<std::string>>()->multitoken(),
         "Usage: \n\
@@ -95,7 +95,9 @@ namespace controller::cmd {
     } catch (const exception::GenericException &e) {
       std::cerr << e.what();
     }
-    api.configure(); /* Configure the application */
+    /* Configure the application */
+    api.configure();
+
     /* Cases that launch a process(task in the future)*/
     if (vm.count("editor")) {
       api.enableEditor();

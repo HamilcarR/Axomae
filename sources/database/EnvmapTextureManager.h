@@ -6,7 +6,7 @@
 #include "ResourceDatabaseManager.h"
 #include "TextureDatabase.h"
 #include "constants.h"
-#include <vector>
+
 /**
  * @file EnvmapTextureManager.h
  *
@@ -37,6 +37,8 @@ namespace texture::envmap {
   };
 }  // namespace texture::envmap
 
+class ApplicationConfig;
+
 /**
  * @class EnvmapTextureManager
  * @brief Tracks the current scene's envmap IDs , and generates new envmaps textures and IDs when an envmap is imported in an HDR database
@@ -49,21 +51,31 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
       ResourceDatabaseManager &resource_db, Dim2 &screen_size, unsigned int &default_framebuffer_id, RenderPipeline &render_pipeline, Scene &scene);
 
   ~EnvmapTextureManager() = default;
+
   EnvmapTextureManager(EnvmapTextureManager &copy) = delete;
+
   EnvmapTextureManager(EnvmapTextureManager &&move) = delete;
+
   EnvmapTextureManager &operator=(EnvmapTextureManager &copy) = delete;
+
   EnvmapTextureManager &operator=(EnvmapTextureManager &&move) = delete;
 
-  void initializeDefaultEnvmap();
+  void initializeDefaultEnvmap(ApplicationConfig *app_conf);
+
   void notified(observer::Data<Message *> &message) override;
 
   [[nodiscard]] int currentCubemapId() const { return current.cubemap_id; }
+
   [[nodiscard]] int currentPrefilterId() const { return current.prefiltered_id; }
+
   [[nodiscard]] int currentIrradianceId() const { return current.irradiance_id; }
+
   [[nodiscard]] int currentLutId() const { return current.lut_id; }
 
   void next();
+
   void previous();
+
   void updateCurrent(int index);
 
  private:

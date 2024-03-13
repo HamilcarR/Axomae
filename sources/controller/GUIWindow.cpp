@@ -230,7 +230,7 @@ namespace controller {
     renderer_scene_list = _UI.renderer_scene_list;
     _UI.renderer_envmap_list->setWidget(viewer_3d);
     viewer_3d->getRenderer().getRenderPipeline().setProgressManager(progress_manager.get());
-
+    viewer_3d->setApplicationConfig(&global_application_config);
     /* UV editor initialization*/
     uv_editor_mesh_list = _UI.meshes_list;
     uv_editor_mesh_list->setSceneSelector(&uv_mesh_selector);
@@ -529,12 +529,7 @@ namespace controller {
 
   /**************************************************************************************************************/
 
-  void Controller::use_gpgpu(bool checked) {
-    if (checked)
-      ImageManager::USE_GPU_COMPUTING();
-    else
-      ImageManager::USE_CPU_COMPUTING();
-  }
+  void Controller::use_gpgpu(bool checked) { global_application_config.flag |= CONF_USE_CUDA; }
 
   /**************************************************************************************************************/
 
@@ -672,7 +667,8 @@ namespace controller {
       try {
         int width = global_application_config.getUvEditorResolutionWidth();
         int height = global_application_config.getUvEditorResolutionHeight();
-        bool tangent = global_application_config.isUvEditorTangentSpace();
+        bool tangent = global_application_config.flag & CONF_UV_TSPACE;
+        LOG("Tangent : " + std::to_string(tangent), LogLevel::INFO);
         std::vector<uint8_t> surf = ImageManager::project_uv_normals(retrieved_mesh->geometry, width, height, tangent);
         view->display(surf, width, height, 3);
       } catch (const exception::GenericException &e) {

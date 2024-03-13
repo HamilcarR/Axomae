@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "Config.h"
 #include "DebugGL.h"
 #include "EnvmapTextureManager.h"
 #include "INodeFactory.h"
@@ -57,7 +58,7 @@ static void load_shader_database(ShaderDatabase &shader_database) {
   database::shader::store<BRDFLookupTableBakerShader>(shader_database, true);
 }
 
-void Renderer::initialize() {
+void Renderer::initialize(ApplicationConfig *app_conf) {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
   /*Read shader + initialize them*/
@@ -66,7 +67,7 @@ void Renderer::initialize() {
   shader_database.initializeShaders();
   /*Initialize a reusable lut texture*/
   scene->initialize();
-  envmap_manager->initializeDefaultEnvmap();
+  envmap_manager->initializeDefaultEnvmap(app_conf);
   camera_framebuffer = std::make_unique<CameraFrameBuffer>(resource_database, &screen_size, &default_framebuffer_id);
   camera_framebuffer->initializeFrameBuffer();
 }

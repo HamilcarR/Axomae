@@ -40,55 +40,7 @@ namespace LogFunctions {
 /*****************************************************************************************************************************************************************************/
 class AbstractLogger : public ILockable {
  public:
-  AbstractLogger();
-  virtual ~AbstractLogger();
   virtual void print() const = 0;
-};
-/*****************************************************************************************************************************************************************************/
-class LogLine {
- public:
-  LogLine(const std::string &message,
-          const LogLevel::LOGENUMTYPE log_level = LogLevel::INFO,
-          const char *file = "",
-          const char *function = "",
-          const unsigned line = 0);
-  const std::string &getMessage() { return message; }
-  const std::string &getLoggedFile() { return file; }
-  const std::string &getFunctionName() { return function; }
-  unsigned getLine() { return line; }
-  LogLevel::LOGENUMTYPE &getLogLevel() { return level; }
-  std::string getFormattedLog() const;
-
- private:
-  std::string message;
-  LogLevel::LOGENUMTYPE level;
-  std::string file{};
-  std::string function{};
-  unsigned line;
-};
-
-/*****************************************************************************************************************************************************************************/
-class Logger : virtual public AbstractLogger {
- public:
-  Logger();
-  virtual void print() const;
-  void logMessage(const std::string &message, LogLevel::LOGENUMTYPE log_level, const char *filename, const char *function, unsigned line);
-  void logMessage(const char *message, LogLevel::LOGENUMTYPE log_level, const char *filename, const char *function, unsigned line);
-  void logMessage(const char *message);
-  void flush();
-  void setPriority(LogLevel::LOGENUMTYPE _priority) { priority = _priority; }
-  void setLoggingStdout() { stdout_logging = true; }
-  void setLogSystemConfig(const LoggerConfigDataStruct &conf);
-  std::ostream &outstm() { return *out; }
-  void loggerState(bool enabled_) { enabled = enabled_; }
-
- protected:
-  std::vector<LogLine> log_buffer{};
-  bool stdout_logging{};
-  bool enabled{};
-  LogLevel::LOGENUMTYPE priority;
-  std::shared_ptr<std::ostream> out;
-  std::string filters{};
 };
 
 #endif

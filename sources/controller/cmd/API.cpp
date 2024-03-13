@@ -12,11 +12,15 @@ namespace controller::cmd {
     argc = argc_;
   }
 
-  void API::disableLogging() { config.loggerSetState(false); }
-  void API::enableLogging() { config.loggerSetState(true); }
-  void API::enableEditor() { config.setEditorLaunched(true); }
-  void API::disableEditor() { config.setEditorLaunched(false); }
-  void API::enableGpu() { config.setGpu(true); }
+  void API::disableLogging() { config.flag &= ~CONF_ENABLE_LOGS; }
+
+  void API::enableLogging() { config.flag |= CONF_ENABLE_LOGS; }
+
+  void API::enableEditor() { config.flag |= CONF_USE_EDITOR; }
+
+  void API::disableEditor() { config.flag &= ~CONF_USE_EDITOR; }
+
+  void API::enableGpu() { config.flag |= CONF_USE_CUDA; }
 
   void API::launchHdrTextureViewer(const std::string &file) {
     IO::Loader loader(nullptr);
@@ -38,7 +42,7 @@ namespace controller::cmd {
       EnvmapProcessing<float> process_texture(data.data, data.metadata.width, data.metadata.height, data.metadata.channels);
       std::unique_ptr<TextureData> texture;
       if (envmap.baketype == "irradiance") {
-        texture = process_texture.computeDiffuseIrradiance(envmap.width_output, envmap.height_output, envmap.samples, config.usingGpu());
+        texture = process_texture.computeDiffuseIrradiance(envmap.width_output, envmap.height_output, envmap.samples, (config.flag & CONF_USE_CUDA));
       }
       image::Metadata metadata;
       metadata.width = texture->width;
@@ -56,7 +60,16 @@ namespace controller::cmd {
   }
 
   void API::setUvEditorOptions(const uv::UVEDITORDATA &data) {
-    config.setUvEditorNormalProjectionMode(data.projection_type == "tangent");
+    if (data.projection_type == "tangent")
+      config.flag |= CONF_UV_TSPACE;
+    else if (data.projection_type == "object")
+      config.flag |= CONF_UV_OSPACE;
+    else {
+      std::cerr << "Wrong projection type.";
+      config.flag |= CONF_UV_TSPACE;
+
+      return;
+    }
     config.setUvEditorResolutionWidth(data.resolution_width);
     config.setUvEditorResolutionHeight(data.resolution_height);
   }

@@ -2,14 +2,9 @@
 #include "Mutex.h"
 #include <memory>
 
-const unsigned UV_EDITOR_RESOLUTION_W = 900;
-const unsigned UV_EDITOR_RESOLUTION_H = 900;
-
 ApplicationConfig::ApplicationConfig() {
+  flag = 0;
   logger_conf = generateLoggerConfigDataStruct();
-  uv_editor_resolution_width = UV_EDITOR_RESOLUTION_W;
-  uv_editor_resolution_height = UV_EDITOR_RESOLUTION_H;
-  uv_editor_normals_tangent_space = true;
 }
 
 std::string ApplicationConfig::getLogFile() const {

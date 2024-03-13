@@ -1,10 +1,11 @@
 #include "GLViewer.h"
+#include "Config.h"
 #include "DebugGL.h"
+#include "Renderer.h"
 #include <QCursor>
+#include <QMouseEvent>
 #include <QPoint>
 #include <QSurfaceFormat>
-
-// TODO : rename
 
 using namespace axomae;
 
@@ -44,7 +45,7 @@ void GLViewer::initializeGL() {
     }
   }
   renderer->onResize(width(), height());
-  renderer->initialize();
+  renderer->initialize(global_application_config);
   errorCheck(__FILE__, __LINE__);
 }
 

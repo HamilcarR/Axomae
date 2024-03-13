@@ -53,7 +53,7 @@ namespace LogLevel{
 
 class ApplicationConfig{
     - logger_conf : LoggerConfigDataStruct
-    + bool getGuiState()
+    + bool isUsingEditor()
     + void loggerSetState(bool)
     + void setGuiLaunched(bool)
     - is_config_init : bool

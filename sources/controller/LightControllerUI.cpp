@@ -1,6 +1,9 @@
 #include "LightControllerUI.h"
+#include "LightingSystem.h"
 #include "Logger.h"
+#include "Renderer.h"
 #include "constants.h"
+
 // TODO : refactor for cleaner controller system
 
 void LightController::connect_all_slots() {
