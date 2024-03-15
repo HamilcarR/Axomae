@@ -20,6 +20,8 @@ class ImageDatabase : public IntegerResourceDB<image::ThumbnailImageHolder<DATAT
 
  private:
   void notifyImageSelected(int index) {
+    if (subscribers.empty())
+      return;
     database::event::ImageSelectedMessage message;
     message.setIndex(index);
     observer::Data<Message> data{};
@@ -28,6 +30,8 @@ class ImageDatabase : public IntegerResourceDB<image::ThumbnailImageHolder<DATAT
   }
 
   void notifyImageDelete(int index) {
+    if (subscribers.empty())
+      return;
     database::event::ImageDeleteMessage message;
     message.setIndex(index);
     observer::Data<Message> data{};
@@ -36,6 +40,8 @@ class ImageDatabase : public IntegerResourceDB<image::ThumbnailImageHolder<DATAT
   }
 
   void notifyImageAdd(int index) {
+    if (subscribers.empty())
+      return;
     database::event::ImageAddMessage message;
     message.setMetadata(getMetadata(index));
     message.setIndex(index);
@@ -73,7 +79,7 @@ class ImageDatabase : public IntegerResourceDB<image::ThumbnailImageHolder<DATAT
       HolderResult result;
       result.id = it->second;
       result.object = BaseType::get(result.id);
-      assert(result.object != nullptr);
+      AX_ASSERT(result.object != nullptr);
       return result;
     }
     auto elem = BaseType::add(std::move(element), keep);
@@ -111,9 +117,13 @@ class ImageDatabase : public IntegerResourceDB<image::ThumbnailImageHolder<DATAT
 
 namespace database::image {
   template<class TYPE>
-  void store(IResourceDB<int, ::image::ThumbnailImageHolder<TYPE>> &database_, bool keep, std::vector<TYPE> &args, ::image::Metadata metadata) {
+  void store(IResourceDB<int, ::image::ThumbnailImageHolder<TYPE>> &database_,
+             bool keep,
+             std::vector<TYPE> &args,
+             const ::image::Metadata &metadata) {
     ASSERT_IS_ARITHMETIC(TYPE);
-    auto raw_image = std::make_unique<::image::ThumbnailImageHolder<TYPE>>(args, metadata, database_.getProgressManager());
+    std::unique_ptr<::image::ThumbnailImageHolder<TYPE>> raw_image = std::make_unique<::image::ThumbnailImageHolder<TYPE>>(
+        args, metadata, database_.getProgressManager());
     database_.add(std::move(raw_image), keep);
   }
 

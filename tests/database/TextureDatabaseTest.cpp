@@ -11,7 +11,7 @@ namespace texture_database_test {
 
   template<class HEAD, class... TAIL>
   constexpr void addTexture(IResourceDB<int, Texture> &database, TextureData *data) {
-    bool persistence = random_math::randb();
+    bool persistence = math::random::randb();
     database::texture::store<HEAD>(database, persistence, data);
     if constexpr (sizeof...(TAIL) > 0)
       addTexture<TAIL...>(database, data);
@@ -102,7 +102,7 @@ TEST(TextureDatabaseTest, remove) {
   TextureDatabaseTest test(database);
   EXPECT_FALSE(database.remove(nullptr));
   for (int i = 0; i < COUNT; i++) {
-    int pos = random_math::nrandi(0, COUNT - 1);
+    int pos = math::random::nrandi(0, COUNT - 1);
     auto iterator = database.getConstData().find(pos);
     bool contain = iterator != database.getConstData().end();
     EXPECT_EQ(contain, database.remove(iterator->second.get()));
@@ -131,7 +131,7 @@ TEST(TextureDatabaseTest, get) {
   EXPECT_EQ(ptr, nullptr);
   ptr = database.get(database.size() + 1);
   EXPECT_EQ(ptr, nullptr);
-  int pos = random_math::nrandi(0, COUNT - 1);
+  int pos = math::random::nrandi(0, COUNT - 1);
   ptr = database.get(pos);
   i = 0;
   bool found = false;

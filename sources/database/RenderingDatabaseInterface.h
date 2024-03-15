@@ -27,15 +27,21 @@ namespace database {
    public:
     IDTYPE id;
     OBJTYPE *object;
+
     Result() : id{}, object(nullptr) {}
+
     Result(IDTYPE id_, OBJTYPE *object_) : id(id_), object(object_) {}
+
     Result(const Result &copy) : id(copy.id), object(copy.object) {}
+
     Result(Result &&assign) noexcept : id(std::move(assign.id)), object(assign.object) {}
+
     Result &operator=(Result &&assign) noexcept {
       id = std::move(assign.id);
       object = assign.object;
       return *this;
     }
+
     Result &operator=(const Result &copy) {
       if (this != &copy) {
         id = copy.id;
@@ -43,6 +49,7 @@ namespace database {
       }
       return *this;
     }
+
     virtual ~Result() = default;
 
     bool operator!=(const Result<IDTYPE, OBJTYPE> &compare) const {

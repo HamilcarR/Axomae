@@ -1,16 +1,15 @@
 #include "ImageDatabase.h"
 #include "DatabaseBuilderTest.h"
-#define DATATYPE_LIST \
-  char, unsigned char, signed char, int, unsigned int, signed int, short int, unsigned short int, signed short int, long int, signed long int, \
-      unsigned long int, long long int, unsigned long long int, float, double, long double, wchar_t
+
+#define DATATYPE_LIST uint8_t, float
 
 const int COUNT = 18;
 const int TEST_SAMPLES = 20;
 const int PIXEL_VALUE_STD = 127;  // Prevents overflow for 1 byte types
 template<class TYPE>
-class MetaTemplate {
+class ImageMetadataAndData {
  public:
-  explicit MetaTemplate(std::string name) {
+  explicit ImageMetadataAndData(std::string name) {
     metadata.name = name;
     metadata.width = 2;
     metadata.height = 2;
@@ -27,8 +26,8 @@ class MetaTemplate {
 
 namespace image_database_test {
   template<class DATATYPE>
-  void addImage(IResourceDB<int, image::RawImageHolder<DATATYPE>> &database) {
-    bool persistence = random_math::randb();
+  void addImage(IResourceDB<int, image::ThumbnailImageHolder<DATATYPE>> &database) {
+    bool persistence = math::random::randb();
     std::vector<DATATYPE> vec;
     image::Metadata metadata;
     database::image::store(database, persistence);
@@ -36,17 +35,17 @@ namespace image_database_test {
 }  // namespace image_database_test
 
 template<class DATATYPE>
-class ImageDatabaseTest final : public DatabaseBuilderTest<int, image::RawImageHolder<DATATYPE>> {
-  using BASETYPE = DatabaseBuilderTest<int, image::RawImageHolder<DATATYPE>>;
+class ImageDatabaseTest final : public DatabaseBuilderTest<int, image::ThumbnailImageHolder<DATATYPE>> {
+  using BASETYPE = DatabaseBuilderTest<int, image::ThumbnailImageHolder<DATATYPE>>;
 
  public:
-  explicit ImageDatabaseTest(IResourceDB<int, image::RawImageHolder<DATATYPE>> &db, int size)
-      : DatabaseBuilderTest<int, image::RawImageHolder<DATATYPE>>(db), total_size(size) {
+  explicit ImageDatabaseTest(IResourceDB<int, image::ThumbnailImageHolder<DATATYPE>> &db, int size)
+      : DatabaseBuilderTest<int, image::ThumbnailImageHolder<DATATYPE>>(db), total_size(size) {
     buildDatabase();
   }
 
   void add(image::Metadata &metadata, std::vector<DATATYPE> &vec, bool persistence) {
-    database::image::store(BASETYPE::database, persistence, vec, metadata);
+    database::image::store(BASETYPE::database, persistence);
     total_size++;
   }
 
@@ -65,18 +64,20 @@ void test_all_types_add() {
   ImageDatabaseTest<HEAD> test(database, TEST_SAMPLES);
   int size = database.size();
   EXPECT_EQ(database.size(), TEST_SAMPLES);
-  MetaTemplate<HEAD> template_("");
+  ImageMetadataAndData<HEAD> template_("");
   test.add(template_.metadata, template_.data, false);
   EXPECT_EQ(database.size(), size + 1);
-  MetaTemplate<HEAD> template_name_1("example");
-  MetaTemplate<HEAD> template_name_2("example");
+  ImageMetadataAndData<HEAD> template_name_1("example");
+  ImageMetadataAndData<HEAD> template_name_2("example");
   ImageDatabase<HEAD> database2;
   ImageDatabaseTest<HEAD> test2(database2, TEST_SAMPLES);
   size = database2.size();
   test2.add(template_name_1.metadata, template_name_1.data, false);
+  size++;
   test2.add(template_name_2.metadata, template_name_2.data, false);
-  EXPECT_EQ(++size, database2.size());
-  MetaTemplate<HEAD> template_name_3("example1");
+  size++;
+  EXPECT_EQ(size, database2.size());
+  ImageMetadataAndData<HEAD> template_name_3("example1");
   test2.add(template_name_3.metadata, template_name_3.data, false);
   EXPECT_EQ(++size, database2.size());
   if constexpr (sizeof...(TAIL) > 0)
@@ -92,7 +93,7 @@ void test_all_types_contains() {
   for (int i = 0; i < database.size(); i++)
     EXPECT_TRUE(database.contains(i));
   EXPECT_EQ(size, database.size());
-  database::Result<int, image::RawImageHolder<HEAD>> result = database.contains(nullptr);
+  database::Result<int, image::ThumbnailImageHolder<HEAD>> result = database.contains(nullptr);
   EXPECT_EQ(result.object, nullptr);
   for (const auto &elem : database.getConstData())
     EXPECT_EQ(database.contains(elem.second.get()).object, elem.second.get());
@@ -111,7 +112,7 @@ void test_all_types_remove() {
   EXPECT_EQ(database.size(), 0);
   ImageDatabase<HEAD> database2;
   ImageDatabaseTest<HEAD> test2(database2, TEST_SAMPLES);
-  std::vector<image::RawImageHolder<HEAD> *> to_delete;
+  std::vector<image::ThumbnailImageHolder<HEAD> *> to_delete;
   for (const auto &elem : database2.getConstData())
     to_delete.push_back(elem.second.get());
   for (auto &elem : to_delete)

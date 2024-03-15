@@ -82,7 +82,7 @@ class Logger : protected AbstractLogger {
       *out << level_str[LogLevel::INFO] << message << "\n";
   }
 
-  void print() const {
+  void print() const override {
     if (out) {
       auto last_log = log_buffer.back();
       *out << last_log.getFormattedLog() << "\n";

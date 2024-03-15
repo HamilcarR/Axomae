@@ -55,7 +55,6 @@ void Material::initializeMaterial() {
   is_transparent = isTransparent();
   if (shader_program) {
     textures_group.initializeGlTextureData(shader_program);
-    errorCheck(__FILE__, __LINE__);
     std::string material = std::string(uniform_name_str_material_struct_name) + std::string(".");
     shader_program->setUniform(material + uniform_name_vec2_material_refractive_index, refractive_index);
     shader_program->setUniform(material + uniform_name_float_material_dielectric_factor, dielectric_factor);

@@ -56,34 +56,43 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 # Model imports 
 find_package(assimp REQUIRED)
+# Unit-Tests
+find_package(GTest REQUIRED)
 
 #****************************************************************************************************
-#Cuda 
+#Include and paths
+#Cuda
 set(CUDA_GENERATED_OUTPUT_DIR ${CMAKE_BINARY_DIR}/cuda_generated)
+# UI files path
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${AXOMAE_UI_LOCATION})
 
 
-
-
-#****************************************************************************************************
-#Include and paths 
-
+# Cache
 # STB
 set(STB_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb CACHE PATH "stb_image include path")
 if(NOT STB_INCLUDE_PATH)
     message(FATAL_ERROR "STB image path needs to be valid!")
 endif()
-
 # Optix
 set(OPTIX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/vendor/Optix CACHE PATH "Optix include path")
 
-# UI files path
-set(CMAKE_AUTOUIC_SEARCH_PATHS ${AXOMAE_UI_LOCATION})
 #****************************************************************************************************
-
 # Project setup
 qt_standard_project_setup()
 
 qt_add_executable(${PROJECT_NAME} sources/main/main.cpp)
 
-# Subdirs include
 add_subdirectory(sources)
+#****************************************************************************************************
+# Testing
+option(BUILD_TESTS "Build unit tests for the project" ON)
+if(BUILD_TESTS)
+    enable_testing()
+    # Subdirs include
+    add_subdirectory(tests)
+endif()
+
+
+
+
+

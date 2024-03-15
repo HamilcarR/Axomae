@@ -11,7 +11,7 @@ const int COUNT = 11;
 namespace node_database_test {
   template<class HEAD, class... TAIL>
   constexpr void addNode(IResourceDB<int, INode> &database) {
-    bool persistence = random_math::randb();
+    bool persistence = math::random::randb();
     database::node::store<HEAD>(database, persistence);
     if constexpr (sizeof...(TAIL) > 0)
       addNode<TAIL...>(database);
@@ -24,9 +24,9 @@ class NodeDatabaseTest final : public DatabaseBuilderTest<int, INode> {
   explicit NodeDatabaseTest(INodeDatabase &db) : DatabaseBuilderTest<int, INode>(db) { buildDatabase(); }
 
   template<class TYPE, class... Args>
-  database::Result<int, INode> addNode(INodeDatabase &database, bool persistence, Args &&...args) {
-    auto result = database::node::store<TYPE>(database, persistence, std::forward<Args>(args)...);
-    return {result.id, static_cast<INode *>(result.object)};
+  database::Result<int, TYPE> addNode(INodeDatabase &database, bool persistence, Args &&...args) {
+    database::Result<int, TYPE> result = database::node::store<TYPE>(database, persistence, std::forward<Args>(args)...);
+    return result;
   }
 
  private:

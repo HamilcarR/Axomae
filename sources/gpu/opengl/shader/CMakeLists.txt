@@ -15,7 +15,9 @@ PRIVATE
 
 )
 
-set(GEN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/ax_shader_autogen/include" )
+set(GEN_INCLUDE_DIR "${CMAKE_BINARY_DIR}/lib/shader/include" )
+file(MAKE_DIRECTORY(${GEN_INCLUDE_DIR}))
+
 #****************************************************************************************************
 # Encode shaders as byte arrays
 execute_process(COMMAND python3 ${PROJECT_SOURCE_DIR}/scripts/generate_shaders.py ${CMAKE_CURRENT_SOURCE_DIR}/glsl ${GEN_INCLUDE_DIR})

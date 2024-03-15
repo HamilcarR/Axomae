@@ -1,6 +1,6 @@
 #!usr/bin/env python3
 
-# This script generates shaders in a format that we can embed in the executable
+# This script generates shaders in a format that can be embedded in the executable
 
 import sys
 import glob
