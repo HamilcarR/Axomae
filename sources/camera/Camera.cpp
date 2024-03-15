@@ -9,38 +9,30 @@ constexpr float PANNING_SENSITIVITY = 10.f;
 
 /**********************************************************************************************************************************************/
 Camera::Camera() : world_up(glm::vec3(0, 1, 0)) {
-  position = glm::vec3(1, 0, -1.f);
-  target = glm::vec3(0, 0, 0);
-  direction = glm::vec3(0, 0, 0);
-  right = glm::vec3(0, 0, 0);
+  position = glm::vec3(0, 0, -1.f);
   local_transformation = glm::mat4(1.f);
+  view = glm::mat4(1.f);
+  projection = glm::mat4(1.f);
+  view_projection = glm::mat4(1.f);
+  camera_up = glm::vec3(0.f);
   type = EMPTY;
 }
 
-Camera::Camera(float deg, Dim2 *screen, float near, float far, const MouseState *pointer) : Camera() {
-  type = EMPTY;
-  position = glm::vec3(0, 0, -1.f);
-  target = glm::vec3(0, 0, 0);
-  direction = glm::vec3(0, 0, 0);
-  right = glm::vec3(0, 0, 0);
-  view = glm::mat4(1.f);
-  projection = glm::mat4(1.f);
+Camera::Camera(float deg, float near, float far, const Dim2 *screen, const MouseState *pointer) : Camera() {
   fov = deg;
-  view_projection = glm::mat4(1.f);
   this->far = far;
   this->near = near;
   ratio_dimensions = screen;
   mouse_state_pointer = pointer;
-  projection = glm::mat4(1.f);
 }
 
 void Camera::reset() {
   projection = glm::mat4(1.f);
   view = glm::mat4(1.f);
-  target = glm::vec3(0, 0, 0);
+  target = glm::vec3(0.f);
   position = glm::vec3(0, 0, -1.f);
-  direction = glm::vec3(0, 0, 0);
-  camera_up = glm::vec3(0, 0, 0);
+  direction = glm::vec3(0.f);
+  camera_up = glm::vec3(0.f);
   view_projection = glm::mat4(1.f);
 }
 
@@ -63,36 +55,12 @@ void Camera::computeViewSpace() {
 /**********************************************************************************************************************************************/
 ArcballCamera::ArcballCamera() { reset(); }
 
-/**
- * This is a constructor for an ArcballCamera object that sets its properties and initializes its
- * radius.
- *
- * @param radians The field of view angle in deg for the camera.
- * @param screen The `screen` parameter is a pointer to an object of the `Dim2` class, which
- * contains information about the size of the screen or window in which the camera will be used. This
- * information is typically used to calculate the aspect ratio of the screen, which is important for
- * rendering the scene correctly
- * @param near The distance to the near clipping plane of the camera's frustum. Any objects closer than
- * this distance will not be rendered.
- * @param far The "far" parameter in this context refers to the distance from the camera beyond which
- * objects will not be rendered. It is a part of the perspective projection matrix used in 3D graphics
- * rendering.
- * @param radius The distance between the camera and the center of rotation in an arcball camera. It
- * determines how far the camera is from the object being viewed.
- * @param pointer The "pointer" parameter is a pointer to a MouseState object, which  contains
- * information about the current state of the mouse (e.g. position, button presses, etc.). This is
- *  used by the ArcballCamera class to track user input and update the camera's
- * position/orientation accordingly
- */
-ArcballCamera::ArcballCamera(float deg, Dim2 *screen, float near, float far, float radius, const MouseState *pointer)
-    : Camera(deg, screen, near, far, pointer) {
-  reset();
-  default_radius = radius;
+ArcballCamera::ArcballCamera(float deg, float near, float far, float radius_, const Dim2 *screen, const MouseState *pointer)
+    : Camera(deg, near, far, screen, pointer), radius(radius_), default_radius(radius_) {
+  ArcballCamera::reset();
   name = "Arcball-Camera";
-  this->radius = radius;
+  type = ARCBALL;
 }
-
-ArcballCamera::~ArcballCamera() {}
 
 void ArcballCamera::reset() {
   Camera::reset();
@@ -163,9 +131,9 @@ void ArcballCamera::computeViewSpace() {
   view = glm::lookAt(position, target, world_up);
 }
 
-const glm::mat4 ArcballCamera::getSceneRotationMatrix() const { return scene_rotation_matrix; }
+glm::mat4 ArcballCamera::getSceneRotationMatrix() const { return scene_rotation_matrix; }
 
-const glm::mat4 ArcballCamera::getSceneTranslationMatrix() const { return scene_translation_matrix; }
+glm::mat4 ArcballCamera::getSceneTranslationMatrix() const { return scene_translation_matrix; }
 
 /**
  * The function calculates the z-axis value for a given x and y coordinate within a specified radius.
@@ -178,9 +146,9 @@ const glm::mat4 ArcballCamera::getSceneTranslationMatrix() const { return scene_
  */
 static float get_z_axis(float x, float y, float radius) {
   if (((x * x) + (y * y)) <= (radius * radius / 2))
-    return (float)sqrt((radius * radius) - (x * x) - (y * y));
+    return (float)sqrtf((radius * radius) - (x * x) - (y * y));
   else
-    return (float)((radius * radius) / 2) / sqrt((x * x) + (y * y));
+    return (float)((radius * radius) / 2) / sqrtf((x * x) + (y * y));
 }
 
 /**
@@ -202,7 +170,7 @@ void ArcballCamera::movePosition() {
 }
 
 /**
- * This function calculates the starting position of the mouse in normalized device coordinates for an
+ * calculates the starting position of the mouse in normalized device coordinates for an
  * Arcball camera when the left mouse button is clicked.
  */
 void ArcballCamera::onLeftClick() {
@@ -247,11 +215,10 @@ void ArcballCamera::zoomOut() { updateZoom(DELTA_ZOOM); }
 FreePerspectiveCamera::FreePerspectiveCamera() : Camera() { type = PERSPECTIVE; }
 
 FreePerspectiveCamera::FreePerspectiveCamera(float deg, Dim2 *screen, float near, float far, const MouseState *pointer)
-    : Camera(deg, screen, near, far, pointer) {
+    : Camera(deg, near, far, screen, pointer) {
   type = PERSPECTIVE;
 }
 
-FreePerspectiveCamera::~FreePerspectiveCamera() {}
 void FreePerspectiveCamera::movePosition() {}
 
 void FreePerspectiveCamera::onLeftClick() {}
@@ -263,7 +230,9 @@ void FreePerspectiveCamera::onRightClick() {}
 void FreePerspectiveCamera::onRightClickRelease() {}
 
 void FreePerspectiveCamera::zoomIn() {}
-void FreePerspectiveCamera::zoomOut() {}
-const glm::mat4 FreePerspectiveCamera::getSceneTranslationMatrix() const { return glm::mat4(1.f); }
 
-const glm::mat4 FreePerspectiveCamera::getSceneRotationMatrix() const { return glm::mat4(1.f); }
+void FreePerspectiveCamera::zoomOut() {}
+
+glm::mat4 FreePerspectiveCamera::getSceneTranslationMatrix() const { return glm::mat4(1.f); }
+
+glm::mat4 FreePerspectiveCamera::getSceneRotationMatrix() const { return glm::mat4(1.f); }

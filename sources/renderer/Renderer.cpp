@@ -23,7 +23,7 @@ Renderer::Renderer()
     : camera_framebuffer(nullptr), start_draw(false), resource_database(ResourceDatabaseManager::getInstance()), default_framebuffer_id(0) {
   setUpMouseStates(mouse_state);
   scene_camera =
-      database::node::store<ArcballCamera>(*resource_database.getNodeDatabase(), true, 45.f, &screen_size, 0.1f, 10000.f, 100.f, &mouse_state).object;
+      database::node::store<ArcballCamera>(*resource_database.getNodeDatabase(), true, 45.f, 0.1f, 10000.f, 100.f, &screen_size, &mouse_state).object;
 
   scene = std::make_unique<Scene>(ResourceDatabaseManager::getInstance());
 }
