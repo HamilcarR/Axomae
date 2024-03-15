@@ -1,8 +1,7 @@
 #include "BoundingBox.h"
 #include "Test.h"
-
-#define m_rand rand() % 100 - 50
-#define f_rand rand() / ((float)RAND_MAX) * 100 - 50
+#include "math_utils.h"
+#define f_rand math::random::nrandf(-10.040, 12.100)
 
 constexpr float EPSILON = 0.0001f;
 constexpr unsigned ITERATION_NUMBER = 5;
@@ -19,7 +18,6 @@ std::vector<float> vertices = {
 
 TEST(BoundingBoxTest, minMaxCompute) {
   std::vector<float> v;
-  srand(time(nullptr));
   glm::vec3 max_coords = glm::vec3(-INT_MAX, -INT_MAX, -INT_MAX);
   glm::vec3 min_coords = glm::vec3(-1.f) * max_coords;
   for (unsigned i = 0; i < 24; i++)
@@ -41,7 +39,6 @@ TEST(BoundingBoxTest, minMaxCompute) {
 
 TEST(BoundingBoxTest, productOperatorTest) {
   BoundingBox B1(vertices);
-  srand(time(nullptr));
   std::vector<std::pair<glm::mat4, glm::vec3[3]>>
       matrix_result;  // first = matrices , second = result matrix x coords => {min_coords , max_coords , center}
   matrix_result.resize(ITERATION_NUMBER);
