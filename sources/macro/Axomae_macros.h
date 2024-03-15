@@ -9,6 +9,7 @@
 #define ASSERT_ISTYPE(TYPE1, TYPE2) static_assert(ISTYPE(TYPE1, TYPE2))
 #define ASSERT_IS_ARITHMETIC(TYPE) static_assert(IS_ARITHMETHIC(TYPE))
 #define NOT_IMPLEMENTED static_assert(false, "Not yet implemented")
-
+// Function does nothing
+#define EMPTY_FUNCBODY return
 #define AX_ASSERT(expr) assert(expr)
 #endif

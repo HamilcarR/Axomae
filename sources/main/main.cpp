@@ -44,7 +44,6 @@ static int exception_cleanup(const char *except_error) {
 
 int main(int argv, char **argc) {
   signal(SIGSEGV, sigsegv_handler);
-
   controller::cmd::API api(argv, argc);
   controller::cmd::ProgramOptionsManager options_manager(api);
   api.configureDefault();

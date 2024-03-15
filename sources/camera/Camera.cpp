@@ -53,7 +53,7 @@ void Camera::computeViewSpace() {
   view = glm::lookAt(position, target, camera_up);
 }
 /**********************************************************************************************************************************************/
-ArcballCamera::ArcballCamera() { reset(); }
+ArcballCamera::ArcballCamera() { ArcballCamera::reset(); }
 
 ArcballCamera::ArcballCamera(float deg, float near, float far, float radius_, const Dim2 *screen, const MouseState *pointer)
     : Camera(deg, near, far, screen, pointer), radius(radius_), default_radius(radius_) {
@@ -72,7 +72,6 @@ void ArcballCamera::reset() {
   cursor_position = glm::vec2(0);
   rotation = last_rotation = glm::quat(1.f, 0.f, 0.f, 0.f);
   axis = glm::vec3(0.f);
-  target = glm::vec3(0.f);
   panning_offset = glm::vec3(0);
   delta_position = glm::vec3(0.f);
   translation = last_translation = scene_translation_matrix = scene_rotation_matrix = local_transformation = glm::mat4(1.f);

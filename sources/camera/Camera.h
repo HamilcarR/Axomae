@@ -1,83 +1,65 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "ICamera.h"
 #include "Node.h"
-
 /**
  * @file Camera.h
- *
- * @brief Interface for the Camera classes
- *
  */
 
 /**
  * @brief Base Camera class
- *
- *
  */
-class Camera : public SceneTreeNode {
+class Camera : public ICamera, public SceneTreeNode {
  public:
   enum TYPE : signed { EMPTY = -1, ARCBALL = 0, PERSPECTIVE = 1 };
 
-  Camera();
+  void computeViewSpace() override;
 
-  /**
-   * @brief Constructor for the Camera class , which initializes various properties of the
-   * camera.
-   *
-   * @param degrees The field of view angle in degrees for the camera.
-   * @param screen A pointer to an object of type Dim2, which contains information about the size
-   * of the screen or window where the camera will be rendering.
-   * @param clip_near The distance from the camera to the near clipping plane. Any objects closer to the
-   * camera than this distance will not be visible.
-   * @param clip_far The far plane of the camera's frustum, which determines the maximum distance at which
-   * objects will be visible.
-   * @param pointer The "pointer" parameter is a pointer to a MouseState object, which is used to
-   * track the state of the mouse (e.g. position, button clicks) for camera movement and control.
-   */
-  Camera(float degrees, float clip_near, float clip_far, const Dim2 *screen, const MouseState *pointer = nullptr);
+  void computeProjectionSpace() override;
 
-  virtual void computeViewSpace();
+  void computeViewProjection() override;
 
-  virtual void computeProjectionSpace();
+  void setView(const glm::mat4 &_view) { view = _view; }
 
-  virtual void computeViewProjection();
+  void setTarget(const glm::vec3 &_target) { target = _target; }
 
-  virtual void setView(const glm::mat4 &_view) { view = _view; }
+  void setPosition(const glm::vec3 &new_pos) { position = new_pos; }
 
-  virtual void setTarget(const glm::vec3 &_target) { target = _target; }
+  void onLeftClick() override = 0;
 
-  virtual void setPosition(const glm::vec3 &new_pos) { position = new_pos; }
+  void onRightClick() override = 0;
 
-  virtual void onLeftClick() = 0;
+  void onLeftClickRelease() override = 0;
 
-  virtual void onRightClick() = 0;
+  void onRightClickRelease() override = 0;
 
-  virtual void onLeftClickRelease() = 0;
+  void movePosition() override = 0;
 
-  virtual void onRightClickRelease() = 0;
+  void zoomIn() override = 0;
 
-  virtual void movePosition() = 0;
+  void zoomOut() override = 0;
 
-  virtual void zoomIn() = 0;
-
-  virtual void zoomOut() = 0;
-
-  virtual void reset();
+  void reset() override;
 
   [[nodiscard]] virtual const glm::vec3 &getPosition() const { return position; }
 
-  [[nodiscard]] virtual glm::mat4 getSceneRotationMatrix() const = 0;
+  [[nodiscard]] glm::mat4 getSceneRotationMatrix() const override = 0;
 
-  [[nodiscard]] virtual glm::mat4 getSceneTranslationMatrix() const = 0;
+  [[nodiscard]] glm::mat4 getSceneTranslationMatrix() const override = 0;
 
-  [[nodiscard]] const glm::mat4 &getViewProjection() const { return view_projection; }
+  [[nodiscard]] const glm::mat4 &getViewProjection() const override { return view_projection; }
 
-  [[nodiscard]] const glm::mat4 &getProjection() const { return projection; }
+  [[nodiscard]] const glm::mat4 &getProjection() const override { return projection; }
 
-  [[nodiscard]] const glm::mat4 &getView() const { return view; }
+  [[nodiscard]] const glm::mat4 &getView() const override { return view; }
 
   [[nodiscard]] TYPE getType() const { return type; }
+
+ protected:
+  Camera();
+
+  Camera(float degrees, float clip_near, float clip_far, const Dim2 *screen, const MouseState *pointer = nullptr);
 
  protected:
   TYPE type{};
@@ -110,39 +92,25 @@ class ArcballCamera : public Camera {
 
   void computeViewSpace() override;
   /**
-   * @brief Left click event , calculates the rotation matrix.
+   * @brief Left click event , calculates the rotation matrix (will rotate the scene around the camera)
    *
    */
   void onLeftClick() override;
+
   /**
-   * @brief Right click event , calculates the translation matrix.
+   * @brief Right click event , calculates the translation matrix (will translate the scene relative to the camera)
    *
    */
   void onRightClick() override;
-  /**
-   * @brief Left click release event.
-   *
-   */
+
   void onLeftClickRelease() override;
-  /**
-   * @brief Right click release event.
-   *
-   */
+
   void onRightClickRelease() override;
-  /**
-   * @brief Mouse wheel up event.
-   *
-   */
+
   void zoomIn() override;
-  /**
-   * @brief Mouse wheel down event.
-   *
-   */
+
   void zoomOut() override;
-  /**
-   * @brief Resets the camera state.
-   *
-   */
+
   void reset() override;
 
   /**
