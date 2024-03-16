@@ -1,4 +1,6 @@
 #include "GUIWindow.h"
+#include "Config.h"
+#include "EventController.h"
 #include "ImageImporter.h"
 #include "ImageManager.h"
 #include "Loader.h"
@@ -10,6 +12,7 @@
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsItem>
 #include <stack>
+
 // TODO : Very old code , need refactoring²
 namespace controller {
   using namespace gui;
@@ -218,25 +221,32 @@ namespace controller {
     resource_database.initializeDatabases();
 
     /* UI elements initialization*/
-    _UI.setupUi(this);
+    main_window_ui.setupUi(this);
+
+    /* Configuration structure initialization */
+    global_application_config = std::make_unique<ApplicationConfig>();
+
+    /* Event structure initialization */
+    application_events = std::make_unique<controller::event::Event>();
 
     /* UI progress bar operator initialization for objects that need to show progress*/
-    _UI.progressBar->setValue(0);
-    progress_manager = std::make_unique<controller::ProgressStatus>(_UI.progressBar);
+    main_window_ui.progressBar->setValue(0);
+    progress_manager = std::make_unique<controller::ProgressStatus>(main_window_ui.progressBar);
     resource_database.setProgressManagerAllDb(progress_manager.get());
 
     /* Realtime renderer initialization*/
-    viewer_3d = _UI.renderer_view;
-    renderer_scene_list = _UI.renderer_scene_list;
-    _UI.renderer_envmap_list->setWidget(viewer_3d);
+    viewer_3d = main_window_ui.renderer_view;
+    renderer_scene_list = main_window_ui.renderer_scene_list;
+    main_window_ui.renderer_envmap_list->setWidget(viewer_3d);
     viewer_3d->getRenderer().getRenderPipeline().setProgressManager(progress_manager.get());
-    viewer_3d->setApplicationConfig(&global_application_config);
+    viewer_3d->setApplicationConfig(global_application_config.get());
+
     /* UV editor initialization*/
-    uv_editor_mesh_list = _UI.meshes_list;
+    uv_editor_mesh_list = main_window_ui.meshes_list;
     uv_editor_mesh_list->setSceneSelector(&uv_mesh_selector);
 
     /*Lighting GUI initialization*/
-    light_controller = std::make_unique<LightController>(_UI);
+    light_controller = std::make_unique<LightController>(main_window_ui);
     light_controller->setup(viewer_3d, renderer_scene_list);
 
     /* Undo pointers setup*/
@@ -250,7 +260,11 @@ namespace controller {
 
   Controller::~Controller() { delete _MemManagement; }
 
-  void Controller::setApplicationConfig(const ApplicationConfig &config) { global_application_config = config; }
+  void Controller::setApplicationConfig(const ApplicationConfig *config) {
+    AX_ASSERT(config);
+    AX_ASSERT(global_application_config);
+    *global_application_config = *config;
+  }
 
   /**************************************************************************************************************/
   void Controller::display_image(SDL_Surface *surf, IMAGETYPE type, bool save_in_heap) {
@@ -291,25 +305,25 @@ namespace controller {
   QGraphicsView *Controller::get_corresponding_view(IMAGETYPE type) {
     switch (type) {
       case HEIGHT:
-        return _UI.height_image;
+        return main_window_ui.height_image;
         break;
       case PROJECTED_NMAP:
         return nullptr;
         break;
       case ALBEDO:
-        return _UI.diffuse_image;
+        return main_window_ui.diffuse_image;
         break;
       case GREYSCALE_LUMI:
-        return _UI.greyscale_image;
+        return main_window_ui.greyscale_image;
         break;
       case GREYSCALE_AVG:
-        return _UI.greyscale_image;
+        return main_window_ui.greyscale_image;
         break;
       case NMAP:
-        return _UI.normal_image;
+        return main_window_ui.normal_image;
         break;
       case DUDV:
-        return _UI.dudv_image;
+        return main_window_ui.dudv_image;
         break;
       default:
         return nullptr;
@@ -399,53 +413,53 @@ namespace controller {
 
     /*Main Window -> Toolbar menu -> Files*/
 
-    QObject::connect(_UI.actionImport_image, SIGNAL(triggered()), this, SLOT(import_image()));
-    QObject::connect(_UI.actionSave_image, SIGNAL(triggered()), this, SLOT(save_image()));
-    QObject::connect(_UI.actionImport_Environment_Map, SIGNAL(triggered()), this, SLOT(import_envmap()));
+    QObject::connect(main_window_ui.actionImport_image, SIGNAL(triggered()), this, SLOT(import_image()));
+    QObject::connect(main_window_ui.actionSave_image, SIGNAL(triggered()), this, SLOT(save_image()));
+    QObject::connect(main_window_ui.actionImport_Environment_Map, SIGNAL(triggered()), this, SLOT(import_envmap()));
 
-    QObject::connect(_UI.use_average, SIGNAL(clicked()), this, SLOT(greyscale_average()));
-    QObject::connect(_UI.use_luminance, SIGNAL(clicked()), this, SLOT(greyscale_luminance()));
-    QObject::connect(_UI.use_scharr, SIGNAL(clicked()), this, SLOT(use_scharr()));
-    QObject::connect(_UI.use_sobel, SIGNAL(clicked()), this, SLOT(use_sobel()));
-    QObject::connect(_UI.use_prewitt, SIGNAL(clicked()), this, SLOT(use_prewitt()));
+    QObject::connect(main_window_ui.use_average, SIGNAL(clicked()), this, SLOT(greyscale_average()));
+    QObject::connect(main_window_ui.use_luminance, SIGNAL(clicked()), this, SLOT(greyscale_luminance()));
+    QObject::connect(main_window_ui.use_scharr, SIGNAL(clicked()), this, SLOT(use_scharr()));
+    QObject::connect(main_window_ui.use_sobel, SIGNAL(clicked()), this, SLOT(use_sobel()));
+    QObject::connect(main_window_ui.use_prewitt, SIGNAL(clicked()), this, SLOT(use_prewitt()));
 
-    QObject::connect(_UI.actionUndo, SIGNAL(triggered()), this, SLOT(undo()));
-    QObject::connect(_UI.actionRedo, SIGNAL(triggered()), this, SLOT(redo()));
-    QObject::connect(_UI.undo_button, SIGNAL(clicked()), this, SLOT(undo()));
-    QObject::connect(_UI.redo_button, SIGNAL(clicked()), this, SLOT(redo()));
-    QObject::connect(_UI.use_objectSpace, SIGNAL(clicked()), this, SLOT(use_object_space()));
-    QObject::connect(_UI.use_tangentSpace, SIGNAL(clicked()), this, SLOT(use_tangent_space()));
+    QObject::connect(main_window_ui.actionUndo, SIGNAL(triggered()), this, SLOT(undo()));
+    QObject::connect(main_window_ui.actionRedo, SIGNAL(triggered()), this, SLOT(redo()));
+    QObject::connect(main_window_ui.undo_button, SIGNAL(clicked()), this, SLOT(undo()));
+    QObject::connect(main_window_ui.redo_button, SIGNAL(clicked()), this, SLOT(redo()));
+    QObject::connect(main_window_ui.use_objectSpace, SIGNAL(clicked()), this, SLOT(use_object_space()));
+    QObject::connect(main_window_ui.use_tangentSpace, SIGNAL(clicked()), this, SLOT(use_tangent_space()));
 
-    QObject::connect(_UI.smooth_dial, SIGNAL(valueChanged(int)), this, SLOT(update_smooth_factor(int)));
-    QObject::connect(_UI.sharpen_button, SIGNAL(clicked()), this, SLOT(sharpen_edge()));
-    QObject::connect(_UI.smooth_button, SIGNAL(clicked()), this, SLOT(smooth_edge()));
-    QObject::connect(_UI.factor_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_factor(int)));
-    QObject::connect(_UI.attenuation_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_attenuation(int)));
+    QObject::connect(main_window_ui.smooth_dial, SIGNAL(valueChanged(int)), this, SLOT(update_smooth_factor(int)));
+    QObject::connect(main_window_ui.sharpen_button, SIGNAL(clicked()), this, SLOT(sharpen_edge()));
+    QObject::connect(main_window_ui.smooth_button, SIGNAL(clicked()), this, SLOT(smooth_edge()));
+    QObject::connect(main_window_ui.factor_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_factor(int)));
+    QObject::connect(main_window_ui.attenuation_slider_nmap, SIGNAL(valueChanged(int)), this, SLOT(change_nmap_attenuation(int)));
 
-    QObject::connect(_UI.compute_dudv, SIGNAL(pressed()), this, SLOT(compute_dudv()));
-    QObject::connect(_UI.factor_slider_dudv, SIGNAL(valueChanged(int)), this, SLOT(change_dudv_nmap(int)));
-    QObject::connect(_UI.use_gpu, SIGNAL(clicked(bool)), this, SLOT(use_gpgpu(bool)));
+    QObject::connect(main_window_ui.compute_dudv, SIGNAL(pressed()), this, SLOT(compute_dudv()));
+    QObject::connect(main_window_ui.factor_slider_dudv, SIGNAL(valueChanged(int)), this, SLOT(change_dudv_nmap(int)));
+    QObject::connect(main_window_ui.use_gpu, SIGNAL(clicked(bool)), this, SLOT(use_gpgpu(bool)));
 
-    QObject::connect(_UI.bake_texture, SIGNAL(clicked()), this, SLOT(cubemap_baking()));
-    QObject::connect(_UI.actionImport_3D_model, SIGNAL(triggered()), this, SLOT(import_3DOBJ()));
+    QObject::connect(main_window_ui.bake_texture, SIGNAL(clicked()), this, SLOT(cubemap_baking()));
+    QObject::connect(main_window_ui.actionImport_3D_model, SIGNAL(triggered()), this, SLOT(import_3DOBJ()));
 
-    QObject::connect(_UI.next_mesh_button, SIGNAL(clicked()), this, SLOT(next_mesh()));
-    QObject::connect(_UI.previous_mesh_button, SIGNAL(clicked()), this, SLOT(previous_mesh()));
+    QObject::connect(main_window_ui.next_mesh_button, SIGNAL(clicked()), this, SLOT(next_mesh()));
+    QObject::connect(main_window_ui.previous_mesh_button, SIGNAL(clicked()), this, SLOT(previous_mesh()));
 
     /*Renderer tab -> Post processing -> Camera*/
-    QObject::connect(_UI.gamma_slider, SIGNAL(valueChanged(int)), this, SLOT(set_renderer_gamma_value(int)));
-    QObject::connect(_UI.exposure_slider, SIGNAL(valueChanged(int)), this, SLOT(set_renderer_exposure_value(int)));
-    QObject::connect(_UI.reset_camera_button, SIGNAL(pressed()), this, SLOT(reset_renderer_camera()));
-    QObject::connect(_UI.set_standard_post_p, SIGNAL(clicked()), this, SLOT(set_renderer_no_post_process()));
-    QObject::connect(_UI.set_edge_post_p, SIGNAL(pressed()), this, SLOT(set_renderer_edge_post_process()));
-    QObject::connect(_UI.set_sharpen_post_p, SIGNAL(pressed()), this, SLOT(set_renderer_sharpen_post_process()));
-    QObject::connect(_UI.set_blurr_post_p, SIGNAL(pressed()), this, SLOT(set_renderer_blurr_post_process()));
+    QObject::connect(main_window_ui.gamma_slider, SIGNAL(valueChanged(int)), this, SLOT(set_renderer_gamma_value(int)));
+    QObject::connect(main_window_ui.exposure_slider, SIGNAL(valueChanged(int)), this, SLOT(set_renderer_exposure_value(int)));
+    QObject::connect(main_window_ui.reset_camera_button, SIGNAL(pressed()), this, SLOT(reset_renderer_camera()));
+    QObject::connect(main_window_ui.set_standard_post_p, SIGNAL(clicked()), this, SLOT(set_renderer_no_post_process()));
+    QObject::connect(main_window_ui.set_edge_post_p, SIGNAL(pressed()), this, SLOT(set_renderer_edge_post_process()));
+    QObject::connect(main_window_ui.set_sharpen_post_p, SIGNAL(pressed()), this, SLOT(set_renderer_sharpen_post_process()));
+    QObject::connect(main_window_ui.set_blurr_post_p, SIGNAL(pressed()), this, SLOT(set_renderer_blurr_post_process()));
 
     /*Renderer tab -> Rasterization -> Polygon display*/
-    QObject::connect(_UI.rasterize_fill_button, SIGNAL(pressed()), this, SLOT(set_rasterizer_fill()));
-    QObject::connect(_UI.rasterize_point_button, SIGNAL(pressed()), this, SLOT(set_rasterizer_point()));
-    QObject::connect(_UI.rasterize_wireframe_button, SIGNAL(pressed()), this, SLOT(set_rasterizer_wireframe()));
-    QObject::connect(_UI.rasterize_display_bbox_checkbox, SIGNAL(toggled(bool)), this, SLOT(set_display_boundingbox(bool)));
+    QObject::connect(main_window_ui.rasterize_fill_button, SIGNAL(pressed()), this, SLOT(set_rasterizer_fill()));
+    QObject::connect(main_window_ui.rasterize_point_button, SIGNAL(pressed()), this, SLOT(set_rasterizer_point()));
+    QObject::connect(main_window_ui.rasterize_wireframe_button, SIGNAL(pressed()), this, SLOT(set_rasterizer_wireframe()));
+    QObject::connect(main_window_ui.rasterize_display_bbox_checkbox, SIGNAL(toggled(bool)), this, SLOT(set_display_boundingbox(bool)));
 
     /*Renderer tab -> Lighting -> Point lights*/
     light_controller->connect_all_slots();
@@ -529,7 +543,7 @@ namespace controller {
 
   /**************************************************************************************************************/
 
-  void Controller::use_gpgpu(bool checked) { global_application_config.flag |= CONF_USE_CUDA; }
+  void Controller::use_gpgpu(bool checked) { global_application_config->flag |= CONF_USE_CUDA; }
 
   /**************************************************************************************************************/
 
@@ -601,19 +615,19 @@ namespace controller {
 
   void Controller::change_nmap_factor(int f) {
     NORMAL_FACTOR = f / dividor;
-    _UI.factor_nmap->setValue(NORMAL_FACTOR);
-    if (_UI.use_tangentSpace->isChecked()) {
+    main_window_ui.factor_nmap->setValue(NORMAL_FACTOR);
+    if (main_window_ui.use_tangentSpace->isChecked()) {
       use_tangent_space();
-    } else if (_UI.use_objectSpace->isChecked()) {
+    } else if (main_window_ui.use_objectSpace->isChecked()) {
       use_object_space();
     }
   }
 
   void Controller::change_nmap_attenuation(int f) {
     NORMAL_ATTENUATION = f / dividor;
-    if (_UI.use_tangentSpace->isChecked()) {
+    if (main_window_ui.use_tangentSpace->isChecked()) {
       use_tangent_space();
-    } else if (_UI.use_objectSpace->isChecked()) {
+    } else if (main_window_ui.use_objectSpace->isChecked()) {
       use_object_space();
     }
   }
@@ -636,7 +650,7 @@ namespace controller {
   /**************************************************************************************************************/
   void Controller::change_dudv_nmap(int factor) {
     DUDV_FACTOR = factor / dividor;
-    _UI.factor_dudv->setValue(DUDV_FACTOR);
+    main_window_ui.factor_dudv->setValue(DUDV_FACTOR);
     SDL_Surface *s = image_session_pointers::normalmap;
     SDL_Surface *copy = Controller::copy_surface(s);
     if (copy != nullptr) {
@@ -651,8 +665,8 @@ namespace controller {
 
   /**************************************************************************************************************/
   void Controller::cubemap_baking() {  // TODO : complete uv projection method , implement baking
-    int width = _UI.uv_width->value();
-    int height = _UI.uv_height->value();
+    int width = main_window_ui.uv_width->value();
+    int height = main_window_ui.uv_height->value();
     width = 0;
     height = 0;
   }
@@ -663,11 +677,11 @@ namespace controller {
   void Controller::project_uv_normals() {
     Mesh *retrieved_mesh = uv_mesh_selector.getCurrent();
     if (retrieved_mesh) {
-      TextureViewerWidget *view = _UI.uv_projection;
+      TextureViewerWidget *view = main_window_ui.uv_projection;
       try {
-        int width = global_application_config.getUvEditorResolutionWidth();
-        int height = global_application_config.getUvEditorResolutionHeight();
-        bool tangent = global_application_config.flag & CONF_UV_TSPACE;
+        int width = global_application_config->getUvEditorResolutionWidth();
+        int height = global_application_config->getUvEditorResolutionHeight();
+        bool tangent = global_application_config->flag & CONF_UV_TSPACE;
         LOG("Tangent : " + std::to_string(tangent), LogLevel::INFO);
         std::vector<uint8_t> surf = ImageManager::project_uv_normals(retrieved_mesh->geometry, width, height, tangent);
         view->display(surf, width, height, 3);
@@ -688,9 +702,9 @@ namespace controller {
       std::vector<Mesh *> scene = struct_holder.first;
       viewer_3d->setNewScene(struct_holder);
       uv_mesh_selector.setScene(scene);
-      _UI.meshes_list->setList(scene);
+      main_window_ui.meshes_list->setList(scene);
       SceneTree &scene_hierarchy = viewer_3d->getRenderer().getScene().getSceneTreeRef();
-      _UI.renderer_scene_list->setScene(scene_hierarchy);
+      main_window_ui.renderer_scene_list->setScene(scene_hierarchy);
       return true;
     }
     return false;
@@ -732,10 +746,12 @@ namespace controller {
     SDL_Surface *surface = image_session_pointers::height;
     SDL_Surface *copy = Controller::copy_surface(surface);
     if (copy != nullptr) {
-      unsigned int factor = _UI.smooth_dial->value();
-      ImageManager::FILTER box_blur = _UI.box_blur_radio->isChecked() ? ImageManager::BOX_BLUR : ImageManager::FILTER_NULL;
-      ImageManager::FILTER gaussian_blur_5_5 = _UI.gaussian_5_5_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_5_5 : ImageManager::FILTER_NULL;
-      ImageManager::FILTER gaussian_blur_3_3 = _UI.gaussian_3_3_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_3_3 : ImageManager::FILTER_NULL;
+      unsigned int factor = main_window_ui.smooth_dial->value();
+      ImageManager::FILTER box_blur = main_window_ui.box_blur_radio->isChecked() ? ImageManager::BOX_BLUR : ImageManager::FILTER_NULL;
+      ImageManager::FILTER gaussian_blur_5_5 = main_window_ui.gaussian_5_5_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_5_5 :
+                                                                                                ImageManager::FILTER_NULL;
+      ImageManager::FILTER gaussian_blur_3_3 = main_window_ui.gaussian_3_3_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_3_3 :
+                                                                                                ImageManager::FILTER_NULL;
       ImageManager::smooth_image(copy, static_cast<ImageManager::FILTER>(box_blur | gaussian_blur_5_5 | gaussian_blur_3_3), factor);
       display_image(copy, HEIGHT, true);
       image_session_pointers::height = copy;
@@ -747,9 +763,10 @@ namespace controller {
     SDL_Surface *surface = image_session_pointers::greyscale;
     SDL_Surface *copy = Controller::copy_surface(surface);
     if (copy != nullptr) {
-      float factor = _UI.sharpen_float_box->value();
-      ImageManager::FILTER sharpen = _UI.sharpen_radio->isChecked() ? ImageManager::SHARPEN : ImageManager::FILTER_NULL;
-      ImageManager::FILTER unsharp_masking = _UI.sharpen_masking_radio->isChecked() ? ImageManager::UNSHARP_MASKING : ImageManager::FILTER_NULL;
+      float factor = main_window_ui.sharpen_float_box->value();
+      ImageManager::FILTER sharpen = main_window_ui.sharpen_radio->isChecked() ? ImageManager::SHARPEN : ImageManager::FILTER_NULL;
+      ImageManager::FILTER unsharp_masking = main_window_ui.sharpen_masking_radio->isChecked() ? ImageManager::UNSHARP_MASKING :
+                                                                                                 ImageManager::FILTER_NULL;
       ImageManager::sharpen_image(copy, static_cast<ImageManager::FILTER>(sharpen | unsharp_masking), factor);
       display_image(copy, HEIGHT, true);
       image_session_pointers::height = copy;
@@ -863,7 +880,7 @@ namespace controller {
       project_uv_normals();
   }
 
-  void Controller::update_smooth_factor(int factor) { _UI.smooth_factor->setValue(factor); }
+  void Controller::update_smooth_factor(int factor) { main_window_ui.smooth_factor->setValue(factor); }
 
   /*
    * TODO: add custom QGraphicsView class , reimplement resizeEvent() to scale GraphicsView to window size */

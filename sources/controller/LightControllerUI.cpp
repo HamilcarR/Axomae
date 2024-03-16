@@ -17,8 +17,8 @@ void LightController::connect_all_slots() {
 }
 
 void LightController::addPointLight() {
-  LightData data = loadFromUi<AbstractLight::POINT>();
-  viewer_3d->getRenderer().pushEvent<Renderer::ON_LEFT_CLICK>(RENDERER_CALLBACK_ENUM::ADD_ELEMENT_POINTLIGHT, data);
+  // LightData data = loadFromUi<AbstractLight::POINT>();
+  //  viewer_3d->getRenderer().pushEvent<Renderer::ON_LEFT_CLICK>(RENDERER_CALLBACK_ENUM::ADD_ELEMENT_POINTLIGHT, data);
 }
 
 void LightController::deletePointLight() {}
@@ -63,3 +63,30 @@ LightData LightController::loadFromUi() const {
   LOG(node->getName(), LogLevel::INFO);
   return data;
 }
+
+/*
+ if (!event_callback_stack[ON_LEFT_CLICK].empty()) {
+  const auto to_process = event_callback_stack[ON_LEFT_CLICK].front();
+  if (to_process.first == ADD_ELEMENT_POINTLIGHT) {  // TODO : pack this in a class
+    glm::mat4 inv_v = glm::inverse(scene_camera->getView());
+    glm::mat4 inv_p = glm::inverse(scene_camera->getProjection());
+    glm::vec4 w_space = glm::vec4(((float)mouse_state.pos_x * 2.f / (float)screen_size.width) - 1.f,
+                                  1.f - (float)mouse_state.pos_y * 2.f / (float)screen_size.height,
+                                  1.f,
+                                  1.f);
+
+LightData data = std::any_cast<LightData>(to_process.second);
+w_space = inv_p * w_space;
+w_space = inv_v * w_space;
+glm::vec3 position = w_space / w_space.w;
+position.z = 0.f;
+data.position = glm::inverse(scene_camera->getSceneRotationMatrix()) * glm::vec4(position, 1.f);
+LOG(std::string("x:") + std::to_string(data.position.x) + std::string("  y:") + std::to_string(data.position.y) + std::string("  z:") +
+        std::to_string(data.position.z),
+    LogLevel::INFO);
+database::node::store<PointLight>(*resource_database.getNodeDatabase(), false, data);
+event_callback_stack[ON_LEFT_CLICK].pop();
+emit sceneModified();
+}
+}
+*/

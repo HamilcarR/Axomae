@@ -61,7 +61,7 @@ int main(int argv, char **argc) {
     if (configuration.flag & CONF_USE_EDITOR) {
       QApplication app(argv, argc);
       controller::Controller win;
-      win.setApplicationConfig(configuration);
+      win.setApplicationConfig(&configuration);
       win.show();
       int ret = app.exec();
       cleanup();
@@ -75,7 +75,7 @@ int main(int argv, char **argc) {
     controller::Controller win;
     api.configureDefault();
     const ApplicationConfig &configuration = api.getConfig();
-    win.setApplicationConfig(configuration);
+    win.setApplicationConfig(&configuration);
     win.show();
     int ret = app.exec();
     cleanup();

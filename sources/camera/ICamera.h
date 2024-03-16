@@ -1,15 +1,16 @@
 #ifndef ICAMERA_H
 #define ICAMERA_H
 #include "math_utils.h"
+
+namespace controller::event {
+  class Event;
+}
 class ICamera {
+ public:
+  virtual void processEvent(const controller::event::Event *event) = 0;
   virtual void computeViewSpace() = 0;
   virtual void computeProjectionSpace() = 0;
   virtual void computeViewProjection() = 0;
-  virtual void onLeftClick() = 0;
-  virtual void onRightClick() = 0;
-  virtual void onLeftClickRelease() = 0;
-  virtual void onRightClickRelease() = 0;
-  virtual void movePosition() = 0;
   virtual void zoomIn() = 0;
   virtual void zoomOut() = 0;
   virtual void reset() = 0;
