@@ -9,6 +9,7 @@ PUBLIC
 PRIVATE
         ax_scene
         ax_event
+        ax_io
 )
 target_include_directories(ax_camera
 PUBLIC

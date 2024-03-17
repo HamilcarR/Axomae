@@ -96,7 +96,6 @@ void GLViewer::wheelEvent(QWheelEvent *event) {
 
 void GLViewer::mousePressEvent(QMouseEvent *event) {
   QOpenGLWidget::mousePressEvent(event);
-  unsigned long long default_flag = widget_input_events->flag;
   switch (event->button()) {
     case Qt::LeftButton:
       widget_input_events->flag |= EventManager::EVENT_MOUSE_L_PRESS;
@@ -109,25 +108,29 @@ void GLViewer::mousePressEvent(QMouseEvent *event) {
   }
   renderer->processEvent(widget_input_events.get());
   update();
-  widget_input_events->flag = default_flag;
 }
 
 void GLViewer::mouseReleaseEvent(QMouseEvent *event) {
   QOpenGLWidget::mouseReleaseEvent(event);
-  unsigned long long default_flag = widget_input_events->flag;
+  /* Need this to reset the mouse release flags, or EVENT_MOUSE_X_RELEASE will stay on even after the end of the event, which is not what we want*/
+  EventManager::TYPE reset_release_event = EventManager::NO_EVENT;
   switch (event->button()) {
     case Qt::LeftButton:
       widget_input_events->flag |= EventManager::EVENT_MOUSE_L_RELEASE;
+      widget_input_events->flag &= ~EventManager::EVENT_MOUSE_L_PRESS;
+      reset_release_event = EventManager::EVENT_MOUSE_L_RELEASE;
       break;
     case Qt::RightButton:
       widget_input_events->flag |= EventManager::EVENT_MOUSE_R_RELEASE;
+      widget_input_events->flag &= ~EventManager::EVENT_MOUSE_R_PRESS;
+      reset_release_event = EventManager::EVENT_MOUSE_R_RELEASE;
       break;
     default:
       break;
   }
   renderer->processEvent(widget_input_events.get());
   update();
-  widget_input_events->flag = default_flag;
+  widget_input_events->flag &= ~reset_release_event;
 }
 
 void GLViewer::mouseDoubleClickEvent(QMouseEvent *event) { QOpenGLWidget::mouseDoubleClickEvent(event); }

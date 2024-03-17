@@ -15,6 +15,7 @@ namespace controller::event {
   class Event {
    public:
     enum TYPE : unsigned {
+      NO_EVENT = 0,
       /* Mouse events */
       EVENT_MOUSE_L_PRESS = 1 << 0,
       EVENT_MOUSE_R_PRESS = 1 << 1,

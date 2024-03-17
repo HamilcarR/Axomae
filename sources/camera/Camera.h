@@ -106,7 +106,6 @@ class ArcballCamera : public Camera {
   float radius{};                       /**<Camera orbit radius*/
   glm::vec3 ndc_mouse_position{};       /**<Current NDC coordinates of the cursor*/
   glm::vec3 ndc_mouse_start_position{}; /**<NDC coordinates of the cursor at the start of a click event*/
-  glm::vec3 ndc_mouse_last_position{};  /**<Last NDC coordinates of the cursor after a release event*/
   glm::quat rotation{};                 /**<Quaternion representing the scene's rotation*/
   glm::quat last_rotation{};            /**<Last rotation after the release event*/
   glm::mat4 translation{};              /**<Translation of the scene*/
@@ -119,6 +118,7 @@ class ArcballCamera : public Camera {
  private:
   glm::vec3 delta_position{}; /**<NDC coordinates difference of the cursor , between two frames*/
   float default_radius{};
+  void computeViewSpace();
 };
 
 // TODO: [AX-10] Implement free perspective camera
