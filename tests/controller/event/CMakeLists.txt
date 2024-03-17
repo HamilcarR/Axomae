@@ -1,0 +1,3 @@
+set(EVENT_MODULE_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/EventControllerTest.cpp PARENT_SCOPE
+)
