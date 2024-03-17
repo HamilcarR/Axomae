@@ -82,21 +82,20 @@ class ArcballCamera : public Camera {
 
   [[nodiscard]] glm::mat4 getSceneRotationMatrix() const override;
 
+  void computeViewSpace();
+
  protected:
   /**
    * @brief Rotates the scene according to the mouse position on left click.
-   *
    */
   virtual void rotate();
   /**
    * @brief Translates the scene according to the mouse position on right click .
-   *
    */
   virtual void translate();
 
   /**
    * @brief Updates the zoom factor.
-   *
    * @param step New zoom factor
    */
   virtual void updateZoom(float step);
@@ -118,7 +117,6 @@ class ArcballCamera : public Camera {
  private:
   glm::vec3 delta_position{}; /**<NDC coordinates difference of the cursor , between two frames*/
   float default_radius{};
-  void computeViewSpace();
 };
 
 // TODO: [AX-10] Implement free perspective camera

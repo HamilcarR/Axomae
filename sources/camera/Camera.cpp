@@ -177,7 +177,6 @@ void ArcballCamera::processEvent(const controller::event::Event *event) {
       ndc_mouse_start_position = orbit_start_ndc_position(cursor_position, radius, (float)ratio_dimensions->width, (float)ratio_dimensions->height);
     } else if (event->flag & ev::EVENT_MOUSE_L_RELEASE) {
       last_rotation = rotation;
-      // rotation = glm::quat(1.f, 0.f, 0.f, 0.f);
     } else if (event->flag & ev::EVENT_MOUSE_R_PRESS) {
       ndc_mouse_start_position = pan_start_ndc_position(cursor_position, (float)ratio_dimensions->width, (float)ratio_dimensions->height);
     } else if (event->flag & ev::EVENT_MOUSE_R_RELEASE) {
