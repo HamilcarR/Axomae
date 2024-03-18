@@ -15,7 +15,7 @@
 #include <vector>
 
 namespace axomae {
-
+  // TODO : refactor
   constexpr int INT_MAXX = 30000;
   constexpr uint8_t AXOMAE_USE_SOBEL = 0X00;
   constexpr uint8_t AXOMAE_USE_PREWITT = 0X01;

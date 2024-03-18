@@ -12,19 +12,24 @@ namespace math::geometry {
 
   class Vect2D : public IVector {
    public:
+    float x{};
+    float y{};
+
+   public:
     Vect2D() = default;
     Vect2D(float x, float y);
     [[nodiscard]] float magnitude() const override;
     void normalize() override;
     [[nodiscard]] float dot(const IVector &arg) const override;
     friend std::ostream &operator<<(std::ostream &os, const Vect2D &p);
-
-   public:
-    float x{};
-    float y{};
   };
 
   class Vect3D : public IVector {
+   public:
+    float x{};
+    float y{};
+    float z{};
+
    public:
     Vect3D() = default;
     Vect3D(float x, float y, float z);
@@ -32,11 +37,6 @@ namespace math::geometry {
     void normalize() override;
     [[nodiscard]] float dot(const IVector &arg) const override;
     friend std::ostream &operator<<(std::ostream &os, const Vect3D &v);
-
-   public:
-    float x{};
-    float y{};
-    float z{};
   };
 
 }  // namespace math::geometry

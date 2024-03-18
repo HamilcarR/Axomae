@@ -46,13 +46,10 @@ namespace image {
     std::cout << "ALPHA : " << std::to_string(alpha) << "\n";
   }
 
-  /**************************************************************************************************************/
-  double Rgb::intensity() {
+  [[maybe_unused]] double Rgb::intensity() {
     double av = (red + green + blue) / 3;
     return av / 255;
   }
-
-  /**************************************************************************************************************/
 
   void Rgb::clamp() {
     if (red > 255)
@@ -69,8 +66,7 @@ namespace image {
       blue = 0;
   }
 
-  /**************************************************************************************************************/
-  Rgb Rgb::int_to_rgb(uint32_t val) {
+  [[maybe_unused]] Rgb Rgb::int_to_rgb(uint32_t val) {
     Rgb rgb;
     rgb.alpha = static_cast<float>(val >> 24 & 0XFF);
     rgb.blue = static_cast<float>(val >> 16 & 0XFF);
@@ -79,8 +75,7 @@ namespace image {
     return rgb;
   }
 
-  /**************************************************************************************************************/
-  Rgb Rgb::int_to_rgb(uint16_t val) {
+  [[maybe_unused]] Rgb Rgb::int_to_rgb(uint16_t val) {
     Rgb rgb;
     rgb.alpha = static_cast<float>(val >> 12 & 0XF);
     rgb.blue = static_cast<float>(val >> 8 & 0XF);
@@ -89,7 +84,6 @@ namespace image {
     return rgb;
   }
 
-  /**************************************************************************************************************/
   uint32_t Rgb::rgb_to_int() {
     uint32_t image = 0;
     int b = static_cast<int>(std::round(blue));
@@ -99,8 +93,6 @@ namespace image {
     image = r | (g << 8) | (b << 16) | (a << 24);
     return image;
   }
-
-  /**************************************************************************************************************/
 
   bool Rgb::operator==(const Rgb &rgb) { return red == rgb.red && green == rgb.green && blue == rgb.blue && alpha == rgb.alpha; }
 
@@ -136,12 +128,10 @@ namespace image {
     return rgb;
   }
 
-  /**************************************************************************************************************/
-  void Rgb::invert_color() {
+  [[maybe_unused]] void Rgb::invert_color() {
     red = std::abs(red - 255);
     green = std::abs(green - 255);
     blue = std::abs(blue - 255);
     alpha = std::abs(alpha - 255);
   }
-
 }  // namespace image

@@ -4,31 +4,24 @@
 
 namespace exception {
   class ExceptionData {
+   protected:
+    std::string this_error_string;
+
    public:
     ExceptionData(const std::string &error_string);
-
     virtual ~ExceptionData() = default;
-
     ExceptionData(const ExceptionData &copy);
-
     ExceptionData(ExceptionData &&move) noexcept;
-
     ExceptionData &operator=(const ExceptionData &copy);
-
     ExceptionData &operator=(ExceptionData &&move) noexcept;
-
     virtual void saveErrorString(const std::string &string) {
       this_error_string += string;
       this_error_string += "\n";
     }
-
     virtual void saveErrorString(const char *string) {
       std::string str(string);
       saveErrorString(str);
     }
-
-   protected:
-    std::string this_error_string;
   };
 
   class GenericException : public std::exception, protected ExceptionData {

@@ -54,8 +54,8 @@ namespace hdr_utils {
   template<class T>
   inline T inv_color_correct(T value) {}
 
-  /* creates a viewable image from an HDR image
-   * Creates an RGBA image no matter the input
+  /* Creates a viewable image from an HDR image.
+   * The output image is always of format RGBA for simplicity.
    * */
   template<class T>
   std::vector<uint8_t> hdr2image(const std::vector<T> &rgb,

@@ -6,7 +6,6 @@
 
 namespace math {
   namespace geometry {
-
     /* Get barycentric coordinates of I in triangle P1P2P3 */
     inline Vect3D barycentric_lerp(Vect2D P1, Vect2D P2, Vect2D P3, Vect2D I) {
       float W1 = ((P2.y - P3.y) * (I.x - P3.x) + (P3.x - P2.x) * (I.y - P3.y)) / ((P2.y - P3.y) * (P1.x - P3.x) + (P3.x - P2.x) * (P1.y - P3.y));

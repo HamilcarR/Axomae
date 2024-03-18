@@ -6,6 +6,12 @@
 namespace image {
   class Rgb {
    public:
+    float red;
+    float green;
+    float blue;
+    float alpha;
+
+   public:
     Rgb();
     Rgb(float r, float g, float b, float a);
     Rgb(float r, float g, float b);
@@ -14,10 +20,10 @@ namespace image {
     Rgb &operator=(const Rgb &copy);
     Rgb &operator=(Rgb &&move) noexcept;
     ~Rgb() = default;
-    static Rgb int_to_rgb(uint32_t value);
-    static Rgb int_to_rgb(uint16_t value);
-    double intensity();
-    void invert_color();
+    [[maybe_unused]] static Rgb int_to_rgb(uint32_t value);
+    [[maybe_unused]] static Rgb int_to_rgb(uint16_t value);
+    [[maybe_unused]] double intensity();
+    [[maybe_unused]] void invert_color();
     bool operator==(const Rgb &arg);
     template<typename T>
     Rgb operator*(T arg) const;
@@ -29,10 +35,6 @@ namespace image {
     void clamp();
     uint32_t rgb_to_int();
     void to_string();
-    float red;
-    float green;
-    float blue;
-    float alpha;
   };
 }  // namespace image
 #endif  // RGB_H

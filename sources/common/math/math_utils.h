@@ -20,6 +20,7 @@ namespace math {
       std::mt19937 gen(rd());
       return gen;
     }
+
     inline std::uniform_int_distribution<int> getUniformIntDistrib(int min, int max) { return std::uniform_int_distribution<int>(min, max); }
 
     inline std::uniform_real_distribution<double> getUniformDoubleDistrib(double min, double max) {
@@ -38,7 +39,6 @@ namespace math {
       return distrib(gen);
     }
 
-    // coin flip
     inline bool randb() { return nrandi(0, 1); }
   };  // namespace random
 
@@ -115,7 +115,6 @@ namespace math {
   }  // namespace importance_sampling
 
   namespace texture {
-
     template<class D>
     double pixelToUv(D coord, const unsigned dim) {
       return static_cast<double>(coord) / static_cast<double>(dim);
