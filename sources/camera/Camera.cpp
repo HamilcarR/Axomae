@@ -1,7 +1,9 @@
 #include "Camera.h"
+#include "Axomae_macros.h"
+#include "EventController.h"
+#include "Logger.h"
 #include "constants.h"
-#include <cmath>
-
+#include "math_utils.h"
 constexpr float DELTA_ZOOM = 1.f;
 constexpr float ANGLE_EPSILON = 0.0001f;   // we use these to avoid nan values when angles or vector lengths become too small
 constexpr float VECTOR_EPSILON = 0.0001f;  //
@@ -15,15 +17,15 @@ Camera::Camera() : world_up(glm::vec3(0, 1, 0)) {
   projection = glm::mat4(1.f);
   view_projection = glm::mat4(1.f);
   camera_up = glm::vec3(0.f);
+  cursor_position = glm::vec2(0);
   type = EMPTY;
 }
 
-Camera::Camera(float deg, float near, float far, const Dim2 *screen, const MouseState *pointer) : Camera() {
+Camera::Camera(float deg, float near, float far, const Dim2 *screen) : Camera() {
   fov = deg;
   this->far = far;
   this->near = near;
   ratio_dimensions = screen;
-  mouse_state_pointer = pointer;
 }
 
 void Camera::reset() {
@@ -34,6 +36,7 @@ void Camera::reset() {
   direction = glm::vec3(0.f);
   camera_up = glm::vec3(0.f);
   view_projection = glm::mat4(1.f);
+  cursor_position = glm::vec2(0);
 }
 
 void Camera::computeProjectionSpace() {
@@ -55,8 +58,8 @@ void Camera::computeViewSpace() {
 /**********************************************************************************************************************************************/
 ArcballCamera::ArcballCamera() { ArcballCamera::reset(); }
 
-ArcballCamera::ArcballCamera(float deg, float near, float far, float radius_, const Dim2 *screen, const MouseState *pointer)
-    : Camera(deg, near, far, screen, pointer), radius(radius_), default_radius(radius_) {
+ArcballCamera::ArcballCamera(float deg, float near, float far, float radius_, const Dim2 *screen)
+    : Camera(deg, near, far, screen), radius(radius_), default_radius(radius_) {
   ArcballCamera::reset();
   name = "Arcball-Camera";
   type = ARCBALL;
@@ -69,7 +72,6 @@ void ArcballCamera::reset() {
   radius = default_radius;
   radius_updated = false;
   ndc_mouse_start_position = ndc_mouse_position = position = glm::vec3(0, 0, radius);
-  cursor_position = glm::vec2(0);
   rotation = last_rotation = glm::quat(1.f, 0.f, 0.f, 0.f);
   axis = glm::vec3(0.f);
   panning_offset = glm::vec3(0);
@@ -93,41 +95,12 @@ void ArcballCamera::rotate() {
 /**
  * This function translates the scene based on the difference between the current and starting mouse
  * positions in normalized device coordinates.
- *
  */
 void ArcballCamera::translate() {
   delta_position = ndc_mouse_position - ndc_mouse_start_position;
   auto new_delta = glm::vec3(glm::inverse(scene_rotation_matrix) * (glm::vec4(delta_position, 1.f)));
   panning_offset += new_delta * PANNING_SENSITIVITY;
   ndc_mouse_start_position = ndc_mouse_position;
-}
-
-/**
- * This function computes the view , and model matrices based on the rotation and translation of the scene.
- *
- */
-void ArcballCamera::computeViewSpace() {
-  cursor_position = glm::vec2(mouse_state_pointer->pos_x, mouse_state_pointer->pos_y);
-  if (mouse_state_pointer->left_button_clicked) {
-    movePosition();
-    rotate();
-    glm::mat4 rotation_matrix = glm::mat4_cast(rotation);
-    ndc_mouse_position = rotation_matrix * glm::vec4(ndc_mouse_position + glm::vec3(0, 0, radius), 0);
-    scene_rotation_matrix = rotation_matrix;
-  } else if (mouse_state_pointer->right_button_clicked) {
-    movePosition();
-    translate();
-    translation = glm::translate(glm::mat4(1.f), panning_offset);
-    scene_translation_matrix = translation;
-    last_translation = translation;
-  } else {
-    scene_rotation_matrix = glm::mat4_cast(last_rotation);
-    scene_translation_matrix = last_translation;
-  }
-  local_transformation = scene_rotation_matrix * scene_translation_matrix;
-  direction = target - glm::vec3(0, 0, radius);
-  position = glm::vec3(0, 0, radius);
-  view = glm::lookAt(position, target, world_up);
 }
 
 glm::mat4 ArcballCamera::getSceneRotationMatrix() const { return scene_rotation_matrix; }
@@ -143,63 +116,101 @@ glm::mat4 ArcballCamera::getSceneTranslationMatrix() const { return scene_transl
  *
  * @return A float value which represents the projected z coordinate of an NDC (x,y) point on the sphere .
  */
-static float get_z_axis(float x, float y, float radius) {
+inline float get_z_axis(float x, float y, float radius) {
   if (((x * x) + (y * y)) <= (radius * radius / 2))
     return (float)sqrtf((radius * radius) - (x * x) - (y * y));
   else
     return (float)((radius * radius) / 2) / sqrtf((x * x) + (y * y));
 }
 
-/**
- * The function computes the position of the mouse in normalized device coordinates based on the cursor
- * position.
- */
-void ArcballCamera::movePosition() {
-  if (mouse_state_pointer->left_button_clicked) {
-    ndc_mouse_position.x = ((cursor_position.x - (ratio_dimensions->width / 2)) / (ratio_dimensions->width / 2)) * radius;
-    ndc_mouse_position.y = (((ratio_dimensions->height / 2) - cursor_position.y) / (ratio_dimensions->height / 2)) * radius;
-    ndc_mouse_position.z = get_z_axis(ndc_mouse_position.x, ndc_mouse_position.y, radius);
-    ndc_mouse_position = glm::normalize(ndc_mouse_position);
-  }
-  if (mouse_state_pointer->right_button_clicked) {
-    ndc_mouse_position.x = ((cursor_position.x - (ratio_dimensions->width / 2)) / (ratio_dimensions->width / 2));
-    ndc_mouse_position.y = (((ratio_dimensions->height / 2) - cursor_position.y) / (ratio_dimensions->height / 2));
-    ndc_mouse_position.z = 0.f;
-  }
-}
-
-/**
- * calculates the starting position of the mouse in normalized device coordinates for an
- * Arcball camera when the left mouse button is clicked.
- */
-void ArcballCamera::onLeftClick() {
-  ndc_mouse_start_position.x = ((cursor_position.x - (ratio_dimensions->width / 2)) / (ratio_dimensions->width / 2)) * radius;
-  ndc_mouse_start_position.y = (((ratio_dimensions->height / 2) - cursor_position.y) / (ratio_dimensions->height / 2)) * radius;
+/* register NDC mouse position at the beginning of a click event*/
+inline glm::vec3 orbit_start_ndc_position(const glm::vec2 &cursor_position, float radius, float ratio_w, float ratio_h) {
+  glm::vec3 ndc_mouse_start_position{};
+  ndc_mouse_start_position.x = ((cursor_position.x - ratio_w / 2) / (ratio_w / 2)) * radius;
+  ndc_mouse_start_position.y = (((ratio_h / 2) - cursor_position.y) / (ratio_h / 2)) * radius;
   ndc_mouse_start_position.z = get_z_axis(ndc_mouse_start_position.x, ndc_mouse_start_position.y, radius);
   ndc_mouse_start_position = glm::normalize(ndc_mouse_start_position);
+  return ndc_mouse_start_position;
 }
 
-/**
- * This function updates the camera's rotation and position based on the last mouse click release
- * event.
- */
-void ArcballCamera::onLeftClickRelease() {
-  last_rotation = rotation;
-  rotation = glm::quat(1.f, 0.f, 0.f, 0.f);
-  ndc_mouse_last_position = position;
-}
-
-/**
- * This function sets the starting position of the mouse in normalized device coordinates when the
- * right mouse button is clicked.
- */
-void ArcballCamera::onRightClick() {
-  ndc_mouse_start_position.x = ((cursor_position.x - (ratio_dimensions->width / 2)) / (ratio_dimensions->width / 2));
-  ndc_mouse_start_position.y = (((ratio_dimensions->height / 2) - cursor_position.y) / (ratio_dimensions->height / 2));
+inline glm::vec3 pan_start_ndc_position(const glm::vec2 &cursor_position, float ratio_w, float ratio_h) {
+  glm::vec3 ndc_mouse_start_position{};
+  ndc_mouse_start_position.x = ((cursor_position.x - (ratio_w / 2)) / (ratio_w / 2));
+  ndc_mouse_start_position.y = (((ratio_h / 2) - cursor_position.y) / (ratio_h / 2));
   ndc_mouse_start_position.z = 0.f;
+  return ndc_mouse_start_position;
 }
 
-void ArcballCamera::onRightClickRelease() {}
+/*NDC mouse positions while in mouse move event */
+inline glm::vec3 orbit_on_move_ndc_position(const glm::vec2 &cursor_position, float radius, float ratio_w, float ratio_h) {
+  glm::vec3 ndc_mouse_position{};
+  ndc_mouse_position.x = ((cursor_position.x - ratio_w / 2) / (ratio_w / 2)) * radius;
+  ndc_mouse_position.y = (((ratio_h / 2) - cursor_position.y) / (ratio_h / 2)) * radius;
+  ndc_mouse_position.z = get_z_axis(ndc_mouse_position.x, ndc_mouse_position.y, radius);
+  ndc_mouse_position = glm::normalize(ndc_mouse_position);
+  return ndc_mouse_position;
+}
+inline glm::vec3 pan_on_move_ndc_position(const glm::vec2 &cursor_position, float ratio_w, float ratio_h) {
+  glm::vec3 ndc_mouse_position{};
+  ndc_mouse_position.x = ((cursor_position.x - (ratio_w / 2)) / (ratio_w / 2));
+  ndc_mouse_position.y = (((ratio_h / 2) - cursor_position.y) / (ratio_h / 2));
+  ndc_mouse_position.z = 0.f;
+  return ndc_mouse_position;
+}
+
+void ArcballCamera::computeViewSpace() {
+  local_transformation = scene_rotation_matrix * scene_translation_matrix;
+  direction = target - glm::vec3(0, 0, radius);
+  position = glm::vec3(0, 0, radius);
+  view = glm::lookAt(position, target, world_up);
+}
+
+void ArcballCamera::processEvent(const controller::event::Event *event) {
+  using ev = controller::event::Event;
+  AX_ASSERT(event != nullptr);
+  cursor_position = glm::vec2(event->mouse_state.pos_x, event->mouse_state.pos_y);
+
+  if (!(event->flag & ev::EVENT_MOUSE_MOVE)) {
+    /* Left / Right mouse click management */
+    if (event->flag & ev::EVENT_MOUSE_L_PRESS) {
+      /* computes mouse start position in NDC */
+      ndc_mouse_start_position = orbit_start_ndc_position(cursor_position, radius, (float)ratio_dimensions->width, (float)ratio_dimensions->height);
+    } else if (event->flag & ev::EVENT_MOUSE_L_RELEASE) {
+      last_rotation = rotation;
+    } else if (event->flag & ev::EVENT_MOUSE_R_PRESS) {
+      ndc_mouse_start_position = pan_start_ndc_position(cursor_position, (float)ratio_dimensions->width, (float)ratio_dimensions->height);
+    } else if (event->flag & ev::EVENT_MOUSE_R_RELEASE) {
+      // EVENT_MOUSE_R_RELEASE
+    }
+  } else {
+    if (event->flag & ev::EVENT_MOUSE_L_PRESS) {
+      ndc_mouse_position = orbit_on_move_ndc_position(cursor_position, radius, (float)ratio_dimensions->width, (float)ratio_dimensions->height);
+      rotate();
+      glm::mat4 rotation_matrix = glm::mat4_cast(rotation);
+      ndc_mouse_position = rotation_matrix * glm::vec4(ndc_mouse_position + glm::vec3(0, 0, radius), 0);
+      scene_rotation_matrix = rotation_matrix;
+    } else if (event->flag & ev::EVENT_MOUSE_R_PRESS) {
+      ndc_mouse_position = pan_on_move_ndc_position(cursor_position, (float)ratio_dimensions->width, (float)ratio_dimensions->height);
+      translate();
+      translation = glm::translate(glm::mat4(1.f), panning_offset);
+      scene_translation_matrix = translation;
+      last_translation = translation;
+    } else {
+      scene_rotation_matrix = glm::mat4_cast(last_rotation);
+      scene_translation_matrix = last_translation;
+    }
+    computeViewSpace();
+  }
+
+  /* Wheel events */
+  if (event->flag & ev::EVENT_MOUSE_WHEEL) {
+    if (event->mouse_state.wheel_delta > 0) {
+      zoomIn();
+    } else if (event->mouse_state.wheel_delta < 0) {
+      zoomOut();
+    }
+  }
+}
 
 void ArcballCamera::updateZoom(float step) { radius += step; }
 
@@ -213,20 +224,9 @@ void ArcballCamera::zoomOut() { updateZoom(DELTA_ZOOM); }
 /**********************************************************************************************************************************************/
 FreePerspectiveCamera::FreePerspectiveCamera() : Camera() { type = PERSPECTIVE; }
 
-FreePerspectiveCamera::FreePerspectiveCamera(float deg, Dim2 *screen, float near, float far, const MouseState *pointer)
-    : Camera(deg, near, far, screen, pointer) {
-  type = PERSPECTIVE;
-}
+FreePerspectiveCamera::FreePerspectiveCamera(float deg, Dim2 *screen, float near, float far) : Camera(deg, near, far, screen) { type = PERSPECTIVE; }
 
-void FreePerspectiveCamera::movePosition() {}
-
-void FreePerspectiveCamera::onLeftClick() {}
-
-void FreePerspectiveCamera::onLeftClickRelease() {}
-
-void FreePerspectiveCamera::onRightClick() {}
-
-void FreePerspectiveCamera::onRightClickRelease() {}
+void FreePerspectiveCamera::processEvent(const controller::event::Event *event) { EMPTY_FUNCBODY; }
 
 void FreePerspectiveCamera::zoomIn() {}
 

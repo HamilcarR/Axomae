@@ -1,6 +1,7 @@
 #include "GLViewer.h"
 #include "Config.h"
 #include "DebugGL.h"
+#include "EventController.h"
 #include "Renderer.h"
 #include <QCursor>
 #include <QMouseEvent>
@@ -8,6 +9,7 @@
 #include <QSurfaceFormat>
 
 using namespace axomae;
+using EventManager = controller::event::Event;
 
 GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent) {
   QSurfaceFormat format;
@@ -20,6 +22,7 @@ GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent) {
   format.setSwapInterval(1);
   setFormat(format);
   renderer = std::make_unique<Renderer>(width(), height(), this);
+  widget_input_events = std::make_unique<EventManager>();
   glew_initialized = false;
 }
 
@@ -61,85 +64,73 @@ void GLViewer::resizeGL(int w, int h) {
   renderer->onResize(width(), height());
 }
 
-void GLViewer::printInfo() { std::cout << "Renderer info here : < >" << std::endl; }
+const controller::event::Event *GLViewer::getInputEventsStructure() const {
+  AX_ASSERT(widget_input_events != nullptr);
+  return widget_input_events.get();
+}
 
 void GLViewer::mouseMoveEvent(QMouseEvent *event) {
   QOpenGLWidget::mouseMoveEvent(event);
   QPoint p = this->mapFromGlobal(QCursor::pos());
-  MouseState *mouse = renderer->getMouseStatePointer();
   QRect bounds = this->rect();
+  widget_input_events->flag |= EventManager::EVENT_MOUSE_MOVE;
   if (bounds.contains(p)) {
-    mouse->previous_pos_x = mouse->pos_x;
-    mouse->previous_pos_y = mouse->pos_y;
-    mouse->pos_x = p.x();
-    mouse->pos_y = p.y();
+    widget_input_events->mouse_state.prev_pos_x = widget_input_events->mouse_state.pos_x;
+    widget_input_events->mouse_state.prev_pos_y = widget_input_events->mouse_state.pos_y;
+    widget_input_events->mouse_state.pos_x = p.x();
+    widget_input_events->mouse_state.pos_y = p.y();
+    renderer->processEvent(widget_input_events.get());
   }
   update();
+  widget_input_events->flag &= ~EventManager::EVENT_MOUSE_MOVE;
 }
 
 void GLViewer::wheelEvent(QWheelEvent *event) {
   QOpenGLWidget::wheelEvent(event);
-  if (event->angleDelta().y() > 0)  // scroll up
-    renderer->onScrollUp();
-  else if (event->angleDelta().y() < 0)
-    renderer->onScrollDown();
+  widget_input_events->flag |= EventManager::EVENT_MOUSE_WHEEL;
+  widget_input_events->mouse_state.wheel_delta = event->angleDelta().y();
+  renderer->processEvent(widget_input_events.get());
   update();
+  widget_input_events->flag &= ~EventManager::EVENT_MOUSE_WHEEL;
 }
 
 void GLViewer::mousePressEvent(QMouseEvent *event) {
-  MouseState *mouse = renderer->getMouseStatePointer();
   QOpenGLWidget::mousePressEvent(event);
   switch (event->button()) {
     case Qt::LeftButton:
-      if (!renderer->eventQueueEmpty(Renderer::ON_LEFT_CLICK))
-        renderer->onLeftClick();
-      else {
-        mouse->left_button_clicked = true;
-        mouse->left_button_released = false;
-        renderer->onLeftClick();
-      }
+      widget_input_events->flag |= EventManager::EVENT_MOUSE_L_PRESS;
       break;
     case Qt::RightButton:
-      if (mouse->busy)
-        renderer->onRightClick();
-      else {
-        mouse->right_button_clicked = true;
-        mouse->right_button_released = false;
-        renderer->onRightClick();
-      }
+      widget_input_events->flag |= EventManager::EVENT_MOUSE_R_PRESS;
       break;
     default:
       break;
   }
+  renderer->processEvent(widget_input_events.get());
   update();
 }
 
 void GLViewer::mouseReleaseEvent(QMouseEvent *event) {
-  MouseState *mouse = renderer->getMouseStatePointer();
   QOpenGLWidget::mouseReleaseEvent(event);
+  /* Need this to reset the mouse release flags, or EVENT_MOUSE_X_RELEASE will stay on even after the end of the event, which is not what we want*/
+  EventManager::TYPE reset_release_event = EventManager::NO_EVENT;
   switch (event->button()) {
     case Qt::LeftButton:
-      if (!renderer->eventQueueEmpty(Renderer::ON_LEFT_CLICK))
-        renderer->onLeftClickRelease();
-      else {
-        mouse->left_button_clicked = false;
-        mouse->left_button_released = true;
-        renderer->onLeftClickRelease();
-      }
+      widget_input_events->flag |= EventManager::EVENT_MOUSE_L_RELEASE;
+      widget_input_events->flag &= ~EventManager::EVENT_MOUSE_L_PRESS;
+      reset_release_event = EventManager::EVENT_MOUSE_L_RELEASE;
       break;
     case Qt::RightButton:
-      if (mouse->busy)
-        renderer->onRightClickRelease();
-      else {
-        mouse->right_button_clicked = false;
-        mouse->right_button_released = true;
-        renderer->onRightClickRelease();
-      }
+      widget_input_events->flag |= EventManager::EVENT_MOUSE_R_RELEASE;
+      widget_input_events->flag &= ~EventManager::EVENT_MOUSE_R_PRESS;
+      reset_release_event = EventManager::EVENT_MOUSE_R_RELEASE;
       break;
     default:
       break;
   }
+  renderer->processEvent(widget_input_events.get());
   update();
+  widget_input_events->flag &= ~reset_release_event;
 }
 
 void GLViewer::mouseDoubleClickEvent(QMouseEvent *event) { QOpenGLWidget::mouseDoubleClickEvent(event); }
@@ -151,3 +142,7 @@ void GLViewer::setNewScene(std::pair<std::vector<Mesh *>, SceneTree> &new_scene)
 }
 
 void GLViewer::onUpdateDrawEvent() { update(); }
+
+const Renderer &GLViewer::getConstRenderer() const { return *renderer; }
+
+Renderer &GLViewer::getRenderer() const { return *renderer; }

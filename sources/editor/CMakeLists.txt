@@ -1,7 +1,4 @@
-
-
-
-add_library(ax_editor 
+add_library(ax_editor
     ProgressStatusWidget.cpp 
     TextureViewerWidget.cpp
     renderer/GLViewer.cpp 
@@ -39,6 +36,7 @@ PRIVATE
     ax_geometry
     ax_renderer
     ax_debug
+    ax_event
 )
 
 set(AUTOGEN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/ax_editor_autogen/include")

@@ -2,28 +2,13 @@
 #include "Config.h"
 #include "DebugGL.h"
 #include "EnvmapTextureManager.h"
-#include "INodeFactory.h"
-#include "Loader.h"
+#include "EventController.h"
 #include "RenderPipeline.h"
 using namespace axomae;
 
-static void setUpMouseStates(MouseState &mouse_state) { /* TODO : Move to a proper mouse controller */
-  mouse_state.pos_x = 0;
-  mouse_state.pos_y = 0;
-  mouse_state.busy = false;
-  mouse_state.left_button_clicked = false;
-  mouse_state.left_button_released = true;
-  mouse_state.right_button_clicked = false;
-  mouse_state.right_button_released = true;
-  mouse_state.previous_pos_x = 0;
-  mouse_state.previous_pos_y = 0;
-}
-
 Renderer::Renderer()
     : camera_framebuffer(nullptr), start_draw(false), resource_database(ResourceDatabaseManager::getInstance()), default_framebuffer_id(0) {
-  setUpMouseStates(mouse_state);
-  scene_camera =
-      database::node::store<ArcballCamera>(*resource_database.getNodeDatabase(), true, 45.f, 0.1f, 10000.f, 100.f, &screen_size, &mouse_state).object;
+  scene_camera = database::node::store<ArcballCamera>(*resource_database.getNodeDatabase(), true, 45.f, 0.1f, 10000.f, 100.f, &screen_size).object;
 
   scene = std::make_unique<Scene>(ResourceDatabaseManager::getInstance());
 }
@@ -120,46 +105,7 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh *>, SceneTree> &new_scen
   camera_framebuffer->updateFrameBufferShader();
 }
 
-void Renderer::onLeftClick() {
-  if (event_callback_stack[ON_LEFT_CLICK].empty())
-    scene_camera->onLeftClick();
-}
-
-void Renderer::onRightClick() const { scene_camera->onRightClick(); }
-
-void Renderer::onLeftClickRelease() {
-  if (!event_callback_stack[ON_LEFT_CLICK].empty()) {
-    const auto to_process = event_callback_stack[ON_LEFT_CLICK].front();
-    if (to_process.first == ADD_ELEMENT_POINTLIGHT) {  // TODO : pack this in a class
-      glm::mat4 inv_v = glm::inverse(scene_camera->getView());
-      glm::mat4 inv_p = glm::inverse(scene_camera->getProjection());
-      glm::vec4 w_space = glm::vec4(((float)mouse_state.pos_x * 2.f / (float)screen_size.width) - 1.f,
-                                    1.f - (float)mouse_state.pos_y * 2.f / (float)screen_size.height,
-                                    1.f,
-                                    1.f);
-
-      LightData data = std::any_cast<LightData>(to_process.second);
-      w_space = inv_p * w_space;
-      w_space = inv_v * w_space;
-      glm::vec3 position = w_space / w_space.w;
-      position.z = 0.f;
-      data.position = glm::inverse(scene_camera->getSceneRotationMatrix()) * glm::vec4(position, 1.f);
-      LOG(std::string("x:") + std::to_string(data.position.x) + std::string("  y:") + std::to_string(data.position.y) + std::string("  z:") +
-              std::to_string(data.position.z),
-          LogLevel::INFO);
-      database::node::store<PointLight>(*resource_database.getNodeDatabase(), false, data);
-      event_callback_stack[ON_LEFT_CLICK].pop();
-      emit sceneModified();
-    }
-  } else
-    scene_camera->onLeftClickRelease();
-}
-
-void Renderer::onRightClickRelease() const { scene_camera->onRightClickRelease(); }
-
-void Renderer::onScrollDown() const { scene_camera->zoomOut(); }
-
-void Renderer::onScrollUp() const { scene_camera->zoomIn(); }
+void Renderer::processEvent(const controller::event::Event *event) const { scene_camera->processEvent(event); }
 
 void Renderer::onResize(unsigned int width, unsigned int height) {
   screen_size.width = width;
@@ -217,22 +163,22 @@ void Renderer::resetSceneCamera() const {
   }
 }
 
-void Renderer::setRasterizerFill() {
+void Renderer::setRasterizerFill() const {
   scene->setPolygonFill();
   gl_widget->update();
 }
 
-void Renderer::setRasterizerPoint() {
+void Renderer::setRasterizerPoint() const {
   scene->setPolygonPoint();
   gl_widget->update();
 }
 
-void Renderer::setRasterizerWireframe() {
+void Renderer::setRasterizerWireframe() const {
   scene->setPolygonWireframe();
   gl_widget->update();
 }
 
-void Renderer::displayBoundingBoxes(bool display) {
+void Renderer::displayBoundingBoxes(bool display) const {
   scene->displayBoundingBoxes(display);
   gl_widget->update();
 }

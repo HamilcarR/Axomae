@@ -26,27 +26,9 @@ class Camera : public ICamera, public SceneTreeNode {
 
   void setPosition(const glm::vec3 &new_pos) { position = new_pos; }
 
-  void onLeftClick() override = 0;
-
-  void onRightClick() override = 0;
-
-  void onLeftClickRelease() override = 0;
-
-  void onRightClickRelease() override = 0;
-
-  void movePosition() override = 0;
-
-  void zoomIn() override = 0;
-
-  void zoomOut() override = 0;
-
   void reset() override;
 
   [[nodiscard]] virtual const glm::vec3 &getPosition() const { return position; }
-
-  [[nodiscard]] glm::mat4 getSceneRotationMatrix() const override = 0;
-
-  [[nodiscard]] glm::mat4 getSceneTranslationMatrix() const override = 0;
 
   [[nodiscard]] const glm::mat4 &getViewProjection() const override { return view_projection; }
 
@@ -59,7 +41,7 @@ class Camera : public ICamera, public SceneTreeNode {
  protected:
   Camera();
 
-  Camera(float degrees, float clip_near, float clip_far, const Dim2 *screen, const MouseState *pointer = nullptr);
+  Camera(float degrees, float clip_near, float clip_far, const Dim2 *screen);
 
  protected:
   TYPE type{};
@@ -75,37 +57,20 @@ class Camera : public ICamera, public SceneTreeNode {
   glm::vec3 direction{};
   glm::vec3 camera_up{};
   const glm::vec3 world_up{};
-  const MouseState *mouse_state_pointer{};
   const Dim2 *ratio_dimensions{};
+  glm::vec2 cursor_position{}; /**<Screen space coordinates of the cursor*/
 };
 
 /**
  * @brief Arcball Camera class
- * The Arcball camera is a static camera , that computes a rotation , and a translation that will be applied to the
- * scene , instead of the camera. This gives the illusion that the camera is moving around the scene.
  */
 class ArcballCamera : public Camera {
  public:
   ArcballCamera();
 
-  ArcballCamera(float degrees, float near, float far, float radius, const Dim2 *screen, const MouseState *pointer);
+  ArcballCamera(float degrees, float near, float far, float radius, const Dim2 *screen);
 
-  void computeViewSpace() override;
-  /**
-   * @brief Left click event , calculates the rotation matrix (will rotate the scene around the camera)
-   *
-   */
-  void onLeftClick() override;
-
-  /**
-   * @brief Right click event , calculates the translation matrix (will translate the scene relative to the camera)
-   *
-   */
-  void onRightClick() override;
-
-  void onLeftClickRelease() override;
-
-  void onRightClickRelease() override;
+  void processEvent(const controller::event::Event *event) override;
 
   void zoomIn() override;
 
@@ -113,38 +78,24 @@ class ArcballCamera : public Camera {
 
   void reset() override;
 
-  /**
-   * @brief Get the Scene Translation Matrix object
-   *
-   * @return const glm::mat4&
-   */
   [[nodiscard]] glm::mat4 getSceneTranslationMatrix() const override;
-  /**
-   * @brief Get the Scene Rotation Matrix object
-   *
-   * @return const glm::mat4&
-   */
+
   [[nodiscard]] glm::mat4 getSceneRotationMatrix() const override;
+
+  void computeViewSpace();
 
  protected:
   /**
    * @brief Rotates the scene according to the mouse position on left click.
-   *
    */
   virtual void rotate();
   /**
    * @brief Translates the scene according to the mouse position on right click .
-   *
    */
   virtual void translate();
-  /**
-   * @brief Combines the translation and rotation matrix.
-   *
-   */
-  void movePosition() override;
+
   /**
    * @brief Updates the zoom factor.
-   *
    * @param step New zoom factor
    */
   virtual void updateZoom(float step);
@@ -152,10 +103,8 @@ class ArcballCamera : public Camera {
  protected:
   float angle{};                        /**<Angle of rotation*/
   float radius{};                       /**<Camera orbit radius*/
-  glm::vec2 cursor_position{};          /**<Screen space coordinates of the cursor*/
   glm::vec3 ndc_mouse_position{};       /**<Current NDC coordinates of the cursor*/
   glm::vec3 ndc_mouse_start_position{}; /**<NDC coordinates of the cursor at the start of a click event*/
-  glm::vec3 ndc_mouse_last_position{};  /**<Last NDC coordinates of the cursor after a release event*/
   glm::quat rotation{};                 /**<Quaternion representing the scene's rotation*/
   glm::quat last_rotation{};            /**<Last rotation after the release event*/
   glm::mat4 translation{};              /**<Translation of the scene*/
@@ -174,12 +123,8 @@ class ArcballCamera : public Camera {
 class FreePerspectiveCamera : public Camera {
  public:
   FreePerspectiveCamera();
-  FreePerspectiveCamera(float degrees, Dim2 *screen, float near, float far, const MouseState *pointer = nullptr);
-  void onLeftClick() override;
-  void onRightClick() override;
-  void onLeftClickRelease() override;
-  void onRightClickRelease() override;
-  void movePosition() override;
+  FreePerspectiveCamera(float degrees, Dim2 *screen, float near, float far);
+  void processEvent(const controller::event::Event *event) override;
   void zoomIn() override;
   void zoomOut() override;
   [[nodiscard]] glm::mat4 getSceneTranslationMatrix() const override;

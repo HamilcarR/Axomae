@@ -1,4 +1,5 @@
 #include "TextureViewerWidget.h"
+#include "EventController.h"
 #include "image_utils.h"
 #include <QPainter>
 
@@ -32,30 +33,10 @@ TextureViewerWidget::TextureViewerWidget(QWidget *parent) : QWidget(parent) {
   window.setupUi(this);
   label = std::make_unique<CustomLabelImageTex>(rgb_under_mouse_str, this);
   label->setScaledContents(true);
+  widget_event_struct = std::make_unique<EventManager>();
   setMouseTracking(true);
 }
-
-TextureViewerWidget::TextureViewerWidget(const std::vector<uint8_t> &image_, int width, int height, int channels, QWidget *parent)
-    : QWidget(parent), raw_display_data(image_) {
-  window.setupUi(this);
-  metadata.width = width;
-  metadata.height = height;
-  metadata.channels = channels;
-  display(image_, width, height, channels);
-  label->setScaledContents(true);
-  setMouseTracking(true);
-}
-
-TextureViewerWidget::TextureViewerWidget(const image::ImageHolder<uint8_t> &tex, QWidget *parent)
-    : QWidget(parent), raw_display_data(tex.data), metadata(tex.metadata) {
-  window.setupUi(this);
-
-  image = std::make_unique<QImage>(raw_display_data.data(), tex.metadata.width, tex.metadata.height, QImage::Format_RGB32);
-  label = std::make_unique<CustomLabelImageTex>(rgb_under_mouse_str, this);
-  label->setPixmap(QPixmap::fromImage(*image));
-  label->setScaledContents(true);
-  setMouseTracking(true);
-}
+TextureViewerWidget::~TextureViewerWidget() {}
 
 void TextureViewerWidget::resizeEvent(QResizeEvent *event) {
   QWidget::resizeEvent(event);
@@ -72,7 +53,7 @@ void TextureViewerWidget::display(const std::vector<uint8_t> &img, int width, in
     image = std::make_unique<QImage>(raw_display_data.data(), width, height, QImage::Format_RGB888);
   else if (channels == 4)
     image = std::make_unique<QImage>(raw_display_data.data(), width, height, QImage::Format_RGBA8888);
-  assert(channels == 3 || channels == 4);  // Other cases for later
+  AX_ASSERT(channels == 3 || channels == 4);
   label->setPixmap(QPixmap::fromImage(*image));
   label->setScaledContents(true);
 }
@@ -80,7 +61,7 @@ void TextureViewerWidget::display(const std::vector<uint8_t> &img, int width, in
 void TextureViewerWidget::mouseMoveEvent(QMouseEvent *event) {
   QWidget::mouseMoveEvent(event);
   QPoint p = event->pos();
-
+  widget_event_struct->flag |= EventManager::EVENT_MOUSE_MOVE;
   if (p.x() < width() && p.y() < height() && p.x() >= 0 && p.y() >= 0) {
     p = mapToImage(static_cast<int>(metadata.width), static_cast<int>(metadata.height), p, width(), height());
     unsigned int index = (p.y() * metadata.width + p.x()) * metadata.channels;
@@ -95,23 +76,10 @@ void TextureViewerWidget::mouseMoveEvent(QMouseEvent *event) {
     }
     label->update();
   }
+  widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_MOVE;
 }
 
 /************************************************************************************************************************************************************/
-
-HdrTextureViewerWidget::HdrTextureViewerWidget(QWidget *parent) : TextureViewerWidget(parent) {
-  window.setupUi(this);
-  label = std::make_unique<CustomLabelImageTex>(rgb_under_mouse_str, this);
-}
-
-HdrTextureViewerWidget::HdrTextureViewerWidget(
-    const std::vector<float> &image_, int width, int height, int channels, bool color_corrected, QWidget *parent)
-    : TextureViewerWidget(parent), raw_hdr_data(image_) {
-  window.setupUi(this);
-  display(image_, width, height, channels, color_corrected);
-  label->setScaledContents(true);
-  setMouseTracking(true);
-}
 
 HdrTextureViewerWidget::HdrTextureViewerWidget(const image::ImageHolder<float> &tex, QWidget *parent)
     : TextureViewerWidget(parent), raw_hdr_data(tex.data) {
@@ -134,7 +102,7 @@ void HdrTextureViewerWidget::display(const std::vector<float> &img, int width, i
     image = std::make_unique<QImage>(raw_display_data.data(), width, height, QImage::Format_RGB888);
   else if (channels == 4)
     image = std::make_unique<QImage>(raw_display_data.data(), width, height, QImage::Format_RGBA8888);
-  assert(channels == 3 || channels == 4);
+  AX_ASSERT(channels == 3 || channels == 4);
   if (!label)
     label = std::make_unique<CustomLabelImageTex>(rgb_under_mouse_str, this);
   label->setPixmap(QPixmap::fromImage(*image));
@@ -144,6 +112,7 @@ void HdrTextureViewerWidget::mouseMoveEvent(QMouseEvent *event) {
   QWidget::mouseMoveEvent(event);
   QPoint p = event->pos();
 
+  widget_event_struct->flag |= EventManager::EVENT_MOUSE_MOVE;
   if (p.x() < width() && p.y() < height() && p.x() >= 0 && p.y() >= 0) {
     p = mapToImage(static_cast<int>(metadata.width), static_cast<int>(metadata.height), p, width(), height());
     // QRgb rgb = image->pixel(p.x(), p.y());
@@ -159,4 +128,5 @@ void HdrTextureViewerWidget::mouseMoveEvent(QMouseEvent *event) {
     }
     label->update();
   }
+  widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_MOVE;
 }

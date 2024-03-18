@@ -21,7 +21,7 @@ PRIVATE
     ax_opengl
     ax_geometry
     ax_renderer
-
+    ax_event
 
 )
 # AUTOUIC weirdly doesn't resolve ui includes
@@ -34,4 +34,4 @@ INTERFACE
 )
 
 add_subdirectory(cmd)
-
+add_subdirectory(event)

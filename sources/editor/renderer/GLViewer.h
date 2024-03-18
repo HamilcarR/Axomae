@@ -16,107 +16,46 @@
 class Renderer;
 class QMouseEvent;
 class ApplicationConfig;
-
+namespace controller::event {
+  class Event;
+}
 /**
  * @class GLViewer
  * This class implements methods for the drawing process
  */
 class GLViewer : public QOpenGLWidget {
-
   Q_OBJECT
-
  public:
-  /**
-   * @brief Construct a new GLViewer object
-   *
-   * @param parent
-   */
-  GLViewer(QWidget *parent = nullptr);
+  explicit GLViewer(QWidget *parent = nullptr);
 
-  /**
-   * @brief Destroy the GLViewer object
-   *
-   */
-  virtual ~GLViewer();
+  ~GLViewer() override;
 
-  /**
-   * @brief Set the New Scene object
-   *
-   * @param new_scene
-   */
   virtual void setNewScene(std::pair<std::vector<Mesh *>, SceneTree> &new_scene);
 
-  /**
-   * @brief Returns the pointer on the renderer's instance
-   *
-   */
-  const Renderer &getConstRenderer() { return *renderer; }
+  [[nodiscard]] const Renderer &getConstRenderer() const;
 
-  Renderer &getRenderer() { return *renderer; }
+  [[nodiscard]] Renderer &getRenderer() const;
 
   void setApplicationConfig(ApplicationConfig *app_conf) { global_application_config = app_conf; }
 
  protected:
-  /**
-   * @brief Initialize GL context
-   *
-   */
   void initializeGL() override;
 
-  /**
-   * @brief Draw method
-   *
-   */
   void paintGL() override;
 
-  /**
-   * @brief Resize the widget
-   *
-   * @param width New width in pixels
-   * @param height New height in pixels
-   */
   void resizeGL(int width, int height) override;
 
-  /**
-   * @brief Displays info on the hardware and software used , and their versions
-   *
-   */
-  void printInfo();
+  [[nodiscard]] const controller::event::Event *getInputEventsStructure() const;
 
  private:
-  /**
-   * @brief Mouse event triggered by moving the cursor
-   *
-   * @param event
-   */
   void mouseMoveEvent(QMouseEvent *event) override;
 
-  /**
-   * @brief Mouse event triggered by click
-   *
-   * @param event
-   */
   void mousePressEvent(QMouseEvent *event) override;
 
-  /**
-   * @brief Mouse event triggered by releasing click
-   *
-   * @param event
-   */
   void mouseReleaseEvent(QMouseEvent *event) override;
 
-  /**
-   * @brief
-   *
-   * @param event
-   */
   void mouseDoubleClickEvent(QMouseEvent *event) override;
 
-  /**
-   * @brief Mouse event triggered by the mouse wheel
-   *
-   * @param event
-   */
   void wheelEvent(QWheelEvent *event) override;
 
  public slots:
@@ -126,6 +65,7 @@ class GLViewer : public QOpenGLWidget {
   std::unique_ptr<Renderer> renderer; /*<Pointer on the renderer of the scene*/
   bool glew_initialized;              /*<Check if context is initialized*/
   ApplicationConfig *global_application_config{};
+  std::unique_ptr<controller::event::Event> widget_input_events;
 };
 
 #endif

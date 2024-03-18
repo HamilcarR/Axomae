@@ -1,12 +1,14 @@
-
 set(PROCESSING_MODULE_SOURCES "" CACHE INTERNAL "")
 set(DATABASE_MODULE_SOURCES "" CACHE INTERNAL "")
 set(SCENE_MODULE_SOURCES "" CACHE INTERNAL "" )
 set(MESH_MODULE_SOURCES "" CACHE INTERNAL "" )
+set(CONTROLLER_MODULE_SOURCES "" CACHE INTERNAL "")
+
 add_subdirectory(database)
 add_subdirectory(processing)
 add_subdirectory(mesh)
 add_subdirectory(scene)
+add_subdirectory(controller)
 
 add_executable(Axomae_test
         Test.cpp
@@ -14,6 +16,7 @@ add_executable(Axomae_test
         ${DATABASE_MODULE_SOURCES}
         ${SCENE_MODULE_SOURCES}
         ${MESH_MODULE_SOURCES}
+        ${CONTROLLER_MODULE_SOURCES}
 )
 
 target_link_libraries(Axomae_test
@@ -35,6 +38,7 @@ PRIVATE
         ax_mesh
         ax_material
         ax_geometry
+        ax_event
 )
 
 target_include_directories(Axomae_test

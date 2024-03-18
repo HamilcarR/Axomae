@@ -1,7 +1,6 @@
 #ifndef GUIWINDOW_H
 #define GUIWINDOW_H
 
-#include "Config.h"
 #include "LightControllerUI.h"
 #include "Renderer.h"
 #include "SceneListView.h"
@@ -16,18 +15,18 @@
 
 /**
  * @file GUIWindow.h
- * UI layout
- *
  */
 
+class ApplicationConfig;
+namespace controller::event {
+  class Event;
+}
 namespace gui {
   enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4, ALBEDO = 5, GREYSCALE_AVG = 6, PROJECTED_NMAP = 7, INVALID = 8 };
 }
 namespace controller {
-
   // TODO : Needs a bit of refactoring , delete old memory management code
   class HeapManagement;
-
   template<typename T>
   struct image_type;
 
@@ -37,8 +36,8 @@ namespace controller {
    public:
     Controller(QWidget *parent = nullptr);
     ~Controller();
-    void setApplicationConfig(const ApplicationConfig &configuration);
-    Ui::MainWindow &getUi() { return _UI; }
+    void setApplicationConfig(const ApplicationConfig *configuration);
+    Ui::MainWindow &getUi() { return main_window_ui; }
     static HeapManagement *_MemManagement;
     static SDL_Surface *copy_surface(SDL_Surface *surface);
 
@@ -102,14 +101,14 @@ namespace controller {
     void display_image(SDL_Surface *surf, gui::IMAGETYPE image, bool save_in_heap);
 
    private:
-    Ui::MainWindow _UI;
+    Ui::MainWindow main_window_ui;
     GLViewer *viewer_3d;
-    ApplicationConfig global_application_config{};
     SceneListView *renderer_scene_list;
     std::unique_ptr<LightController> light_controller;
     ResourceDatabaseManager &resource_database;
     std::unique_ptr<ProgressStatus> progress_manager;
-
+    std::unique_ptr<ApplicationConfig> global_application_config;
+    std::unique_ptr<controller::event::Event> application_events;
     /*UV editor*/
     MeshListView *uv_editor_mesh_list;
     SceneSelector uv_mesh_selector;
