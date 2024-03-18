@@ -1,4 +1,5 @@
-add_library(ax_math)
+add_library(ax_math
+        Vector.cpp)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_math)
 target_link_libraries(ax_math 

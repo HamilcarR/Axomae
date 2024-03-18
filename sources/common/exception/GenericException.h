@@ -3,14 +3,18 @@
 #include <stdexcept>
 
 namespace exception {
-
   class ExceptionData {
    public:
     ExceptionData(const std::string &error_string);
+
     virtual ~ExceptionData() = default;
+
     ExceptionData(const ExceptionData &copy);
+
     ExceptionData(ExceptionData &&move) noexcept;
+
     ExceptionData &operator=(const ExceptionData &copy);
+
     ExceptionData &operator=(ExceptionData &&move) noexcept;
 
     virtual void saveErrorString(const std::string &string) {

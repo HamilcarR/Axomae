@@ -53,9 +53,9 @@ inline Vect3D tan_space_transform(Vect3D T, Vect3D BT, Vect3D N, Vect3D I) {
 }
 
 /***************************************************************************************************************/
-inline image::Rgb compute_normals_set_pixels_rgb(Point2D P1,
-                                                 Point2D P2,
-                                                 Point2D P3,
+inline image::Rgb compute_normals_set_pixels_rgb(Vect2D P1,
+                                                 Vect2D P2,
+                                                 Vect2D P3,
                                                  Vect3D N1,
                                                  Vect3D N2,
                                                  Vect3D N3,
@@ -69,7 +69,7 @@ inline image::Rgb compute_normals_set_pixels_rgb(Point2D P1,
                                                  int y,
                                                  bool tangent_space) {
 
-  Point2D I = {static_cast<float>(x), static_cast<float>(y)};
+  Vect2D I = {static_cast<float>(x), static_cast<float>(y)};
   Vect3D C = math::geometry::barycentric_lerp(P1, P2, P3, I);
   if (C.x >= 0 && C.y >= 0 && C.z >= 0) {
     auto interpolate = [&C](Vect3D N1, Vect3D N2, Vect3D N3) {
@@ -135,9 +135,9 @@ std::vector<uint8_t> ImageManager::project_uv_normals(const Object3D &object, in
   for (unsigned int i = 0; i < object.indices.size(); i += 3) {
     const std::vector<unsigned int> &index = object.indices;
     /* texture coordinates of each vertex in a face */
-    Point2D P1 = {object.uv[index[i] * 2], object.uv[index[i] * 2 + 1]};
-    Point2D P2 = {object.uv[index[i + 1] * 2], object.uv[index[i + 1] * 2 + 1]};
-    Point2D P3 = {object.uv[index[i + 2] * 2], object.uv[index[i + 2] * 2 + 1]};
+    Vect2D P1 = {object.uv[index[i] * 2], object.uv[index[i] * 2 + 1]};
+    Vect2D P2 = {object.uv[index[i + 1] * 2], object.uv[index[i + 1] * 2 + 1]};
+    Vect2D P3 = {object.uv[index[i + 2] * 2], object.uv[index[i + 2] * 2 + 1]};
     /* Normals of each vertex*/
     Vect3D N1 = {object.normals[index[i] * 3], object.normals[index[i] * 3 + 1], object.normals[index[i] * 3 + 2]};
     Vect3D N2 = {object.normals[index[i + 1] * 3], object.normals[index[i + 1] * 3 + 1], object.normals[index[i + 1] * 3 + 2]};
@@ -152,7 +152,7 @@ std::vector<uint8_t> ImageManager::project_uv_normals(const Object3D &object, in
     Vect3D T3 = {object.tangents[index[i + 2] * 3], object.tangents[index[i + 2] * 3 + 1], object.tangents[index[i + 2] * 3 + 2]};
 
     /*check if UVs are correctly set in bounds ... if not , we clamp*/
-    auto clamp_uv = [&](Point2D P) {
+    auto clamp_uv = [&](Vect2D P) {
       if (P.x > 1.f)
         P.x = std::fmod(P.x, 1.f);
       if (P.y > 1.f)

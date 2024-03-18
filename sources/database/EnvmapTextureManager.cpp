@@ -7,7 +7,6 @@
 #include "RenderPipeline.h"
 #include "Scene.h"
 
-
 // TODO : read config values from file/cmd
 static texture::envmap::EnvmapBakingConfig generate_config() {
   texture::envmap::EnvmapBakingConfig config{};
@@ -41,7 +40,7 @@ EnvmapTextureManager::EnvmapTextureManager(
 }
 
 void EnvmapTextureManager::createFurnace() {
-  std::vector<float> image_data(256 * 256 * 3, 1.f);
+  std::vector<float> image_data(256 * 256 * 3, 2.f);
   image::Metadata metadata;
   metadata.name = "Furnace.hdr";
   metadata.width = 256;
