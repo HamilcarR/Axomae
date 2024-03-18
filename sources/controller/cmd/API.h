@@ -12,10 +12,14 @@
 
 namespace controller::cmd {
   class API {
+   private:
+    int *argv;
+    char **argc;
+    ApplicationConfig config;
+
    public:
     explicit API(int &argv, char **argc);
-
-    const ApplicationConfig &getConfig() { return config; }
+    const ApplicationConfig &getConfig() const { return config; }
     void disableLogging();
     void enableLogging();
     void enableEditor();
@@ -26,11 +30,6 @@ namespace controller::cmd {
     void configureDefault();
     void launchHdrTextureViewer(const std::string &file);
     void setUvEditorOptions(const uv::UVEDITORDATA &data);
-
-   private:
-    int *argv;
-    char **argc;
-    ApplicationConfig config;
   };
 
 }  // namespace controller::cmd

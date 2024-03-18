@@ -29,6 +29,7 @@ namespace controller::event {
       /* Keyboard events */
     };
 
+   public:
     unsigned long long flag;
     MouseState mouse_state{};
   };

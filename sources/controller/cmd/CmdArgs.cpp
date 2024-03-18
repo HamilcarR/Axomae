@@ -1,4 +1,5 @@
 #include "CmdArgs.h"
+#include "API.h"
 #include "GenericException.h"
 #include "Operator.h"
 #include <boost/program_options.hpp>
@@ -27,7 +28,7 @@ static const char *required_command_str = "";
 namespace controller::cmd {
   namespace po = boost::program_options;
 
-  ProgramOptionsManager::ProgramOptionsManager(API &api_) : api(api_) {}
+  ProgramOptionsManager::ProgramOptionsManager(API *api_) : api(api_) {}
 
   /* Program options*/
   static void configOpts(po::variables_map &vm, API &api, bool &command_valid) {
@@ -91,27 +92,27 @@ namespace controller::cmd {
     }
     /* Order is important here , first the cases that only modify the ApplicationConfig states*/
     try {
-      configOpts(vm, api, valid_command);
+      configOpts(vm, *api, valid_command);
     } catch (const exception::GenericException &e) {
       std::cerr << e.what();
     }
     /* Configure the application */
-    api.configure();
+    api->configure();
 
     /* Cases that launch a process(task in the future)*/
     if (vm.count("editor")) {
-      api.enableEditor();
+      api->enableEditor();
       valid_command = true;
     }
     if (vm.count("viewer")) {
       valid_command = true;
-      api.disableEditor();
+      api->disableEditor();
       std::string file = std::string(vm["viewer"].as<std::string>());
-      api.launchHdrTextureViewer(file);
+      api->launchHdrTextureViewer(file);
     }
     if (vm.count("bake")) {
       valid_command = true;
-      api.disableEditor();
+      api->disableEditor();
       const auto &opts = vm["bake"].as<std::vector<std::string>>();
       if (opts.size() != 6) {
         throw po::required_option("Option \"--bake\" missing argument");
@@ -129,7 +130,7 @@ namespace controller::cmd {
       envmap.samples = std::stoi(opts[3]);
       envmap.path_input = std::string(opts[4]);
       envmap.path_output = std::string(opts[5]);
-      api.bakeTexture(envmap);  // replace by tasking
+      api->bakeTexture(envmap);  // replace by tasking
     }
 
     if (!valid_command) {

@@ -33,6 +33,20 @@ namespace controller {
   /* Controls the main editor window , deals with event management between main window and the rest of the app */
   class Controller final : public QMainWindow {
     Q_OBJECT
+
+   private:
+    Ui::MainWindow main_window_ui;
+    GLViewer *viewer_3d;
+    SceneListView *renderer_scene_list;
+    ResourceDatabaseManager &resource_database;
+    std::unique_ptr<LightController> light_controller;
+    std::unique_ptr<ProgressStatus> progress_manager;
+    std::unique_ptr<ApplicationConfig> global_application_config;
+    std::unique_ptr<controller::event::Event> application_events;
+    /*UV editor*/
+    MeshListView *uv_editor_mesh_list;
+    SceneSelector uv_mesh_selector;
+
    public:
     Controller(QWidget *parent = nullptr);
     ~Controller();
@@ -41,13 +55,17 @@ namespace controller {
     static HeapManagement *_MemManagement;
     static SDL_Surface *copy_surface(SDL_Surface *surface);
 
+   private:
+    void connect_all_slots();
+    QGraphicsView *get_corresponding_view(gui::IMAGETYPE image);
+    SDL_Surface *get_corresponding_session_pointer(gui::IMAGETYPE image);
+    bool set_corresponding_session_pointer(image_type<SDL_Surface> *image_type_pointer);
+    void display_image(SDL_Surface *surf, gui::IMAGETYPE image, bool save_in_heap);
+
     /* SLOTS */
    public slots:
     bool import_image();
     bool import_3DOBJ();
-    /**
-     * @brief Loads an .hdr image and stores it in the HDR database
-     */
     bool import_envmap();
     bool open_project();
     bool save_project();
@@ -85,33 +103,8 @@ namespace controller {
     void set_display_boundingbox(bool display);
 
    protected slots:
-    /**
-     * @brief Updates UI slider according to the factor
-     *
-     * @param factor change factor
-     */
     void update_smooth_factor(int factor);
     void select_uv_editor_item();
-
-   private:
-    void connect_all_slots();
-    QGraphicsView *get_corresponding_view(gui::IMAGETYPE image);
-    SDL_Surface *get_corresponding_session_pointer(gui::IMAGETYPE image);
-    bool set_corresponding_session_pointer(image_type<SDL_Surface> *image_type_pointer);
-    void display_image(SDL_Surface *surf, gui::IMAGETYPE image, bool save_in_heap);
-
-   private:
-    Ui::MainWindow main_window_ui;
-    GLViewer *viewer_3d;
-    SceneListView *renderer_scene_list;
-    std::unique_ptr<LightController> light_controller;
-    ResourceDatabaseManager &resource_database;
-    std::unique_ptr<ProgressStatus> progress_manager;
-    std::unique_ptr<ApplicationConfig> global_application_config;
-    std::unique_ptr<controller::event::Event> application_events;
-    /*UV editor*/
-    MeshListView *uv_editor_mesh_list;
-    SceneSelector uv_mesh_selector;
   };
 
 }  // namespace controller

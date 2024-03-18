@@ -1,21 +1,21 @@
 #ifndef CMDARGS_H
 #define CMDARGS_H
-#include "API.h"
+
 #include "constants.h"
 /**
  * @brief Command line arguments splitter
  */
 
 namespace controller::cmd {
-
+  class API;
   class ProgramOptionsManager {
-   public:
-    explicit ProgramOptionsManager(API &api);
-    void processArgs(int argv, char **argc);
-
    private:
-    API &api;
-  };
+    API *api;
 
+   public:
+    /* Takes a valid address of an API object*/
+    explicit ProgramOptionsManager(API *api);
+    void processArgs(int argv, char **argc);
+  };
 }  // namespace controller::cmd
 #endif

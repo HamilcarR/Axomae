@@ -1,12 +1,12 @@
+#include "API.h"
 #include "CmdArgs.h"
 #include "GUIWindow.h"
 #include "GenericException.h"
 #include "ImageImporter.h"
 #include <boost/program_options.hpp>
+#include <csignal>
 #include <cstdlib>
-#include <gtest/gtest.h>
 #include <iostream>
-#include <signal.h>
 #include <string>
 using namespace axomae;
 
@@ -45,7 +45,7 @@ static int exception_cleanup(const char *except_error) {
 int main(int argv, char **argc) {
   signal(SIGSEGV, sigsegv_handler);
   controller::cmd::API api(argv, argc);
-  controller::cmd::ProgramOptionsManager options_manager(api);
+  controller::cmd::ProgramOptionsManager options_manager(&api);
   api.configureDefault();
   init_graphics();
   if (argv >= 2) {

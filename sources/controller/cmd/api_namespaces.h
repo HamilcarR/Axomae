@@ -12,7 +12,6 @@ namespace controller {
       unsigned int samples{};
       std::string baketype;
     };
-
   }  // namespace texturing
 
   namespace uv {
@@ -22,6 +21,5 @@ namespace controller {
       unsigned int resolution_height;
     };
   }  // namespace uv
-
 }  // namespace controller
 #endif  // API_NAMESPACES_H
