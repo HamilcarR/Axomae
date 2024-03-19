@@ -16,7 +16,7 @@ PRIVATE
 )
 
 set(GEN_INCLUDE_DIR "${CMAKE_BINARY_DIR}/lib/shader/include" )
-file(MAKE_DIRECTORY(${GEN_INCLUDE_DIR}))
+file(MAKE_DIRECTORY ${GEN_INCLUDE_DIR})
 
 #****************************************************************************************************
 # Encode shaders as byte arrays
