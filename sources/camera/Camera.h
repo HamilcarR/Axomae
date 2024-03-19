@@ -68,6 +68,7 @@ class ArcballCamera : public Camera {
   glm::vec3 panning_offset{};           /**<Variable representing the new world position of the scene after translation */
   glm::mat4 scene_rotation_matrix{};    /**<Computed rotation matrix of the scene if the camera is an Arcball*/
   glm::mat4 scene_translation_matrix{}; /**<Computed translation matrix of the scene*/
+
  private:
   glm::vec3 delta_position{}; /**<NDC coordinates difference of the cursor , between two frames*/
   float default_radius{};
@@ -81,7 +82,7 @@ class ArcballCamera : public Camera {
   void reset() override;
   [[nodiscard]] glm::mat4 getSceneTranslationMatrix() const override;
   [[nodiscard]] glm::mat4 getSceneRotationMatrix() const override;
-  void computeViewSpace();
+  void computeViewSpace() override;
 
  protected:
   virtual void rotate();
