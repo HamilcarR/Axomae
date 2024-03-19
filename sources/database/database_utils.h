@@ -8,8 +8,17 @@
 
 namespace database::event {
   class ImageUpdateMessage {
+
    public:
     enum OPERATION : unsigned { DELETE = 0, ADD = 1, SELECTED = 2 };
+
+   protected:
+    int index{};
+
+   protected:
+    ImageUpdateMessage() = default;
+
+   public:
     virtual ~ImageUpdateMessage() = default;
     ImageUpdateMessage &operator=(const ImageUpdateMessage &) = default;
     ImageUpdateMessage &operator=(ImageUpdateMessage &&) = default;
@@ -18,12 +27,6 @@ namespace database::event {
     void setIndex(int id) { index = id; }
     [[nodiscard]] virtual OPERATION getOperation() const = 0;
     [[nodiscard]] int getIndex() const { return index; }
-
-   protected:
-    ImageUpdateMessage() = default;
-
-   protected:
-    int index{};
   };
   /*image event when an image has been deleted to the DB*/
   class ImageDeleteMessage : public ImageUpdateMessage {
@@ -32,8 +35,15 @@ namespace database::event {
     [[nodiscard]] OPERATION getOperation() const override { return OPERATION::DELETE; }
   };
 
+  /*******************************************************************************************************************************************/
+
   /*Image event when an image has been added to the DB*/
   class ImageAddMessage : public ImageUpdateMessage {
+
+   private:
+    const QPixmap *value{};
+    image::Metadata metadata;
+
    public:
     ImageAddMessage() : ImageUpdateMessage() { index = 0; }
     [[nodiscard]] OPERATION getOperation() const override { return OPERATION::ADD; }
@@ -41,10 +51,6 @@ namespace database::event {
     void setThumbnail(const QPixmap *thumbnail) { value = thumbnail; }
     [[nodiscard]] image::Metadata getMetadata() { return metadata; }
     void setMetadata(image::Metadata metad) { metadata = metad; }
-
-   private:
-    const QPixmap *value{};
-    image::Metadata metadata;
   };
 
   class ImageSelectedMessage : public ImageUpdateMessage {

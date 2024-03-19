@@ -7,7 +7,10 @@ add_library(ax_database
     TextureDatabase.cpp
     EnvmapTextureManager.cpp
     model/ImageModel.cpp
-    )
+        QueryResult.h
+        DatabaseStorage.h
+        DatabaseInterface.h
+)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_database)
 target_link_libraries(ax_database 

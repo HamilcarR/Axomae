@@ -18,8 +18,6 @@ LightingDatabase::LightingDatabase() {
   node_database = ResourceDatabaseManager::getInstance().getNodeDatabase();
 }
 
-LightingDatabase::~LightingDatabase() {}
-
 bool LightingDatabase::addLight(int node_database_index) {
   AbstractLight *light = static_cast<AbstractLight *>(node_database->get(node_database_index));
   assert(light);

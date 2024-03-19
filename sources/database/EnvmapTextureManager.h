@@ -7,11 +7,6 @@
 #include "TextureDatabase.h"
 #include "constants.h"
 
-/**
- * @file EnvmapTextureManager.h
- *
- */
-
 namespace texture::envmap {
   /*This structure packs all 3 cubemaps IDs used in IBL*/
   struct EnvmapTextureGroup {
@@ -44,45 +39,8 @@ class ApplicationConfig;
  * @brief Tracks the current scene's envmap IDs , and generates new envmaps textures and IDs when an envmap is imported in an HDR database
  */
 class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpdateMessage *> {
+
   using Message = database::event::ImageUpdateMessage;
-
- public:
-  explicit EnvmapTextureManager(
-      ResourceDatabaseManager &resource_db, Dim2 &screen_size, unsigned int &default_framebuffer_id, RenderPipeline &render_pipeline, Scene &scene);
-
-  ~EnvmapTextureManager() = default;
-
-  EnvmapTextureManager(EnvmapTextureManager &copy) = delete;
-
-  EnvmapTextureManager(EnvmapTextureManager &&move) = delete;
-
-  EnvmapTextureManager &operator=(EnvmapTextureManager &copy) = delete;
-
-  EnvmapTextureManager &operator=(EnvmapTextureManager &&move) = delete;
-
-  void initializeDefaultEnvmap(ApplicationConfig *app_conf);
-
-  void notified(observer::Data<Message *> &message) override;
-
-  [[nodiscard]] int currentCubemapId() const { return current.cubemap_id; }
-
-  [[nodiscard]] int currentPrefilterId() const { return current.prefiltered_id; }
-
-  [[nodiscard]] int currentIrradianceId() const { return current.irradiance_id; }
-
-  [[nodiscard]] int currentLutId() const { return current.lut_id; }
-
-  void next();
-
-  void previous();
-
-  void updateCurrent(int index);
-
- private:
-  void deleteFromCollection(int index);
-  void addToCollection(int index);
-
-  void createFurnace();
 
  private:
   ResourceDatabaseManager &resource_database;
@@ -96,6 +54,29 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
   RenderPipeline &render_pipeline;
   CubeMapMesh *skybox_mesh; /*skybox mesh that will be operated on by this class*/
   Scene &scene;
+
+ public:
+  explicit EnvmapTextureManager(
+      ResourceDatabaseManager &resource_db, Dim2 &screen_size, unsigned int &default_framebuffer_id, RenderPipeline &render_pipeline, Scene &scene);
+  ~EnvmapTextureManager() = default;
+  EnvmapTextureManager(EnvmapTextureManager &copy) = delete;
+  EnvmapTextureManager(EnvmapTextureManager &&move) = delete;
+  EnvmapTextureManager &operator=(EnvmapTextureManager &copy) = delete;
+  EnvmapTextureManager &operator=(EnvmapTextureManager &&move) = delete;
+  void initializeDefaultEnvmap(ApplicationConfig *app_conf);
+  void notified(observer::Data<Message *> &message) override;
+  [[nodiscard]] int currentCubemapId() const { return current.cubemap_id; }
+  [[nodiscard]] int currentPrefilterId() const { return current.prefiltered_id; }
+  [[nodiscard]] int currentIrradianceId() const { return current.irradiance_id; }
+  [[nodiscard]] int currentLutId() const { return current.lut_id; }
+  void next();
+  void previous();
+  void updateCurrent(int index);
+
+ private:
+  void deleteFromCollection(int index);
+  void addToCollection(int index);
+  void createFurnace();
 };
 
 #endif
