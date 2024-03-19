@@ -143,6 +143,4 @@ void GLViewer::setNewScene(std::pair<std::vector<Mesh *>, SceneTree> &new_scene)
 
 void GLViewer::onUpdateDrawEvent() { update(); }
 
-const Renderer &GLViewer::getConstRenderer() const { return *renderer; }
-
 Renderer &GLViewer::getRenderer() const { return *renderer; }

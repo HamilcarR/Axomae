@@ -10,6 +10,8 @@
 class CustomLabelImageTex : public QLabel {
  public:
   explicit CustomLabelImageTex(std::string &current_rgb_text, QWidget *parent = nullptr);
+
+ protected:
   void paintEvent(QPaintEvent *event) override;
 
  private:

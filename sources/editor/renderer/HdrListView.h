@@ -22,12 +22,6 @@ class ThumbnailDelegate : public QStyledItemDelegate {
 
 class EnvmapListDisplay : public QListView {
   Q_OBJECT
- public:
-  explicit EnvmapListDisplay(QWidget *parent = nullptr);
-  void setWidget(GLViewer *widget);
- protected slots:
-  void itemClicked(const QModelIndex &index);
-
  protected:
   HdrImageDatabase *database;
   GLViewer *gl_widget{};
@@ -35,6 +29,13 @@ class EnvmapListDisplay : public QListView {
  private:
   std::unique_ptr<HdrImageModel> hdr_image_model;
   std::unique_ptr<ThumbnailDelegate> t_delegate;
+
+ public:
+  explicit EnvmapListDisplay(QWidget *parent = nullptr);
+  void setWidget(GLViewer *widget);
+
+ protected slots:
+  void itemClicked(const QModelIndex &index);
 };
 
 #endif

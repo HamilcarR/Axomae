@@ -1,11 +1,13 @@
 add_library(ax_editor
-    ProgressStatusWidget.cpp 
-    TextureViewerWidget.cpp
-    renderer/GLViewer.cpp 
-    renderer/HdrListView.cpp
-    image/Thumbnail.cpp
-    UV/MeshListView.cpp 
-    UV/SceneSelector.cpp
+        ProgressStatusWidget.cpp
+        TextureViewerWidget.cpp
+        renderer/GLViewer.cpp
+        renderer/HdrListView.cpp
+        renderer/SceneListView.cpp
+        image/Thumbnail.cpp
+        UV/MeshListView.cpp
+        UV/SceneSelector.cpp
+
 )
 
 

@@ -9,6 +9,10 @@
  */
 
 class SceneSelector {
+ private:
+  std::vector<Mesh *> scene{};
+  int current_mesh_index{};
+
  public:
   SceneSelector();
   void setScene(std::vector<Mesh *> &meshes);
@@ -17,10 +21,6 @@ class SceneSelector {
   Mesh *getCurrent();
   bool setCurrent(int new_current_mesh);
   int getCurrentId() { return current_mesh_index; }
-
- private:
-  std::vector<Mesh *> scene{};
-  int current_mesh_index{};
 };
 
 #endif
