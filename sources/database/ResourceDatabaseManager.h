@@ -6,7 +6,7 @@
 
 /**
  * @file ResourceDatabaseManager.h
- * @brief This file implements a singleton containing resources databases, like textures and shaders databases
+ * @brief This file implements a singleton containing multiple resources database
  *
  */
 
@@ -28,6 +28,17 @@ namespace controller {
  *
  */
 class ResourceDatabaseManager final {
+ private:
+  std::unique_ptr<TextureDatabase> texture_database; /*<Pointer on the texture database*/
+  std::unique_ptr<ShaderDatabase> shader_database;   /*<Pointer on the shader database*/
+  std::unique_ptr<INodeDatabase> node_database;      /*<Pointer on the node database*/
+  std::unique_ptr<HdrImageDatabase> hdr_database;    /*<Raw HDR images database*/
+  std::unique_ptr<RawImageDatabase> image_database;  /*<Raw texture images database*/
+
+ private:
+  ResourceDatabaseManager();
+  ~ResourceDatabaseManager() = default;
+
  public:
   static ResourceDatabaseManager &getInstance();
   ResourceDatabaseManager(const ResourceDatabaseManager &) = delete;
@@ -55,24 +66,8 @@ class ResourceDatabaseManager final {
   [[nodiscard]] INodeDatabase *getNodeDatabase() const { return node_database.get(); }
   [[nodiscard]] HdrImageDatabase *getHdrDatabase() const { return hdr_database.get(); }
   [[nodiscard]] RawImageDatabase *getRawImgdatabase() const { return image_database.get(); }
-
   void setProgressManagerAllDb(controller::ProgressStatus *progress_manager);
   void initializeDatabases(controller::ProgressStatus *progress_manager = nullptr);
-
- private:
-  /**
-   * @brief Construct a new Resource Database Manager object
-   *
-   */
-  ResourceDatabaseManager();
-  ~ResourceDatabaseManager() = default;
-
- private:
-  std::unique_ptr<TextureDatabase> texture_database; /*<Pointer on the texture database*/
-  std::unique_ptr<ShaderDatabase> shader_database;   /*<Pointer on the shader database*/
-  std::unique_ptr<INodeDatabase> node_database;      /*<Pointer on the node database*/
-  std::unique_ptr<HdrImageDatabase> hdr_database;    /*<Raw HDR images database*/
-  std::unique_ptr<RawImageDatabase> image_database;  /*<Raw texture images database*/
 };
 
 #endif

@@ -15,59 +15,29 @@
  */
 class ShaderDatabase final : public IResourceDB<Shader::TYPE, Shader> {
  public:
-  /**
-   * @brief Construct a new Shader Database object
-   *
-   */
   explicit ShaderDatabase(controller::ProgressStatus *progress_manager = nullptr);
-
-  /**
-   * @brief Cleans the whole database , Deletes all shaders .
-   *
-   */
   void clean() override;
-
-  /**
-   * @brief
-   *
-   */
   void purge() override;
-
   bool remove(Shader::TYPE type) override;
   bool remove(const Shader *shader) override;
-
-  /**
-   * @brief Recompile the database of shaders
-   *
-   */
   void recompile();
-
-  /**
-   * @brief Initialize the shaders
-   *
-   */
   void initializeShaders();
-
   /**
-   * @brief Add a shader into the database. Contrary to the method overriden , this version adds a shader only if it's type doesn't exist in the
+   * @brief Add a shader into the database. Contrary to the parent method , this version adds a shader only if it's type doesn't exist in the
    * database. In case there's already a shader of a same type , it is returned instead.
    *
    * @param shader Shader object
    * @return Shader::TYPE ID of the shader in database
    */
   database::Result<Shader::TYPE, Shader> add(std::unique_ptr<Shader> shader, bool keep) override;
-
   /**
    * @brief This database stores only a static amount of shaders , each unique (for now) .
    * Hence , this method will always return Shader::EMPTY , as shaders are already inserted according to their type id.
    */
   Shader::TYPE firstFreeId() const override;
-
- private:
 };
 
 namespace database::shader {
-
   template<class TYPE, class... Args>
   static database::Result<Shader::TYPE, TYPE> store(IResourceDB<Shader::TYPE, Shader> &database, bool keep, Args &&...args) {
     ASSERT_SUBTYPE(Shader, TYPE);

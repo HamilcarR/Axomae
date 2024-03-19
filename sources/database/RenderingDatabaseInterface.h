@@ -29,7 +29,7 @@ class IResourceDB : public DatabaseInterface<U, T>, public IAxObject {
   T *get(U id) const override;
   bool remove(U id) override;
   bool remove(const T *element) override;
-  [[nodiscard]] U firstFreeId() const = 0;
+  [[nodiscard]] U firstFreeId() const override = 0;
   database::Result<U, T> add(std::unique_ptr<T> element, bool keep) override;
   bool contains(U id) const override;
   database::Result<U, T> contains(const T *element_address) const override;

@@ -17,17 +17,18 @@
  *
  */
 class TextureDatabase final : public IntegerResourceDB<Texture> {
+ private:
+  std::map<std::string, int> unique_textures;
+
  public:
   explicit TextureDatabase(controller::ProgressStatus *progress_manager = nullptr);
   void clean() override;
   void purge() override;
   bool remove(int index) override;
   bool remove(const Texture *texture) override;
-
   /**
    * @brief Add a texture object to the database . In case the object is already present , this method will return the
    * existing texture's id
-   *
    * @param keep True if texture is to be kept
    * @return int Database ID of the texture
    */
@@ -36,9 +37,6 @@ class TextureDatabase final : public IntegerResourceDB<Texture> {
   bool empty() const override { return database_map.empty(); }
   database::Result<int, Texture> getUniqueTexture(const std::string &name) const;
   bool removeUniqueTextureReference(int id);
-
- private:
-  std::map<std::string, int> unique_textures;
 };
 
 namespace database::texture {
