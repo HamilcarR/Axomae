@@ -14,8 +14,6 @@ GLGeometryBuffer::GLGeometryBuffer() {
 
 GLGeometryBuffer::GLGeometryBuffer(const Object3D *geometry) : GLGeometryBuffer() { this->geometry = geometry; }
 
-GLGeometryBuffer::~GLGeometryBuffer() {}
-
 bool GLGeometryBuffer::isReady() const {
   return vao && vertex_buffer && normal_buffer && index_buffer && texture_buffer && color_buffer && tangent_buffer && geometry;
 }
@@ -58,8 +56,11 @@ void GLGeometryBuffer::bindVao() { glBindVertexArray(vao); }
 void GLGeometryBuffer::bindVertexBuffer() { glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer); }
 
 void GLGeometryBuffer::bindNormalBuffer() { glBindBuffer(GL_ARRAY_BUFFER, normal_buffer); }
+
 void GLGeometryBuffer::bindTextureBuffer() { glBindBuffer(GL_ARRAY_BUFFER, texture_buffer); }
+
 void GLGeometryBuffer::bindColorBuffer() { glBindBuffer(GL_ARRAY_BUFFER, color_buffer); }
+
 void GLGeometryBuffer::bindIndexBuffer() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer); }
 
 void GLGeometryBuffer::bindTangentBuffer() { glBindBuffer(GL_ARRAY_BUFFER, tangent_buffer); }

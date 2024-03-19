@@ -6,8 +6,6 @@ GLRenderBuffer::GLRenderBuffer() {
   format = EMPTY;
 }
 
-GLRenderBuffer::~GLRenderBuffer() {}
-
 GLRenderBuffer::GLRenderBuffer(unsigned int _width, unsigned int _height, INTERNAL_FORMAT _format) {
   width = _width;
   height = _height;
@@ -23,7 +21,7 @@ void GLRenderBuffer::initializeBuffers() {
 
 bool GLRenderBuffer::isReady() const { return renderbuffer_id != 0; }
 
-void GLRenderBuffer::fillBuffers() {}
+void GLRenderBuffer::fillBuffers() { EMPTY_FUNCBODY; }
 
 void GLRenderBuffer::bind() { glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer_id); }
 

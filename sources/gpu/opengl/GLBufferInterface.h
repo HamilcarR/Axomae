@@ -8,46 +8,24 @@
  */
 
 /**
- * @brief Interface for opengl function wrappers
  * @class GLBufferInterface
  */
 class GLBufferInterface {
  public:
   /**
-   * @brief Initializes the buffers the class uses
+   * @brief Generates the framebuffer's ID.
+   * !Note : This method should be called after the framebuffer texture generation as it uses : glFramebufferTexture2D
    *
    */
   virtual void initializeBuffers() = 0;
-
   /**
-   * @brief Checks if buffers IDs have been initialized
+   * @brief Checks if framebuffer is ready to use
    *
-   * @return true If ID is ready to use
    */
   virtual bool isReady() const = 0;
-
-  /**
-   * @brief Fills the buffers with raw data
-   *
-   */
   virtual void fillBuffers() = 0;
-
-  /**
-   * @brief Generic method to bind the GLBuffer class object
-   *
-   */
   virtual void bind() = 0;
-
-  /**
-   * @brief Generic method to unbind the GLBuffer class object
-   *
-   */
   virtual void unbind() = 0;
-
-  /**
-   * @brief Free the IDs used by OpenGL
-   *
-   */
   virtual void clean() = 0;
 };
 

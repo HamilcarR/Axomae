@@ -1,9 +1,9 @@
 #ifndef RENDERQUAD_H
 #define RENDERQUAD_H
 
-#include "FrameBufferInterface.h"
+#include "IFrameBuffer.h"
 
-class RenderQuadFBO : public FrameBufferInterface {
+class RenderQuadFBO : public IFrameBuffer {
  public:
   RenderQuadFBO();
   RenderQuadFBO(TextureDatabase *texture_database, Dim2 *texture_size, unsigned int *default_fbo_id);

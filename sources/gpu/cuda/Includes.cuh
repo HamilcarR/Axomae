@@ -54,10 +54,6 @@ inline void check_error(const char *file, int line) {
 
 /**
  * @brief Get the maximum blocks/threads for a 2D buffer
- *
- * @param width Width of the buffer
- * @param height Height of the buffer
- * @return gpu_threads
  */
 inline gpu_threads get_optimal_thread_distribution(float width, float height, float depth = 0) {
   gpu_threads value;

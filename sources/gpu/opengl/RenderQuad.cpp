@@ -4,8 +4,7 @@
 
 RenderQuadFBO::RenderQuadFBO() {}
 
-RenderQuadFBO::RenderQuadFBO(TextureDatabase *database, Dim2 *screen, unsigned int *default_fbo)
-    : FrameBufferInterface(database, screen, default_fbo) {
+RenderQuadFBO::RenderQuadFBO(TextureDatabase *database, Dim2 *screen, unsigned int *default_fbo) : IFrameBuffer(database, screen, default_fbo) {
   LOG("initialized cubemap", LogLevel::INFO);
 }
 

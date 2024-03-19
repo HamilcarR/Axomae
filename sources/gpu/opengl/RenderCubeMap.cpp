@@ -3,8 +3,7 @@
 
 RenderCubeMap::RenderCubeMap() {}
 
-RenderCubeMap::RenderCubeMap(TextureDatabase *database, Dim2 *screen, unsigned int *default_fbo)
-    : FrameBufferInterface(database, screen, default_fbo) {
+RenderCubeMap::RenderCubeMap(TextureDatabase *database, Dim2 *screen, unsigned int *default_fbo) : IFrameBuffer(database, screen, default_fbo) {
   LOG("initialized cubemap", LogLevel::INFO);
 }
 

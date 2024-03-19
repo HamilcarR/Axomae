@@ -1,14 +1,14 @@
 #ifndef RENDERCUBEMAP_H
 #define RENDERCUBEMAP_H
 
-#include "FrameBufferInterface.h"
+#include "IFrameBuffer.h"
 #include "Shader.h"
 
 /**
  * @brief A Framebuffer that renders to a cubemap
  *
  */
-class RenderCubeMap : public FrameBufferInterface {
+class RenderCubeMap : public IFrameBuffer {
  public:
   RenderCubeMap();
   RenderCubeMap(TextureDatabase *texture_database, Dim2 *texture_size, unsigned int *default_fbo_pointer_id);

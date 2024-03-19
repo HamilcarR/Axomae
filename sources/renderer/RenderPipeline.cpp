@@ -1,6 +1,6 @@
 #include "RenderPipeline.h"
 #include "DebugGL.h"
-#include "FrameBufferInterface.h"
+#include "IFrameBuffer.h"
 #include "INodeFactory.h"
 #include "RenderCubeMap.h"
 #include "RenderQuad.h"

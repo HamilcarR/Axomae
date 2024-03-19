@@ -32,10 +32,14 @@ class GLFrameBuffer : public GLBufferInterface {
     CUBEMAP_NEGATIVE_Z = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
   };
 
-  /**
-   * @brief Construct a new GLFrameBuffer object
-   *
-   */
+ protected:
+  TEXTURE_TARGET target_texture_type;                  /*<Type of the target texture */
+  std::unique_ptr<GLRenderBuffer> renderbuffer_object; /*<Pointer on the renderbuffer */
+  unsigned int framebuffer_id;                         /*<Framebuffer ID*/
+  unsigned int texture_id;                             /*<ID of the texture rendered to*/
+  unsigned int *pointer_on_default_fbo_id;             /*<Pointer on default fbo variable*/
+
+ public:
   GLFrameBuffer();
 
   /**
@@ -54,73 +58,19 @@ class GLFrameBuffer : public GLBufferInterface {
                 unsigned int *default_fbo_id_pointer = nullptr,
                 TEXTURE_TARGET target_texture_type = TEXTURE2D);
 
-  /**
-   * @brief Destroy the GLFrameBuffer object
-   *
-   */
-  virtual ~GLFrameBuffer() = default;
-
-  /**
-   * @brief Generates the framebuffer's ID.
-   * !Note : This method should be called after the framebuffer texture generation as it uses : glFramebufferTexture2D
-   *
-   */
-  virtual void initializeBuffers() override;
-
-  /**
-   * @brief Checks if framebuffer is ready to use
-   *
-   */
-  virtual bool isReady() const override;
-
+  void initializeBuffers() override;
+  bool isReady() const override;
   /**
    * @brief Attach a texture to the framebuffer
-   *
-   * @param target
-   * @param texture_id
-   * @param mipmap_level
    */
   void attachTexture2D(INTERNAL_FORMAT color_attachment, TEXTURE_TARGET target, unsigned int texture_id, unsigned int mipmap_level = 0);
-
-  /**
-   * @brief Binds the framebuffer
-   *
-   */
-  virtual void bind() override;
-
-  /**
-   * @brief Unbinds the framebuffer
-   *
-   */
-  virtual void unbind() override;
-
-  /**
-   * @brief Frees all ressources allocated by the framebuffer
-   *
-   */
-  virtual void clean() override;
-
-  /**
-   * @brief Resize the textures of the framebuffer and render buffer
-   *
-   * @param width New width
-   * @param height  New height
-   */
-  virtual void resize(unsigned int width, unsigned int height);
+  void bind() override;
+  void unbind() override;
+  void clean() override;
+  void resize(unsigned int width, unsigned int height);
 
  private:
-  /**
-   * @brief Dummy method
-   *
-   */
-  virtual void fillBuffers() override;
-
- protected:
-  TEXTURE_TARGET target_texture_type;                  /*<Type of the target texture */
-  std::unique_ptr<GLRenderBuffer> renderbuffer_object; /*<Pointer on the renderbuffer */
-  unsigned int framebuffer_id;                         /*<Framebuffer ID*/
-  unsigned int texture_id;                             /*<ID of the texture rendered to*/
-  unsigned int *pointer_on_default_fbo_id;             /*<Pointer on default fbo variable*/
+  void fillBuffers() override;
 };
 
 #endif
