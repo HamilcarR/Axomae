@@ -1,7 +1,8 @@
 add_library(ax_shader 
     Shader.cpp
     utils/glsl.cpp
-    )
+        ShaderInterface.h
+)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_shader)
 

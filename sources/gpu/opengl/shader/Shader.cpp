@@ -5,7 +5,6 @@
 #include "glsl.h"
 #include <cstring>
 #include <stdexcept>
-#define SHADER_ERROR_LOG_SIZE 512
 
 /**
  * @file Shader.cpp
@@ -15,17 +14,12 @@
 
 using namespace shader_utils;
 
+constexpr unsigned SHADER_ERROR_LOG_SIZE = 512;
 static int success;
 static char infoLog[SHADER_ERROR_LOG_SIZE];
 
 constexpr const char *RUNTIME_ERROR_NEGATIVE_TEXTURE_UNIT = "Texture unit provided is negative";
 
-/**
- * This function checks for compilation errors in a shader and prints an error message if there are
- * any.
- *
- * @param shader_id The ID of the shader object that needs to be checked for compilation errors.
- */
 inline void shaderCompilationErrorCheck(unsigned int shader_id) {
   success = 0;
   memset(infoLog, 0, SHADER_ERROR_LOG_SIZE);
@@ -36,12 +30,6 @@ inline void shaderCompilationErrorCheck(unsigned int shader_id) {
   }
 }
 
-/**
- * This function checks for errors in shader program linking and prints an error message if there is a
- * failure.
- *
- * @param program_id The ID of the shader program that needs to be checked for linking errors.
- */
 inline void programLinkingErrorCheck(unsigned int program_id) {
   success = 0;
   memset(infoLog, 0, SHADER_ERROR_LOG_SIZE);
@@ -71,22 +59,22 @@ Shader::Shader(const std::string &vertex_code, const std::string &fragment_code)
 
 void Shader::enableAttributeArray(GLuint att) { glEnableVertexAttribArray(att); }
 
-void Shader::setAttributeBuffer(GLuint location, GLenum type, int offset, int tuplesize, int stride) {
-  glVertexAttribPointer(location, tuplesize, type, GL_FALSE, stride, (void *)0);
+void Shader::setAttributeBuffer(GLuint location, GLenum etype, int offset, int tuplesize, int stride) {
+  glVertexAttribPointer(location, tuplesize, etype, GL_FALSE, stride, (void *)0);
 }
 
-void Shader::setTextureUniforms(std::string texture_name, Texture::TYPE type) {
+void Shader::setTextureUniforms(const std::string &texture_name, Texture::TYPE texture_type) {
   try {
-    setTextureUniforms(texture_name, static_cast<int>(type));
+    setTextureUniforms(texture_name, static_cast<int>(texture_type));
   } catch (const std::exception &e) {
     LOG("Exception caught : " + std::string(e.what()), LogLevel::ERROR);
   }
 }
 
-void Shader::setTextureUniforms(std::string texture_name, int type) {
+void Shader::setTextureUniforms(const std::string &texture_name, int texture_type) {
   if (type < 0)
     throw std::runtime_error(RUNTIME_ERROR_NEGATIVE_TEXTURE_UNIT);
-  setUniform(texture_name, static_cast<int>(type));
+  setUniform(texture_name, static_cast<int>(texture_type));
 }
 
 void Shader::setSceneCameraPointer(Camera *camera) { camera_pointer = camera; }
@@ -94,6 +82,11 @@ void Shader::setSceneCameraPointer(Camera *camera) { camera_pointer = camera; }
 void Shader::updateCamera() {
   if (camera_pointer != nullptr)
     setCameraPositionUniform();
+}
+
+void Shader::setShadersRawText(const std::string &vs, const std::string &fs) {
+  fragment_shader_txt = fs;
+  vertex_shader_txt = vs;
 }
 
 void Shader::setCameraPositionUniform() {
@@ -108,7 +101,7 @@ void Shader::setAllMatricesUniforms(const glm::mat4 &model) {
   if (camera_pointer != nullptr)
     setInverseModelViewMatrixUniform(camera_pointer->getView(), model);
 }
-void Shader::setCubemapNormalMatrixUniform(glm::mat4 modelview_matrix) {
+void Shader::setCubemapNormalMatrixUniform(const glm::mat4 &modelview_matrix) {
   setUniform(uniform_name_cubemap_matrix_normal, glm::mat3(glm::transpose(glm::inverse(modelview_matrix))));
 }
 
@@ -240,47 +233,20 @@ BRDFShader::BRDFShader(std::string vertex_shader, std::string fragment_shader) :
 /***********************************************************************************************************************************************************/
 ScreenFramebufferShader::ScreenFramebufferShader() : Shader(glsl_utils::screen_fbo_vert(), glsl_utils::screen_fbo_frag()) {
   type = SCREEN_FRAMEBUFFER;
-  post_p_blurr = false;
-  post_p_sharpen = false;
-  post_p_edge = false;
+  p_process_flag = DEFAULT;
 }
 ScreenFramebufferShader::ScreenFramebufferShader(std::string vertex_shader, std::string fragment_shader) : Shader(vertex_shader, fragment_shader) {
   type = SCREEN_FRAMEBUFFER;
-  post_p_blurr = false;
-  post_p_sharpen = false;
-  post_p_edge = false;
+  p_process_flag = DEFAULT;
 }
 
 void ScreenFramebufferShader::setPostProcessUniforms() {
-  setUniform(uniform_name_bool_blurr, post_p_blurr);
-  setUniform(uniform_name_bool_edge, post_p_edge);
-  setUniform(uniform_name_bool_sharpen, post_p_sharpen);
+  setUniform(uniform_name_bool_blurr, p_process_flag == BLURR);
+  setUniform(uniform_name_bool_edge, p_process_flag == EDGE);
+  setUniform(uniform_name_bool_sharpen, p_process_flag == SHARPEN);
 }
 
-void ScreenFramebufferShader::setPostProcess(POST_PROCESS_TYPE type) {
-  switch (type) {
-    case EDGE:
-      post_p_edge = true;
-      post_p_sharpen = false;
-      post_p_blurr = false;
-      break;
-    case SHARPEN:
-      post_p_edge = true;
-      post_p_sharpen = true;
-      post_p_blurr = false;
-      break;
-    case BLURR:
-      post_p_edge = false;
-      post_p_sharpen = false;
-      post_p_blurr = true;
-      break;
-    default:
-      post_p_edge = false;
-      post_p_sharpen = false;
-      post_p_blurr = false;
-      break;
-  }
-}
+void ScreenFramebufferShader::setPostProcess(POST_PROCESS_TYPE type) { p_process_flag = type; }
 /***********************************************************************************************************************************************************/
 
 BoundingBoxShader::BoundingBoxShader() : Shader(glsl_utils::bbox_vert(), glsl_utils::bbox_frag()) { type = BOUNDING_BOX; }
