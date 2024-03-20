@@ -65,7 +65,7 @@ void GLViewer::resizeGL(int w, int h) {
 }
 
 const controller::event::Event *GLViewer::getInputEventsStructure() const {
-  AX_ASSERT(widget_input_events != nullptr);
+  AX_ASSERT(widget_input_events != nullptr, "Event structure pointer is not valid.");
   return widget_input_events.get();
 }
 

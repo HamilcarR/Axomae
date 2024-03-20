@@ -37,12 +37,12 @@ class GLRenderBuffer : public GLBufferInterface {
    *
    */
   void initializeBuffers() override;
-  bool isReady() const override;
+  [[nodiscard]] bool isReady() const override;
   void bind() override;
   void unbind() override;
   void clean() override;
 
-  unsigned int getID() { return renderbuffer_id; }
+  unsigned int getID() const { return renderbuffer_id; }
   INTERNAL_FORMAT getFormat() { return format; }
   virtual void resize(unsigned width, unsigned height);
   void fillBuffers() override;

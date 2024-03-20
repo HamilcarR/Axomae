@@ -8,6 +8,10 @@
 namespace IO {
 
   class ImageImporter {
+   private:
+    SDL_Surface *surf;
+    static ImageImporter *instance;
+
    public:
     static ImageImporter *getInstance();
     static void close();
@@ -17,8 +21,6 @@ namespace IO {
    private:
     ImageImporter();
     ~ImageImporter();
-    SDL_Surface *surf;
-    static ImageImporter *instance;
   };
 
 }  // namespace IO

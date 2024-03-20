@@ -52,7 +52,7 @@ class Mesh : public SceneTreeNode {
    * @param obj Geometry data
    * @param mat Material data
    */
-  Mesh(const Object3D &obj, const Material &mat, ISceneNode *parent = nullptr);
+  Mesh(const Object3D &obj, const GLMaterial &mat, ISceneNode *parent = nullptr);
 
   /**
    * @brief Construct a new Mesh object with a name , geometry , and material
@@ -61,7 +61,7 @@ class Mesh : public SceneTreeNode {
    * @param obj Geometry data
    * @param mat Material data
    */
-  Mesh(const std::string &name, const Object3D &obj, const Material &mat, ISceneNode *parent = nullptr);
+  Mesh(const std::string &name, const Object3D &obj, const GLMaterial &mat, ISceneNode *parent = nullptr);
 
   /**
    * @brief Construct a new Mesh object
@@ -71,7 +71,7 @@ class Mesh : public SceneTreeNode {
    * @param mat Mesh material
    * @param shader Shader used
    */
-  Mesh(const std::string &name, const Object3D &obj, const Material &mat, Shader *shader, ISceneNode *parent = nullptr);
+  Mesh(const std::string &name, const Object3D &obj, const GLMaterial &mat, Shader *shader, ISceneNode *parent = nullptr);
 
   /**
    * @brief Construct a new Mesh object
@@ -81,7 +81,7 @@ class Mesh : public SceneTreeNode {
    * @param mat Mesh material
    * @param shader Shader used
    */
-  Mesh(const std::string &name, const Object3D &&obj, const Material &mat, Shader *shader, ISceneNode *parent = nullptr);
+  Mesh(const std::string &name, const Object3D &&obj, const GLMaterial &mat, Shader *shader, ISceneNode *parent = nullptr);
 
   /**
    * @brief Enable the mesh's material to render
@@ -223,7 +223,7 @@ class Mesh : public SceneTreeNode {
    *
    * @return Material*
    */
-  Material *getMaterial() { return &material; }
+  GLMaterial *getMaterial() { return &material; }
 
   /**
    * @brief Get the Mesh Name
@@ -260,8 +260,8 @@ class Mesh : public SceneTreeNode {
   bool isDrawn() { return is_drawn; }
 
  public:
-  Object3D geometry; /**<3D Geometry of the mesh , vertex positions , UVs etc*/
-  Material material; /**<Material to be used for the mesh*/
+  Object3D geometry;   /**<3D Geometry of the mesh , vertex positions , UVs etc*/
+  GLMaterial material; /**<Material to be used for the mesh*/
  protected:
   bool mesh_initialized;      /**<Is the mesh ready to render*/
   Mesh *cubemap_reference;    /**<Tracks the scene's cubemap*/

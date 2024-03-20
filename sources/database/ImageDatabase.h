@@ -100,7 +100,7 @@ typename ImageDatabase<T>::HolderResult ImageDatabase<T>::add(HolderPointer elem
     HolderResult result;
     result.id = it->second;
     result.object = BaseType::get(result.id);
-    AX_ASSERT(result.object != nullptr);
+    AX_ASSERT(result.object != nullptr, "Database query result has invalid object stored");
     return result;
   }
   auto elem = BaseType::add(std::move(element), keep);

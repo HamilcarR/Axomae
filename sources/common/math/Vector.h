@@ -18,6 +18,7 @@ namespace math::geometry {
    public:
     Vect2D() = default;
     Vect2D(float x, float y);
+    ~Vect2D() = default;
     [[nodiscard]] float magnitude() const override;
     void normalize() override;
     [[nodiscard]] float dot(const IVector &arg) const override;
@@ -33,6 +34,7 @@ namespace math::geometry {
    public:
     Vect3D() = default;
     Vect3D(float x, float y, float z);
+    ~Vect3D() = default;
     [[nodiscard]] float magnitude() const override;
     void normalize() override;
     [[nodiscard]] float dot(const IVector &arg) const override;

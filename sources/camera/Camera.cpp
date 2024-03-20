@@ -167,7 +167,7 @@ void ArcballCamera::computeViewSpace() {
 
 void ArcballCamera::processEvent(const controller::event::Event *event) {
   using ev = controller::event::Event;
-  AX_ASSERT(event != nullptr);
+  AX_ASSERT(event != nullptr, "Provided event structure null.");
   cursor_position = glm::vec2(event->mouse_state.pos_x, event->mouse_state.pos_y);
 
   if (!(event->flag & ev::EVENT_MOUSE_MOVE)) {

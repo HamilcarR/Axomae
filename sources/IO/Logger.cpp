@@ -24,17 +24,16 @@ static std::string getFormatedLog(
 class LoggerOutputStreamException : public exception::GenericException {
  public:
   LoggerOutputStreamException() : GenericException() { saveErrorString("The output stream for the application logger system is undefined !"); }
-  virtual ~LoggerOutputStreamException() {}
 };
 
 /***************************************************************************************************************************************************************/
 class LogLine {
  public:
-  LogLine(const std::string &_message,
-          const LogLevel::LOGENUMTYPE log_level = LogLevel::INFO,
-          const char *_file = "",
-          const char *_function = "",
-          const unsigned _line = 0) {
+  explicit LogLine(const std::string &_message,
+                   const LogLevel::LOGENUMTYPE log_level = LogLevel::INFO,
+                   const char *_file = "",
+                   const char *_function = "",
+                   const unsigned _line = 0) {
     message = _message;
     level = log_level;
     file = _file;
@@ -47,11 +46,11 @@ class LogLine {
 
   const std::string &getFunctionName() { return function; }
 
-  unsigned getLine() { return line; }
+  [[nodiscard]] unsigned getLine() const { return line; }
 
   LogLevel::LOGENUMTYPE &getLogLevel() { return level; }
 
-  std::string getFormattedLog() const { return getFormatedLog(message, file, function, line, level); }
+  [[nodiscard]] std::string getFormattedLog() const { return getFormatedLog(message, file, function, line, level); }
 
  private:
   std::string message;
@@ -63,7 +62,10 @@ class LogLine {
 /***************************************************************************************************************************************************************/
 class Logger : protected AbstractLogger {
  public:
-  Logger() { enabled = true; }
+  Logger() {
+    priority = LogLevel::INFO;
+    enabled = true;
+  }
 
   void logMessage(const std::string &message, LogLevel::LOGENUMTYPE log_level, const char *file, const char *function, unsigned line) {
     Mutex::Lock lock(mutex);
@@ -128,7 +130,7 @@ class Logger : protected AbstractLogger {
 static Logger logger_global;
 
 namespace log_functions {
-  void log_message(std::string message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line) {
+  void log_message(const std::string &message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line) {
     logger_global.logMessage(message, level, file, function, line);
   }
 

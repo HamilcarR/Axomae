@@ -15,21 +15,21 @@ Mesh::Mesh(ISceneNode *parent) : SceneTreeNode(parent) {
   modelview_matrix = glm::mat4(1.f);
 }
 
-Mesh::Mesh(const Object3D &geo, const Material &mat, ISceneNode *parent) : Mesh(parent) {
+Mesh::Mesh(const Object3D &geo, const GLMaterial &mat, ISceneNode *parent) : Mesh(parent) {
   geometry = geo;
   material = mat;
   name = "uninitialized mesh";
   shader_program = nullptr;
 }
 
-Mesh::Mesh(const std::string &n, const Object3D &geo, const Material &mat, ISceneNode *parent) : Mesh(parent) {
+Mesh::Mesh(const std::string &n, const Object3D &geo, const GLMaterial &mat, ISceneNode *parent) : Mesh(parent) {
   geometry = geo;
   material = mat;
   name = n;
   shader_program = nullptr;
 }
 
-Mesh::Mesh(const std::string &n, const Object3D &geo, const Material &mat, Shader *shader, ISceneNode *parent) : Mesh(parent) {
+Mesh::Mesh(const std::string &n, const Object3D &geo, const GLMaterial &mat, Shader *shader, ISceneNode *parent) : Mesh(parent) {
   geometry = geo;
   material = mat;
   name = n;
@@ -37,7 +37,7 @@ Mesh::Mesh(const std::string &n, const Object3D &geo, const Material &mat, Shade
   material.setShaderPointer(shader);
 }
 
-Mesh::Mesh(const std::string &n, const Object3D &&geo, const Material &mat, Shader *shader, ISceneNode *parent) : Mesh(parent) {
+Mesh::Mesh(const std::string &n, const Object3D &&geo, const GLMaterial &mat, Shader *shader, ISceneNode *parent) : Mesh(parent) {
   geometry = std::move(geo);
   material = mat;
   name = n;

@@ -9,7 +9,7 @@ TextureGroup::TextureGroup(const TextureGroup &texture_group)
 
 void TextureGroup::addTexture(int index) { texture_collection.push_back(index); }
 
-Texture *TextureGroup::getTexturePointer(Texture::TYPE type) {
+Texture *TextureGroup::getTexturePointer(Texture::TYPE type) const {
   for (int id : texture_collection) {
     Texture *A = texture_database->get(id);
     if (A && A->getTextureType() == type)

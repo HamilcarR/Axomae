@@ -9,6 +9,8 @@
 #include "axomae_utils.h"
 #include <QImage>
 
+// TODO : code needs total uncoupling from any foreign structure : needs to return arrays of basic data
+
 namespace IO {
   namespace exception {}
 
@@ -105,7 +107,7 @@ namespace IO {
   }
 
   template<class TEXTYPE>
-  static void loadTextureDummy(Material *material, TextureDatabase *texture_database) {
+  static void loadTextureDummy(GLMaterial *material, TextureDatabase *texture_database) {
     auto result = database::texture::store<TEXTYPE>(*texture_database, true, nullptr);
     LOG("Loading dummy texture at index : " + std::to_string(result.id), LogLevel::INFO);
     material->addTexture(result.id);
@@ -122,7 +124,7 @@ namespace IO {
    */
   template<class TEXTYPE>
   static void loadTexture(const aiScene *scene,
-                          Material *material,
+                          GLMaterial *material,
                           TextureData *texture,
                           const aiString &texture_string,
                           ResourceDatabaseManager &resource_manager,
@@ -165,11 +167,11 @@ namespace IO {
    *
    * @return a Material object.
    */
-  static Material loadAllTextures(const aiScene *scene,
-                                  const aiMaterial *material,
-                                  ResourceDatabaseManager &resource_manager,
-                                  controller::IProgressManager *progress_manager) {
-    Material mesh_material;
+  static GLMaterial loadAllTextures(const aiScene *scene,
+                                    const aiMaterial *material,
+                                    ResourceDatabaseManager &resource_manager,
+                                    controller::IProgressManager *progress_manager) {
+    GLMaterial mesh_material;
     std::vector<Texture::TYPE> dummy_textures_type;
     TextureData diffuse, metallic, roughness, normal, ambiantocclusion, emissive, specular, opacity;
     diffuse.name = "diffuse";
@@ -190,7 +192,7 @@ namespace IO {
       loadTextureDummy<DiffuseTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_OPACITY) > 0) {
-      mesh_material.setTransparency(true);
+      mesh_material.setAlphaFactor(true);
       material->GetTexture(aiTextureType_OPACITY, 0, &opacity_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
       loadTexture<OpacityTexture>(scene, &mesh_material, &opacity, opacity_texture, resource_manager, progress_manager);
     } else
@@ -246,14 +248,14 @@ namespace IO {
     return transparency;
   }
 
-  std::pair<unsigned, Material> loadMaterials(const aiScene *scene,
-                                              const aiMaterial *material,
-                                              ResourceDatabaseManager &resource_manager,
-                                              unsigned id,
-                                              controller::IProgressManager *progress_manager) {
-    Material mesh_material = loadAllTextures(scene, material, resource_manager, progress_manager);
+  std::pair<unsigned, GLMaterial> loadMaterials(const aiScene *scene,
+                                                const aiMaterial *material,
+                                                ResourceDatabaseManager &resource_manager,
+                                                unsigned id,
+                                                controller::IProgressManager *progress_manager) {
+    GLMaterial mesh_material = loadAllTextures(scene, material, resource_manager, progress_manager);
     float transparency_factor = loadTransparencyValue(material);
-    mesh_material.setTransparency(transparency_factor);
+    mesh_material.setAlphaFactor(transparency_factor);
     return {id, mesh_material};
   }
 
@@ -463,7 +465,7 @@ namespace IO {
         file, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs);
     if (modelScene != nullptr) {
       std::vector<std::future<std::pair<unsigned, std::unique_ptr<Object3D>>>> loaded_meshes_futures;
-      std::vector<Material> material_array;
+      std::vector<GLMaterial> material_array;
       std::vector<Mesh *> node_lookup_table;
       Shader *shader_program = shader_database.get(Shader::BRDF);
       node_lookup_table.resize(modelScene->mNumMeshes);

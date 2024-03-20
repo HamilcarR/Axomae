@@ -122,7 +122,7 @@ void EnvmapTextureManager::addToCollection(int index) {
   HdrImageDatabase &image_database = *resource_database.getHdrDatabase();
   texture::envmap::EnvmapTextureGroup texgroup{};
   image::ThumbnailImageHolder<float> *raw_image_data = image_database.get(index);
-  AX_ASSERT(raw_image_data);
+  AX_ASSERT(raw_image_data, "Index returns invalid pointer.");
   texgroup.equirect_id = index;
   TextureData envmap = texture_metadata(raw_image_data);
   auto result = database::texture::store<EnvironmentMap2DTexture>(texture_database, false, &envmap);

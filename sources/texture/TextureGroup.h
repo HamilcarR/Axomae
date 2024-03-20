@@ -84,7 +84,7 @@ class TextureGroup {
    * @param type
    * @return Texture*
    */
-  Texture *getTexturePointer(Texture::TYPE type);
+  [[nodiscard]] Texture *getTexturePointer(Texture::TYPE type) const;
 
   /**
    * @brief Get the Texture Collection object

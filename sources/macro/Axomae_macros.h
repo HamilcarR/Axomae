@@ -11,5 +11,5 @@
 #define NOT_IMPLEMENTED static_assert(false, "Not yet implemented")
 // Function does nothing
 #define EMPTY_FUNCBODY return
-#define AX_ASSERT(expr) assert(expr)
+#define AX_ASSERT(expr, message) assert(expr &&message)
 #endif

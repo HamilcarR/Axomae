@@ -96,7 +96,7 @@ class Drawable {
    *
    * @return Material*
    */
-  Material *getMaterialPointer() const;
+  GLMaterial *getMaterialPointer() const;
 
  protected:
   Mesh *mesh_object;           /**<Pointer to the mesh */

@@ -30,8 +30,8 @@ struct LoggerConfigDataStruct {
 };
 
 namespace log_functions {
-  void log_message(const char *message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line);
-  void log_message(std::string message, const LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line);
+  void log_message(const char *message, LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line);
+  void log_message(const std::string &message, LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line);
   void log_message(const char *message);
   void log_flush();
   void log_configure(const LoggerConfigDataStruct &config);
@@ -42,6 +42,7 @@ namespace log_functions {
 /*****************************************************************************************************************************************************************************/
 class AbstractLogger : public ILockable {
  public:
+  virtual ~AbstractLogger() = default;
   virtual void print() const = 0;
 };
 

@@ -3,7 +3,6 @@
 #include "Mutex.h"
 
 class ILockable {
-
  protected:
   mutable Mutex mutex;
 };

@@ -43,8 +43,8 @@ namespace IO {
     initProgress("Importing environment map", width * height * channels);
     if (!data)
       throw exception::LoadImagePathException(path);
-    AX_ASSERT(width > 0 && height > 0);
-    AX_ASSERT(channels == 1 || channels == 2 || channels == 3 || channels == 4);
+    AX_ASSERT(width > 0 && height > 0, "Wrong size \"width\" or \"height\" for imported HDR image.");
+    AX_ASSERT(channels == 1 || channels == 2 || channels == 3 || channels == 4, "Channel number invalid for imported HDR image.");
 
     std::vector<float> image_data{};
     image_data.reserve(width * height * channels);

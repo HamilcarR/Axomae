@@ -4,14 +4,15 @@
 #include "UniformNames.h"
 
 using namespace axomae;
-
+constexpr float GAMMA = 1.2f;
+constexpr float EXPOSURE = 0.3f;
 CameraFrameBuffer::CameraFrameBuffer(ResourceDatabaseManager &resource_database, Dim2 *screen_size_pointer, unsigned int *default_fbo_pointer)
     : IFrameBuffer(resource_database.getTextureDatabase(), screen_size_pointer, default_fbo_pointer),
       shader_database(resource_database.getShaderDatabase()),
       texture_database(resource_database.getTextureDatabase()),
       node_database(resource_database.getNodeDatabase()) {
-  gamma = 1.2f;
-  exposure = 0.3f;
+  gamma = GAMMA;
+  exposure = EXPOSURE;
   gl_framebuffer_object = nullptr;
   drawable_screen_quad = nullptr;
   mesh_screen_quad = nullptr;
@@ -19,18 +20,19 @@ CameraFrameBuffer::CameraFrameBuffer(ResourceDatabaseManager &resource_database,
 }
 
 void CameraFrameBuffer::updateFrameBufferShader() {
-  shader_framebuffer = static_cast<ScreenFramebufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
-  AX_ASSERT(mesh_screen_quad != nullptr);
+  shader_framebuffer = dynamic_cast<ScreenFramebufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
+  AX_ASSERT(mesh_screen_quad != nullptr, "");
   mesh_screen_quad->setShader(shader_framebuffer);
 }
 
 void CameraFrameBuffer::initializeFrameBuffer() {
   initializeFrameBufferTexture<FrameBufferTexture>(
       GLFrameBuffer::COLOR0, true, Texture::RGBA16F, Texture::BGRA, Texture::UBYTE, texture_dim->width, texture_dim->height);
-  shader_framebuffer = static_cast<ScreenFramebufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
+  shader_framebuffer = dynamic_cast<ScreenFramebufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
   Texture *fbo_texture = fbo_attachment_texture_collection[GLFrameBuffer::COLOR0];
-  AX_ASSERT(texture_database->contains(fbo_texture).object);
-  int database_texture_id = texture_database->contains(fbo_texture).id;
+  database::Result<int, Texture> query_fbo_texture = texture_database->contains(fbo_texture);
+  AX_ASSERT(query_fbo_texture.object != nullptr, "Query fbo texture is not valid.");
+  int database_texture_id = query_fbo_texture.id;
   auto result = database::node::store<FrameBufferMesh>(*node_database, true, database_texture_id, shader_framebuffer);
   mesh_screen_quad = result.object;
   drawable_screen_quad = std::make_unique<Drawable>(mesh_screen_quad);

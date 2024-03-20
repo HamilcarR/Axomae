@@ -58,7 +58,7 @@ std::vector<Drawable *> Scene::getOpaqueElements() const {
   std::vector<Drawable *> to_return;
   for (auto &aabb : scene) {
     Drawable *A = aabb.drawable;
-    Material *mat = A->getMaterialPointer();
+    GLMaterial *mat = A->getMaterialPointer();
     if (!mat->isTransparent())
       to_return.push_back(A);
   }
@@ -70,7 +70,7 @@ std::vector<Drawable *> Scene::getSortedSceneByTransparency() {
   sorted_transparent_meshes.clear();
   for (auto aabb : scene) {
     Drawable *A = aabb.drawable;
-    Material *mat = A->getMaterialPointer();
+    GLMaterial *mat = A->getMaterialPointer();
     if (!mat->isTransparent())
       to_return.push_back(A);
     else {
@@ -87,7 +87,7 @@ std::vector<Drawable *> Scene::getSortedSceneByTransparency() {
 
 void Scene::sortTransparentElements() {
   for (auto bbox : scene) {
-    Material *A = bbox.drawable->getMaterialPointer();
+    GLMaterial *A = bbox.drawable->getMaterialPointer();
     if (A->isTransparent()) {
       glm::mat4 modelview_matrix = bbox.drawable->getMeshPointer()->getModelViewMatrix();
       glm::vec3 updated_aabb_center = bbox.aabb.computeModelViewPosition(modelview_matrix);

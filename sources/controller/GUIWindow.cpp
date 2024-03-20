@@ -261,8 +261,8 @@ namespace controller {
   Controller::~Controller() { delete _MemManagement; }
 
   void Controller::setApplicationConfig(const ApplicationConfig *config) {
-    AX_ASSERT(config);
-    AX_ASSERT(global_application_config);
+    AX_ASSERT(config, "");
+    AX_ASSERT(global_application_config, "Application config property is invalid.");
     *global_application_config = *config;
   }
 

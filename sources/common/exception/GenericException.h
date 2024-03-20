@@ -8,17 +8,17 @@ namespace exception {
     std::string this_error_string;
 
    public:
-    ExceptionData(const std::string &error_string);
+    explicit ExceptionData(const std::string &error_string);
     virtual ~ExceptionData() = default;
     ExceptionData(const ExceptionData &copy);
     ExceptionData(ExceptionData &&move) noexcept;
     ExceptionData &operator=(const ExceptionData &copy);
     ExceptionData &operator=(ExceptionData &&move) noexcept;
-    virtual void saveErrorString(const std::string &string) {
+    void saveErrorString(const std::string &string) {
       this_error_string += string;
       this_error_string += "\n";
     }
-    virtual void saveErrorString(const char *string) {
+    void saveErrorString(const char *string) {
       std::string str(string);
       saveErrorString(str);
     }

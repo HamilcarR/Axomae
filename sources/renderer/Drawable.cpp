@@ -90,7 +90,7 @@ Shader *Drawable::getMeshShaderPointer() const {
     return nullptr;
 }
 
-Material *Drawable::getMaterialPointer() const {
+GLMaterial *Drawable::getMaterialPointer() const {
   if (mesh_object)
     return mesh_object->getMaterial();
   else

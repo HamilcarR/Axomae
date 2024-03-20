@@ -53,7 +53,7 @@ void TextureViewerWidget::display(const std::vector<uint8_t> &img, int width, in
     image = std::make_unique<QImage>(raw_display_data.data(), width, height, QImage::Format_RGB888);
   else if (channels == 4)
     image = std::make_unique<QImage>(raw_display_data.data(), width, height, QImage::Format_RGBA8888);
-  AX_ASSERT(channels == 3 || channels == 4);
+  AX_ASSERT(channels == 3 || channels == 4, "Invalid channel number.");
   label->setPixmap(QPixmap::fromImage(*image));
   label->setScaledContents(true);
 }
@@ -102,7 +102,7 @@ void HdrTextureViewerWidget::display(const std::vector<float> &img, int width, i
     image = std::make_unique<QImage>(raw_display_data.data(), width, height, QImage::Format_RGB888);
   else if (channels == 4)
     image = std::make_unique<QImage>(raw_display_data.data(), width, height, QImage::Format_RGBA8888);
-  AX_ASSERT(channels == 3 || channels == 4);
+  AX_ASSERT(channels == 3 || channels == 4, "Invalid channel number.");
   if (!label)
     label = std::make_unique<CustomLabelImageTex>(rgb_under_mouse_str, this);
   label->setPixmap(QPixmap::fromImage(*image));
