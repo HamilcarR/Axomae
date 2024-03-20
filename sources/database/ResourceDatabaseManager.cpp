@@ -26,8 +26,6 @@ void ResourceDatabaseManager::clean() {
   image_database->clean();
 }
 
-ResourceDatabaseManager::ResourceDatabaseManager() {}
-
 void ResourceDatabaseManager::initializeDatabases(controller::ProgressStatus *progress_manager) {
   texture_database = std::make_unique<TextureDatabase>(progress_manager);
   shader_database = std::make_unique<ShaderDatabase>(progress_manager);

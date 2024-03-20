@@ -43,7 +43,6 @@ class IResourceDB : public DatabaseInterface<U, T>, public IAxObject {
  * firstFreeId() method for integers id based databases*/
 template<class T>
 class IntegerResourceDB : public IResourceDB<int, T> {
-  using BASETYPE = IResourceDB<int, T>;
 
  public:
   /**
@@ -55,7 +54,8 @@ class IntegerResourceDB : public IResourceDB<int, T> {
    * 3) allocated new storage in the map , at the end.
    * @return U id
    */
-  [[nodiscard]] virtual int firstFreeId() const {
+  [[nodiscard]] int firstFreeId() const override {
+    using BASETYPE = IResourceDB<int, T>;
     int diff = 0;
     if (BASETYPE::database_map.begin()->first > 0)  // In case 0 is available.
       return 0;

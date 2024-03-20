@@ -16,6 +16,7 @@
 class ShaderDatabase final : public IResourceDB<Shader::TYPE, Shader> {
  public:
   explicit ShaderDatabase(controller::ProgressStatus *progress_manager = nullptr);
+  ~ShaderDatabase() override = default;
   void clean() override;
   void purge() override;
   bool remove(Shader::TYPE type) override;

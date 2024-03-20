@@ -19,6 +19,9 @@
  */
 template<class U, class T>
 class DatabaseInterface {
+ public:
+  virtual ~DatabaseInterface() = default;
+
   /**
    * @brief Proceeds with a soft clean of the database . The implementation depends on the class that inherits this ,
    * but this usually consists of only some objects being freed , according to their persistence.

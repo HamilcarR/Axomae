@@ -11,6 +11,7 @@ class INodeDatabase final : public IntegerResourceDB<INode> {
 
  public:
   explicit INodeDatabase(controller::ProgressStatus *progress_manager = nullptr);
+  ~INodeDatabase() override = default;
   void clean() override;
   void purge() override;
   INode *get(int id) const override;

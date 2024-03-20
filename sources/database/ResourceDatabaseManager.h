@@ -36,7 +36,7 @@ class ResourceDatabaseManager final {
   std::unique_ptr<RawImageDatabase> image_database;  /*<Raw texture images database*/
 
  private:
-  ResourceDatabaseManager();
+  ResourceDatabaseManager() = default;
   ~ResourceDatabaseManager() = default;
 
  public:

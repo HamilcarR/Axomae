@@ -23,6 +23,7 @@ class ImageDatabase : public IntegerResourceDB<image::ThumbnailImageHolder<DATAT
 
  public:
   explicit ImageDatabase(controller::ProgressStatus *progress_status = nullptr);
+  ~ImageDatabase() override = default;
   void purge() override;
   void isSelected(int index);
   void clean() override;
