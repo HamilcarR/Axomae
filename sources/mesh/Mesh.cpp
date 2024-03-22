@@ -1,7 +1,7 @@
 #include "Mesh.h"
+#include "Axomae_macros.h"
 #include "DebugGL.h"
 #include "PerformanceLogger.h"
-
 Mesh::Mesh(ISceneNode *parent) : SceneTreeNode(parent) {
   mesh_initialized = false;
   face_culling_enabled = false;
@@ -13,51 +13,53 @@ Mesh::Mesh(ISceneNode *parent) : SceneTreeNode(parent) {
   is_drawn = true;
   polygon_mode = FILL;
   modelview_matrix = glm::mat4(1.f);
+  material = std::make_unique<GLMaterial>();
+  AX_ASSERT(material != nullptr, "Resource allocation error.");
 }
 
 Mesh::Mesh(const Object3D &geo, const GLMaterial &mat, ISceneNode *parent) : Mesh(parent) {
   geometry = geo;
-  material = mat;
+  *material = mat;
   name = "uninitialized mesh";
   shader_program = nullptr;
 }
 
 Mesh::Mesh(const std::string &n, const Object3D &geo, const GLMaterial &mat, ISceneNode *parent) : Mesh(parent) {
   geometry = geo;
-  material = mat;
+  *material = mat;
   name = n;
   shader_program = nullptr;
 }
 
 Mesh::Mesh(const std::string &n, const Object3D &geo, const GLMaterial &mat, Shader *shader, ISceneNode *parent) : Mesh(parent) {
   geometry = geo;
-  material = mat;
+  *material = mat;
   name = n;
   shader_program = shader;
-  material.setShaderPointer(shader);
+  material->setShaderPointer(shader);
 }
 
-Mesh::Mesh(const std::string &n, const Object3D &&geo, const GLMaterial &mat, Shader *shader, ISceneNode *parent) : Mesh(parent) {
+Mesh::Mesh(const std::string &n, Object3D &&geo, const GLMaterial &mat, Shader *shader, ISceneNode *parent) : Mesh(parent) {
   geometry = std::move(geo);
-  material = mat;
+  *material = mat;
   name = n;
   shader_program = shader;
-  material.setShaderPointer(shader);
+  material->setShaderPointer(shader);
 }
 
 void Mesh::initializeGlData() {
   if (shader_program != nullptr) {
     shader_program->initializeShader();  // TODO :  move shader initialization away from mesh initialization
     shader_program->bind();
-    material.initializeMaterial();  // TODO : move material initialization away from mesh initialization
+    material->initializeMaterial();  // TODO : move material initialization away from mesh initialization
     shader_program->release();
     mesh_initialized = true;
   }
 }
 
-void Mesh::bindMaterials() { material.bind(); }
+void Mesh::bindMaterials() { material->bind(); }
 
-void Mesh::unbindMaterials() { material.unbind(); }
+void Mesh::unbindMaterials() { material->unbind(); }
 
 void Mesh::preRenderSetup() {
   setFaceCulling(true);
@@ -82,7 +84,7 @@ void Mesh::setShader(Shader *shader) {
   shader_program = shader;
   if (!shader_program->isInitialized())
     shader_program->initializeShader();
-  material.setShaderPointer(shader);
+  material->setShaderPointer(shader);
 }
 
 void Mesh::setupAndBind() {
@@ -106,11 +108,11 @@ void Mesh::releaseShaders() {
 void Mesh::clean() {
   SceneTreeNode::clean();
   shader_program = nullptr;
-  material.clean();
+  material->clean();
   geometry.clean();
 }
 
-bool Mesh::isInitialized() { return mesh_initialized; }
+bool Mesh::isInitialized() const { return mesh_initialized; }
 
 void Mesh::setSceneCameraPointer(Camera *camera) {
   this->camera = camera;
@@ -124,7 +126,7 @@ void Mesh::cullFrontFace() { glCullFace(GL_FRONT); }
 
 void Mesh::cullFrontAndBackFace() { glCullFace(GL_FRONT_AND_BACK); }
 
-void Mesh::afterRenderSetup() { return; }
+void Mesh::afterRenderSetup() { EMPTY_FUNCBODY; }
 
 void Mesh::setPolygonDrawMode(RASTERMODE mode) { polygon_mode = mode; }
 
@@ -246,8 +248,8 @@ FrameBufferMesh::FrameBufferMesh() : QuadMesh() { name = "Custom screen framebuf
 
 FrameBufferMesh::FrameBufferMesh(int texture_index, Shader *_shader) : FrameBufferMesh() {
   shader_program = _shader;
-  material.setShaderPointer(shader_program);
-  material.addTexture(texture_index);
+  material->setShaderPointer(shader_program);
+  material->addTexture(texture_index);
 }
 
 void FrameBufferMesh::preRenderSetup() {
@@ -265,9 +267,9 @@ BoundingBoxMesh::BoundingBoxMesh(ISceneNode *parent) : Mesh(parent) {}
 BoundingBoxMesh::BoundingBoxMesh(Mesh *m, Shader *s) : BoundingBoxMesh(m) {
   shader_program = s;
   name = std::string("Boundingbox-") + m->getMeshName();
-  std::vector<float> vertices = m->getGeometry().vertices;
+  const std::vector<float> &vertices = m->getGeometry().vertices;
   bounding_box = BoundingBox(vertices);
-  material.setShaderPointer(s);
+  material->setShaderPointer(s);
   std::pair<std::vector<float>, std::vector<unsigned>> geom = bounding_box.getVertexArray();
   geometry.vertices = geom.first;
   geometry.indices = geom.second;
@@ -277,7 +279,7 @@ BoundingBoxMesh::BoundingBoxMesh(Mesh *m, const BoundingBox &bbox, Shader *s) : 
   shader_program = s;
   name = std::string("Boundingbox-") + m->getMeshName();
   bounding_box = bbox;
-  material.setShaderPointer(s);
+  material->setShaderPointer(s);
   std::pair<std::vector<float>, std::vector<unsigned>> geom = bounding_box.getVertexArray();
   geometry.vertices = geom.first;
   geometry.indices = geom.second;

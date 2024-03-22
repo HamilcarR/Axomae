@@ -2,7 +2,7 @@
 
 using namespace axomae;
 
-constexpr unsigned int THREAD_NUMBERS = 12;  // TODO: [AX-27] Create a class reading/writing a config file
+constexpr unsigned int THREAD_NUMBERS = 8;
 glm::vec3 calculateCenter(glm::vec3 min_coords, glm::vec3 max_coords);
 
 glm::vec3 &update_min(glm::vec3 &min_vec, glm::vec3 &compared) {
@@ -31,7 +31,45 @@ BoundingBox::BoundingBox() {
   min_coords = glm::vec3(0.f);
 }
 
-// TODO: [AX-12] Parallelize bounding box computation
+BoundingBox::BoundingBox(const BoundingBox &copy) {
+  max_coords = copy.max_coords;
+  min_coords = copy.min_coords;
+  center = copy.center;
+}
+BoundingBox::BoundingBox(BoundingBox &&move) noexcept {
+  max_coords = move.max_coords;
+  min_coords = move.min_coords;
+  center = move.center;
+}
+BoundingBox &BoundingBox::operator=(const BoundingBox &copy) {
+  if (&copy != this) {
+    max_coords = copy.max_coords;
+    min_coords = copy.min_coords;
+    center = copy.center;
+  }
+  return *this;
+}
+BoundingBox &BoundingBox::operator=(BoundingBox &&move) noexcept {
+  if (&move != this) {
+    max_coords = move.max_coords;
+    min_coords = move.min_coords;
+    center = move.center;
+  }
+  return *this;
+}
+
+BoundingBox::BoundingBox(const glm::vec3 &_min_coords, const glm::vec3 &_max_coords) {
+  center = calculateCenter(_min_coords, _max_coords);
+  min_coords = _min_coords;
+  max_coords = _max_coords;
+}
+
+BoundingBox operator*(const glm::mat4 &matrix, const BoundingBox &bounding_box) {
+  glm::vec3 min_c = matrix * glm::vec4(bounding_box.getMinCoords(), 1.f);
+  glm::vec3 max_c = matrix * glm::vec4(bounding_box.getMaxCoords(), 1.f);
+  return BoundingBox(min_c, max_c);
+}
+
 BoundingBox::BoundingBox(const std::vector<float> &vertices) : BoundingBox() {
   center = glm::vec3(0, 0, 0);
   /*
@@ -89,20 +127,6 @@ BoundingBox::BoundingBox(const std::vector<float> &vertices) : BoundingBox() {
   center = calculateCenter(min_coords, max_coords);
 }
 
-BoundingBox::BoundingBox(glm::vec3 _min_coords, glm::vec3 _max_coords) {
-  center = calculateCenter(_min_coords, _max_coords);
-  min_coords = _min_coords;
-  max_coords = _max_coords;
-}
-
-BoundingBox::~BoundingBox() {}
-
-BoundingBox operator*(const glm::mat4 &matrix, const BoundingBox &bounding_box) {
-  glm::vec3 min_c = matrix * glm::vec4(bounding_box.getMinCoords(), 1.f);
-  glm::vec3 max_c = matrix * glm::vec4(bounding_box.getMaxCoords(), 1.f);
-  return BoundingBox(min_c, max_c);
-}
-
 std::pair<std::vector<float>, std::vector<unsigned>> BoundingBox::getVertexArray() const {
   std::vector<float> vertices = {
       min_coords.x, min_coords.y, max_coords.z,  // 0
@@ -125,3 +149,5 @@ glm::vec3 calculateCenter(glm::vec3 min_coords, glm::vec3 max_coords) {
   center.z = (max_coords.z + min_coords.z) / 2;
   return center;
 }
+
+glm::vec3 BoundingBox::computeModelViewPosition(const glm::mat4 &modelview) const { return glm::vec3(modelview * glm::vec4(center, 1.f)); }
