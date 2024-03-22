@@ -482,12 +482,11 @@ namespace IO {
       for (auto it = loaded_meshes_futures.begin(); it != loaded_meshes_futures.end(); it++) {
         std::pair<unsigned, std::unique_ptr<Object3D>> geometry_loaded = it->get();
         unsigned mesh_index = geometry_loaded.first;
-        Object3D *geometry = geometry_loaded.second.get();
         const aiMesh *mesh = modelScene->mMeshes[mesh_index];
         const char *mesh_name = mesh->mName.C_Str();
         std::string name(mesh_name);
         auto mesh_result = database::node::store<Mesh>(
-            node_database, false, name, std::move(*geometry), material_array[mesh_index], shader_program, nullptr);
+            node_database, false, name, std::move(*geometry_loaded.second), material_array[mesh_index], shader_program, nullptr);
         LOG("object loaded : " + name, LogLevel::INFO);
         node_lookup_table[mesh_index] = mesh_result.object;
         objects.first.push_back(mesh_result.object);

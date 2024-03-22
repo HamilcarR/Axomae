@@ -62,7 +62,7 @@ void CameraFrameBuffer::startDraw() {
 
 void CameraFrameBuffer::renderFrameBufferMesh() {
   drawable_screen_quad->bind();
-  glDrawElements(GL_TRIANGLES, drawable_screen_quad->getMeshPointer()->geometry.indices.size(), GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, drawable_screen_quad->getMeshPointer()->getGeometry().indices.size(), GL_UNSIGNED_INT, 0);
   drawable_screen_quad->unbind();
 }
 

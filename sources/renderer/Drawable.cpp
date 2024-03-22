@@ -12,7 +12,7 @@ Drawable::Drawable(Mesh *mesh) {
   if (mesh != nullptr) {
     mesh_object = mesh;
     camera_pointer = nullptr;
-    gl_buffers.setGeometryPointer(&mesh_object->geometry);
+    gl_buffers.setGeometryPointer(&mesh_object->getGeometry());
     if (!initialize())
       LOG("A problem prevented mesh initialization!", LogLevel::ERROR);
   }
@@ -92,7 +92,7 @@ Shader *Drawable::getMeshShaderPointer() const {
 
 GLMaterial *Drawable::getMaterialPointer() const {
   if (mesh_object)
-    return mesh_object->getMaterial();
+    return dynamic_cast<GLMaterial *>(mesh_object->getMaterial());
   else
     return nullptr;
 }

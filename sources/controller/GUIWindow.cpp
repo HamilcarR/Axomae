@@ -528,7 +528,7 @@ namespace controller {
   /**************************************************************************************************************/
 
   bool Controller::greyscale_luminance() {
-    SDL_Surface *s = image_session_pointers::albedo;  // use image_session_pointers TODO
+    SDL_Surface *s = image_session_pointers::albedo;
     SDL_Surface *copy = Controller::copy_surface(s);
     if (copy != nullptr) {
       //_MemManagement->addToHeap({ copy , GREYSCALE_LUMI });
@@ -665,10 +665,7 @@ namespace controller {
 
   /**************************************************************************************************************/
   void Controller::cubemap_baking() {  // TODO : complete uv projection method , implement baking
-    int width = main_window_ui.uv_width->value();
-    int height = main_window_ui.uv_height->value();
-    width = 0;
-    height = 0;
+    EMPTY_FUNCBODY;
   }
 
   /**************************************************************************************************************/
@@ -683,7 +680,7 @@ namespace controller {
         int height = global_application_config->getUvEditorResolutionHeight();
         bool tangent = global_application_config->flag & CONF_UV_TSPACE;
         LOG("Tangent : " + std::to_string(tangent), LogLevel::INFO);
-        std::vector<uint8_t> surf = ImageManager::project_uv_normals(retrieved_mesh->geometry, width, height, tangent);
+        std::vector<uint8_t> surf = ImageManager::project_uv_normals(retrieved_mesh->getGeometry(), width, height, tangent);
         view->display(surf, width, height, 3);
       } catch (const exception::GenericException &e) {
         LOG(e.what(), LogLevel::ERROR);
@@ -733,11 +730,11 @@ namespace controller {
     IO::ImageImporter *inst = IO::ImageImporter::getInstance();
     QString filename = QFileDialog::getSaveFileName(this, tr("Save files"), "./", tr("All Files (*)"));
     if (image_session_pointers::height != nullptr)
-      inst->save_image(image_session_pointers::height, (filename.toStdString() + "-height.bmp").c_str());
+      IO::ImageImporter::save_image(image_session_pointers::height, (filename.toStdString() + "-height.bmp").c_str());
     if (image_session_pointers::normalmap != nullptr)
-      inst->save_image(image_session_pointers::normalmap, (filename.toStdString() + "-nmap.bmp").c_str());
+      IO::ImageImporter::save_image(image_session_pointers::normalmap, (filename.toStdString() + "-nmap.bmp").c_str());
     if (image_session_pointers::dudv != nullptr)
-      inst->save_image(image_session_pointers::dudv, (filename.toStdString() + "-dudv.bmp").c_str());
+      IO::ImageImporter::save_image(image_session_pointers::dudv, (filename.toStdString() + "-dudv.bmp").c_str());
     return false;
   }
 
@@ -763,7 +760,7 @@ namespace controller {
     SDL_Surface *surface = image_session_pointers::greyscale;
     SDL_Surface *copy = Controller::copy_surface(surface);
     if (copy != nullptr) {
-      float factor = main_window_ui.sharpen_float_box->value();
+      float factor = (float)main_window_ui.sharpen_float_box->value();
       ImageManager::FILTER sharpen = main_window_ui.sharpen_radio->isChecked() ? ImageManager::SHARPEN : ImageManager::FILTER_NULL;
       ImageManager::FILTER unsharp_masking = main_window_ui.sharpen_masking_radio->isChecked() ? ImageManager::UNSHARP_MASKING :
                                                                                                  ImageManager::FILTER_NULL;

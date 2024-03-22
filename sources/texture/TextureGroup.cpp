@@ -4,8 +4,35 @@
 
 TextureGroup::TextureGroup() : texture_database(ResourceDatabaseManager::getInstance().getTextureDatabase()), initialized(false) {}
 
-TextureGroup::TextureGroup(const TextureGroup &texture_group)
-    : texture_collection(texture_group.getTextureCollection()), initialized(texture_group.isInitialized()) {}
+TextureGroup::TextureGroup(const TextureGroup &copy) {
+  texture_collection = copy.texture_collection;
+  initialized = copy.initialized;
+  texture_database = copy.texture_database;
+}
+
+TextureGroup::TextureGroup(TextureGroup &&move) noexcept {
+  texture_collection = std::move(move.texture_collection);
+  initialized = move.initialized;
+  texture_database = move.texture_database;
+}
+
+TextureGroup &TextureGroup::operator=(const TextureGroup &copy) {
+  if (this != &copy) {
+    texture_collection = copy.getTextureCollection();
+    initialized = copy.isInitialized();
+    texture_database = copy.texture_database;
+  }
+  return *this;
+}
+
+TextureGroup &TextureGroup::operator=(TextureGroup &&move) noexcept {
+  if (this != &move) {
+    texture_collection = std::move(move.texture_collection);
+    texture_database = move.texture_database;
+    initialized = move.initialized;
+  }
+  return *this;
+}
 
 void TextureGroup::addTexture(int index) { texture_collection.push_back(index); }
 
@@ -75,14 +102,6 @@ void TextureGroup::unbind() {
     if (A)
       A->unbindTexture();
   }
-}
-
-TextureGroup &TextureGroup::operator=(const TextureGroup &texture_group) {
-  if (this != &texture_group) {
-    texture_collection = texture_group.getTextureCollection();
-    initialized = texture_group.isInitialized();
-  }
-  return *this;
 }
 
 bool TextureGroup::removeTexture(int id) {

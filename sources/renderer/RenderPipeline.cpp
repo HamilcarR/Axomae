@@ -152,7 +152,8 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap,
       prefilter_shader->setAllMatricesUniforms(glm::mat4(1.f));
       cubemap_prefilter_fbo.renderToTexture(k, GLFrameBuffer::COLOR0, i);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glDrawElements(GL_TRIANGLES, cube_drawable.getMeshPointer()->geometry.indices.size(), GL_UNSIGNED_INT, nullptr);
+      Mesh *cube_draw_mesh_ptr = cube_drawable.getMeshPointer();
+      glDrawElements(GL_TRIANGLES, cube_draw_mesh_ptr->getGeometry().indices.size(), GL_UNSIGNED_INT, nullptr);
       glFinish();
     }
   }
@@ -227,7 +228,8 @@ void RenderPipeline::renderToCubemap(Drawable &cube_drawable,
     cube_drawable.bind();
     cubemap_framebuffer.renderToTexture(i, GLFrameBuffer::COLOR0, mip_level);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glDrawElements(GL_TRIANGLES, cube_drawable.getMeshPointer()->geometry.indices.size(), GL_UNSIGNED_INT, nullptr);
+    Mesh *cube_draw_mesh_ptr = cube_drawable.getMeshPointer();
+    glDrawElements(GL_TRIANGLES, cube_draw_mesh_ptr->getGeometry().indices.size(), GL_UNSIGNED_INT, nullptr);
   }
   cube_drawable.unbind();
   cubemap_framebuffer.unbindFrameBuffer();
@@ -246,7 +248,8 @@ void RenderPipeline::renderToQuad(Drawable &quad_drawable,
   quad_drawable.bind();
   quad_framebuffer.renderToTexture(GLFrameBuffer::COLOR0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glDrawElements(GL_TRIANGLES, quad_drawable.getMeshPointer()->geometry.indices.size(), GL_UNSIGNED_INT, nullptr);
+  Mesh *quad_draw_mesh_ptr = quad_drawable.getMeshPointer();
+  glDrawElements(GL_TRIANGLES, quad_draw_mesh_ptr->getGeometry().indices.size(), GL_UNSIGNED_INT, nullptr);
   quad_drawable.unbind();
   quad_framebuffer.unbindFrameBuffer();
   glViewport(0, 0, origin_viewport.width, origin_viewport.height);
@@ -257,7 +260,8 @@ Drawable RenderPipeline::constructCube(Shader *shader, int database_texture_id, 
   assert(shader != nullptr);
   CubeMesh *cube = database::node::store<CubeMesh>(*resource_database->getNodeDatabase(), false).object;
   cube->setShader(shader);
-  cube->material.addTexture(database_texture_id);
+  MaterialInterface *material = cube->getMaterial();
+  material->addTexture(database_texture_id);
   cube->setSceneCameraPointer(camera);
   return {cube};
 }

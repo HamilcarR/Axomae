@@ -1,6 +1,7 @@
 #include "Material.h"
 #include "DebugGL.h"
 #include "UniformNames.h"
+
 GLMaterial::GLMaterial() {
   dielectric_factor = 0.f;
   shininess = 100.f;
@@ -11,6 +12,48 @@ GLMaterial::GLMaterial() {
   refractive_index = glm::vec2(1.f, 1.1f);
   shader_program = nullptr;
   is_transparent = false;
+}
+
+void GLMaterial::do_copy_constr(const GLMaterial &copy) {
+  if (this != &copy) {
+    textures_group = copy.textures_group;
+    dielectric_factor = copy.dielectric_factor;
+    roughness_factor = copy.roughness_factor;
+    transmission_factor = copy.transmission_factor;
+    emissive_factor = copy.emissive_factor;
+    shininess = copy.shininess;
+    alpha_factor = copy.alpha_factor;
+    refractive_index = copy.refractive_index;
+    shader_program = copy.shader_program;
+    is_transparent = copy.is_transparent;
+  }
+}
+
+void GLMaterial::do_move_constr(GLMaterial &&move) noexcept {
+  textures_group = std::move(move.textures_group);
+  dielectric_factor = move.dielectric_factor;
+  roughness_factor = move.roughness_factor;
+  transmission_factor = move.transmission_factor;
+  emissive_factor = move.emissive_factor;
+  shininess = move.shininess;
+  alpha_factor = move.alpha_factor;
+  refractive_index = move.refractive_index;
+  shader_program = move.shader_program;
+  is_transparent = move.is_transparent;
+}
+
+GLMaterial::GLMaterial(const GLMaterial &copy) { do_copy_constr(copy); }
+
+GLMaterial::GLMaterial(GLMaterial &&move) noexcept { do_move_constr(std::forward<GLMaterial>(move)); }
+
+GLMaterial &GLMaterial::operator=(const GLMaterial &copy) {
+  do_copy_constr(copy);
+  return *this;
+}
+
+GLMaterial &GLMaterial::operator=(GLMaterial &&move) noexcept {
+  do_move_constr(std::forward<GLMaterial>(move));
+  return *this;
 }
 
 bool GLMaterial::isTransparent() const {

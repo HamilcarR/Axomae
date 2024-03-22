@@ -36,7 +36,7 @@ void Scene::setScene(std::pair<std::vector<Mesh *>, SceneTree> &to_copy) {
     Scene::AABB mesh;
     A->setCubemapPointer(scene_skybox);
     auto drawable = std::make_unique<Drawable>(A);
-    mesh.aabb = BoundingBox(A->geometry.vertices);
+    mesh.aabb = BoundingBox(A->getGeometry().vertices);
     mesh.drawable = drawable.get();
     scene.push_back(mesh);
     drawable_collection.push_back(std::move(drawable));
@@ -146,7 +146,7 @@ void Scene::drawForwardTransparencyMode() {
   for (Drawable *A : meshes) {
     A->bind();
     light_database->updateShadersData(A->getMeshShaderPointer(), view_matrix);
-    glDrawElements(GL_TRIANGLES, A->getMeshPointer()->geometry.indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, A->getMeshPointer()->getGeometry().indices.size(), GL_UNSIGNED_INT, 0);
     A->unbind();
   }
 }
@@ -157,7 +157,7 @@ void Scene::drawBoundingBoxes() {
     std::vector<Drawable *> bounding_boxes = getBoundingBoxElements();
     for (Drawable *A : bounding_boxes) {
       A->bind();
-      glDrawElements(GL_TRIANGLES, A->getMeshPointer()->geometry.indices.size(), GL_UNSIGNED_INT, 0);
+      glDrawElements(GL_TRIANGLES, A->getMeshPointer()->getGeometry().indices.size(), GL_UNSIGNED_INT, 0);
       A->unbind();
     }
   }
@@ -199,7 +199,8 @@ std::vector<Mesh *> Scene::getMeshCollectionPtr() const {
 void Scene::switchEnvmap(int cubemap_id, int irradiance_id, int prefiltered_id, int /*lut_id*/) {
   for (auto &elem : scene) {
     Mesh *mesh = elem.drawable->getMeshPointer();
-    TextureGroup &texgroup = mesh->material.getTextureGroupRef();
+    GLMaterial *material = dynamic_cast<GLMaterial *>(mesh->getMaterial());
+    TextureGroup &texgroup = material->getTextureGroupRef();
     if (mesh != scene_skybox) {
       texgroup.removeTexture(Texture::IRRADIANCE);
       texgroup.addTexture(irradiance_id);
