@@ -2,6 +2,8 @@
 #include <cmath>
 #include <sstream>
 
+// Old code , tb refactored
+
 namespace axomae {
 
   __device__ const static bool isbigEndian = SDL_BIG_ENDIAN == SDL_BYTEORDER;

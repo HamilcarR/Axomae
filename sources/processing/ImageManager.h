@@ -13,10 +13,16 @@ namespace axomae {
   struct max_colors;
   /***
    * @class ImageManager
-   * @brief provides algorithms for image processing , like edge detection , greyscale conversion etc.
-   *
+   * @brief provides algorithms for image processing ,  edge detection , greyscale conversion etc.
    */
   class ImageManager {
+   private:
+    static bool gpu;
+
+   private:
+    ImageManager();
+    ~ImageManager();
+
    public:
     enum FILTER { FILTER_NULL = 0, GAUSSIAN_SMOOTH_3_3 = 0x01, GAUSSIAN_SMOOTH_5_5 = 0x02, BOX_BLUR = 0x03, SHARPEN = 0x04, UNSHARP_MASKING = 0x05 };
     static max_colors *get_colors_max_variation(SDL_Surface *image);
@@ -37,15 +43,8 @@ namespace axomae {
     static void USE_CPU_COMPUTING() { gpu = false; }
     static bool USING_GPU() { return gpu; }
     static std::vector<uint8_t> project_uv_normals(const Object3D &object, int width, int height, bool tangent_space);
-    static void smooth_image(SDL_Surface *surf, FILTER filter, const unsigned int smooth_iterations);
-    static void sharpen_image(SDL_Surface *surf, FILTER filter, const unsigned int sharpen_iterations);
-
-   private:
-    ImageManager();
-    ~ImageManager();
-
-   private:
-    static bool gpu;
+    static void smooth_image(SDL_Surface *surf, FILTER filter, unsigned int smooth_iterations);
+    static void sharpen_image(SDL_Surface *surf, FILTER filter, unsigned int sharpen_iterations);
   };
 
 }  // namespace axomae

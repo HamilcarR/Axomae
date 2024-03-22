@@ -97,7 +97,7 @@ inline image::Rgb compute_normals_set_pixels_rgb(Vect2D P1,
       return rgb;
     }
   } else {
-    return image::Rgb(0, 0, 0);
+    return {0, 0, 0};
   }
 }
 
