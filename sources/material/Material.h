@@ -12,6 +12,7 @@
 
 /**
  * @brief Material class implementation
+ * Used for the real time renderer
  */
 class GLMaterial : public MaterialInterface {
  public:
