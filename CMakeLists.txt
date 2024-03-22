@@ -3,7 +3,6 @@ project(Axomae VERSION 1.0 LANGUAGES C CXX)
 
 # Custom variables
 set(AXOMAE_UI_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/sources/editor/Form")
-
 #****************************************************************************************************
 # Compilation
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -17,17 +16,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(USE_GOLD "ON" CACHE BOOL "Use GOLD linker")
 set(USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
 
-if(USE_GOLD)
-    set(CMAKE_CXX_FLAGS "-fuse-ld=gold")
-elseif(USE_MOLD)
-    set(CMAKE_CXX_FLAGS "-fuse-ld=mold")
-endif()
-
 # CUDA Compilation
 set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER}")
 set(CMAKE_CUDA_ARCHITECTURES "75")
 enable_language(CUDA)
-
 #****************************************************************************************************
 # Debug 
 set(USE_ASAN "OFF" CACHE BOOL "Enable Address Sanitizer")
@@ -58,7 +50,6 @@ find_package(GLEW REQUIRED)
 find_package(assimp REQUIRED)
 # Unit-Tests
 find_package(GTest REQUIRED)
-
 #****************************************************************************************************
 #Include and paths
 #Cuda
@@ -75,7 +66,6 @@ if(NOT STB_INCLUDE_PATH)
 endif()
 # Optix
 set(OPTIX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/vendor/Optix CACHE PATH "Optix include path")
-
 #****************************************************************************************************
 # Project setup
 qt_standard_project_setup()
@@ -91,8 +81,12 @@ if(BUILD_TESTS)
     # Subdirs include
     add_subdirectory(tests)
 endif()
-
-
-
+#****************************************************************************************************
+# Link
+if(USE_GOLD)
+    target_link_options(${PROJECT_NAME} PUBLIC -fuse-ld=gold)
+elseif(USE_MOLD)
+    target_link_options(${PROJECT_NAME} PUBLIC -fuse-ld=mold)
+endif()
 
 
