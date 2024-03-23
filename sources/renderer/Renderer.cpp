@@ -7,18 +7,57 @@
 using namespace axomae;
 
 Renderer::Renderer()
-    : camera_framebuffer(nullptr), start_draw(false), resource_database(ResourceDatabaseManager::getInstance()), default_framebuffer_id(0) {
-  scene_camera = database::node::store<ArcballCamera>(*resource_database.getNodeDatabase(), true, 45.f, 0.1f, 10000.f, 100.f, &screen_size).object;
-
+    : camera_framebuffer(nullptr), start_draw(false), resource_database(&ResourceDatabaseManager::getInstance()), default_framebuffer_id(0) {
+  INodeDatabase *node_db = resource_database->getNodeDatabase();
+  scene_camera = database::node::store<ArcballCamera>(*node_db, true, 45.f, 0.1f, 10000.f, 100.f, &screen_size).object;
   scene = std::make_unique<Scene>(ResourceDatabaseManager::getInstance());
+  scene->setLightDatabasePointer(&light_database);
+  LightData default_dir_light;
+  default_dir_light.direction = glm::vec3(0.f, 100.f, 0.f);
+  default_dir_light.asPbrColor(255, 255, 255);
+  default_dir_light.intensity = 0.0007f;
+  default_dir_light.parent = scene_camera;
+  default_dir_light.name = "Default-DirectionalLight";
+  auto query = database::node::store<DirectionalLight>(*resource_database->getNodeDatabase(), true, default_dir_light);
+  light_database.addLight(query.id);
+}
+
+Renderer::Renderer(Renderer &&move) noexcept {
+  render_pipeline = std::move(move.render_pipeline);
+  camera_framebuffer = std::move(move.camera_framebuffer);
+  start_draw = move.start_draw;
+  resource_database = move.resource_database;
+  scene = std::move(move.scene);
+  scene_camera = move.scene_camera;
+  screen_size = move.screen_size;
+  default_framebuffer_id = move.default_framebuffer_id;
+  light_database = std::move(light_database);
+  gl_widget = move.gl_widget;
+  envmap_manager = std::move(move.envmap_manager);
+}
+Renderer &Renderer::operator=(Renderer &&move) noexcept {
+  if (this != &move) {
+    render_pipeline = std::move(move.render_pipeline);
+    camera_framebuffer = std::move(move.camera_framebuffer);
+    start_draw = move.start_draw;
+    resource_database = move.resource_database;
+    scene = std::move(move.scene);
+    scene_camera = move.scene_camera;
+    screen_size = move.screen_size;
+    default_framebuffer_id = move.default_framebuffer_id;
+    light_database = std::move(light_database);
+    gl_widget = move.gl_widget;
+    envmap_manager = std::move(move.envmap_manager);
+  }
+  return *this;
 }
 
 Renderer::Renderer(unsigned width, unsigned height, GLViewer *widget) : Renderer() {
   screen_size.width = width;
   screen_size.height = height;
   gl_widget = widget;
-  render_pipeline = std::make_unique<RenderPipeline>(default_framebuffer_id, *gl_widget, &resource_database);
-  envmap_manager = std::make_unique<EnvmapTextureManager>(resource_database, screen_size, default_framebuffer_id, *render_pipeline, *scene);
+  render_pipeline = std::make_unique<RenderPipeline>(&default_framebuffer_id, gl_widget, resource_database);
+  envmap_manager = std::make_unique<EnvmapTextureManager>(*resource_database, screen_size, default_framebuffer_id, *render_pipeline, *scene);
 }
 
 Renderer::~Renderer() {
@@ -26,7 +65,7 @@ Renderer::~Renderer() {
     camera_framebuffer->clean();
   scene->clear();
   render_pipeline->clean();
-  resource_database.purge();
+  resource_database->purge();
   light_database.clearDatabase();
   scene_camera = nullptr;
 }
@@ -47,13 +86,13 @@ void Renderer::initialize(ApplicationConfig *app_conf) {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
   /*Read shader + initialize them*/
-  ShaderDatabase &shader_database = *resource_database.getShaderDatabase();
-  load_shader_database(shader_database);
-  shader_database.initializeShaders();
+  ShaderDatabase *shader_database = resource_database->getShaderDatabase();
+  load_shader_database(*shader_database);
+  shader_database->initializeShaders();
   /*Initialize a reusable lut texture*/
   scene->initialize();
   envmap_manager->initializeDefaultEnvmap(app_conf);
-  camera_framebuffer = std::make_unique<CameraFrameBuffer>(resource_database, &screen_size, &default_framebuffer_id);
+  camera_framebuffer = std::make_unique<CameraFrameBuffer>(*resource_database, &screen_size, &default_framebuffer_id);
   camera_framebuffer->initializeFrameBuffer();
 }
 
@@ -94,11 +133,10 @@ void Renderer::set_new_scene(std::pair<std::vector<Mesh *>, SceneTree> &new_scen
                       envmap_manager->currentIrradianceId(),
                       envmap_manager->currentPrefilterId(),
                       envmap_manager->currentLutId());
-  scene->setLightDatabasePointer(&light_database);
+
   scene->setCameraPointer(scene_camera);
-  light_database.clearDatabase();
   scene->updateTree();
-  ShaderDatabase *shader_database = resource_database.getShaderDatabase();
+  ShaderDatabase *shader_database = resource_database->getShaderDatabase();
   scene->generateBoundingBoxes(shader_database->get(Shader::BOUNDING_BOX));
   start_draw = true;
   shader_database->initializeShaders();
@@ -110,75 +148,73 @@ void Renderer::processEvent(const controller::event::Event *event) const { scene
 void Renderer::onResize(unsigned int width, unsigned int height) {
   screen_size.width = width;
   screen_size.height = height;
-  if (camera_framebuffer)
+  if (camera_framebuffer) {
     camera_framebuffer->resize();
+  }
 }
 
-void Renderer::setGammaValue(float value) const {
-  if (camera_framebuffer != nullptr) {
+void Renderer::setGammaValue(float value) {
+  if (camera_framebuffer) {
     camera_framebuffer->setGamma(value);
-    gl_widget->update();
   }
 }
 
-void Renderer::setExposureValue(float value) const {
-  if (camera_framebuffer != nullptr) {
+void Renderer::setExposureValue(float value) {
+  if (camera_framebuffer) {
     camera_framebuffer->setExposure(value);
-    gl_widget->update();
   }
 }
 
-void Renderer::setNoPostProcess() const {
-  if (camera_framebuffer != nullptr) {
+void Renderer::setNoPostProcess() {
+  if (camera_framebuffer) {
     camera_framebuffer->setPostProcessDefault();
-    gl_widget->update();
   }
 }
 
-void Renderer::setPostProcessEdge() const {
-  if (camera_framebuffer != nullptr) {
+void Renderer::setPostProcessEdge() {
+  if (camera_framebuffer) {
     camera_framebuffer->setPostProcessEdge();
-    gl_widget->update();
   }
 }
 
-void Renderer::setPostProcessSharpen() const {
-  if (camera_framebuffer != nullptr) {
+void Renderer::setPostProcessSharpen() {
+  if (camera_framebuffer) {
     camera_framebuffer->setPostProcessSharpen();
-    gl_widget->update();
   }
 }
 
-void Renderer::setPostProcessBlurr() const {
-  if (camera_framebuffer != nullptr) {
+void Renderer::setPostProcessBlurr() {
+  if (camera_framebuffer) {
     camera_framebuffer->setPostProcessBlurr();
-    gl_widget->update();
   }
 }
 
-void Renderer::resetSceneCamera() const {
-  if (scene_camera != nullptr) {
+void Renderer::resetSceneCamera() {
+  if (scene_camera) {
     scene_camera->reset();
-    gl_widget->update();
   }
 }
 
-void Renderer::setRasterizerFill() const {
-  scene->setPolygonFill();
-  gl_widget->update();
+void Renderer::setRasterizerFill() {
+  if (scene) {
+    scene->setPolygonFill();
+  }
 }
 
-void Renderer::setRasterizerPoint() const {
-  scene->setPolygonPoint();
-  gl_widget->update();
+void Renderer::setRasterizerPoint() {
+  if (scene) {
+    scene->setPolygonPoint();
+  }
 }
 
-void Renderer::setRasterizerWireframe() const {
-  scene->setPolygonWireframe();
-  gl_widget->update();
+void Renderer::setRasterizerWireframe() {
+  if (scene) {
+    scene->setPolygonWireframe();
+  }
 }
 
-void Renderer::displayBoundingBoxes(bool display) const {
-  scene->displayBoundingBoxes(display);
-  gl_widget->update();
+void Renderer::displayBoundingBoxes(bool display) {
+  if (scene) {
+    scene->displayBoundingBoxes(display);
+  }
 }

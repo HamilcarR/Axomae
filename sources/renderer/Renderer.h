@@ -13,6 +13,7 @@
 #include "Loader.h"
 #include "Mesh.h"
 #include "RendererEnums.h"
+#include "RendererInterface.h"
 #include "ResourceDatabaseManager.h"
 #include "Scene.h"
 #include "constants.h"
@@ -31,133 +32,63 @@ namespace controller::event {
 /**
  * @brief Renderer class definition
  */
-class Renderer : public QObject {
-  Q_OBJECT
+class Renderer final : public IRenderer {
+ public:
+  std::unique_ptr<RenderPipeline> render_pipeline;
+  std::unique_ptr<CameraFrameBuffer> camera_framebuffer;
+  bool start_draw;
+  ResourceDatabaseManager *resource_database;
+  std::unique_ptr<Scene> scene;
+  Camera *scene_camera;
+  Dim2 screen_size{};
+  unsigned int default_framebuffer_id;
+  LightingDatabase light_database;
+  GLViewer *gl_widget{};
+  std::unique_ptr<EnvmapTextureManager> envmap_manager;
 
  private:
   Renderer();
 
  public:
   Renderer(unsigned width, unsigned height, GLViewer *widget = nullptr);
-
+  Renderer(const Renderer &copy) = delete;
+  Renderer(Renderer &&move) noexcept;
+  Renderer &operator=(const Renderer &copy) = delete;
+  Renderer &operator=(Renderer &&move) noexcept;
   ~Renderer() override;
-
-  void initialize(ApplicationConfig *app_conf);
-
   /**
    * @brief Method setting up the meshes , and the scene camera
    */
-  bool prep_draw();
-
-  void draw();
-
+  bool prep_draw() override;
   /**
    * @brief Cleans up the former scene and replaces it with a new
    * @param new_scene New scene to be rendererd
    */
   void set_new_scene(std::pair<std::vector<Mesh *>, SceneTree> &new_scene);
-
   /**
    * @brief Checks if all Drawable objects in the scene have been initialized
-   * @return true If the scene is initialized and ready
    */
   bool scene_ready();
-
-  void processEvent(const controller::event::Event *event) const;
-
-  void onResize(unsigned int width, unsigned int height);
-
-  void setDefaultFrameBufferId(unsigned id) { default_framebuffer_id = id; }
-
-  unsigned int *getDefaultFrameBufferIdPointer() { return &default_framebuffer_id; }
-
-  void setGammaValue(float gamma) const;
-
-  void setExposureValue(float exposure) const;
-
-  void setNoPostProcess() const;
-
-  void setPostProcessEdge() const;
-
-  void setPostProcessSharpen() const;
-
-  void setPostProcessBlurr() const;
-
-  void resetSceneCamera() const;
-
-  void setRasterizerPoint() const;
-
-  void setRasterizerFill() const;
-
-  void setRasterizerWireframe() const;
-
-  void displayBoundingBoxes(bool display) const;
-
+  void initialize(ApplicationConfig *app_conf) override;
+  void draw() override;
+  void processEvent(const controller::event::Event *event) const override;
+  void onResize(unsigned int width, unsigned int height) override;
+  void setDefaultFrameBufferId(unsigned id) override { default_framebuffer_id = id; }
+  [[nodiscard]] unsigned int *getDefaultFrameBufferIdPointer() override { return &default_framebuffer_id; }
   [[nodiscard]] const Scene &getConstScene() const { return *scene; }
-
-  [[nodiscard]] Scene &getScene() const { return *scene; }
-
-  [[nodiscard]] RenderPipeline &getRenderPipeline() const { return *render_pipeline; }
-
-  /**
-   * @brief Executes a specific method according to the value of the callback flag
-   *
-   * @tparam Args Type of the arguments
-   * @param callback_flag	A flag of type RENDERER_CALLBACK_ENUM , will call one of the renderer methods
-   * @param args Arguments of the callback function
-   */
-  template<RENDERER_CALLBACK_ENUM function_flag, class... Args>
-  void executeMethod(Args &&...args) {
-    if constexpr (function_flag == SET_GAMMA)
-      setGammaValue(std::forward<Args>(args)...);
-    else if constexpr (function_flag == SET_EXPOSURE)
-      setExposureValue(std::forward<Args>(args)...);
-    else if constexpr (function_flag == SET_POSTPROCESS_NOPROCESS)
-      setNoPostProcess(std::forward<Args>(args)...);
-    else if constexpr (function_flag == SET_POSTPROCESS_SHARPEN)
-      setPostProcessSharpen(std::forward<Args>(args)...);
-    else if constexpr (function_flag == SET_POSTPROCESS_BLURR)
-      setPostProcessBlurr(std::forward<Args>(args)...);
-    else if constexpr (function_flag == SET_POSTPROCESS_EDGE)
-      setPostProcessEdge(std::forward<Args>(args)...);
-    else if constexpr (function_flag == SET_RASTERIZER_POINT)
-      setRasterizerPoint(std::forward<Args>(args)...);
-    else if constexpr (function_flag == SET_RASTERIZER_FILL)
-      setRasterizerFill(std::forward<Args>(args)...);
-    else if constexpr (function_flag == SET_RASTERIZER_WIREFRAME)
-      setRasterizerWireframe(std::forward<Args>(args)...);
-    else if constexpr (function_flag == SET_DISPLAY_BOUNDINGBOX)
-      displayBoundingBoxes(std::forward<Args>(args)...);
-    else if constexpr (function_flag == SET_DISPLAY_RESET_CAMERA)
-      resetSceneCamera(std::forward<Args>(args)...);
-    else {
-      return;
-    }
-  }
-
-  template<class Func, class... Args>
-  void execCallback(Func &&function, Renderer *instance, Args &&...args) {
-    function(instance, std::forward<Args>(args)...);
-  }
-
- signals:
-  void sceneModified();
-  void envmapSelected();
-
- public:
-  std::unique_ptr<RenderPipeline> render_pipeline;
-  std::unique_ptr<CameraFrameBuffer> camera_framebuffer; /**<Main framebuffer attached to the view*/
-  bool start_draw;                                       /**<If the renderer is ready to draw*/
-  ResourceDatabaseManager
-      &resource_database;              /**<The main database containing a texture database ,a node database for stored meshes and a shader database*/
-  std::unique_ptr<Scene> scene;        /**<The scene to be rendered*/
-  Camera *scene_camera;                /**<Pointer on the scene camera*/
-  Dim2 screen_size{};                  /**<Dimensions of the renderer windows*/
-  unsigned int default_framebuffer_id; /**<In the case the GUI uses other contexts and other framebuffers , we use this
-                                          variable to reset the rendering to the default framebuffer*/
-  LightingDatabase light_database;
-  GLViewer *gl_widget{};
-  std::unique_ptr<EnvmapTextureManager> envmap_manager;
+  [[nodiscard]] Scene &getScene() const override { return *scene; }
+  [[nodiscard]] RenderPipeline &getRenderPipeline() const override { return *render_pipeline; }
+  void setGammaValue(float gamma) override;
+  void setExposureValue(float exposure) override;
+  void setNoPostProcess() override;
+  void setPostProcessEdge() override;
+  void setPostProcessSharpen() override;
+  void setPostProcessBlurr() override;
+  void resetSceneCamera() override;
+  void setRasterizerPoint() override;
+  void setRasterizerFill() override;
+  void setRasterizerWireframe() override;
+  void displayBoundingBoxes(bool display) override;
 };
 
 #endif

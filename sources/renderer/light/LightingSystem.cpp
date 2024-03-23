@@ -1,7 +1,65 @@
-#include "LightingSystem.h"
+#include "light/LightingSystem.h"
 #include "UniformNames.h"
 
 AbstractLight::AbstractLight(ISceneNode *parent) : SceneTreeNode(parent) { id = 0; }
+
+AbstractLight::AbstractLight(const AbstractLight &copy) {
+  if (this != &copy) {
+    type = copy.type;
+    id = copy.id;
+    position = copy.position;
+    viewspace_position = copy.viewspace_position;
+    specularColor = copy.specularColor;
+    ambientColor = copy.ambientColor;
+    diffuseColor = copy.diffuseColor;
+    light_struct_name = copy.light_struct_name;
+    intensity = copy.intensity;
+  }
+}
+
+AbstractLight::AbstractLight(AbstractLight &&move) noexcept {
+  if (this != &move) {
+    type = move.type;
+    id = move.id;
+    position = move.position;
+    viewspace_position = move.viewspace_position;
+    specularColor = move.specularColor;
+    ambientColor = move.ambientColor;
+    diffuseColor = move.diffuseColor;
+    light_struct_name = std::move(move.light_struct_name);
+    intensity = move.intensity;
+  }
+}
+
+AbstractLight &AbstractLight::operator=(const AbstractLight &copy) {
+  if (this != &copy) {
+    type = copy.type;
+    id = copy.id;
+    position = copy.position;
+    viewspace_position = copy.viewspace_position;
+    specularColor = copy.specularColor;
+    ambientColor = copy.ambientColor;
+    diffuseColor = copy.diffuseColor;
+    light_struct_name = copy.light_struct_name;
+    intensity = copy.intensity;
+  }
+  return *this;
+}
+
+AbstractLight &AbstractLight::operator=(AbstractLight &&move) noexcept {
+  if (this != &move) {
+    type = move.type;
+    id = move.id;
+    position = move.position;
+    viewspace_position = move.viewspace_position;
+    specularColor = move.specularColor;
+    ambientColor = move.ambientColor;
+    diffuseColor = move.diffuseColor;
+    light_struct_name = std::move(move.light_struct_name);
+    intensity = move.intensity;
+  }
+  return *this;
+}
 
 void AbstractLight::updateShaderData(Shader *shader_program, glm::mat4 &modelview, unsigned int index) {
   if (shader_program) {
@@ -63,8 +121,6 @@ DirectionalLight::DirectionalLight(const LightData &data)
   setName(data.name);
 }
 
-DirectionalLight::~DirectionalLight() {}
-
 void DirectionalLight::updateShaderData(Shader *shader, glm::mat4 &view, unsigned int index) {
   glm::mat4 modelview = view * computeFinalTransformation();
   viewspace_position = glm::vec3(modelview * glm::vec4(position, 0.f));
@@ -120,8 +176,6 @@ PointLight::PointLight(const LightData &data)
     : PointLight(data.position, data.ambiant_col, data.diffuse_col, data.specular_col, data.attenuation, data.intensity, data.parent) {
   setName(data.name);
 }
-
-PointLight::~PointLight() {}
 
 void PointLight::updateShaderData(Shader *shader, glm::mat4 &view, unsigned int index) {
   local_transformation = glm::translate(glm::mat4(1.f), position);

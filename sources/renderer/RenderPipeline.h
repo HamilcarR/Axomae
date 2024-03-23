@@ -8,8 +8,6 @@
 #include "Scene.h"
 /**
  * @file RenderPipeline.h
- * This file implements the rendering steps for each techniques , like deferred rendering , depth peeling , texture
- * baking  , occlusion culling etc.
  */
 class GLViewer;
 class Renderer;
@@ -18,11 +16,17 @@ class Renderer;
  * @class RenderPipeline
  */
 class RenderPipeline : public controller::IProgressManager {
+
+ private:
+  unsigned int *default_framebuffer_id;
+  ResourceDatabaseManager *resource_database;
+  GLViewer *context;
+
  public:
-  explicit RenderPipeline(unsigned int &default_framebuffer_id, GLViewer &context, ResourceDatabaseManager *resource_database = nullptr);
+  explicit RenderPipeline(unsigned int *default_framebuffer_id, GLViewer *context, ResourceDatabaseManager *resource_database = nullptr);
 
   /**
-   * @brief This method will bake an Environment map into a cubemap.
+   * @brief bake an Environment map into a cubemap.
    * A new cubemap texture will be created , and stored in the texture database.
    * In addition , the texture will be assigned to the cubemap mesh.
    *
@@ -35,7 +39,7 @@ class RenderPipeline : public controller::IProgressManager {
   int bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_map, CubeMapMesh &cubemap_mesh, unsigned width, unsigned height, Dim2 default_dim);
 
   /**
-   * @brief This method produces an irradiance texture , that it will store inside the texture database
+   * @brief This method produces an irradiance texture , and stores it inside the texture database.
    *
    * @param cube_envmap Pre-computed Cubemap database index , from an environment map
    * @param width Width of the irradiance texture
@@ -43,12 +47,6 @@ class RenderPipeline : public controller::IProgressManager {
    * @return int Irradiance texture database index
    */
   int bakeIrradianceCubemap(int cube_envmap, unsigned width, unsigned height, Dim2 default_dim);
-
-  /**
-   * @brief
-   *
-   * @return * void
-   */
   virtual void clean();
 
   /**
@@ -74,24 +72,7 @@ class RenderPipeline : public controller::IProgressManager {
   int generateBRDFLookupTexture(unsigned int width, unsigned int height, Dim2 default_dim);
 
  protected:
-  /**
-   * @brief Constructs a quad mesh , wrap it inside a drawable , and returns it
-   *
-   * @param shader
-   * @param camera
-   * @return Drawable
-   */
   Drawable constructQuad(Shader *shader, Camera *camera);
-
-  /**
-   * @brief Construct a cube mesh , wrap it inside a drawable , and returns the drawable
-   *
-   * @param shader
-   * @param database_texture_id
-   * @param type
-   * @param camera
-   * @return Drawable
-   */
   Drawable constructCube(Shader *shader, int database_texture_id, Texture::TYPE type, Camera *camera);
 
   /**
@@ -125,44 +106,20 @@ class RenderPipeline : public controller::IProgressManager {
                                  Texture::FORMAT data_format,
                                  Texture::FORMAT data_type,
                                  Shader *shader);
-  /**
-   * @brief
-   *
-   * @param cube_drawable
-   * @param cubemap_framebuffer
-   * @param camera
-   * @param render_viewport
-   * @param origin_viewport
-   * @param mip_level
-   */
-  void renderToCubemap(Drawable &cube_drawable,
-                       RenderCubeMap &cubemap_framebuffer,
-                       Camera &camera,
-                       Dim2 render_viewport,
-                       Dim2 origin_viewport,
-                       unsigned int mip_level = 0);
 
-  /**
-   * @brief
-   *
-   * @param quad_drawable
-   * @param quad_framebuffer
-   * @param camera
-   * @param render_viewport
-   * @param origin_viewport
-   * @param mip_level
-   */
-  void renderToQuad(Drawable &quad_drawable,
-                    RenderQuadFBO &quad_framebuffer,
-                    Camera &camera,
-                    Dim2 render_viewport,
-                    Dim2 origin_viewport,
-                    unsigned int mip_level = 0);
+  static void renderToCubemap(Drawable &cube_drawable,
+                              RenderCubeMap &cubemap_framebuffer,
+                              Camera &camera,
+                              Dim2 render_viewport,
+                              Dim2 origin_viewport,
+                              unsigned int mip_level = 0);
 
- private:
-  unsigned int &default_framebuffer_id;
-  ResourceDatabaseManager *resource_database;
-  GLViewer &context;
+  static void renderToQuad(Drawable &quad_drawable,
+                           RenderQuadFBO &quad_framebuffer,
+                           Camera &camera,
+                           Dim2 render_viewport,
+                           Dim2 origin_viewport,
+                           unsigned int mip_level = 0);
 };
 
 #endif

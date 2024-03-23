@@ -2,10 +2,7 @@
 #include "DebugGL.h"
 using namespace axomae;
 
-Drawable::Drawable() {
-  mesh_object = nullptr;
-  camera_pointer = nullptr;
-}
+Drawable::Drawable() : mesh_object(nullptr), camera_pointer(nullptr) {}
 
 Drawable::Drawable(Mesh *mesh) {
   assert(mesh != nullptr);
@@ -26,7 +23,6 @@ bool Drawable::initialize() {
   if (mesh_object == nullptr)
     return false;
   mesh_object->initializeGlData();
-  errorCheck(__FILE__, __LINE__);
   gl_buffers.initializeBuffers();
   errorCheck(__FILE__, __LINE__);
   return gl_buffers.isReady();
@@ -36,7 +32,6 @@ bool Drawable::initialize() {
 void Drawable::startDraw() {
   if (mesh_object != nullptr) {
     mesh_object->bindShaders();
-    errorCheck(__FILE__, __LINE__);
     gl_buffers.bindVao();
     gl_buffers.fillBuffers();
 
@@ -62,6 +57,7 @@ void Drawable::startDraw() {
 
     gl_buffers.unbindVao();
     mesh_object->releaseShaders();
+    errorCheck(__FILE__, __LINE__);
   }
 }
 

@@ -1,8 +1,8 @@
-add_library(ax_renderer 
-    Drawable.cpp 
-    LightingSystem.cpp 
-    Renderer.cpp 
-    RenderPipeline.cpp
+add_library(ax_renderer
+        Drawable.cpp
+        light/LightingSystem.cpp
+        Renderer.cpp
+        RenderPipeline.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_renderer)
@@ -31,5 +31,6 @@ PRIVATE
 target_include_directories(ax_renderer 
 PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/light
 )
 
