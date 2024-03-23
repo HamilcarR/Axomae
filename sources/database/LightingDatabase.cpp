@@ -19,7 +19,7 @@ LightingDatabase::LightingDatabase() {
 }
 
 bool LightingDatabase::addLight(int node_database_index) {
-  AbstractLight *light = static_cast<AbstractLight *>(node_database->get(node_database_index));
+  AbstractLight *light = dynamic_cast<AbstractLight *>(node_database->get(node_database_index));
   assert(light);
   if (contains(light))
     return false;
@@ -107,6 +107,12 @@ void LightingDatabase::updateShadersData(Shader *shader, glm::mat4 &view) {
         break;
       case AbstractLight::SPOT:
         shader->setUniform(std::string(uniform_name_uint_lighting_spot_number_name), light_num);
+        break;
+      case AbstractLight::AMBIANT:
+      case AbstractLight::HEMISPHERE:
+      case AbstractLight::QUAD:
+      case AbstractLight::AREA_TEXTURE:
+      default:
         break;
     }
     updateShadersData(it->first, shader, view);

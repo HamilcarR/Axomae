@@ -226,20 +226,17 @@ namespace controller {
     /* Configuration structure initialization */
     global_application_config = std::make_unique<ApplicationConfig>();
 
-    /* Event structure initialization */
-    application_events = std::make_unique<controller::event::Event>();
-
     /* UI progress bar operator initialization for objects that need to show progress*/
     main_window_ui.progressBar->setValue(0);
     progress_manager = std::make_unique<controller::ProgressStatus>(main_window_ui.progressBar);
     resource_database.setProgressManagerAllDb(progress_manager.get());
 
     /* Realtime renderer initialization*/
-    viewer_3d = main_window_ui.renderer_view;
+    realtime_viewer = main_window_ui.renderer_view;
     renderer_scene_list = main_window_ui.renderer_scene_list;
-    main_window_ui.renderer_envmap_list->setWidget(viewer_3d);
-    viewer_3d->getRenderer().getRenderPipeline().setProgressManager(progress_manager.get());
-    viewer_3d->setApplicationConfig(global_application_config.get());
+    main_window_ui.renderer_envmap_list->setWidget(realtime_viewer);
+    realtime_viewer->getRenderer().getRenderPipeline().setProgressManager(progress_manager.get());
+    realtime_viewer->setApplicationConfig(global_application_config.get());
 
     /* UV editor initialization*/
     uv_editor_mesh_list = main_window_ui.meshes_list;
@@ -247,7 +244,7 @@ namespace controller {
 
     /*Lighting GUI initialization*/
     light_controller = std::make_unique<LightController>(main_window_ui);
-    light_controller->setup(viewer_3d, renderer_scene_list);
+    light_controller->setup(realtime_viewer, renderer_scene_list);
 
     /* Undo pointers setup*/
     init_image_session_ptr();
@@ -697,10 +694,10 @@ namespace controller {
       IO::Loader loader(progress_manager.get());
       auto struct_holder = loader.load(filename.toStdString().c_str());
       std::vector<Mesh *> scene = struct_holder.first;
-      viewer_3d->setNewScene(struct_holder);
+      realtime_viewer->setNewScene(struct_holder);
       uv_mesh_selector.setScene(scene);
       main_window_ui.meshes_list->setList(scene);
-      SceneTree &scene_hierarchy = viewer_3d->getRenderer().getScene().getSceneTreeRef();
+      SceneTree &scene_hierarchy = realtime_viewer->getRenderer().getScene().getSceneTreeRef();
       main_window_ui.renderer_scene_list->setScene(scene_hierarchy);
       return true;
     }
@@ -794,72 +791,79 @@ namespace controller {
 
   /**************************************************************************************************************/
   void Controller::set_renderer_gamma_value(int value) {
-    if (viewer_3d != nullptr) {
+    if (realtime_viewer != nullptr) {
       float v = (float)value / POSTP_SLIDER_DIV;
-      viewer_3d->getRenderer().executeMethod<SET_GAMMA>(v);
+      realtime_viewer->rendererCallback<SET_GAMMA>(v);
     }
   }
 
   /**************************************************************************************************************/
   void Controller::reset_renderer_camera() {
-    if (viewer_3d != nullptr)
-      viewer_3d->getRenderer().executeMethod<SET_DISPLAY_RESET_CAMERA>();
+    if (realtime_viewer != nullptr) {
+      realtime_viewer->rendererCallback<SET_DISPLAY_RESET_CAMERA>();
+    }
   }
 
   /**************************************************************************************************************/
   void Controller::set_renderer_exposure_value(int value) {
-    if (viewer_3d != nullptr) {
+    if (realtime_viewer != nullptr) {
       float v = (float)value / POSTP_SLIDER_DIV;
-      viewer_3d->getRenderer().executeMethod<SET_EXPOSURE>(v);
+      realtime_viewer->rendererCallback<SET_EXPOSURE>(v);
     }
   }
   /**************************************************************************************************************/
   void Controller::set_renderer_no_post_process() {
-    if (viewer_3d != nullptr) {
-      viewer_3d->getRenderer().executeMethod<SET_POSTPROCESS_NOPROCESS>();
+    if (realtime_viewer != nullptr) {
+      realtime_viewer->rendererCallback<SET_POSTPROCESS_NOPROCESS>();
     }
   }
   /**************************************************************************************************************/
   void Controller::set_renderer_edge_post_process() {
-    if (viewer_3d != nullptr) {
-      viewer_3d->getRenderer().executeMethod<SET_POSTPROCESS_EDGE>();
+    if (realtime_viewer != nullptr) {
+      realtime_viewer->rendererCallback<SET_POSTPROCESS_EDGE>();
     }
   }
 
   /**************************************************************************************************************/
   void Controller::set_renderer_sharpen_post_process() {
-    if (viewer_3d != nullptr)
-      viewer_3d->getRenderer().executeMethod<SET_POSTPROCESS_SHARPEN>();
+    if (realtime_viewer != nullptr) {
+      realtime_viewer->rendererCallback<SET_POSTPROCESS_SHARPEN>();
+    }
   }
 
   /**************************************************************************************************************/
   void Controller::set_renderer_blurr_post_process() {
-    if (viewer_3d != nullptr)
-      viewer_3d->getRenderer().executeMethod<SET_POSTPROCESS_BLURR>();
+    if (realtime_viewer != nullptr) {
+      realtime_viewer->rendererCallback<SET_POSTPROCESS_BLURR>();
+    }
   }
 
   /**************************************************************************************************************/
   void Controller::set_rasterizer_point() {
-    if (viewer_3d)
-      viewer_3d->getRenderer().executeMethod<SET_RASTERIZER_POINT>();
+    if (realtime_viewer) {
+      realtime_viewer->rendererCallback<SET_RASTERIZER_POINT>();
+    }
   }
 
   /**************************************************************************************************************/
   void Controller::set_rasterizer_fill() {
-    if (viewer_3d)
-      viewer_3d->getRenderer().executeMethod<SET_RASTERIZER_FILL>();
+    if (realtime_viewer) {
+      realtime_viewer->rendererCallback<SET_RASTERIZER_FILL>();
+    }
   }
 
   /**************************************************************************************************************/
   void Controller::set_rasterizer_wireframe() {
-    if (viewer_3d)
-      viewer_3d->getRenderer().executeMethod<SET_RASTERIZER_WIREFRAME>();
+    if (realtime_viewer) {
+      realtime_viewer->rendererCallback<SET_RASTERIZER_WIREFRAME>();
+    }
   }
 
   /**************************************************************************************************************/
   void Controller::set_display_boundingbox(bool display) {
-    if (viewer_3d)
-      viewer_3d->getRenderer().executeMethod<SET_DISPLAY_BOUNDINGBOX>(display);
+    if (realtime_viewer) {
+      realtime_viewer->rendererCallback<SET_DISPLAY_BOUNDINGBOX>(display);
+    }
   }
 
   /**************************************************************************************************************/

@@ -3,17 +3,17 @@
 
 #include "Mesh.h"
 #include "RendererEnums.h"
+#include "RendererInterface.h"
 #include "SceneHierarchy.h"
 #include "constants.h"
 #include "utils_3D.h"
 #include <QOpenGLWidget>
-
 /**
  * @file GLView.h
  * This file implements Viewer widget in the QT interface
  */
 
-class Renderer;
+class RendererInterface;
 class QMouseEvent;
 class ApplicationConfig;
 namespace controller::event {
@@ -24,20 +24,28 @@ namespace controller::event {
  * This class implements methods for the drawing process
  */
 class GLViewer : public QOpenGLWidget {
+
   Q_OBJECT
 
  private:
-  std::unique_ptr<Renderer> renderer; /*<Pointer on the renderer of the scene*/
-  bool glew_initialized;              /*<Check if context is initialized*/
+  std::unique_ptr<IRenderer> renderer; /*<Pointer on the renderer of the scene*/
+  bool glew_initialized;               /*<Check if context is initialized*/
   ApplicationConfig *global_application_config{};
   std::unique_ptr<controller::event::Event> widget_input_events;
 
  public:
   explicit GLViewer(QWidget *parent = nullptr);
-  ~GLViewer();
+  ~GLViewer() override;
+  GLViewer(const GLViewer &copy) = delete;
+  GLViewer &operator=(const GLViewer &copy) = delete;
+  GLViewer &operator=(GLViewer &&move) noexcept;
+  GLViewer(GLViewer &&move) noexcept;
   virtual void setNewScene(std::pair<std::vector<Mesh *>, SceneTree> &new_scene);
-  [[nodiscard]] Renderer &getRenderer() const;
+  [[nodiscard]] RendererInterface &getRenderer() const;
   void setApplicationConfig(ApplicationConfig *app_conf) { global_application_config = app_conf; }
+  void setRenderer(std::unique_ptr<IRenderer> &renderer);
+  template<RENDERER_CALLBACK_ENUM callback_id, class... Args>
+  constexpr void rendererCallback(Args &&...args);
 
  protected:
   void initializeGL() override;
@@ -56,4 +64,9 @@ class GLViewer : public QOpenGLWidget {
   void onUpdateDrawEvent();
 };
 
+template<RENDERER_CALLBACK_ENUM callback_id, class... Args>
+constexpr void GLViewer::rendererCallback(Args &&...args) {
+  renderer->executeMethod<callback_id>(std::forward<Args>(args)...);
+  update();
+}
 #endif

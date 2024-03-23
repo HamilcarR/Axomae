@@ -7,12 +7,14 @@
 #include <sstream>
 
 inline void errorCheck(const char *filename, unsigned int line) {
+#ifndef NDEBUG
   GLenum error = GL_NO_ERROR;
   error = glGetError();
   if (error != GL_NO_ERROR) {
     std::string err = std::string("GL API ERROR :") + std::to_string(error);
     LOG(err, LogLevel::ERROR);
   }
+#endif
 }
 
 inline void glDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam) {

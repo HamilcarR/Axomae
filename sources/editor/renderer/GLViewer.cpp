@@ -16,7 +16,9 @@ GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent) {
   format.setRenderableType(QSurfaceFormat::OpenGL);
   format.setVersion(4, 6);
   format.setProfile(QSurfaceFormat::CoreProfile);
+#ifndef NDEBUG
   format.setOption(QSurfaceFormat::DebugContext);
+#endif
   format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
   format.setAlphaBufferSize(8);
   format.setSwapInterval(1);
@@ -27,6 +29,29 @@ GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent) {
 }
 
 GLViewer::~GLViewer() {}
+
+GLViewer &GLViewer::operator=(GLViewer &&move) noexcept {
+  if (this != &move) {
+    renderer = std::move(move.renderer);
+    glew_initialized = move.glew_initialized;
+    move.glew_initialized = false;
+    global_application_config = move.global_application_config;
+    move.global_application_config = nullptr;
+    widget_input_events = std::move(move.widget_input_events);
+  }
+  return *this;
+}
+
+GLViewer::GLViewer(GLViewer &&move) noexcept {
+  if (this != &move) {
+    renderer = std::move(move.renderer);
+    glew_initialized = move.glew_initialized;
+    move.glew_initialized = false;
+    global_application_config = move.global_application_config;
+    move.global_application_config = nullptr;
+    widget_input_events = std::move(move.widget_input_events);
+  }
+}
 
 void GLViewer::initializeGL() {
   makeCurrent();
@@ -39,12 +64,14 @@ void GLViewer::initializeGL() {
       exit(EXIT_FAILURE);
     } else {
       glew_initialized = true;
+#ifndef NDEBUG
       if (GLEW_ARB_debug_output) {
         glEnable(GL_DEBUG_OUTPUT);
         glDebugMessageCallback(glDebugCallback, nullptr);
       } else {
         LOG("Debug output extension not supported\n", LogLevel::WARNING);
       }
+#endif
     }
   }
   renderer->onResize(width(), height());
@@ -137,10 +164,13 @@ void GLViewer::mouseDoubleClickEvent(QMouseEvent *event) { QOpenGLWidget::mouseD
 
 void GLViewer::setNewScene(std::pair<std::vector<Mesh *>, SceneTree> &new_scene) {
   makeCurrent();
-  renderer->set_new_scene(new_scene);
+  Renderer *r = dynamic_cast<Renderer *>(renderer.get());
+  r->set_new_scene(new_scene);
   doneCurrent();
 }
 
 void GLViewer::onUpdateDrawEvent() { update(); }
 
-Renderer &GLViewer::getRenderer() const { return *renderer; }
+RendererInterface &GLViewer::getRenderer() const { return *renderer; }
+
+void GLViewer::setRenderer(std::unique_ptr<IRenderer> &r) { renderer = std::move(r); }

@@ -69,7 +69,6 @@ set(OPTIX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/vendor/Optix CACHE PATH "Opti
 #****************************************************************************************************
 # Project setup
 qt_standard_project_setup()
-
 qt_add_executable(${PROJECT_NAME} sources/main/main.cpp)
 
 add_subdirectory(sources)

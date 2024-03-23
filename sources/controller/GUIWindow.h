@@ -36,20 +36,20 @@ namespace controller {
 
    private:
     Ui::MainWindow main_window_ui;
-    GLViewer *viewer_3d;
+    /* The 3D model viewer */
+    GLViewer *realtime_viewer;
     SceneListView *renderer_scene_list;
     ResourceDatabaseManager &resource_database;
     std::unique_ptr<LightController> light_controller;
     std::unique_ptr<ProgressStatus> progress_manager;
     std::unique_ptr<ApplicationConfig> global_application_config;
-    std::unique_ptr<controller::event::Event> application_events;
     /*UV editor*/
     MeshListView *uv_editor_mesh_list;
     SceneSelector uv_mesh_selector;
 
    public:
     Controller(QWidget *parent = nullptr);
-    ~Controller();
+    ~Controller() override;
     void setApplicationConfig(const ApplicationConfig *configuration);
     Ui::MainWindow &getUi() { return main_window_ui; }
     static HeapManagement *_MemManagement;

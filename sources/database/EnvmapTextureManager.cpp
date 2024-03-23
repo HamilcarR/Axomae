@@ -40,7 +40,7 @@ EnvmapTextureManager::EnvmapTextureManager(
 }
 
 void EnvmapTextureManager::createFurnace() {
-  std::vector<float> image_data(256 * 256 * 3, 2.f);
+  std::vector<float> image_data(256 * 256 * 3, 0.1f);
   image::Metadata metadata;
   metadata.name = "Furnace.hdr";
   metadata.width = 256;
