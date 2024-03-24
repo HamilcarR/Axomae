@@ -7,6 +7,12 @@ constexpr unsigned int ITERATIONS = 5;
 constexpr unsigned int TEST_TREE_MAX_DEPTH = 4;
 constexpr unsigned int TEST_TREE_MAX_NODE_DEGREE = 3;
 class SceneTreeBuilder {
+ protected:
+  SceneTree tree;
+  unsigned node_count;
+  unsigned leaf_count;
+  INodeDatabase database;
+
  public:
   SceneTreeBuilder() {
     srand(time(nullptr));
@@ -17,7 +23,7 @@ class SceneTreeBuilder {
   virtual ~SceneTreeBuilder() = default;
 
   void buildSceneTree(unsigned int depth, unsigned int max_degree) {
-    ISceneNode *root = database::node::store<SceneTreeNode>(database, false).object;
+    SceneTreeNode *root = database::node::store<SceneTreeNode>(database, false).object;
     root->setName("root");
     tree.setRoot(root);
     node_count++;
@@ -26,21 +32,17 @@ class SceneTreeBuilder {
   }
 
   SceneTree *getTreePointer() { return &tree; }
-
-  unsigned getLeafCount() { return leaf_count; }
-
-  unsigned getNodeCount() { return node_count; }
-
+  unsigned getLeafCount() const { return leaf_count; }
+  unsigned getNodeCount() const { return node_count; }
   void clean() { tree.clear(); }
-
-  std::vector<INode *> findByName(const std::string &name) {
-    std::vector<INode *> names;
+  std::vector<NodeInterface *> findByName(const std::string &name) {
+    std::vector<NodeInterface *> names;
     findByNameRecursive(tree.getRootNode(), name, names);
     return names;
   }
 
  private:
-  void findByNameRecursive(INode *node, const std::string &name, std::vector<INode *> &collection) {
+  void findByNameRecursive(NodeInterface *node, const std::string &name, std::vector<NodeInterface *> &collection) {
     if (node != nullptr) {
       if (node->getName() == name)
         collection.push_back(node);
@@ -50,36 +52,31 @@ class SceneTreeBuilder {
     return;
   }
 
-  void buildRecursive(ISceneNode *node, unsigned max_degree, unsigned depth) {
+  void buildRecursive(SceneTreeNode *node, unsigned max_degree, unsigned depth) {
     if (depth == 0) {
       leaf_count++;
       return;
     }
     int size_numbers = rand() % max_degree + 1;
     for (int i = 0; i < size_numbers; i++) {
-      ISceneNode *child = database::node::store<SceneTreeNode>(database, false, node).object;
+      SceneTreeNode *child = database::node::store<SceneTreeNode>(database, false, node).object;
       child->setName(std::string("child-") + std::to_string(depth) + std::string("-") + std::to_string(i));
       node_count++;
       buildRecursive(child, max_degree, depth - 1);
     }
   }
-
- protected:
-  SceneTree tree;
-  unsigned node_count;
-  unsigned leaf_count;
-  INodeDatabase database;
 };
 
 class PseudoFunctors {
  public:
-  static void testDummyFunction(INode *node) { std::cout << node << "\n"; }
-  static void testNodeCount(INode *node, unsigned int *i) { (*i)++; }
-  static void testTransformationPropagation(INode *node, std::vector<glm::mat4> &matrices) {
-    glm::mat4 m = static_cast<ISceneNode *>(node)->computeFinalTransformation();
+  static void testDummyFunction(NodeInterface *node) { std::cout << node << "\n"; }
+  static void testNodeCount(NodeInterface *node, unsigned int *i) { (*i)++; }
+  static void testTransformationPropagation(NodeInterface *node, std::vector<glm::mat4> &matrices) {
+    SceneTreeNode *n = dynamic_cast<SceneTreeNode *>(node);
+    glm::mat4 m = n->computeFinalTransformation();
     matrices.push_back(m);
   }
-  static void testLeafCount(INode *node, unsigned int *leaf_number) {
+  static void testLeafCount(NodeInterface *node, unsigned int *leaf_number) {
     if (node->isLeaf())
       (*leaf_number)++;
   }
@@ -99,9 +96,9 @@ TEST(DFSTest, updateAccumulatedTransformations) {
   SceneTreeBuilder builder;
   builder.buildSceneTree(TEST_TREE_MAX_DEPTH, TEST_TREE_MAX_NODE_DEGREE);
   SceneTree *tree = builder.getTreePointer();
-  auto root_local_transf = static_cast<ISceneNode *>(tree->getRootNode())->getLocalModelMatrix();
+  auto root_local_transf = dynamic_cast<SceneTreeNode *>(tree->getRootNode())->getLocalModelMatrix();
   auto updated_local_transf = glm::translate(root_local_transf, glm::vec3(1., 0., 0.));
-  static_cast<ISceneNode *>(tree->getRootNode())->setLocalModelMatrix(updated_local_transf);
+  dynamic_cast<SceneTreeNode *>(tree->getRootNode())->setLocalModelMatrix(updated_local_transf);
   tree->updateAccumulatedTransformations();
   std::vector<glm::mat4> matrices;
   tree->dfs(tree->getRootNode(), &PseudoFunctors::testTransformationPropagation, matrices);

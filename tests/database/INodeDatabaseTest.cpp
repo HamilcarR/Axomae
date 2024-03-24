@@ -10,7 +10,7 @@
 const int COUNT = 11;
 namespace node_database_test {
   template<class HEAD, class... TAIL>
-  constexpr void addNode(IResourceDB<int, INode> &database) {
+  constexpr void addNode(IResourceDB<int, NodeInterface> &database) {
     bool persistence = math::random::randb();
     database::node::store<HEAD>(database, persistence);
     if constexpr (sizeof...(TAIL) > 0)
@@ -19,9 +19,9 @@ namespace node_database_test {
 
 };  // namespace node_database_test
 
-class NodeDatabaseTest final : public DatabaseBuilderTest<int, INode> {
+class NodeDatabaseTest final : public DatabaseBuilderTest<int, NodeInterface> {
  public:
-  explicit NodeDatabaseTest(INodeDatabase &db) : DatabaseBuilderTest<int, INode>(db) { buildDatabase(); }
+  explicit NodeDatabaseTest(INodeDatabase &db) : DatabaseBuilderTest<int, NodeInterface>(db) { buildDatabase(); }
 
   template<class TYPE, class... Args>
   database::Result<int, TYPE> addNode(INodeDatabase &database, bool persistence, Args &&...args) {
@@ -53,7 +53,7 @@ TEST(NodeDatabaseTest, contains) {
 static void test_all_remove(NodeDatabaseTest &test) {
   for (int i = 0; i < test.getDatabaseSize(); i++) {
     const auto it = test.database.getConstData().find(i);
-    INode *ptr = it->second.get();
+    NodeInterface *ptr = it->second.get();
     EXPECT_TRUE(test.database.remove(i));
     EXPECT_FALSE(test.database.remove(i));
     EXPECT_FALSE(test.database.remove(ptr));
