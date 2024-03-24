@@ -19,7 +19,7 @@ class MeshListView : public QListWidget {
   SceneSelector *uv_editor_mesh_selection{};
 
  public:
-  MeshListView(QWidget *parent = nullptr);
+  explicit MeshListView(QWidget *parent = nullptr);
   void setList(const std::vector<Mesh *> &meshes);
   void setSceneSelector(SceneSelector *scene_selector);
   void setSelected(int row);

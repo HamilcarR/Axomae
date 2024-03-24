@@ -4,7 +4,6 @@ class Object3D;
 class MeshInterface {
   virtual void preRenderSetup() = 0;
   virtual void afterRenderSetup() = 0;
-  virtual void clean() = 0;
   [[nodiscard]] virtual bool isInitialized() const = 0;
   [[nodiscard]] virtual MaterialInterface *getMaterial() const = 0;
   [[nodiscard]] virtual const std::string &getMeshName() const = 0;

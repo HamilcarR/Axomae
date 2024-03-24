@@ -33,7 +33,7 @@ namespace IO {
     size_t range_max = 0;
     std::vector<std::future<void>> future_results;
     unsigned i = 0;
-    for (i; i < THREAD_POOL_SIZE; i++) {
+    for (i = 0; i < THREAD_POOL_SIZE; i++) {
       range_min = i * thread_buffer_size;
       range_max = i * thread_buffer_size + thread_buffer_size;
       if (i == THREAD_POOL_SIZE - 1)
@@ -288,31 +288,14 @@ namespace IO {
     return to;
   }
 
-  /**
-   * The function "fillTreeData" recursively fills a tree data structure with scene nodes and their
-   * corresponding transformations and meshes.
-   *
-   * @param ai_node A pointer to an aiNode object, which represents a node in the scene hierarchy of an
-   * imported model. This parameter is used to traverse the scene hierarchy and extract data from each
-   * node.
-   * @param mesh_lookup The `mesh_lookup` parameter is a vector that contains pointers to `Mesh` objects.
-   * These `Mesh` objects represent the meshes in the scene. The `ai_node->mMeshes` array contains
-   * indices that correspond to the meshes in the `mesh_lookup` vector.
-   * @param parent The parent parameter is a pointer to the parent scene node. It represents the parent
-   * node in the scene graph hierarchy.
-
-   *
-   * @return a pointer to a random node of the tree... Root can be determined from any point of the tree , by using the
-   * method SceneNodeInterface::returnRoot()
-   */
-  ISceneNode *fillTreeData(aiNode *ai_node, const std::vector<Mesh *> &mesh_lookup, ISceneNode *parent) {
+  SceneTreeNode *fillTreeData(aiNode *ai_node, const std::vector<Mesh *> &mesh_lookup, SceneTreeNode *parent) {
     INodeDatabase *node_database = ResourceDatabaseManager::getInstance().getNodeDatabase();
     if (ai_node != nullptr) {
       std::string name = ai_node->mName.C_Str();
       glm::mat4 transformation = aiMatrix4x4ToGlm(ai_node->mTransformation);
-      std::vector<ISceneNode *> add_node;
+      std::vector<SceneTreeNode *> add_node;
       if (ai_node->mNumMeshes == 0) {
-        ISceneNode *empty_node =
+        SceneTreeNode *empty_node =
             database::node::store<SceneTreeNode>(*node_database, false, parent).object;  //* Empty node , no other goal than transformation node .
         add_node.push_back(empty_node);
       } else if (ai_node->mNumMeshes == 1)
@@ -329,7 +312,7 @@ namespace IO {
       for (auto A : add_node) {
         A->setLocalModelMatrix(transformation);
         A->setName(name);
-        std::vector<INode *> parents_array = {parent};
+        std::vector<NodeInterface *> parents_array = {parent};
         A->setParents(parents_array);
       }
       for (unsigned i = 0; i < ai_node->mNumChildren; i++)
@@ -353,9 +336,9 @@ namespace IO {
   SceneTree generateSceneTree(const aiScene *modelScene, const std::vector<Mesh *> &node_lookup) {
     aiNode *ai_root = modelScene->mRootNode;
     SceneTree scene_tree;
-    ISceneNode *node = fillTreeData(ai_root, node_lookup, nullptr);
+    SceneTreeNode *node = fillTreeData(ai_root, node_lookup, nullptr);
     assert(node != nullptr);
-    node = dynamic_cast<ISceneNode *>(node->returnRoot());
+    node = dynamic_cast<SceneTreeNode *>(node->returnRoot());
     scene_tree.setRoot(node);
     scene_tree.updateAccumulatedTransformations();
     return scene_tree;
@@ -496,7 +479,7 @@ namespace IO {
       return objects;
     } else {
       LOG("Problem loading scene", LogLevel::ERROR);
-      return {};
+      return std::pair<std::vector<Mesh *>, SceneTree>();
     }
   }
 

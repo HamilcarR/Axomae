@@ -4,7 +4,7 @@
 #include "constants.h"
 #include "light/LightingSystem.h"
 
-// TODO : refactor for cleaner controller system
+// TODO : refactor for cleaner controller system : Implement light control system after free camera
 
 void LightController::connect_all_slots() {
   QObject::connect(ui.button_renderer_lighting_PointLights_add, SIGNAL(pressed()), this, SLOT(addPointLight()));
@@ -32,7 +32,7 @@ LightData LightController::loadFromUi() const {
   int red = 0, green = 0, blue = 0;
   float intensity = 0.f;
   NodeItem *selected = nullptr;
-  ISceneNode *node = nullptr;
+  NodeInterface *node = nullptr;
   LightData data;
   if constexpr (type == AbstractLight::POINT) {
     red = ui.hslider_renderer_lighting_PointLights_colors_red->value();
@@ -54,12 +54,12 @@ LightData LightController::loadFromUi() const {
   if (!scene_list_view->selectedItems().empty())
     selected = static_cast<NodeItem *>(scene_list_view->selectedItems().at(0));
   if (selected)
-    node = static_cast<ISceneNode *>(scene_list_view->getSceneNode(selected));
+    node = static_cast<NodeInterface *>(scene_list_view->getSceneNode(selected));
   else {
     NodeItem *root = scene_list_view->getRoot();
-    node = static_cast<ISceneNode *>(scene_list_view->getSceneNode(root));
+    node = static_cast<NodeInterface *>(scene_list_view->getSceneNode(root));
   }
-  data.parent = node;
+  // data.parent = node;
   LOG(node->getName(), LogLevel::INFO);
   return data;
 }

@@ -9,7 +9,6 @@
 /**
  * @file Texture.h
  * Implementation of the texture classes
- *
  */
 
 /******************************************************************************************************************************************************************************************************************/
@@ -18,34 +17,23 @@ class Texture;
 
 /**
  * @brief Texture class
- *
  */
 class Texture {
- protected:
-  Texture();
-  explicit Texture(TextureData *tex);
-
  public:
-  virtual ~Texture() = default;
-
-  /**
-   * @brief Internal format of textures
-   *
-   */
   enum FORMAT : unsigned {
     /*Internal and data formats*/
     RG = GL_RG,
-    RGBA = GL_RGBA,       /**<RGBA with 8 bits per channel*/
-    BGRA = GL_BGRA,       /**<BGRA with 8 bits per channel*/
-    RGB = GL_RGB,         /**<RGB with 8 bits per channel*/
-    BGR = GL_BGR,         /**<BGR with 8 bits per channel*/
-    RGBA16F = GL_RGBA16F, /**<RGBA with 16 bits floating point per channel*/
-    RGBA32F = GL_RGBA32F, /**<RGBA with 32 bits floating point per channel*/
-    RGB16F = GL_RGB16F,   /**<RGB with 16 bits floating point per channel*/
-    RGB32F = GL_RGB32F,   /**<RGB with 32 bits floating point per channel*/
+    RGBA = GL_RGBA,
+    BGRA = GL_BGRA,
+    RGB = GL_RGB,
+    BGR = GL_BGR,
+    RGBA16F = GL_RGBA16F,
+    RGBA32F = GL_RGBA32F,
+    RGB16F = GL_RGB16F,
+    RGB32F = GL_RGB32F,
     /*Data type*/
-    UBYTE = GL_UNSIGNED_BYTE, /**<Unsigned byte*/
-    FLOAT = GL_FLOAT          /**<4 byte float*/
+    UBYTE = GL_UNSIGNED_BYTE,
+    FLOAT = GL_FLOAT
   };
 
   enum TYPE : signed {
@@ -76,14 +64,29 @@ class Texture {
                              it's texture coordinates*/
   };
 
-  /**
-   * @brief Sets the raw data
-   * @param texture A pointer to a TextureData object that contains information
-   * about the texture, including its width, height, and pixel data.
-   */
+ protected:
+  std::string name;
+  TYPE type;
+  FORMAT internal_format;
+  FORMAT data_format;
+  FORMAT data_type;
+  unsigned int width;
+  unsigned int height;
+  std::vector<uint32_t> data;
+  std::vector<float> f_data;
+  unsigned int sampler2D;
+  unsigned int mipmaps;
+  bool is_dummy;
+  bool is_initialized;
+
+ protected:
+  Texture();
+  explicit Texture(TextureData *tex);
+
+ public:
+  virtual ~Texture() = default;
   virtual void set(TextureData *texture);
   [[nodiscard]] unsigned int getSamplerID() const { return sampler2D; }
-
   /**
    * @brief Set the texture's sampler ID .
    * This method will not check if sampler2D has already a valid value.
@@ -96,20 +99,10 @@ class Texture {
   virtual bool isDummyTexture() { return is_dummy; }
   void setDummy(bool d) { is_dummy = d; }
   [[nodiscard]] const std::string &getName() const { return name; }
-
-  /**
-   * @brief Checks if the texture has raw pixel data stored
-   *
-   */
   virtual bool empty() { return data.empty() && f_data.empty(); }
   virtual bool isInitialized() { return sampler2D != 0; }
   virtual void setMipmapsLevel(unsigned level) { mipmaps = level; }
   virtual unsigned int getMipmapsLevel() { return mipmaps; }
-  /**
-   * @brief Generate mip maps , and set texture filters accordingly
-   * (LINEAR_MIPMAP_LINEAR)
-   *
-   */
   virtual void generateMipmap();
   virtual void bindTexture() = 0;
   virtual void unbindTexture() = 0;
@@ -121,25 +114,9 @@ class Texture {
  protected:
   /**
    * @brief Initialize texture filters , mipmaps and glTexImage2D
-   *
    */
   virtual void initializeTexture2D();
   virtual void setTextureParametersOptions();
-
- protected:
-  std::string name;       /**<Name of the texture*/
-  TYPE type;              /**<Type of the texture*/
-  FORMAT internal_format; /**<Data layout format on the GPU*/
-  FORMAT data_format;     /**<Raw texture data format*/
-  FORMAT data_type;
-  unsigned int width;         /**<Width of the texture*/
-  unsigned int height;        /**<Height of the texture*/
-  std::vector<uint32_t> data; /**<Raw data of the texture*/
-  std::vector<float> f_data;
-  unsigned int sampler2D; /**<ID of the texture*/
-  unsigned int mipmaps;   /**<Texture mipmaps level*/
-  bool is_dummy;          /**<Check if the current texture is a dummy texture*/
-  bool is_initialized;
 };
 
 /******************************************************************************************************************************************************************************************************************/

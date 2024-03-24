@@ -2,7 +2,7 @@
 #include "Axomae_macros.h"
 #include "DebugGL.h"
 #include "PerformanceLogger.h"
-Mesh::Mesh(ISceneNode *parent) : SceneTreeNode(parent) {
+Mesh::Mesh(SceneTreeNode *parent) : SceneTreeNode(parent) {
   mesh_initialized = false;
   face_culling_enabled = false;
   depth_mask_enabled = false;
@@ -17,21 +17,21 @@ Mesh::Mesh(ISceneNode *parent) : SceneTreeNode(parent) {
   AX_ASSERT(material != nullptr, "Resource allocation error.");
 }
 
-Mesh::Mesh(const Object3D &geo, const GLMaterial &mat, ISceneNode *parent) : Mesh(parent) {
+Mesh::Mesh(const Object3D &geo, const GLMaterial &mat, SceneTreeNode *parent) : Mesh(parent) {
   geometry = geo;
   *material = mat;
   name = "uninitialized mesh";
   shader_program = nullptr;
 }
 
-Mesh::Mesh(const std::string &n, const Object3D &geo, const GLMaterial &mat, ISceneNode *parent) : Mesh(parent) {
+Mesh::Mesh(const std::string &n, const Object3D &geo, const GLMaterial &mat, SceneTreeNode *parent) : Mesh(parent) {
   geometry = geo;
   *material = mat;
   name = n;
   shader_program = nullptr;
 }
 
-Mesh::Mesh(const std::string &n, const Object3D &geo, const GLMaterial &mat, Shader *shader, ISceneNode *parent) : Mesh(parent) {
+Mesh::Mesh(const std::string &n, const Object3D &geo, const GLMaterial &mat, Shader *shader, SceneTreeNode *parent) : Mesh(parent) {
   geometry = geo;
   *material = mat;
   name = n;
@@ -39,7 +39,7 @@ Mesh::Mesh(const std::string &n, const Object3D &geo, const GLMaterial &mat, Sha
   material->setShaderPointer(shader);
 }
 
-Mesh::Mesh(const std::string &n, Object3D &&geo, const GLMaterial &mat, Shader *shader, ISceneNode *parent) : Mesh(parent) {
+Mesh::Mesh(const std::string &n, Object3D &&geo, const GLMaterial &mat, Shader *shader, SceneTreeNode *parent) : Mesh(parent) {
   geometry = std::move(geo);
   *material = mat;
   name = n;
@@ -105,8 +105,8 @@ void Mesh::releaseShaders() {
   if (shader_program)
     shader_program->release();
 }
-void Mesh::clean() {
-  SceneTreeNode::clean();
+void Mesh::reset() {
+  SceneTreeNode::reset();
   shader_program = nullptr;
   material->clean();
   geometry.clean();
@@ -148,7 +148,7 @@ void Mesh::setDepthMask(bool val) {
 void Mesh::setDepthFunc(DEPTHFUNC func) { glDepthFunc(func); }
 
 /*****************************************************************************************************************/
-CubeMesh::CubeMesh(ISceneNode *parent) : Mesh(parent) {
+CubeMesh::CubeMesh(SceneTreeNode *parent) : Mesh(parent) {
   std::vector<float> vertices = {-1, -1, -1,  // 0
                                  1,  -1, -1,  // 1
                                  -1, 1,  -1,  // 2
@@ -197,7 +197,7 @@ void CubeMesh::preRenderSetup() {
 }
 
 /*****************************************************************************************************************/
-CubeMapMesh::CubeMapMesh(ISceneNode *parent) : CubeMesh(parent) { name = "CubeMap"; }
+CubeMapMesh::CubeMapMesh(SceneTreeNode *parent) : CubeMesh(parent) { name = "CubeMap"; }
 
 void CubeMapMesh::preRenderSetup() {
   setFaceCulling(false);
@@ -218,7 +218,7 @@ glm::mat4 CubeMapMesh::computeFinalTransformation() {
   return accumulated_transformation;
 }
 /*****************************************************************************************************************/
-QuadMesh::QuadMesh(ISceneNode *parent) : Mesh(parent) {
+QuadMesh::QuadMesh(SceneTreeNode *parent) : Mesh(parent) {
   std::vector<float> vertices = {-1.0f, -1.0f, 0.f, -1.0f, 1.0f, 0.f, 1.0f, 1.0f, 0.f, 1.0f, -1.0f, 0.f};
   std::vector<unsigned int> indices = {2, 1, 0, 3, 2, 0};
   std::vector<float> textures = {0, 0, 0, 1, 1, 1, 1, 0};
@@ -261,7 +261,7 @@ void FrameBufferMesh::preRenderSetup() {
 
 /*****************************************************************************************************************/
 
-BoundingBoxMesh::BoundingBoxMesh(ISceneNode *parent) : Mesh(parent) {}
+BoundingBoxMesh::BoundingBoxMesh(SceneTreeNode *parent) : Mesh(parent) {}
 
 // TODO: [AX-19] Fix cubemap bounding box computation
 BoundingBoxMesh::BoundingBoxMesh(Mesh *m, Shader *s) : BoundingBoxMesh(m) {

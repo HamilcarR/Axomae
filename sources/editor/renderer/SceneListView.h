@@ -21,17 +21,16 @@ class NodeItemBuilder {
   static NodeItem *buildNode(std::string name, int type, QTreeWidgetItem *parent = nullptr) { return new NodeItem(name, type, parent); }
 };
 
-// TODO: [AX-57] implement a visitor node for icon attributions to scene elements
 class SceneListView : virtual public QTreeWidget {
  private:
-  std::vector<NodeItem *> items;                  // Only used to keep track of elements in the tree.
-  std::map<ISceneNode *, NodeItem *> node_lookup; /*<Keeps track of the NodeItems and their corresponding INodes*/
-  SceneTree *current_scene;                       /*<Keeps track of the currently processed scene*/
+  std::vector<NodeItem *> items;                     // Only used to keep track of elements in the tree.
+  std::map<NodeInterface *, NodeItem *> node_lookup; /*<Keeps track of the NodeItems and their corresponding INodes*/
+  SceneTree *current_scene;                          /*<Keeps track of the currently processed scene*/
 
  public:
   SceneListView(QWidget *parent = nullptr);
   virtual void emptyTree();
-  INode *getSceneNode(const NodeItem *searched);
+  NodeInterface *getSceneNode(const NodeItem *searched);
   NodeItem *getRoot() const;
   const NodeItem *getConstRoot() const;
   void updateSceneList();

@@ -22,7 +22,7 @@ class LightData {
     INTENSITY_UPDATE = 1 << 7,
     THETA_UPDATE = 1 << 8
   };
-  ISceneNode *parent;
+  SceneTreeNode *parent;
   glm::vec3 position;
   glm::vec3 direction;
   glm::vec3 attenuation;
@@ -53,24 +53,24 @@ class AbstractLight : public SceneTreeNode, public LightInterface {
   enum TYPE : signed { DIRECTIONAL = 0, POINT = 1, SPOT = 2, AMBIANT = 3, HEMISPHERE = 4, QUAD = 5, AREA_TEXTURE = 6 };
 
  protected:
-  TYPE type;
+  TYPE type{};
   unsigned int id;
-  glm::vec3 position;
-  glm::vec3 viewspace_position;
-  glm::vec3 specularColor;
-  glm::vec3 ambientColor;
-  glm::vec3 diffuseColor;  // In case the renderer is PBR , we use only this variable for irradiance
-  std::string light_struct_name;
-  float intensity;
+  glm::vec3 position{};
+  glm::vec3 viewspace_position{};
+  glm::vec3 specularColor{};
+  glm::vec3 ambientColor{};
+  glm::vec3 diffuseColor{};  // In case the renderer is PBR , we use only this variable for irradiance
+  std::string light_struct_name{};
+  float intensity{};
 
  protected:
-  explicit AbstractLight(ISceneNode *parent = nullptr);
+  explicit AbstractLight(SceneTreeNode *parent = nullptr);
 
  public:
-  AbstractLight(const AbstractLight &copy);
-  AbstractLight(AbstractLight &&move) noexcept;
-  AbstractLight &operator=(const AbstractLight &copy);
-  AbstractLight &operator=(AbstractLight &&move) noexcept;
+  AbstractLight(const AbstractLight &copy) = default;
+  AbstractLight(AbstractLight &&move) noexcept = default;
+  AbstractLight &operator=(const AbstractLight &copy) = default;
+  AbstractLight &operator=(AbstractLight &&move) noexcept = default;
   ~AbstractLight() override = default;
   void setPosition(const glm::vec3 &pos) override { position = pos; }
   void setSpecularColor(const glm::vec3 &col) override { specularColor = col; }
@@ -96,15 +96,19 @@ class AbstractLight : public SceneTreeNode, public LightInterface {
 class DirectionalLight : public AbstractLight {
  public:
   ~DirectionalLight() override = default;
+  DirectionalLight(const DirectionalLight &copy) = default;
+  DirectionalLight(DirectionalLight &&move) noexcept = default;
+  DirectionalLight &operator=(const DirectionalLight &copy) = default;
+  DirectionalLight &operator=(DirectionalLight &&move) noexcept = default;
   void updateShaderData(Shader *shader, glm::mat4 &view, unsigned int index) override;
   void updateLightData(const LightData &data) override;
 
  protected:
-  explicit DirectionalLight(ISceneNode *parent = nullptr);
+  explicit DirectionalLight(SceneTreeNode *parent = nullptr);
   explicit DirectionalLight(const LightData &light_data);
-  DirectionalLight(glm::vec3 position, glm::vec3 color, float intensity, ISceneNode *parent = nullptr);
+  DirectionalLight(glm::vec3 position, glm::vec3 color, float intensity, SceneTreeNode *parent = nullptr);
   DirectionalLight(
-      glm::vec3 position, glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float intensity, ISceneNode *parent = nullptr);
+      glm::vec3 position, glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float intensity, SceneTreeNode *parent = nullptr);
 };
 
 /*****************************************************************************************************************/
@@ -114,26 +118,30 @@ class DirectionalLight : public AbstractLight {
  */
 class PointLight : public AbstractLight {
  protected:
-  glm::vec3 attenuation;
+  glm::vec3 attenuation{};
+
+ public:
+  ~PointLight() override = default;
+  PointLight(const PointLight &copy) = default;
+  PointLight(PointLight &&move) noexcept = default;
+  PointLight &operator=(PointLight &&move) noexcept = default;
+  PointLight &operator=(const PointLight &copy) = default;
+  void updateShaderData(Shader *shader, glm::mat4 &view, unsigned int index) override;
+  [[nodiscard]] const glm::vec3 &getAttenuation() const { return attenuation; }
+  void setAttenuation(const glm::vec3 &atten) { attenuation = atten; }
+  void updateLightData(const LightData &data) override;
 
  protected:
-  explicit PointLight(ISceneNode *parent = nullptr);
+  explicit PointLight(SceneTreeNode *parent = nullptr);
   explicit PointLight(const LightData &data);
-  PointLight(glm::vec3 position, glm::vec3 color, glm::vec3 attenuation_components, float intensity, ISceneNode *parent = nullptr);
+  PointLight(glm::vec3 position, glm::vec3 color, glm::vec3 attenuation_components, float intensity, SceneTreeNode *parent = nullptr);
   PointLight(glm::vec3 position,
              glm::vec3 ambientColor,
              glm::vec3 diffuseColor,
              glm::vec3 specularColor,
              glm::vec3 attenuation_compnents,
              float intensity,
-             ISceneNode *parent = nullptr);
-
- public:
-  ~PointLight() override = default;
-  void updateShaderData(Shader *shader, glm::mat4 &view, unsigned int index) override;
-  [[nodiscard]] const glm::vec3 &getAttenuation() const { return attenuation; }
-  void setAttenuation(const glm::vec3 &atten) { attenuation = atten; }
-  void updateLightData(const LightData &data) override;
+             SceneTreeNode *parent = nullptr);
 };
 
 /*****************************************************************************************************************/
@@ -141,14 +149,25 @@ class PointLight : public AbstractLight {
 class SpotLight : public AbstractLight {
 
  protected:
-  glm::vec3 direction;
-  glm::vec3 viewspace_direction;
+  glm::vec3 direction{};
+  glm::vec3 viewspace_direction{};
   float theta;
 
+ public:
+  ~SpotLight() override = default;
+  SpotLight(const SpotLight &copy) = default;
+  SpotLight(SpotLight &&move) noexcept = default;
+  SpotLight &operator=(SpotLight &&move) noexcept = default;
+  SpotLight &operator=(const SpotLight &copy) = default;
+  void updateShaderData(Shader *shader, glm::mat4 &view, unsigned int index) override;
+  void updateLightData(const LightData &data) override;
+  virtual void setDirection(glm::vec3 dir) { direction = dir; }
+  virtual void setAngle(float angle) { theta = angle; }
+
  protected:
-  explicit SpotLight(ISceneNode *parent = nullptr);
+  explicit SpotLight(SceneTreeNode *parent = nullptr);
   explicit SpotLight(const LightData &data);
-  SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 color, float cutoff_angle, float intensity, ISceneNode *parent = nullptr);
+  SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 color, float cutoff_angle, float intensity, SceneTreeNode *parent = nullptr);
   SpotLight(glm::vec3 position,
             glm::vec3 direction,
             glm::vec3 ambient,
@@ -156,14 +175,7 @@ class SpotLight : public AbstractLight {
             glm::vec3 specular,
             float cutoff_angle,
             float intensity,
-            ISceneNode *parent = nullptr);
-
- public:
-  ~SpotLight() override = default;
-  void updateShaderData(Shader *shader, glm::mat4 &view, unsigned int index) override;
-  void updateLightData(const LightData &data) override;
-  virtual void setDirection(glm::vec3 dir) { direction = dir; }
-  virtual void setAngle(float angle) { theta = angle; }
+            SceneTreeNode *parent = nullptr);
 };
 
 // TODO: [AX-33] Add Area lighting

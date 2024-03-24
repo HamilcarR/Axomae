@@ -5,7 +5,7 @@
 namespace controller::event {
   class Event;
 }
-class ICamera {
+class CameraInterface {
  public:
   virtual void processEvent(const controller::event::Event *event) = 0;
   virtual void computeViewSpace() = 0;

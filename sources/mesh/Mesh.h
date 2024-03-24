@@ -43,11 +43,11 @@ class Mesh : public SceneTreeNode, public MeshInterface {
   RASTERMODE polygon_mode;
 
  public:
-  explicit Mesh(ISceneNode *parent = nullptr);
-  Mesh(const Object3D &obj, const GLMaterial &mat, ISceneNode *parent = nullptr);
-  Mesh(const std::string &name, const Object3D &obj, const GLMaterial &mat, ISceneNode *parent = nullptr);
-  Mesh(const std::string &name, const Object3D &obj, const GLMaterial &mat, Shader *shader, ISceneNode *parent = nullptr);
-  Mesh(const std::string &name, Object3D &&obj, const GLMaterial &mat, Shader *shader, ISceneNode *parent = nullptr);
+  explicit Mesh(SceneTreeNode *parent = nullptr);
+  Mesh(const Object3D &obj, const GLMaterial &mat, SceneTreeNode *parent = nullptr);
+  Mesh(const std::string &name, const Object3D &obj, const GLMaterial &mat, SceneTreeNode *parent = nullptr);
+  Mesh(const std::string &name, const Object3D &obj, const GLMaterial &mat, Shader *shader, SceneTreeNode *parent = nullptr);
+  Mesh(const std::string &name, Object3D &&obj, const GLMaterial &mat, Shader *shader, SceneTreeNode *parent = nullptr);
   virtual void bindMaterials();
   virtual void unbindMaterials();
   /**
@@ -59,7 +59,7 @@ class Mesh : public SceneTreeNode, public MeshInterface {
   virtual void setupAndBind();
   virtual void bindShaders();
   virtual void releaseShaders();
-  void clean() override;
+  void reset() override;
   [[nodiscard]] bool isInitialized() const override;
   virtual void initializeGlData();
   virtual void setSceneCameraPointer(Camera *camera);
@@ -85,12 +85,9 @@ class Mesh : public SceneTreeNode, public MeshInterface {
 
 /*****************************************************************************************************************/
 
-/**
- * @brief A generic cube
- */
 class CubeMesh : public Mesh {
  public:
-  explicit CubeMesh(ISceneNode *parent = nullptr);
+  explicit CubeMesh(SceneTreeNode *parent = nullptr);
   void preRenderSetup() override;
 };
 
@@ -101,7 +98,7 @@ class CubeMesh : public Mesh {
  */
 class CubeMapMesh : public CubeMesh {
  public:
-  explicit CubeMapMesh(ISceneNode *parent = nullptr);
+  explicit CubeMapMesh(SceneTreeNode *parent = nullptr);
   void preRenderSetup() override;
   glm::mat4 computeFinalTransformation() override;
 };
@@ -109,7 +106,7 @@ class CubeMapMesh : public CubeMesh {
 /*****************************************************************************************************************/
 class QuadMesh : public Mesh {
  public:
-  explicit QuadMesh(ISceneNode *parent = nullptr);
+  explicit QuadMesh(SceneTreeNode *parent = nullptr);
   void preRenderSetup() override;
 };
 
@@ -134,7 +131,7 @@ class BoundingBoxMesh : public Mesh {
   BoundingBox bounding_box;
 
  public:
-  explicit BoundingBoxMesh(ISceneNode *parent = nullptr);
+  explicit BoundingBoxMesh(SceneTreeNode *parent = nullptr);
   BoundingBoxMesh(Mesh *bound_mesh, Shader *display_shader);
   /**
    * @brief Construct a new Bounding Box Mesh using pre-computed bounding boxes

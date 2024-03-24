@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "ICamera.h"
+#include "CameraInterface.h"
 #include "Node.h"
 /**
  * @file Camera.h
@@ -10,7 +10,7 @@
 /**
  * @brief Base Camera class
  */
-class Camera : public ICamera, public SceneTreeNode {
+class Camera : public CameraInterface, public SceneTreeNode {
  public:
   enum TYPE : signed { EMPTY = -1, ARCBALL = 0, PERSPECTIVE = 1 };
 

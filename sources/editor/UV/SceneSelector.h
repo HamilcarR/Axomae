@@ -20,7 +20,7 @@ class SceneSelector {
   void toPrevious();
   Mesh *getCurrent();
   bool setCurrent(int new_current_mesh);
-  int getCurrentId() { return current_mesh_index; }
+  int getCurrentId() const { return current_mesh_index; }
 };
 
 #endif

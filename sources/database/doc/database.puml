@@ -64,9 +64,9 @@ class INodeDatabase{
     + INodeDatabase(controller::ProgressStatus*)
     + void clean()
     + void purge()
-    + INode* get(int) const
+    + NodeInterface* get(int) const
     + bool remove(int)
-    + bool remove(const INode*)
+    + bool remove(const NodeInterface*)
     + bool contains(int)
 }
 

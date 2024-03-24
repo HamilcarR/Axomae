@@ -8,7 +8,7 @@ void INodeDatabase::clean() {
   std::vector<int> to_delete;
   for (auto &A : database_map) {
     if (!A.second.isPersistent()) {
-      A.second.get()->clean();
+      A.second.get()->reset();
       to_delete.push_back(A.first);
     }
   }
@@ -20,11 +20,11 @@ void INodeDatabase::clean() {
 void INodeDatabase::purge() {
   Mutex::Lock lock(mutex);
   for (auto &A : database_map)
-    A.second.get()->clean();
+    A.second.get()->reset();
   database_map.clear();
 }
 
-INode *INodeDatabase::get(const int id) const {
+NodeInterface *INodeDatabase::get(const int id) const {
   Mutex::Lock lock(mutex);
   auto it = database_map.find(id);
   return it == database_map.end() ? nullptr : it->second.get();
@@ -34,17 +34,17 @@ bool INodeDatabase::remove(const int id) {
   Mutex::Lock lock(mutex);
   auto it = database_map.find(id);
   if (it != database_map.end()) {
-    it->second.get()->clean();
+    it->second.get()->reset();
     database_map.erase(it);
     return true;
   }
   return false;
 }
-bool INodeDatabase::remove(const INode *element) {
+bool INodeDatabase::remove(const NodeInterface *element) {
   Mutex::Lock lock(mutex);
   for (auto &A : database_map) {
     if (element == A.second.get()) {
-      A.second.get()->clean();
+      A.second.get()->reset();
       database_map.erase(A.first);
       return true;
     }
@@ -54,7 +54,7 @@ bool INodeDatabase::remove(const INode *element) {
 
 bool INodeDatabase::contains(const int id) const { return database_map.find(id) != database_map.end(); }
 
-database::Result<int, INode> INodeDatabase::contains(const INode *element_address) const {
+database::Result<int, NodeInterface> INodeDatabase::contains(const NodeInterface *element_address) const {
   Mutex::Lock lock(mutex);
   for (const auto &A : database_map) {
     if (A.second.get() == element_address)
