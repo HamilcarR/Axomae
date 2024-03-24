@@ -30,7 +30,7 @@ class NodeBuilder {
    */
   template<class NodeType, class... Args>
   static std::unique_ptr<NodeType> build(Args &&...args) {
-    ASSERT_SUBTYPE(INode, NodeType);
+    ASSERT_SUBTYPE(NodeInterface, NodeType);
     return std::make_unique<PRVINTERFACE<NodeType, Args...>>(std::forward<Args>(args)...);
   }
 };

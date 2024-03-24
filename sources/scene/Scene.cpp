@@ -162,7 +162,7 @@ void Scene::drawBoundingBoxes() {
   }
 }
 
-std::vector<INode *> Scene::getNodeByName(const std::string &name) { return scene_tree.findByName(name); }
+std::vector<NodeInterface *> Scene::getNodeByName(const std::string &name) { return scene_tree.findByName(name); }
 
 void Scene::setPolygonWireframe() {
   for (auto A : scene) {

@@ -1,49 +1,9 @@
 #include "Node.h"
 #include <algorithm>
 
-bool INode::isLeaf() const { return children.empty(); }
-
-bool INode::isRoot() const {
-  if (parents.empty())
-    return true;
-  else {
-    for (INode *A : parents)
-      if (A != nullptr)
-        return false;
-    return true;
-  }
-}
-
-void INode::emptyParents() { parents.clear(); }
-
-void INode::emptyChildren() { children.clear(); }
-
-void INode::clean() {
-  mark = false;
-  updated = false;
-  name = "";
-  emptyChildren();
-  emptyParents();
-  owner = nullptr;
-  flag = EMPTY;
-}
-
-/**************************************************************************************************************************************/
-
-void ISceneNode::resetLocalModelMatrix() { local_transformation = glm::mat4(1.f); }
-
-void ISceneNode::resetAccumulatedMatrix() { accumulated_transformation = glm::mat4(1.f); }
-
-void ISceneNode::clean() {
-  INode::clean();
-  resetLocalModelMatrix();
-  resetAccumulatedMatrix();
-}
-/**************************************************************************************************************************************/
-
-SceneTreeNode::SceneTreeNode(ISceneNode *_parent, ISceneHierarchy *_owner) {
+SceneTreeNode::SceneTreeNode(SceneTreeNode *_parent, AbstractHierarchy *_owner) {
   if (_parent != nullptr) {
-    std::vector<INode *> ret = {_parent};
+    std::vector<NodeInterface *> ret = {_parent};
     setParents(ret);
   }
   setHierarchyOwner(_owner);
@@ -53,30 +13,50 @@ SceneTreeNode::SceneTreeNode(ISceneNode *_parent, ISceneHierarchy *_owner) {
   updated = true;
 }
 
-SceneTreeNode::SceneTreeNode(const std::string &_name, const glm::mat4 &transformation, ISceneNode *parent, ISceneHierarchy *owner)
+SceneTreeNode::SceneTreeNode(const std::string &_name, const glm::mat4 &transformation, SceneTreeNode *parent, AbstractHierarchy *owner)
     : SceneTreeNode(parent, owner) {
   name = _name;
   local_transformation = transformation;
 }
 
-SceneTreeNode::SceneTreeNode(const SceneTreeNode &copy) {
-  local_transformation = copy.getLocalModelMatrix();
-  parents.clear();
-  children.clear();
-  parents.push_back(copy.getParents()[0]);
-  for (auto const &A : copy.getChildren()) {
-    children.push_back(A);
+bool SceneTreeNode::isLeaf() const { return children.empty(); }
+
+bool SceneTreeNode::isRoot() const {
+  if (parents.empty())
+    return true;
+  else {
+    for (NodeInterface *A : parents)
+      if (A != nullptr)
+        return false;
+    return true;
   }
-  setHierarchyOwner(copy.getHierarchyOwner());
 }
+
+void SceneTreeNode::emptyParents() { parents.clear(); }
+
+void SceneTreeNode::emptyChildren() { children.clear(); }
+
+void SceneTreeNode::reset() {
+  mark = false;
+  updated = false;
+  name = "";
+  emptyChildren();
+  emptyParents();
+  owner = nullptr;
+  resetLocalModelMatrix();
+  resetAccumulatedMatrix();
+}
+
+void SceneTreeNode::resetLocalModelMatrix() { local_transformation = glm::mat4(1.f); }
+
+void SceneTreeNode::resetAccumulatedMatrix() { accumulated_transformation = glm::mat4(1.f); }
 
 /**
  * The function returns the root node of a scene tree by traversing up the parent nodes until the root
  * is reached.
- *
  * @return a pointer to a SceneNodeInterface object, specifically the root node of the scene tree.
  */
-ISceneNode *SceneTreeNode::returnRoot() {
+NodeInterface *SceneTreeNode::returnRoot() {
   parents.erase(std::remove(parents.begin(), parents.end(), nullptr), parents.end());
   SceneTreeNode *iterator = getParent();
   if (iterator == nullptr)
@@ -89,7 +69,6 @@ ISceneNode *SceneTreeNode::returnRoot() {
 /**
  * The function computes the final transformation matrix for a scene tree node by multiplying the
  * accumulated transformation matrix with the local transformation matrix.
- *
  * @return a glm::mat4, which is a 4x4 matrix representing a transformation.
  */
 glm::mat4 SceneTreeNode::computeFinalTransformation() {
@@ -99,19 +78,7 @@ glm::mat4 SceneTreeNode::computeFinalTransformation() {
     return accumulated_transformation * local_transformation;
 }
 
-SceneTreeNode &SceneTreeNode::operator=(const SceneTreeNode &copy) {
-  if (this != &copy) {
-    local_transformation = copy.getLocalModelMatrix();
-    parents.clear();
-    children.clear();
-    parents.push_back(copy.getParent());
-    for (auto const &A : copy.getChildren())
-      children.push_back(A);
-  }
-  return *this;
-}
-
-void SceneTreeNode::setParents(std::vector<INode *> &nodes) {
+void SceneTreeNode::setParents(std::vector<NodeInterface *> &nodes) {
   if (!nodes.empty()) {
     parents.clear();
     parents.push_back(nodes[0]);
@@ -120,30 +87,27 @@ void SceneTreeNode::setParents(std::vector<INode *> &nodes) {
   }
 }
 
-void SceneTreeNode::setParent(INode *node) {
+void SceneTreeNode::setParent(NodeInterface *node) {
   if (node != nullptr) {
-    std::vector<INode *> ret = {node};
+    std::vector<NodeInterface *> ret = {node};
     setParents(ret);
   }
 }
 
 SceneTreeNode *SceneTreeNode::getParent() const {
   if (!parents.empty())
-    return static_cast<SceneTreeNode *>(parents[0]);
+    return dynamic_cast<SceneTreeNode *>(parents[0]);
   else
     return nullptr;
 }
 
-void SceneTreeNode::addChildNode(INode *node) {
+void SceneTreeNode::addChildNode(NodeInterface *node) {
   if (node) {
     bool contains = std::find(children.begin(), children.end(), node) != children.end();
     if (!contains) {
       children.push_back(node);
-      std::vector<INode *> ret = {this};
+      std::vector<NodeInterface *> ret = {this};
       node->setParents(ret);
     }
   }
 }
-
-void SceneTreeNode::clean() { ISceneNode::clean(); }
-/**************************************************************************************************************************************/

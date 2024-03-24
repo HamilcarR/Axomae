@@ -144,7 +144,7 @@ class Scene {
    * @param name String the method should look for in the scene tree.
    * @return SceneNodeInterface* Node having the name "name" or nullptr.
    */
-  std::vector<INode *> getNodeByName(const std::string &name);
+  std::vector<NodeInterface *> getNodeByName(const std::string &name);
 
   /**
    * @brief
