@@ -20,6 +20,7 @@ Renderer::Renderer()
   default_dir_light.name = "Default-DirectionalLight";
   auto query = database::node::store<DirectionalLight>(*resource_database->getNodeDatabase(), true, default_dir_light);
   light_database.addLight(query.id);
+  camera_framebuffer = std::make_unique<CameraFrameBuffer>(*resource_database, &screen_size, &default_framebuffer_id);
 }
 
 Renderer::Renderer(Renderer &&move) noexcept {
@@ -92,7 +93,6 @@ void Renderer::initialize(ApplicationConfig *app_conf) {
   /*Initialize a reusable lut texture*/
   scene->initialize();
   envmap_manager->initializeDefaultEnvmap(app_conf);
-  camera_framebuffer = std::make_unique<CameraFrameBuffer>(*resource_database, &screen_size, &default_framebuffer_id);
   camera_framebuffer->initializeFrameBuffer();
 }
 
@@ -126,9 +126,11 @@ void Renderer::draw() {
   errorCheck(__FILE__, __LINE__);
 }
 
-void Renderer::set_new_scene(std::pair<std::vector<Mesh *>, SceneTree> &new_scene) {
+void Renderer::setNewScene(const SceneChangeData &new_scene) {
+  AX_ASSERT(new_scene.scene, "");
+  AX_ASSERT(camera_framebuffer, "Screen Framebuffer is not set.");
   scene->clear();
-  scene->setScene(new_scene);
+  scene->setScene(*new_scene.scene, new_scene.mesh_list);
   scene->switchEnvmap(envmap_manager->currentCubemapId(),
                       envmap_manager->currentIrradianceId(),
                       envmap_manager->currentPrefilterId(),
@@ -217,4 +219,9 @@ void Renderer::displayBoundingBoxes(bool display) {
   if (scene) {
     scene->displayBoundingBoxes(display);
   }
+}
+void Renderer::setViewerWidget(GLViewer *widget) {
+  gl_widget = widget;
+  if (render_pipeline)
+    render_pipeline->setContextSwitcher(gl_widget);
 }

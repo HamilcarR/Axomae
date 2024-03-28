@@ -3,11 +3,19 @@
 #include "RendererEnums.h"
 
 class Scene;
+class SceneTree;
 class RenderPipeline;
 class ApplicationConfig;
+class Mesh;
+class GLViewer;
 namespace controller::event {
   class Event;
 }
+
+struct SceneChangeData {
+  SceneTree *scene;
+  std::vector<Mesh *> mesh_list;
+};
 
 class RendererInterface {
  public:
@@ -24,9 +32,15 @@ class RendererInterface {
   virtual void processEvent(const controller::event::Event *event) const = 0;
   virtual void onResize(unsigned int width, unsigned int height) = 0;
   virtual void setDefaultFrameBufferId(unsigned id) = 0;
+  /**
+   * @brief Cleans up the former scene and replaces it with a new one.
+   */
+  virtual void setNewScene(const SceneChangeData &new_scene) = 0;
   [[nodiscard]] virtual unsigned int *getDefaultFrameBufferIdPointer() = 0;
   [[nodiscard]] virtual RenderPipeline &getRenderPipeline() const = 0;
   [[nodiscard]] virtual Scene &getScene() const = 0;
+
+  virtual void setViewerWidget(GLViewer *widget) = 0;
 };
 
 class IRenderer : public RendererInterface {

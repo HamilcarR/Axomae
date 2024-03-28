@@ -29,7 +29,9 @@ namespace controller {
   };
 
   // TODO: [AX-52] Fix memory leak at normal map generation when sliding the factor scale
-  /*To be refractored*/
+
+  /*To be refactored*/
+  /***************************************************************************************************************************************************************************************/
   /*structure to keep track of pointers to destroy*/
   class HeapManagement {
    public:
@@ -203,8 +205,6 @@ namespace controller {
     }
   }  // namespace image_session_pointers
 
-  /**************************************************************************************************************/
-
   HeapManagement *Controller::_MemManagement = new HeapManagement;
 
   static void init_image_session_ptr() {
@@ -215,6 +215,7 @@ namespace controller {
     image_session_pointers::dudv = nullptr;
   }
 
+  /***************************************************************************************************************************************************************************************/
   Controller::Controller(QWidget *parent) : QMainWindow(parent), resource_database(ResourceDatabaseManager::getInstance()) {
 
     /*Initialize databases*/
@@ -694,7 +695,8 @@ namespace controller {
       IO::Loader loader(progress_manager.get());
       auto struct_holder = loader.load(filename.toStdString().c_str());
       std::vector<Mesh *> scene = struct_holder.first;
-      realtime_viewer->setNewScene(struct_holder);
+      SceneChangeData scene_data = {&struct_holder.second, struct_holder.first};
+      realtime_viewer->setNewScene(scene_data);
       uv_mesh_selector.setScene(scene);
       main_window_ui.meshes_list->setList(scene);
       SceneTree &scene_hierarchy = realtime_viewer->getRenderer().getScene().getSceneTreeRef();

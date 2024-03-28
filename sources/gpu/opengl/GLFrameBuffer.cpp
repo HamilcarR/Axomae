@@ -41,7 +41,7 @@ void GLFrameBuffer::initializeBuffers() {
 
 bool GLFrameBuffer::isReady() const { return framebuffer_id != 0; }
 
-void GLFrameBuffer::fillBuffers() {}
+void GLFrameBuffer::fillBuffers() { EMPTY_FUNCBODY; }
 
 void GLFrameBuffer::bind() { glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id); }
 

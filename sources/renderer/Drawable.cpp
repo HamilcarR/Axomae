@@ -5,14 +5,12 @@ using namespace axomae;
 Drawable::Drawable() : mesh_object(nullptr), camera_pointer(nullptr) {}
 
 Drawable::Drawable(Mesh *mesh) {
-  assert(mesh != nullptr);
-  if (mesh != nullptr) {
-    mesh_object = mesh;
-    camera_pointer = nullptr;
-    gl_buffers.setGeometryPointer(&mesh_object->getGeometry());
-    if (!initialize())
-      LOG("A problem prevented mesh initialization!", LogLevel::ERROR);
-  }
+  AX_ASSERT(mesh != nullptr, "");
+  mesh_object = mesh;
+  camera_pointer = nullptr;
+  gl_buffers.setGeometryPointer(&mesh_object->getGeometry());
+  if (!initialize())
+    LOG("A problem prevented mesh initialization!", LogLevel::ERROR);
 }
 
 void Drawable::clean() { gl_buffers.clean(); }

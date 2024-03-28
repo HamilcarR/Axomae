@@ -111,6 +111,6 @@ void IFrameBuffer::initializeFrameBufferTexture(GLFrameBuffer::INTERNAL_FORMAT c
                                                 unsigned int mipmaps) {
 
   unsigned int texture_id = setUpEmptyTexture<TEXTYPE>(width, height, persistence, internal_format, data_format, data_type, mipmaps);
-  fbo_attachment_texture_collection[color_attachment] = texture_database->get(texture_id);
+  fbo_attachment_texture_collection[color_attachment] = texture_database->get((int)texture_id);
 }
 #endif

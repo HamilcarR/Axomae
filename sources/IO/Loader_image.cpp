@@ -37,10 +37,11 @@ namespace IO {
 
   image::ImageHolder<float> Loader::loadHdr(const char *path, bool store) {
     controller::ProgressManagerHelper helper(this);
-    helper.notifyProgress(controller::ProgressManagerHelper::ZERO);
+
     int width = -1, height = -1, channels = -1;
     float *data = stbi_loadf(path, &width, &height, &channels, 0);
-    initProgress("Importing environment map", width * height * channels);
+    initProgress("Importing environment map", (float)(width * height * channels));
+    helper.notifyProgress(controller::ProgressManagerHelper::ONE_FOURTH);
     if (!data)
       throw exception::LoadImagePathException(path);
     AX_ASSERT(width > 0 && height > 0, "Wrong size \"width\" or \"height\" for imported HDR image.");
@@ -67,7 +68,7 @@ namespace IO {
       database::image::store<float>(*hdr_database, false, image_data, metadata);
     }
     stbi_image_free(data);
-    helper.notifyProgress(controller::ProgressManagerHelper::COMPLETE);
+    helper.reset();
     return image::ImageHolder<float>(image_data, metadata);
   }
 

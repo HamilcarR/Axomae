@@ -23,6 +23,7 @@ namespace database {
     Storage &operator=(const Storage &) = delete;
     Storage(Storage &&assign) noexcept;
     Storage &operator=(Storage &&assign) noexcept;
+    virtual ~Storage() = default;
     bool operator==(const Storage &compare);
     T *get() const;
     void setId(U id_);

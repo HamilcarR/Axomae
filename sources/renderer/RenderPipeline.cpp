@@ -165,7 +165,7 @@ int RenderPipeline::generateBRDFLookupTexture(unsigned int width, unsigned int h
   Dim2 camera_dim{1, 1};
   FreePerspectiveCamera camera(FOV, &camera_dim, NEAR, FAR);
   Dim2 tex_dim{width, height};
-  RenderQuadFBO &&quad_fbo = constructQuadFbo<BRDFLookupTexture>(
+  RenderQuadFBO quad_fbo = constructQuadFbo<BRDFLookupTexture>(
       &tex_dim, false, GLFrameBuffer::COLOR0, Texture::RGB16F, Texture::RG, Texture::FLOAT, brdf_lut_shader);
   Drawable quad_drawable = constructQuad(brdf_lut_shader, &camera);
   Dim2 original_dim = default_dim_;

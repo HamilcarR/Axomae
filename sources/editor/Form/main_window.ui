@@ -2360,7 +2360,18 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
              </attribute>
              <layout class="QGridLayout" name="gridLayout_30">
               <item row="0" column="0">
-               <layout class="QGridLayout" name="gridLayout_29"/>
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <item>
+                 <widget class="NovaViewerWidget" name="nova_viewer" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -2526,6 +2537,12 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
    <class>TextureViewerWidget</class>
    <extends>QWidget</extends>
    <header>TextureViewerWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>NovaViewerWidget</class>
+   <extends>QWidget</extends>
+   <header>NovaViewerWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

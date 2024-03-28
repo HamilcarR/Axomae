@@ -3,6 +3,7 @@ add_library(ax_renderer
         light/LightingSystem.cpp
         Renderer.cpp
         RenderPipeline.cpp
+        NovaRenderer.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_renderer)

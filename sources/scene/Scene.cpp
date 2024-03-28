@@ -28,18 +28,23 @@ void Scene::initialize() { scene_skybox->setShader(resource_manager.getShaderDat
 
 inline void setUpIblData(TextureDatabase &texture_database, Mesh *mesh) {}
 
-void Scene::setScene(std::pair<std::vector<Mesh *>, SceneTree> &to_copy) {
-  to_copy.second.pushNewRoot(scene_skybox);
-  scene_tree = to_copy.second;
-  to_copy.first.push_back(scene_skybox);
-  for (Mesh *A : to_copy.first) {
-    Scene::AABB mesh;
+static void make_drawable(std::vector<std::unique_ptr<Drawable>> &scene_drawables, std::vector<Scene::AABB> &bounding_boxes, Mesh *A) {
+  Scene::AABB bbox_mesh;
+  auto drawable = std::make_unique<Drawable>(A);
+  bbox_mesh.aabb = BoundingBox(A->getGeometry().vertices);
+  bbox_mesh.drawable = drawable.get();
+  bounding_boxes.push_back(bbox_mesh);
+  scene_drawables.push_back(std::move(drawable));
+}
+
+void Scene::setScene(const SceneTree &tree, const std::vector<Mesh *> &mesh_list) {
+  scene_tree = tree;
+  scene_tree.pushNewRoot(scene_skybox);
+  scene_skybox->setCubemapPointer(scene_skybox);
+  make_drawable(drawable_collection, scene, scene_skybox);
+  for (Mesh *A : mesh_list) {
     A->setCubemapPointer(scene_skybox);
-    auto drawable = std::make_unique<Drawable>(A);
-    mesh.aabb = BoundingBox(A->getGeometry().vertices);
-    mesh.drawable = drawable.get();
-    scene.push_back(mesh);
-    drawable_collection.push_back(std::move(drawable));
+    make_drawable(drawable_collection, scene, A);
   }
 }
 

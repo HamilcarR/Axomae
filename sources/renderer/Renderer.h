@@ -60,11 +60,8 @@ class Renderer final : public IRenderer {
    * @brief Method setting up the meshes , and the scene camera
    */
   bool prep_draw() override;
-  /**
-   * @brief Cleans up the former scene and replaces it with a new
-   * @param new_scene New scene to be rendererd
-   */
-  void set_new_scene(std::pair<std::vector<Mesh *>, SceneTree> &new_scene);
+
+  void setNewScene(const SceneChangeData &new_scene) override;
   /**
    * @brief Checks if all Drawable objects in the scene have been initialized
    */
@@ -89,6 +86,7 @@ class Renderer final : public IRenderer {
   void setRasterizerFill() override;
   void setRasterizerWireframe() override;
   void displayBoundingBoxes(bool display) override;
+  void setViewerWidget(GLViewer *widget) override;
 };
 
 #endif

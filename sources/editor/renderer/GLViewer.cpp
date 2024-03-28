@@ -10,8 +10,7 @@
 
 using namespace axomae;
 using EventManager = controller::event::Event;
-
-GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent) {
+static QSurfaceFormat setupFormat() {
   QSurfaceFormat format;
   format.setRenderableType(QSurfaceFormat::OpenGL);
   format.setVersion(4, 6);
@@ -22,8 +21,20 @@ GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent) {
   format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
   format.setAlphaBufferSize(8);
   format.setSwapInterval(1);
-  setFormat(format);
+  return format;
+}
+
+GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent) {
+  setFormat(setupFormat());
   renderer = std::make_unique<Renderer>(width(), height(), this);
+  widget_input_events = std::make_unique<EventManager>();
+  glew_initialized = false;
+}
+
+GLViewer::GLViewer(std::unique_ptr<IRenderer> &r, QWidget *parent) : QOpenGLWidget(parent) {
+  setFormat(setupFormat());
+  renderer = std::move(r);
+  renderer->setViewerWidget(this);
   widget_input_events = std::make_unique<EventManager>();
   glew_initialized = false;
 }
@@ -69,7 +80,7 @@ void GLViewer::initializeGL() {
         glEnable(GL_DEBUG_OUTPUT);
         glDebugMessageCallback(glDebugCallback, nullptr);
       } else {
-        LOG("Debug output extension not supported\n", LogLevel::WARNING);
+        LOG("Debug output extension not supported.\n", LogLevel::WARNING);
       }
 #endif
     }
@@ -162,10 +173,10 @@ void GLViewer::mouseReleaseEvent(QMouseEvent *event) {
 
 void GLViewer::mouseDoubleClickEvent(QMouseEvent *event) { QOpenGLWidget::mouseDoubleClickEvent(event); }
 
-void GLViewer::setNewScene(std::pair<std::vector<Mesh *>, SceneTree> &new_scene) {
+void GLViewer::setNewScene(const SceneChangeData &new_scene) {
   makeCurrent();
-  Renderer *r = dynamic_cast<Renderer *>(renderer.get());
-  r->set_new_scene(new_scene);
+  auto *r = dynamic_cast<Renderer *>(renderer.get());
+  r->setNewScene(new_scene);
   doneCurrent();
 }
 

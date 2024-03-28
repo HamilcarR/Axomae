@@ -24,7 +24,7 @@ class RenderPipeline : public controller::IProgressManager {
 
  public:
   explicit RenderPipeline(unsigned int *default_framebuffer_id, GLViewer *context, ResourceDatabaseManager *resource_database = nullptr);
-
+  void setContextSwitcher(GLViewer *ctx) { context = ctx; }
   /**
    * @brief bake an Environment map into a cubemap.
    * A new cubemap texture will be created , and stored in the texture database.

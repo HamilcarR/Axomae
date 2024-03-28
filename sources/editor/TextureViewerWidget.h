@@ -38,6 +38,10 @@ class TextureViewerWidget : public QWidget {
  public:
   explicit TextureViewerWidget(QWidget *parent = nullptr);
   ~TextureViewerWidget() override;
+  TextureViewerWidget(const TextureViewerWidget &copy) = delete;
+  TextureViewerWidget(TextureViewerWidget &&move) noexcept = delete;
+  TextureViewerWidget &operator=(const TextureViewerWidget &copy) = delete;
+  TextureViewerWidget &operator=(TextureViewerWidget &&move) noexcept = delete;
   void resizeEvent(QResizeEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
   void display(const std::vector<uint8_t> &image, int width, int height, int channels);

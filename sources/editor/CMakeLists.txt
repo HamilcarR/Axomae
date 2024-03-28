@@ -7,6 +7,7 @@ add_library(ax_editor
         image/Thumbnail.cpp
         UV/MeshListView.cpp
         UV/SceneSelector.cpp
+        nova/NovaViewerWidget.cpp
 
 )
 
@@ -49,6 +50,7 @@ PUBLIC
     image
     renderer
     UV
+    nova
 INTERFACE
     ${AUTOGEN_INCLUDE_DIR}
 

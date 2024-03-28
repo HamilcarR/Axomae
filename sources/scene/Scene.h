@@ -43,7 +43,7 @@ class Scene {
 
  public:
   explicit Scene(ResourceDatabaseManager &manager);
-  void setScene(std::pair<std::vector<Mesh *>, SceneTree> &to_copy);
+  void setScene(const SceneTree &scene_tree, const std::vector<Mesh *> &mesh_list);
   virtual std::vector<Drawable *> getOpaqueElements() const;
   void initialize();
 

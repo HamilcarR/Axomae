@@ -33,12 +33,12 @@ class CameraFrameBuffer : public IFrameBuffer {
    * @brief Initializes the textures used by the framebuffer , the shader , and creates the quad mesh that the
    * framebuffer will draw on
    */
-  virtual void initializeFrameBuffer() override;
+  void initializeFrameBuffer() override;
   /**
    * @brief Send the uniforms used by the post processing effects , like gamma and exposure , and sets up the mesh used
    */
   virtual void startDraw();
-  virtual void clean() override;
+  void clean() override;
   virtual void updateFrameBufferShader();
   void setGamma(float value) { gamma = value; }
   void setExposure(float value) { exposure = value; }
