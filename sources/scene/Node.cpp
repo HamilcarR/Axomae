@@ -4,9 +4,9 @@
 SceneTreeNode::SceneTreeNode(SceneTreeNode *_parent, AbstractHierarchy *_owner) {
   if (_parent != nullptr) {
     std::vector<NodeInterface *> ret = {_parent};
-    setParents(ret);
+    SceneTreeNode::setParents(ret);
   }
-  setHierarchyOwner(_owner);
+  SceneTreeNode::setHierarchyOwner(_owner);
   local_transformation = accumulated_transformation = glm::mat4(1.f);
   mark = false;
   name = "Generic-Hierarchy-Node";

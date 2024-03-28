@@ -68,7 +68,7 @@ std::vector<Drawable *> Scene::getOpaqueElements() const {
 std::vector<Drawable *> Scene::getSortedSceneByTransparency() {
   std::vector<Drawable *> to_return;
   sorted_transparent_meshes.clear();
-  for (auto aabb : scene) {
+  for (const AABB &aabb : scene) {
     Drawable *A = aabb.drawable;
     GLMaterial *mat = A->getMaterialPointer();
     if (!mat->isTransparent())
@@ -80,7 +80,7 @@ std::vector<Drawable *> Scene::getSortedSceneByTransparency() {
       sorted_transparent_meshes[dist_to_camera] = A;
     }
   }
-  for (std::map<float, Drawable *>::reverse_iterator it = sorted_transparent_meshes.rbegin(); it != sorted_transparent_meshes.rend(); it++)
+  for (auto it = sorted_transparent_meshes.rbegin(); it != sorted_transparent_meshes.rend(); it++)
     to_return.push_back(it->second);
   return to_return;
 }
@@ -101,7 +101,7 @@ std::vector<Drawable *> Scene::getSortedTransparentElements() {
   std::vector<Drawable *> transparent_meshes;
   sorted_transparent_meshes.clear();
   sortTransparentElements();
-  for (std::map<float, Drawable *>::reverse_iterator it = sorted_transparent_meshes.rbegin(); it != sorted_transparent_meshes.rend(); it++)
+  for (auto it = sorted_transparent_meshes.rbegin(); it != sorted_transparent_meshes.rend(); it++)
     transparent_meshes.push_back(it->second);
   return transparent_meshes;
 }
@@ -127,13 +127,13 @@ bool Scene::isReady() {
   return true;
 }
 
-void Scene::prepare_draw(Camera *scene_camera) {
+void Scene::prepare_draw(Camera *_scene_camera) {
   for (auto aabb : scene) {
-    aabb.drawable->setSceneCameraPointer(scene_camera);
+    aabb.drawable->setSceneCameraPointer(_scene_camera);
     aabb.drawable->startDraw();
   }
   for (auto A : bounding_boxes_array) {
-    A->setSceneCameraPointer(scene_camera);
+    A->setSceneCameraPointer(_scene_camera);
     A->startDraw();
   }
 }
@@ -198,7 +198,7 @@ std::vector<Mesh *> Scene::getMeshCollectionPtr() const {
 void Scene::switchEnvmap(int cubemap_id, int irradiance_id, int prefiltered_id, int /*lut_id*/) {
   for (auto &elem : scene) {
     Mesh *mesh = elem.drawable->getMeshPointer();
-    GLMaterial *material = dynamic_cast<GLMaterial *>(mesh->getMaterial());
+    auto *material = dynamic_cast<GLMaterial *>(mesh->getMaterial());
     TextureGroup &texgroup = material->getTextureGroupRef();
     if (mesh != scene_skybox) {
       texgroup.removeTexture(Texture::IRRADIANCE);

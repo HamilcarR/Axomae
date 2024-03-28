@@ -21,8 +21,8 @@ class SceneTreeNode : public SceneNodeInterface, public NodeInterface {
   std::string name;                       /*<Name of the node*/
   std::vector<NodeInterface *> parents;   /*<List of parents*/
   std::vector<NodeInterface *> children;  /*<List of children*/
-  AbstractHierarchy *owner;               /*<Structure owning this hierarchy*/
-  int flag;                               /*<Flag indicate what operations need to be done on this node*/
+  AbstractHierarchy *owner{};             /*<Structure owning this hierarchy*/
+  int flag{};                             /*<Flag indicate what operations need to be done on this node*/
   glm::mat4 local_transformation{};       /*<Local transformation of the node*/
   glm::mat4 accumulated_transformation{}; /*<Matrix equal to all ancestors transformations*/
 
