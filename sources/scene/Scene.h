@@ -104,7 +104,6 @@ class Scene {
  private:
   /**
    * @brief Sort transparent elements by distance and store their position in sorted_transparent_meshes
-   *
    */
   void sortTransparentElements();
 };
