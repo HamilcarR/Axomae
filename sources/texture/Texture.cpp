@@ -25,7 +25,6 @@ static std::map<Texture::TYPE, const char *> texture_type_c_str = {{Texture::DIF
 
 /**
  * The function sets the data of a dummy texture to a solid black color.
- *
  * @param dummy The parameter "dummy" is a pointer to a struct of type "TextureData". The function sets
  * the width, height, and data of the TextureData struct pointed to by "dummy" to create a dummy
  * texture with a solid black color.
@@ -45,7 +44,6 @@ static void set_dummy_TextureData(Texture *set_texture) {
 /**
  * The function sets the width, height, and data of a dummy texture with a constant blue color ,
  * indicating a uniform vector (0 , 0 , 1) representing the normal.
- *
  * @param dummy A pointer to a TextureData struct that will be filled with one only pixel having the value (128 , 128 ,
  * 255).
  */
@@ -73,7 +71,7 @@ Texture::Texture() {
 
 Texture::Texture(TextureData *tex) : Texture() {
   if (tex != nullptr)
-    set(tex);
+    Texture::set(tex);
 }
 
 void Texture::set(TextureData *texture) {
@@ -426,7 +424,7 @@ const char *Generic2DTexture::getTextureTypeCStr() { return location_name.c_str(
 
 void Generic2DTexture::setTextureUnit(unsigned int tex_unit) { texture_unit = tex_unit; }
 
-void Generic2DTexture::setLocationName(std::string _name) { location_name = _name; }
+void Generic2DTexture::setLocationName(const std::string &_name) { location_name = _name; }
 
 /****************************************************************************************************************************/
 CubemapTexture::CubemapTexture(FORMAT _internal_format, FORMAT _data_format, FORMAT _data_type, unsigned _width, unsigned _height)
