@@ -1,8 +1,13 @@
 #ifndef HierarchyInterface_H
 #define HierarchyInterface_H
 #include "NodeInterface.h"
+#include <queue>
 #include <string>
 #include <vector>
+
+/**
+ *@file HierarchyInterface.h
+ */
 
 template<class T, class U>
 class IResourceDB;
@@ -121,35 +126,41 @@ void AbstractHierarchy::bfs(NodeInterface *begin, F func, Args &&...args) {
     bfsTraverse(iterator, func, std::forward<Args>(args)...);
   }
 }
-
+#include <iostream>
 template<class F, class... Args>
 void AbstractHierarchy::bfsTraverse(NodeInterface *node, F func, Args &&...args) {
-  if (node != nullptr) {
-    if (node->isRoot())
-      func(node, std::forward<Args>(args)...);
-    for (NodeInterface *child : node->getChildren())
-      func(child, std::forward<Args>(args)...);
-    for (NodeInterface *child : node->getChildren())
-      bfsTraverse(child, func, std::forward<Args>(args)...);
+  if (!node)
+    return;
+  std::queue<NodeInterface *> queue;
+  queue.push(node);
+  while (!queue.empty()) {
+    NodeInterface *node_processed = queue.front();
+    queue.pop();
+    func(node_processed, std::forward<Args>(args)...);
+    for (NodeInterface *child : node_processed->getChildren())
+      queue.push(child);
   }
 }
 
 template<class F, class... Args>
 void AbstractHierarchy::bfsConst(const NodeInterface *begin, F func, Args &&...args) const {
   if ((const_iterator = begin) != nullptr) {
-    bfsTraverse(const_iterator, func, std::forward<Args>(args)...);
+    bfsConstTraverse(const_iterator, func, std::forward<Args>(args)...);
   }
 }
 
 template<class F, class... Args>
 void AbstractHierarchy::bfsConstTraverse(const NodeInterface *node, F func, Args &&...args) const {
-  if (node != nullptr) {
-    if (node->isRoot())
-      func(node, std::forward<Args>(args)...);
-    for (NodeInterface *child : node->getChildren())
-      func(child, std::forward<Args>(args)...);
-    for (NodeInterface *child : node->getChildren())
-      bfsTraverse(child, func, std::forward<Args>(args)...);
+  if (!node)
+    return;
+  std::queue<const NodeInterface *> queue;
+  queue.push(node);
+  while (!queue.empty()) {
+    const NodeInterface *node_processed = queue.front();
+    queue.pop();
+    func(node_processed, std::forward<Args>(args)...);
+    for (const NodeInterface *child : node_processed->getChildren())
+      queue.push(child);
   }
 }
 
