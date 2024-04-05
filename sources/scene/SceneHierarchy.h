@@ -27,7 +27,7 @@ class SceneTree : public AbstractHierarchy {
    * @brief Traverse the scene structure upwards, and recomputes all accum transformations
    */
   virtual void updateAccumulatedTransformations();
-  virtual void pushNewRoot(NodeInterface *new_root);
+  virtual void pushNewRoot(SceneTreeNode *new_root);
   std::vector<NodeInterface *> findByName(const std::string &name) override;
 };
 

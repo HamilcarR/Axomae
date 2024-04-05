@@ -108,7 +108,7 @@ void GLMaterial::disableBlend() { glDisable(GL_BLEND); }
 
 void GLMaterial::setBlendFunc(BLENDFUNC source_factor, BLENDFUNC dest_factor) { glBlendFunc(source_factor, dest_factor); }
 
-math::geometry::Vect2D GLMaterial::getRefractiveIndex() const {
-  math::geometry::Vect2D ret{refractive_index.x, refractive_index.y};
+Vec2f GLMaterial::getRefractiveIndex() const {
+  Vec2f ret{refractive_index.x, refractive_index.y};
   return ret;
 }

@@ -1,7 +1,7 @@
 #ifndef RendererInterface_H
 #define RendererInterface_H
+#include "EventInterface.h"
 #include "RendererEnums.h"
-
 class Scene;
 class SceneTree;
 class RenderPipeline;
@@ -17,19 +17,15 @@ struct SceneChangeData {
   std::vector<Mesh *> mesh_list;
 };
 
-class RendererInterface {
+class RendererInterface : public EventInterface {
  public:
-  virtual ~RendererInterface() = default;
+  ~RendererInterface() override = default;
   virtual void initialize(ApplicationConfig *app_conf) = 0;
   /**
    * @brief Method setting up the meshes , and the scene camera
    */
   virtual bool prep_draw() = 0;
   virtual void draw() = 0;
-  /**
-   * @brief Process mouse/keyboard events
-   */
-  virtual void processEvent(const controller::event::Event *event) const = 0;
   virtual void onResize(unsigned int width, unsigned int height) = 0;
   virtual void setDefaultFrameBufferId(unsigned id) = 0;
   /**

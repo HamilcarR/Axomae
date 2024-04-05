@@ -38,6 +38,9 @@ class SceneTreeNode : public SceneNodeInterface, public NodeInterface {
   SceneTreeNode &operator=(SceneTreeNode &&move) noexcept = default;
 
  public:
+  /**
+   * Computes the final transformation of the node based on the transformation of it's parent.
+   */
   glm::mat4 computeFinalTransformation() override;
   virtual void setParent(NodeInterface *node);
   [[nodiscard]] virtual SceneTreeNode *getParent() const;

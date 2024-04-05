@@ -66,11 +66,6 @@ NodeInterface *SceneTreeNode::returnRoot() {
   return iterator;
 }
 
-/**
- * The function computes the final transformation matrix for a scene tree node by multiplying the
- * accumulated transformation matrix with the local transformation matrix.
- * @return a glm::mat4, which is a 4x4 matrix representing a transformation.
- */
 glm::mat4 SceneTreeNode::computeFinalTransformation() {
   if (parents.empty() || parents[0] == nullptr)
     return local_transformation;

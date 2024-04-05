@@ -30,7 +30,7 @@ void NovaRenderer::draw() {
   camera_framebuffer->renderFrameBufferMesh();
 }
 
-void NovaRenderer::processEvent(const controller::event::Event *event) const {}
+void NovaRenderer::processEvent(const controller::event::Event *event) {}
 void NovaRenderer::setDefaultFrameBufferId(unsigned int id) {}
 unsigned int *NovaRenderer::getDefaultFrameBufferIdPointer() { return nullptr; }
 Scene &NovaRenderer::getScene() const {}

@@ -2,7 +2,7 @@
 #include "math.h"
 
 #ifdef USE_STATS_TIMER
-  #include "PerformanceLogger.h"
+#  include "PerformanceLogger.h"
 #endif
 constexpr unsigned MAX_ITER_THREAD = 100;
 
@@ -170,13 +170,6 @@ __global__ void gpgpu_functions::irradiance_mapping::gpgpu_device_compute_diffus
     irradiance.y /= total_samples;
     irradiance.z /= total_samples;
     gpgpu_device_write_buffer(D_result_buffer, irradiance, i, j, _width);
-    /*******************************************************
-     *!note : Threads aren't coalesced :
-     *!Divide image by channels. 3 textures = 3 channels.
-     *!Compute each differently using async kernel launch.
-     *!Merge together .
-     *
-     * */
   }
 }
 
@@ -225,17 +218,14 @@ __host__ void gpgpu_functions::irradiance_mapping::gpgpu_kernel_call(
 #endif
 }
 
-
-
-
 void gpgpu_functions::irradiance_mapping::GPU_compute_irradiance(float *src_texture,
-                            unsigned src_texture_width,
-                            unsigned src_texture_height,
-                            unsigned channels,
-                            float **dest_texture,
-                            unsigned dest_texture_width,
-                            unsigned dest_texture_height,
-                            unsigned samples) {
+                                                                 unsigned src_texture_width,
+                                                                 unsigned src_texture_height,
+                                                                 unsigned channels,
+                                                                 float **dest_texture,
+                                                                 unsigned dest_texture_width,
+                                                                 unsigned dest_texture_height,
+                                                                 unsigned samples) {
   cudaResourceDesc resource_descriptor;
   std::memset(&resource_descriptor, 0, sizeof(resource_descriptor));
   cudaTextureDesc texture_descriptor;

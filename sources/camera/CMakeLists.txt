@@ -6,9 +6,9 @@ PUBLIC
         ax_math
         ax_common
         ax_macro
+        ax_event
 PRIVATE
         ax_scene
-        ax_event
         ax_io
 )
 target_include_directories(ax_camera

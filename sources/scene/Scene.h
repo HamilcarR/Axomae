@@ -22,7 +22,7 @@ class LightingDatabase;
 /**
  * @class This class manages all drawable meshes inside the scene and provides methods to sort them by types.
  */
-class Scene {
+class Scene : public EventInterface {
  public:
   struct AABB {
     BoundingBox aabb;
@@ -31,6 +31,7 @@ class Scene {
 
  private:
   std::map<float, Drawable *> sorted_transparent_meshes; /*<Sorted collection of transparent meshes , by distance to the camera*/
+  std::map<float, AABB> sorted_meshes;                   /*<All meshes sorted by distance to the camera*/
   std::vector<AABB> scene;                               /*<Meshes of the scene , and their computed bounding boxes*/
   SceneTree scene_tree;                                  /*<Scene tree containing a hierarchy of transformations*/
   std::vector<Drawable *> bounding_boxes_array;          /*<Array of bounding boxes*/
@@ -100,12 +101,13 @@ class Scene {
   SceneTree &getSceneTreeRef() { return scene_tree; }
   std::vector<Mesh *> getMeshCollectionPtr() const;
   void switchEnvmap(int cubemap_id, int irradiance_id, int prefiltered_id, int lut_id);
+  void processEvent(const controller::event::Event *event) override;
 
  private:
   /**
-   * @brief Sort transparent elements by distance and store their position in sorted_transparent_meshes
+   * @brief Sort meshes by distance to the camera : Will erase sorted_meshes and sorted_transparent_meshes beforehand
    */
-  void sortTransparentElements();
+  void sortMeshesByDistanceToCamera();
 };
 
 #endif

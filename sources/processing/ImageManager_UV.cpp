@@ -47,40 +47,40 @@ inline float bounding_coords(float x, float y, float z, bool min) {
 }
 
 /***************************************************************************************************************/
-inline Vect3D tan_space_transform(Vect3D T, Vect3D BT, Vect3D N, Vect3D I) {
-  Vect3D result = {I.x * BT.x + I.y * BT.y + I.z * BT.z, I.x * T.x + T.y * I.y + T.z * I.z, I.x * N.x + N.y * I.y + I.z * N.z};
+inline Vec3f tan_space_transform(Vec3f T, Vec3f BT, Vec3f N, Vec3f I) {
+  Vec3f result = {I.x * BT.x + I.y * BT.y + I.z * BT.z, I.x * T.x + T.y * I.y + T.z * I.z, I.x * N.x + N.y * I.y + I.z * N.z};
   return result;
 }
 
 /***************************************************************************************************************/
-inline image::Rgb compute_normals_set_pixels_rgb(Vect2D P1,
-                                                 Vect2D P2,
-                                                 Vect2D P3,
-                                                 Vect3D N1,
-                                                 Vect3D N2,
-                                                 Vect3D N3,
-                                                 Vect3D BT1,
-                                                 Vect3D BT2,
-                                                 Vect3D BT3,
-                                                 Vect3D T1,
-                                                 Vect3D T2,
-                                                 Vect3D T3,
+inline image::Rgb compute_normals_set_pixels_rgb(Vec2f P1,
+                                                 Vec2f P2,
+                                                 Vec2f P3,
+                                                 Vec3f N1,
+                                                 Vec3f N2,
+                                                 Vec3f N3,
+                                                 Vec3f BT1,
+                                                 Vec3f BT2,
+                                                 Vec3f BT3,
+                                                 Vec3f T1,
+                                                 Vec3f T2,
+                                                 Vec3f T3,
                                                  int x,
                                                  int y,
                                                  bool tangent_space) {
 
-  Vect2D I = {static_cast<float>(x), static_cast<float>(y)};
-  Vect3D C = math::geometry::barycentric_lerp(P1, P2, P3, I);
+  Vec2f I = {static_cast<float>(x), static_cast<float>(y)};
+  Vec3f C = math::geometry::barycentric_lerp(P1, P2, P3, I);
   if (C.x >= 0 && C.y >= 0 && C.z >= 0) {
-    auto interpolate = [&C](Vect3D N1, Vect3D N2, Vect3D N3) {
-      Vect3D normal = {N1.x * C.x + N2.x * C.y + N3.x * C.z, N1.y * C.x + N2.y * C.y + N3.y * C.z, N1.z * C.x + N2.z * C.y + N3.z * C.z};
+    auto interpolate = [&C](Vec3f N1, Vec3f N2, Vec3f N3) {
+      Vec3f normal = {N1.x * C.x + N2.x * C.y + N3.x * C.z, N1.y * C.x + N2.y * C.y + N3.y * C.z, N1.z * C.x + N2.z * C.y + N3.z * C.z};
       return normal;
     };
     if (tangent_space) {
-      Vect3D normal = interpolate(N1, N2, N3);
-      Vect3D B = {(BT1.x + BT2.x + BT3.x) / 3, (BT1.y + BT2.y + BT3.y) / 3, (BT1.z + BT2.z + BT3.z) / 3};
-      Vect3D T = {(T1.x + T2.x + T3.x) / 3, (T1.y + T2.y + T3.y) / 3, (T1.z + T2.z + T3.z) / 3};
-      Vect3D N = {(N1.x + N2.x + N3.x) / 3, (N1.y + N2.y + N3.y) / 3, (N1.z + N2.z + N3.z) / 3};
+      Vec3f normal = interpolate(N1, N2, N3);
+      Vec3f B = {(BT1.x + BT2.x + BT3.x) / 3, (BT1.y + BT2.y + BT3.y) / 3, (BT1.z + BT2.z + BT3.z) / 3};
+      Vec3f T = {(T1.x + T2.x + T3.x) / 3, (T1.y + T2.y + T3.y) / 3, (T1.z + T2.z + T3.z) / 3};
+      Vec3f N = {(N1.x + N2.x + N3.x) / 3, (N1.y + N2.y + N3.y) / 3, (N1.z + N2.z + N3.z) / 3};
       B.normalize();
       T.normalize();
       N.normalize();
@@ -92,7 +92,7 @@ inline image::Rgb compute_normals_set_pixels_rgb(Vect2D P1,
       N1.normalize();
       N2.normalize();
       N3.normalize();
-      Vect3D normal = interpolate(N1, N2, N3);
+      Vec3f normal = interpolate(N1, N2, N3);
       image::Rgb rgb = image::Rgb((normal.x * 255 + 255) / 2, (normal.y * 255 + 255) / 2, (normal.z * 255 + 255) / 2, 0);
       return rgb;
     }
@@ -135,24 +135,24 @@ std::vector<uint8_t> ImageManager::project_uv_normals(const Object3D &object, in
   for (unsigned int i = 0; i < object.indices.size(); i += 3) {
     const std::vector<unsigned int> &index = object.indices;
     /* texture coordinates of each vertex in a face */
-    Vect2D P1 = {object.uv[index[i] * 2], object.uv[index[i] * 2 + 1]};
-    Vect2D P2 = {object.uv[index[i + 1] * 2], object.uv[index[i + 1] * 2 + 1]};
-    Vect2D P3 = {object.uv[index[i + 2] * 2], object.uv[index[i + 2] * 2 + 1]};
+    Vec2f P1 = {object.uv[index[i] * 2], object.uv[index[i] * 2 + 1]};
+    Vec2f P2 = {object.uv[index[i + 1] * 2], object.uv[index[i + 1] * 2 + 1]};
+    Vec2f P3 = {object.uv[index[i + 2] * 2], object.uv[index[i + 2] * 2 + 1]};
     /* Normals of each vertex*/
-    Vect3D N1 = {object.normals[index[i] * 3], object.normals[index[i] * 3 + 1], object.normals[index[i] * 3 + 2]};
-    Vect3D N2 = {object.normals[index[i + 1] * 3], object.normals[index[i + 1] * 3 + 1], object.normals[index[i + 1] * 3 + 2]};
-    Vect3D N3 = {object.normals[index[i + 2] * 3], object.normals[index[i + 2] * 3 + 1], object.normals[index[i + 2] * 3 + 2]};
+    Vec3f N1 = {object.normals[index[i] * 3], object.normals[index[i] * 3 + 1], object.normals[index[i] * 3 + 2]};
+    Vec3f N2 = {object.normals[index[i + 1] * 3], object.normals[index[i + 1] * 3 + 1], object.normals[index[i + 1] * 3 + 2]};
+    Vec3f N3 = {object.normals[index[i + 2] * 3], object.normals[index[i + 2] * 3 + 1], object.normals[index[i + 2] * 3 + 2]};
     /* bitangents */
-    Vect3D BT1 = {object.bitangents[index[i] * 3], object.bitangents[index[i] * 3 + 1], object.bitangents[index[i] * 3 + 2]};
-    Vect3D BT2 = {object.bitangents[index[i + 1] * 3], object.bitangents[index[i + 1] * 3 + 1], object.bitangents[index[i + 1] * 3 + 2]};
-    Vect3D BT3 = {object.bitangents[index[i + 2] * 3], object.bitangents[index[i + 2] * 3 + 1], object.bitangents[index[i + 2] * 3 + 2]};
+    Vec3f BT1 = {object.bitangents[index[i] * 3], object.bitangents[index[i] * 3 + 1], object.bitangents[index[i] * 3 + 2]};
+    Vec3f BT2 = {object.bitangents[index[i + 1] * 3], object.bitangents[index[i + 1] * 3 + 1], object.bitangents[index[i + 1] * 3 + 2]};
+    Vec3f BT3 = {object.bitangents[index[i + 2] * 3], object.bitangents[index[i + 2] * 3 + 1], object.bitangents[index[i + 2] * 3 + 2]};
     /* tangents */
-    Vect3D T1 = {object.tangents[index[i] * 3], object.tangents[index[i] * 3 + 1], object.tangents[index[i] * 3 + 2]};
-    Vect3D T2 = {object.tangents[index[i + 1] * 3], object.tangents[index[i + 1] * 3 + 1], object.tangents[index[i + 1] * 3 + 2]};
-    Vect3D T3 = {object.tangents[index[i + 2] * 3], object.tangents[index[i + 2] * 3 + 1], object.tangents[index[i + 2] * 3 + 2]};
+    Vec3f T1 = {object.tangents[index[i] * 3], object.tangents[index[i] * 3 + 1], object.tangents[index[i] * 3 + 2]};
+    Vec3f T2 = {object.tangents[index[i + 1] * 3], object.tangents[index[i + 1] * 3 + 1], object.tangents[index[i + 1] * 3 + 2]};
+    Vec3f T3 = {object.tangents[index[i + 2] * 3], object.tangents[index[i + 2] * 3 + 1], object.tangents[index[i + 2] * 3 + 2]};
 
     /*check if UVs are correctly set in bounds ... if not , we clamp*/
-    auto clamp_uv = [&](Vect2D P) {
+    auto clamp_uv = [&](Vec2f P) {
       if (P.x > 1.f)
         P.x = std::fmod(P.x, 1.f);
       if (P.y > 1.f)

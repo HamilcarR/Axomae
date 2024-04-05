@@ -2,12 +2,15 @@
 #include "BoundingBox.h"
 #include "Camera.h"
 #include "Drawable.h"
+#include "EventController.h"
 #include "INodeDatabase.h"
+#include "Logger.h"
+#include "Ray.h"
 #include "Shader.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
+#include "math_camera.h"
 #include "utils_3D.h"
-
 using namespace axomae;
 
 Scene::Scene(ResourceDatabaseManager &rdm) : resource_manager(rdm), display_bbox(false) {
@@ -73,39 +76,43 @@ std::vector<Drawable *> Scene::getOpaqueElements() const {
 std::vector<Drawable *> Scene::getSortedSceneByTransparency() {
   std::vector<Drawable *> to_return;
   sorted_transparent_meshes.clear();
+  sorted_meshes.clear();
   for (const AABB &aabb : scene) {
     Drawable *A = aabb.drawable;
     GLMaterial *mat = A->getMaterialPointer();
+    glm::mat4 modelview_matrix = A->getMeshPointer()->getModelViewMatrix();
+    glm::vec3 updated_aabb_center = aabb.aabb.computeModelViewPosition(modelview_matrix);
+    float dist_to_camera = glm::length(updated_aabb_center);
     if (!mat->isTransparent())
       to_return.push_back(A);
     else {
-      glm::mat4 modelview_matrix = A->getMeshPointer()->getModelViewMatrix();
-      glm::vec3 updated_aabb_center = aabb.aabb.computeModelViewPosition(modelview_matrix);
-      float dist_to_camera = glm::length(updated_aabb_center);
       sorted_transparent_meshes[dist_to_camera] = A;
     }
+    sorted_meshes[dist_to_camera] = aabb;
   }
   for (auto it = sorted_transparent_meshes.rbegin(); it != sorted_transparent_meshes.rend(); it++)
     to_return.push_back(it->second);
   return to_return;
 }
 
-void Scene::sortTransparentElements() {
+void Scene::sortMeshesByDistanceToCamera() {
+  sorted_transparent_meshes.clear();
+  sorted_meshes.clear();
   for (auto bbox : scene) {
     GLMaterial *A = bbox.drawable->getMaterialPointer();
+    glm::mat4 modelview_matrix = bbox.drawable->getMeshPointer()->getModelViewMatrix();
+    glm::vec3 updated_aabb_center = bbox.aabb.computeModelViewPosition(modelview_matrix);
+    float dist_to_camera = glm::length(updated_aabb_center);
     if (A->isTransparent()) {
-      glm::mat4 modelview_matrix = bbox.drawable->getMeshPointer()->getModelViewMatrix();
-      glm::vec3 updated_aabb_center = bbox.aabb.computeModelViewPosition(modelview_matrix);
-      float dist_to_camera = glm::length(updated_aabb_center);
       sorted_transparent_meshes[dist_to_camera] = bbox.drawable;
     }
+    sorted_meshes[dist_to_camera] = bbox;
   }
 }
 
 std::vector<Drawable *> Scene::getSortedTransparentElements() {
   std::vector<Drawable *> transparent_meshes;
-  sorted_transparent_meshes.clear();
-  sortTransparentElements();
+  sortMeshesByDistanceToCamera();
   for (auto it = sorted_transparent_meshes.rbegin(); it != sorted_transparent_meshes.rend(); it++)
     transparent_meshes.push_back(it->second);
   return transparent_meshes;
@@ -195,6 +202,7 @@ void Scene::setPolygonFill() {
 
 std::vector<Mesh *> Scene::getMeshCollectionPtr() const {
   std::vector<Mesh *> to_ret;
+  to_ret.reserve(scene.size());
   for (auto &elem : scene)
     to_ret.push_back(elem.drawable->getMeshPointer());
   return to_ret;
@@ -213,6 +221,42 @@ void Scene::switchEnvmap(int cubemap_id, int irradiance_id, int prefiltered_id, 
     } else {
       texgroup.removeTexture(Texture::CUBEMAP);
       texgroup.addTexture(cubemap_id);
+    }
+  }
+}
+
+void Scene::processEvent(const controller::event::Event *event) {
+  using Event = controller::event::Event;
+  if (event->flag & Event::EVENT_MOUSE_L_DOUBLE) {
+    if (!scene_camera)
+      return;
+    const Dim2 *dimensions = scene_camera->getScreenDimensions();
+    AX_ASSERT(dimensions, "Camera pointer on screen Dim structure not valid.");
+    int x = event->mouse_state.pos_x, y = event->mouse_state.pos_y;
+    const math::camera::camera_ray r = math::camera::ray(
+        x, y, (int)dimensions->width, (int)dimensions->height, scene_camera->getProjection(), scene_camera->getView(), math::camera::SPACE::WORLD);
+    nova::Ray ray(r.origin, r.direction);
+    for (auto it : sorted_meshes) {  // replace by space partition
+      AABB elem = it.second;
+      nova::hit_data hit;
+      nova::hit_optionals<BoundingBox::ray_matrix_holder> data;
+      glm::mat4 world_mat = elem.drawable->getMeshPointer()->computeFinalTransformation();
+      glm::mat4 local_mat = elem.drawable->getMeshPointer()->getLocalModelMatrix();
+      BoundingBox::ray_matrix_holder holder{};
+      holder.projection = scene_camera->getProjection();
+      holder.view = scene_camera->getView();
+      holder.world_matrix = world_mat;
+      holder.local_matrix = local_mat;
+      holder.name = elem.drawable->getMeshPointer()->getName();
+      holder.mesh = elem.drawable->getMeshPointer();
+      data.data = holder;
+      std::string name = holder.name;
+      bool b = elem.aabb.hit(ray, scene_camera->getNear(), scene_camera->getFar(), hit, &data);
+
+      if (b) {
+        LOG("HIT OBJ : " + name + "  " + std::to_string(hit.t), LogLevel::INFO);
+        //  scene_camera->setTarget(glm::vec3(scene_camera->getView() * glm::vec4(elem.aabb.getPosition(), 1.f)));
+      }
     }
   }
 }

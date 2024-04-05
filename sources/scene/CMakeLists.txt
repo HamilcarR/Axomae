@@ -20,7 +20,8 @@ PRIVATE
         ax_opengl
         ax_geometry
         ax_renderer
-
+        ax_event
+        ax_nova
 
 
 

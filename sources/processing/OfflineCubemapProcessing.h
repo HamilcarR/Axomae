@@ -8,7 +8,6 @@
 #include <immintrin.h>
 #include <sstream>
 
-constexpr long double epsilon = 1e-6;
 constexpr glm::dvec3 RED = glm::dvec3(1., 0, 0);
 constexpr glm::dvec3 YELLOW = glm::dvec3(0, 1, 1);
 constexpr glm::dvec3 GREEN = glm::dvec3(0, 1, 0);
@@ -210,7 +209,7 @@ inline glm::dvec3 EnvmapProcessing<T>::computeIrradianceImportanceSampling(
   glm::dvec2 pix = glm::dvec2(math::texture::uvToPixel(uv.x, _width), math::texture::uvToPixel(uv.y, _height));
   float dd = (float)glm::dot(right_vec, normal);
   glm::dvec3 tangent = glm::dvec3(0.0, 1.0, 0.0);
-  if (1.0 - abs(dd) > epsilon)
+  if (1.0 - abs(dd) > math::epsilon)
     tangent = glm::normalize(glm::cross(right_vec, normal));
   glm::dvec3 bitangent = glm::cross(normal, tangent);
   for (samples = 0; samples < total_samples; samples++)

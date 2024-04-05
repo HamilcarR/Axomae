@@ -1,5 +1,9 @@
 #include "BoundingBox.h"
-
+#include "Logger.h"
+#include "Ray.h"
+#include "utils_3D.h"
+#include <glm/ext/quaternion_common.hpp>
+#include <glm/gtx/matrix_operation.hpp>
 using namespace axomae;
 
 constexpr unsigned int THREAD_NUMBERS = 8;
@@ -72,9 +76,6 @@ BoundingBox operator*(const glm::mat4 &matrix, const BoundingBox &bounding_box) 
 
 BoundingBox::BoundingBox(const std::vector<float> &vertices) : BoundingBox() {
   center = glm::vec3(0, 0, 0);
-  /*
-   * This lambda calculates asynchroneously the minimum/maximum coordinates of every meshes
-   */
   auto lambda_parallel_compute_bbox =
       [](const std::vector<float> &vertices, unsigned min_index, unsigned max_index) -> std::pair<glm::vec3, glm::vec3> {
     float x_max, y_max, z_max;
@@ -139,7 +140,7 @@ std::pair<std::vector<float>, std::vector<unsigned>> BoundingBox::getVertexArray
       min_coords.x, min_coords.y, min_coords.z   // 7
   };
   std::vector<unsigned> indices = {0, 1, 2, 0, 2, 3, 1, 4, 5, 1, 5, 2, 7, 6, 5, 7, 5, 4, 3, 6, 7, 3, 7, 0, 2, 5, 6, 2, 6, 3, 7, 4, 1, 7, 1, 0};
-  return std::pair<std::vector<float>, std::vector<unsigned>>(vertices, indices);
+  return {vertices, indices};
 }
 
 glm::vec3 calculateCenter(glm::vec3 min_coords, glm::vec3 max_coords) {
@@ -150,4 +151,106 @@ glm::vec3 calculateCenter(glm::vec3 min_coords, glm::vec3 max_coords) {
   return center;
 }
 
-glm::vec3 BoundingBox::computeModelViewPosition(const glm::mat4 &modelview) const { return glm::vec3(modelview * glm::vec4(center, 1.f)); }
+glm::vec3 BoundingBox::computeModelViewPosition(const glm::mat4 &modelview) const { return {modelview * glm::vec4(center, 1.f)}; }
+
+static bool test_intersection(const glm::vec3 &x_axis,
+                              const glm::vec3 &y_axis,
+                              const glm::vec3 &z_axis,
+                              const glm::vec3 &ray_origin,
+                              const glm::vec3 &ray_direction,
+                              const glm::vec3 &delta,
+                              const glm::vec3 &tmin_coords,
+                              const glm::vec3 &tmax_coords,
+                              float tmin,
+                              float tmax,
+                              float &ret_tmin
+
+) {
+  tmin = 0.0001f;
+  tmax = 100000.f;
+  float delta_x = glm::dot(delta, x_axis);
+  float Dx = glm::dot(ray_direction, x_axis);
+  if (std::abs(Dx) > math::epsilon) {
+    float t1 = (tmin_coords.x + delta_x) / Dx;
+    float t2 = (tmax_coords.x + delta_x) / Dx;
+    if (t1 > t2) {
+      float temp = t1;
+      t1 = t2;
+      t2 = temp;
+    }
+    tmax = t2 < tmax ? t2 : tmax;
+    tmin = t1 > tmin ? t1 : tmin;
+    if (tmax < tmin)
+      return false;
+  } else {
+    if (tmin_coords.x - delta_x > 0.f || tmax_coords.x - delta_x < 0.f) {
+      return false;
+    }
+  }
+  tmin = 0.0001f;
+  tmax = 100000.f;
+  /* Compute for Y planes intersection */
+  float delta_y = glm::dot(delta, y_axis);
+  float Dy = glm::dot(ray_direction, y_axis);
+  if (std::abs(Dy) > math::epsilon) {
+    float t1 = (tmin_coords.y + delta_y) / Dy;
+    float t2 = (tmax_coords.y + delta_y) / Dy;
+    if (t1 > t2) {
+      float temp = t1;
+      t1 = t2;
+      t2 = temp;
+    }
+    tmax = t2 < tmax ? t2 : tmax;
+    tmin = t1 > tmin ? t1 : tmin;
+    if (tmax < tmin)
+      return false;
+  } else {
+    if (tmin_coords.y - delta_y > 0.f || tmax_coords.y - delta_y < 0.f) {
+      return false;
+    }
+  }
+  tmin = 0.0001f;
+  tmax = 100000.f;
+  /* Compute for Z planes intersections */
+  float delta_z = glm::dot(delta, z_axis);
+  float Dz = glm::dot(ray_direction, z_axis);
+  if (std::abs(Dz) > math::epsilon) {
+    float t1 = (tmin_coords.z + delta_z) / Dz;
+    float t2 = (tmax_coords.z + delta_z) / Dz;
+    if (t1 > t2) {
+      float temp = t1;
+      t1 = t2;
+      t2 = temp;
+    }
+    tmax = t2 < tmax ? t2 : tmax;
+    tmin = t1 > tmin ? t1 : tmin;
+    if (tmax < tmin)
+      return false;
+  } else {
+    if (tmin_coords.z - delta_z > 0.f || tmax_coords.z - delta_z < 0.f) {
+      return false;
+    }
+  }
+  ret_tmin = tmin;
+  return true;
+}
+#include "Mesh.h"
+bool BoundingBox::hit(const nova::Ray &ray, float tmin, float tmax, nova::hit_data &hit_data, const nova::base_optionals *user_opts) const {
+  auto opt_struct = dynamic_cast<const nova::hit_optionals<ray_matrix_holder> *>(user_opts);
+  std::string name = opt_struct->data.name;
+  bool b = name == "Sphere";
+  const glm::mat4 &view = opt_struct->data.view;
+  const glm::mat4 &world_matrix = opt_struct->data.world_matrix;
+  const glm::mat4 &local_matrix = opt_struct->data.local_matrix;
+  const glm::mat4 &modelview_matrix = opt_struct->data.view * world_matrix;
+  glm::vec3 ray_direction = glm::vec3(ray.direction.x, ray.direction.y, ray.direction.z);
+  glm::vec3 ray_origin = glm::vec3(ray.origin.x, ray.origin.y, ray.origin.z);
+  glm::vec3 x_axis = math::geometry::glm_extract_xaxis(world_matrix);
+  glm::vec3 y_axis = math::geometry::glm_extract_yaxis(world_matrix);
+  glm::vec3 z_axis = math::geometry::glm_extract_zaxis(world_matrix);
+  glm::vec3 tmin_coords = world_matrix * glm::vec4(min_coords, 1.f);
+  glm::vec3 tmax_coords = world_matrix * glm::vec4(max_coords, 1.f);
+  glm::vec3 center = calculateCenter(tmin_coords, tmax_coords);
+  glm::vec3 delta = center - ray_origin;
+  return test_intersection(x_axis, y_axis, z_axis, ray_origin, ray_direction, delta, tmin_coords, tmax_coords, tmin, tmax, hit_data.t);
+}

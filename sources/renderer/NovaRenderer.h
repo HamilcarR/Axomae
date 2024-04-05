@@ -37,7 +37,7 @@ class NovaRenderer final : public IRenderer {
   void initialize(ApplicationConfig *app_conf) override;
   bool prep_draw() override;
   void draw() override;
-  void processEvent(const controller::event::Event *event) const override;
+  void processEvent(const controller::event::Event *event) override;
   void onResize(unsigned int width, unsigned int height) override;
   void setDefaultFrameBufferId(unsigned id) override;
   void setNewScene(const SceneChangeData &new_scene) override;

@@ -68,7 +68,7 @@ class Renderer final : public IRenderer {
   bool scene_ready();
   void initialize(ApplicationConfig *app_conf) override;
   void draw() override;
-  void processEvent(const controller::event::Event *event) const override;
+  void processEvent(const controller::event::Event *event) override;
   void onResize(unsigned int width, unsigned int height) override;
   void setDefaultFrameBufferId(unsigned id) override { default_framebuffer_id = id; }
   [[nodiscard]] unsigned int *getDefaultFrameBufferIdPointer() override { return &default_framebuffer_id; }

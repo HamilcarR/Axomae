@@ -171,7 +171,27 @@ void GLViewer::mouseReleaseEvent(QMouseEvent *event) {
   widget_input_events->flag &= ~reset_release_event;
 }
 
-void GLViewer::mouseDoubleClickEvent(QMouseEvent *event) { QOpenGLWidget::mouseDoubleClickEvent(event); }
+void GLViewer::mouseDoubleClickEvent(QMouseEvent *event) {
+  QOpenGLWidget::mouseDoubleClickEvent(event);
+  EventManager ::TYPE reset_dclick_event = EventManager::NO_EVENT;
+  switch (event->button()) {
+    case Qt::LeftButton:
+      widget_input_events->flag |= EventManager::EVENT_MOUSE_L_DOUBLE;
+      widget_input_events->flag &= ~EventManager::EVENT_MOUSE_R_DOUBLE;
+      reset_dclick_event = EventManager::EVENT_MOUSE_L_DOUBLE;
+      break;
+    case Qt::RightButton:
+      widget_input_events->flag |= EventManager::EVENT_MOUSE_R_DOUBLE;
+      widget_input_events->flag &= ~EventManager::EVENT_MOUSE_L_DOUBLE;
+      reset_dclick_event = EventManager::EVENT_MOUSE_R_DOUBLE;
+      break;
+    default:
+      break;
+  }
+  renderer->processEvent(widget_input_events.get());
+  update();
+  widget_input_events->flag &= ~reset_dclick_event;
+}
 
 void GLViewer::setNewScene(const SceneChangeData &new_scene) {
   makeCurrent();

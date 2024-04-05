@@ -32,10 +32,8 @@ namespace axomae {
   constexpr int PREWITT = 1;
 
 }  // namespace axomae
-
 struct Dim2 {
   unsigned int width;
   unsigned int height;
 };
-
 #endif

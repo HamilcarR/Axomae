@@ -25,7 +25,7 @@ Camera::Camera(float deg, float near, float far, const Dim2 *screen) : Camera() 
   fov = deg;
   this->far = far;
   this->near = near;
-  ratio_dimensions = screen;
+  screen_dimensions = screen;
 }
 
 void Camera::reset() {
@@ -40,7 +40,7 @@ void Camera::reset() {
 }
 
 void Camera::computeProjectionSpace() {
-  projection = glm::perspective(glm::radians(fov), ((float)(ratio_dimensions->width)) / ((float)(ratio_dimensions->height)), near, far);
+  projection = glm::perspective(glm::radians(fov), ((float)(screen_dimensions->width)) / ((float)(screen_dimensions->height)), near, far);
 }
 
 void Camera::computeViewProjection() {
@@ -55,6 +55,7 @@ void Camera::computeViewSpace() {
   camera_up = glm::cross(direction, right);
   view = glm::lookAt(position, target, camera_up);
 }
+
 /**********************************************************************************************************************************************/
 ArcballCamera::ArcballCamera() { ArcballCamera::reset(); }
 
@@ -103,9 +104,9 @@ void ArcballCamera::translate() {
   ndc_mouse_start_position = ndc_mouse_position;
 }
 
-glm::mat4 ArcballCamera::getSceneRotationMatrix() const { return scene_rotation_matrix; }
+const glm::mat4 &ArcballCamera::getSceneRotationMatrix() const { return scene_rotation_matrix; }
 
-glm::mat4 ArcballCamera::getSceneTranslationMatrix() const { return scene_translation_matrix; }
+const glm::mat4 &ArcballCamera::getSceneTranslationMatrix() const { return scene_translation_matrix; }
 
 /**
  * The function calculates the z-axis value for a given x and y coordinate within a specified radius.
@@ -174,23 +175,23 @@ void ArcballCamera::processEvent(const controller::event::Event *event) {
     /* Left / Right mouse click management */
     if (event->flag & ev::EVENT_MOUSE_L_PRESS) {
       /* computes mouse start position in NDC */
-      ndc_mouse_start_position = orbit_start_ndc_position(cursor_position, radius, (float)ratio_dimensions->width, (float)ratio_dimensions->height);
+      ndc_mouse_start_position = orbit_start_ndc_position(cursor_position, radius, (float)screen_dimensions->width, (float)screen_dimensions->height);
     } else if (event->flag & ev::EVENT_MOUSE_L_RELEASE) {
       last_rotation = rotation;
     } else if (event->flag & ev::EVENT_MOUSE_R_PRESS) {
-      ndc_mouse_start_position = pan_start_ndc_position(cursor_position, (float)ratio_dimensions->width, (float)ratio_dimensions->height);
+      ndc_mouse_start_position = pan_start_ndc_position(cursor_position, (float)screen_dimensions->width, (float)screen_dimensions->height);
     } else if (event->flag & ev::EVENT_MOUSE_R_RELEASE) {
       // EVENT_MOUSE_R_RELEASE
     }
   } else {
     if (event->flag & ev::EVENT_MOUSE_L_PRESS) {
-      ndc_mouse_position = orbit_on_move_ndc_position(cursor_position, radius, (float)ratio_dimensions->width, (float)ratio_dimensions->height);
+      ndc_mouse_position = orbit_on_move_ndc_position(cursor_position, radius, (float)screen_dimensions->width, (float)screen_dimensions->height);
       rotate();
       glm::mat4 rotation_matrix = glm::mat4_cast(rotation);
       ndc_mouse_position = rotation_matrix * glm::vec4(ndc_mouse_position + glm::vec3(0, 0, radius), 0);
       scene_rotation_matrix = rotation_matrix;
     } else if (event->flag & ev::EVENT_MOUSE_R_PRESS) {
-      ndc_mouse_position = pan_on_move_ndc_position(cursor_position, (float)ratio_dimensions->width, (float)ratio_dimensions->height);
+      ndc_mouse_position = pan_on_move_ndc_position(cursor_position, (float)screen_dimensions->width, (float)screen_dimensions->height);
       translate();
       translation = glm::translate(glm::mat4(1.f), panning_offset);
       scene_translation_matrix = translation;
@@ -232,6 +233,6 @@ void FreePerspectiveCamera::zoomIn() {}
 
 void FreePerspectiveCamera::zoomOut() {}
 
-glm::mat4 FreePerspectiveCamera::getSceneTranslationMatrix() const { return glm::mat4(1.f); }
+const glm::mat4 &FreePerspectiveCamera::getSceneTranslationMatrix() const { return glm::mat4(1.f); }
 
-glm::mat4 FreePerspectiveCamera::getSceneRotationMatrix() const { return glm::mat4(1.f); }
+const glm::mat4 &FreePerspectiveCamera::getSceneRotationMatrix() const { return glm::mat4(1.f); }

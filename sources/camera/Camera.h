@@ -28,7 +28,7 @@ class Camera : public CameraInterface, public SceneTreeNode {
   glm::vec3 direction{};
   glm::vec3 camera_up{};
   const glm::vec3 world_up{};
-  const Dim2 *ratio_dimensions{};
+  const Dim2 *screen_dimensions{};
   glm::vec2 cursor_position{}; /**<Screen space coordinates of the cursor*/
 
  protected:
@@ -48,6 +48,10 @@ class Camera : public CameraInterface, public SceneTreeNode {
   [[nodiscard]] const glm::mat4 &getProjection() const override { return projection; }
   [[nodiscard]] const glm::mat4 &getView() const override { return view; }
   [[nodiscard]] TYPE getType() const { return type; }
+  [[nodiscard]] const Dim2 *getScreenDimensions() const override { return screen_dimensions; }
+  [[nodiscard]] float getNear() const override { return near; }
+  [[nodiscard]] float getFar() const override { return far; }
+  static glm::vec2 worldToScreen(int width, int height, const glm::vec4 &world_point, const glm::mat4 &projection, const glm::mat4 &view);
 };
 
 /**
@@ -80,8 +84,8 @@ class ArcballCamera : public Camera {
   void zoomIn() override;
   void zoomOut() override;
   void reset() override;
-  [[nodiscard]] glm::mat4 getSceneTranslationMatrix() const override;
-  [[nodiscard]] glm::mat4 getSceneRotationMatrix() const override;
+  [[nodiscard]] const glm::mat4 &getSceneTranslationMatrix() const override;
+  [[nodiscard]] const glm::mat4 &getSceneRotationMatrix() const override;
   void computeViewSpace() override;
 
  protected:
@@ -98,8 +102,8 @@ class FreePerspectiveCamera : public Camera {
   void processEvent(const controller::event::Event *event) override;
   void zoomIn() override;
   void zoomOut() override;
-  [[nodiscard]] glm::mat4 getSceneTranslationMatrix() const override;
-  [[nodiscard]] glm::mat4 getSceneRotationMatrix() const override;
+  [[nodiscard]] const glm::mat4 &getSceneTranslationMatrix() const override;
+  [[nodiscard]] const glm::mat4 &getSceneRotationMatrix() const override;
 };
 
 #endif

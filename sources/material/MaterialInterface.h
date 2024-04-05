@@ -14,7 +14,7 @@ class MaterialInterface {
   [[nodiscard]] virtual float getTransmissionFactor() const = 0;
   virtual void setAlphaFactor(float transparency_value) = 0;
   [[nodiscard]] virtual float getAlphaFactor() const = 0;
-  [[nodiscard]] virtual math::geometry::Vect2D getRefractiveIndex() const = 0;
+  [[nodiscard]] virtual Vec2f getRefractiveIndex() const = 0;
   virtual void setRefractiveIndexValue(float n1, float n2) = 0;
   [[nodiscard]] virtual bool hasTextures() const = 0;
   virtual void addTexture(int image_database_index) = 0;

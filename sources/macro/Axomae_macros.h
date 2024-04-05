@@ -1,7 +1,8 @@
 #ifndef AXOMAE_MACROS_H
 #define AXOMAE_MACROS_H
-#include "constants.h"
-
+#include <cassert>
+#include <cstdlib>
+#include <type_traits>
 #define ISTYPE(TYPE1, TYPE2) std::is_same_v<TYPE1, TYPE2>
 #define IS_ARITHMETHIC(TYPE) std::is_arithmetic_v<TYPE>
 #define ISSUBTYPE(BASE, DERIVED) std::is_base_of_v<BASE, DERIVED>

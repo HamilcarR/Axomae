@@ -1,7 +1,9 @@
 #ifndef FramebufferInterface_H
 #define FramebufferInterface_H
 #include "constants.h"
+
 class Texture;
+
 class FramebufferInterface {
  public:
   /**

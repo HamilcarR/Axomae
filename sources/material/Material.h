@@ -69,7 +69,7 @@ class GLMaterial : public MaterialInterface {
   [[nodiscard]] float getTransmissionFactor() const override { return transmission_factor; }
   [[nodiscard]] float getEmissiveFactor() const override { return emissive_factor; }
   [[nodiscard]] float getAlphaFactor() const override { return alpha_factor; }
-  [[nodiscard]] math::geometry::Vect2D getRefractiveIndex() const override;
+  [[nodiscard]] Vec2f getRefractiveIndex() const override;
   [[nodiscard]] Shader *getShaderProgram() const { return shader_program; }
   [[nodiscard]] bool hasTextures() const override { return !textures_group.isEmpty(); }
 

@@ -25,7 +25,6 @@ SceneTree::SceneTree(SceneTreeNode *node) { root = node; }
 void SceneTree::updateAccumulatedTransformations() {
   if (root != nullptr) {
     auto recompute_matrices = [](NodeInterface *n) {
-      /* We know we are iterating through Scene Tree , hence the dyn cast*/
       auto *node = dynamic_cast<SceneTreeNode *>(n);
       if (!node->isRoot()) {
         auto *parent = dynamic_cast<SceneTreeNode *>(node->getParents()[0]);
@@ -38,7 +37,7 @@ void SceneTree::updateAccumulatedTransformations() {
   }
 }
 
-void SceneTree::pushNewRoot(NodeInterface *new_root) {
+void SceneTree::pushNewRoot(SceneTreeNode *new_root) {
   if (root != new_root) {
     if (root == nullptr)
       root = new_root;

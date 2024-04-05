@@ -21,6 +21,8 @@ PRIVATE
     ax_geometry
     ax_debug
     ax_io
+PUBLIC
+    ax_nova
 )
 target_include_directories(ax_mesh 
 PUBLIC 
