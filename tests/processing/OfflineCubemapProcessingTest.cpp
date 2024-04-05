@@ -81,7 +81,7 @@ TEST(EnvmapComputation, uvSphericalCohesion) {
     glm::dvec2 uv = builder.generate();
     glm::dvec2 sph = math::spherical::uvToSpherical(uv);
     glm::dvec2 test = math::spherical::sphericalToUv(sph);
-    EXPECT_LE(glm::length(test - uv), epsilon);
+    EXPECT_LE(glm::length(test - uv), math::epsilon);
   }
 }
 
@@ -91,6 +91,6 @@ TEST(EnvmapComputation, uvCartesianCohesion) {
     glm::dvec2 sph = builder.generate();
     glm::dvec3 cart = math::spherical::sphericalToCartesian(sph);
     glm::dvec2 test = math::spherical::cartesianToSpherical(cart);
-    EXPECT_LE(glm::length(test - sph), epsilon);
+    EXPECT_LE(glm::length(test - sph), math::epsilon);
   }
 }

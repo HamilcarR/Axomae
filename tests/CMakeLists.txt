@@ -9,6 +9,7 @@ add_subdirectory(processing)
 add_subdirectory(mesh)
 add_subdirectory(scene)
 add_subdirectory(controller)
+add_subdirectory(common)
 
 add_executable(Axomae_test
         Test.cpp
