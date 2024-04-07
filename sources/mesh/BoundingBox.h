@@ -31,9 +31,9 @@ class BoundingBox : public SceneTreeNode, public nova::Hitable {
   BoundingBox &operator=(BoundingBox &&move) noexcept;
   [[nodiscard]] virtual const glm::vec3 &getPosition() const { return center; }
   /**
-   * @brief Compute the position of the OOB in view space.
+   * @brief Compute the position of the AABB in view space.
    * @param modelview Modelview matrix : Model x View
-   * @return glm::vec4 Position of the OOB relative to the camera
+   * @return glm::vec4 Position of the AABB relative to the camera
    */
   [[nodiscard]] virtual glm::vec3 computeModelViewPosition(const glm::mat4 &modelview) const;
   /**
@@ -50,15 +50,6 @@ class BoundingBox : public SceneTreeNode, public nova::Hitable {
    * Use camera near and far .
    */
   [[nodiscard]] bool hit(const nova::Ray &ray, float tmin, float tmax, nova::hit_data &data, const nova::base_optionals *user_opts) const override;
-
-  struct ray_matrix_holder {
-    glm::mat4 projection;
-    glm::mat4 view;
-    glm::mat4 local_matrix;
-    glm::mat4 world_matrix;
-    std::string name;
-    Mesh *mesh;
-  };
 };
 
 #endif

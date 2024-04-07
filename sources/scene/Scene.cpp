@@ -234,26 +234,19 @@ void Scene::processEvent(const controller::event::Event *event) {
     AX_ASSERT(dimensions, "Camera pointer on screen Dim structure not valid.");
     int x = event->mouse_state.pos_x, y = event->mouse_state.pos_y;
     const math::camera::camera_ray r = math::camera::ray(
-        x, y, (int)dimensions->width, (int)dimensions->height, scene_camera->getProjection(), scene_camera->getView(), math::camera::SPACE::WORLD);
-    nova::Ray ray(r.origin, r.direction);
+        x, y, (int)dimensions->width, (int)dimensions->height, scene_camera->getProjection(), scene_camera->getView());
+    nova::Ray ray(r.near, r.far);
     for (auto it : sorted_meshes) {  // replace by space partition
       AABB elem = it.second;
       nova::hit_data hit;
-      nova::hit_optionals<BoundingBox::ray_matrix_holder> data;
+      nova::hit_optionals<glm::mat4> matrix_holder;
       glm::mat4 world_mat = elem.drawable->getMeshPointer()->computeFinalTransformation();
       glm::mat4 local_mat = elem.drawable->getMeshPointer()->getLocalModelMatrix();
-      BoundingBox::ray_matrix_holder holder{};
-      holder.projection = scene_camera->getProjection();
-      holder.view = scene_camera->getView();
-      holder.world_matrix = world_mat;
-      holder.local_matrix = local_mat;
-      holder.name = elem.drawable->getMeshPointer()->getName();
-      holder.mesh = elem.drawable->getMeshPointer();
-      data.data = holder;
-      std::string name = holder.name;
-      bool b = elem.aabb.hit(ray, scene_camera->getNear(), scene_camera->getFar(), hit, &data);
+      matrix_holder.data = world_mat;
+      bool b = elem.aabb.hit(ray, scene_camera->getNear(), scene_camera->getFar(), hit, &matrix_holder);
 
       if (b) {
+        std::string name = elem.drawable->getMeshPointer()->getName();
         LOG("HIT OBJ : " + name + "  " + std::to_string(hit.t), LogLevel::INFO);
         //  scene_camera->setTarget(glm::vec3(scene_camera->getView() * glm::vec4(elem.aabb.getPosition(), 1.f)));
       }

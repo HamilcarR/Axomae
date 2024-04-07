@@ -9,7 +9,7 @@ using namespace axomae;
 Renderer::Renderer()
     : camera_framebuffer(nullptr), start_draw(false), resource_database(&ResourceDatabaseManager::getInstance()), default_framebuffer_id(0) {
   INodeDatabase *node_db = resource_database->getNodeDatabase();
-  scene_camera = database::node::store<ArcballCamera>(*node_db, true, 45.f, 0.1f, 10000.f, 10.f, &screen_size).object;
+  scene_camera = database::node::store<ArcballCamera>(*node_db, true, 45.f, 0.1f, 10000.f, 50.f, &screen_size).object;
   scene = std::make_unique<Scene>(ResourceDatabaseManager::getInstance());
   scene->setLightDatabasePointer(&light_database);
   LightData default_dir_light;
