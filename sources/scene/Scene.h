@@ -102,7 +102,7 @@ class Scene : public EventInterface {
   std::vector<Mesh *> getMeshCollectionPtr() const;
   void switchEnvmap(int cubemap_id, int irradiance_id, int prefiltered_id, int lut_id);
   void processEvent(const controller::event::Event *event) override;
-
+  void focusOnRenderable(int viewport_mouse_coord_x , int viewport_mouse_coord_y);
  private:
   /**
    * @brief Sort meshes by distance to the camera : Will erase sorted_meshes and sorted_transparent_meshes beforehand

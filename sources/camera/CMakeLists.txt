@@ -1,4 +1,7 @@
-add_library(ax_camera Camera.cpp)
+add_library(ax_camera
+        Camera.cpp
+        ArcballCamera.cpp
+        FreePerspectiveCamera.cpp)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_camera)
 target_link_libraries(ax_camera

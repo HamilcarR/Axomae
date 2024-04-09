@@ -1,6 +1,7 @@
-
+#include "ArcballCamera.h"
 #include "Camera.h"
 #include "DatabaseBuilderTest.h"
+#include "FreePerspectiveCamera.h"
 #include "LightingSystem.h"
 #include "Mesh.h"
 

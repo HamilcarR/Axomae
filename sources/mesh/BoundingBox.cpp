@@ -2,7 +2,6 @@
 #include "Logger.h"
 #include "Ray.h"
 #include "utils_3D.h"
-#include <glm/ext/quaternion_common.hpp>
 #include <glm/gtx/matrix_operation.hpp>
 #include <utility>
 using namespace axomae;
@@ -164,7 +163,7 @@ static bool test_intersection(const glm::vec3 &x_axis,
                               const glm::vec3 &tmax_coords,
                               const float tmin,
                               const float tmax,
-                              float &ret_tmin
+                              nova::hit_data &returned_hit
 
 ) {
   /* Intersections on X axis */
@@ -200,12 +199,14 @@ static bool test_intersection(const glm::vec3 &x_axis,
     return false;
   if (min < 0)
     return false;
-  ret_tmin = min;
+  returned_hit.t = min;
+  const glm::vec3 obj_space_hit_position = delta + ray_direction * min;
+  returned_hit.position = Vec3f(obj_space_hit_position.x, obj_space_hit_position.y, obj_space_hit_position.z);
   return true;
 }
 
-bool BoundingBox::hit(const nova::Ray &ray, float tmin, float tmax, nova::hit_data &hit_data, const nova::base_optionals *user_opts) const {
-  auto opt_struct = dynamic_cast<const nova::hit_optionals<glm::mat4> *>(user_opts);
+bool BoundingBox::hit(const nova::Ray &ray, float tmin, float tmax, nova::hit_data &hit_data, const nova::base_options *user_opts) const {
+  auto opt_struct = dynamic_cast<const nova::hit_options<glm::mat4> *>(user_opts);
   const glm::mat4 &world_matrix = opt_struct->data;
   const glm::mat4 inv_W = glm::inverse(world_matrix);
   const glm::vec3 x_axis = glm::vec3(1, 0, 0);
@@ -216,6 +217,11 @@ bool BoundingBox::hit(const nova::Ray &ray, float tmin, float tmax, nova::hit_da
   const glm::vec3 tmin_coords = min_coords;
   const glm::vec3 tmax_coords = max_coords;
   const glm::vec3 delta = ray_origin;
-
-  return test_intersection(x_axis, y_axis, z_axis, ray_origin, ray_direction, delta, tmin_coords, tmax_coords, tmin, tmax, hit_data.t);
+  bool hit_success = test_intersection(x_axis, y_axis, z_axis, ray_origin, ray_direction, delta, tmin_coords, tmax_coords, tmin, tmax, hit_data);
+  if (hit_success) {
+    const glm::vec3 world_space_hit_pos = world_matrix * glm::vec4(hit_data.position.x, hit_data.position.y, hit_data.position.z, 1.f);
+    hit_data.position = Vec3f(world_space_hit_pos.x, world_space_hit_pos.y, world_space_hit_pos.z);
+    return true;
+  }
+  return false;
 }

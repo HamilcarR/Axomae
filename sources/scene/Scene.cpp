@@ -225,31 +225,33 @@ void Scene::switchEnvmap(int cubemap_id, int irradiance_id, int prefiltered_id, 
   }
 }
 
+void Scene::focusOnRenderable(int x, int y) {
+  if (!scene_camera)
+    return;
+  const Dim2 *dimensions = scene_camera->getScreenDimensions();
+  AX_ASSERT(dimensions, "Camera pointer on screen Dim structure not valid.");
+  const math::camera::camera_ray r = math::camera::ray(
+      x, y, (int)dimensions->width, (int)dimensions->height, scene_camera->getProjection(), scene_camera->getView());
+  nova::Ray ray(r.near, r.far);
+  for (const std::pair<const float, AABB> &it : sorted_meshes) {  // replace by space partition
+    AABB elem = it.second;
+    nova::hit_data hit;
+    nova::hit_options<glm::mat4> matrix_holder;
+    glm::mat4 world_mat = elem.drawable->getMeshPointer()->computeFinalTransformation();
+    matrix_holder.data = world_mat;
+    if (elem.aabb.hit(ray, scene_camera->getNear(), scene_camera->getFar(), hit, &matrix_holder)) {
+      std::string name = elem.drawable->getMeshPointer()->getName();
+      LOG("HIT OBJ : " + name + "   Distance :" + std::to_string(hit.t), LogLevel::INFO);
+      const glm::vec3 box_center_worldspace = world_mat * glm::vec4(elem.aabb.getPosition(), 1.f);
+      scene_camera->focus(box_center_worldspace);
+      return;
+    }
+  }
+}
+
 void Scene::processEvent(const controller::event::Event *event) {
   using Event = controller::event::Event;
   if (event->flag & Event::EVENT_MOUSE_L_DOUBLE) {
-    if (!scene_camera)
-      return;
-    const Dim2 *dimensions = scene_camera->getScreenDimensions();
-    AX_ASSERT(dimensions, "Camera pointer on screen Dim structure not valid.");
-    int x = event->mouse_state.pos_x, y = event->mouse_state.pos_y;
-    const math::camera::camera_ray r = math::camera::ray(
-        x, y, (int)dimensions->width, (int)dimensions->height, scene_camera->getProjection(), scene_camera->getView());
-    nova::Ray ray(r.near, r.far);
-    for (auto it : sorted_meshes) {  // replace by space partition
-      AABB elem = it.second;
-      nova::hit_data hit;
-      nova::hit_optionals<glm::mat4> matrix_holder;
-      glm::mat4 world_mat = elem.drawable->getMeshPointer()->computeFinalTransformation();
-      glm::mat4 local_mat = elem.drawable->getMeshPointer()->getLocalModelMatrix();
-      matrix_holder.data = world_mat;
-      bool b = elem.aabb.hit(ray, scene_camera->getNear(), scene_camera->getFar(), hit, &matrix_holder);
-
-      if (b) {
-        std::string name = elem.drawable->getMeshPointer()->getName();
-        LOG("HIT OBJ : " + name + "  " + std::to_string(hit.t), LogLevel::INFO);
-        //  scene_camera->setTarget(glm::vec3(scene_camera->getView() * glm::vec4(elem.aabb.getPosition(), 1.f)));
-      }
-    }
+    focusOnRenderable(event->mouse_state.pos_x, event->mouse_state.pos_y);
   }
 }

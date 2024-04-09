@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "ArcballCamera.h"
 #include "Config.h"
 #include "DebugGL.h"
 #include "EnvmapTextureManager.h"

@@ -22,8 +22,10 @@ namespace math::camera {
     glm::vec4 o = inv_P * glm::vec4(ndc_x, ndc_y, -1.f, 1.f);
     o /= o.w;
     o = inv_V * glm::vec4(o.x, o.y, o.z, 1.f);
+
     glm::vec4 d = inv_P * glm::vec4(ndc_x, ndc_y, -1.f, 0.f);
     d = glm::normalize(inv_V * glm::vec4(d.x, d.y, -1.f, 0.f));
+
     camera_ray r;
     r.near = {o.x, o.y, o.z};
     r.far = {d.x, d.y, d.z};

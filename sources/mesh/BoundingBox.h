@@ -49,7 +49,7 @@ class BoundingBox : public SceneTreeNode, public nova::Hitable {
    * @brief tmin must be initialized to a small value (0.f) while tmax should be set at a highest value.
    * Use camera near and far .
    */
-  [[nodiscard]] bool hit(const nova::Ray &ray, float tmin, float tmax, nova::hit_data &data, const nova::base_optionals *user_opts) const override;
+  [[nodiscard]] bool hit(const nova::Ray &ray, float tmin, float tmax, nova::hit_data &data, const nova::base_options *user_opts) const override;
 };
 
 #endif

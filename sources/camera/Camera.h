@@ -51,59 +51,6 @@ class Camera : public CameraInterface, public SceneTreeNode {
   [[nodiscard]] const Dim2 *getScreenDimensions() const override { return screen_dimensions; }
   [[nodiscard]] float getNear() const override { return near; }
   [[nodiscard]] float getFar() const override { return far; }
-  static glm::vec2 worldToScreen(int width, int height, const glm::vec4 &world_point, const glm::mat4 &projection, const glm::mat4 &view);
-};
-
-/**
- * @brief Arcball Camera class
- */
-class ArcballCamera : public Camera {
- protected:
-  float angle{};  /**<Angle of rotation*/
-  float radius{}; /**<Camera orbit radius*/
-  bool radius_updated{};
-  glm::vec3 ndc_mouse_position{};       /**<Current NDC coordinates of the cursor*/
-  glm::vec3 ndc_mouse_start_position{}; /**<NDC coordinates of the cursor at the start of a click event*/
-  glm::quat rotation{};                 /**<Quaternion representing the scene's rotation*/
-  glm::quat last_rotation{};            /**<Last rotation after the release event*/
-  glm::mat4 translation{};              /**<Translation of the scene*/
-  glm::mat4 last_translation{};         /**<Translation of the scene after release event*/
-  glm::vec3 axis{};                     /**<Axis of rotation according to the direction of the mouse sweep*/
-  glm::vec3 panning_offset{};           /**<Variable representing the new world position of the scene after translation */
-  glm::mat4 scene_rotation_matrix{};    /**<Computed rotation matrix of the scene if the camera is an Arcball*/
-  glm::mat4 scene_translation_matrix{}; /**<Computed translation matrix of the scene*/
-
- private:
-  glm::vec3 delta_position{}; /**<NDC coordinates difference of the cursor , between two frames*/
-  float default_radius{};
-
- public:
-  ArcballCamera();
-  ArcballCamera(float degrees, float near, float far, float radius, const Dim2 *screen);
-  void processEvent(const controller::event::Event *event) override;
-  void zoomIn() override;
-  void zoomOut() override;
-  void reset() override;
-  [[nodiscard]] const glm::mat4 &getSceneTranslationMatrix() const override;
-  [[nodiscard]] const glm::mat4 &getSceneRotationMatrix() const override;
-  void computeViewSpace() override;
-
- protected:
-  virtual void rotate();
-  virtual void translate();
-  virtual void updateZoom(float step);
-};
-
-// TODO: [AX-10] Implement free perspective camera
-class FreePerspectiveCamera : public Camera {
- public:
-  FreePerspectiveCamera();
-  FreePerspectiveCamera(float degrees, Dim2 *screen, float near, float far);
-  void processEvent(const controller::event::Event *event) override;
-  void zoomIn() override;
-  void zoomOut() override;
-  [[nodiscard]] const glm::mat4 &getSceneTranslationMatrix() const override;
-  [[nodiscard]] const glm::mat4 &getSceneRotationMatrix() const override;
 };
 
 #endif
