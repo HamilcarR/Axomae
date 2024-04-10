@@ -163,12 +163,12 @@ std::vector<uint8_t> ImageManager::project_uv_normals(const Object3D &object, in
     P2 = clamp_uv(P2);
     P3 = clamp_uv(P3);
 
-    P1.x *= static_cast<float>(width);
-    P1.y *= static_cast<float>(height);
-    P2.x *= static_cast<float>(width);
-    P2.y *= static_cast<float>(height);
-    P3.x *= static_cast<float>(width);
-    P3.y *= static_cast<float>(height);
+    P1.x *= static_cast<float>(width - 1);
+    P1.y *= static_cast<float>(height - 1);
+    P2.x *= static_cast<float>(width - 1);
+    P2.y *= static_cast<float>(height - 1);
+    P3.x *= static_cast<float>(width - 1);
+    P3.y *= static_cast<float>(height - 1);
     int x_max = static_cast<int>(bounding_coords(P1.x, P2.x, P3.x, false));
     int x_min = static_cast<int>(bounding_coords(P1.x, P2.x, P3.x, true));
     int y_max = static_cast<int>(bounding_coords(P1.y, P2.y, P3.y, false));
@@ -177,6 +177,7 @@ std::vector<uint8_t> ImageManager::project_uv_normals(const Object3D &object, in
       for (int y = y_min; y <= y_max; y++) {
         image::Rgb val = compute_normals_set_pixels_rgb(P1, P2, P3, N1, N2, N3, BT1, BT2, BT3, T1, T2, T3, x, y, tangent_space);
         int idx = (y * width + x) * 3;
+        AX_ASSERT(idx >= 0 && idx < width * height * 3, "");
         if (!(val == image::Rgb(0, 0, 0))) {
           raw_img[idx] = static_cast<uint8_t>(val.red);
           raw_img[idx + 1] = static_cast<uint8_t>(val.green);

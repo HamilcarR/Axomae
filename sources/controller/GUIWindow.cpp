@@ -681,7 +681,7 @@ namespace controller {
         std::vector<uint8_t> surf = ImageManager::project_uv_normals(retrieved_mesh->getGeometry(), width, height, tangent);
         view->display(surf, width, height, 3);
       } catch (const exception::GenericException &e) {
-        LOG(e.what(), LogLevel::ERROR);
+        LOG(std::string("The application has encountered an error : ") + e.what(), LogLevel::ERROR);
       }
     }
   }
