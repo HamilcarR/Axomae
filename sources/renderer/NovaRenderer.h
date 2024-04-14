@@ -11,8 +11,6 @@ class ResourceDatabaseManager;
 class RenderPipeline;
 class GLPixelBufferObject;
 class EnvmapTextureManager;
-template<class T>
-class EnvmapProcessing;
 
 class NovaRenderer final : public IRenderer {
 
@@ -32,7 +30,6 @@ class NovaRenderer final : public IRenderer {
   Texture *framebuffer_texture{};
   std::unique_ptr<GLPixelBufferObject> pixel_buffer_object;
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
-  std::unique_ptr<EnvmapProcessing<float>> envmap_processing;
 
  private:
   NovaRenderer() = default;

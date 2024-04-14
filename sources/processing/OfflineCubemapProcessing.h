@@ -80,6 +80,7 @@ class EnvmapProcessing final : GenericTextureProcessing {
   template<class D>
   glm::dvec3 computeIrradianceImportanceSampling(D x, D y, D z, unsigned _width, unsigned _height, unsigned total_samples) const;
 };
+using HdrEnvmapProcessing = EnvmapProcessing<float>;
 
 template<class T>
 EnvmapProcessing<T>::EnvmapProcessing(const std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels)

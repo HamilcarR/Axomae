@@ -18,7 +18,6 @@ NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *wi
   render_pipeline = std::make_unique<RenderPipeline>(&default_framebuffer_id, gl_widget, resource_database);
   pixel_buffer_object = std::make_unique<GLPixelBufferObject>(GLPixelBufferObject::UP, screen_size.width * screen_size.height * 3 * sizeof(float));
   scene = std::make_unique<Scene>(*resource_database);
-  envmap_processing = std::make_unique<HdrEnvmapProcessing>();
   envmap_manager = std::make_unique<EnvmapTextureManager>(*resource_database, screen_size, default_framebuffer_id, *render_pipeline, nullptr);
 }
 
