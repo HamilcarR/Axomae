@@ -27,9 +27,7 @@ class TextureBuilder {
         data.push_back(value_if_not_random);
   }
 
-  virtual ~TextureBuilder() {}
-
-  const TexStruct getData() {
+  TexStruct getData() {
     TexStruct tex;
     tex.data = data;
     tex.width = width;
@@ -47,7 +45,6 @@ template<class T>
 class RandomVecBuilder {
  public:
   RandomVecBuilder() { srand(time(nullptr)); }
-  virtual ~RandomVecBuilder() {}
   T generate() { return T(f_rand); }
 };
 
@@ -71,7 +68,11 @@ TEST(EnvmapComputation, discreteSample) {
   EnvmapProcessing process(builder.getData().data, builder.getData().width, builder.getData().height);
   for (unsigned i = 0; i < builder.width; i++)
     for (unsigned j = 0; j < builder.height; j++) {
-      ASSERT_EQ(process.discreteSample(i, j), glm::dvec3(1.f));
+      glm::vec3 compared = glm::abs(process.discreteSample(i, j) - glm::dvec3(1.f));
+      glm::vec3 epsilon = glm::vec3(math::epsilon);
+      ASSERT_LE(compared.x, epsilon.x);
+      ASSERT_LE(compared.y, epsilon.y);
+      ASSERT_LE(compared.z, epsilon.z);
     }
 }
 

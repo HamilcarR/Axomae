@@ -14,10 +14,10 @@ std::unique_ptr<TextureData> EnvmapProcessing<float>::computeDiffuseIrradiance(u
     envmap_tex_data.f_data.resize(_width * _height * 4);
     envmap_tex_data.nb_components = 4;
     std::vector<float> temp;
-    for (const auto &elem : data) {
-      temp.push_back(elem.x);
-      temp.push_back(elem.y);
-      temp.push_back(elem.z);
+    for (int i = 0; i < data->size(); i += 3) {
+      temp.push_back((*data)[i]);
+      temp.push_back((*data)[i + 1]);
+      temp.push_back((*data)[i + 2]);
       temp.push_back(0);  // Alpha channel because cuda channel descriptors don't have RGB only
     }
     float *dest_array{};
@@ -29,7 +29,6 @@ std::unique_ptr<TextureData> EnvmapProcessing<float>::computeDiffuseIrradiance(u
   } else {
     envmap_tex_data.f_data.resize(_width * _height * channels);
     envmap_tex_data.nb_components = channels;
-    unsigned index = 0;
     std::vector<std::shared_future<void>> futures;
     for (unsigned i = 1; i <= MAX_THREADS; i++) {
       unsigned int width_max = (_width / MAX_THREADS) * i, width_min = width_max - (_width / MAX_THREADS);
@@ -41,8 +40,8 @@ std::unique_ptr<TextureData> EnvmapProcessing<float>::computeDiffuseIrradiance(u
       };
       futures.push_back(std::async(std::launch::async, lambda, delta, width_min, width_max));
     }
-    for (auto it = futures.begin(); it != futures.end(); it++) {
-      it->get();
+    for (auto it : futures) {
+      it.get();
     }
   }
   return std::make_unique<TextureData>(envmap_tex_data);

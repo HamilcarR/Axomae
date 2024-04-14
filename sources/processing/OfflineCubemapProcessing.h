@@ -25,9 +25,9 @@ class TextureNonPowerOfTwoDimensionsException : public exception::GenericExcepti
 };
 
 template<class T>
-class EnvmapProcessing : virtual public GenericTextureProcessing {
+class EnvmapProcessing : public GenericTextureProcessing {
  protected:
-  std::vector<glm::vec3> data;
+  const std::vector<float> *data;
   unsigned width;
   unsigned height;
   unsigned channels;
@@ -37,18 +37,19 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
 
  public:
   EnvmapProcessing(const std::vector<T> &_data, unsigned _width, unsigned _height, unsigned int num_channels = 3);
-  const std::vector<glm::vec3> &getData() { return data; }
   TextureData computeSpecularIrradiance(double roughness);
   /**
    * @brief This method wrap around if the texture coordinates provided land beyond the texture dimensions, repeating
    * the texture values on both axes.
    */
   template<class D>
-  inline glm::dvec2 wrapAroundTexCoords(D u, D v) const;
+  glm::dvec2 wrapAroundTexCoords(D u, D v) const;
+
   /**
    * @brief Normalizes a set of pixel coordinates into texture bounds.
    */
-  inline glm::dvec2 wrapAroundPixelCoords(int x, int y) const;
+  glm::dvec2 wrapAroundPixelCoords(int x, int y) const;
+
   /**
    * @brief Computes the linear interpolation of a point based on 4 of it's neighbours.
    */
@@ -57,37 +58,39 @@ class EnvmapProcessing : virtual public GenericTextureProcessing {
                                  const glm::dvec2 &bottom_left,
                                  const glm::dvec2 &bottom_right,
                                  const glm::dvec2 &point) const;
+
   /**
    * @brief Sample the original texture using pixel coordinates.
    */
-  inline glm::dvec3 discreteSample(int x, int y) const;
+  glm::dvec3 discreteSample(int x, int y) const;
+
   /**
    * @brief In case the coordinates go beyond the bounds of the texture , we wrap around .
    * In addition , sampling texels may return an interpolated value when u,v are converted to a (x ,y) non
    * integer texture coordinate.
    */
   template<class D>
-  inline glm::dvec3 uvSample(D u, D v) const;
+  glm::dvec3 uvSample(D u, D v) const;
   template<typename D>
   void launchAsyncDiffuseIrradianceCompute(D delta, float *f_data, unsigned width_begin, unsigned width_end, unsigned _width, unsigned _height) const;
   std::unique_ptr<TextureData> computeDiffuseIrradiance(unsigned _width, unsigned _height, unsigned delta, bool gpu) const;
   template<class D>
-  inline glm::dvec3 computeIrradianceSingleTexel(unsigned x, unsigned y, unsigned samples, D tangent, D bitangent, D normal) const;
+  glm::dvec3 computeIrradianceSingleTexel(unsigned x, unsigned y, unsigned samples, D tangent, D bitangent, D normal) const;
   template<class D>
-  inline glm::dvec3 computeIrradianceImportanceSampling(D x, D y, D z, unsigned _width, unsigned _height, unsigned total_samples) const;
+  glm::dvec3 computeIrradianceImportanceSampling(D x, D y, D z, unsigned _width, unsigned _height, unsigned total_samples) const;
 };
+
 template<class T>
-EnvmapProcessing<T>::EnvmapProcessing(const std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels) {
+EnvmapProcessing<T>::EnvmapProcessing(const std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels)
+    : data(&_data) {
   if (!isValidDim(_width) || !isValidDim(_height))
     throw TextureInvalidDimensionsException();
-  else if (!isDimPowerOfTwo(_width) || !isDimPowerOfTwo(_height))
+  if (!isDimPowerOfTwo(_width) || !isDimPowerOfTwo(_height))
     throw TextureNonPowerOfTwoDimensionsException();
+  AX_ASSERT(num_channels == 3, "");
   width = _width;
   height = _height;
   channels = num_channels;
-  for (unsigned i = 0; i < width * height * num_channels; i += num_channels) {
-    data.push_back(glm::vec3(_data[i], _data[i + 1], _data[i + 2]));
-  }
 }
 
 template<class T>
@@ -97,7 +100,7 @@ TextureData EnvmapProcessing<T>::computeSpecularIrradiance(double roughness) {
 
 template<class T>
 template<class D>
-inline glm::dvec2 EnvmapProcessing<T>::wrapAroundTexCoords(const D u, const D v) const {
+glm::dvec2 EnvmapProcessing<T>::wrapAroundTexCoords(const D u, const D v) const {
   D u_integer = 0, v_integer = 0;
   D u_double_p = 0., v_double_p = 0.;
   u_integer = std::floor(u);
@@ -114,7 +117,7 @@ inline glm::dvec2 EnvmapProcessing<T>::wrapAroundTexCoords(const D u, const D v)
 }
 
 template<class T>
-inline glm::dvec2 EnvmapProcessing<T>::wrapAroundPixelCoords(const int x, const int y) const {
+glm::dvec2 EnvmapProcessing<T>::wrapAroundPixelCoords(const int x, const int y) const {
   unsigned int x_coord = 0, y_coord = 0;
   int _width = static_cast<int>(width);
   int _height = static_cast<int>(height);
@@ -147,14 +150,17 @@ glm::dvec3 EnvmapProcessing<T>::bilinearInterpolate(const glm::dvec2 &top_left,
 }
 
 template<class T>
-inline glm::dvec3 EnvmapProcessing<T>::discreteSample(int x, int y) const {
-  const glm::dvec2 normalized = wrapAroundPixelCoords(static_cast<int>(x), static_cast<int>(y));
-  const glm::dvec3 texel_value = data[normalized.y * width + normalized.x];
-  return texel_value;
+glm::dvec3 EnvmapProcessing<T>::discreteSample(int x, int y) const {
+  const glm::dvec2 normalized = wrapAroundPixelCoords(x, y);
+  const float r = (*data)[(normalized.y * width + normalized.x) * channels];
+  const float g = (*data)[(normalized.y * width + normalized.x) * channels + 1];
+  const float b = (*data)[(normalized.y * width + normalized.x) * channels + 2];
+  return {r, g, b};
 }
+
 template<class T>
 template<class D>
-inline glm::dvec3 EnvmapProcessing<T>::uvSample(const D u, const D v) const {
+glm::dvec3 EnvmapProcessing<T>::uvSample(const D u, const D v) const {
   const glm::dvec2 wrap_uv = wrapAroundTexCoords(u, v);
   const glm::dvec2 pixel_coords = glm::dvec2(math::texture::uvToPixel(wrap_uv.x, width), math::texture::uvToPixel(wrap_uv.y, height));
   const glm::dvec2 top_left(std::floor(pixel_coords.x), std::floor(pixel_coords.y));
@@ -173,7 +179,6 @@ void EnvmapProcessing<T>::launchAsyncDiffuseIrradianceCompute(
     for (unsigned j = 0; j < _height; j++) {
       glm::dvec2 uv = glm::dvec2(math::texture::pixelToUv(i, _width), math::texture::pixelToUv(j, _height));
       const glm::dvec2 sph = math::spherical::uvToSpherical(uv.x, uv.y);
-      const glm::dvec2 sph_to_uv = math::spherical::sphericalToUv(sph);
       const glm::dvec3 cart = math::spherical::sphericalToCartesian(sph.x, sph.y);
       glm::dvec3 irrad = computeIrradianceImportanceSampling(cart.x, cart.y, cart.z, _width, _height, delta);
       unsigned index = (j * _width + i) * channels;
@@ -185,9 +190,9 @@ void EnvmapProcessing<T>::launchAsyncDiffuseIrradianceCompute(
 }
 template<class T>
 template<class D>
-inline glm::dvec3 EnvmapProcessing<T>::computeIrradianceSingleTexel(
+glm::dvec3 EnvmapProcessing<T>::computeIrradianceSingleTexel(
     const unsigned x, const unsigned y, const unsigned samples, const D tangent, const D bitangent, const D normal) const {
-  glm::dvec3 random = math::importance_sampling::pgc3d((unsigned)x, (unsigned)y, samples);
+  glm::dvec3 random = math::importance_sampling::pgc3d(x, y, samples);
   double phi = 2 * PI * random.x;
   double theta = asin(sqrt(random.y));
   glm::dvec3 uv_cart = math::spherical::sphericalToCartesian(phi, theta);
@@ -199,7 +204,7 @@ inline glm::dvec3 EnvmapProcessing<T>::computeIrradianceSingleTexel(
 
 template<class T>
 template<class D>
-inline glm::dvec3 EnvmapProcessing<T>::computeIrradianceImportanceSampling(
+glm::dvec3 EnvmapProcessing<T>::computeIrradianceImportanceSampling(
     const D x, const D y, const D z, const unsigned _width, const unsigned _height, const unsigned total_samples) const {
   unsigned int samples = 0;
   glm::dvec3 irradiance{0};
@@ -207,7 +212,7 @@ inline glm::dvec3 EnvmapProcessing<T>::computeIrradianceImportanceSampling(
   glm::dvec3 right_vec{1.f, 0.f, 0.f};
   glm::dvec2 uv = math::spherical::sphericalToUv(math::spherical::cartesianToSpherical(x, y, z));
   glm::dvec2 pix = glm::dvec2(math::texture::uvToPixel(uv.x, _width), math::texture::uvToPixel(uv.y, _height));
-  float dd = (float)glm::dot(right_vec, normal);
+  double dd = glm::dot(right_vec, normal);
   glm::dvec3 tangent = glm::dvec3(0.0, 1.0, 0.0);
   if (1.0 - abs(dd) > math::epsilon)
     tangent = glm::normalize(glm::cross(right_vec, normal));
