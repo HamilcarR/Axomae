@@ -74,6 +74,10 @@ class Logger : protected AbstractLogger {
     if (enabled)
       print();
   }
+  void logMessage(const std::string &message) {
+    if (enabled)
+      *out << level_str[LogLevel::INFO] << message << "\n";
+  }
 
   void logMessage(const char *message, LogLevel::LOGENUMTYPE log_level, const char *file, const char *function, unsigned line) {
     logMessage(std::string(message), log_level, file, function, line);
@@ -138,6 +142,7 @@ namespace log_functions {
     log_message(std::string(message), level, file, function, line);
   }
 
+  void log_message(const std::string &message) { logger_global.logMessage(message); }
   void log_message(const char *message) { logger_global.logMessage(message); }
 
   void log_flush() { logger_global.flush(); }

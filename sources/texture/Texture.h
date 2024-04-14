@@ -102,6 +102,8 @@ class Texture {
   virtual void setGlData(Shader *shader) = 0;
   void cleanGlData();
   virtual void setNewSize(unsigned width, unsigned height);
+  template<class T>
+  void setNewData(const std::vector<T> &new_buffer, FORMAT format, FORMAT type);
   void clean();
 
  protected:
@@ -111,7 +113,10 @@ class Texture {
   virtual void initializeTexture2D();
   virtual void setTextureParametersOptions();
 };
-
+template<class T>
+void Texture::setNewData(const std::vector<T> &new_buffer, FORMAT format, FORMAT type) {
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (int)width, (int)height, format, type, new_buffer.data());
+}
 /******************************************************************************************************************************************************************************************************************/
 class DiffuseTexture : public Texture {
  protected:

@@ -1,7 +1,7 @@
 #ifndef RendererInterface_H
 #define RendererInterface_H
 #include "EventInterface.h"
-#include "RendererEnums.h"
+#include "RendererCallbacks.h"
 class Scene;
 class SceneTree;
 class RenderPipeline;
@@ -31,17 +31,18 @@ class RendererInterface : public EventInterface {
   /**
    * @brief Cleans up the former scene and replaces it with a new one.
    */
-  virtual void setNewScene(const SceneChangeData &new_scene) = 0;
   [[nodiscard]] virtual unsigned int *getDefaultFrameBufferIdPointer() = 0;
+  virtual void setViewerWidget(GLViewer *widget) = 0;
+
   [[nodiscard]] virtual RenderPipeline &getRenderPipeline() const = 0;
   [[nodiscard]] virtual Scene &getScene() const = 0;
-
-  virtual void setViewerWidget(GLViewer *widget) = 0;
 };
 
 class IRenderer : public RendererInterface {
  public:
   ~IRenderer() override = default;
+
+  virtual void setNewScene(const SceneChangeData &new_scene) = 0;
   virtual void setGammaValue(float gamma) = 0;
   virtual void setExposureValue(float exposure) = 0;
   virtual void setNoPostProcess() = 0;

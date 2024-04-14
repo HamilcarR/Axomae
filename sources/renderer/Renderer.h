@@ -12,7 +12,7 @@
 #include "LightingDatabase.h"
 #include "Loader.h"
 #include "Mesh.h"
-#include "RendererEnums.h"
+#include "RendererCallbacks.h"
 #include "RendererInterface.h"
 #include "ResourceDatabaseManager.h"
 #include "Scene.h"

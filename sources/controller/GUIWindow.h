@@ -18,6 +18,7 @@
  */
 
 class ApplicationConfig;
+class QTimer;
 namespace controller::event {
   class Event;
 }
@@ -25,7 +26,7 @@ namespace gui {
   enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4, ALBEDO = 5, GREYSCALE_AVG = 6, PROJECTED_NMAP = 7, INVALID = 8 };
 }
 namespace controller {
-  // TODO : Needs a bit of refactoring , delete old memory management code
+  // TODO :  delete old memory management code
   class HeapManagement;
   template<typename T>
   struct image_type;
@@ -43,16 +44,22 @@ namespace controller {
     std::unique_ptr<LightController> light_controller;
     std::unique_ptr<ProgressStatus> progress_manager;
     std::unique_ptr<ApplicationConfig> global_application_config;
-    /*UV editor*/
+    /* UV editor*/
     MeshListView *uv_editor_mesh_list;
     SceneSelector uv_mesh_selector;
+    /* Raytracing engine */
+    GLViewer *nova_viewer;
+
+    std::unique_ptr<QTimer> timer;
 
    public:
-    Controller(QWidget *parent = nullptr);
+    static HeapManagement *_MemManagement;  // TODO : Refactor
+
+   public:
+    explicit Controller(QWidget *parent = nullptr);
     ~Controller() override;
     void setApplicationConfig(const ApplicationConfig *configuration);
     Ui::MainWindow &getUi() { return main_window_ui; }
-    static HeapManagement *_MemManagement;
     static SDL_Surface *copy_surface(SDL_Surface *surface);
 
    private:

@@ -9,6 +9,7 @@
 #include "SceneSelector.h"
 #include "ShaderFactory.h"
 #include "TextureViewerWidget.h"
+#include <QTimer>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsItem>
 #include <stack>
@@ -217,6 +218,7 @@ namespace controller {
 
   /***************************************************************************************************************************************************************************************/
   Controller::Controller(QWidget *parent) : QMainWindow(parent), resource_database(ResourceDatabaseManager::getInstance()) {
+    timer = std::make_unique<QTimer>();
 
     /*Initialize databases*/
     resource_database.initializeDatabases();
@@ -238,6 +240,12 @@ namespace controller {
     main_window_ui.renderer_envmap_list->setWidget(realtime_viewer);
     realtime_viewer->getRenderer().getRenderPipeline().setProgressManager(progress_manager.get());
     realtime_viewer->setApplicationConfig(global_application_config.get());
+
+    /* Nova raytracer */
+    nova_viewer = main_window_ui.nova_viewer->getViewer();
+    // nova_viewer->renderOnTimer(30);
+    nova_viewer->getRenderer().getRenderPipeline().setProgressManager(progress_manager.get());
+    nova_viewer->setApplicationConfig(global_application_config.get());
 
     /* UV editor initialization*/
     uv_editor_mesh_list = main_window_ui.meshes_list;
@@ -410,7 +418,6 @@ namespace controller {
     // TODO : move code to their own module + Form
 
     /*Main Window -> Toolbar menu -> Files*/
-
     QObject::connect(main_window_ui.actionImport_image, SIGNAL(triggered()), this, SLOT(import_image()));
     QObject::connect(main_window_ui.actionSave_image, SIGNAL(triggered()), this, SLOT(save_image()));
     QObject::connect(main_window_ui.actionImport_Environment_Map, SIGNAL(triggered()), this, SLOT(import_envmap()));
@@ -496,16 +503,14 @@ namespace controller {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("HDR images (*.hdr)"));
     if (filename.isEmpty())
       return false;
-    else {
-      try {
-        IO::Loader loader(progress_manager.get());
-        loader.loadHdr(filename.toStdString().c_str());
-      } catch (exception::GenericException &e) {
-        LOG(e.what(), LogLevel::ERROR);
-        return false;
-      }
-      return true;
+    try {
+      IO::Loader loader(progress_manager.get());
+      loader.loadHdr(filename.toStdString().c_str());
+    } catch (exception::GenericException &e) {
+      LOG(e.what(), LogLevel::ERROR);
+      return false;
     }
+    return true;
   }
 
   /**************************************************************************************************************/

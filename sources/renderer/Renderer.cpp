@@ -59,7 +59,7 @@ Renderer::Renderer(unsigned width, unsigned height, GLViewer *widget) : Renderer
   screen_size.height = height;
   gl_widget = widget;
   render_pipeline = std::make_unique<RenderPipeline>(&default_framebuffer_id, gl_widget, resource_database);
-  envmap_manager = std::make_unique<EnvmapTextureManager>(*resource_database, screen_size, default_framebuffer_id, *render_pipeline, *scene);
+  envmap_manager = std::make_unique<EnvmapTextureManager>(*resource_database, screen_size, default_framebuffer_id, *render_pipeline, scene.get());
 }
 
 Renderer::~Renderer() {

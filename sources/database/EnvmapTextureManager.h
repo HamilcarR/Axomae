@@ -17,6 +17,9 @@ namespace texture::envmap {
     /*EnvironmentMap2DTexture ID*/
     int equirect_id;
     int lut_id;
+
+    /*Raw data*/
+    image::ImageHolder<float> *metadata;
   };
 
   struct EnvmapBakingConfig {
@@ -43,25 +46,28 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
   using Message = database::event::ImageUpdateMessage;
 
  private:
-  ResourceDatabaseManager &resource_database;
+  ResourceDatabaseManager *resource_database;
   std::vector<texture::envmap::EnvmapTextureGroup> bakes_id;
   texture::envmap::EnvmapTextureGroup current{};
   texture::envmap::EnvmapBakingConfig config{};
   unsigned current_counter{0};
-  Dim2 &screen_dim;
+  Dim2 screen_dim;
   bool cuda_process; /* Use cuda for baking*/
-  unsigned int &default_framebuffer_id;
-  RenderPipeline &render_pipeline;
+  unsigned int *default_framebuffer_id;
+  RenderPipeline *render_pipeline;
   CubeMapMesh *skybox_mesh; /*skybox mesh that will be operated on by this class*/
-  Scene &scene;
+  Scene *scene;
 
  public:
-  explicit EnvmapTextureManager(
-      ResourceDatabaseManager &resource_db, Dim2 &screen_size, unsigned int &default_framebuffer_id, RenderPipeline &render_pipeline, Scene &scene);
+  explicit EnvmapTextureManager(ResourceDatabaseManager &resource_db,
+                                const Dim2 &screen_size,
+                                unsigned int &default_framebuffer_id,
+                                RenderPipeline &render_pipeline,
+                                Scene *scene);
   ~EnvmapTextureManager() = default;
-  EnvmapTextureManager(EnvmapTextureManager &copy) = delete;
+  EnvmapTextureManager(const EnvmapTextureManager &copy) = delete;
   EnvmapTextureManager(EnvmapTextureManager &&move) = delete;
-  EnvmapTextureManager &operator=(EnvmapTextureManager &copy) = delete;
+  EnvmapTextureManager &operator=(const EnvmapTextureManager &copy) = delete;
   EnvmapTextureManager &operator=(EnvmapTextureManager &&move) = delete;
   void initializeDefaultEnvmap(ApplicationConfig *app_conf);
   void notified(observer::Data<Message *> &message) override;
@@ -69,6 +75,7 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
   [[nodiscard]] int currentPrefilterId() const { return current.prefiltered_id; }
   [[nodiscard]] int currentIrradianceId() const { return current.irradiance_id; }
   [[nodiscard]] int currentLutId() const { return current.lut_id; }
+  [[nodiscard]] const image::ImageHolder<float> *currentEnvmapMetadata() const { return current.metadata; }
   void next();
   void previous();
   void updateCurrent(int index);

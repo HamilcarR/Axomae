@@ -40,7 +40,7 @@ std::unique_ptr<TextureData> EnvmapProcessing<float>::computeDiffuseIrradiance(u
       };
       futures.push_back(std::async(std::launch::async, lambda, delta, width_min, width_max));
     }
-    for (auto it : futures) {
+    for (const auto &it : futures) {
       it.get();
     }
   }

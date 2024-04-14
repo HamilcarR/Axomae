@@ -26,17 +26,17 @@ static texture::envmap::EnvmapBakingConfig generate_config() {
 }
 
 EnvmapTextureManager::EnvmapTextureManager(
-    ResourceDatabaseManager &resource_database_, Dim2 &screen_dimensions, unsigned int &default_id, RenderPipeline &rdp, Scene &scene_)
-    : resource_database(resource_database_),
+    ResourceDatabaseManager &resource_database_, const Dim2 &screen_dimensions, unsigned int &default_id, RenderPipeline &rdp, Scene *scene_)
+    : resource_database(&resource_database_),
       screen_dim(screen_dimensions),
       cuda_process(false),
-      default_framebuffer_id(default_id),
-      render_pipeline(rdp),
+      default_framebuffer_id(&default_id),
+      render_pipeline(&rdp),
       scene(scene_) {
-
-  resource_database.getHdrDatabase()->attach(*this);
+  resource_database->getHdrDatabase()->attach(*this);
   config = generate_config();
-  skybox_mesh = &scene.getSkybox();
+  if (scene)
+    skybox_mesh = &scene->getSkybox();
 }
 
 void EnvmapTextureManager::createFurnace() {
@@ -48,20 +48,20 @@ void EnvmapTextureManager::createFurnace() {
   metadata.channels = 3;
   metadata.color_corrected = true;
   metadata.is_hdr = true;
-  HdrImageDatabase *hdr_database = resource_database.getHdrDatabase();
+  HdrImageDatabase *hdr_database = resource_database->getHdrDatabase();
   database::image::store<float>(*hdr_database, true, image_data, metadata);
 }
 
 void EnvmapTextureManager::initializeDefaultEnvmap(ApplicationConfig *conf) {
-
   /* Need to compute the LUT beforehand , because of the add event in the HDR database*/
-  if (resource_database.getTextureDatabase()->getTexturesByType(Texture::BRDFLUT).empty())
-    resource_database.getTextureDatabase()->setPersistence(
-        render_pipeline.generateBRDFLookupTexture(config.lut.width, config.lut.height, screen_dim));
-  /*Adding the default envmap :
+  if (resource_database->getTextureDatabase()->getTexturesByType(Texture::BRDFLUT).empty())
+    resource_database->getTextureDatabase()->setPersistence(
+        render_pipeline->generateBRDFLookupTexture(config.lut.width, config.lut.height, screen_dim));
+  /*
+   * Adding the default envmap :
    * This needs to always have a default state
    */
-  if (resource_database.getHdrDatabase()->empty()) {
+  if (resource_database->getHdrDatabase()->empty()) {
     try {
       IO::Loader loader(nullptr);
       loader.loadHdr(config.default_envmap_path.c_str());
@@ -91,7 +91,8 @@ void EnvmapTextureManager::notified(observer::Data<EnvmapTextureManager::Message
 void EnvmapTextureManager::updateCurrent(int index) {
   assert(static_cast<unsigned>(index) < bakes_id.size());
   current = bakes_id[index];
-  scene.switchEnvmap(current.cubemap_id, current.irradiance_id, current.prefiltered_id, current.lut_id);
+  if (scene)
+    scene->switchEnvmap(current.cubemap_id, current.irradiance_id, current.prefiltered_id, current.lut_id);
 }
 
 void EnvmapTextureManager::next() {}
@@ -118,34 +119,35 @@ static TextureData texture_metadata(image::ThumbnailImageHolder<float> *raw_imag
 }
 
 void EnvmapTextureManager::addToCollection(int index) {
-  TextureDatabase &texture_database = *resource_database.getTextureDatabase();
-  HdrImageDatabase &image_database = *resource_database.getHdrDatabase();
+  TextureDatabase *texture_database = resource_database->getTextureDatabase();
+  HdrImageDatabase *image_database = resource_database->getHdrDatabase();
   texture::envmap::EnvmapTextureGroup texgroup{};
-  image::ThumbnailImageHolder<float> *raw_image_data = image_database.get(index);
+  image::ThumbnailImageHolder<float> *raw_image_data = image_database->get(index);
   AX_ASSERT(raw_image_data, "Index returns invalid pointer.");
   texgroup.equirect_id = index;
+  texgroup.metadata = raw_image_data;
   TextureData envmap = texture_metadata(raw_image_data);
-  auto result = database::texture::store<EnvironmentMap2DTexture>(texture_database, false, &envmap);
+  auto result = database::texture::store<EnvironmentMap2DTexture>(*texture_database, false, &envmap);
   assert(result.object);
   if (!cuda_process) {
-    texgroup.cubemap_id = render_pipeline.bakeEnvmapToCubemap(
+    texgroup.cubemap_id = render_pipeline->bakeEnvmapToCubemap(
         result.object, *skybox_mesh, config.skybox_dim.width, config.skybox_dim.height, screen_dim);
-    texgroup.irradiance_id = render_pipeline.bakeIrradianceCubemap(
+    texgroup.irradiance_id = render_pipeline->bakeIrradianceCubemap(
         texgroup.cubemap_id, config.irradiance_dim.width, config.irradiance_dim.height, screen_dim);
-    texgroup.prefiltered_id = render_pipeline.preFilterEnvmap(texgroup.cubemap_id,
-                                                              config.base_env_dim_upscale,
-                                                              config.prefilter_dim.width,
-                                                              config.prefilter_dim.height,
-                                                              config.prefilter_mip_maps,
-                                                              config.base_samples,
-                                                              config.sampling_factor_per_mips,
-                                                              screen_dim);
-    texture_database.setPersistence(texgroup.cubemap_id);
-    texture_database.setPersistence(texgroup.irradiance_id);
-    texture_database.setPersistence(texgroup.prefiltered_id);
+    texgroup.prefiltered_id = render_pipeline->preFilterEnvmap(texgroup.cubemap_id,
+                                                               config.base_env_dim_upscale,
+                                                               config.prefilter_dim.width,
+                                                               config.prefilter_dim.height,
+                                                               config.prefilter_mip_maps,
+                                                               config.base_samples,
+                                                               config.sampling_factor_per_mips,
+                                                               screen_dim);
+    texture_database->setPersistence(texgroup.cubemap_id);
+    texture_database->setPersistence(texgroup.irradiance_id);
+    texture_database->setPersistence(texgroup.prefiltered_id);
   } else {
     /* Cuda baking here*/
   }
-  texgroup.lut_id = texture_database.getTexturesByType(Texture::BRDFLUT)[0].id;
+  texgroup.lut_id = texture_database->getTexturesByType(Texture::BRDFLUT)[0].id;
   bakes_id.push_back(texgroup);
 }

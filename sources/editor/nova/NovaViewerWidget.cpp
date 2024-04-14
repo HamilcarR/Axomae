@@ -1,4 +1,5 @@
 #include "NovaViewerWidget.h"
+#include "GLViewer.h"
 #include "NovaRenderer.h"
 #include <QGridLayout>
 
@@ -12,3 +13,5 @@ NovaViewerWidget::NovaViewerWidget(QWidget *parent) : QWidget(parent) {
   setMouseTracking(true);
 }
 NovaViewerWidget::~NovaViewerWidget() = default;
+
+GLViewer *NovaViewerWidget::getViewer() const { return viewer.get(); }

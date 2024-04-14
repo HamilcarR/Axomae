@@ -24,7 +24,7 @@ namespace math::geometry {
     return d;
   }
 
-  inline glm::mat3 glm_extract_rotation(const glm::mat4 &model) { return glm::mat3(model); }
+  inline glm::mat3 glm_extract_rotation(const glm::mat4 &model) { return {model}; }
   inline glm::vec3 glm_extract_translation(const glm::mat4 &model) { return {model[3]}; }
   inline glm::vec3 glm_extract_scale(const glm::mat4 &model) { return {model[0].x, model[1].y, model[2].z}; }
   inline glm::vec3 glm_extract_xaxis(const glm::mat4 &model) { return {glm::normalize(model[0])}; }

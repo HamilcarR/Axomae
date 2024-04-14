@@ -2,11 +2,10 @@
 #define GLVIEWER_H
 
 #include "Mesh.h"
-#include "RendererEnums.h"
+#include "RendererCallbacks.h"
 #include "RendererInterface.h"
 #include "SceneHierarchy.h"
 #include "constants.h"
-#include "utils_3D.h"
 #include <QOpenGLWidget>
 /**
  * @file GLView.h
@@ -19,6 +18,7 @@ class ApplicationConfig;
 namespace controller::event {
   class Event;
 }
+class QTimer;
 /**
  * @class GLViewer
  * This class implements methods for the drawing process
@@ -33,6 +33,10 @@ class GLViewer : public QOpenGLWidget {
   ApplicationConfig *global_application_config{};
   std::unique_ptr<controller::event::Event> widget_input_events;
 
+ private:
+  bool render_on_timer{false};
+  std::unique_ptr<QTimer> timer;
+
  public:
   explicit GLViewer(QWidget *parent = nullptr);
   explicit GLViewer(std::unique_ptr<IRenderer> &renderer, QWidget *parent = nullptr);
@@ -45,6 +49,8 @@ class GLViewer : public QOpenGLWidget {
   [[nodiscard]] RendererInterface &getRenderer() const;
   void setApplicationConfig(ApplicationConfig *app_conf) { global_application_config = app_conf; }
   void setRenderer(std::unique_ptr<IRenderer> &renderer);
+  void renderOnTimer(int interval);
+  void renderOnUpdate();
   template<RENDERER_CALLBACK_ENUM callback_id, class... Args>
   constexpr void rendererCallback(Args &&...args);
 
@@ -63,8 +69,10 @@ class GLViewer : public QOpenGLWidget {
 
  public slots:
   void onUpdateDrawEvent();
+  void onTimerTimeout();
 };
 
+/* Replace by an event structure in Controller class and send it to the renderer */
 template<RENDERER_CALLBACK_ENUM callback_id, class... Args>
 constexpr void GLViewer::rendererCallback(Args &&...args) {
   renderer->executeMethod<callback_id>(std::forward<Args>(args)...);

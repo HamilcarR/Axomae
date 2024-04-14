@@ -463,19 +463,19 @@ void CubemapTexture::setCubeMapTextureData(TextureData *texture) {
 CubemapTexture::CubemapTexture(TextureData *data) : CubemapTexture() {
   type = CUBEMAP;
   if (data)
-    setCubeMapTextureData(data);
+    CubemapTexture::setCubeMapTextureData(data);
 }
 
 void CubemapTexture::initializeTexture2D() {
   if (!data.empty())
     for (unsigned int i = 1; i <= 6; i++) {
       uint32_t *pointer_to_data = data.data() + (i - 1) * width * height;
-      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (i - 1), 0, internal_format, width, height, 0, data_format, data_type, pointer_to_data);
+      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (i - 1), 0, internal_format, (int)width, (int)height, 0, data_format, data_type, pointer_to_data);
       errorCheck(__FILE__, __LINE__);
     }
   else
     for (unsigned i = 0; i < 6; i++) {
-      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internal_format, width, height, 0, data_format, data_type, nullptr);
+      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internal_format, (int)width, (int)height, 0, data_format, data_type, nullptr);
       errorCheck(__FILE__, __LINE__);
     }
 
@@ -555,7 +555,7 @@ IrradianceTexture::IrradianceTexture(FORMAT _internal_format, FORMAT _data_forma
 IrradianceTexture::IrradianceTexture(TextureData *data) : IrradianceTexture() {
   type = IRRADIANCE;
   if (data)
-    setCubeMapTextureData(data);
+    CubemapTexture::setCubeMapTextureData(data);
 }
 
 const char *IrradianceTexture::getTextureTypeCStr() { return texture_type_c_str[IRRADIANCE]; }
@@ -578,7 +578,7 @@ EnvironmentMap2DTexture::EnvironmentMap2DTexture(FORMAT _internal_format, FORMAT
 EnvironmentMap2DTexture::EnvironmentMap2DTexture(TextureData *data) : Texture(data) { type = ENVMAP2D; }
 
 void EnvironmentMap2DTexture::initializeTexture2D() {
-  glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, f_data.data());
+  glTexImage2D(GL_TEXTURE_2D, 0, internal_format, (int)width, (int)height, 0, data_format, data_type, f_data.data());
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

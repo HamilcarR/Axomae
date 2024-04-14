@@ -7,7 +7,7 @@
 #include <QMouseEvent>
 #include <QPoint>
 #include <QSurfaceFormat>
-
+#include <QTimer>
 using namespace axomae;
 using EventManager = controller::event::Event;
 static QSurfaceFormat setupFormat() {
@@ -24,22 +24,24 @@ static QSurfaceFormat setupFormat() {
   return format;
 }
 
-GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent) {
+GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent), glew_initialized(false) {
   setFormat(setupFormat());
   renderer = std::make_unique<Renderer>(width(), height(), this);
   widget_input_events = std::make_unique<EventManager>();
-  glew_initialized = false;
+  timer = std::make_unique<QTimer>();
+  connect(timer.get(), &QTimer::timeout, this, &GLViewer::onTimerTimeout);
 }
 
-GLViewer::GLViewer(std::unique_ptr<IRenderer> &r, QWidget *parent) : QOpenGLWidget(parent) {
+GLViewer::GLViewer(std::unique_ptr<IRenderer> &r, QWidget *parent) : QOpenGLWidget(parent), glew_initialized(false) {
   setFormat(setupFormat());
   renderer = std::move(r);
   renderer->setViewerWidget(this);
   widget_input_events = std::make_unique<EventManager>();
-  glew_initialized = false;
+  timer = std::make_unique<QTimer>();
+  connect(timer.get(), &QTimer::timeout, this, &GLViewer::onTimerTimeout);
 }
 
-GLViewer::~GLViewer() {}
+GLViewer::~GLViewer() = default;
 
 GLViewer &GLViewer::operator=(GLViewer &&move) noexcept {
   if (this != &move) {
@@ -87,7 +89,6 @@ void GLViewer::initializeGL() {
   }
   renderer->onResize(width(), height());
   renderer->initialize(global_application_config);
-  errorCheck(__FILE__, __LINE__);
 }
 
 void GLViewer::paintGL() {
@@ -100,11 +101,25 @@ void GLViewer::paintGL() {
 void GLViewer::resizeGL(int w, int h) {
   QOpenGLWidget::resizeGL(w, h);
   renderer->onResize(width(), height());
+  update();
 }
 
 const controller::event::Event *GLViewer::getInputEventsStructure() const {
   AX_ASSERT(widget_input_events != nullptr, "Event structure pointer is not valid.");
   return widget_input_events.get();
+}
+
+void GLViewer::renderOnTimer(int time) {
+  if (timer)
+    timer->start(time);
+  render_on_timer = true;
+}
+
+void GLViewer::renderOnUpdate() { render_on_timer = false; }
+
+void GLViewer::onTimerTimeout() {
+  if (render_on_timer)
+    update();
 }
 
 void GLViewer::mouseMoveEvent(QMouseEvent *event) {

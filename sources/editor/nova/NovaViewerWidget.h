@@ -1,9 +1,10 @@
 #ifndef NOVAVIEWERWIDGET_H
 #define NOVAVIEWERWIDGET_H
-#include "GLViewer.h"
+
 #include "ui_nova_viewer.h"
 
 class QGridLayout;
+class GLViewer;
 class NovaViewerWidget : public QWidget {
   Q_OBJECT
  private:
@@ -18,6 +19,8 @@ class NovaViewerWidget : public QWidget {
   NovaViewerWidget &operator=(const NovaViewerWidget &copy) = delete;
   NovaViewerWidget &operator=(NovaViewerWidget &&move) noexcept = delete;
   NovaViewerWidget(NovaViewerWidget &&move) noexcept = delete;
+
+  [[nodiscard]] GLViewer *getViewer() const;
 };
 
 #endif  // NovaViewerWidget_H

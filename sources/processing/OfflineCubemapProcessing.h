@@ -25,8 +25,9 @@ class TextureNonPowerOfTwoDimensionsException : public exception::GenericExcepti
 };
 
 template<class T>
-class EnvmapProcessing : public GenericTextureProcessing {
- protected:
+class EnvmapProcessing final : GenericTextureProcessing {
+
+ private:
   const std::vector<float> *data;
   unsigned width;
   unsigned height;

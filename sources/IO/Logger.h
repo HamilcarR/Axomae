@@ -12,6 +12,7 @@
 #include <vector>
 
 #define LOG(message, level) log_functions::log_message(message, level, __FILE__, __func__, __LINE__)
+#define LOGFL(message, level, file, function, line) log_functions::log_message(message, level, file, function, line)
 #define LOGS(message) log_functions::log_message(message)
 #define LOGFLUSH() log_functions::log_flush()
 #define LOGCONFIG(config) log_functions::log_configure(config)
@@ -33,6 +34,7 @@ namespace log_functions {
   void log_message(const char *message, LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line);
   void log_message(const std::string &message, LogLevel::LOGENUMTYPE level, const char *file, const char *function, unsigned int line);
   void log_message(const char *message);
+  void log_message(const std::string &message);
   void log_flush();
   void log_configure(const LoggerConfigDataStruct &config);
   void log_disable();

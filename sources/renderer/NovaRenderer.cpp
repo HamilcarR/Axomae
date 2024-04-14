@@ -1,42 +1,65 @@
 #include "NovaRenderer.h"
 #include "CameraFrameBuffer.h"
+#include "DebugGL.h"
+#include "DrawEngine.h"
 #include "EnvmapTextureManager.h"
+#include "GLPixelBufferObject.h"
+#include "GLViewer.h"
+#include "NovaRenderer.h"
+#include "OfflineCubemapProcessing.h"
+#include "PerformanceLogger.h"
 #include "RenderPipeline.h"
 #include "Scene.h"
+
 NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *widget) : NovaRenderer() {
   resource_database = &ResourceDatabaseManager::getInstance();
   camera_framebuffer = std::make_unique<CameraFrameBuffer>(*resource_database, &screen_size, &default_framebuffer_id);
+  gl_widget = widget;
+  render_pipeline = std::make_unique<RenderPipeline>(&default_framebuffer_id, gl_widget, resource_database);
+  pixel_buffer_object = std::make_unique<GLPixelBufferObject>(GLPixelBufferObject::UP, screen_size.width * screen_size.height * 3 * sizeof(float));
+  scene = std::make_unique<Scene>(*resource_database);
+  envmap_processing = std::make_unique<HdrEnvmapProcessing>();
+  envmap_manager = std::make_unique<EnvmapTextureManager>(*resource_database, screen_size, default_framebuffer_id, *render_pipeline, nullptr);
 }
 
-NovaRenderer::~NovaRenderer() = default;
+NovaRenderer::~NovaRenderer() { pixel_buffer_object->clean(); }
 
-void NovaRenderer::initialize(ApplicationConfig *app_conf) { camera_framebuffer->initializeFrameBuffer(); }
+void NovaRenderer::initialize(ApplicationConfig *app_conf) {
+  camera_framebuffer->initializeFrameBuffer();
+  framebuffer_texture = camera_framebuffer->getFrameBufferTexturePointer(GLFrameBuffer::COLOR0);
+  pixel_buffer_object->initializeBuffers();
+}
 bool NovaRenderer::prep_draw() {
-  if (camera_framebuffer && camera_framebuffer->getDrawable()->ready()) {
+  if (camera_framebuffer && camera_framebuffer->getDrawable()->ready())
     camera_framebuffer->startDraw();
-    return true;
-  } else
-    glClearColor(1.f, 1.f, 1.f, 1.f);
+  if (pixel_buffer_object->isReady()) {
+    pixel_buffer_object->bind();
+    pixel_buffer_object->fillBuffers();
+  }
+  glClearColor(1.f, 1.f, 1.f, 1.f);
+  return true;
 }
 
 void NovaRenderer::draw() {
+  PerformanceLogger perf;
+  perf.startTimer();
   glClear(GL_COLOR_BUFFER_BIT);
-  Texture *tex = camera_framebuffer->getFrameBufferTexturePointer(GLFrameBuffer::COLOR0);
-  tex->bindTexture();
-  auto result = ResourceDatabaseManager::getInstance().getHdrDatabase()->get(1);
-  if (result) {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, result->metadata().width, result->metadata().height, 0, GL_RGB, GL_FLOAT, result->data.data());
+  framebuffer_texture->bindTexture();
+  pixel_buffer_object->bind();
+  GL_ERROR_CHECK(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, screen_size.width, screen_size.height, GL_RGB, GL_FLOAT, nullptr));
+  pixel_buffer_object->fillBuffers();
+  float *map_buffer = pixel_buffer_object->mapBuffer<float>(GLPixelBufferObject::RW);
+  if (map_buffer) {
+    const image::ImageHolder<float> *current_envmap = envmap_manager->currentEnvmapMetadata();
+    nova::SceneResourcesHolder holder{&current_envmap->data, (int)current_envmap->metadata.width, (int)current_envmap->metadata.height};
+    nova::draw(map_buffer, (int)screen_size.width, (int)screen_size.height, &holder);
   }
+  AX_ASSERT(pixel_buffer_object->unmapBuffer(), "");
+  pixel_buffer_object->unbind();
   camera_framebuffer->renderFrameBufferMesh();
+  perf.endTimer();
+  perf.print();
 }
-
-void NovaRenderer::processEvent(const controller::event::Event *event) {}
-void NovaRenderer::setDefaultFrameBufferId(unsigned int id) {}
-unsigned int *NovaRenderer::getDefaultFrameBufferIdPointer() { return nullptr; }
-Scene &NovaRenderer::getScene() const {}
-RenderPipeline &NovaRenderer::getRenderPipeline() const {}
-
-void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {}
 
 void NovaRenderer::onResize(unsigned int width, unsigned int height) {
   screen_size.width = width;
@@ -44,7 +67,24 @@ void NovaRenderer::onResize(unsigned int width, unsigned int height) {
   if (camera_framebuffer) {
     camera_framebuffer->resize();
   }
+  if (pixel_buffer_object && pixel_buffer_object->isReady()) {
+    pixel_buffer_object->bind();
+    pixel_buffer_object->setNewSize((int)width * (int)height * 3 * sizeof(float));
+    pixel_buffer_object->unbind();
+  }
 }
+
+void NovaRenderer::processEvent(const controller::event::Event *event) {}
+
+void NovaRenderer::setDefaultFrameBufferId(unsigned int id) {}
+
+unsigned int *NovaRenderer::getDefaultFrameBufferIdPointer() { return nullptr; }
+
+Scene &NovaRenderer::getScene() const { return *scene; }
+
+RenderPipeline &NovaRenderer::getRenderPipeline() const { return *render_pipeline; }
+
+void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {}
 
 void NovaRenderer::setGammaValue(float value) {
   if (camera_framebuffer) {
