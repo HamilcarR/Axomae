@@ -9,6 +9,7 @@ target_link_libraries(ax_nova
 PRIVATE
     ax_math
     ax_macro
+    ax_processing
 )
 
 target_include_directories(ax_nova

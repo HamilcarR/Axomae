@@ -17,7 +17,7 @@ namespace nova {
     Ray &operator=(const Ray &) = default;
     Ray &operator=(Ray &&) = default;
 
-    Vec3f pointAt(float t) const;
+    [[nodiscard]] Vec3f pointAt(float t) const;
   };
 
 }  // namespace nova
