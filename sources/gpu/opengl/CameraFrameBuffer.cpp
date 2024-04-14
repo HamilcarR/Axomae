@@ -1,4 +1,5 @@
 #include "CameraFrameBuffer.h"
+#include "DebugGL.h"
 #include "Drawable.h"
 #include "INodeFactory.h"
 #include "UniformNames.h"
@@ -62,7 +63,7 @@ void CameraFrameBuffer::startDraw() {
 
 void CameraFrameBuffer::renderFrameBufferMesh() {
   drawable_screen_quad->bind();
-  glDrawElements(GL_TRIANGLES, drawable_screen_quad->getMeshPointer()->getGeometry().indices.size(), GL_UNSIGNED_INT, 0);
+  GL_ERROR_CHECK(glDrawElements(GL_TRIANGLES, drawable_screen_quad->getMeshPointer()->getGeometry().indices.size(), GL_UNSIGNED_INT, 0));
   drawable_screen_quad->unbind();
 }
 

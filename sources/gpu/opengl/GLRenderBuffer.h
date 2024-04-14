@@ -24,7 +24,7 @@ class GLRenderBuffer : public GLBufferInterface {
   };
 
  protected:
-  unsigned int renderbuffer_id;
+  unsigned int renderbuffer_id{};
   unsigned int width;
   unsigned int height;
   INTERNAL_FORMAT format;
@@ -42,7 +42,7 @@ class GLRenderBuffer : public GLBufferInterface {
   void unbind() override;
   void clean() override;
 
-  unsigned int getID() const { return renderbuffer_id; }
+  [[nodiscard]] unsigned int getID() const { return renderbuffer_id; }
   INTERNAL_FORMAT getFormat() { return format; }
   virtual void resize(unsigned width, unsigned height);
   void fillBuffers() override;

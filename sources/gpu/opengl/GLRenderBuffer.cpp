@@ -13,28 +13,27 @@ GLRenderBuffer::GLRenderBuffer(unsigned int _width, unsigned int _height, INTERN
 }
 
 void GLRenderBuffer::initializeBuffers() {
-  glGenRenderbuffers(1, &renderbuffer_id);
+  GL_ERROR_CHECK(glGenRenderbuffers(1, &renderbuffer_id));
   bind();
-  glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
-  errorCheck(__FILE__, __LINE__);
+  GL_ERROR_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, format, width, height));
 }
 
 bool GLRenderBuffer::isReady() const { return renderbuffer_id != 0; }
 
 void GLRenderBuffer::fillBuffers() { EMPTY_FUNCBODY; }
 
-void GLRenderBuffer::bind() { glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer_id); }
+void GLRenderBuffer::bind() { GL_ERROR_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer_id)); }
 
-void GLRenderBuffer::unbind() { glBindRenderbuffer(GL_RENDERBUFFER, 0); }
+void GLRenderBuffer::unbind() { GL_ERROR_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, 0)); }
 
 void GLRenderBuffer::clean() {
   unbind();
-  glDeleteRenderbuffers(1, &renderbuffer_id);
+  GL_ERROR_CHECK(glDeleteRenderbuffers(1, &renderbuffer_id));
 }
 
 void GLRenderBuffer::resize(unsigned _width, unsigned _height) {
   bind();
-  glRenderbufferStorage(GL_RENDERBUFFER, format, _width, _height);
+  GL_ERROR_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, format, _width, _height));
   unbind();
   width = _width;
   height = _height;

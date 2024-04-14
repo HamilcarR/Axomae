@@ -35,9 +35,9 @@ class GLFrameBuffer : public GLBufferInterface {
  protected:
   TEXTURE_TARGET target_texture_type;                  /*<Type of the target texture */
   std::unique_ptr<GLRenderBuffer> renderbuffer_object; /*<Pointer on the renderbuffer */
-  unsigned int framebuffer_id;                         /*<Framebuffer ID*/
-  unsigned int texture_id;                             /*<ID of the texture rendered to*/
-  unsigned int *pointer_on_default_fbo_id;             /*<Pointer on default fbo variable*/
+  unsigned int framebuffer_id{};                       /*<Framebuffer ID*/
+  unsigned int texture_id{};                           /*<ID of the texture rendered to*/
+  unsigned int *pointer_on_default_fbo_id{};           /*<Pointer on default fbo variable*/
 
  public:
   GLFrameBuffer();
@@ -59,7 +59,7 @@ class GLFrameBuffer : public GLBufferInterface {
                 TEXTURE_TARGET target_texture_type = TEXTURE2D);
 
   void initializeBuffers() override;
-  bool isReady() const override;
+  [[nodiscard]] bool isReady() const override;
   /**
    * @brief Attach a texture to the framebuffer
    */

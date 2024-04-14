@@ -25,7 +25,7 @@ class GLGeometryBuffer : public GLBufferInterface {
 
  public:
   GLGeometryBuffer();
-  GLGeometryBuffer(const Object3D *geometry);
+  explicit GLGeometryBuffer(const Object3D *geometry);
   virtual void setGeometryPointer(const Object3D *geo) { geometry = geo; };
   /**
    * @brief Initialize glGenBuffers for all vertex attributes
