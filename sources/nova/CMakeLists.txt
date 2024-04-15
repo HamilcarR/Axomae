@@ -16,3 +16,5 @@ target_include_directories(ax_nova
 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+add_subdirectory(texturing)

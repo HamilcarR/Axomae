@@ -8,8 +8,8 @@
 namespace math::camera {
 
   struct camera_ray {
-    Vec3f near;
-    Vec3f far;
+    glm::vec3 near;
+    glm::vec3 far;
   };
 
   /* returns world-space ray */
@@ -26,7 +26,7 @@ namespace math::camera {
     glm::vec4 d = inv_P * glm::vec4(ndc_x, ndc_y, -1.f, 0.f);
     d = glm::normalize(inv_V * glm::vec4(d.x, d.y, -1.f, 0.f));
 
-    camera_ray r;
+    camera_ray r{};
     r.near = {o.x, o.y, o.z};
     r.far = {d.x, d.y, d.z};
     return r;

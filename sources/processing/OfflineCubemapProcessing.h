@@ -146,8 +146,13 @@ glm::dvec3 EnvmapProcessing<T>::bilinearInterpolate(const glm::dvec2 &top_left,
                                                     const glm::dvec2 &point) const {
   const double u = (point.x - top_left.x) / (top_right.x - top_left.x);
   const double v = (point.y - top_left.y) / (bottom_left.y - top_left.y);
-  const glm::dvec3 top_interp = (1 - u) * discreteSample(top_left.x, top_left.y) + u * discreteSample(top_right.x, top_right.y);
-  const glm::dvec3 bot_interp = (1 - u) * discreteSample(bottom_left.x, bottom_left.y) + u * discreteSample(bottom_right.x, bottom_right.y);
+  const double horizontal_diff = (1 - u);
+  const glm::dvec3 tl = discreteSample(top_left.x, top_left.y);
+  const glm::dvec3 tr = discreteSample(top_right.x, top_right.y);
+  const glm::dvec3 bl = discreteSample(bottom_left.x, bottom_left.y);
+  const glm::dvec3 br = discreteSample(bottom_right.x, bottom_right.y);
+  const glm::dvec3 top_interp = horizontal_diff * tl + u * tr;
+  const glm::dvec3 bot_interp = horizontal_diff * bl + u * br;
   return (1 - v) * top_interp + v * bot_interp;
 }
 

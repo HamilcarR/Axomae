@@ -1,6 +1,6 @@
 #ifndef HITABLE_H
 #define HITABLE_H
-#include "Vector.h"
+#include "math_utils.h"
 namespace nova {
 
   struct base_options {
@@ -17,8 +17,8 @@ namespace nova {
 
   struct hit_data {
     float t{};
-    Vec3f normal{};
-    Vec3f position{};
+    glm::vec3 normal{};
+    glm::vec3 position{};
   };
   class Ray;
   class Hitable {

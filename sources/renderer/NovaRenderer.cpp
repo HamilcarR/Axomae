@@ -18,7 +18,8 @@ NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *wi
   render_pipeline = std::make_unique<RenderPipeline>(&default_framebuffer_id, gl_widget, resource_database);
   pixel_buffer_object = std::make_unique<GLPixelBufferObject>(GLPixelBufferObject::UP, screen_size.width * screen_size.height * 3 * sizeof(float));
   scene = std::make_unique<Scene>(*resource_database);
-  envmap_manager = std::make_unique<EnvmapTextureManager>(*resource_database, screen_size, default_framebuffer_id, *render_pipeline, nullptr);
+  envmap_manager = std::make_unique<EnvmapTextureManager>(
+      *resource_database, screen_size, default_framebuffer_id, *render_pipeline, nullptr, EnvmapTextureManager::SELECTED);
 }
 
 NovaRenderer::~NovaRenderer() { pixel_buffer_object->clean(); }
@@ -40,8 +41,7 @@ bool NovaRenderer::prep_draw() {
 }
 
 void NovaRenderer::draw() {
-  PerformanceLogger perf;
-  perf.startTimer();
+
   glClear(GL_COLOR_BUFFER_BIT);
   framebuffer_texture->bindTexture();
   pixel_buffer_object->bind();
@@ -49,15 +49,18 @@ void NovaRenderer::draw() {
   pixel_buffer_object->fillBuffers();
   float *map_buffer = pixel_buffer_object->mapBuffer<float>(GLPixelBufferObject::RW);
   if (map_buffer) {
+    PerformanceLogger logger;
+    logger.startTimer();
     const image::ImageHolder<float> *current_envmap = envmap_manager->currentEnvmapMetadata();
-    nova::SceneResourcesHolder holder{&current_envmap->data, (int)current_envmap->metadata.width, (int)current_envmap->metadata.height};
+    nova::texturing::SceneResourcesHolder holder{
+        EnvmapProcessing<float>(current_envmap->data, (int)current_envmap->metadata.width, (int)current_envmap->metadata.height)};
     nova::draw(map_buffer, (int)screen_size.width, (int)screen_size.height, &holder);
+    logger.endTimer();
+    logger.print();
   }
   AX_ASSERT(pixel_buffer_object->unmapBuffer(), "");
   pixel_buffer_object->unbind();
   camera_framebuffer->renderFrameBufferMesh();
-  perf.endTimer();
-  perf.print();
 }
 
 void NovaRenderer::onResize(unsigned int width, unsigned int height) {

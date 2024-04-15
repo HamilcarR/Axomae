@@ -26,8 +26,10 @@ class IFrameBuffer : public FramebufferInterface {
 
  public:
   IFrameBuffer();
+  ~IFrameBuffer() override = default;
   IFrameBuffer(TextureDatabase *texture_database, Dim2 *texture_size, unsigned int *default_fbo_id_pointer = nullptr);
   IFrameBuffer(IFrameBuffer &&move) noexcept;
+  IFrameBuffer(const IFrameBuffer &copy) = delete;
   void resize() override;
   void setTextureDimensions(Dim2 *pointer_on_texture_size) override;
   void bindFrameBuffer() override;

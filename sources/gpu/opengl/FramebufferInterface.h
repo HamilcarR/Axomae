@@ -6,6 +6,7 @@ class Texture;
 
 class FramebufferInterface {
  public:
+  virtual ~FramebufferInterface() = default;
   /**
    * @brief Resizes the textures used by the framebuffer .
    * Will use the values stored inside the texture_dim pointer property

@@ -2,11 +2,7 @@
 
 #include "Logger.h"
 
-RenderQuadFBO::RenderQuadFBO() {}
-
-RenderQuadFBO::RenderQuadFBO(TextureDatabase *database, Dim2 *screen, unsigned int *default_fbo) : IFrameBuffer(database, screen, default_fbo) {
-  LOG("initialized cubemap", LogLevel::INFO);
-}
+RenderQuadFBO::RenderQuadFBO(TextureDatabase *database, Dim2 *screen, unsigned int *default_fbo) : IFrameBuffer(database, screen, default_fbo) {}
 
 void RenderQuadFBO::renderToTexture(GLFrameBuffer::INTERNAL_FORMAT color_attachment) {
   Texture *tex = fbo_attachment_texture_collection[color_attachment];

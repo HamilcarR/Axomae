@@ -1,5 +1,6 @@
 add_library(ax_thread 
     Mutex.cpp
+        ThreadPool.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_thread)

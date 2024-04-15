@@ -10,9 +10,12 @@
  */
 class RenderCubeMap : public IFrameBuffer {
  public:
-  RenderCubeMap();
+  RenderCubeMap() = default;
+  ~RenderCubeMap() override = default;
+  RenderCubeMap(const RenderCubeMap &copy) = delete;
+  RenderCubeMap(RenderCubeMap &&move) noexcept = default;
   RenderCubeMap(TextureDatabase *texture_database, Dim2 *texture_size, unsigned int *default_fbo_pointer_id);
-  virtual void renderToTexture(unsigned face = 0, GLFrameBuffer::INTERNAL_FORMAT color_attachment = GLFrameBuffer::COLOR0, unsigned mipmap_level = 0);
+  virtual void renderToTexture(unsigned face, GLFrameBuffer::INTERNAL_FORMAT color_attachment, unsigned mipmap_level);
 
  protected:
 };

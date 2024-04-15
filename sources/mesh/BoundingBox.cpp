@@ -201,7 +201,7 @@ static bool test_intersection(const glm::vec3 &x_axis,
     return false;
   returned_hit.t = min;
   const glm::vec3 obj_space_hit_position = delta + ray_direction * min;
-  returned_hit.position = Vec3f(obj_space_hit_position.x, obj_space_hit_position.y, obj_space_hit_position.z);
+  returned_hit.position = obj_space_hit_position;
   return true;
 }
 
@@ -220,7 +220,7 @@ bool BoundingBox::hit(const nova::Ray &ray, float tmin, float tmax, nova::hit_da
   bool hit_success = test_intersection(x_axis, y_axis, z_axis, ray_origin, ray_direction, delta, tmin_coords, tmax_coords, tmin, tmax, hit_data);
   if (hit_success) {
     const glm::vec3 world_space_hit_pos = world_matrix * glm::vec4(hit_data.position.x, hit_data.position.y, hit_data.position.z, 1.f);
-    hit_data.position = Vec3f(world_space_hit_pos.x, world_space_hit_pos.y, world_space_hit_pos.z);
+    hit_data.position = world_space_hit_pos;
     return true;
   }
   return false;
