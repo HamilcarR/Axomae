@@ -7,6 +7,8 @@
 #include "RenderPipeline.h"
 #include "Scene.h"
 
+std::vector<texture::envmap::EnvmapTextureGroup> EnvmapTextureManager::bakes_id{};
+
 // TODO : read config values from file/cmd
 static texture::envmap::EnvmapBakingConfig generate_config() {
   texture::envmap::EnvmapBakingConfig config{};
@@ -25,14 +27,19 @@ static texture::envmap::EnvmapBakingConfig generate_config() {
   return config;
 }
 
-EnvmapTextureManager::EnvmapTextureManager(
-    ResourceDatabaseManager &resource_database_, const Dim2 &screen_dimensions, unsigned int &default_id, RenderPipeline &rdp, Scene *scene_)
+EnvmapTextureManager::EnvmapTextureManager(ResourceDatabaseManager &resource_database_,
+                                           const Dim2 &screen_dimensions,
+                                           unsigned int &default_id,
+                                           RenderPipeline &rdp,
+                                           Scene *scene_,
+                                           int policy)
     : resource_database(&resource_database_),
       screen_dim(screen_dimensions),
       cuda_process(false),
       default_framebuffer_id(&default_id),
       render_pipeline(&rdp),
-      scene(scene_) {
+      scene(scene_),
+      update_policy_flag(policy) {
   resource_database->getHdrDatabase()->attach(*this);
   config = generate_config();
   if (scene)
@@ -76,15 +83,22 @@ void EnvmapTextureManager::initializeDefaultEnvmap(ApplicationConfig *conf) {
 void EnvmapTextureManager::notified(observer::Data<EnvmapTextureManager::Message *> &message) {
   switch (message.data->getOperation()) {
     case Message::ADD:
-      addToCollection(message.data->getIndex());
+      if (update_policy_flag & ADD) {
+        addToCollection(message.data->getIndex());
+      }
       break;
     case Message::DELETE:
-      deleteFromCollection(message.data->getIndex());
+      if (update_policy_flag & DELETE) {
+        deleteFromCollection(message.data->getIndex());
+      }
       break;
     case Message::SELECTED:
-      updateCurrent(message.data->getIndex());
+      if (update_policy_flag & SELECTED) {
+        updateCurrent(message.data->getIndex());
+      }
+      break;
     default:
-      return;
+      break;
   }
 }
 
@@ -145,8 +159,6 @@ void EnvmapTextureManager::addToCollection(int index) {
     texture_database->setPersistence(texgroup.cubemap_id);
     texture_database->setPersistence(texgroup.irradiance_id);
     texture_database->setPersistence(texgroup.prefiltered_id);
-  } else {
-    /* Cuda baking here*/
   }
   texgroup.lut_id = texture_database->getTexturesByType(Texture::BRDFLUT)[0].id;
   bakes_id.push_back(texgroup);

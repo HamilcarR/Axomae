@@ -50,7 +50,7 @@ namespace database::event {
     [[nodiscard]] const QPixmap *getThumbnail() { return value; }
     void setThumbnail(const QPixmap *thumbnail) { value = thumbnail; }
     [[nodiscard]] image::Metadata getMetadata() { return metadata; }
-    void setMetadata(image::Metadata metad) { metadata = metad; }
+    void setMetadata(const image::Metadata &metad) { metadata = metad; }
   };
 
   class ImageSelectedMessage : public ImageUpdateMessage {

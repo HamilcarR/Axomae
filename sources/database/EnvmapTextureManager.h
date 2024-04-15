@@ -33,6 +33,7 @@ namespace texture::envmap {
     int base_env_dim_upscale;
     std::string default_envmap_path;
   };
+
 }  // namespace texture::envmap
 
 class ApplicationConfig;
@@ -42,12 +43,22 @@ class ApplicationConfig;
  * @brief Tracks the current scene's envmap IDs , and generates new envmaps textures and IDs when an envmap is imported in an HDR database
  */
 class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpdateMessage *> {
-
   using Message = database::event::ImageUpdateMessage;
+
+ public:
+  /* How this EnvmapTextureManager instance will react to an envmap being imported*/
+  enum UpdatePolicy {
+    NONE = 0,
+    ADD = 1 << 0,
+    DELETE = 1 << 1,
+    SELECTED = 1 << 2
+
+  };
 
  private:
   ResourceDatabaseManager *resource_database;
-  std::vector<texture::envmap::EnvmapTextureGroup> bakes_id;
+  /* Different instances of the manager need to keep track of each others envmap generations*/
+  static std::vector<texture::envmap::EnvmapTextureGroup> bakes_id;
   texture::envmap::EnvmapTextureGroup current{};
   texture::envmap::EnvmapBakingConfig config{};
   unsigned current_counter{0};
@@ -57,13 +68,15 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
   RenderPipeline *render_pipeline;
   CubeMapMesh *skybox_mesh; /*skybox mesh that will be operated on by this class*/
   Scene *scene;
+  int update_policy_flag;
 
  public:
   explicit EnvmapTextureManager(ResourceDatabaseManager &resource_db,
                                 const Dim2 &screen_size,
                                 unsigned int &default_framebuffer_id,
                                 RenderPipeline &render_pipeline,
-                                Scene *scene);
+                                Scene *scene,
+                                int policy = ADD | DELETE | SELECTED);
   ~EnvmapTextureManager() = default;
   EnvmapTextureManager(const EnvmapTextureManager &copy) = delete;
   EnvmapTextureManager(EnvmapTextureManager &&move) = delete;

@@ -16,38 +16,15 @@ namespace image {
     ImageHolder() = default;
     ImageHolder(const std::vector<TYPE> &img, const image::Metadata &meta);
     virtual ~ImageHolder() = default;
-    ImageHolder(const ImageHolder<TYPE> &copy);
-    ImageHolder(ImageHolder<TYPE> &&assign) noexcept;
-    ImageHolder<TYPE> &operator=(const ImageHolder<TYPE> &copy);
-    ImageHolder<TYPE> &operator=(ImageHolder<TYPE> &&assign) noexcept;
+    ImageHolder(const ImageHolder<TYPE> &copy) = default;
+    ImageHolder(ImageHolder<TYPE> &&assign) noexcept = default;
+    ImageHolder<TYPE> &operator=(const ImageHolder<TYPE> &copy) = default;
+    ImageHolder<TYPE> &operator=(ImageHolder<TYPE> &&assign) noexcept = default;
   };
 
   template<class T>
   ImageHolder<T>::ImageHolder(const std::vector<T> &img, const image::Metadata &meta) : data(img), metadata(meta) {}
 
-  template<class T>
-  ImageHolder<T>::ImageHolder(const ImageHolder<T> &copy) {
-    data = copy.data;
-    metadata = copy.metadata;
-  }
-
-  template<class T>
-  ImageHolder<T>::ImageHolder(ImageHolder<T> &&assign) noexcept {
-    data = std::move(assign.data);
-    metadata = std::move(assign.metadata);
-  }
-
-  template<class T>
-  ImageHolder<T> &ImageHolder<T>::operator=(const ImageHolder<T> &copy) {
-    data = copy.data;
-    metadata = copy.metadata;
-  }
-
-  template<class T>
-  ImageHolder<T> &ImageHolder<T>::operator=(ImageHolder<T> &&assign) noexcept {
-    data = std::move(assign.data);
-    metadata = std::move(assign.metadata);
-  }
   /*******************************************************************************************************************************************/
 
   template<class TYPE>
