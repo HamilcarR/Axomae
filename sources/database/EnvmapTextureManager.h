@@ -89,6 +89,7 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
   [[nodiscard]] int currentIrradianceId() const { return current.irradiance_id; }
   [[nodiscard]] int currentLutId() const { return current.lut_id; }
   [[nodiscard]] const image::ImageHolder<float> *currentEnvmapMetadata() const { return current.metadata; }
+  [[nodiscard]] image::ImageHolder<float> *currentMutableEnvmapMetadata() const { return current.metadata; }
   void next();
   void previous();
   void updateCurrent(int index);

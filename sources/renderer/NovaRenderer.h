@@ -4,6 +4,9 @@
 #include "LightingDatabase.h"
 #include "RendererInterface.h"
 
+namespace nova {
+  struct SceneResourcesHolder;
+}
 class EnvmapTextureManager;
 class GLViewer;
 class CameraFrameBuffer;
@@ -30,6 +33,7 @@ class NovaRenderer final : public IRenderer {
   Texture *framebuffer_texture{};
   std::unique_ptr<GLPixelBufferObject> pixel_buffer_object;
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
+  std::unique_ptr<nova::SceneResourcesHolder> nova_scene_resources;
 
  private:
   NovaRenderer() = default;
@@ -41,6 +45,8 @@ class NovaRenderer final : public IRenderer {
   NovaRenderer &operator=(const NovaRenderer &copy) = delete;
   NovaRenderer(NovaRenderer &&move) noexcept = default;
   NovaRenderer &operator=(NovaRenderer &&move) noexcept = default;
+
+  void populateNovaSceneResources();
   void initialize(ApplicationConfig *app_conf) override;
   bool prep_draw() override;
   void draw() override;

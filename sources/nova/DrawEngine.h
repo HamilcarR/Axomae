@@ -6,10 +6,16 @@
 #include "Vector.h"
 #include "image_utils.h"
 #include "math_texturing.h"
+#include "nova_camera.h"
 #include "nova_texturing.h"
-
 #include <vector>
 namespace nova {
+
+  struct SceneResourcesHolder {
+    texturing::EnvmapResourcesHolder envmap_data;
+    camera::CameraResourcesHolder camera_data;
+  };
+
   constexpr uint8_t THREAD_NUM = 8;
 
   inline bool hit_sphere(const glm::vec3 &center, float radius, const Ray &r, hit_data *r_hit) {
@@ -30,15 +36,15 @@ namespace nova {
     return false;
   }
 
-  inline glm::vec3 color(Ray &r, const texturing::SceneResourcesHolder *scene_data) {
+  inline glm::vec3 color(Ray &r, const SceneResourcesHolder *scene_data) {
     hit_data hit_d;
     glm::vec3 center(0, 0, -2);
     if (hit_sphere(center, 0.5, r, &hit_d)) {
       glm::vec3 normal = hit_d.normal;
-      glm::vec3 sampled_color = texturing::sample_cubemap(normal, scene_data);
+      glm::vec3 sampled_color = texturing::sample_cubemap(normal, &scene_data->envmap_data);
       return sampled_color;
     }
-    return texturing::compute_envmap_background(r, scene_data);
+    return texturing::compute_envmap_background(r, &scene_data->envmap_data);
   }
 
   inline void fill_buffer(float *display_buffer,
@@ -48,7 +54,7 @@ namespace nova {
                           float height_h,
                           int width,
                           int height,
-                          const texturing::SceneResourcesHolder *scene_data) {
+                          const SceneResourcesHolder *scene_data) {
     glm::vec3 llc{-2.f, -1.f, -1.f};
     glm::vec3 hor{4.f, 0.f, 0.f};
     glm::vec3 ver{0.f, 2.f, 0.f};
@@ -67,20 +73,27 @@ namespace nova {
       }
   }
 
-  inline void draw(float *display_buffer, int width, int height, const texturing::SceneResourcesHolder *scene_data) {
+  inline void draw(float *display_buffer, int width, int height, const SceneResourcesHolder *scene_data) {
+    // fill_buffer(display_buffer, 0, width - 1, 0, height - 1, width, height, scene_data);
     std::vector<std::future<void>> futures;
     futures.reserve(THREAD_NUM);
-    for (int i = 0; i < THREAD_NUM; i++) {
-      float lb = i * width / THREAD_NUM;
-      float hb = i * width / THREAD_NUM + (float)width / THREAD_NUM;
-      if (i == THREAD_NUM - 1)
-        hb = hb - 1;
-      futures.push_back(std::async(std::launch::async, fill_buffer, display_buffer, lb, hb, 0, height, width, height, scene_data));
+    int thread_per_width = THREAD_NUM / 4;
+    int thread_per_height = THREAD_NUM / 2;
+    int width_per_thread = width / thread_per_width;
+    int height_per_thread = height / thread_per_height;
+    for (int i = 0; i <= width; i += width_per_thread) {
+      for (int j = 0; j <= height; j += height_per_thread) {
+        int hbi = i + width_per_thread;
+        int hbj = j + height_per_thread;
+        if (i + width_per_thread >= width)
+          hbi = width - 1;
+        if (j + height_per_thread >= height)
+          hbj = height - 1;
+        futures.push_back(std::async(std::launch::async, fill_buffer, display_buffer, i, hbi, j, hbj, width, height, scene_data));
+      }
     }
-
-    for (auto &futs : futures) {
+    for (auto &futs : futures)
       futs.get();
-    }
   }
 }  // namespace nova
 #endif

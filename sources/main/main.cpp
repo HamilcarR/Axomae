@@ -10,19 +10,9 @@
 #include <string>
 using namespace axomae;
 
-static void init_graphics() {
-  if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-    std::cout << "SDL_Init problem : " << SDL_GetError() << "\n";
-  }
-  if (!IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG)) {
-    std::cout << "IMG init problem : " << IMG_GetError() << "\n";
-  }
-}
+static void init_graphics() {}
 
-static void cleanup() {
-  IMG_Quit();
-  SDL_Quit();
-}
+static void cleanup() {}
 
 static void sigsegv_handler(int signal) {
   try {

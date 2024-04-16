@@ -41,6 +41,9 @@ class TextureData {  // TODO : Make this inherit RawImageHolder
 inline bool isDimPowerOfTwo(int dimension) { return (dimension & (dimension - 1)) == 0; }
 inline bool isValidDim(int dimension) { return dimension > 0; }
 
-class GenericTextureProcessing : public IAxObject {};
+class GenericTextureProcessing : public IAxObject {
+ public:
+  virtual ~GenericTextureProcessing() = default;
+};
 
 #endif

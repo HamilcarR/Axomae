@@ -243,7 +243,7 @@ namespace controller {
 
     /* Nova raytracer */
     nova_viewer = main_window_ui.nova_viewer->getViewer();
-    // nova_viewer->renderOnTimer(30);
+    nova_viewer->renderOnTimer(0);
     nova_viewer->getRenderer().getRenderPipeline().setProgressManager(progress_manager.get());
     nova_viewer->setApplicationConfig(global_application_config.get());
 

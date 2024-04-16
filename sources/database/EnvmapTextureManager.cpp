@@ -86,11 +86,13 @@ void EnvmapTextureManager::notified(observer::Data<EnvmapTextureManager::Message
       if (update_policy_flag & ADD) {
         addToCollection(message.data->getIndex());
       }
+      updateCurrent(message.data->getIndex());
       break;
     case Message::DELETE:
       if (update_policy_flag & DELETE) {
         deleteFromCollection(message.data->getIndex());
       }
+      updateCurrent(message.data->getIndex());
       break;
     case Message::SELECTED:
       if (update_policy_flag & SELECTED) {
@@ -103,7 +105,7 @@ void EnvmapTextureManager::notified(observer::Data<EnvmapTextureManager::Message
 }
 
 void EnvmapTextureManager::updateCurrent(int index) {
-  assert(static_cast<unsigned>(index) < bakes_id.size());
+  AX_ASSERT(index < bakes_id.size(), "Environment map index selected discrepancy with the Environment map manager id collection. ");
   current = bakes_id[index];
   if (scene)
     scene->switchEnvmap(current.cubemap_id, current.irradiance_id, current.prefiltered_id, current.lut_id);

@@ -18,3 +18,4 @@ PUBLIC
 )
 
 add_subdirectory(texturing)
+add_subdirectory(camera)

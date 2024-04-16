@@ -28,7 +28,7 @@ template<class T>
 class EnvmapProcessing final : GenericTextureProcessing {
 
  private:
-  const std::vector<float> *data;
+  std::vector<float> *data;
   unsigned width;
   unsigned height;
   unsigned channels;
@@ -37,7 +37,13 @@ class EnvmapProcessing final : GenericTextureProcessing {
   static constexpr unsigned MAX_THREADS = 8;  // Retrieve from config
 
  public:
-  EnvmapProcessing(const std::vector<T> &_data, unsigned _width, unsigned _height, unsigned int num_channels = 3);
+  EnvmapProcessing() = default;
+  EnvmapProcessing(std::vector<T> &_data, unsigned _width, unsigned _height, unsigned int num_channels = 3);
+  ~EnvmapProcessing() override = default;
+  EnvmapProcessing(const EnvmapProcessing &copy);
+  EnvmapProcessing(EnvmapProcessing &&move) noexcept;
+  EnvmapProcessing &operator=(const EnvmapProcessing &copy);
+  EnvmapProcessing &operator=(EnvmapProcessing &&move) noexcept;
   TextureData computeSpecularIrradiance(double roughness);
   /**
    * @brief This method wrap around if the texture coordinates provided land beyond the texture dimensions, repeating
@@ -83,7 +89,48 @@ class EnvmapProcessing final : GenericTextureProcessing {
 using HdrEnvmapProcessing = EnvmapProcessing<float>;
 
 template<class T>
-EnvmapProcessing<T>::EnvmapProcessing(const std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels)
+EnvmapProcessing<T>::EnvmapProcessing(const EnvmapProcessing &copy) {
+  if (this != &copy) {
+    data = copy.data;
+    width = copy.width;
+    height = copy.height;
+    channels = copy.channels;
+  }
+}
+template<class T>
+EnvmapProcessing<T>::EnvmapProcessing(EnvmapProcessing &&move) noexcept {
+  if (this != &move) {
+    data = move.data;
+    width = move.width;
+    height = move.height;
+    channels = move.channels;
+  }
+}
+
+template<class T>
+EnvmapProcessing<T> &EnvmapProcessing<T>::operator=(const EnvmapProcessing &copy) {
+  if (this != &copy) {
+    data = copy.data;
+    width = copy.width;
+    height = copy.height;
+    channels = copy.channels;
+  }
+  return *this;
+}
+
+template<class T>
+EnvmapProcessing<T> &EnvmapProcessing<T>::operator=(EnvmapProcessing &&move) noexcept {
+  if (this != &move) {
+    data = move.data;
+    width = move.width;
+    height = move.height;
+    channels = move.channels;
+  }
+  return *this;
+}
+
+template<class T>
+EnvmapProcessing<T>::EnvmapProcessing(std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels)
     : data(&_data) {
   if (!isValidDim(_width) || !isValidDim(_height))
     throw TextureInvalidDimensionsException();
@@ -159,9 +206,10 @@ glm::dvec3 EnvmapProcessing<T>::bilinearInterpolate(const glm::dvec2 &top_left,
 template<class T>
 glm::dvec3 EnvmapProcessing<T>::discreteSample(int x, int y) const {
   const glm::dvec2 normalized = wrapAroundPixelCoords(x, y);
-  const float r = (*data)[(normalized.y * width + normalized.x) * channels];
-  const float g = (*data)[(normalized.y * width + normalized.x) * channels + 1];
-  const float b = (*data)[(normalized.y * width + normalized.x) * channels + 2];
+  int index = (normalized.y * width + normalized.x) * channels;
+  const float r = (*data)[index];
+  const float g = (*data)[index + 1];
+  const float b = (*data)[index + 2];
   return {r, g, b};
 }
 

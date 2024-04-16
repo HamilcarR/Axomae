@@ -20,6 +20,7 @@ NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *wi
   scene = std::make_unique<Scene>(*resource_database);
   envmap_manager = std::make_unique<EnvmapTextureManager>(
       *resource_database, screen_size, default_framebuffer_id, *render_pipeline, nullptr, EnvmapTextureManager::SELECTED);
+  nova_scene_resources = std::make_unique<nova::SceneResourcesHolder>();
 }
 
 NovaRenderer::~NovaRenderer() { pixel_buffer_object->clean(); }
@@ -40,8 +41,15 @@ bool NovaRenderer::prep_draw() {
   return true;
 }
 
-void NovaRenderer::draw() {
+void NovaRenderer::populateNovaSceneResources() {
+  /*Setup envmap */
+  image::ImageHolder<float> *current_envmap = envmap_manager->currentMutableEnvmapMetadata();
 
+  nova_scene_resources->envmap_data.texture_processor = EnvmapProcessing<float>(
+      current_envmap->data, (int)current_envmap->metadata.width, (int)current_envmap->metadata.height);
+}
+
+void NovaRenderer::draw() {
   glClear(GL_COLOR_BUFFER_BIT);
   framebuffer_texture->bindTexture();
   pixel_buffer_object->bind();
@@ -49,14 +57,8 @@ void NovaRenderer::draw() {
   pixel_buffer_object->fillBuffers();
   float *map_buffer = pixel_buffer_object->mapBuffer<float>(GLPixelBufferObject::RW);
   if (map_buffer) {
-    PerformanceLogger logger;
-    logger.startTimer();
-    const image::ImageHolder<float> *current_envmap = envmap_manager->currentEnvmapMetadata();
-    nova::texturing::SceneResourcesHolder holder{
-        EnvmapProcessing<float>(current_envmap->data, (int)current_envmap->metadata.width, (int)current_envmap->metadata.height)};
-    nova::draw(map_buffer, (int)screen_size.width, (int)screen_size.height, &holder);
-    logger.endTimer();
-    logger.print();
+    populateNovaSceneResources();
+    nova::draw(map_buffer, (int)screen_size.width, (int)screen_size.height, nova_scene_resources.get());
   }
   AX_ASSERT(pixel_buffer_object->unmapBuffer(), "");
   pixel_buffer_object->unbind();

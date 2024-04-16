@@ -1,6 +1,6 @@
-#ifndef THREADPOOL_H
-#define THREADPOOL_H
+#ifndef WORKPOOL_H
+#define WORKPOOL_H
 
 class ThreadPool {};
 
-#endif  // THREADPOOL_H
+#endif
