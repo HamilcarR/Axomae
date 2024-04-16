@@ -1,9 +1,10 @@
 #ifndef MATH_SPHERICAL_H
 #define MATH_SPHERICAL_H
+#include "math_utils_approx.h"
 #include <glm/common.hpp>
 #include <glm/glm.hpp>
 
-constexpr double PI = 3.14159265358979323846264;
+constexpr double PI = M_PI;
 namespace math::spherical {
   template<class T>
   inline glm::dvec2 uvToSpherical(const T &u, const T &v) {
@@ -35,8 +36,8 @@ namespace math::spherical {
 
   template<class T>
   inline glm::dvec2 cartesianToSpherical(const T &x, const T &y, const T &z) {
-    const T theta = acos(z);
-    const T phi = atan2f(y, x);
+    const T theta = acos_approx(z);
+    const T phi = atan2_approx(y, x);  // atan2f(y, x);
     return {phi, theta};
   }
 
