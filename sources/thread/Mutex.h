@@ -15,6 +15,7 @@
  */
 class Mutex : public GenericLockInterface {
  public:
+  ~Mutex() override = default;
   class Lock {
    public:
     explicit Lock(Mutex &_mutex);
@@ -29,17 +30,8 @@ class Mutex : public GenericLockInterface {
   };
 
  private:
-  /**
-   * @brief Lock the mutex
-   *
-   */
-  virtual void lock();
-
-  /**
-   * @brief Unlock the mutex
-   *
-   */
-  virtual void unlock();
+  void lock() override;
+  void unlock() override;
 };
 
 #endif

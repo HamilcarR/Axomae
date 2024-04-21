@@ -10,10 +10,11 @@
 
 /**
  * @class GenericLockInterface
- *
  */
 class GenericLockInterface {
+
  public:
+  virtual ~GenericLockInterface() = default;
   virtual void lock() = 0;
   virtual void unlock() = 0;
 

@@ -26,25 +26,25 @@ class TextureNonPowerOfTwoDimensionsException : public exception::GenericExcepti
 };
 
 template<class T>
-class EnvmapProcessing final : GenericTextureProcessing {
+class TextureOperations final : GenericTextureProcessing {
 
  private:
-  std::vector<float> *data;
-  unsigned width;
-  unsigned height;
-  unsigned channels;
+  std::vector<float> *data{};
+  unsigned width{};
+  unsigned height{};
+  unsigned channels{};
 
  private:
   static constexpr unsigned MAX_THREADS = 8;  // Retrieve from config
 
  public:
-  EnvmapProcessing() = default;
-  EnvmapProcessing(std::vector<T> &_data, unsigned _width, unsigned _height, unsigned int num_channels = 3);
-  ~EnvmapProcessing() override = default;
-  EnvmapProcessing(const EnvmapProcessing &copy);
-  EnvmapProcessing(EnvmapProcessing &&move) noexcept;
-  EnvmapProcessing &operator=(const EnvmapProcessing &copy);
-  EnvmapProcessing &operator=(EnvmapProcessing &&move) noexcept;
+  TextureOperations() = default;
+  TextureOperations(std::vector<T> &_data, unsigned _width, unsigned _height, unsigned int num_channels = 3);
+  ~TextureOperations() override = default;
+  TextureOperations(const TextureOperations &copy);
+  TextureOperations(TextureOperations &&move) noexcept;
+  TextureOperations &operator=(const TextureOperations &copy);
+  TextureOperations &operator=(TextureOperations &&move) noexcept;
   TextureData computeSpecularIrradiance(double roughness);
   /**
    * @brief This method wrap around if the texture coordinates provided land beyond the texture dimensions, repeating
@@ -89,10 +89,10 @@ class EnvmapProcessing final : GenericTextureProcessing {
   template<class D>
   glm::vec3 computeIrradianceImportanceSampling(D x, D y, D z, unsigned _width, unsigned _height, unsigned total_samples) const;
 };
-using HdrEnvmapProcessing = EnvmapProcessing<float>;
+using HdrEnvmapProcessing = TextureOperations<float>;
 
 template<class T>
-EnvmapProcessing<T>::EnvmapProcessing(const EnvmapProcessing &copy) {
+TextureOperations<T>::TextureOperations(const TextureOperations &copy) {
   if (this != &copy) {
     data = copy.data;
     width = copy.width;
@@ -101,7 +101,7 @@ EnvmapProcessing<T>::EnvmapProcessing(const EnvmapProcessing &copy) {
   }
 }
 template<class T>
-EnvmapProcessing<T>::EnvmapProcessing(EnvmapProcessing &&move) noexcept {
+TextureOperations<T>::TextureOperations(TextureOperations &&move) noexcept {
   if (this != &move) {
     data = move.data;
     width = move.width;
@@ -111,7 +111,7 @@ EnvmapProcessing<T>::EnvmapProcessing(EnvmapProcessing &&move) noexcept {
 }
 
 template<class T>
-EnvmapProcessing<T> &EnvmapProcessing<T>::operator=(const EnvmapProcessing &copy) {
+TextureOperations<T> &TextureOperations<T>::operator=(const TextureOperations &copy) {
   if (this != &copy) {
     data = copy.data;
     width = copy.width;
@@ -122,7 +122,7 @@ EnvmapProcessing<T> &EnvmapProcessing<T>::operator=(const EnvmapProcessing &copy
 }
 
 template<class T>
-EnvmapProcessing<T> &EnvmapProcessing<T>::operator=(EnvmapProcessing &&move) noexcept {
+TextureOperations<T> &TextureOperations<T>::operator=(TextureOperations &&move) noexcept {
   if (this != &move) {
     data = move.data;
     width = move.width;
@@ -133,7 +133,7 @@ EnvmapProcessing<T> &EnvmapProcessing<T>::operator=(EnvmapProcessing &&move) noe
 }
 
 template<class T>
-EnvmapProcessing<T>::EnvmapProcessing(std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels)
+TextureOperations<T>::TextureOperations(std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels)
     : data(&_data) {
   if (!isValidDim(_width) || !isValidDim(_height))
     throw TextureInvalidDimensionsException();
@@ -146,16 +146,16 @@ EnvmapProcessing<T>::EnvmapProcessing(std::vector<T> &_data, const unsigned _wid
 }
 
 template<class T>
-TextureData EnvmapProcessing<T>::computeSpecularIrradiance(double roughness) {
+TextureData TextureOperations<T>::computeSpecularIrradiance(double roughness) {
   return {};
 }
 
 template<class T>
-glm::vec3 EnvmapProcessing<T>::bilinearInterpolate(const glm::vec2 &top_left,
-                                                   const glm::vec2 &top_right,
-                                                   const glm::vec2 &bottom_left,
-                                                   const glm::vec2 &bottom_right,
-                                                   const glm::vec2 &point) const {
+glm::vec3 TextureOperations<T>::bilinearInterpolate(const glm::vec2 &top_left,
+                                                    const glm::vec2 &top_right,
+                                                    const glm::vec2 &bottom_left,
+                                                    const glm::vec2 &bottom_right,
+                                                    const glm::vec2 &point) const {
   const float u = (point.x - top_left.x) / (top_right.x - top_left.x);
   const float v = (point.y - top_left.y) / (bottom_left.y - top_left.y);
   const float horizontal_diff = (1 - u);
@@ -170,7 +170,7 @@ glm::vec3 EnvmapProcessing<T>::bilinearInterpolate(const glm::vec2 &top_left,
 
 template<class T>
 template<class D>
-glm::vec2 EnvmapProcessing<T>::wrapAroundTexCoords(const D u, const D v) const {
+glm::vec2 TextureOperations<T>::wrapAroundTexCoords(const D u, const D v) const {
   D u_integer = 0, v_integer = 0;
   D u_double_p = 0., v_double_p = 0.;
   u_integer = std::floor(u);
@@ -187,7 +187,7 @@ glm::vec2 EnvmapProcessing<T>::wrapAroundTexCoords(const D u, const D v) const {
 }
 
 template<class T>
-glm::vec2 EnvmapProcessing<T>::wrapAroundPixelCoords(const int x, const int y) const {
+glm::vec2 TextureOperations<T>::wrapAroundPixelCoords(const int x, const int y) const {
   int x_coord = 0, y_coord = 0;
   int _width = static_cast<int>(width);
   int _height = static_cast<int>(height);
@@ -207,7 +207,7 @@ glm::vec2 EnvmapProcessing<T>::wrapAroundPixelCoords(const int x, const int y) c
 }
 
 template<class T>
-glm::vec3 EnvmapProcessing<T>::discreteSample(int x, int y) const {
+glm::vec3 TextureOperations<T>::discreteSample(int x, int y) const {
   const glm::vec2 normalized = wrapAroundPixelCoords(x, y);
   int index = (static_cast<int>(normalized.y) * width + static_cast<int>(normalized.x)) * channels;
   const float r = (*data)[index];
@@ -218,7 +218,7 @@ glm::vec3 EnvmapProcessing<T>::discreteSample(int x, int y) const {
 
 template<class T>
 template<class D>
-glm::vec3 EnvmapProcessing<T>::uvSample(const D u, const D v) const {
+glm::vec3 TextureOperations<T>::uvSample(const D u, const D v) const {
   const glm::vec2 wrap_uv = wrapAroundTexCoords(u, v);
   const glm::vec2 pixel_coords = glm::dvec2(math::texture::uvToPixel(wrap_uv.x, width), math::texture::uvToPixel(wrap_uv.y, height));
   const glm::vec2 top_left(std::floor(pixel_coords.x), std::floor(pixel_coords.y));
@@ -231,7 +231,7 @@ glm::vec3 EnvmapProcessing<T>::uvSample(const D u, const D v) const {
 
 template<class T>
 template<typename D>
-void EnvmapProcessing<T>::launchAsyncDiffuseIrradianceCompute(
+void TextureOperations<T>::launchAsyncDiffuseIrradianceCompute(
     const D delta, float *f_data, const unsigned width_begin, const unsigned width_end, const unsigned _width, const unsigned _height) const {
   for (unsigned i = width_begin; i <= width_end; i++) {
     for (unsigned j = 0; j < _height; j++) {
@@ -247,7 +247,7 @@ void EnvmapProcessing<T>::launchAsyncDiffuseIrradianceCompute(
   }
 }
 template<class T>
-glm::vec3 EnvmapProcessing<T>::computeIrradianceSingleTexel(
+glm::vec3 TextureOperations<T>::computeIrradianceSingleTexel(
     const unsigned x, const unsigned y, const unsigned samples, const glm::vec3 &tangent, const glm::vec3 &bitangent, const glm::vec3 &normal) const {
   glm::vec3 random = math::importance_sampling::pgc3d(x, y, samples);
   float phi = 2 * PI * random.x;
@@ -261,7 +261,7 @@ glm::vec3 EnvmapProcessing<T>::computeIrradianceSingleTexel(
 
 template<class T>
 template<class D>
-glm::vec3 EnvmapProcessing<T>::computeIrradianceImportanceSampling(
+glm::vec3 TextureOperations<T>::computeIrradianceImportanceSampling(
     const D x, const D y, const D z, const unsigned _width, const unsigned _height, const unsigned total_samples) const {
   unsigned int samples = 0;
   glm::vec3 irradiance{0};

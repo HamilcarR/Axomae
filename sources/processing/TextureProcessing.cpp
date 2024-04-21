@@ -1,9 +1,9 @@
-#include "OfflineCubemapProcessing.h"
+#include "TextureProcessing.h"
 #include "cuda/CubemapProcessing.cuh"
 
 namespace gpu_func = gpgpu_functions::irradiance_mapping;
 template<>
-std::unique_ptr<TextureData> EnvmapProcessing<float>::computeDiffuseIrradiance(unsigned _width, unsigned _height, unsigned delta, bool gpu) const {
+std::unique_ptr<TextureData> TextureOperations<float>::computeDiffuseIrradiance(unsigned _width, unsigned _height, unsigned delta, bool gpu) const {
   if (!isDimPowerOfTwo(_width) || !isDimPowerOfTwo(_height))
     throw TextureNonPowerOfTwoDimensionsException();
   TextureData envmap_tex_data;
