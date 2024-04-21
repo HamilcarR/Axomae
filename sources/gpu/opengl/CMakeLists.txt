@@ -7,7 +7,7 @@ add_library(ax_opengl
         RenderCubeMap.cpp
         RenderQuad.cpp
         FramebufferInterface.h
-        GLPixelBufferObject.cpp
+        GLMutablePixelBufferObject.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_opengl)

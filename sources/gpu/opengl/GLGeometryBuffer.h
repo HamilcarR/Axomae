@@ -11,7 +11,7 @@
 /**
  * @brief Wrapper class for Opengl vertices attributes buffers
  */
-class GLGeometryBuffer : public GLBufferInterface {
+class GLGeometryBuffer : public GLMutableBufferInterface {
  private:
   GLuint vao;               /**<VAO ID*/
   GLuint vertex_buffer;     /**<Vertex buffer ID*/

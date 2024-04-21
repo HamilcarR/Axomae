@@ -4,7 +4,10 @@
 #include "GenericTextureProcessing.h"
 #include "Logger.h"
 #include "Mutex.h"
+#include "ThreadPool.h"
 #include "math_utils.h"
+#include "thread_utils.h"
+
 #include <fstream>
 #include <immintrin.h>
 #include <sstream>
@@ -17,34 +20,40 @@ constexpr glm::dvec3 BLACK = glm::dvec3(0);
 
 class TextureInvalidDimensionsException : public exception::GenericException {
  public:
-  TextureInvalidDimensionsException() : GenericException() { saveErrorString("This texture has invalid dimensions. (negative or non numerical)"); }
+  TextureInvalidDimensionsException() : GenericException() {
+    saveErrorString("Provided texture has invalid dimensions. (negative or non numerical)");
+  }
 };
 
 class TextureNonPowerOfTwoDimensionsException : public exception::GenericException {
  public:
-  TextureNonPowerOfTwoDimensionsException() : GenericException() { saveErrorString("This texture has dimensions that are not a power of two."); }
+  TextureNonPowerOfTwoDimensionsException() : GenericException() { saveErrorString("Provided texture has dimensions that are not a power of two."); }
 };
 
 template<class T>
 class TextureOperations final : GenericTextureProcessing {
 
  private:
-  std::vector<float> *data{};
+  std::vector<T> *data{};
   unsigned width{};
   unsigned height{};
   unsigned channels{};
+  threading::ThreadPool *thread_pool{};
 
  private:
   static constexpr unsigned MAX_THREADS = 8;  // Retrieve from config
 
  public:
   TextureOperations() = default;
-  TextureOperations(std::vector<T> &_data, unsigned _width, unsigned _height, unsigned int num_channels = 3);
+  TextureOperations(
+      std::vector<T> &_data, unsigned _width, unsigned _height, unsigned int num_channels = 3, threading::ThreadPool *thread_pool = nullptr);
   ~TextureOperations() override = default;
   TextureOperations(const TextureOperations &copy);
   TextureOperations(TextureOperations &&move) noexcept;
   TextureOperations &operator=(const TextureOperations &copy);
   TextureOperations &operator=(TextureOperations &&move) noexcept;
+  void copyTexture(T *dest, int dest_width, int dest_height) const;
+
   TextureData computeSpecularIrradiance(double roughness);
   /**
    * @brief This method wrap around if the texture coordinates provided land beyond the texture dimensions, repeating
@@ -133,7 +142,43 @@ TextureOperations<T> &TextureOperations<T>::operator=(TextureOperations &&move) 
 }
 
 template<class T>
-TextureOperations<T>::TextureOperations(std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels)
+void TextureOperations<T>::copyTexture(T *dest, int dest_width, int dest_height) const {
+  if (thread_pool) {
+    std::vector<std::future<void>> futs;
+    std::vector<threading::Tile> tiles = threading::divideByTiles(dest_width, dest_height, thread_pool->threadNumber());
+    auto async_copy = [this, dest_width, dest_height](T *dest, int width_begin, int width_end, int height_begin, int height_end) {
+      for (int i = width_begin; i <= width_end; i++)
+        for (int j = height_begin; j <= height_end; j++) {
+          double u = math::texture::pixelToUv(i, dest_width);
+          double v = math::texture::pixelToUv(j, dest_height);
+          glm::vec3 col = uvSample(u, v);
+          int idx = (j * dest_width + i) * channels;
+          dest[idx] = col.r;
+          dest[idx + 1] = col.g;
+          dest[idx + 2] = col.b;
+        }
+    };
+    for (const auto &elem : tiles)
+      futs.push_back(thread_pool->addTask(true, async_copy, dest, elem.width_start, elem.width_end, elem.height_start, elem.height_end));
+    for (auto &elem : futs)
+      elem.get();
+  } else {
+    for (int i = 0; i < dest_width; i++)
+      for (int j = 0; j < dest_height; j++) {
+        double u = math::texture::pixelToUv(i, dest_width);
+        double v = math::texture::pixelToUv(j, dest_height);
+        glm::vec3 col = uvSample(u, v);
+        int idx = (j * dest_width + i) * channels;
+        dest[idx] = col.r;
+        dest[idx + 1] = col.g;
+        dest[idx + 2] = col.b;
+      }
+  }
+}
+
+template<class T>
+TextureOperations<T>::TextureOperations(
+    std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels, threading::ThreadPool *pool)
     : data(&_data) {
   if (!isValidDim(_width) || !isValidDim(_height))
     throw TextureInvalidDimensionsException();
@@ -143,6 +188,8 @@ TextureOperations<T>::TextureOperations(std::vector<T> &_data, const unsigned _w
   width = _width;
   height = _height;
   channels = num_channels;
+  if (pool)
+    thread_pool = pool;
 }
 
 template<class T>

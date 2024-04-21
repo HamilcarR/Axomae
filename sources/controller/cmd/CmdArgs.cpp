@@ -40,6 +40,9 @@ namespace controller::cmd {
     if (vm.count("gpu")) {
       api.enableGpu();
     }
+    if (vm.count("threads")) {
+      api.initializeThreadPool(vm["threads"].as<int>());
+    }
     if (vm.count("uv")) {
       api.enableEditor();
       command_valid = true;
@@ -61,15 +64,16 @@ namespace controller::cmd {
   void setDescript(po::options_description &descript) {
     // clang-format off
     descript.add_options()
-        ("help,h", "Prints this help message")
-        ("verbose,v", "Turn on stdout logs")
-        ("editor,e", "Launch the editor")
-        ("gpu,g" , "Enable GPGPU compute")
-        ("viewer" , po::value<std::string>(), "Open viewer for the specified file")
+        ("help,h", "Prints this help message.")
+        ("verbose,v", "Turn on stdout logs.")
+        ("editor,e", "Launch the editor.")
+        ("gpu,g" , "Enable GPGPU compute.")
+        ("threads,t" , po::value<int>()->default_value(4) , "Number of threads to be used (Default:4).")
+        ("viewer" , po::value<std::string>(), "Open viewer for the specified file.")
         ("uv" , po::value<std::vector<std::string>>()->multitoken() ,
         "Usage: \n\
         --uv [tangent|object] [X resolution] [Y resolution]\n\
-        Launch the program with the uv editor set to these options")
+        Launch the program with the uv editor set to these options.")
         ("bake,b",po::value<std::vector<std::string>>()->multitoken(),
         "Usage: \n\
         --bake [type] [width] [height] [samples] [path_in] [path_out]\n\

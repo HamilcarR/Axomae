@@ -11,7 +11,7 @@
  * @class GLRenderBuffer
  * @brief Provides a wrapper for render buffers
  */
-class GLRenderBuffer : public GLBufferInterface {
+class GLRenderBuffer : public GLMutableBufferInterface {
  public:
   enum INTERNAL_FORMAT : signed {
     EMPTY = -1,

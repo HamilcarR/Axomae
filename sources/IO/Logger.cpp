@@ -76,17 +76,14 @@ class Logger : protected AbstractLogger {
   }
   void logMessage(const std::string &message) {
     if (enabled)
-      *out << level_str[LogLevel::INFO] << message << "\n";
+      *out << level_str[LogLevel::INFO] << ": " << message << "\n";
   }
 
   void logMessage(const char *message, LogLevel::LOGENUMTYPE log_level, const char *file, const char *function, unsigned line) {
     logMessage(std::string(message), log_level, file, function, line);
   }
 
-  void logMessage(const char *message) {
-    if (enabled)
-      *out << level_str[LogLevel::INFO] << message << "\n";
-  }
+  void logMessage(const char *message) { logMessage(std::string(message)); }
 
   void print() const override {
     if (out) {

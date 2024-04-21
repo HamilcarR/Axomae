@@ -25,9 +25,10 @@ inline void errorCheck(const char *filename, unsigned int line) {
 #ifndef NDEBUG
   GLenum error = GL_NO_ERROR;
   error = glGetError();
-  if (error != GL_NO_ERROR) {
+  while (error != GL_NO_ERROR) {
     std::string err = std::string("GL API ERROR :") + std::to_string(error);
     LOGFL(err, LogLevel::DEBUG, filename, "", line);
+    error = glGetError();
   }
 #endif
 }

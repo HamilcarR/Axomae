@@ -5,7 +5,7 @@
 #include "GLRenderBuffer.h"
 #include "Texture.h"
 
-class GLFrameBuffer : public GLBufferInterface {
+class GLFrameBuffer : public GLMutableBufferInterface {
  public:
   enum INTERNAL_FORMAT : signed {
     EMPTY = -1,

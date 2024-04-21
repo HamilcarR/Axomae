@@ -58,7 +58,7 @@ namespace controller {
    public:
     explicit Controller(QWidget *parent = nullptr);
     ~Controller() override;
-    void setApplicationConfig(const ApplicationConfig *configuration);
+    void setApplicationConfig(ApplicationConfig &&configuration);
     Ui::MainWindow &getUi() { return main_window_ui; }
     static SDL_Surface *copy_surface(SDL_Surface *surface);
 

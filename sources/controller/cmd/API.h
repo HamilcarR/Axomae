@@ -19,7 +19,16 @@ namespace controller::cmd {
 
    public:
     explicit API(int &argv, char **argc);
-    const ApplicationConfig &getConfig() const { return config; }
+
+    /**
+     * Use this method after completing the ApplicationConfig structure states.
+     * Will move the final config property , and invalidate the current instance.
+     */
+    [[nodiscard]] ApplicationConfig &&getConfig() {
+      argv = nullptr;
+      argc = nullptr;
+      return std::move(config);
+    }
     void disableLogging();
     void enableLogging();
     void enableEditor();
@@ -30,6 +39,7 @@ namespace controller::cmd {
     void configureDefault();
     void launchHdrTextureViewer(const std::string &file);
     void setUvEditorOptions(const uv::UVEDITORDATA &data);
+    void initializeThreadPool(int n);
   };
 
 }  // namespace controller::cmd

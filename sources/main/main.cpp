@@ -4,6 +4,7 @@
 #include "GenericException.h"
 #include "ImageImporter.h"
 #include <boost/program_options.hpp>
+#include <boost/stacktrace.hpp>
 #include <csignal>
 #include <cstdlib>
 #include <iostream>
@@ -18,7 +19,7 @@ static void sigsegv_handler(int signal) {
   try {
     LOG("Application crash", LogLevel::CRITICAL);
     LOGFLUSH();
-    // Generate stack here
+    std::cerr << boost::stacktrace::stacktrace();
     cleanup();
   } catch (const std::exception &e) {
     std::cerr << e.what();
@@ -47,28 +48,26 @@ int main(int argv, char **argc) {
       return exception_cleanup(e.what());
     }
     api.configure();
-    const ApplicationConfig &configuration = api.getConfig();
+    ApplicationConfig &&configuration = api.getConfig();
     if (configuration.flag & CONF_USE_EDITOR) {
       QApplication app(argv, argc);
       controller::Controller win;
-      win.setApplicationConfig(&configuration);
+      win.setApplicationConfig(std::forward<ApplicationConfig>(configuration));
       win.show();
       int ret = app.exec();
       cleanup();
       return ret;
-    } else {
-      cleanup();
-      return EXIT_SUCCESS;
     }
-  } else {
-    QApplication app(argv, argc);
-    controller::Controller win;
-    api.configureDefault();
-    const ApplicationConfig &configuration = api.getConfig();
-    win.setApplicationConfig(&configuration);
-    win.show();
-    int ret = app.exec();
     cleanup();
-    return ret;
+    return EXIT_SUCCESS;
   }
+  QApplication app(argv, argc);
+  controller::Controller win;
+  api.configureDefault();
+  ApplicationConfig &&configuration = api.getConfig();
+  win.setApplicationConfig(std::forward<ApplicationConfig>(configuration));
+  win.show();
+  int ret = app.exec();
+  cleanup();
+  return ret;
 }

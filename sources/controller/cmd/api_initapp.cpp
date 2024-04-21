@@ -9,6 +9,7 @@ namespace controller::cmd {
     conf.enable_logging = config.flag & CONF_ENABLE_LOGS;
     config.setUvEditorResolutionWidth(DEFAULT_UV_RES_X);
     config.setUvEditorResolutionHeight(DEFAULT_UV_RES_Y);
+    config.initializeThreadPool();
     LOGCONFIG(conf);
   }
   void API::configure() {

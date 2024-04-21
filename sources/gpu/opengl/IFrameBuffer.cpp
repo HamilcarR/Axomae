@@ -29,7 +29,7 @@ IFrameBuffer::IFrameBuffer(IFrameBuffer &&move) noexcept {
 
 void IFrameBuffer::resize() {
   if (texture_dim && gl_framebuffer_object) {
-    for (auto A : fbo_attachment_texture_collection) {
+    for (auto &A : fbo_attachment_texture_collection) {
       A.second->setNewSize(texture_dim->width, texture_dim->height);
       gl_framebuffer_object->resize(texture_dim->width, texture_dim->height);
     }

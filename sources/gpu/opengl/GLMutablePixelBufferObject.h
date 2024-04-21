@@ -3,34 +3,36 @@
 #include "DebugGL.h"
 #include "GLBufferInterface.h"
 #include "init_3D.h"
-class GLPixelBufferObject final : public GLMutableBufferInterface {
- protected:
+class GLMutablePixelBufferObject final : public GLMutableBufferInterface {
+ public:
   enum TRANSFER : unsigned { DOWN = GL_PIXEL_PACK_BUFFER, UP = GL_PIXEL_UNPACK_BUFFER };
   enum ACCESS : unsigned { R = GL_READ_ONLY, W = GL_WRITE_ONLY, RW = GL_READ_WRITE };
 
  protected:
   GLuint pbo{0};
   TRANSFER buffer_type{UP};
-  size_t buffer_size;
+  size_t buffer_size{0};
   bool buffer_filled{false};
   ACCESS access_type{R};
 
  public:
-  GLPixelBufferObject() = default;
-  GLPixelBufferObject(TRANSFER type, size_t size);
-  ~GLPixelBufferObject() override = default;
+  GLMutablePixelBufferObject() = default;
+  GLMutablePixelBufferObject(TRANSFER type, size_t size);
+  ~GLMutablePixelBufferObject() override = default;
 
   void initializeBuffers() override;
   [[nodiscard]] bool isReady() const override;
-
-  void fillSubBuffers(void *buffer, size_t offset, size_t data_size);
+  void fillBuffers() override;
+  void fillBuffersAddress(void *address);
+  void fillSubBuffers(void *buffer, size_t offset, size_t length);
+  void flushMappedRange(size_t offset, size_t length);
   void bind() override;
   void unbind() override;
   void clean() override;
   template<class T>
   T *mapBuffer(ACCESS access);
   template<class T>
-  T *mapBufferRange(size_t offset, size_t size);
+  T *mapBufferRange(size_t offset, size_t size, GLbitfield flag);
   bool unmapBuffer();
   void setBufferSize(size_t new_size) { buffer_size = new_size; }
   void setNewSize(size_t new_size);
@@ -39,13 +41,13 @@ class GLPixelBufferObject final : public GLMutableBufferInterface {
   [[nodiscard]] TRANSFER getTransferType() const { return buffer_type; }
 };
 template<class T>
-T *GLPixelBufferObject::mapBuffer(ACCESS access) {
+T *GLMutablePixelBufferObject::mapBuffer(ACCESS access) {
   return static_cast<T *>(glMapBuffer(buffer_type, access));
 }
 
 template<class T>
-T *GLPixelBufferObject::mapBufferRange(size_t offset, size_t size) {
-  return static_cast<T *>(glMapBufferRange(buffer_type, offset, size, GL_MAP_WRITE_BIT | GL_MAP_READ_BIT));
+T *GLMutablePixelBufferObject::mapBufferRange(size_t offset, size_t size, GLbitfield flag) {
+  return static_cast<T *>(glMapBufferRange(buffer_type, offset, size, GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | flag));
 }
 
 #endif

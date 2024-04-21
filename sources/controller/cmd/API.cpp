@@ -1,8 +1,9 @@
 #include "API.h"
 #include "GenericException.h"
 #include "Loader.h"
-#include "OfflineCubemapProcessing.h"
+#include "TextureProcessing.h"
 #include "TextureViewerWidget.h"
+#include "ThreadPool.h"
 #include "constants.h"
 
 namespace controller::cmd {
@@ -13,6 +14,11 @@ namespace controller::cmd {
   }
 
   void API::disableLogging() { config.flag &= ~CONF_ENABLE_LOGS; }
+
+  void API::initializeThreadPool(int n) {
+    config.flag |= CONF_USE_MTHREAD;
+    config.initializeThreadPool(n);
+  }
 
   void API::enableLogging() { config.flag |= CONF_ENABLE_LOGS; }
 
@@ -25,7 +31,7 @@ namespace controller::cmd {
   void API::launchHdrTextureViewer(const std::string &file) {
     IO::Loader loader(nullptr);
     try {
-      image::ImageHolder<float> data = loader.loadHdr(file.c_str(), false);
+      auto data = loader.loadHdr(file.c_str(), false);
       QApplication qapp(*argv, argc);
       HdrTextureViewerWidget tex(data);
       tex.show();
@@ -39,7 +45,7 @@ namespace controller::cmd {
     IO::Loader loader(nullptr);
     try {
       image::ImageHolder<float> data = loader.loadHdr(envmap.path_input.c_str(), false);
-      EnvmapProcessing<float> process_texture(data.data, data.metadata.width, data.metadata.height, data.metadata.channels);
+      TextureOperations<float> process_texture(data.data, data.metadata.width, data.metadata.height, data.metadata.channels);
       std::unique_ptr<TextureData> texture;
       if (envmap.baketype == "irradiance") {
         texture = process_texture.computeDiffuseIrradiance(envmap.width_output, envmap.height_output, envmap.samples, (config.flag & CONF_USE_CUDA));

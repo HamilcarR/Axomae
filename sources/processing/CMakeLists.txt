@@ -1,7 +1,7 @@
 add_library(ax_processing 
     ImageManager_UV.cpp 
-    ImageManager.cpp 
-    OfflineCubemapProcessing.cpp
+    ImageManager.cpp
+    TextureProcessing.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_processing)

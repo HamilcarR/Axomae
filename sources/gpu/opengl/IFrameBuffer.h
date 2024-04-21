@@ -38,7 +38,7 @@ class IFrameBuffer : public FramebufferInterface {
   void clean() override;
   void setDefaultFrameBufferIdPointer(unsigned *id) override;
   Texture *getFrameBufferTexturePointer(GLFrameBuffer::INTERNAL_FORMAT color_attachment);
-
+  GLFrameBuffer *getFramebufferObject() const { return gl_framebuffer_object.get(); }
   /**
    * @brief Initialize an empty target texture to be rendered to , saves it in the database , and returns it's database
    * ID

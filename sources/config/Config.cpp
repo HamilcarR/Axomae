@@ -1,11 +1,12 @@
 #include "Config.h"
-#include "Mutex.h"
+
 #include <memory>
 
 ApplicationConfig::ApplicationConfig() {
   flag = 0;
   logger_conf = generateLoggerConfigDataStruct();
 }
+ApplicationConfig::~ApplicationConfig() = default;
 
 std::string ApplicationConfig::getLogFile() const {
   time_t now = time(0);
@@ -31,3 +32,16 @@ LoggerConfigDataStruct ApplicationConfig::generateDefaultLoggerConfigDataStruct(
 }
 
 LoggerConfigDataStruct ApplicationConfig::generateLoggerConfigDataStruct() const { return logger_conf; }
+
+int ApplicationConfig::getThreadPoolSize() const {
+  if (thread_pool) {
+    return thread_pool->threadNumber();
+  }
+  return 0;
+}
+
+void ApplicationConfig::initializeThreadPool(int size) {
+  if (size == 0)
+    size = static_cast<int>(std::thread::hardware_concurrency());
+  thread_pool = std::make_unique<threading::ThreadPool>(size);
+}

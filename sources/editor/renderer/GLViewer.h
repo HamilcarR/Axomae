@@ -27,10 +27,13 @@ class GLViewer : public QOpenGLWidget {
 
   Q_OBJECT
 
+ public:
+  ApplicationConfig *global_application_config{};
+
  protected:
   std::unique_ptr<IRenderer> renderer; /*<Pointer on the renderer of the scene*/
   bool glew_initialized;               /*<Check if context is initialized*/
-  ApplicationConfig *global_application_config{};
+
   std::unique_ptr<controller::event::Event> widget_input_events;
 
  private:
@@ -47,7 +50,7 @@ class GLViewer : public QOpenGLWidget {
   GLViewer(GLViewer &&move) noexcept;
   virtual void setNewScene(const SceneChangeData &new_scene);
   [[nodiscard]] RendererInterface &getRenderer() const;
-  void setApplicationConfig(ApplicationConfig *app_conf) { global_application_config = app_conf; }
+  void setApplicationConfig(ApplicationConfig *app_conf);
   void setRenderer(std::unique_ptr<IRenderer> &renderer);
   void renderOnTimer(int interval);
   void renderOnUpdate();

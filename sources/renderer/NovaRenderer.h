@@ -5,14 +5,14 @@
 #include "RendererInterface.h"
 
 namespace nova {
-  struct SceneResourcesHolder;
+  struct NovaResourceHolder;
 }
 class EnvmapTextureManager;
 class GLViewer;
 class CameraFrameBuffer;
 class ResourceDatabaseManager;
 class RenderPipeline;
-class GLPixelBufferObject;
+class GLMutablePixelBufferObject;
 class EnvmapTextureManager;
 
 class NovaRenderer final : public IRenderer {
@@ -31,9 +31,17 @@ class NovaRenderer final : public IRenderer {
 
  private:
   Texture *framebuffer_texture{};
-  std::unique_ptr<GLPixelBufferObject> pixel_buffer_object;
+  std::unique_ptr<GLMutablePixelBufferObject> pbo;
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
-  std::unique_ptr<nova::SceneResourcesHolder> nova_scene_resources;
+  std::unique_ptr<nova::NovaResourceHolder> nova_scene_resources;
+  ApplicationConfig *global_application_config;
+  std::vector<std::future<void>> nova_result_futures;
+  std::vector<float> nova_render_buffer;
+  const int width_resolution = 8192;
+  const int height_resolution = 8192;
+  int current_frame, next_frame;
+  bool isResized{false};
+  float *pbo_map_buffer{};
 
  private:
   NovaRenderer() = default;
@@ -45,7 +53,7 @@ class NovaRenderer final : public IRenderer {
   NovaRenderer &operator=(const NovaRenderer &copy) = delete;
   NovaRenderer(NovaRenderer &&move) noexcept = default;
   NovaRenderer &operator=(NovaRenderer &&move) noexcept = default;
-
+  void synchronizeRendererThreads();
   void populateNovaSceneResources();
   void initialize(ApplicationConfig *app_conf) override;
   bool prep_draw() override;

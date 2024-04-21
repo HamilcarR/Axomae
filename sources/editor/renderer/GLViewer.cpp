@@ -66,6 +66,8 @@ GLViewer::GLViewer(GLViewer &&move) noexcept {
   }
 }
 
+void GLViewer::setApplicationConfig(ApplicationConfig *app_conf) { global_application_config = app_conf; }
+
 void GLViewer::initializeGL() {
   makeCurrent();
   if (!glew_initialized) {

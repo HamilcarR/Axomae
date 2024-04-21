@@ -6,26 +6,23 @@
  * Defines an interface for Opengl buffer wrappers
  */
 
-/**
- * @class GLBufferInterface
- */
-class GLBufferInterface {
+class GLBaseBufferInterface {
  public:
-  virtual ~GLBufferInterface() = default;
-
-  /**
-   * @brief Generates the framebuffer's ID.
-   * !Note : This method should be called after the framebuffer texture generation as it uses : glFramebufferTexture2D
-   */
+  virtual ~GLBaseBufferInterface() = default;
   virtual void initializeBuffers() = 0;
-  /**
-   * @brief Checks if framebuffer is ready to use
-   */
   [[nodiscard]] virtual bool isReady() const = 0;
-  virtual void fillBuffers() = 0;
   virtual void bind() = 0;
   virtual void unbind() = 0;
   virtual void clean() = 0;
 };
 
+class GLMutableBufferInterface : public GLBaseBufferInterface {
+ public:
+  virtual void fillBuffers() = 0;
+};
+
+class GLImmutableBufferInterface : public GLBaseBufferInterface {
+ public:
+  virtual void fillStorageBuffers(const void *data) = 0;
+};
 #endif

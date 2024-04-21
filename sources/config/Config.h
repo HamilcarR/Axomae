@@ -1,8 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 #include "Logger.h"
-#include "constants.h"
-
+#include "ThreadPool.h"
 /**
  * @brief File implementing a utility returning configurations states for the application , either from the configuration file or the CLI tool.
  * @file Config.h
@@ -35,21 +34,28 @@ class ApplicationConfig {
   unsigned int uv_editor_resolution_width;
   unsigned int uv_editor_resolution_height;
   /* Threading */
-  unsigned int number_of_threads{};
+  std::unique_ptr<threading::ThreadPool> thread_pool{};
   /* Logging */
   LoggerConfigDataStruct logger_conf{};
 
  public:
   ApplicationConfig();
+  ~ApplicationConfig();
+  ApplicationConfig(const ApplicationConfig &copy) = delete;
+  ApplicationConfig(ApplicationConfig &&move) noexcept = default;
+  ApplicationConfig &operator=(ApplicationConfig &&move) noexcept = default;
+  ApplicationConfig &operator=(const ApplicationConfig &move) = delete;
+
   void setUvEditorResolutionWidth(unsigned int resolution) { uv_editor_resolution_width = resolution; }
   void setUvEditorResolutionHeight(unsigned int resolution) { uv_editor_resolution_height = resolution; }
-  [[nodiscard]] int getUvEditorResolutionWidth() { return uv_editor_resolution_width; }
-  [[nodiscard]] int getUvEditorResolutionHeight() { return uv_editor_resolution_height; }
-  [[nodiscard]] unsigned int getThreadsNumber() { return number_of_threads; }
+  [[nodiscard]] int getUvEditorResolutionWidth() const { return static_cast<int>(uv_editor_resolution_width); }
+  [[nodiscard]] int getUvEditorResolutionHeight() const { return static_cast<int>(uv_editor_resolution_height); }
+  [[nodiscard]] int getThreadPoolSize() const;
+  void initializeThreadPool(int size = 0);
+  [[nodiscard]] threading::ThreadPool *getThreadPool() const { return thread_pool.get(); }
   [[nodiscard]] std::string getLogFile() const;
   [[nodiscard]] LoggerConfigDataStruct generateDefaultLoggerConfigDataStruct() const;
   [[nodiscard]] LoggerConfigDataStruct generateLoggerConfigDataStruct() const;
-  void setThreadsSize(unsigned size) { number_of_threads = size; }
 };
 
 #endif

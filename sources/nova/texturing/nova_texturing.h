@@ -1,12 +1,12 @@
 #ifndef NOVA_TEXTURING_H
 #define NOVA_TEXTURING_H
 #include "Includes.cuh"
-#include "OfflineCubemapProcessing.h"
+#include "TextureProcessing.h"
 #include "math_utils.h"
 
 namespace nova::texturing {
   struct EnvmapResourcesHolder {
-    EnvmapProcessing<float> texture_processor;
+    TextureOperations<float> texture_processor;
   };
 
   inline glm::vec3 sample_cubemap(const glm::vec3 &sample_vector, const EnvmapResourcesHolder *res_holder) {
