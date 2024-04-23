@@ -13,7 +13,6 @@
 #include <vector>
 
 namespace nova {
-  static std::mutex mutex;
   struct NovaResourceHolder {
     texturing::EnvmapResourcesHolder envmap_data;
     camera::CameraResourcesHolder camera_data{};
@@ -55,8 +54,8 @@ namespace nova {
                           int width_h,
                           int height_l,
                           int height_h,
-                          const int width,
-                          const int height,
+                          const unsigned width,
+                          const unsigned height,
                           const NovaResourceHolder *scene_data) {
     glm::vec3 llc{-2.f, -1.f, -1.f};
     glm::vec3 hor{4.f, 0.f, 0.f};
@@ -66,19 +65,20 @@ namespace nova {
       for (int y = height_h - 1; y > height_l; y--) {
         double u = math::texture::pixelToUv(x, width);
         double v = math::texture::pixelToUv(y, height);
-        unsigned int idx = (y * width + x) * 3;
+        unsigned int idx = (y * width + x) * 4;
 
         Ray r(ori, llc + glm::vec3(u) * hor + ver * glm::vec3(v));
         glm::vec3 rgb = color(r, scene_data);
-        display_buffer[idx] += rgb.x * 0.1f;
-        display_buffer[idx + 1] += rgb.y * 0.1f;
-        display_buffer[idx + 2] += rgb.z * 0.1f;
+        display_buffer[idx] += rgb.x * 0.01f;
+        display_buffer[idx + 1] += rgb.y * 0.01f;
+        display_buffer[idx + 2] += rgb.z * 0.01f;
+        display_buffer[idx + 3] = 0.f;
       }
   }
 
   inline std::vector<std::future<void>> draw(float *display_buffer,
-                                             const int width_resolution,
-                                             const int height_resolution,
+                                             const unsigned width_resolution,
+                                             const unsigned height_resolution,
                                              const NovaResourceHolder *scene_data) {
     AX_ASSERT(scene_data != nullptr, "");
     std::vector<std::future<void>> futs;

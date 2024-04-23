@@ -31,14 +31,14 @@ class NovaRenderer final : public IRenderer {
 
  private:
   Texture *framebuffer_texture{};
-  std::unique_ptr<GLMutablePixelBufferObject> pbo;
+  std::unique_ptr<GLMutablePixelBufferObject> pbo_read;
+  std::unique_ptr<GLMutablePixelBufferObject> pbo_write;
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
   std::unique_ptr<nova::NovaResourceHolder> nova_scene_resources;
   ApplicationConfig *global_application_config;
   std::vector<std::future<void>> nova_result_futures;
   std::vector<float> nova_render_buffer;
-  const int width_resolution = 8192;
-  const int height_resolution = 8192;
+  Dim2 resolution{2048, 2048};
   int current_frame, next_frame;
   bool isResized{false};
   float *pbo_map_buffer{};
@@ -53,7 +53,7 @@ class NovaRenderer final : public IRenderer {
   NovaRenderer &operator=(const NovaRenderer &copy) = delete;
   NovaRenderer(NovaRenderer &&move) noexcept = default;
   NovaRenderer &operator=(NovaRenderer &&move) noexcept = default;
-  void synchronizeRendererThreads();
+  void syncRenderEngineThreads();
   void populateNovaSceneResources();
   void initialize(ApplicationConfig *app_conf) override;
   bool prep_draw() override;
