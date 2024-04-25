@@ -3,6 +3,7 @@
 
 #include "CameraInterface.h"
 #include "Node.h"
+
 /**
  * @file Camera.h
  */
@@ -39,6 +40,7 @@ class Camera : public CameraInterface, public SceneTreeNode {
   void computeViewSpace() override;
   void computeProjectionSpace() override;
   void computeViewProjection() override;
+  void setUpVector(const glm::vec3 &up) { camera_up = up; }
   void setView(const glm::mat4 &_view) { view = _view; }
   void setTarget(const glm::vec3 &_target) { target = _target; }
   void setPosition(const glm::vec3 &new_pos) { position = new_pos; }

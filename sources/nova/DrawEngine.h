@@ -6,6 +6,7 @@
 #include "ThreadPool.h"
 #include "Vector.h"
 #include "image_utils.h"
+#include "math_camera.h"
 #include "math_texturing.h"
 #include "nova_camera.h"
 #include "nova_texturing.h"
@@ -32,21 +33,39 @@ namespace nova {
         return false;
       r_hit->t = t1;
       r_hit->position = r.pointAt(t1);
-      r_hit->normal = (r_hit->position - center) + glm::vec3(1.f) * 0.5f;
+      r_hit->normal = (r_hit->position - center);
       return true;
     }
     return false;
   }
 
-  inline glm::vec3 color(Ray &r, const NovaResourceHolder *scene_data) {
+  inline glm::vec4 color(Ray &r, const NovaResourceHolder *scene_data) {
     hit_data hit_d;
-    glm::vec3 center(0, 0, -2);
-    if (hit_sphere(center, 0.5, r, &hit_d)) {
+    float alpha = 1.f;
+    glm::vec4 center{0, 0, 0, 1.f};
+    center = scene_data->camera_data.M * center;
+    if (hit_sphere(center, 1, r, &hit_d)) {
       glm::vec3 normal = hit_d.normal;
       glm::vec3 sampled_color = texturing::sample_cubemap(normal, &scene_data->envmap_data);
-      return sampled_color;
+      return glm::vec4(normal, 1.f);  //{sampled_color, alpha};
     }
-    return texturing::compute_envmap_background(r, &scene_data->envmap_data);
+    r.origin = scene_data->camera_data.M * glm::vec4(r.origin, 1.f);
+    r.direction = scene_data->camera_data.M * glm::vec4(r.direction, 0.f);
+    return {texturing::compute_envmap_background(r, &scene_data->envmap_data), 1.f};
+  }
+
+  inline glm::vec4 color_fragment(const glm::vec2 &coord, const NovaResourceHolder *scene_data) {
+    const camera::CameraResourcesHolder &camera = scene_data->camera_data;
+    math::camera::camera_ray r = math::camera::ray_inv_mat(coord.x,
+                                                           coord.y,
+                                                           scene_data->camera_data.screen_width,
+                                                           scene_data->camera_data.screen_height,
+                                                           scene_data->camera_data.inv_P,
+                                                           scene_data->camera_data.inv_V);
+    r.near = glm::vec4(r.near, 1.f);
+    r.far = glm::vec4(r.far, 0.f);
+    Ray ray(r.near, r.far);
+    return color(ray, scene_data);
   }
 
   inline void fill_buffer(float *display_buffer,
@@ -57,22 +76,14 @@ namespace nova {
                           const unsigned width,
                           const unsigned height,
                           const NovaResourceHolder *scene_data) {
-    glm::vec3 llc{-2.f, -1.f, -1.f};
-    glm::vec3 hor{4.f, 0.f, 0.f};
-    glm::vec3 ver{0.f, 2.f, 0.f};
-    glm::vec3 ori(0.f);
-    for (int x = width_l; x < width_h; x++)
-      for (int y = height_h - 1; y > height_l; y--) {
-        double u = math::texture::pixelToUv(x, width);
-        double v = math::texture::pixelToUv(y, height);
+    for (int y = height_h - 1; y > height_l; y--)
+      for (int x = width_l; x < width_h; x++) {
+        glm::vec4 rgb = color_fragment({x, y}, scene_data);
         unsigned int idx = (y * width + x) * 4;
-
-        Ray r(ori, llc + glm::vec3(u) * hor + ver * glm::vec3(v));
-        glm::vec3 rgb = color(r, scene_data);
-        display_buffer[idx] += rgb.x * 0.01f;
-        display_buffer[idx + 1] += rgb.y * 0.01f;
-        display_buffer[idx + 2] += rgb.z * 0.01f;
-        display_buffer[idx + 3] = 0.f;
+        display_buffer[idx] = rgb.r;
+        display_buffer[idx + 1] = rgb.g;
+        display_buffer[idx + 2] = rgb.b;
+        display_buffer[idx + 3] = rgb.a;
       }
   }
 

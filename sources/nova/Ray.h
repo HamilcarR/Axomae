@@ -20,5 +20,8 @@ namespace nova {
     [[nodiscard]] glm::vec3 pointAt(float t) const;
   };
 
+  /* Generalized ray*/
+  class GenRay {};
+
 }  // namespace nova
 #endif

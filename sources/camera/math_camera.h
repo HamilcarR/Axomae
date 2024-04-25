@@ -12,12 +12,43 @@ namespace math::camera {
     glm::vec3 far;
   };
 
-  /* returns world-space ray */
-  inline camera_ray ray(int screen_x, int screen_y, int width, int height, const glm::mat4 &projection, const glm::mat4 &view) {
-    const float ndc_x = (float)(2 * screen_x - width) / (float)width;
-    const float ndc_y = (float)(height - 2 * screen_y) / (float)height;
-    const glm::mat4 inv_P = glm::inverse(projection);
-    const glm::mat4 inv_V = glm::inverse(view);
+  /* To screen */
+  /***********************************************************************************************/
+
+  inline glm::vec2 persp2ndc(const glm::vec4 &perspective_vec, const glm::mat4 &P) { return P * perspective_vec; }
+
+  inline glm::vec2 ndc2screen(float ndc_x, float ndc_y, int width, int height) {
+    int x = (int)((float)width * (ndc_x - 1.f) / 2.f);
+    int y = (int)((float)height * (1.f - ndc_y) / 2.f);
+    return {x, y};
+  }
+
+  inline glm::vec4 view2persp(const glm::vec4 &view_vec, const glm::mat4 &P) { return P * view_vec; }
+
+  /* To world*/
+  /***********************************************************************************************/
+  inline glm::vec2 screen2ndc(int x, int y, int width, int height) {
+    const float ndc_x = (float)(2 * x - width) / (float)width;
+    const float ndc_y = (float)(height - 2 * y) / (float)height;
+    return {ndc_x, ndc_y};
+  }
+
+  inline glm::vec4 ndc2persp(float ndc_x, float ndc_y, const glm::mat4 &inv_P, bool is_point) {
+    glm::vec4 point = inv_P * glm::vec4(ndc_x, ndc_y, -1.f, is_point ? 1.f : 0.f);
+    point /= point.w;
+    return point;
+  }
+
+  inline glm::vec4 persp2view(const glm::vec3 &vec, const glm::mat4 &inv_V, bool is_point) {
+    glm::vec4 point = inv_V * glm::vec4(vec.x, vec.y, vec.z, is_point ? 1.f : 0.f);
+    return point;
+  }
+
+  /***********************************************************************************************/
+  inline camera_ray ray_inv_mat(int x, int y, int width, int height, const glm::mat4 &inv_P, const glm::mat4 &inv_V) {
+    const glm::vec2 to_ndc = screen2ndc(x, y, width, height);
+    const float ndc_x = to_ndc.x;
+    const float ndc_y = to_ndc.y;
 
     glm::vec4 o = inv_P * glm::vec4(ndc_x, ndc_y, -1.f, 1.f);
     o /= o.w;
@@ -30,6 +61,13 @@ namespace math::camera {
     r.near = {o.x, o.y, o.z};
     r.far = {d.x, d.y, d.z};
     return r;
+  }
+
+  /* returns world-space ray */
+  inline camera_ray ray(int screen_x, int screen_y, int width, int height, const glm::mat4 &projection, const glm::mat4 &view) {
+    const glm::mat4 inv_P = glm::inverse(projection);
+    const glm::mat4 inv_V = glm::inverse(view);
+    return ray_inv_mat(screen_x, screen_y, width, height, inv_P, inv_V);
   }
 
 }  // namespace math::camera
