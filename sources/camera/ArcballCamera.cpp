@@ -126,7 +126,6 @@ void ArcballCamera::processEvent(const controller::event::Event *event) {
   using ev = controller::event::Event;
   AX_ASSERT(event != nullptr, "Provided event structure null.");
   cursor_position = glm::vec2(event->mouse_state.pos_x, event->mouse_state.pos_y);
-  LOGS(std::to_string(cursor_position.x) + "     " + std::to_string(cursor_position.y));
   if (!(event->flag & ev::EVENT_MOUSE_MOVE)) {
     /* Left / Right mouse click management */
     if (event->flag & ev::EVENT_MOUSE_L_PRESS) {
