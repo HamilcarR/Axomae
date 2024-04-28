@@ -145,8 +145,8 @@ void GLViewer::wheelEvent(QWheelEvent *event) {
   widget_input_events->flag |= EventManager::EVENT_MOUSE_WHEEL;
   widget_input_events->mouse_state.wheel_delta = event->angleDelta().y();
   renderer->processEvent(widget_input_events.get());
-  update();
   widget_input_events->flag &= ~EventManager::EVENT_MOUSE_WHEEL;
+  update();
 }
 
 void GLViewer::mousePressEvent(QMouseEvent *event) {

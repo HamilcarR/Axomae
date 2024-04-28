@@ -43,5 +43,14 @@ namespace math::spherical {
 
   inline glm::dvec2 cartesianToSpherical(const glm::dvec3 &xyz) { return cartesianToSpherical(xyz.x, xyz.y, xyz.z); }
 
+  struct SphAxis {
+    float yaw;
+    float pitch;
+    float roll;
+  };
+
+  inline SphAxis cartesianToSphericalAxis(const glm::dvec3 &xyz) {
+    return {atan2_approx(-xyz.x, -xyz.z), (float)std::asin(xyz.y / glm::length(xyz)), 0.f};
+  }
 }  // namespace math::spherical
 #endif  // math_spherical_H

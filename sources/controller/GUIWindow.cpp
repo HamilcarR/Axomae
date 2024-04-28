@@ -808,6 +808,9 @@ namespace controller {
     if (realtime_viewer != nullptr) {
       realtime_viewer->rendererCallback<SET_DISPLAY_RESET_CAMERA>();
     }
+    if (nova_viewer != nullptr) {
+      nova_viewer->rendererCallback<SET_DISPLAY_RESET_CAMERA>();
+    }
   }
 
   /**************************************************************************************************************/

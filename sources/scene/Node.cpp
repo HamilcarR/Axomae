@@ -24,12 +24,10 @@ bool SceneTreeNode::isLeaf() const { return children.empty(); }
 bool SceneTreeNode::isRoot() const {
   if (parents.empty())
     return true;
-  else {
-    for (NodeInterface *A : parents)
-      if (A != nullptr)
-        return false;
-    return true;
-  }
+  for (NodeInterface *A : parents)
+    if (A != nullptr)
+      return false;
+  return true;
 }
 
 void SceneTreeNode::emptyParents() { parents.clear(); }

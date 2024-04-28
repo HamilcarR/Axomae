@@ -207,7 +207,7 @@ void CubeMapMesh::preRenderSetup() {
   glm::mat4 projection = camera->getProjection();
   glm::mat4 local = camera->getSceneRotationMatrix();
   local = glm::scale(local, glm::vec3(INT_MAX, INT_MAX, INT_MAX));
-  if (shader_program != nullptr) {
+  if (shader_program) {
     shader_program->setSceneCameraPointer(camera);
     shader_program->setAllMatricesUniforms(projection, view, local);
   }

@@ -10,6 +10,7 @@ NovaViewerWidget::NovaViewerWidget(QWidget *parent) : QWidget(parent) {
   layout = std::make_unique<QGridLayout>(this);
   layout->addWidget(viewer.get());
   layout->setSpacing(0);
+  viewer->setMouseTracking(true);
   setMouseTracking(true);
 }
 NovaViewerWidget::~NovaViewerWidget() = default;

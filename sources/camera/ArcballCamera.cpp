@@ -1,6 +1,7 @@
 #include "ArcballCamera.h"
 #include "Axomae_macros.h"
 #include "EventController.h"
+#include "Logger.h"
 #include "constants.h"
 #include "math_utils.h"
 
@@ -112,10 +113,12 @@ inline glm::vec3 pan_on_move_ndc_position(const glm::vec2 &cursor_position, floa
 }
 
 void ArcballCamera::computeViewSpace() {
-  local_transformation = scene_rotation_matrix * scene_translation_matrix;
   position = glm::vec3(0, 0, radius);
   direction = -position;
-  view = glm::lookAt(position, glm::vec3(0.f), world_up);
+  right = glm::normalize(glm::cross(world_up, direction));
+  camera_up = glm::cross(direction, right);
+  local_transformation = scene_rotation_matrix * scene_translation_matrix;
+  view = glm::lookAt(position, glm::vec3(0.f), camera_up);
 }
 
 /* Move to a controller */
@@ -123,7 +126,7 @@ void ArcballCamera::processEvent(const controller::event::Event *event) {
   using ev = controller::event::Event;
   AX_ASSERT(event != nullptr, "Provided event structure null.");
   cursor_position = glm::vec2(event->mouse_state.pos_x, event->mouse_state.pos_y);
-
+  LOGS(std::to_string(cursor_position.x) + "     " + std::to_string(cursor_position.y));
   if (!(event->flag & ev::EVENT_MOUSE_MOVE)) {
     /* Left / Right mouse click management */
     if (event->flag & ev::EVENT_MOUSE_L_PRESS) {
@@ -166,7 +169,10 @@ void ArcballCamera::processEvent(const controller::event::Event *event) {
   }
 }
 
-void ArcballCamera::updateZoom(float step) { radius += step; }
+void ArcballCamera::updateZoom(float step) {
+  radius += step;
+  computeViewSpace();
+}
 
 void ArcballCamera::zoomIn() {
   if ((radius - DELTA_ZOOM) >= DELTA_ZOOM)

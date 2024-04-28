@@ -22,12 +22,24 @@ namespace camera {
     glm::mat4 PVM;
     glm::mat4 inv_PVM;
 
-    /* Model */
+    /* Primary scene rotation from camera*/
+    glm::mat4 R;
+    glm::mat4 inv_R;
+
+    /* Primary scene transformation from camera*/
+    glm::mat4 T;
+    glm::mat4 inv_T;
+
+    /* Primary scene transformation from camera (R x T)*/
     glm::mat4 M;
     glm::mat4 inv_M;
 
     /* Normal matrix */
     glm::mat3 N;
+
+    glm::vec3 position;
+    glm::vec3 up_vector;
+    glm::vec3 direction;
   };
 }  // namespace camera
 #endif  // NOVA_CAMERA_H

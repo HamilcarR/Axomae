@@ -40,7 +40,7 @@ class NovaRenderer final : public IRenderer {
   std::vector<float> nova_render_buffer;
   Dim2 resolution{2048, 2048};
   int current_frame, next_frame;
-  bool isResized{false};
+  bool needRedraw{false};
   float *pbo_map_buffer{};
 
  private:

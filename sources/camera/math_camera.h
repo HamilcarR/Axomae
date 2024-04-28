@@ -15,15 +15,14 @@ namespace math::camera {
   /* To screen */
   /***********************************************************************************************/
 
-  inline glm::vec2 persp2ndc(const glm::vec4 &perspective_vec, const glm::mat4 &P) { return P * perspective_vec; }
-
   inline glm::vec2 ndc2screen(float ndc_x, float ndc_y, int width, int height) {
     int x = (int)((float)width * (ndc_x - 1.f) / 2.f);
     int y = (int)((float)height * (1.f - ndc_y) / 2.f);
     return {x, y};
   }
 
-  inline glm::vec4 view2persp(const glm::vec4 &view_vec, const glm::mat4 &P) { return P * view_vec; }
+  inline glm::vec2 view2ndc(const glm::vec4 &perspective_vec, const glm::mat4 &P) { return P * perspective_vec; }
+  inline glm::vec4 world2view(const glm::vec4 &view_vec, const glm::mat4 &P) { return P * view_vec; }
 
   /* To world*/
   /***********************************************************************************************/
@@ -33,16 +32,13 @@ namespace math::camera {
     return {ndc_x, ndc_y};
   }
 
-  inline glm::vec4 ndc2persp(float ndc_x, float ndc_y, const glm::mat4 &inv_P, bool is_point) {
+  inline glm::vec4 ndc2view(float ndc_x, float ndc_y, const glm::mat4 &inv_P, bool is_point) {
     glm::vec4 point = inv_P * glm::vec4(ndc_x, ndc_y, -1.f, is_point ? 1.f : 0.f);
-    point /= point.w;
+    point /= is_point ? point.w : 1;
     return point;
   }
 
-  inline glm::vec4 persp2view(const glm::vec3 &vec, const glm::mat4 &inv_V, bool is_point) {
-    glm::vec4 point = inv_V * glm::vec4(vec.x, vec.y, vec.z, is_point ? 1.f : 0.f);
-    return point;
-  }
+  inline glm::vec4 view2world(const glm::vec4 &vec, const glm::mat4 &inv_V) { return inv_V * vec; }
 
   /***********************************************************************************************/
   inline camera_ray ray_inv_mat(int x, int y, int width, int height, const glm::mat4 &inv_P, const glm::mat4 &inv_V) {

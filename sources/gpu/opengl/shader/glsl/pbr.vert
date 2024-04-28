@@ -27,7 +27,7 @@ out vec2 vertex_fragment_uv;
 out vec3 vertex_fragment_normals;
 out vec3 vertex_fragment_positions;
 out vec3 vertex_fragment_fragment_position;
-out vec3 vertex_fragment_camera_position;
+out vec3 vertex_fragment_camera_position; //is 0
 /******************************************/
 /* Flat Shader Output*/
 out mat3 MAT_TBN;
