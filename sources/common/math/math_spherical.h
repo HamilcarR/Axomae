@@ -35,13 +35,15 @@ namespace math::spherical {
   inline glm::dvec3 sphericalToCartesian(const glm::dvec2 &sph) { return sphericalToCartesian(sph.x, sph.y); }
 
   template<class T>
-  inline glm::dvec2 cartesianToSpherical(const T &x, const T &y, const T &z) {
-    const T theta = acos_approx(z);
-    const T phi = atan2_approx(y, x);  // atan2f(y, x);
+  inline glm::dvec2 cartesianToSpherical(const T &x, const T &y, const T &z, bool fast_approx = true) {
+    const T theta = fast_approx ? acos_approx(z) : std::acos(z);
+    const T phi = fast_approx ? atan2_approx(y, x) : atan2f(y, x);
     return {phi, theta};
   }
 
-  inline glm::dvec2 cartesianToSpherical(const glm::dvec3 &xyz) { return cartesianToSpherical(xyz.x, xyz.y, xyz.z); }
+  inline glm::dvec2 cartesianToSpherical(const glm::dvec3 &xyz, bool fast_approx = true) {
+    return cartesianToSpherical(xyz.x, xyz.y, xyz.z, fast_approx);
+  }
 
   struct SphAxis {
     float yaw;
