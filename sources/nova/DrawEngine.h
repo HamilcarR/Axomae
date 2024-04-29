@@ -35,7 +35,7 @@ namespace nova {
                                              NovaRenderEngineInterface<R> *engine_instance,
                                              threading::ThreadPool *thread_pool,
                                              const NovaResources *nova_resources) {
-    AX_ASSERT(renderer != nullptr, "Rendering engine is null");
+    AX_ASSERT(engine_instance != nullptr, "Rendering engine is null");
     AX_ASSERT(nova_resources != nullptr, "Scene descriptor is null");
     AX_ASSERT(thread_pool != nullptr, "");
     std::vector<std::future<void>> futs;

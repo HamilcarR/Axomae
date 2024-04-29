@@ -35,7 +35,7 @@ glm::vec4 NovaRenderEngineLR::engine_sample_color(const Ray &ray, const NovaReso
 
 void NovaRenderEngineLR::engine_render_tile(
     float *dest_buffer, int width_limit_low, int width_limit_high, int height_limit_low, int height_limit_high, const NovaResources *nova_resources) {
-  AX_ASSERT(scene_data, "Scene description NULL.");
+  AX_ASSERT(nova_resources, "Scene description NULL.");
   for (int y = height_limit_high - 1; y > height_limit_low; y--)
     for (int x = width_limit_low; x < width_limit_high; x++) {
       math::camera::camera_ray r = math::camera::ray_inv_mat(x,
