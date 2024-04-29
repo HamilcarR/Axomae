@@ -25,9 +25,10 @@ NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *wi
   scene = std::make_unique<Scene>(*resource_database);
   envmap_manager = std::make_unique<EnvmapTextureManager>(
       *resource_database, screen_size, default_framebuffer_id, *render_pipeline, nullptr, EnvmapTextureManager::SELECTED);
-  nova_scene_resources = std::make_unique<nova::NovaResourceHolder>();
+  nova_scene_resources = std::make_unique<nova::NovaResources>();
   nova_render_buffer.resize(resolution.width * resolution.height * 4);
   pbo_read = std::make_unique<GLMutablePixelBufferObject>(GLMutablePixelBufferObject::UP, nova_render_buffer.size() * sizeof(float));
+  nova_engine = std::make_unique<NovaLRengineInterface>();
   current_frame = next_frame = 0;
 }
 
@@ -56,14 +57,12 @@ bool NovaRenderer::prep_draw() {
 }
 
 void NovaRenderer::populateNovaSceneResources() {
-  if (global_application_config) {
-    /* Multithreading */
-    nova_scene_resources->thread_pool = global_application_config->getThreadPool();
-  }
   /*Setup envmap */
   image::ImageHolder<float> *current_envmap = envmap_manager->currentMutableEnvmapMetadata();
   nova_scene_resources->envmap_data.texture_processor = TextureOperations<float>(
       current_envmap->data, (int)current_envmap->metadata.width, (int)current_envmap->metadata.height);
+
+  scene_camera->computeViewProjection();
 }
 
 void NovaRenderer::syncRenderEngineThreads() {
@@ -77,11 +76,16 @@ void NovaRenderer::syncRenderEngineThreads() {
 void NovaRenderer::draw() {
   current_frame = current_frame >= screen_size.height ? 0 : current_frame + 1;
   PerformanceLogger perf;
-  // perf.startTimer();
+  perf.startTimer();
   if (!nova_render_buffer.empty()) {
 
     populateNovaSceneResources();
-    nova_result_futures = nova::draw(nova_render_buffer.data(), screen_size.width, screen_size.height, nova_scene_resources.get());
+    nova_result_futures = nova::draw(nova_render_buffer.data(),
+                                     screen_size.width,
+                                     screen_size.height,
+                                     nova_engine.get(),
+                                     global_application_config->getThreadPool(),
+                                     nova_scene_resources.get());
   }
   framebuffer_texture->bindTexture();
 
@@ -109,8 +113,8 @@ void NovaRenderer::draw() {
   pbo_read->unbind();
   framebuffer_texture->unbindTexture();
   camera_framebuffer->renderFrameBufferMesh();
-  // perf.endTimer();
-  //   perf.print();
+  perf.endTimer();
+  perf.print();
 }
 
 void NovaRenderer::onResize(unsigned int width, unsigned int height) {

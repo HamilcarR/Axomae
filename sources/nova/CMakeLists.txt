@@ -1,5 +1,6 @@
 add_library(ax_nova
         Ray.cpp
+        DrawEngine.cpp
 )
 
 
@@ -9,7 +10,8 @@ target_link_libraries(ax_nova
 PRIVATE
     ax_math
     ax_macro
-    ax_processing
+    ax_thread
+
 )
 
 target_include_directories(ax_nova

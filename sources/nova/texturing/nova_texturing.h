@@ -1,6 +1,6 @@
 #ifndef NOVA_TEXTURING_H
 #define NOVA_TEXTURING_H
-#include "Includes.cuh"
+#include "Axomae_macros.h"
 #include "TextureProcessing.h"
 #include "math_utils.h"
 

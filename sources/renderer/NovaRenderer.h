@@ -2,10 +2,11 @@
 #define NOVARENDERER_H
 
 #include "LightingDatabase.h"
+#include "NovaInterface.h"
 #include "RendererInterface.h"
 
 namespace nova {
-  struct NovaResourceHolder;
+  struct NovaResources;
 }
 class EnvmapTextureManager;
 class GLViewer;
@@ -14,6 +15,8 @@ class ResourceDatabaseManager;
 class RenderPipeline;
 class GLMutablePixelBufferObject;
 class EnvmapTextureManager;
+template<class T>
+class NovaRenderEngineInterface;
 
 class NovaRenderer final : public IRenderer {
 
@@ -33,8 +36,9 @@ class NovaRenderer final : public IRenderer {
   Texture *framebuffer_texture{};
   std::unique_ptr<GLMutablePixelBufferObject> pbo_read;
   std::unique_ptr<GLMutablePixelBufferObject> pbo_write;
+  std::unique_ptr<NovaLRengineInterface> nova_engine;
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
-  std::unique_ptr<nova::NovaResourceHolder> nova_scene_resources;
+  std::unique_ptr<nova::NovaResources> nova_scene_resources;
   ApplicationConfig *global_application_config;
   std::vector<std::future<void>> nova_result_futures;
   std::vector<float> nova_render_buffer;

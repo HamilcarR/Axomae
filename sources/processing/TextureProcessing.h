@@ -1,16 +1,13 @@
 #ifndef OFFLINECUBEMAPPROCESSING_H
 #define OFFLINECUBEMAPPROCESSING_H
+#include "Axomae_macros.h"
 #include "GenericException.h"
-#include "GenericTextureProcessing.h"
-#include "Logger.h"
-#include "Mutex.h"
+
 #include "ThreadPool.h"
 #include "math_utils.h"
-#include "thread_utils.h"
 
-#include <fstream>
-#include <immintrin.h>
-#include <sstream>
+inline bool isDimPowerOfTwo(int dimension) { return (dimension & (dimension - 1)) == 0; }
+inline bool isValidDim(int dimension) { return dimension > 0; }
 
 constexpr glm::dvec3 RED = glm::dvec3(1., 0, 0);
 constexpr glm::dvec3 YELLOW = glm::dvec3(0, 1, 1);
@@ -30,8 +27,10 @@ class TextureNonPowerOfTwoDimensionsException : public exception::GenericExcepti
   TextureNonPowerOfTwoDimensionsException() : GenericException() { saveErrorString("Provided texture has dimensions that are not a power of two."); }
 };
 
+class TextureData;
+
 template<class T>
-class TextureOperations final : GenericTextureProcessing {
+class TextureOperations {
 
  private:
   std::vector<T> *data{};
@@ -47,14 +46,13 @@ class TextureOperations final : GenericTextureProcessing {
   TextureOperations() = default;
   TextureOperations(
       std::vector<T> &_data, unsigned _width, unsigned _height, unsigned int num_channels = 3, threading::ThreadPool *thread_pool = nullptr);
-  ~TextureOperations() override = default;
+  ~TextureOperations();
   TextureOperations(const TextureOperations &copy);
   TextureOperations(TextureOperations &&move) noexcept;
   TextureOperations &operator=(const TextureOperations &copy);
   TextureOperations &operator=(TextureOperations &&move) noexcept;
   void copyTexture(T *dest, int dest_width, int dest_height) const;
 
-  TextureData computeSpecularIrradiance(double roughness);
   /**
    * @brief This method wrap around if the texture coordinates provided land beyond the texture dimensions, repeating
    * the texture values on both axes.
@@ -65,21 +63,21 @@ class TextureOperations final : GenericTextureProcessing {
   /**
    * @brief Normalizes a set of pixel coordinates into texture bounds.
    */
-  glm::vec2 wrapAroundPixelCoords(int x, int y) const;
+  [[nodiscard]] glm::vec2 wrapAroundPixelCoords(int x, int y) const;
 
   /**
    * @brief Computes the linear interpolation of a point based on 4 of it's neighbours.
    */
-  glm::vec3 bilinearInterpolate(const glm::vec2 &top_left,
-                                const glm::vec2 &top_right,
-                                const glm::vec2 &bottom_left,
-                                const glm::vec2 &bottom_right,
-                                const glm::vec2 &point) const;
+  [[nodiscard]] glm::vec3 bilinearInterpolate(const glm::vec2 &top_left,
+                                              const glm::vec2 &top_right,
+                                              const glm::vec2 &bottom_left,
+                                              const glm::vec2 &bottom_right,
+                                              const glm::vec2 &point) const;
 
   /**
    * @brief Sample the original texture using pixel coordinates.
    */
-  glm::vec3 discreteSample(int x, int y) const;
+  [[nodiscard]] glm::vec3 discreteSample(int x, int y) const;
 
   /**
    * @brief In case the coordinates go beyond the bounds of the texture , we wrap around .
@@ -90,9 +88,9 @@ class TextureOperations final : GenericTextureProcessing {
   glm::vec3 uvSample(D u, D v) const;
   template<typename D>
   void launchAsyncDiffuseIrradianceCompute(D delta, float *f_data, unsigned width_begin, unsigned width_end, unsigned _width, unsigned _height) const;
-  std::unique_ptr<TextureData> computeDiffuseIrradiance(unsigned _width, unsigned _height, unsigned delta, bool gpu) const;
+  [[nodiscard]] std::unique_ptr<TextureData> computeDiffuseIrradiance(unsigned _width, unsigned _height, unsigned delta, bool gpu) const;
 
-  glm::vec3 computeIrradianceSingleTexel(
+  [[nodiscard]] glm::vec3 computeIrradianceSingleTexel(
       unsigned x, unsigned y, unsigned samples, const glm::vec3 &tangent, const glm::vec3 &bitangent, const glm::vec3 &normal) const;
 
   template<class D>
@@ -143,37 +141,16 @@ TextureOperations<T> &TextureOperations<T>::operator=(TextureOperations &&move) 
 
 template<class T>
 void TextureOperations<T>::copyTexture(T *dest, int dest_width, int dest_height) const {
-  if (thread_pool) {
-    std::vector<std::future<void>> futs;
-    std::vector<threading::Tile> tiles = threading::divideByTiles(dest_width, dest_height, thread_pool->threadNumber());
-    auto async_copy = [this, dest_width, dest_height](T *dest, int width_begin, int width_end, int height_begin, int height_end) {
-      for (int i = width_begin; i <= width_end; i++)
-        for (int j = height_begin; j <= height_end; j++) {
-          double u = math::texture::pixelToUv(i, dest_width);
-          double v = math::texture::pixelToUv(j, dest_height);
-          glm::vec3 col = uvSample(u, v);
-          int idx = (j * dest_width + i) * channels;
-          dest[idx] = col.r;
-          dest[idx + 1] = col.g;
-          dest[idx + 2] = col.b;
-        }
-    };
-    for (const auto &elem : tiles)
-      futs.push_back(thread_pool->addTask(true, async_copy, dest, elem.width_start, elem.width_end, elem.height_start, elem.height_end));
-    for (auto &elem : futs)
-      elem.get();
-  } else {
-    for (int i = 0; i < dest_width; i++)
-      for (int j = 0; j < dest_height; j++) {
-        double u = math::texture::pixelToUv(i, dest_width);
-        double v = math::texture::pixelToUv(j, dest_height);
-        glm::vec3 col = uvSample(u, v);
-        int idx = (j * dest_width + i) * channels;
-        dest[idx] = col.r;
-        dest[idx + 1] = col.g;
-        dest[idx + 2] = col.b;
-      }
-  }
+  for (int i = 0; i < dest_width; i++)
+    for (int j = 0; j < dest_height; j++) {
+      double u = math::texture::pixelToUv(i, dest_width);
+      double v = math::texture::pixelToUv(j, dest_height);
+      glm::vec3 col = uvSample(u, v);
+      int idx = (j * dest_width + i) * channels;
+      dest[idx] = col.r;
+      dest[idx + 1] = col.g;
+      dest[idx + 2] = col.b;
+    }
 }
 
 template<class T>
@@ -190,11 +167,6 @@ TextureOperations<T>::TextureOperations(
   channels = num_channels;
   if (pool)
     thread_pool = pool;
-}
-
-template<class T>
-TextureData TextureOperations<T>::computeSpecularIrradiance(double roughness) {
-  return {};
 }
 
 template<class T>
@@ -326,4 +298,8 @@ glm::vec3 TextureOperations<T>::computeIrradianceImportanceSampling(
     irradiance += computeIrradianceSingleTexel(pixel_x, pixel_y, samples, tangent, bitangent, normal);
   return irradiance / static_cast<float>(total_samples);
 }
+
+template<class T>
+TextureOperations<T>::~TextureOperations() = default;
+
 #endif

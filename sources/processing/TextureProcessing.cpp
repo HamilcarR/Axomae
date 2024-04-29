@@ -1,4 +1,5 @@
 #include "TextureProcessing.h"
+#include "GenericTextureProcessing.h"
 #include "cuda/CubemapProcessing.cuh"
 
 namespace gpu_func = gpgpu_functions::irradiance_mapping;

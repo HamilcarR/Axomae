@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "../common/math/math_camera.h"
 #include "BoundingBox.h"
 #include "Camera.h"
 #include "Drawable.h"
@@ -9,7 +10,6 @@
 #include "Shader.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
-#include "math_camera.h"
 #include "utils_3D.h"
 using namespace axomae;
 
