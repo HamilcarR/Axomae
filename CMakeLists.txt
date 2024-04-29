@@ -22,7 +22,7 @@ set(CMAKE_CUDA_ARCHITECTURES "75")
 enable_language(CUDA)
 #****************************************************************************************************
 # Debug 
-set(USE_ASAN "OFF" CACHE BOOL "Enable Address Sanitizer")
+set(USE_ASAN "OFF" CACHE BOOL "Enable Address Sanitization")
 if(USE_ASAN)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
     set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
@@ -31,6 +31,11 @@ endif()
 
 set(USE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
 
+set(USE_TSAN "OFF" CACHE BOOL "Enable thread Sanitization")
+if(use_TSAN)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread")
+    set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fsanitize=thread")
+endif()
 #****************************************************************************************************
 # Dependencies 
 
