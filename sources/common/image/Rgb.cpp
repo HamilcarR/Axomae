@@ -9,36 +9,6 @@ namespace image {
 
   Rgb::Rgb(float r, float g, float b, float a) : red(r), green(g), blue(b), alpha(a) {}
 
-  Rgb::Rgb(const Rgb &copy) {
-    red = copy.red;
-    green = copy.green;
-    blue = copy.blue;
-    alpha = copy.alpha;
-  }
-
-  Rgb::Rgb(Rgb &&move) noexcept {
-    red = std::move(move.red);
-    green = std::move(move.green);
-    blue = std::move(move.blue);
-    alpha = std::move(move.alpha);
-  }
-
-  Rgb &Rgb::operator=(const Rgb &copy) {
-    red = copy.red;
-    green = copy.green;
-    blue = copy.blue;
-    alpha = copy.alpha;
-    return *this;
-  }
-
-  Rgb &Rgb::operator=(Rgb &&move) noexcept {
-    red = std::move(move.red);
-    green = std::move(move.green);
-    blue = std::move(move.blue);
-    alpha = std::move(move.alpha);
-    return *this;
-  }
-
   void Rgb::to_string() {
     std::cout << "RED : " << std::to_string(red) << "\n";
     std::cout << "GREEN : " << std::to_string(green) << "\n";

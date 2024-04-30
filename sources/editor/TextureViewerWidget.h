@@ -1,6 +1,7 @@
 #ifndef TEXTUREVIEWERWIDGET_H
 #define TEXTUREVIEWERWIDGET_H
 #include "Image.h"
+#include "Rgb.h"
 #include "ui_texture_viewer.h"
 #include <QImage>
 #include <QLabel>
@@ -12,11 +13,20 @@ namespace controller::event {
 }
 
 class CustomLabelImageTex : public QLabel {
+ public:
+  struct pixel_type {
+    image::Rgb color;
+    bool to_normalize;
+  };
+
  private:
   std::string *current_rgb;
+  pixel_type color_pixel_indicator;
 
  public:
   explicit CustomLabelImageTex(std::string &current_rgb_text, QWidget *parent = nullptr);
+
+  void setColor(const pixel_type &pixel_type);
 
  protected:
   void paintEvent(QPaintEvent *event) override;
