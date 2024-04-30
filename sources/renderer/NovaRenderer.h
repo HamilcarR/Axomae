@@ -49,6 +49,7 @@ class NovaRenderer final : public IRenderer {
 
  private:
   NovaRenderer() = default;
+  void updateNovaCameraFields();
 
  public:
   NovaRenderer(unsigned width, unsigned height, GLViewer *widget = nullptr);

@@ -78,7 +78,6 @@ void NovaRenderer::draw() {
   PerformanceLogger perf;
   perf.startTimer();
   if (!nova_render_buffer.empty()) {
-
     populateNovaSceneResources();
     nova_result_futures = nova::draw(nova_render_buffer.data(),
                                      screen_size.width,
@@ -120,15 +119,50 @@ void NovaRenderer::draw() {
 void NovaRenderer::onResize(unsigned int width, unsigned int height) {
   screen_size.width = width;
   screen_size.height = height;
+  scene_camera->computeViewProjection();
+  updateNovaCameraFields();
   needRedraw = true;
   current_frame = 0;
   if (global_application_config)
     global_application_config->getThreadPool()->emptyQueue();
 
   std::memset(nova_render_buffer.data(), 0, screen_size.width * screen_size.height * 4 * sizeof(float));
-  if (camera_framebuffer) {
+  if (camera_framebuffer)
     camera_framebuffer->resize();
-  }
+}
+
+void NovaRenderer::updateNovaCameraFields() {
+  if (!scene_camera)
+    return;
+  nova_scene_resources->camera_data.up_vector = scene_camera->getUpVector();
+
+  nova_scene_resources->camera_data.P = scene_camera->getProjection();
+  nova_scene_resources->camera_data.inv_P = glm::inverse(nova_scene_resources->camera_data.P);
+
+  nova_scene_resources->camera_data.V = scene_camera->getView();
+  nova_scene_resources->camera_data.inv_V = glm::inverse(nova_scene_resources->camera_data.V);
+
+  nova_scene_resources->camera_data.T = scene_camera->getSceneTranslationMatrix();
+  nova_scene_resources->camera_data.inv_T = glm::inverse(scene_camera->getSceneTranslationMatrix());
+
+  nova_scene_resources->camera_data.R = scene_camera->getSceneRotationMatrix();
+  nova_scene_resources->camera_data.inv_R = glm::inverse(scene_camera->getSceneRotationMatrix());
+
+  nova_scene_resources->camera_data.M = scene_camera->getLocalModelMatrix();
+  nova_scene_resources->camera_data.inv_M = glm::inverse(nova_scene_resources->camera_data.M);
+
+  nova_scene_resources->camera_data.PVM = nova_scene_resources->camera_data.P * nova_scene_resources->camera_data.V *
+                                          nova_scene_resources->camera_data.M;
+  nova_scene_resources->camera_data.inv_PVM = glm::inverse(nova_scene_resources->camera_data.PVM);
+
+  nova_scene_resources->camera_data.N = glm::mat3(glm::transpose(nova_scene_resources->camera_data.inv_M));
+
+  nova_scene_resources->camera_data.position = scene_camera->getPosition();
+
+  nova_scene_resources->camera_data.direction = scene_camera->getDirection();
+
+  nova_scene_resources->camera_data.screen_width = screen_size.width;
+  nova_scene_resources->camera_data.screen_height = screen_size.height;
 }
 
 void NovaRenderer::processEvent(const controller::event::Event *event) {
@@ -137,35 +171,7 @@ void NovaRenderer::processEvent(const controller::event::Event *event) {
   if (scene_camera) {
     scene_camera->processEvent(event);
     /* Camera setup */
-    nova_scene_resources->camera_data.up_vector = scene_camera->getUpVector();
-
-    nova_scene_resources->camera_data.P = scene_camera->getProjection();
-    nova_scene_resources->camera_data.inv_P = glm::inverse(nova_scene_resources->camera_data.P);
-
-    nova_scene_resources->camera_data.V = scene_camera->getView();
-    nova_scene_resources->camera_data.inv_V = glm::inverse(nova_scene_resources->camera_data.V);
-
-    nova_scene_resources->camera_data.T = scene_camera->getSceneTranslationMatrix();
-    nova_scene_resources->camera_data.inv_T = glm::inverse(scene_camera->getSceneTranslationMatrix());
-
-    nova_scene_resources->camera_data.R = scene_camera->getSceneRotationMatrix();
-    nova_scene_resources->camera_data.inv_R = glm::inverse(scene_camera->getSceneRotationMatrix());
-
-    nova_scene_resources->camera_data.M = scene_camera->getLocalModelMatrix();
-    nova_scene_resources->camera_data.inv_M = glm::inverse(nova_scene_resources->camera_data.M);
-
-    nova_scene_resources->camera_data.PVM = nova_scene_resources->camera_data.P * nova_scene_resources->camera_data.V *
-                                            nova_scene_resources->camera_data.M;
-    nova_scene_resources->camera_data.inv_PVM = glm::inverse(nova_scene_resources->camera_data.PVM);
-
-    nova_scene_resources->camera_data.N = glm::mat3(glm::transpose(nova_scene_resources->camera_data.inv_M));
-
-    nova_scene_resources->camera_data.position = scene_camera->getPosition();
-
-    nova_scene_resources->camera_data.direction = scene_camera->getDirection();
-
-    nova_scene_resources->camera_data.screen_width = screen_size.width;
-    nova_scene_resources->camera_data.screen_height = screen_size.height;
+    updateNovaCameraFields();
   }
 }
 
