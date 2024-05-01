@@ -20,6 +20,16 @@ namespace image {
     return os.str();
   }
 
+  std::string Rgb::to_stringi() const {
+    std::stringstream os;
+
+    os << "R: " << std::to_string((int)red) << " ";
+    os << "G: " << std::to_string((int)green) << " ";
+    os << "B: " << std::to_string((int)blue) << " ";
+    os << "A: " << std::to_string((int)alpha) << "  ";
+    return os.str();
+  }
+
   [[maybe_unused]] double Rgb::intensity() {
     double av = (red + green + blue) / 3;
     return av / 255;

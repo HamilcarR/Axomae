@@ -34,5 +34,5 @@ void NovaViewerWidget::mouseMoveEvent(QMouseEvent *event) {
     return;
   QPoint p = this->mapFromGlobal(QCursor::pos());
   image::Rgb framebuffer_color_pixel = viewer->getFramebufferColor(p.x(), p.y());
-  rgb_label->updateLabel({framebuffer_color_pixel}, false);
+  rgb_label->updateLabel({framebuffer_color_pixel}, true);
 }

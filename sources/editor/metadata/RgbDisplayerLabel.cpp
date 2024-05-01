@@ -15,10 +15,10 @@ namespace editor {
     text_painter.setFont(font);
     text_painter.fillRect(0, height() - 12, width(), 12, QColor(100, 100, 100, 200));
     text_painter.setPen(QColor(10, 10, 10, 225));
-    const std::string current_rgb_text = current_pixel_display_info.texture_color_value.to_string();
-    text_painter.drawText(0, this->height() - 1, current_rgb_text.c_str());
+
+    text_painter.drawText(0, this->height() - 1, current_pixel_display_info.rgb_display_text.c_str());
     QFontMetrics metrics(font);
-    int width_text = metrics.size(Qt::TextSingleLine, QString(current_rgb_text.c_str())).width();
+    int width_text = metrics.size(Qt::TextSingleLine, QString(current_pixel_display_info.rgb_display_text.c_str())).width();
     QPainter color_painter(this);
     QColor pixel_color_mouse;
     pixel_color_mouse.setRed((int)current_pixel_display_info.texture_color_value.red);
@@ -32,6 +32,19 @@ namespace editor {
 
     current_pixel_display_info = display_info;
     if (normalize) {  // normalize on color display
+      current_pixel_display_info.texture_color_value.red = std::clamp(
+          hdr_utils::color_correction(current_pixel_display_info.texture_color_value.red) * 255, 0.f, 255.f);
+      current_pixel_display_info.texture_color_value.green = std::clamp(
+          hdr_utils::color_correction(current_pixel_display_info.texture_color_value.green) * 255, 0.f, 255.f);
+      current_pixel_display_info.texture_color_value.blue = std::clamp(
+          hdr_utils::color_correction(current_pixel_display_info.texture_color_value.blue) * 255, 0.f, 255.f);
+      current_pixel_display_info.texture_color_value.alpha *= 255;
+      current_pixel_display_info.texture_color_value.red = std::floor(current_pixel_display_info.texture_color_value.red);
+      current_pixel_display_info.texture_color_value.green = std::floor(current_pixel_display_info.texture_color_value.green);
+      current_pixel_display_info.texture_color_value.blue = std::floor(current_pixel_display_info.texture_color_value.blue);
+      current_pixel_display_info.rgb_display_text = current_pixel_display_info.texture_color_value.to_stringi();
+    } else {
+      current_pixel_display_info.rgb_display_text = current_pixel_display_info.texture_color_value.to_string();
       current_pixel_display_info.texture_color_value.red = std::clamp(
           hdr_utils::color_correction(current_pixel_display_info.texture_color_value.red) * 255, 0.f, 255.f);
       current_pixel_display_info.texture_color_value.green = std::clamp(

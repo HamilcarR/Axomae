@@ -7,12 +7,12 @@ namespace editor {
   class RgbDisplayerLabel : public QLabel {
    public:
     struct DisplayInfo {
-
       image::Rgb texture_color_value;
-
+      std::string rgb_display_text;
     };
 
    private:
+    bool is_int;
     DisplayInfo current_pixel_display_info;
 
    public:

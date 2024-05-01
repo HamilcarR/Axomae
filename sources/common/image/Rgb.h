@@ -34,7 +34,8 @@ namespace image {
     Rgb operator-(Rgb arg) const;
     void clamp();
     uint32_t rgb_to_int();
-    std::string to_string() const;
+    [[nodiscard]] std::string to_string() const;
+    [[nodiscard]] std::string to_stringi() const;
   };
 }  // namespace image
 #endif  // RGB_H

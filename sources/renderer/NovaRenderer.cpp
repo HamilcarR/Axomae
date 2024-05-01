@@ -183,9 +183,9 @@ void NovaRenderer::processEvent(const controller::event::Event *event) {
 
 void NovaRenderer::getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) {
   int idx = ((screen_size.height - y) * screen_size.width + x) * 4;
-  float r = nova_render_buffer[idx] / renderer_data.max_channel_color_value;
-  float g = nova_render_buffer[idx + 1] / renderer_data.max_channel_color_value;
-  float b = nova_render_buffer[idx + 2] / renderer_data.max_channel_color_value;
+  float r = nova_render_buffer[idx];
+  float g = nova_render_buffer[idx + 1];
+  float b = nova_render_buffer[idx + 2];
 
   r_screen_pixel_color[0] = r;
   r_screen_pixel_color[1] = g;
