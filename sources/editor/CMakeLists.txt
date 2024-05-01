@@ -8,6 +8,7 @@ add_library(ax_editor
         UV/MeshListView.cpp
         UV/SceneSelector.cpp
         nova/NovaViewerWidget.cpp
+        metadata/RgbDisplayerLabel.cpp
 
 )
 

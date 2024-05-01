@@ -60,12 +60,7 @@ namespace hdr_utils {
    * The output image is always of format RGBA for simplicity.
    * */
   template<class T>
-  std::vector<uint8_t> hdr2image(const std::vector<T> &rgb,
-                                 int width,
-                                 int height,
-                                 int channels,
-                                 bool needs_color_correct,
-                                 controller::ProgressManagerHelper *progress = nullptr) {
+  std::vector<uint8_t> hdr2image(const std::vector<T> &rgb, int width, int height, int channels, bool needs_color_correct) {
     ASSERT_IS_ARITHMETIC(T);
     assert(rgb.size() == static_cast<unsigned>(width * height * channels));
 
@@ -81,8 +76,6 @@ namespace hdr_utils {
     if (needs_color_correct)
       max = color_correction(max);
     int index = 0;
-    if (progress)
-      progress->notifyProgress(controller::ProgressManagerHelper::ZERO);
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
         index = (i * width + j) * channels;

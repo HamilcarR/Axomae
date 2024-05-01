@@ -15,10 +15,10 @@ namespace image {
     Rgb();
     Rgb(float r, float g, float b, float a);
     Rgb(float r, float g, float b);
-    Rgb(const Rgb &copy);
-    Rgb(Rgb &&move) noexcept;
-    Rgb &operator=(const Rgb &copy);
-    Rgb &operator=(Rgb &&move) noexcept;
+    Rgb(const Rgb &copy) = default;
+    Rgb(Rgb &&move) noexcept = default;
+    Rgb &operator=(const Rgb &copy) = default;
+    Rgb &operator=(Rgb &&move) noexcept = default;
     ~Rgb() = default;
     [[maybe_unused]] static Rgb int_to_rgb(uint32_t value);
     [[maybe_unused]] static Rgb int_to_rgb(uint16_t value);
@@ -34,7 +34,7 @@ namespace image {
     Rgb operator-(Rgb arg) const;
     void clamp();
     uint32_t rgb_to_int();
-    void to_string();
+    std::string to_string() const;
   };
 }  // namespace image
 #endif  // RGB_H

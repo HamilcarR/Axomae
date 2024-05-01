@@ -97,6 +97,8 @@ void Renderer::initialize(ApplicationConfig *app_conf) {
   camera_framebuffer->initializeFrameBuffer();
 }
 
+void Renderer::getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) { EMPTY_FUNCBODY; }
+
 bool Renderer::scene_ready() {
   if (!scene->isReady())
     return false;

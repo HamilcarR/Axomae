@@ -13,7 +13,7 @@
 inline void errorCheck(const char *filename, const char *function, unsigned int line) {
 #ifndef NDEBUG
   GLenum error = GL_NO_ERROR;
-  error = glGetError();
+  error = glGetError();  // put in lopp
   if (error != GL_NO_ERROR) {
     std::string err = std::string("GL API ERROR :") + std::to_string(error);
     LOGFL(err, LogLevel::DEBUG, filename, function, line);

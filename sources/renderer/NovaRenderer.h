@@ -19,6 +19,10 @@ template<class T>
 class NovaRenderEngineInterface;
 
 class NovaRenderer final : public IRenderer {
+ private:
+  struct NovaInternalMetadata {
+    float max_channel_color_value;
+  };
 
  public:
   std::unique_ptr<RenderPipeline> render_pipeline;
@@ -46,10 +50,12 @@ class NovaRenderer final : public IRenderer {
   int current_frame, next_frame;
   bool needRedraw{false};
   float *pbo_map_buffer{};
+  NovaInternalMetadata renderer_data;
 
  private:
   NovaRenderer() = default;
   void updateNovaCameraFields();
+  void copyBufferToPbo(float *pbo_mapped_buffer, int width, int height, int channels);
 
  public:
   NovaRenderer(unsigned width, unsigned height, GLViewer *widget = nullptr);
@@ -59,6 +65,7 @@ class NovaRenderer final : public IRenderer {
   NovaRenderer(NovaRenderer &&move) noexcept = default;
   NovaRenderer &operator=(NovaRenderer &&move) noexcept = default;
   void syncRenderEngineThreads();
+  void getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) override;
   void populateNovaSceneResources();
   void initialize(ApplicationConfig *app_conf) override;
   bool prep_draw() override;
