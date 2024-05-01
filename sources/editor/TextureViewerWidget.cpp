@@ -52,14 +52,9 @@ void TextureViewerWidget::mouseMoveEvent(QMouseEvent *event) {
       uint8_t r_ = raw_display_data[index];
       uint8_t g_ = raw_display_data[index + 1];
       uint8_t b_ = raw_display_data[index + 2];
-
-      image::Rgb rgb;
-      rgb.red = r_;
-      rgb.green = g_;
-      rgb.blue = b_;
-      rgb.alpha = 1;
-      editor::RgbDisplayerLabel::DisplayInfo color_info{rgb};
-      label->updateLabel(color_info);
+      uint8_t a_ = 255;
+      const uint8_t rgb[4] = {r_, g_, b_, a_};
+      label->updateLabel(rgb);
     }
   }
   widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_MOVE;
@@ -108,16 +103,10 @@ void HdrTextureViewerWidget::mouseMoveEvent(QMouseEvent *event) {
       float r_ = raw_hdr_data[index];
       float g_ = raw_hdr_data[index + 1];
       float b_ = raw_hdr_data[index + 2];
-
-      image::Rgb rgb;
-      rgb.red = r_;
-      rgb.green = g_;
-      rgb.blue = b_;
-      rgb.alpha = 1;
-      editor::RgbDisplayerLabel::DisplayInfo color_info{rgb};
-      label->updateLabel(color_info);
+      float a_ = 1.f;
+      const float rgb[4] = {r_, g_, b_, a_};
+      label->updateLabel(rgb, false);
     }
-    label->update();
   }
   widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_MOVE;
 }

@@ -28,31 +28,26 @@ namespace editor {
     color_painter.fillRect(width_text + 1, height() - 12, 12, 12, pixel_color_mouse);
   }
 
-  void RgbDisplayerLabel::updateLabel(const DisplayInfo &display_info, bool normalize) {
+  void RgbDisplayerLabel::updateLabel(const float rgb[4], bool normalize) {
+    current_pixel_display_info.texture_color_value = {rgb[0], rgb[1], rgb[2], rgb[3]};
 
-    current_pixel_display_info = display_info;
-    if (normalize) {  // normalize on color display
-      current_pixel_display_info.texture_color_value.red = std::clamp(
-          hdr_utils::color_correction(current_pixel_display_info.texture_color_value.red) * 255, 0.f, 255.f);
-      current_pixel_display_info.texture_color_value.green = std::clamp(
-          hdr_utils::color_correction(current_pixel_display_info.texture_color_value.green) * 255, 0.f, 255.f);
-      current_pixel_display_info.texture_color_value.blue = std::clamp(
-          hdr_utils::color_correction(current_pixel_display_info.texture_color_value.blue) * 255, 0.f, 255.f);
-      current_pixel_display_info.texture_color_value.alpha *= 255;
-      current_pixel_display_info.texture_color_value.red = std::floor(current_pixel_display_info.texture_color_value.red);
-      current_pixel_display_info.texture_color_value.green = std::floor(current_pixel_display_info.texture_color_value.green);
-      current_pixel_display_info.texture_color_value.blue = std::floor(current_pixel_display_info.texture_color_value.blue);
-      current_pixel_display_info.rgb_display_text = current_pixel_display_info.texture_color_value.to_stringi();
-    } else {
-      current_pixel_display_info.rgb_display_text = current_pixel_display_info.texture_color_value.to_string();
-      current_pixel_display_info.texture_color_value.red = std::clamp(
-          hdr_utils::color_correction(current_pixel_display_info.texture_color_value.red) * 255, 0.f, 255.f);
-      current_pixel_display_info.texture_color_value.green = std::clamp(
-          hdr_utils::color_correction(current_pixel_display_info.texture_color_value.green) * 255, 0.f, 255.f);
-      current_pixel_display_info.texture_color_value.blue = std::clamp(
-          hdr_utils::color_correction(current_pixel_display_info.texture_color_value.blue) * 255, 0.f, 255.f);
-      current_pixel_display_info.texture_color_value.alpha *= 255;
-    }
+    current_pixel_display_info.rgb_display_text = current_pixel_display_info.texture_color_value.to_string();
+    current_pixel_display_info.texture_color_value.red = std::clamp(
+        hdr_utils::color_correction(current_pixel_display_info.texture_color_value.red) * 255, 0.f, 255.f);
+    current_pixel_display_info.texture_color_value.green = std::clamp(
+        hdr_utils::color_correction(current_pixel_display_info.texture_color_value.green) * 255, 0.f, 255.f);
+    current_pixel_display_info.texture_color_value.blue = std::clamp(
+        hdr_utils::color_correction(current_pixel_display_info.texture_color_value.blue) * 255, 0.f, 255.f);
+    current_pixel_display_info.texture_color_value.alpha *= 255;
     update();
   }
+
+  void RgbDisplayerLabel::updateLabel(const uint8_t rgb[4]) {
+    current_pixel_display_info.texture_color_value = {(float)rgb[0], (float)rgb[1], (float)rgb[2], (float)rgb[3]};
+
+    current_pixel_display_info.rgb_display_text = current_pixel_display_info.texture_color_value.to_stringi();
+
+    update();
+  }
+
 }  // namespace editor

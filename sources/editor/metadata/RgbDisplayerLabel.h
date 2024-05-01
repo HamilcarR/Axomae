@@ -17,7 +17,8 @@ namespace editor {
 
    public:
     explicit RgbDisplayerLabel(QWidget *parent = nullptr);
-    void updateLabel(const DisplayInfo &display_info, bool normalize = false);
+    void updateLabel(const float rgb[4], bool normalize = false);
+    void updateLabel(const uint8_t rgb[4]);
 
    protected:
     void paintEvent(QPaintEvent *event) override;
