@@ -4,6 +4,7 @@
 
 #include <QPainter>
 namespace editor {
+  constexpr int COLOR_DISPLAYER_SIZE = 30;
   RgbDisplayerLabel::RgbDisplayerLabel(QWidget *parent) : QLabel(parent) { setMouseTracking(true); }
 
   void RgbDisplayerLabel::paintEvent(QPaintEvent *event) {
@@ -25,7 +26,7 @@ namespace editor {
     pixel_color_mouse.setGreen((int)current_pixel_display_info.texture_color_value.green);
     pixel_color_mouse.setBlue((int)current_pixel_display_info.texture_color_value.blue);
     pixel_color_mouse.setAlpha(255);
-    color_painter.fillRect(width_text + 1, height() - 12, 12, 12, pixel_color_mouse);
+    color_painter.fillRect(width_text + 1, height() - 12, COLOR_DISPLAYER_SIZE, 12, pixel_color_mouse);
   }
 
   void RgbDisplayerLabel::updateLabel(const float rgb[4], bool normalize) {
