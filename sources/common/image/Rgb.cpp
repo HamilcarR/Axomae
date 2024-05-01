@@ -1,5 +1,6 @@
 #include "Rgb.h"
 #include "constants.h"
+#include <sstream>
 
 namespace image {
 
@@ -9,11 +10,14 @@ namespace image {
 
   Rgb::Rgb(float r, float g, float b, float a) : red(r), green(g), blue(b), alpha(a) {}
 
-  void Rgb::to_string() {
-    std::cout << "RED : " << std::to_string(red) << "\n";
-    std::cout << "GREEN : " << std::to_string(green) << "\n";
-    std::cout << "BLUE : " << std::to_string(blue) << "\n";
-    std::cout << "ALPHA : " << std::to_string(alpha) << "\n";
+  std::string Rgb::to_string() const {
+    std::stringstream os;
+
+    os << "R: " << std::to_string(red) << " ";
+    os << "G: " << std::to_string(green) << " ";
+    os << "B: " << std::to_string(blue) << " ";
+    os << "A: " << std::to_string(alpha) << "  ";
+    return os.str();
   }
 
   [[maybe_unused]] double Rgb::intensity() {

@@ -37,15 +37,13 @@ class TextureOperations {
   unsigned width{};
   unsigned height{};
   unsigned channels{};
-  threading::ThreadPool *thread_pool{};
 
  private:
   static constexpr unsigned MAX_THREADS = 8;  // Retrieve from config
 
  public:
   TextureOperations() = default;
-  TextureOperations(
-      std::vector<T> &_data, unsigned _width, unsigned _height, unsigned int num_channels = 3, threading::ThreadPool *thread_pool = nullptr);
+  TextureOperations(std::vector<T> &_data, unsigned _width, unsigned _height, unsigned int num_channels = 3);
   ~TextureOperations();
   TextureOperations(const TextureOperations &copy);
   TextureOperations(TextureOperations &&move) noexcept;
@@ -154,8 +152,7 @@ void TextureOperations<T>::copyTexture(T *dest, int dest_width, int dest_height)
 }
 
 template<class T>
-TextureOperations<T>::TextureOperations(
-    std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels, threading::ThreadPool *pool)
+TextureOperations<T>::TextureOperations(std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels)
     : data(&_data) {
   if (!isValidDim(_width) || !isValidDim(_height))
     throw TextureInvalidDimensionsException();
@@ -165,8 +162,6 @@ TextureOperations<T>::TextureOperations(
   width = _width;
   height = _height;
   channels = num_channels;
-  if (pool)
-    thread_pool = pool;
 }
 
 template<class T>

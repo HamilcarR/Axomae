@@ -12,8 +12,9 @@ Thumbnail::Thumbnail(std::vector<uint8_t> &rgb, const image::Metadata &metadata,
 Thumbnail::Thumbnail(std::vector<float> &rgb, const image::Metadata &metadata, controller::ProgressStatus *status) {
   initProgress(status, "Generating image thumbnail", static_cast<float>(metadata.width * metadata.height * metadata.channels));
   controller::ProgressManagerHelper helper(this);
+  helper.notifyProgress(controller::ProgressManagerHelper::ONE_FOURTH);
   /*If already color corrected , we just pass false*/
-  std::vector<uint8_t> tmp = hdr_utils::hdr2image(rgb, metadata.width, metadata.height, metadata.channels, !metadata.color_corrected, &helper);
+  std::vector<uint8_t> tmp = hdr_utils::hdr2image(rgb, metadata.width, metadata.height, metadata.channels, !metadata.color_corrected);
   image = std::make_unique<QImage>(tmp.data(), metadata.width, metadata.height, QImage::Format_RGB32);
   *image = image->scaled(100, 50, Qt::KeepAspectRatio);
   resetProgress();

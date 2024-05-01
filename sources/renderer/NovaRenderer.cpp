@@ -73,6 +73,19 @@ void NovaRenderer::syncRenderEngineThreads() {
   nova_result_futures.clear();
 }
 
+void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int channels) {
+  float max_val = 0.f;
+  for (unsigned y = 0; y < height; y++)
+    for (unsigned x = 0; x < width; x++) {
+      unsigned idx = (y * screen_size.width + x) * channels;
+      for (unsigned k = 0; k < channels; k++) {
+        pbo_map_buffer[idx + k] = nova_render_buffer[idx + k];
+        max_val = std::max(max_val, nova_render_buffer[idx + k]);
+      }
+    }
+  renderer_data.max_channel_color_value = max_val;
+}
+
 void NovaRenderer::draw() {
   current_frame = current_frame >= screen_size.height ? 0 : current_frame + 1;
   PerformanceLogger perf;
@@ -97,14 +110,7 @@ void NovaRenderer::draw() {
       std::memset(pbo_map_buffer, 0, screen_size.width * screen_size.height * 4 * sizeof(float));
       needRedraw = false;
     }
-    for (unsigned y = 0; y < screen_size.height; y++)
-      for (unsigned x = 0; x < screen_size.width; x++) {
-        unsigned idx = (y * screen_size.width + x) * 4;
-        pbo_map_buffer[idx] = nova_render_buffer[idx];
-        pbo_map_buffer[idx + 1] = nova_render_buffer[idx + 1];
-        pbo_map_buffer[idx + 2] = nova_render_buffer[idx + 2];
-        pbo_map_buffer[idx + 3] = nova_render_buffer[idx + 3];
-      }
+    copyBufferToPbo(pbo_map_buffer, screen_size.width, screen_size.height, 4);
     if (!pbo_read->unmapBuffer()) {
       LOG("PBO unmap returned false ", LogLevel::WARNING);
     }
@@ -167,6 +173,18 @@ void NovaRenderer::processEvent(const controller::event::Event *event) {
     nova_scene_resources->camera_data.screen_width = screen_size.width;
     nova_scene_resources->camera_data.screen_height = screen_size.height;
   }
+}
+
+void NovaRenderer::getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) {
+  int idx = ((screen_size.height - y) * screen_size.width + x) * 4;
+  float r = nova_render_buffer[idx] / renderer_data.max_channel_color_value;
+  float g = nova_render_buffer[idx + 1] / renderer_data.max_channel_color_value;
+  float b = nova_render_buffer[idx + 2] / renderer_data.max_channel_color_value;
+
+  r_screen_pixel_color[0] = r;
+  r_screen_pixel_color[1] = g;
+  r_screen_pixel_color[2] = b;
+  r_screen_pixel_color[3] = 1.f;
 }
 
 void NovaRenderer::setDefaultFrameBufferId(unsigned int id) {}

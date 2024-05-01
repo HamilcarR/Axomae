@@ -12,8 +12,6 @@ namespace controller::event {
   class Event;
 }
 
-
-
 struct SceneChangeData {
   SceneTree *scene;
   std::vector<Mesh *> mesh_list;
@@ -35,7 +33,7 @@ class RendererInterface : public EventInterface {
    */
   [[nodiscard]] virtual unsigned int *getDefaultFrameBufferIdPointer() = 0;
   virtual void setViewerWidget(GLViewer *widget) = 0;
-
+  virtual void getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) = 0;
   [[nodiscard]] virtual RenderPipeline &getRenderPipeline() const = 0;
   [[nodiscard]] virtual Scene &getScene() const = 0;
 };
@@ -43,7 +41,6 @@ class RendererInterface : public EventInterface {
 class IRenderer : public RendererInterface {
  public:
   ~IRenderer() override = default;
-
   virtual void setNewScene(const SceneChangeData &new_scene) = 0;
   virtual void setGammaValue(float gamma) = 0;
   virtual void setExposureValue(float exposure) = 0;

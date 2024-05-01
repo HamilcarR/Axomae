@@ -222,3 +222,13 @@ void GLViewer::onUpdateDrawEvent() { update(); }
 RendererInterface &GLViewer::getRenderer() const { return *renderer; }
 
 void GLViewer::setRenderer(std::unique_ptr<IRenderer> &r) { renderer = std::move(r); }
+
+image::Rgb GLViewer::getFramebufferColor(int x, int y) const {
+  if (!renderer)
+    return {0, 0, 0, 0};
+  float pixel_color[4] = {0};
+  QRect bounds = this->rect();
+  if (bounds.contains(x, y))
+    renderer->getScreenPixelColor(x, y, pixel_color);
+  return {pixel_color[0], pixel_color[1], pixel_color[2], pixel_color[3]};
+}

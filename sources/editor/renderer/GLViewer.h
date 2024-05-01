@@ -4,8 +4,10 @@
 #include "Mesh.h"
 #include "RendererCallbacks.h"
 #include "RendererInterface.h"
+#include "Rgb.h"
 #include "SceneHierarchy.h"
 #include "constants.h"
+
 #include <QOpenGLWidget>
 /**
  * @file GLView.h
@@ -33,7 +35,6 @@ class GLViewer : public QOpenGLWidget {
  protected:
   std::unique_ptr<IRenderer> renderer; /*<Pointer on the renderer of the scene*/
   bool glew_initialized;               /*<Check if context is initialized*/
-
   std::unique_ptr<controller::event::Event> widget_input_events;
 
  private:
@@ -54,6 +55,8 @@ class GLViewer : public QOpenGLWidget {
   void setRenderer(std::unique_ptr<IRenderer> &renderer);
   void renderOnTimer(int interval);
   void renderOnUpdate();
+  [[nodiscard]] image::Rgb getFramebufferColor(int x, int y) const;
+
   template<RENDERER_CALLBACK_ENUM callback_id, class... Args>
   constexpr void rendererCallback(Args &&...args);
 
