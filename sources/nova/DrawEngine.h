@@ -35,12 +35,12 @@ namespace nova {
                                              NovaRenderEngineInterface<R> *engine_instance,
                                              threading::ThreadPool *thread_pool,
                                              const NovaResources *nova_resources) {
-    AX_ASSERT(engine_instance != nullptr, "Rendering engine is null");
-    AX_ASSERT(nova_resources != nullptr, "Scene descriptor is null");
+    AX_ASSERT(engine_instance != nullptr, "Rendering engine is not initialized.");
+    AX_ASSERT(nova_resources != nullptr, "Scene descriptor is not initialized.");
     AX_ASSERT(thread_pool != nullptr, "");
     std::vector<std::future<void>> futs;
     int THREAD_NUM = thread_pool->threadNumber();
-    std::vector<Tile> tiles = divideByTiles(width_resolution, height_resolution, THREAD_NUM);
+    std::vector<Tile> tiles = divideByTiles(width_resolution, height_resolution, 5, 5);
     for (const auto &elem : tiles) {
       auto renderer_callback =
           [&engine_instance](

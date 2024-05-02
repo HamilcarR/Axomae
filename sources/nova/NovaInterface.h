@@ -32,6 +32,9 @@ class NovaRenderEngineInterface {
   }
 };
 
+/* Use for local rays. */
 using NovaLRengineInterface = NovaRenderEngineInterface<nova::NovaRenderEngineLR>;
+
+/* Use for generalized rays.*/
 using NovaGRengineInterface = NovaRenderEngineInterface<nova::NovaRenderEngineGR>;
 #endif  // NOVAINTERFACE_H

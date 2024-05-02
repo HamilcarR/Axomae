@@ -15,4 +15,5 @@
 // clang-format off
 #define AX_ASSERT(expr, message) assert(expr && message)
 // clang-format on
+
 #endif
