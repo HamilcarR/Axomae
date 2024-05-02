@@ -6,6 +6,8 @@
 
 constexpr double PI = M_PI;
 namespace math::spherical {
+  float acos_lt(float a);
+
   template<class T>
   inline glm::dvec2 uvToSpherical(const T &u, const T &v) {
     const T phi = 2 * PI * u;
@@ -36,7 +38,7 @@ namespace math::spherical {
 
   template<class T>
   inline glm::dvec2 cartesianToSpherical(const T &x, const T &y, const T &z, bool fast_approx = true) {
-    const T theta = fast_approx ? acos_approx(z) : std::acos(z);
+    const T theta = fast_approx ? acos_lt(z) : std::acos(z);
     const T phi = fast_approx ? atan2_approx(y, x) : atan2f(y, x);
     return {phi, theta};
   }

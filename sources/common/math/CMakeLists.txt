@@ -1,4 +1,5 @@
 add_library(ax_math
+        math_acos_lt.cpp
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_math)
 target_link_libraries(ax_math

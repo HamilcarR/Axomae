@@ -1,14 +1,14 @@
 #ifndef NOVAINTERFACE_H
 #define NOVAINTERFACE_H
 #include "Ray.h"
-#include "nova_camera.h"
-#include "nova_texturing.h"
-
+#include "camera/nova_camera.h"
+#include "rendering/nova_engine.h"
+#include "texturing/nova_texturing.h"
 namespace nova {
   struct NovaResources {
     texturing::EnvmapResourcesHolder envmap_data;
     camera::CameraResourcesHolder camera_data{};
-    int render_samples{};
+    engine::EngineResourcesHolder renderer_data{};
   };
 
   class NovaRenderEngineLR;

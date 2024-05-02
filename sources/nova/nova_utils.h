@@ -25,15 +25,14 @@ namespace nova {
       tiles.push_back({i, 0, i + remain - 1, height - 1});
     return tiles;
   }
-#pragma GCC push_options
-#pragma GCC optimize("O0")
+
   inline std::vector<Tile> divideByTiles(int total_width, int total_height, int N_tiles_W, int N_tiles_H) {
     std::vector<Tile> tiles;
     int W = total_width / N_tiles_W;
     int H = total_height / N_tiles_H;
     int W_R = W + (total_width % W);
     int H_R = H + (total_height % H);
-
+    tiles.reserve(N_tiles_H * N_tiles_W);
     for (int j = 0; j < N_tiles_H; ++j) {
       for (int i = 0; i < N_tiles_W; ++i) {
         Tile tile{};
@@ -47,6 +46,5 @@ namespace nova {
 
     return tiles;
   }
-#pragma GCC pop_options
 }  // namespace nova
 #endif  // NOVA_UTILS_H

@@ -42,7 +42,7 @@ class NovaRenderer final : public IRenderer {
   std::unique_ptr<GLMutablePixelBufferObject> pbo_write;
   std::unique_ptr<NovaLRengineInterface> nova_engine;
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
-  std::unique_ptr<nova::NovaResources> nova_scene_resources;
+  std::unique_ptr<nova::NovaResources> nova_engine_data;
   ApplicationConfig *global_application_config;
   std::vector<std::future<void>> nova_result_futures;
   std::vector<float> nova_render_buffer;
@@ -56,6 +56,7 @@ class NovaRenderer final : public IRenderer {
   NovaRenderer() = default;
   void updateNovaCameraFields();
   void copyBufferToPbo(float *pbo_mapped_buffer, int width, int height, int channels);
+  void initializeEngine();
 
  public:
   NovaRenderer(unsigned width, unsigned height, GLViewer *widget = nullptr);
