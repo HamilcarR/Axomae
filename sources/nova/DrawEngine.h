@@ -1,10 +1,10 @@
 #ifndef NOVA_DRAW_ENGINE_H
 #define NOVA_DRAW_ENGINE_H
-#include "Hitable.h"
 #include "NovaInterface.h"
 #include "Ray.h"
 #include "ThreadPool.h"
 #include "nova_utils.h"
+#include "primitive/Hitable.h"
 #include "texturing/nova_texturing.h"
 #include <vector>
 
@@ -39,7 +39,6 @@ namespace nova {
     AX_ASSERT(nova_resources != nullptr, "Scene descriptor is not initialized.");
     AX_ASSERT(thread_pool != nullptr, "");
     std::vector<std::future<void>> futs;
-    int THREAD_NUM = thread_pool->threadNumber();
     std::vector<Tile> tiles = divideByTiles(
         width_resolution, height_resolution, nova_resources->renderer_data.tiles_w, nova_resources->renderer_data.tiles_h);
     for (const auto &elem : tiles) {

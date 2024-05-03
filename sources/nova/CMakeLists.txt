@@ -1,5 +1,5 @@
 add_library(ax_nova
-        Ray.cpp
+        ray/Ray.cpp
         DrawEngine.cpp
         texturing/nova_texturing.cpp
 )
@@ -18,4 +18,8 @@ PRIVATE
 target_include_directories(ax_nova
 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/ray
+
 )
+
+add_subdirectory(primitive)

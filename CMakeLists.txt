@@ -29,13 +29,21 @@ if(USE_ASAN)
 
 endif()
 
-set(USE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
-
 set(USE_TSAN "OFF" CACHE BOOL "Enable thread Sanitization")
 if(use_TSAN)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread")
     set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fsanitize=thread")
 endif()
+
+#****************************************************************************************************
+#custom project variables
+set(USE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
+option(HIGHP_LUT "Enable high precision when computing lookup tables" OFF)
+option(MEDIUMP_LUT "Enable medium precision when computing lookup tables" ON)
+option(LOWP_LUT "Enable low precision when computing lookup tables" OFF)
+
+
+
 #****************************************************************************************************
 # Dependencies 
 
@@ -93,4 +101,7 @@ elseif(USE_MOLD)
     target_link_options(${PROJECT_NAME} PUBLIC -fuse-ld=mold)
 endif()
 
+
+#****************************************************************************************************
+# Global preprocessor variables
 

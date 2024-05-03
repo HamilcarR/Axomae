@@ -39,8 +39,8 @@ NovaRenderer::~NovaRenderer() {
 }
 
 void NovaRenderer::initializeEngine() {
-  nova_engine_data->renderer_data.tiles_w = 5;
-  nova_engine_data->renderer_data.tiles_h = 5;
+  nova_engine_data->renderer_data.tiles_w = 10;
+  nova_engine_data->renderer_data.tiles_h = 10;
   nova_engine_data->renderer_data.render_samples = 100;
 }
 

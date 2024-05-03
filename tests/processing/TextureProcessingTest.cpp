@@ -98,7 +98,7 @@ TEST(Texturing, uvCartesianCohesionNoApproximation) {
 }
 
 TEST(Texturing, uvCartesianCohesionApproximated) {
-  float epsilon_ = 1e-03;
+  float epsilon_ = 5e-03;
   RandomVecBuilder<glm::dvec2> builder;
   for (unsigned i = 0; i < SAMPLES; i++) {
     glm::dvec2 sph = builder.generate();

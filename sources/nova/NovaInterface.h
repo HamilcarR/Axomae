@@ -6,7 +6,7 @@
 #include "texturing/nova_texturing.h"
 namespace nova {
   struct NovaResources {
-    texturing::EnvmapResourcesHolder envmap_data;
+    texturing::EnvmapResourcesHolder envmap_data{};
     camera::CameraResourcesHolder camera_data{};
     engine::EngineResourcesHolder renderer_data{};
   };

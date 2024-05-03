@@ -5,8 +5,13 @@
 
 namespace math::spherical {
   namespace acos {
-    constexpr int lt_width = 200000;
-
+#ifdef HIGHP_LUT
+    constexpr int lt_width = 1000000;
+#elif MEDIUMP_LUT
+    constexpr int lt_width = 500000;
+#else
+    constexpr int lt_width = 10000;
+#endif
     constexpr float fill_lut(float i) { return std::acos(i); }
 
     constexpr auto LUT = [] {
