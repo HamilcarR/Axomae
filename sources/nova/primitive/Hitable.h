@@ -1,6 +1,6 @@
 #ifndef HITABLE_H
 #define HITABLE_H
-#include "../../common/math/math_utils.h"
+#include "math_utils.h"
 namespace nova {
 
   struct base_options {

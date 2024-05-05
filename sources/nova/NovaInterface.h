@@ -3,12 +3,14 @@
 #include "Ray.h"
 #include "camera/nova_camera.h"
 #include "rendering/nova_engine.h"
+#include "scene/nova_scene.h"
 #include "texturing/nova_texturing.h"
 namespace nova {
   struct NovaResources {
     texturing::EnvmapResourcesHolder envmap_data{};
     camera::CameraResourcesHolder camera_data{};
     engine::EngineResourcesHolder renderer_data{};
+    scene::SceneResourcesHolder scene_data{};
   };
 
   class NovaRenderEngineLR;

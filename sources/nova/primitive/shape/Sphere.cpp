@@ -17,7 +17,7 @@ bool Sphere::hit(const Ray &r, float tmin, float tmax, hit_data &data, const bas
       return false;
     data.t = t1;
     data.position = r.pointAt(t1);
-    data.normal = (data.position - origin);
+    data.normal = data.position - origin;
     return true;
   }
   return false;

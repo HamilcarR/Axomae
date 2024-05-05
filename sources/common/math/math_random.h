@@ -5,8 +5,7 @@
 namespace math::random {
 
   inline std::mt19937 init_rand() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    thread_local std::mt19937 gen;
     return gen;
   }
 
@@ -26,6 +25,12 @@ namespace math::random {
     auto gen = init_rand();
     auto distrib = getUniformDoubleDistrib(n1, n2);
     return distrib(gen);
+  }
+
+  /* nrandi(0 , 1) */
+  inline int fast_randb() {
+    uint8_t n;
+    return n & 0x01;
   }
 
   inline bool randb() { return nrandi(0, 1); }

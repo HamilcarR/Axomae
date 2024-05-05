@@ -18,6 +18,10 @@ namespace camera {
     glm::mat4 PV;
     glm::mat4 inv_PV;
 
+    /* View x Model */
+    glm::mat4 VM;
+    glm::mat4 inv_VM;
+
     /* Projection * View * Model*/
     glm::mat4 PVM;
     glm::mat4 inv_PVM;

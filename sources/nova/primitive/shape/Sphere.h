@@ -6,8 +6,8 @@
 namespace nova {
   class Sphere : public Hitable {
    private:
-    float radius;
-    glm::vec3 origin;
+    float radius{};
+    glm::vec3 origin{};
 
    public:
     Sphere() = default;

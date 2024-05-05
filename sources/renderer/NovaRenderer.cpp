@@ -13,6 +13,7 @@
 #include "RenderPipeline.h"
 #include "Scene.h"
 #include "TextureProcessing.h"
+#include "shape/Sphere.h"
 #include <boost/stacktrace/detail/frame_decl.hpp>
 #include <unistd.h>
 
@@ -27,6 +28,7 @@ NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *wi
       *resource_database, screen_size, default_framebuffer_id, *render_pipeline, nullptr, EnvmapTextureManager::SELECTED);
   nova_engine_data = std::make_unique<nova::NovaResources>();
   nova_render_buffer.resize(resolution.width * resolution.height * 4);
+  accumulated_render_buffer.resize(resolution.width * resolution.height * 4);
   pbo_read = std::make_unique<GLMutablePixelBufferObject>(GLMutablePixelBufferObject::UP, nova_render_buffer.size() * sizeof(float));
   nova_engine = std::make_unique<NovaLRengineInterface>();
   current_frame = next_frame = 0;
@@ -39,9 +41,10 @@ NovaRenderer::~NovaRenderer() {
 }
 
 void NovaRenderer::initializeEngine() {
-  nova_engine_data->renderer_data.tiles_w = 10;
-  nova_engine_data->renderer_data.tiles_h = 10;
-  nova_engine_data->renderer_data.render_samples = 100;
+  nova_engine_data->renderer_data.tiles_w = 5;
+  nova_engine_data->renderer_data.tiles_h = 5;
+  nova_engine_data->renderer_data.aliasing_samples = 8;
+  nova_engine_data->renderer_data.renderer_max_samples = 31;
 }
 
 void NovaRenderer::initialize(ApplicationConfig *app_conf) {
@@ -50,6 +53,11 @@ void NovaRenderer::initialize(ApplicationConfig *app_conf) {
   pbo_read->initializeBuffers();
   global_application_config = app_conf;
   scene_camera->computeProjectionSpace();
+  nova_engine_data->scene_data.objects.push_back(nova::Sphere(glm::vec3(10, 10, 10), 2.f));
+  nova_engine_data->scene_data.objects.push_back(nova::Sphere(glm::vec3(0, 0, 0), 2.f));
+  nova_engine_data->scene_data.objects.push_back(nova::Sphere(glm::vec3(-10, -10, -10), 2.f));
+  nova_engine_data->scene_data.objects.push_back(nova::Sphere(glm::vec3(0, 10, 0), 2.f));
+  nova_engine_data->scene_data.objects.push_back(nova::Sphere(glm::vec3(10, 0, 0), 2.f));
   initializeEngine();
 }
 bool NovaRenderer::prep_draw() {
@@ -69,8 +77,7 @@ void NovaRenderer::populateNovaSceneResources() {
   nova_engine_data->envmap_data.raw_data = &current_envmap->data;
   nova_engine_data->envmap_data.width = (int)current_envmap->metadata.width;
   nova_engine_data->envmap_data.height = (int)current_envmap->metadata.height;
-
-  scene_camera->computeViewProjection();
+  nova_engine_data->renderer_data.sample_increment = current_frame;
 }
 
 void NovaRenderer::syncRenderEngineThreads() {
@@ -87,67 +94,87 @@ void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int ch
     for (unsigned x = 0; x < width; x++) {
       unsigned idx = (y * screen_size.width + x) * channels;
       for (unsigned k = 0; k < channels; k++) {
-        pbo_map_buffer[idx + k] = nova_render_buffer[idx + k];
-        max_val = std::max(max_val, nova_render_buffer[idx + k]);
+        const float pixel_value = nova_render_buffer[idx + k] + accumulated_render_buffer[idx + k];
+        pbo_map_buffer[idx + k] = pixel_value / current_frame;
+        accumulated_render_buffer[idx + k] = pixel_value;
+        max_val = std::max(max_val, pixel_value);
       }
     }
   renderer_data.max_channel_color_value = max_val;
 }
 
 void NovaRenderer::draw() {
-  current_frame = current_frame >= screen_size.height ? 0 : current_frame + 1;
-  PerformanceLogger perf;
-  perf.startTimer();
-  if (!nova_render_buffer.empty()) {
-    populateNovaSceneResources();
-    nova_result_futures = nova::draw(nova_render_buffer.data(),
-                                     screen_size.width,
-                                     screen_size.height,
-                                     nova_engine.get(),
-                                     global_application_config->getThreadPool(),
-                                     nova_engine_data.get());
-  }
-  framebuffer_texture->bindTexture();
 
-  pbo_read->bind();
-  GL_ERROR_CHECK(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, screen_size.width, screen_size.height, GL_RGBA, GL_FLOAT, nullptr));
-  pbo_map_buffer = pbo_read->mapBufferRange<float>(0, screen_size.width * screen_size.height * 4 * sizeof(float), 0);
-  if (pbo_map_buffer) {
-    if (needRedraw) {
-      std::memset(pbo_map_buffer, 0, screen_size.width * screen_size.height * 4 * sizeof(float));
-      needRedraw = false;
+  if (current_frame < nova_engine_data->renderer_data.renderer_max_samples) {
+    PerformanceLogger perf;
+    perf.startTimer();
+    if (!nova_render_buffer.empty()) {
+      populateNovaSceneResources();
+      nova_result_futures = nova::draw(nova_render_buffer.data(),
+                                       screen_size.width,
+                                       screen_size.height,
+                                       nova_engine.get(),
+                                       global_application_config->getThreadPool(),
+                                       nova_engine_data.get());
     }
-    copyBufferToPbo(pbo_map_buffer, screen_size.width, screen_size.height, 4);
-    if (!pbo_read->unmapBuffer()) {
-      LOG("PBO unmap returned false ", LogLevel::WARNING);
-    }
-  }
+    framebuffer_texture->bindTexture();
 
-  pbo_read->unbind();
-  framebuffer_texture->unbindTexture();
+    pbo_read->bind();
+    GL_ERROR_CHECK(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, screen_size.width, screen_size.height, GL_RGBA, GL_FLOAT, nullptr));
+    pbo_map_buffer = pbo_read->mapBufferRange<float>(0, screen_size.width * screen_size.height * 4 * sizeof(float), 0);
+    if (pbo_map_buffer) {
+      if (needRedraw) {
+        std::memset(pbo_map_buffer, 0, screen_size.width * screen_size.height * 4 * sizeof(float));
+        needRedraw = false;
+      }
+      copyBufferToPbo(pbo_map_buffer, screen_size.width, screen_size.height, 4);
+      if (!pbo_read->unmapBuffer()) {
+        LOG("PBO unmap returned false ", LogLevel::WARNING);
+      }
+    }
+
+    pbo_read->unbind();
+    framebuffer_texture->unbindTexture();
+    perf.endTimer();
+    perf.print();
+  }
   camera_framebuffer->renderFrameBufferMesh();
-  perf.endTimer();
-  perf.print();
+  current_frame++;
 }
 
 void NovaRenderer::onResize(unsigned int width, unsigned int height) {
   screen_size.width = width;
   screen_size.height = height;
-  scene_camera->computeViewProjection();
   updateNovaCameraFields();
   needRedraw = true;
-  current_frame = 0;
-  if (global_application_config)
-    global_application_config->getThreadPool()->emptyQueue();
-
-  std::memset(nova_render_buffer.data(), 0, screen_size.width * screen_size.height * 4 * sizeof(float));
+  prepareRedraw();
   if (camera_framebuffer)
     camera_framebuffer->resize();
+}
+
+void NovaRenderer::emptyAccumBuffer() {
+  std::memset(accumulated_render_buffer.data(), 0, screen_size.width * screen_size.height * 4 * sizeof(float));
+}
+void NovaRenderer::emptyRenderBuffer() { std::memset(nova_render_buffer.data(), 0, screen_size.width * screen_size.height * 4 * sizeof(float)); }
+
+void NovaRenderer::emptyBuffers() {
+  for (unsigned i = 0; i < screen_size.width * screen_size.height * 4; i++) {
+    nova_render_buffer[i] = 0.f;
+    accumulated_render_buffer[i] = 0.f;
+  }
+}
+
+void NovaRenderer::prepareRedraw() {
+  if (global_application_config)
+    global_application_config->getThreadPool()->emptyQueue();
+  current_frame = 1;
+  emptyBuffers();
 }
 
 void NovaRenderer::updateNovaCameraFields() {
   if (!scene_camera)
     return;
+  scene_camera->computeViewProjection();
   nova_engine_data->camera_data.up_vector = scene_camera->getUpVector();
 
   nova_engine_data->camera_data.P = scene_camera->getProjection();
@@ -168,6 +195,9 @@ void NovaRenderer::updateNovaCameraFields() {
   nova_engine_data->camera_data.PVM = nova_engine_data->camera_data.P * nova_engine_data->camera_data.V * nova_engine_data->camera_data.M;
   nova_engine_data->camera_data.inv_PVM = glm::inverse(nova_engine_data->camera_data.PVM);
 
+  nova_engine_data->camera_data.VM = nova_engine_data->camera_data.V * nova_engine_data->camera_data.M;
+  nova_engine_data->camera_data.inv_VM = glm::inverse(nova_engine_data->camera_data.V * nova_engine_data->camera_data.M);
+
   nova_engine_data->camera_data.N = glm::mat3(glm::transpose(nova_engine_data->camera_data.inv_M));
 
   nova_engine_data->camera_data.position = scene_camera->getPosition();
@@ -179,6 +209,7 @@ void NovaRenderer::updateNovaCameraFields() {
 }
 
 void NovaRenderer::processEvent(const controller::event::Event *event) {
+  using ev = controller::event::Event;
   if (!event)
     return;
   if (scene_camera) {
@@ -186,13 +217,17 @@ void NovaRenderer::processEvent(const controller::event::Event *event) {
     /* Camera setup */
     updateNovaCameraFields();
   }
+  if (event->flag & (ev::EVENT_MOUSE_WHEEL | ev::EVENT_MOUSE_L_PRESS | ev::EVENT_MOUSE_R_PRESS)) {
+    emptyAccumBuffer();
+    current_frame = 1;
+  }
 }
 
 void NovaRenderer::getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) {
   int idx = ((screen_size.height - y) * screen_size.width + x) * 4;
-  float r = nova_render_buffer[idx];
-  float g = nova_render_buffer[idx + 1];
-  float b = nova_render_buffer[idx + 2];
+  float r = accumulated_render_buffer[idx] / current_frame;
+  float g = accumulated_render_buffer[idx + 1] / current_frame;
+  float b = accumulated_render_buffer[idx + 2] / current_frame;
 
   r_screen_pixel_color[0] = r;
   r_screen_pixel_color[1] = g;
@@ -208,7 +243,7 @@ Scene &NovaRenderer::getScene() const { return *scene; }
 
 RenderPipeline &NovaRenderer::getRenderPipeline() const { return *render_pipeline; }
 
-void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {}
+void NovaRenderer::setNewScene(const SceneChangeData &new_scene) { prepareRedraw(); }
 
 void NovaRenderer::setGammaValue(float value) {
   if (camera_framebuffer) {

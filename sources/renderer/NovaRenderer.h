@@ -46,6 +46,7 @@ class NovaRenderer final : public IRenderer {
   ApplicationConfig *global_application_config;
   std::vector<std::future<void>> nova_result_futures;
   std::vector<float> nova_render_buffer;
+  std::vector<float> accumulated_render_buffer;
   Dim2 resolution{2048, 2048};
   int current_frame, next_frame;
   bool needRedraw{false};
@@ -57,6 +58,10 @@ class NovaRenderer final : public IRenderer {
   void updateNovaCameraFields();
   void copyBufferToPbo(float *pbo_mapped_buffer, int width, int height, int channels);
   void initializeEngine();
+  void prepareRedraw();
+  void emptyBuffers();
+  void emptyAccumBuffer();
+  void emptyRenderBuffer();
 
  public:
   NovaRenderer(unsigned width, unsigned height, GLViewer *widget = nullptr);

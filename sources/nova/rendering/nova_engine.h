@@ -5,7 +5,9 @@ namespace nova::engine {
   struct EngineResourcesHolder {
     int tiles_w{};
     int tiles_h{};
-    int render_samples{};
+    int sample_increment{};
+    int aliasing_samples{};
+    int renderer_max_samples{};
   };
 }  // namespace nova::engine
 
