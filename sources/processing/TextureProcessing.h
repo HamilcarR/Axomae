@@ -158,7 +158,6 @@ TextureOperations<T>::TextureOperations(std::vector<T> &_data, const unsigned _w
     throw TextureInvalidDimensionsException();
   if (!isDimPowerOfTwo(_width) || !isDimPowerOfTwo(_height))
     throw TextureNonPowerOfTwoDimensionsException();
-  AX_ASSERT(num_channels == 3, "");
   width = _width;
   height = _height;
   channels = num_channels;

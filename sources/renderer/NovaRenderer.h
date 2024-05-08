@@ -48,10 +48,11 @@ class NovaRenderer final : public IRenderer {
   std::vector<float> nova_render_buffer;
   std::vector<float> accumulated_render_buffer;
   Dim2 resolution{2048, 2048};
-  int current_frame, next_frame;
+  int current_frame, next_frame, scanline;
   bool needRedraw{false};
   float *pbo_map_buffer{};
   NovaInternalMetadata renderer_data;
+  nova::HdrBufferStruct engine_render_buffers;
 
  private:
   NovaRenderer() = default;

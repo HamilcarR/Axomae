@@ -5,7 +5,10 @@
 #include "rendering/nova_engine.h"
 #include "scene/nova_scene.h"
 #include "texturing/nova_texturing.h"
+
+#include <map>
 namespace nova {
+
   struct NovaResources {
     texturing::EnvmapResourcesHolder envmap_data{};
     camera::CameraResourcesHolder camera_data{};
@@ -15,6 +18,7 @@ namespace nova {
 
   class NovaRenderEngineLR;
   class NovaRenderEngineGR;
+  struct Tile;
 }  // namespace nova
 
 template<class RENDERER_TYPE>
@@ -23,14 +27,8 @@ class NovaRenderEngineInterface {
   glm::vec4 sample_color(const nova::Ray &ray, const nova::NovaResources *nova_resources) {
     return (static_cast<RENDERER_TYPE *>(this))->engine_sample_color(ray, nova_resources);
   }
-  void render_tile(float *dest_buffer,
-                   int width_limit_low,
-                   int width_limit_high,
-                   int height_limit_low,
-                   int height_limit_high,
-                   const nova::NovaResources *nova_resources) {
-    (static_cast<RENDERER_TYPE *>(this))
-        ->engine_render_tile(dest_buffer, width_limit_low, width_limit_high, height_limit_low, height_limit_high, nova_resources);
+  void render_tile(nova::HdrBufferStruct *out_buffers, const nova::Tile &tile, const nova::NovaResources *nova_resources) {
+    (static_cast<RENDERER_TYPE *>(this))->engine_render_tile(out_buffers, tile, nova_resources);
   }
 };
 

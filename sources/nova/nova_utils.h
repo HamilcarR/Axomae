@@ -9,6 +9,9 @@ namespace nova {
     int height_start;
     int width_end;
     int height_end;
+    int sample_per_tile;
+    int image_total_width;
+    int image_total_height;
   };
 
   /*Divide thread load for a 2D array by tiles*/

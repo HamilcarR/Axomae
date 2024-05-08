@@ -40,24 +40,16 @@ NovaRenderer::~NovaRenderer() {
   pbo_read->clean();
 }
 
-void NovaRenderer::initializeEngine() {
-  nova_engine_data->renderer_data.tiles_w = 5;
-  nova_engine_data->renderer_data.tiles_h = 5;
-  nova_engine_data->renderer_data.aliasing_samples = 8;
-  nova_engine_data->renderer_data.renderer_max_samples = 31;
-}
-
 void NovaRenderer::initialize(ApplicationConfig *app_conf) {
   camera_framebuffer->initializeFrameBuffer();
   framebuffer_texture = camera_framebuffer->getFrameBufferTexturePointer(GLFrameBuffer::COLOR0);
   pbo_read->initializeBuffers();
   global_application_config = app_conf;
   scene_camera->computeProjectionSpace();
-  nova_engine_data->scene_data.objects.push_back(nova::Sphere(glm::vec3(10, 10, 10), 2.f));
-  nova_engine_data->scene_data.objects.push_back(nova::Sphere(glm::vec3(0, 0, 0), 2.f));
-  nova_engine_data->scene_data.objects.push_back(nova::Sphere(glm::vec3(-10, -10, -10), 2.f));
-  nova_engine_data->scene_data.objects.push_back(nova::Sphere(glm::vec3(0, 10, 0), 2.f));
-  nova_engine_data->scene_data.objects.push_back(nova::Sphere(glm::vec3(10, 0, 0), 2.f));
+  for (int i = -2; i < 2; i++)
+    for (int j = -2; j < 2; j++)
+      for (int z = -2; z < 2; z++)
+        nova_engine_data->scene_data.objects.push_back(nova::Sphere(glm::vec3(i, j, z), 0.1f));
   initializeEngine();
 }
 bool NovaRenderer::prep_draw() {
@@ -81,65 +73,79 @@ void NovaRenderer::populateNovaSceneResources() {
 }
 
 void NovaRenderer::syncRenderEngineThreads() {
-  for (auto &elem : nova_result_futures) {
-    if (elem.valid())
-      elem.get();
+  try {
+    for (auto &elem : nova_result_futures) {
+      if (elem.valid())
+        elem.get();
+    }
+  } catch (std::future_error &e) {
   }
+
   nova_result_futures.clear();
 }
 
 void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int channels) {
-  float max_val = 0.f;
-  for (unsigned y = 0; y < height; y++)
-    for (unsigned x = 0; x < width; x++) {
-      unsigned idx = (y * screen_size.width + x) * channels;
-      for (unsigned k = 0; k < channels; k++) {
-        const float pixel_value = nova_render_buffer[idx + k] + accumulated_render_buffer[idx + k];
-        pbo_map_buffer[idx + k] = pixel_value / current_frame;
-        accumulated_render_buffer[idx + k] = pixel_value;
-        max_val = std::max(max_val, pixel_value);
-      }
-    }
-  renderer_data.max_channel_color_value = max_val;
+  float max = 0.f;
+  for (int i = 0; i < width * height * channels; i++) {
+    const float old = accumulated_render_buffer[i] / (current_frame + 1);
+    const float new_ = nova_render_buffer[i];
+    const float pix = old + 0.6f * (new_ - old);
+    pbo_map[i] = pix;
+    max = std::max(max, pix);
+  }
+}
+
+void NovaRenderer::initializeEngine() {
+  nova_engine_data->renderer_data.tiles_w = 20;
+  nova_engine_data->renderer_data.tiles_h = 20;
+  nova_engine_data->renderer_data.aliasing_samples = 8;
+  nova_engine_data->renderer_data.renderer_max_samples = 1000;
 }
 
 void NovaRenderer::draw() {
 
-  if (current_frame < nova_engine_data->renderer_data.renderer_max_samples) {
-    PerformanceLogger perf;
-    perf.startTimer();
-    if (!nova_render_buffer.empty()) {
-      populateNovaSceneResources();
-      nova_result_futures = nova::draw(nova_render_buffer.data(),
-                                       screen_size.width,
-                                       screen_size.height,
-                                       nova_engine.get(),
-                                       global_application_config->getThreadPool(),
-                                       nova_engine_data.get());
-    }
-    framebuffer_texture->bindTexture();
+  engine_render_buffers.accumulator_buffer = accumulated_render_buffer.data();
+  engine_render_buffers.partial_buffer = nova_render_buffer.data();
+  engine_render_buffers.byte_size_buffers = screen_size.height * screen_size.width * sizeof(float) * 4;
+  PerformanceLogger perf;
+  perf.startTimer();
 
-    pbo_read->bind();
-    GL_ERROR_CHECK(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, screen_size.width, screen_size.height, GL_RGBA, GL_FLOAT, nullptr));
-    pbo_map_buffer = pbo_read->mapBufferRange<float>(0, screen_size.width * screen_size.height * 4 * sizeof(float), 0);
-    if (pbo_map_buffer) {
-      if (needRedraw) {
-        std::memset(pbo_map_buffer, 0, screen_size.width * screen_size.height * 4 * sizeof(float));
-        needRedraw = false;
-      }
-      copyBufferToPbo(pbo_map_buffer, screen_size.width, screen_size.height, 4);
-      if (!pbo_read->unmapBuffer()) {
-        LOG("PBO unmap returned false ", LogLevel::WARNING);
-      }
-    }
-
-    pbo_read->unbind();
-    framebuffer_texture->unbindTexture();
-    perf.endTimer();
-    perf.print();
+  populateNovaSceneResources();
+  if (needRedraw) {
+    current_frame = 1;
+    global_application_config->getThreadPool()->emptyQueue();
+    emptyAccumBuffer();
+    populateNovaSceneResources();
+    needRedraw = false;
   }
+  nova_result_futures.clear();
+  const float s1 = (-1 - std::sqrt(1.f + 8 * nova_engine_data->renderer_data.renderer_max_samples)) * 0.5f;
+  const float s2 = (-1 + std::sqrt(1.f + 8 * nova_engine_data->renderer_data.renderer_max_samples)) * 0.5f;
+  if (current_frame < std::max(s1, s2))
+    nova_result_futures = nova::draw(&engine_render_buffers,
+                                     screen_size.width,
+                                     screen_size.height,
+                                     nova_engine.get(),
+                                     global_application_config->getThreadPool(),
+                                     nova_engine_data.get());
+  framebuffer_texture->bindTexture();
+  pbo_read->bind();
+  GL_ERROR_CHECK(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, screen_size.width, screen_size.height, GL_RGBA, GL_FLOAT, nullptr));
+  pbo_map_buffer = pbo_read->mapBufferRange<float>(0, screen_size.width * screen_size.height * 4 * sizeof(float), 0);
+  if (pbo_map_buffer) {
+    copyBufferToPbo(pbo_map_buffer, screen_size.width, screen_size.height, 4);
+    if (!pbo_read->unmapBuffer()) {
+      LOG("PBO unmap returned false ", LogLevel::WARNING);
+    }
+  }
+
+  pbo_read->unbind();
+  framebuffer_texture->unbindTexture();
+  perf.endTimer();
+  perf.print();
   camera_framebuffer->renderFrameBufferMesh();
   current_frame++;
+  scanline++;
 }
 
 void NovaRenderer::onResize(unsigned int width, unsigned int height) {
@@ -217,13 +223,16 @@ void NovaRenderer::processEvent(const controller::event::Event *event) {
     /* Camera setup */
     updateNovaCameraFields();
   }
-  if (event->flag & (ev::EVENT_MOUSE_WHEEL | ev::EVENT_MOUSE_L_PRESS | ev::EVENT_MOUSE_R_PRESS)) {
-    emptyAccumBuffer();
-    current_frame = 1;
+  if (event->flag &
+      (ev::EVENT_MOUSE_WHEEL | ev::EVENT_MOUSE_L_PRESS | ev::EVENT_MOUSE_R_PRESS | ev::EVENT_MOUSE_R_RELEASE | ev::EVENT_MOUSE_L_RELEASE))
+  {
+    needRedraw = true;
   }
 }
 
 void NovaRenderer::getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) {
+  if (x >= screen_size.width || x < 0 || y < 0 || y >= screen_size.height)
+    return;
   int idx = ((screen_size.height - y) * screen_size.width + x) * 4;
   float r = accumulated_render_buffer[idx] / current_frame;
   float g = accumulated_render_buffer[idx + 1] / current_frame;
