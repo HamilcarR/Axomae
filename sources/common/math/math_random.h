@@ -1,11 +1,12 @@
 #ifndef MATH_RANDOM_H
 #define MATH_RANDOM_H
+#include <chrono>
+#include <ctime>
 #include <random>
-
 namespace math::random {
 
-  inline std::mt19937 init_rand() {
-    thread_local std::mt19937 gen;
+  inline std::minstd_rand &init_rand() {
+    static thread_local std::minstd_rand gen(std::random_device{}());
     return gen;
   }
 
@@ -16,13 +17,13 @@ namespace math::random {
   }
 
   inline int nrandi(int n1, int n2) {
-    auto gen = init_rand();
+    auto &gen = init_rand();
     auto distrib = getUniformIntDistrib(n1, n2);
     return distrib(gen);
   }
 
   inline double nrandf(double n1, double n2) {
-    auto gen = init_rand();
+    auto &gen = init_rand();
     auto distrib = getUniformDoubleDistrib(n1, n2);
     return distrib(gen);
   }
