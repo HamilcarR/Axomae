@@ -1,10 +1,11 @@
 #ifndef SPHERE_H
 #define SPHERE_H
-#include "Hitable.h"
 #include "math_utils.h"
+#include "nova_shape.h"
+#include "scene/Hitable.h"
 
-namespace nova {
-  class Sphere : public Hitable {
+namespace nova::shape {
+  class Sphere final : public NovaShapeInterface {
    private:
     float radius{};
     glm::vec3 origin{};
@@ -13,11 +14,11 @@ namespace nova {
     Sphere() = default;
     Sphere(const glm::vec3 &origin, float radius);
     ~Sphere() override = default;
-    Sphere(const Sphere &copy) = default;
+    Sphere(const Sphere &copy) = delete;
     Sphere(Sphere &&move) noexcept = default;
-    Sphere &operator=(const Sphere &copy) = default;
+    Sphere &operator=(const Sphere &copy) = delete;
     Sphere &operator=(Sphere &&move) noexcept = default;
-    bool hit(const Ray &r, float tmin, float tmax, hit_data &data, const base_options *user_options) const override;
+    bool intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &normal, float &t) const override;
   };
-}  // namespace nova
+}  // namespace nova::shape
 #endif  // SPHERE_H

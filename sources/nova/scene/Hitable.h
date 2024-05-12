@@ -3,13 +3,13 @@
 #include "math_utils.h"
 namespace nova {
 
-  struct base_options {
-    virtual ~base_options() = default;
-  };
-
   /**
    * @brief Provides additional data that can be passed to the hit method
    */
+
+  struct base_options {
+    virtual ~base_options() = default;
+  };
   template<class T>
   struct hit_options : public base_options {
     T data;
@@ -19,7 +19,9 @@ namespace nova {
     float t{};
     glm::vec3 normal{};
     glm::vec3 position{};
+    glm::vec4 attenuation{};
   };
+
   class Ray;
   class Hitable {
    public:

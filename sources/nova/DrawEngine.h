@@ -3,8 +3,9 @@
 #include "NovaInterface.h"
 #include "Ray.h"
 #include "ThreadPool.h"
+#include "math_camera.h"
 #include "nova_utils.h"
-#include "primitive/Hitable.h"
+#include "scene/Hitable.h"
 #include "texturing/nova_texturing.h"
 #include <vector>
 
@@ -15,8 +16,8 @@ namespace nova {
     NovaRenderEngineLR() = default;
     virtual ~NovaRenderEngineLR() = default;
 
-    glm::vec4 engine_sample_color(const Ray &ray, const NovaResources *nova_resources);
-    void engine_render_tile(HdrBufferStruct *dest_buffer, const Tile &tile, const NovaResources *nova_resources);
+    glm::vec4 engine_sample_color(const Ray &ray, const NovaResources *nova_resources, int depth);
+    void engine_render_tile(HdrBufferStruct *dest_buffer, Tile &tile, const NovaResources *nova_resources);
     NovaRenderEngineLR(const NovaRenderEngineLR &copy) = delete;
     NovaRenderEngineLR(NovaRenderEngineLR &&move) noexcept = default;
     NovaRenderEngineLR &operator=(NovaRenderEngineLR &&move) noexcept = default;
@@ -35,11 +36,10 @@ namespace nova {
     AX_ASSERT(buffers, "Buffer structure is not initialized.");
     AX_ASSERT(thread_pool != nullptr, "Worker pool is not initialized.");
     std::vector<std::future<void>> futs;
-
     std::vector<Tile> tiles = divideByTiles(
         width_resolution, height_resolution, nova_resources->renderer_data.tiles_w, nova_resources->renderer_data.tiles_h);
     for (auto &elem : tiles) {
-      auto renderer_callback = [&engine_instance](HdrBufferStruct *buffers, const Tile &tile, const NovaResources *nova_resources) {
+      auto renderer_callback = [&engine_instance](HdrBufferStruct *buffers, Tile &tile, const NovaResources *nova_resources) {
         engine_instance->render_tile(buffers, tile, nova_resources);
       };
       elem.sample_per_tile = nova_resources->renderer_data.sample_increment;

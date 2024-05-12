@@ -39,7 +39,6 @@ class NovaRenderer final : public IRenderer {
  private:
   Texture *framebuffer_texture{};
   std::unique_ptr<GLMutablePixelBufferObject> pbo_read;
-  std::unique_ptr<GLMutablePixelBufferObject> pbo_write;
   std::unique_ptr<NovaLRengineInterface> nova_engine;
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
   std::unique_ptr<nova::NovaResources> nova_engine_data;
@@ -63,6 +62,7 @@ class NovaRenderer final : public IRenderer {
   void emptyBuffers();
   void emptyAccumBuffer();
   void emptyRenderBuffer();
+  void resetToBaseState();
 
  public:
   NovaRenderer(unsigned width, unsigned height, GLViewer *widget = nullptr);

@@ -1,5 +1,7 @@
 #ifndef NOVA_ENGINE_H
 #define NOVA_ENGINE_H
+#include "nova_utils.h"
+
 #include <map>
 
 namespace nova {
@@ -8,8 +10,9 @@ namespace nova {
   struct RenderBuffers {
     T *accumulator_buffer;
     T *partial_buffer;
-    size_t byte_size_buffers;
-    int channels;
+    size_t byte_size_buffers{};
+    int channels{};
+    std::vector<Tile> tiles;
   };
   using HdrBufferStruct = RenderBuffers<float>;
 
@@ -20,6 +23,7 @@ namespace nova {
       int sample_increment{};
       int aliasing_samples{};
       int renderer_max_samples{};
+      int max_depth{};
     };
   }  // namespace engine
 }  // namespace nova

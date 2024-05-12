@@ -1,6 +1,6 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
-#include "../nova/primitive/Hitable.h"
+#include "../nova/scene/Hitable.h"
 #include "Node.h"
 #include "utils_3D.h"
 /**

@@ -5,6 +5,8 @@ namespace nova::texturing {
     AX_ASSERT(res_holder != nullptr, "");
     const TextureOperations<float> texture_processor(*res_holder->raw_data, res_holder->width, res_holder->height);
     glm::vec3 normalized = glm::normalize(sample_vector);
+    std::swap(normalized.y, normalized.z);
+    normalized.z = -normalized.z;
     const glm::vec2 sph = math::spherical::cartesianToSpherical(normalized);
     const glm::vec2 uv = math::spherical::sphericalToUv(sph);
 

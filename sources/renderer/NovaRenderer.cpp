@@ -9,13 +9,17 @@
 #include "GLMutablePixelBufferObject.h"
 #include "GLViewer.h"
 #include "NovaRenderer.h"
+
 #include "PerformanceLogger.h"
 #include "RenderPipeline.h"
 #include "Scene.h"
 #include "TextureProcessing.h"
+#include "nova_material.h"
 #include "shape/Sphere.h"
 #include <boost/stacktrace/detail/frame_decl.hpp>
 #include <unistd.h>
+
+static constexpr int MAX_RECUR_DEPTH = 50;
 
 NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *widget) : NovaRenderer() {
   resource_database = &ResourceDatabaseManager::getInstance();
@@ -41,15 +45,47 @@ NovaRenderer::~NovaRenderer() {
 }
 
 void NovaRenderer::initialize(ApplicationConfig *app_conf) {
+  namespace nova_material = nova::material;
+  namespace nova_primitive = nova::primitive;
+  namespace nova_shape = nova::shape;
+
   camera_framebuffer->initializeFrameBuffer();
   framebuffer_texture = camera_framebuffer->getFrameBufferTexturePointer(GLFrameBuffer::COLOR0);
   pbo_read->initializeBuffers();
   global_application_config = app_conf;
   scene_camera->computeProjectionSpace();
-  for (int i = -2; i < 2; i++)
-    for (int j = -2; j < 2; j++)
-      for (int z = -2; z < 2; z++)
-        nova_engine_data->scene_data.objects.push_back(nova::Sphere(glm::vec3(i, j, z), 0.1f));
+  std::unique_ptr<nova_material::NovaMaterialInterface> col1 = std::make_unique<nova_material::NovaConductorMaterial>(glm::vec4(1.f, 1.f, 1.f, 1.f));
+  std::unique_ptr<nova_material::NovaMaterialInterface> col2 = std::make_unique<nova_material::NovaDiffuseMaterial>(glm::vec4(1.5f, 1.f, 1.f, 1.f));
+  std::unique_ptr<nova_material::NovaMaterialInterface> col3 = std::make_unique<nova_material::NovaDiffuseMaterial>(glm::vec4(1.f, 12.f, 1.f, 1.f));
+  std::unique_ptr<nova_material::NovaMaterialInterface> col4 = std::make_unique<nova_material::NovaDiffuseMaterial>(glm::vec4(1.f, 1.f, 8.f, 1.f));
+  nova_engine_data->scene_data.materials_collection.push_back(std::move(col1));
+  nova_engine_data->scene_data.materials_collection.push_back(std::move(col2));
+  nova_engine_data->scene_data.materials_collection.push_back(std::move(col3));
+  nova_engine_data->scene_data.materials_collection.push_back(std::move(col4));
+
+  auto c1 = nova_engine_data->scene_data.materials_collection[0].get();
+  auto c2 = nova_engine_data->scene_data.materials_collection[1].get();
+  auto c3 = nova_engine_data->scene_data.materials_collection[2].get();
+  auto c4 = nova_engine_data->scene_data.materials_collection[3].get();
+
+  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(-4, 0, 0), 2.f));
+  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(4, 0, 0), 2.f));
+  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(0, 5, 0), 2.f));
+  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(0, -5, 0), 2.f));
+  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(0, 0, -5), 2.f));
+
+  auto s1 = nova_engine_data->scene_data.shapes[0].get();
+  auto s2 = nova_engine_data->scene_data.shapes[1].get();
+  auto s3 = nova_engine_data->scene_data.shapes[2].get();
+  auto s4 = nova_engine_data->scene_data.shapes[3].get();
+  auto s5 = nova_engine_data->scene_data.shapes[4].get();
+
+  nova_engine_data->scene_data.primitives.push_back(nova_primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s1, c1));
+  nova_engine_data->scene_data.primitives.push_back(nova_primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s2, c4));
+  nova_engine_data->scene_data.primitives.push_back(nova_primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s3, c1));
+  nova_engine_data->scene_data.primitives.push_back(nova_primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s4, c3));
+  nova_engine_data->scene_data.primitives.push_back(nova_primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s5, c2));
+
   initializeEngine();
 }
 bool NovaRenderer::prep_draw() {
@@ -89,7 +125,7 @@ void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int ch
   for (int i = 0; i < width * height * channels; i++) {
     const float old = accumulated_render_buffer[i] / (current_frame + 1);
     const float new_ = nova_render_buffer[i];
-    const float pix = old + 0.6f * (new_ - old);
+    const float pix = old + 0.8f * (new_ - old);
     pbo_map[i] = pix;
     max = std::max(max, pix);
   }
@@ -100,6 +136,12 @@ void NovaRenderer::initializeEngine() {
   nova_engine_data->renderer_data.tiles_h = 20;
   nova_engine_data->renderer_data.aliasing_samples = 8;
   nova_engine_data->renderer_data.renderer_max_samples = 1000;
+  nova_engine_data->renderer_data.max_depth = MAX_RECUR_DEPTH;
+}
+
+void NovaRenderer::resetToBaseState() {
+  current_frame = 1;
+  nova_engine_data->renderer_data.max_depth = 1;
 }
 
 void NovaRenderer::draw() {
@@ -112,35 +154,48 @@ void NovaRenderer::draw() {
 
   populateNovaSceneResources();
   if (needRedraw) {
-    current_frame = 1;
+    resetToBaseState();
     global_application_config->getThreadPool()->emptyQueue();
     emptyAccumBuffer();
     populateNovaSceneResources();
     needRedraw = false;
   }
+
   nova_result_futures.clear();
   const float s1 = (-1 - std::sqrt(1.f + 8 * nova_engine_data->renderer_data.renderer_max_samples)) * 0.5f;
   const float s2 = (-1 + std::sqrt(1.f + 8 * nova_engine_data->renderer_data.renderer_max_samples)) * 0.5f;
-  if (current_frame < std::max(s1, s2))
+  const float smax = std::max(s1, s2);
+  if (current_frame < smax) {
+    nova_engine_data->renderer_data.max_depth = nova_engine_data->renderer_data.max_depth < MAX_RECUR_DEPTH ?
+                                                    nova_engine_data->renderer_data.max_depth + 1 :
+                                                    MAX_RECUR_DEPTH;
     nova_result_futures = nova::draw(&engine_render_buffers,
                                      screen_size.width,
                                      screen_size.height,
                                      nova_engine.get(),
                                      global_application_config->getThreadPool(),
                                      nova_engine_data.get());
+  }
   framebuffer_texture->bindTexture();
   pbo_read->bind();
-  GL_ERROR_CHECK(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, screen_size.width, screen_size.height, GL_RGBA, GL_FLOAT, nullptr));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  // Set texture filtering mode
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  GL_ERROR_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, screen_size.width, screen_size.height, 0, GL_RGBA, GL_FLOAT, nullptr));
+
   pbo_map_buffer = pbo_read->mapBufferRange<float>(0, screen_size.width * screen_size.height * 4 * sizeof(float), 0);
   if (pbo_map_buffer) {
     copyBufferToPbo(pbo_map_buffer, screen_size.width, screen_size.height, 4);
-    if (!pbo_read->unmapBuffer()) {
+    if (!pbo_read->unmapBuffer())
       LOG("PBO unmap returned false ", LogLevel::WARNING);
-    }
   }
 
   pbo_read->unbind();
   framebuffer_texture->unbindTexture();
+
   perf.endTimer();
   perf.print();
   camera_framebuffer->renderFrameBufferMesh();

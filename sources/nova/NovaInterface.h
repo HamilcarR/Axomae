@@ -24,10 +24,10 @@ namespace nova {
 template<class RENDERER_TYPE>
 class NovaRenderEngineInterface {
  public:
-  glm::vec4 sample_color(const nova::Ray &ray, const nova::NovaResources *nova_resources) {
-    return (static_cast<RENDERER_TYPE *>(this))->engine_sample_color(ray, nova_resources);
+  glm::vec4 sample_color(const nova::Ray &ray, const nova::NovaResources *nova_resources, int depth) {
+    return (static_cast<RENDERER_TYPE *>(this))->engine_sample_color(ray, nova_resources, depth);
   }
-  void render_tile(nova::HdrBufferStruct *out_buffers, const nova::Tile &tile, const nova::NovaResources *nova_resources) {
+  void render_tile(nova::HdrBufferStruct *out_buffers, nova::Tile &tile, const nova::NovaResources *nova_resources) {
     (static_cast<RENDERER_TYPE *>(this))->engine_render_tile(out_buffers, tile, nova_resources);
   }
 };
