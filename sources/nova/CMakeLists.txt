@@ -1,10 +1,5 @@
 add_library(ax_nova
         DrawEngine.cpp
-        ray/Ray.cpp
-        texturing/nova_texturing.cpp
-        shape/Sphere.cpp
-        material/nova_material.cpp
-        primitive/NovaGeoPrimitive.cpp
 
 )
 
@@ -29,3 +24,14 @@ PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/shape
 
 )
+
+add_subdirectory(texturing)
+add_subdirectory(shape)
+add_subdirectory(scene)
+add_subdirectory(rendering)
+add_subdirectory(ray)
+add_subdirectory(primitive)
+add_subdirectory(material)
+add_subdirectory(light)
+add_subdirectory(kernel)
+add_subdirectory(camera)

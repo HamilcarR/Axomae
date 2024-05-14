@@ -41,11 +41,8 @@ namespace math::camera {
   inline glm::vec4 view2world(const glm::vec4 &vec, const glm::mat4 &inv_V) { return inv_V * vec; }
 
   /***********************************************************************************************/
-  inline camera_ray ray_inv_mat(int x, int y, int width, int height, const glm::mat4 &inv_P, const glm::mat4 &inv_V) {
-    const glm::vec2 to_ndc = screen2ndc(x, y, width, height);
-    const float ndc_x = to_ndc.x;
-    const float ndc_y = to_ndc.y;
 
+  inline camera_ray ray_inv_mat(float ndc_x, float ndc_y, const glm::mat4 &inv_P, const glm::mat4 &inv_V) {
     glm::vec4 o = inv_P * glm::vec4(ndc_x, ndc_y, -1.f, 1.f);
     o /= o.w;
     o = inv_V * glm::vec4(o.x, o.y, o.z, 1.f);
@@ -57,6 +54,13 @@ namespace math::camera {
     r.near = {o.x, o.y, o.z};
     r.far = {d.x, d.y, d.z};
     return r;
+  }
+
+  inline camera_ray ray_inv_mat(int x, int y, int width, int height, const glm::mat4 &inv_P, const glm::mat4 &inv_V) {
+    const glm::vec2 to_ndc = screen2ndc(x, y, width, height);
+    const float ndc_x = to_ndc.x;
+    const float ndc_y = to_ndc.y;
+    return ray_inv_mat(ndc_x, ndc_y, inv_P, inv_V);
   }
 
   /* returns world-space ray */

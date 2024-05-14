@@ -6,6 +6,8 @@
 #include "nova_utils.h"
 #include <memory>
 
+/* Lambertian shading */
+
 namespace nova {
   class Ray;
   namespace material {
@@ -54,7 +56,18 @@ namespace nova {
     class NovaDielectricMaterial final : public NovaMaterialInterface {
      private:
       glm::vec4 albedo;
-      float n1, n2;  // ior
+      float eta;  // ior
+
+     public:
+      explicit NovaDielectricMaterial(const glm::vec4 &color) : albedo(color), eta(1.f) {}
+      NovaDielectricMaterial(const glm::vec4 &color, float ior) : albedo(color), eta(ior) {}
+      ~NovaDielectricMaterial() override = default;
+      NovaDielectricMaterial(const NovaDielectricMaterial &other) = default;
+      NovaDielectricMaterial(NovaDielectricMaterial &&other) noexcept = default;
+      NovaDielectricMaterial &operator=(const NovaDielectricMaterial &other) = default;
+      NovaDielectricMaterial &operator=(NovaDielectricMaterial &&other) noexcept = default;
+
+      bool scatter(const Ray &in, Ray &out, hit_data &hit_d) const override;
     };
   }  // namespace material
 }  // namespace nova

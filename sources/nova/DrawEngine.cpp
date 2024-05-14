@@ -2,8 +2,6 @@
 #include "math_camera.h"
 #include "nova_material.h"
 
-static std::mutex mutex;
-
 namespace nova {
   glm::vec4 NovaRenderEngineLR::engine_sample_color(const Ray &ray, const NovaResources *nova_resources, int depth) {
     hit_data hit_d;
@@ -26,6 +24,7 @@ namespace nova {
     }
     glm::vec3 sample_vector = ray.direction;
     return {texturing::sample_cubemap(sample_vector, &nova_resources->envmap_data), 1.f};
+    // return glm::vec4(0.2f, 0.3f, 0.7f, 1.f) + glm::normalize(ray.direction).y * (glm::vec4(1.f, 1.f, 1.f, 1.f) - glm::vec4(1.f));
   }
 
   void NovaRenderEngineLR::engine_render_tile(HdrBufferStruct *buffers, Tile &tile, const NovaResources *nova_resources) {
@@ -34,19 +33,16 @@ namespace nova {
       for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
         const unsigned int idx = (y * tile.image_total_width + x) * 4;
         glm::vec4 rgb{};
+        const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
         for (int i = 0; i < tile.sample_per_tile; i++) {
-          const int dx = math::random::nrandi(-1, 1);
-          const int dy = math::random::nrandi(-1, 1);
-          math::camera::camera_ray r = math::camera::ray_inv_mat(x + dx,
-                                                                 tile.image_total_height - (y + dy),
-                                                                 tile.image_total_width,
-                                                                 tile.image_total_height,
-                                                                 nova_resources->camera_data.inv_P,
-                                                                 nova_resources->camera_data.inv_VM);
+          const float dx = math::random::nrandf(0, 0.003);
+          const float dy = math::random::nrandf(0, 0.003);
+          math::camera::camera_ray r = math::camera::ray_inv_mat(
+              ndc.x + dx, ndc.y + dy, nova_resources->camera_data.inv_P, nova_resources->camera_data.inv_VM);
           Ray ray(r.near, r.far);
           rgb += engine_sample_color(ray, nova_resources, nova_resources->renderer_data.max_depth);
         }
-        rgb /= tile.sample_per_tile;
+        rgb /= (float)(tile.sample_per_tile);
         for (int k = 0; k < 3; k++)
           buffers->accumulator_buffer[idx + k] += buffers->partial_buffer[idx + k];
         buffers->partial_buffer[idx] = rgb.r;

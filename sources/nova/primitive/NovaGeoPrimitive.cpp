@@ -1,3 +1,4 @@
+#include "NovaGeoPrimitive.h"
 #include "Ray.h"
 #include "nova_material.h"
 #include "nova_primitive.h"

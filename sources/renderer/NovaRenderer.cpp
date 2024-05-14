@@ -8,14 +8,14 @@
 #include "EventController.h"
 #include "GLMutablePixelBufferObject.h"
 #include "GLViewer.h"
-#include "NovaRenderer.h"
-
+#include "NovaGeoPrimitive.h"
 #include "PerformanceLogger.h"
 #include "RenderPipeline.h"
 #include "Scene.h"
 #include "TextureProcessing.h"
 #include "nova_material.h"
 #include "shape/Sphere.h"
+#include "shape/Square.h"
 #include <boost/stacktrace/detail/frame_decl.hpp>
 #include <unistd.h>
 
@@ -55,9 +55,10 @@ void NovaRenderer::initialize(ApplicationConfig *app_conf) {
   global_application_config = app_conf;
   scene_camera->computeProjectionSpace();
   std::unique_ptr<nova_material::NovaMaterialInterface> col1 = std::make_unique<nova_material::NovaConductorMaterial>(glm::vec4(1.f, 1.f, 1.f, 1.f));
-  std::unique_ptr<nova_material::NovaMaterialInterface> col2 = std::make_unique<nova_material::NovaDiffuseMaterial>(glm::vec4(1.5f, 1.f, 1.f, 1.f));
-  std::unique_ptr<nova_material::NovaMaterialInterface> col3 = std::make_unique<nova_material::NovaDiffuseMaterial>(glm::vec4(1.f, 12.f, 1.f, 1.f));
-  std::unique_ptr<nova_material::NovaMaterialInterface> col4 = std::make_unique<nova_material::NovaDiffuseMaterial>(glm::vec4(1.f, 1.f, 8.f, 1.f));
+  std::unique_ptr<nova_material::NovaMaterialInterface> col2 = std::make_unique<nova_material::NovaDielectricMaterial>(glm::vec4(1.f), 1.45f);
+  std::unique_ptr<nova_material::NovaMaterialInterface> col3 = std::make_unique<nova_material::NovaDiffuseMaterial>(glm::vec4(0.5f, 1.f, 0.f, 1.f));
+  std::unique_ptr<nova_material::NovaMaterialInterface> col4 = std::make_unique<nova_material::NovaDielectricMaterial>(glm::vec4(1.f, 1.f, 1.f, 1.f),
+                                                                                                                       1.54f);
   nova_engine_data->scene_data.materials_collection.push_back(std::move(col1));
   nova_engine_data->scene_data.materials_collection.push_back(std::move(col2));
   nova_engine_data->scene_data.materials_collection.push_back(std::move(col3));
@@ -68,11 +69,12 @@ void NovaRenderer::initialize(ApplicationConfig *app_conf) {
   auto c3 = nova_engine_data->scene_data.materials_collection[2].get();
   auto c4 = nova_engine_data->scene_data.materials_collection[3].get();
 
-  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(-4, 0, 0), 2.f));
-  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(4, 0, 0), 2.f));
-  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(0, 5, 0), 2.f));
-  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(0, -5, 0), 2.f));
-  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(0, 0, -5), 2.f));
+  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(0, .5f, -2), 0.5f));
+  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(0, .5f, 0), 0.5f));
+  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(-2, .5f, 0), 0.5f));
+  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(2, .5f, 0), 0.5f));
+  nova_engine_data->scene_data.shapes.push_back(
+      nova_shape::NovaShapeInterface::create<nova_shape::Square>(glm::vec3(-25, 0, -25), glm::vec3(50, 0, 0), glm::vec3(0, 0, 50)));
 
   auto s1 = nova_engine_data->scene_data.shapes[0].get();
   auto s2 = nova_engine_data->scene_data.shapes[1].get();
@@ -135,7 +137,7 @@ void NovaRenderer::initializeEngine() {
   nova_engine_data->renderer_data.tiles_w = 20;
   nova_engine_data->renderer_data.tiles_h = 20;
   nova_engine_data->renderer_data.aliasing_samples = 8;
-  nova_engine_data->renderer_data.renderer_max_samples = 1000;
+  nova_engine_data->renderer_data.renderer_max_samples = 10000;
   nova_engine_data->renderer_data.max_depth = MAX_RECUR_DEPTH;
 }
 
