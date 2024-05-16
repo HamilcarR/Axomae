@@ -146,6 +146,19 @@ void NovaRenderer::resetToBaseState() {
   nova_engine_data->renderer_data.max_depth = 1;
 }
 
+void NovaRenderer::displayProgress(float current, float target) {
+  if (current > target)
+    return;
+  if (!gl_widget)
+    return;
+  if (!gl_widget->getProgressManager())
+    return;
+  gl_widget->targetProgress(target);
+  gl_widget->setCurrent(current);
+  gl_widget->setProgressStatusText("Sample: " + std::to_string((int)current) + "/" + std::to_string((int)target) + " ");
+  gl_widget->notifyProgress();
+}
+
 void NovaRenderer::draw() {
 
   engine_render_buffers.accumulator_buffer = accumulated_render_buffer.data();
@@ -167,6 +180,7 @@ void NovaRenderer::draw() {
   const float s1 = (-1 - std::sqrt(1.f + 8 * nova_engine_data->renderer_data.renderer_max_samples)) * 0.5f;
   const float s2 = (-1 + std::sqrt(1.f + 8 * nova_engine_data->renderer_data.renderer_max_samples)) * 0.5f;
   const float smax = std::max(s1, s2);
+
   if (current_frame < smax) {
     nova_engine_data->renderer_data.max_depth = nova_engine_data->renderer_data.max_depth < MAX_RECUR_DEPTH ?
                                                     nova_engine_data->renderer_data.max_depth + 1 :
@@ -201,6 +215,8 @@ void NovaRenderer::draw() {
   perf.endTimer();
   perf.print();
   camera_framebuffer->renderFrameBufferMesh();
+
+  displayProgress(current_frame, nova_engine_data->renderer_data.renderer_max_samples);
   current_frame++;
   scanline++;
 }
@@ -290,7 +306,7 @@ void NovaRenderer::processEvent(const controller::event::Event *event) {
 void NovaRenderer::getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) {
   if (x >= screen_size.width || x < 0 || y < 0 || y >= screen_size.height)
     return;
-  int idx = ((screen_size.height - y) * screen_size.width + x) * 4;
+  int idx = (((screen_size.height - 1) - y) * screen_size.width + x) * 4;
   float r = accumulated_render_buffer[idx] / current_frame;
   float g = accumulated_render_buffer[idx + 1] / current_frame;
   float b = accumulated_render_buffer[idx + 2] / current_frame;
@@ -300,6 +316,30 @@ void NovaRenderer::getScreenPixelColor(int x, int y, float r_screen_pixel_color[
   r_screen_pixel_color[2] = b;
   r_screen_pixel_color[3] = 1.f;
 }
+
+[[nodiscard]] image::ImageHolder<float> NovaRenderer::getSnapshotFloat(int width, int height) const {
+  image::ImageHolder<float> img;
+  img.data.resize(screen_size.width * screen_size.height * 4);
+  img.metadata.channels = 4;
+  img.metadata.color_corrected = true;
+  img.metadata.format = "hdr";
+  img.metadata.width = screen_size.width;
+  img.metadata.height = screen_size.height;
+  img.metadata.is_hdr = true;
+  for (int y = 0; y < screen_size.height; y++)
+    for (int x = 0; x < screen_size.width; x++) {
+      int idx = (y * screen_size.width + x) * 4;
+      for (int k = 0; k < 3; k++) {
+        const float old = accumulated_render_buffer[idx + k] / (current_frame + 1);
+        const float new_ = nova_render_buffer[idx + k];
+        const float pix = old + 0.8f * (new_ - old);
+        img.data[idx + k] = hdr_utils::color_correction(old);
+      }
+      img.data[idx + 3] = nova_render_buffer[idx + 3];
+    }
+  return img;
+}
+[[nodiscard]] image::ImageHolder<uint8_t> NovaRenderer::getSnapshotUint8(int width, int height) const { AX_UNREACHABLE; }
 
 void NovaRenderer::setDefaultFrameBufferId(unsigned int id) {}
 

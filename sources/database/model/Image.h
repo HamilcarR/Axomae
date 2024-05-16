@@ -20,11 +20,34 @@ namespace image {
     ImageHolder(ImageHolder<TYPE> &&assign) noexcept = default;
     ImageHolder<TYPE> &operator=(const ImageHolder<TYPE> &copy) = default;
     ImageHolder<TYPE> &operator=(ImageHolder<TYPE> &&assign) noexcept = default;
+    void flip_v();
+    void flip_u();
   };
 
   template<class T>
   ImageHolder<T>::ImageHolder(const std::vector<T> &img, const image::Metadata &meta) : data(img), metadata(meta) {}
-
+  template<class T>
+  void ImageHolder<T>::flip_v() {
+    for (int y = 0; y < metadata.height; y++) {
+      for (int x = 0; x < metadata.width; x++) {
+        int cur = (y * metadata.width + x) * metadata.channels;
+        int inv = ((metadata.height - 1 - y) * metadata.width + x) * metadata.channels;
+        for (int k = 0; k < 3; k++)
+          std::swap(data[cur + k], data[inv + k]);
+      }
+    }
+  }
+  template<class T>
+  void ImageHolder<T>::flip_u() {
+    for (int y = 0; y < metadata.height; y++) {
+      for (int x = 0; x < metadata.width; x++) {
+        int cur = (y * metadata.width + x) * metadata.channels;
+        int inv = (y * metadata.width + (metadata.width - 1 - x)) * metadata.channels;
+        for (int k = 0; k < 3; k++)
+          std::swap(data[cur + k], data[inv + k]);
+      }
+    }
+  }
   /*******************************************************************************************************************************************/
 
   template<class TYPE>

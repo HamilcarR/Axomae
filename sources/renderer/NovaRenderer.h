@@ -42,15 +42,15 @@ class NovaRenderer final : public IRenderer {
   std::unique_ptr<NovaLRengineInterface> nova_engine;
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
   std::unique_ptr<nova::NovaResources> nova_engine_data;
-  ApplicationConfig *global_application_config;
+  ApplicationConfig *global_application_config{};
   std::vector<std::future<void>> nova_result_futures;
   std::vector<float> nova_render_buffer;
   std::vector<float> accumulated_render_buffer;
   Dim2 resolution{2048, 2048};
-  int current_frame, next_frame, scanline;
+  int current_frame{}, next_frame{}, scanline{};
   bool needRedraw{false};
   float *pbo_map_buffer{};
-  NovaInternalMetadata renderer_data;
+  NovaInternalMetadata renderer_data{};
   nova::HdrBufferStruct engine_render_buffers;
 
  private:
@@ -63,6 +63,7 @@ class NovaRenderer final : public IRenderer {
   void emptyAccumBuffer();
   void emptyRenderBuffer();
   void resetToBaseState();
+  void displayProgress(float current, float target);
 
  public:
   NovaRenderer(unsigned width, unsigned height, GLViewer *widget = nullptr);
@@ -84,7 +85,8 @@ class NovaRenderer final : public IRenderer {
   [[nodiscard]] unsigned int *getDefaultFrameBufferIdPointer() override;
   [[nodiscard]] RenderPipeline &getRenderPipeline() const override;
   [[nodiscard]] Scene &getScene() const override;
-
+  [[nodiscard]] image::ImageHolder<float> getSnapshotFloat(int width, int height) const override;
+  [[nodiscard]] image::ImageHolder<uint8_t> getSnapshotUint8(int width, int height) const override;
   void setGammaValue(float gamma) override;
   void setExposureValue(float exposure) override;
   void setNoPostProcess() override;

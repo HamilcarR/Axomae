@@ -1,6 +1,7 @@
 #ifndef GLVIEWER_H
 #define GLVIEWER_H
 
+#include "Image.h"
 #include "Mesh.h"
 #include "RendererCallbacks.h"
 #include "RendererInterface.h"
@@ -25,7 +26,7 @@ class QTimer;
  * @class GLViewer
  * This class implements methods for the drawing process
  */
-class GLViewer : public QOpenGLWidget {
+class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
 
   Q_OBJECT
 
@@ -55,6 +56,8 @@ class GLViewer : public QOpenGLWidget {
   void setRenderer(std::unique_ptr<IRenderer> &renderer);
   void renderOnTimer(int interval);
   void renderOnUpdate();
+  [[nodiscard]] image::ImageHolder<uint8_t> getRenderScreenshotUint8(int width, int height) const;
+  [[nodiscard]] image::ImageHolder<float> getRenderScreenshotFloat(int width, int height) const;
   [[nodiscard]] image::Rgb getFramebufferColor(int x, int y) const;
 
   template<RENDERER_CALLBACK_ENUM callback_id, class... Args>

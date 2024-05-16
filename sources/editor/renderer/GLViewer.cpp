@@ -232,3 +232,7 @@ image::Rgb GLViewer::getFramebufferColor(int x, int y) const {
     renderer->getScreenPixelColor(x, y, pixel_color);
   return {pixel_color[0], pixel_color[1], pixel_color[2], pixel_color[3]};
 }
+
+image::ImageHolder<uint8_t> GLViewer::getRenderScreenshotUint8(int width, int height) const { return renderer->getSnapshotUint8(width, height); }
+
+image::ImageHolder<float> GLViewer::getRenderScreenshotFloat(int width, int height) const { return renderer->getSnapshotFloat(width, height); }

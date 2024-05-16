@@ -26,9 +26,11 @@
 class RenderPipeline;
 class GLViewer;
 class ApplicationConfig;
-namespace controller::event {
-  class Event;
-}
+namespace controller {
+  namespace event {
+    class Event;
+  }
+}  // namespace controller
 /**
  * @brief Renderer class definition
  */
@@ -72,11 +74,12 @@ class Renderer final : public IRenderer {
   void onResize(unsigned int width, unsigned int height) override;
   void setDefaultFrameBufferId(unsigned id) override { default_framebuffer_id = id; }
   void getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) override;
-
   [[nodiscard]] unsigned int *getDefaultFrameBufferIdPointer() override { return &default_framebuffer_id; }
   [[nodiscard]] const Scene &getConstScene() const { return *scene; }
   [[nodiscard]] Scene &getScene() const override { return *scene; }
   [[nodiscard]] RenderPipeline &getRenderPipeline() const override { return *render_pipeline; }
+  [[nodiscard]] image::ImageHolder<float> getSnapshotFloat(int width, int height) const override;
+  [[nodiscard]] image::ImageHolder<uint8_t> getSnapshotUint8(int width, int height) const override;
   void setGammaValue(float gamma) override;
   void setExposureValue(float exposure) override;
   void setNoPostProcess() override;

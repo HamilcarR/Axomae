@@ -1,6 +1,7 @@
 #ifndef RendererInterface_H
 #define RendererInterface_H
 #include "EventInterface.h"
+#include "Image.h"
 #include "RendererCallbacks.h"
 class Scene;
 class SceneTree;
@@ -8,9 +9,10 @@ class RenderPipeline;
 class ApplicationConfig;
 class Mesh;
 class GLViewer;
+
 namespace controller::event {
   class Event;
-}
+}  // namespace controller::event
 
 struct SceneChangeData {
   SceneTree *scene;
@@ -53,6 +55,9 @@ class IRenderer : public RendererInterface {
   virtual void setRasterizerFill() = 0;
   virtual void setRasterizerWireframe() = 0;
   virtual void displayBoundingBoxes(bool display) = 0;
+  [[nodiscard]] virtual image::ImageHolder<float> getSnapshotFloat(int width, int height) const = 0;
+  [[nodiscard]] virtual image::ImageHolder<uint8_t> getSnapshotUint8(int width, int height) const = 0;
+
   template<RENDERER_CALLBACK_ENUM function_flag, class... Args>
   void executeMethod(Args &&...args) {
     if constexpr (function_flag == SET_GAMMA)

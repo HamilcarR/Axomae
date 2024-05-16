@@ -1,4 +1,5 @@
 target_sources(ax_nova PUBLIC
-    Sphere.cpp
+        Sphere.cpp
         Square.cpp
+        Triangle.cpp
 )

@@ -10,7 +10,6 @@ namespace controller {
 
   bool OP_ProgressStatus::op(ioperator::OpData<progress_bar::ProgressBarTextFormat> *data) const {
     std::string format = formatted_string(data->data.format, data->data.percentage);
-    Mutex::Lock lock(mutex);
     module->setFormat(QString(format.c_str()));
     module->setValue(data->data.percentage);
     return true;

@@ -15,5 +15,5 @@
 // clang-format off
 #define AX_ASSERT(expr, message) assert(expr && message)
 // clang-format on
-
+#define AX_UNREACHABLE assert(false && "Unreachable code executed!")
 #endif

@@ -66,7 +66,10 @@ namespace IO {
      */
     image::ImageHolder<float> loadHdr(const char *path, bool store = true);
 
-    void writeHdr(const char *path, const image::ImageHolder<float> &image);
+    /**
+     * @brief Writes an hdr file on disk , adds extension automatically , so no appending ".hdr" is necessary to the path
+     */
+    void writeHdr(const char *path, const image::ImageHolder<float> &image, bool flip = false);
 
    private:
     ResourceDatabaseManager *resource_database;

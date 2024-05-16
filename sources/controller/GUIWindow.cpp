@@ -239,12 +239,14 @@ namespace controller {
     renderer_scene_list = main_window_ui.renderer_scene_list;
     main_window_ui.renderer_envmap_list->setWidget(realtime_viewer);
     realtime_viewer->getRenderer().getRenderPipeline().setProgressManager(progress_manager.get());
+    realtime_viewer->setProgressManager(progress_manager.get());
     realtime_viewer->setApplicationConfig(global_application_config.get());
 
     /* Nova raytracer */
     nova_viewer = main_window_ui.nova_viewer->getViewer();
     nova_viewer->renderOnTimer(0);
     nova_viewer->getRenderer().getRenderPipeline().setProgressManager(progress_manager.get());
+    nova_viewer->setProgressManager(progress_manager.get());
     nova_viewer->setApplicationConfig(global_application_config.get());
 
     /* UV editor initialization*/
@@ -730,14 +732,20 @@ namespace controller {
 
   /**************************************************************************************************************/
   bool Controller::save_image() {
-    IO::ImageImporter *inst = IO::ImageImporter::getInstance();
     QString filename = QFileDialog::getSaveFileName(this, tr("Save files"), "./", tr("All Files (*)"));
-    if (image_session_pointers::height != nullptr)
-      IO::ImageImporter::save_image(image_session_pointers::height, (filename.toStdString() + "-height.bmp").c_str());
-    if (image_session_pointers::normalmap != nullptr)
-      IO::ImageImporter::save_image(image_session_pointers::normalmap, (filename.toStdString() + "-nmap.bmp").c_str());
-    if (image_session_pointers::dudv != nullptr)
-      IO::ImageImporter::save_image(image_session_pointers::dudv, (filename.toStdString() + "-dudv.bmp").c_str());
+    QString current_tab = main_window_ui.workspace->currentWidget()->objectName();
+    if (current_tab == "rt_renderer") {
+      image::ImageHolder<float> raw_image = nova_viewer->getRenderScreenshotFloat(1024, 1024);
+      IO::Loader loader(progress_manager.get());
+      loader.writeHdr(filename.toStdString().c_str(), raw_image, true);
+    } else {
+      if (image_session_pointers::height != nullptr)
+        IO::ImageImporter::save_image(image_session_pointers::height, (filename.toStdString() + "-height.bmp").c_str());
+      if (image_session_pointers::normalmap != nullptr)
+        IO::ImageImporter::save_image(image_session_pointers::normalmap, (filename.toStdString() + "-nmap.bmp").c_str());
+      if (image_session_pointers::dudv != nullptr)
+        IO::ImageImporter::save_image(image_session_pointers::dudv, (filename.toStdString() + "-dudv.bmp").c_str());
+    }
     return false;
   }
 

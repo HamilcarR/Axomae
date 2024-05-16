@@ -69,11 +69,15 @@ namespace IO {
     }
     stbi_image_free(data);
     helper.reset();
-    return image::ImageHolder<float>(image_data, metadata);
+    return {image_data, metadata};
   }
 
-  void Loader::writeHdr(const char *path, const image::ImageHolder<float> &image) {
-    int n = stbi_write_hdr(path,
+  void Loader::writeHdr(const char *path, const image::ImageHolder<float> &image, bool flip) {
+    std::string final_path = path;
+    final_path += ".hdr";
+    if (flip)
+      stbi_flip_vertically_on_write(true);
+    int n = stbi_write_hdr(final_path.c_str(),
                            static_cast<int>(image.metadata.width),
                            static_cast<int>(image.metadata.height),
                            static_cast<int>(image.metadata.channels),
