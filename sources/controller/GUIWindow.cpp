@@ -9,6 +9,7 @@
 #include "SceneSelector.h"
 #include "ShaderFactory.h"
 #include "TextureViewerWidget.h"
+#include "WorkspaceTracker.h"
 #include <QTimer>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsItem>
@@ -225,6 +226,7 @@ namespace controller {
 
     /* UI elements initialization*/
     main_window_ui.setupUi(this);
+    current_workspace = std::make_unique<WorkspaceTracker>(&main_window_ui);
 
     /* Configuration structure initialization */
     global_application_config = std::make_unique<ApplicationConfig>();
@@ -733,12 +735,12 @@ namespace controller {
   /**************************************************************************************************************/
   bool Controller::save_image() {
     QString filename = QFileDialog::getSaveFileName(this, tr("Save files"), "./", tr("All Files (*)"));
-    QString current_tab = main_window_ui.workspace->currentWidget()->objectName();
-    if (current_tab == "rt_renderer") {
-      image::ImageHolder<float> raw_image = nova_viewer->getRenderScreenshotFloat(1024, 1024);
+    uint64_t flag = current_workspace->getContext();
+    if (flag & UI_RENDERER_NOVA) {
+      image::ImageHolder<float> raw_image = nova_viewer->getRenderScreenshotFloat(1920, 1080);
       IO::Loader loader(progress_manager.get());
       loader.writeHdr(filename.toStdString().c_str(), raw_image, true);
-    } else {
+    } else if (flag & UI_EDITOR_BAKER_NMAP) {
       if (image_session_pointers::height != nullptr)
         IO::ImageImporter::save_image(image_session_pointers::height, (filename.toStdString() + "-height.bmp").c_str());
       if (image_session_pointers::normalmap != nullptr)

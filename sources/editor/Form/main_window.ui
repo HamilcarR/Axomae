@@ -510,7 +510,7 @@
             <property name="tabBarAutoHide">
              <bool>false</bool>
             </property>
-            <widget class="QWidget" name="texture">
+            <widget class="QWidget" name="nmap_editor">
              <attribute name="title">
               <string>Normal Mapping</string>
              </attribute>
@@ -1041,7 +1041,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_3">
+            <widget class="QWidget" name="hdr_editor">
              <attribute name="title">
               <string>Cube Mapping</string>
              </attribute>

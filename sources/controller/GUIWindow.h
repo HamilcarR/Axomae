@@ -26,10 +26,14 @@ namespace gui {
   enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4, ALBEDO = 5, GREYSCALE_AVG = 6, PROJECTED_NMAP = 7, INVALID = 8 };
 }
 namespace controller {
+
   // TODO :  delete old memory management code
   class HeapManagement;
+
   template<typename T>
   struct image_type;
+
+  class WorkspaceTracker;
 
   /* Controls the main editor window , deals with event management between main window and the rest of the app */
   class Controller final : public QMainWindow {
@@ -49,6 +53,8 @@ namespace controller {
     SceneSelector uv_mesh_selector;
     /* Raytracing engine */
     GLViewer *nova_viewer;
+    /* Tracks current workspace (which widgets are displayed)*/
+    std::unique_ptr<WorkspaceTracker> current_workspace;
 
     std::unique_ptr<QTimer> timer;
 
