@@ -152,7 +152,6 @@ TextureOperations<T> &TextureOperations<T>::operator=(TextureOperations &&move) 
   return *this;
 }
 
-/*TODO : add functor for color correction etc*/
 template<class T>
 template<class F, class... Args>
 void TextureOperations<T>::processTexture(T *dest, int dest_width, int dest_height, F &&func, Args &&...args) const {
