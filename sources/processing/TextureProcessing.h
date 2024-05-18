@@ -33,7 +33,7 @@ template<class T>
 class TextureOperations {
 
  private:
-  std::vector<T> *data{};
+  const std::vector<T> *data{};
   unsigned width{};
   unsigned height{};
   unsigned channels{};
@@ -43,13 +43,18 @@ class TextureOperations {
 
  public:
   TextureOperations() = default;
-  TextureOperations(std::vector<T> &_data, unsigned _width, unsigned _height, unsigned int num_channels = 3);
+  TextureOperations(const std::vector<T> &_data, unsigned _width, unsigned _height, unsigned int num_channels = 3);
   ~TextureOperations();
   TextureOperations(const TextureOperations &copy);
   TextureOperations(TextureOperations &&move) noexcept;
   TextureOperations &operator=(const TextureOperations &copy);
   TextureOperations &operator=(TextureOperations &&move) noexcept;
-  void copyTexture(T *dest, int dest_width, int dest_height) const;
+
+  /**
+   * Applies F to each channel of the current texture "data" and copy it in "dest"
+   */
+  template<class F, class... Args>
+  void processTexture(T *dest, int dest_width, int dest_height, F &&functor, Args &&...args) const;
 
   /**
    * @brief This method wrap around if the texture coordinates provided land beyond the texture dimensions, repeating
@@ -97,6 +102,16 @@ class TextureOperations {
 using HdrEnvmapProcessing = TextureOperations<float>;
 
 template<class T>
+TextureOperations<T>::TextureOperations(const std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels)
+    : data(&_data) {
+  if (!isValidDim(_width) || !isValidDim(_height))
+    throw TextureInvalidDimensionsException();
+  width = _width;
+  height = _height;
+  channels = num_channels;
+}
+
+template<class T>
 TextureOperations<T>::TextureOperations(const TextureOperations &copy) {
   if (this != &copy) {
     data = copy.data;
@@ -137,14 +152,19 @@ TextureOperations<T> &TextureOperations<T>::operator=(TextureOperations &&move) 
   return *this;
 }
 
+/*TODO : add functor for color correction etc*/
 template<class T>
-void TextureOperations<T>::copyTexture(T *dest, int dest_width, int dest_height) const {
-  for (int i = 0; i < dest_width; i++)
-    for (int j = 0; j < dest_height; j++) {
+template<class F, class... Args>
+void TextureOperations<T>::processTexture(T *dest, int dest_width, int dest_height, F &&func, Args &&...args) const {
+  for (int j = 0; j < dest_height; j++)
+    for (int i = 0; i < dest_width; i++) {
       double u = math::texture::pixelToUv(i, dest_width);
       double v = math::texture::pixelToUv(j, dest_height);
       glm::vec3 col = uvSample(u, v);
       int idx = (j * dest_width + i) * channels;
+      col.r = func(col.r, std::forward<Args>(args)...);
+      col.g = func(col.g, std::forward<Args>(args)...);
+      col.b = func(col.b, std::forward<Args>(args)...);
       dest[idx] = col.r;
       dest[idx + 1] = col.g;
       dest[idx + 2] = col.b;
@@ -152,15 +172,13 @@ void TextureOperations<T>::copyTexture(T *dest, int dest_width, int dest_height)
 }
 
 template<class T>
-TextureOperations<T>::TextureOperations(std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels)
-    : data(&_data) {
-  if (!isValidDim(_width) || !isValidDim(_height))
-    throw TextureInvalidDimensionsException();
-  if (!isDimPowerOfTwo(_width) || !isDimPowerOfTwo(_height))
-    throw TextureNonPowerOfTwoDimensionsException();
-  width = _width;
-  height = _height;
-  channels = num_channels;
+glm::vec3 TextureOperations<T>::discreteSample(int x, int y) const {
+  const glm::vec2 normalized = wrapAroundPixelCoords(x, y);
+  int index = (static_cast<int>(normalized.y) * width + static_cast<int>(normalized.x)) * channels;
+  const float r = (*data)[index];
+  const float g = (*data)[index + 1];
+  const float b = (*data)[index + 2];
+  return {r, g, b};
 }
 
 template<class T>
@@ -179,6 +197,19 @@ glm::vec3 TextureOperations<T>::bilinearInterpolate(const glm::vec2 &top_left,
   const glm::vec3 top_interp = horizontal_diff * tl + u * tr;
   const glm::vec3 bot_interp = horizontal_diff * bl + u * br;
   return (1 - v) * top_interp + v * bot_interp;
+}
+
+template<class T>
+template<class D>
+glm::vec3 TextureOperations<T>::uvSample(const D u, const D v) const {
+  const glm::vec2 wrap_uv = wrapAroundTexCoords(u, v);
+  const glm::vec2 pixel_coords = glm::dvec2(math::texture::uvToPixel(wrap_uv.x, width), math::texture::uvToPixel(wrap_uv.y, height));
+  const glm::vec2 top_left(std::floor(pixel_coords.x), std::floor(pixel_coords.y));
+  const glm::vec2 top_right(std::floor(pixel_coords.x) + 1, std::floor(pixel_coords.y));
+  const glm::vec2 bottom_left(std::floor(pixel_coords.x), std::floor(pixel_coords.y) + 1);
+  const glm::vec2 bottom_right(std::floor(pixel_coords.x) + 1, std::floor(pixel_coords.y) + 1);
+  const glm::vec3 texel_value = bilinearInterpolate(top_left, top_right, bottom_left, bottom_right, pixel_coords);
+  return texel_value;
 }
 
 template<class T>
@@ -217,29 +248,6 @@ glm::vec2 TextureOperations<T>::wrapAroundPixelCoords(const int x, const int y) 
   else
     y_coord = y;
   return {x_coord, y_coord};
-}
-
-template<class T>
-glm::vec3 TextureOperations<T>::discreteSample(int x, int y) const {
-  const glm::vec2 normalized = wrapAroundPixelCoords(x, y);
-  int index = (static_cast<int>(normalized.y) * width + static_cast<int>(normalized.x)) * channels;
-  const float r = (*data)[index];
-  const float g = (*data)[index + 1];
-  const float b = (*data)[index + 2];
-  return {r, g, b};
-}
-
-template<class T>
-template<class D>
-glm::vec3 TextureOperations<T>::uvSample(const D u, const D v) const {
-  const glm::vec2 wrap_uv = wrapAroundTexCoords(u, v);
-  const glm::vec2 pixel_coords = glm::dvec2(math::texture::uvToPixel(wrap_uv.x, width), math::texture::uvToPixel(wrap_uv.y, height));
-  const glm::vec2 top_left(std::floor(pixel_coords.x), std::floor(pixel_coords.y));
-  const glm::vec2 top_right(std::floor(pixel_coords.x) + 1, std::floor(pixel_coords.y));
-  const glm::vec2 bottom_left(std::floor(pixel_coords.x), std::floor(pixel_coords.y) + 1);
-  const glm::vec2 bottom_right(std::floor(pixel_coords.x) + 1, std::floor(pixel_coords.y) + 1);
-  const glm::vec3 texel_value = bilinearInterpolate(top_left, top_right, bottom_left, bottom_right, pixel_coords);
-  return texel_value;
 }
 
 template<class T>

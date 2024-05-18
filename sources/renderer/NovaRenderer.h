@@ -44,8 +44,9 @@ class NovaRenderer final : public IRenderer {
   std::unique_ptr<nova::NovaResources> nova_engine_data;
   ApplicationConfig *global_application_config{};
   std::vector<std::future<void>> nova_result_futures;
-  std::vector<float> nova_render_buffer;
+  std::vector<float> partial_render_buffer;
   std::vector<float> accumulated_render_buffer;
+  std::vector<float> final_render_buffer;
   Dim2 resolution{2048, 2048};
   int current_frame{}, next_frame{}, scanline{};
   bool needRedraw{false};

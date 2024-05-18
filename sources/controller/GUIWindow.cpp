@@ -705,6 +705,7 @@ namespace controller {
       std::vector<Mesh *> scene = struct_holder.first;
       SceneChangeData scene_data = {&struct_holder.second, struct_holder.first};
       realtime_viewer->setNewScene(scene_data);
+      nova_viewer->setNewScene(scene_data);
       uv_mesh_selector.setScene(scene);
       main_window_ui.meshes_list->setList(scene);
       SceneTree &scene_hierarchy = realtime_viewer->getRenderer().getScene().getSceneTreeRef();

@@ -16,11 +16,12 @@
 #include "nova_material.h"
 #include "shape/Sphere.h"
 #include "shape/Square.h"
+#include "shape/Triangle.h"
 #include <boost/stacktrace/detail/frame_decl.hpp>
 #include <unistd.h>
 
 static constexpr int MAX_RECUR_DEPTH = 50;
-
+static std::mutex mutex;
 NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *widget) : NovaRenderer() {
   resource_database = &ResourceDatabaseManager::getInstance();
   camera_framebuffer = std::make_unique<CameraFrameBuffer>(*resource_database, &screen_size, &default_framebuffer_id);
@@ -31,9 +32,10 @@ NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *wi
   envmap_manager = std::make_unique<EnvmapTextureManager>(
       *resource_database, screen_size, default_framebuffer_id, *render_pipeline, nullptr, EnvmapTextureManager::SELECTED);
   nova_engine_data = std::make_unique<nova::NovaResources>();
-  nova_render_buffer.resize(resolution.width * resolution.height * 4);
+  partial_render_buffer.resize(resolution.width * resolution.height * 4);
   accumulated_render_buffer.resize(resolution.width * resolution.height * 4);
-  pbo_read = std::make_unique<GLMutablePixelBufferObject>(GLMutablePixelBufferObject::UP, nova_render_buffer.size() * sizeof(float));
+  final_render_buffer.resize(resolution.width * resolution.height * 4);
+  pbo_read = std::make_unique<GLMutablePixelBufferObject>(GLMutablePixelBufferObject::UP, partial_render_buffer.size() * sizeof(float));
   nova_engine = std::make_unique<NovaLRengineInterface>();
   current_frame = next_frame = 0;
 }
@@ -54,42 +56,66 @@ void NovaRenderer::initialize(ApplicationConfig *app_conf) {
   pbo_read->initializeBuffers();
   global_application_config = app_conf;
   scene_camera->computeProjectionSpace();
-  std::unique_ptr<nova_material::NovaMaterialInterface> col1 = std::make_unique<nova_material::NovaConductorMaterial>(glm::vec4(1.f, 1.f, 1.f, 1.f));
-  std::unique_ptr<nova_material::NovaMaterialInterface> col2 = std::make_unique<nova_material::NovaDielectricMaterial>(glm::vec4(1.f), 1.45f);
-  std::unique_ptr<nova_material::NovaMaterialInterface> col3 = std::make_unique<nova_material::NovaDiffuseMaterial>(glm::vec4(0.5f, 1.f, 0.f, 1.f));
-  std::unique_ptr<nova_material::NovaMaterialInterface> col4 = std::make_unique<nova_material::NovaDielectricMaterial>(glm::vec4(1.f, 1.f, 1.f, 1.f),
-                                                                                                                       1.54f);
-  nova_engine_data->scene_data.materials_collection.push_back(std::move(col1));
-  nova_engine_data->scene_data.materials_collection.push_back(std::move(col2));
-  nova_engine_data->scene_data.materials_collection.push_back(std::move(col3));
-  nova_engine_data->scene_data.materials_collection.push_back(std::move(col4));
-
-  auto c1 = nova_engine_data->scene_data.materials_collection[0].get();
-  auto c2 = nova_engine_data->scene_data.materials_collection[1].get();
-  auto c3 = nova_engine_data->scene_data.materials_collection[2].get();
-  auto c4 = nova_engine_data->scene_data.materials_collection[3].get();
-
-  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(0, .5f, -2), 0.5f));
-  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(0, .5f, 0), 0.5f));
-  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(-2, .5f, 0), 0.5f));
-  nova_engine_data->scene_data.shapes.push_back(nova_shape::NovaShapeInterface::create<nova_shape::Sphere>(glm::vec3(2, .5f, 0), 0.5f));
-  nova_engine_data->scene_data.shapes.push_back(
-      nova_shape::NovaShapeInterface::create<nova_shape::Square>(glm::vec3(-25, 0, -25), glm::vec3(50, 0, 0), glm::vec3(0, 0, 50)));
-
-  auto s1 = nova_engine_data->scene_data.shapes[0].get();
-  auto s2 = nova_engine_data->scene_data.shapes[1].get();
-  auto s3 = nova_engine_data->scene_data.shapes[2].get();
-  auto s4 = nova_engine_data->scene_data.shapes[3].get();
-  auto s5 = nova_engine_data->scene_data.shapes[4].get();
-
-  nova_engine_data->scene_data.primitives.push_back(nova_primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s1, c1));
-  nova_engine_data->scene_data.primitives.push_back(nova_primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s2, c4));
-  nova_engine_data->scene_data.primitives.push_back(nova_primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s3, c1));
-  nova_engine_data->scene_data.primitives.push_back(nova_primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s4, c3));
-  nova_engine_data->scene_data.primitives.push_back(nova_primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s5, c2));
-
   initializeEngine();
 }
+
+void NovaRenderer::resetToBaseState() {
+  current_frame = 1;
+  nova_engine_data->renderer_data.max_depth = 1;
+  if (global_application_config && global_application_config->getThreadPool())
+    global_application_config->getThreadPool()->emptyQueue();
+  emptyAccumBuffer();
+  populateNovaSceneResources();
+}
+
+void NovaRenderer::syncRenderEngineThreads() {
+  if (global_application_config && global_application_config->getThreadPool())
+    global_application_config->getThreadPool()->fence();
+}
+
+void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
+  namespace nova_material = nova::material;
+  namespace nova_primitive = nova::primitive;
+  namespace nova_shape = nova::shape;
+
+  resetToBaseState();
+  syncRenderEngineThreads();
+  nova_engine_data->scene_data.materials_collection.clear();
+  nova_engine_data->scene_data.primitives.clear();
+  nova_engine_data->scene_data.shapes.clear();
+  std::unique_ptr<nova_material::NovaMaterialInterface> mat1 = std::make_unique<nova_material::NovaDielectricMaterial>(glm::vec4(1.f, 1.f, 1.f, 1.f),
+                                                                                                                       2.54f);
+  nova_engine_data->scene_data.materials_collection.push_back(std::move(mat1));
+  auto c1 = nova_engine_data->scene_data.materials_collection[0].get();
+  for (const auto &elem : new_scene.mesh_list) {
+    const Object3D &geometry = elem->getGeometry();
+    for (int i = 0; i < geometry.indices.size(); i += 3) {
+      glm::vec3 v1{}, v2{}, v3{};
+      // V1
+      int idx = geometry.indices[i] * 3;
+      v1.x = geometry.vertices[idx];
+      v1.y = geometry.vertices[idx + 1];
+      v1.z = geometry.vertices[idx + 2];
+      // V2
+      idx = geometry.indices[i + 1] * 3;
+      v2.x = geometry.vertices[idx];
+      v2.y = geometry.vertices[idx + 1];
+      v2.z = geometry.vertices[idx + 2];
+
+      idx = geometry.indices[i + 2] * 3;
+      v3.x = geometry.vertices[idx];
+      v3.y = geometry.vertices[idx + 1];
+      v3.z = geometry.vertices[idx + 2];
+
+      auto tri = nova::shape::NovaShapeInterface::create<nova_shape::Triangle>(v1, v2, v3);
+      nova_engine_data->scene_data.shapes.push_back(std::move(tri));
+      auto s1 = nova_engine_data->scene_data.shapes.back().get();
+      auto primit = nova::primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s1, c1);
+      nova_engine_data->scene_data.primitives.push_back(std::move(primit));
+    }
+  }
+}
+
 bool NovaRenderer::prep_draw() {
   if (camera_framebuffer && camera_framebuffer->getDrawable()->ready())
     camera_framebuffer->startDraw();
@@ -110,24 +136,13 @@ void NovaRenderer::populateNovaSceneResources() {
   nova_engine_data->renderer_data.sample_increment = current_frame;
 }
 
-void NovaRenderer::syncRenderEngineThreads() {
-  try {
-    for (auto &elem : nova_result_futures) {
-      if (elem.valid())
-        elem.get();
-    }
-  } catch (std::future_error &e) {
-  }
-
-  nova_result_futures.clear();
-}
-
 void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int channels) {
   float max = 0.f;
   for (int i = 0; i < width * height * channels; i++) {
     const float old = accumulated_render_buffer[i] / (current_frame + 1);
-    const float new_ = nova_render_buffer[i];
+    const float new_ = partial_render_buffer[i];
     const float pix = old + 0.8f * (new_ - old);
+    final_render_buffer[i] = pix;
     pbo_map[i] = pix;
     max = std::max(max, pix);
   }
@@ -139,11 +154,6 @@ void NovaRenderer::initializeEngine() {
   nova_engine_data->renderer_data.aliasing_samples = 8;
   nova_engine_data->renderer_data.renderer_max_samples = 10000;
   nova_engine_data->renderer_data.max_depth = MAX_RECUR_DEPTH;
-}
-
-void NovaRenderer::resetToBaseState() {
-  current_frame = 1;
-  nova_engine_data->renderer_data.max_depth = 1;
 }
 
 void NovaRenderer::displayProgress(float current, float target) {
@@ -162,7 +172,7 @@ void NovaRenderer::displayProgress(float current, float target) {
 void NovaRenderer::draw() {
 
   engine_render_buffers.accumulator_buffer = accumulated_render_buffer.data();
-  engine_render_buffers.partial_buffer = nova_render_buffer.data();
+  engine_render_buffers.partial_buffer = partial_render_buffer.data();
   engine_render_buffers.byte_size_buffers = screen_size.height * screen_size.width * sizeof(float) * 4;
   PerformanceLogger perf;
   perf.startTimer();
@@ -170,9 +180,6 @@ void NovaRenderer::draw() {
   populateNovaSceneResources();
   if (needRedraw) {
     resetToBaseState();
-    global_application_config->getThreadPool()->emptyQueue();
-    emptyAccumBuffer();
-    populateNovaSceneResources();
     needRedraw = false;
   }
 
@@ -234,12 +241,13 @@ void NovaRenderer::onResize(unsigned int width, unsigned int height) {
 void NovaRenderer::emptyAccumBuffer() {
   std::memset(accumulated_render_buffer.data(), 0, screen_size.width * screen_size.height * 4 * sizeof(float));
 }
-void NovaRenderer::emptyRenderBuffer() { std::memset(nova_render_buffer.data(), 0, screen_size.width * screen_size.height * 4 * sizeof(float)); }
+void NovaRenderer::emptyRenderBuffer() { std::memset(partial_render_buffer.data(), 0, screen_size.width * screen_size.height * 4 * sizeof(float)); }
 
 void NovaRenderer::emptyBuffers() {
   for (unsigned i = 0; i < screen_size.width * screen_size.height * 4; i++) {
-    nova_render_buffer[i] = 0.f;
+    partial_render_buffer[i] = 0.f;
     accumulated_render_buffer[i] = 0.f;
+    final_render_buffer[i] = 0.f;
   }
 }
 
@@ -319,24 +327,16 @@ void NovaRenderer::getScreenPixelColor(int x, int y, float r_screen_pixel_color[
 
 [[nodiscard]] image::ImageHolder<float> NovaRenderer::getSnapshotFloat(int width, int height) const {
   image::ImageHolder<float> img;
-  img.data.resize(screen_size.width * screen_size.height * 4);
+  img.data.resize(width * height * 4);
   img.metadata.channels = 4;
   img.metadata.color_corrected = true;
   img.metadata.format = "hdr";
-  img.metadata.width = screen_size.width;
-  img.metadata.height = screen_size.height;
+  img.metadata.width = width;
+  img.metadata.height = height;
   img.metadata.is_hdr = true;
-  for (int y = 0; y < screen_size.height; y++)
-    for (int x = 0; x < screen_size.width; x++) {
-      int idx = (y * screen_size.width + x) * 4;
-      for (int k = 0; k < 3; k++) {
-        const float old = accumulated_render_buffer[idx + k] / (current_frame + 1);
-        const float new_ = nova_render_buffer[idx + k];
-        const float pix = old + 0.8f * (new_ - old);
-        img.data[idx + k] = hdr_utils::color_correction(old);
-      }
-      img.data[idx + 3] = nova_render_buffer[idx + 3];
-    }
+  TextureOperations<float> op(final_render_buffer, screen_size.width, screen_size.height, 4);
+  auto apply_color_correct = [](const float &channel_component) { return channel_component; };
+  op.processTexture(img.data.data(), width, height, apply_color_correct);
   return img;
 }
 [[nodiscard]] image::ImageHolder<uint8_t> NovaRenderer::getSnapshotUint8(int width, int height) const { AX_UNREACHABLE; }
@@ -348,8 +348,6 @@ unsigned int *NovaRenderer::getDefaultFrameBufferIdPointer() { return nullptr; }
 Scene &NovaRenderer::getScene() const { return *scene; }
 
 RenderPipeline &NovaRenderer::getRenderPipeline() const { return *render_pipeline; }
-
-void NovaRenderer::setNewScene(const SceneChangeData &new_scene) { prepareRedraw(); }
 
 void NovaRenderer::setGammaValue(float value) {
   if (camera_framebuffer) {

@@ -6,6 +6,7 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <unistd.h>
 #include <utility>
 #include <vector>
 
@@ -43,6 +44,10 @@ namespace threading {
 
     unsigned long threadNumber() const { return threads.size(); }
 
+    void fence() {
+      std::unique_lock lock(mutex);
+      condition_variable.wait(lock, [this] { return busy_threads == 0; });
+    }
     // Waits until threads finish their current task and shutdowns the pool
     void Shutdown() {
       {
@@ -105,6 +110,7 @@ namespace threading {
         std::unique_lock<std::mutex> lock(thread_pool->mutex);
         while (!thread_pool->shutdown_requested || (thread_pool->shutdown_requested && !thread_pool->queue.empty())) {
           thread_pool->busy_threads--;
+          thread_pool->condition_variable.notify_all();
           thread_pool->condition_variable.wait(lock, [this] { return this->thread_pool->shutdown_requested || !this->thread_pool->queue.empty(); });
           thread_pool->busy_threads++;
 

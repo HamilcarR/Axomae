@@ -15,6 +15,7 @@ std::unique_ptr<TextureData> TextureOperations<float>::computeDiffuseIrradiance(
     envmap_tex_data.f_data.resize(_width * _height * 4);
     envmap_tex_data.nb_components = 4;
     std::vector<float> temp;
+    temp.reserve(data->size());
     for (int i = 0; i < data->size(); i += 3) {
       temp.push_back((*data)[i]);
       temp.push_back((*data)[i + 1]);

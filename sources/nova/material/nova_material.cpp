@@ -1,4 +1,6 @@
 #include "nova_material.h"
+
+#include <math.h>
 using namespace nova::material;
 
 inline glm::vec3 rand_p_hemisphere() {
@@ -53,31 +55,31 @@ static float schlick(float cosine, float eta) {
 }
 
 bool NovaDielectricMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d) const {
-
-  const glm::vec3 reflected = glm::reflect(in.direction, hit_d.normal);
+  glm::vec3 direction = glm::normalize(in.direction);
+  const glm::vec3 reflected = glm::reflect(direction, hit_d.normal);
   out.origin = hit_d.position;
   hit_d.attenuation = albedo;
   glm::vec3 normal = hit_d.normal;
   float index = eta;
   float reflect_prob = 0.f;
   float cosine = 0.f;
-  if (glm::dot(in.direction, hit_d.normal) > 0) {
+  if (glm::dot(direction, hit_d.normal) > 0) {
     normal = -normal;
-    cosine = glm::dot(in.direction, hit_d.normal) * eta / in.direction.length();
+    cosine = glm::dot(direction, hit_d.normal) * eta / glm::length(direction);
   } else {
     index = 1.f / eta;
-    cosine = -glm::dot(in.direction, hit_d.normal) / in.direction.length();
+    cosine = -glm::dot(direction, hit_d.normal) / glm::length(direction);
   }
   glm::vec3 refracted;
-  if (refract(in.direction, normal, index, refracted))
+  if (refract(direction, normal, index, refracted))
     reflect_prob = schlick(cosine, eta);
   else
     reflect_prob = 1.f;
 
   if (math::random::nrandf(0, 1) < reflect_prob)
-    out.direction = reflected;
+    out.direction = glm::normalize(reflected);
   else
-    out.direction = refracted;
+    out.direction = glm::normalize(refracted);
 
   return true;
 }

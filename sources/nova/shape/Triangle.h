@@ -5,11 +5,13 @@
 
 namespace nova::shape {
   class Triangle final : public NovaShapeInterface {
-    glm::vec3 v1{}, v2{}, v3{};
-    glm::vec3 normal{};
+    glm::vec3 v0{}, v1{}, v2{};
+    glm::vec3 e1{};
+    glm::vec3 e2{};
 
    public:
     Triangle() = default;
+    Triangle(const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_);
     ~Triangle() override = default;
     Triangle(const Triangle &other) = default;
     Triangle(Triangle &&other) noexcept = default;
