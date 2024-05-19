@@ -2,10 +2,6 @@
 	path = vendor/stb
 	url = https://github.com/nothings/stb
 
-[submodule "vendor/googletest"]
-	path = vendor/googletest
-	url = https://github.com/google/googletest
-
 [submodule "vendor/glm"]
 	path = vendor/glm
 	url = https://github.com/g-truc/glm
@@ -13,3 +9,7 @@
 [submodule "vendor/assimp"]
 	path = vendor/assimp
 	url = https://github.com/assimp/assimp
+
+[submodule "vendor/boost"]
+    path = vendor/boost
+    url = https://github.com/boostorg/boost

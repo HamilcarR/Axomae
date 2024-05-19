@@ -12,17 +12,6 @@ namespace math::geometry {
     float W3 = 1 - W1 - W2;
     return {W1, W2, W3};
   }
-  struct glm_matrix_decompose {
-    glm::vec3 scale, skew, translation;
-    glm::quat rotation;
-    glm::vec4 perspective;
-  };
-
-  inline glm_matrix_decompose decompose_model(const glm::mat4 &model) {
-    glm_matrix_decompose d{};
-    glm::decompose(model, d.scale, d.rotation, d.translation, d.skew, d.perspective);
-    return d;
-  }
 
   inline glm::mat3 glm_extract_rotation(const glm::mat4 &model) { return {model}; }
   inline glm::vec3 glm_extract_translation(const glm::mat4 &model) { return {model[3]}; }

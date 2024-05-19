@@ -17,7 +17,7 @@ set(USE_GOLD "ON" CACHE BOOL "Use GOLD linker")
 set(USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
 
 # CUDA Compilation
-set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER}")
+set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr")
 set(CMAKE_CUDA_ARCHITECTURES "75")
 enable_language(CUDA)
 #****************************************************************************************************
@@ -59,10 +59,10 @@ find_package(SDL2_image REQUIRED)
 find_package(CUDAToolkit REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
-# Model imports 
-find_package(assimp REQUIRED)
-# Unit-Tests
-find_package(GTest REQUIRED)
+
+
+
+
 #****************************************************************************************************
 #Include and paths
 #Cuda
@@ -70,15 +70,16 @@ set(CUDA_GENERATED_OUTPUT_DIR ${CMAKE_BINARY_DIR}/cuda_generated)
 # UI files path
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${AXOMAE_UI_LOCATION})
 
-
 # Cache
+
 # STB
-set(STB_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb CACHE PATH "stb_image include path")
-if(NOT STB_INCLUDE_PATH)
-    message(FATAL_ERROR "STB image path needs to be valid!")
-endif()
+set(STB_INCLUDE_PATH "" CACHE INTERNAL "")
+# GLM
+set(GLM_INCLUDE_PATH "" CACHE INTERNAL "")
 # Optix
-set(OPTIX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/vendor/Optix CACHE PATH "Optix include path")
+set(OPTIX_INCLUDE_PATH "" CACHE INTERNAL "")
+
+add_subdirectory(vendor)
 #****************************************************************************************************
 # Project setup
 qt_standard_project_setup()
@@ -104,4 +105,5 @@ endif()
 
 #****************************************************************************************************
 # Global preprocessor variables
+
 

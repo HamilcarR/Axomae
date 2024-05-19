@@ -26,10 +26,8 @@ add_executable(Axomae_test
 
 target_link_libraries(Axomae_test
 PUBLIC
-        GTest::gtest_main
-        GTest::gtest
-
-
+        gtest
+        gtest_main
 PRIVATE
         ax_common
         ax_processing
@@ -50,5 +48,4 @@ target_include_directories(Axomae_test
 PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
-
 gtest_discover_tests(Axomae_test)

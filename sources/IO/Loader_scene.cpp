@@ -9,6 +9,10 @@
 #include "axomae_utils.h"
 #include <QImage>
 
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+
 // TODO : code needs total uncoupling from any foreign structure : needs to return arrays of basic data
 
 namespace IO {

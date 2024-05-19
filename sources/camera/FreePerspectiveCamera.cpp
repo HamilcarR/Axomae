@@ -11,8 +11,8 @@ void FreePerspectiveCamera::zoomIn() {}
 
 void FreePerspectiveCamera::zoomOut() {}
 
-const glm::mat4 &FreePerspectiveCamera::getSceneTranslationMatrix() const { return glm::mat4(1.f); }
+const glm::mat4 &FreePerspectiveCamera::getSceneTranslationMatrix() const { AX_UNREACHABLE; }
 
-const glm::mat4 &FreePerspectiveCamera::getSceneRotationMatrix() const { return glm::mat4(1.f); }
+const glm::mat4 &FreePerspectiveCamera::getSceneRotationMatrix() const { AX_UNREACHABLE; }
 
 void FreePerspectiveCamera::focus(const glm::vec3 &position) { EMPTY_FUNCBODY; }
