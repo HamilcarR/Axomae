@@ -48,7 +48,8 @@ option(LOWP_LUT "Enable low precision when computing lookup tables" OFF)
 # Dependencies 
 
 # Command line utilities
-find_package(Boost COMPONENTS program_options REQUIRED)
+
+
 # GUI
 find_package(Qt6 COMPONENTS Gui REQUIRED)
 find_package(Qt6 COMPONENTS OpenGLWidgets REQUIRED)

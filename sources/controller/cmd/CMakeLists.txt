@@ -8,7 +8,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ax_cmd)
 target_link_libraries(ax_cmd 
 PRIVATE
     ax_config
-    Boost::program_options
+    boost_program_options
     ax_io
     ax_database
     ax_editor

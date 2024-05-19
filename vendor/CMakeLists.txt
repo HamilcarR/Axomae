@@ -10,6 +10,16 @@ if(NOT assimp_FOUND)
     add_subdirectory(assimp)
 
 endif()
+########################################################################################
+#Boost
+#find_package(Boost COMPONENTS program_options)
+if(NOT Boost_FOUND OR NOT Boost_PROGRAM_OPTIONS_FOUND)
+
+    add_library(Boost::program_options INTERFACE IMPORTED)
+    target_link_libraries(Boost::program_options INTERFACE boost_program_options)
+endif()
+
+
 #########################################################################################
 # GLM
 set(GLM_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/glm PARENT_SCOPE)
@@ -37,3 +47,6 @@ set(OPTIX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Optix PARENT_SCOPE)
 #########################################################################################
 # STB
 set(STB_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/stb PARENT_SCOPE)
+
+
+
