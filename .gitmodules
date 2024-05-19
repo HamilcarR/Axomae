@@ -11,5 +11,5 @@
 	url = https://github.com/assimp/assimp
 
 [submodule "vendor/boost"]
-    path = vendor/boost
-    url = https://github.com/boostorg/boost
+	path = vendor/boost
+	url = https://github.com/boostorg/boost
