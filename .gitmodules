@@ -6,10 +6,14 @@
 	path = vendor/glm
 	url = https://github.com/g-truc/glm
 
-[submodule "vendor/assimp"]
-	path = vendor/assimp
-	url = https://github.com/assimp/assimp
-
 [submodule "vendor/boost"]
 	path = vendor/boost
 	url = https://github.com/boostorg/boost
+
+[submodule "vendor/assimp"]
+	path = vendor/assimp
+	url = https://github.com/assimp/assimp/tree/v5.4.1
+
+[submodule "vendor/googletest"]
+	path = vendor/googletest
+	url = https://github.com/google/googletest/tree/v1.12.0

@@ -1,3 +1,7 @@
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+    message(FATAL_ERROR "In-source build not allowed.")
+endif()
+
 cmake_minimum_required(VERSION 3.27)
 project(Axomae VERSION 1.0 LANGUAGES C CXX)
 
@@ -38,10 +42,10 @@ endif()
 #****************************************************************************************************
 #custom project variables
 set(USE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
-option(HIGHP_LUT "Enable high precision when computing lookup tables" OFF)
-option(MEDIUMP_LUT "Enable medium precision when computing lookup tables" ON)
-option(LOWP_LUT "Enable low precision when computing lookup tables" OFF)
-
+option(HIGHP_LUT "Enable high precision when computing lookup tables." OFF)
+option(MEDIUMP_LUT "Enable medium precision when computing lookup tables." ON)
+option(LOWP_LUT "Enable low precision when computing lookup tables." OFF)
+option(BUILD_TESTS "Build unit tests." OFF)
 
 
 #****************************************************************************************************
@@ -72,13 +76,26 @@ set(CUDA_GENERATED_OUTPUT_DIR ${CMAKE_BINARY_DIR}/cuda_generated)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${AXOMAE_UI_LOCATION})
 
 # Cache
+# Assimp
+set(ASSIMP_INCLUDE_PATH "" CACHE INTERNAL "")
 
 # STB
 set(STB_INCLUDE_PATH "" CACHE INTERNAL "")
+
 # GLM
 set(GLM_INCLUDE_PATH "" CACHE INTERNAL "")
+
 # Optix
 set(OPTIX_INCLUDE_PATH "" CACHE INTERNAL "")
+
+# Boost
+set(BOOST_INCLUDE_PATH "" CACHE INTERNAL "")
+
+# Boost program options
+set(BOOST_PROGRAM_OPTIONS_INCLUDE_PATH "" CACHE INTERNAL "")
+
+# GTest
+set(GTEST_INCLUDE_PATH "" CACHE INTERNAL "")
 
 add_subdirectory(vendor)
 #****************************************************************************************************
@@ -89,7 +106,7 @@ qt_add_executable(${PROJECT_NAME} sources/main/main.cpp)
 add_subdirectory(sources)
 #****************************************************************************************************
 # Testing
-option(BUILD_TESTS "Build unit tests for the project" ON)
+
 if(BUILD_TESTS)
     enable_testing()
     # Subdirs include

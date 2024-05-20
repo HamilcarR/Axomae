@@ -47,5 +47,9 @@ PRIVATE
 target_include_directories(Axomae_test
 PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${GTEST_INCLUDE_PATH}
 )
+
+include(GoogleTest)
 gtest_discover_tests(Axomae_test)
+

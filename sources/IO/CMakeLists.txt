@@ -42,4 +42,5 @@ target_include_directories(ax_io
 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${STB_INCLUDE_PATH}
+    ${ASSIMP_INCLUDE_PATH}
 )
