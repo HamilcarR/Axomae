@@ -1,3 +1,7 @@
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+    message(FATAL_ERROR "In-source build not allowed.")
+endif()
+
 cmake_minimum_required(VERSION 3.27)
 project(Axomae VERSION 1.0 LANGUAGES C CXX)
 
@@ -17,7 +21,7 @@ set(USE_GOLD "ON" CACHE BOOL "Use GOLD linker")
 set(USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
 
 # CUDA Compilation
-set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER}")
+set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr")
 set(CMAKE_CUDA_ARCHITECTURES "75")
 enable_language(CUDA)
 #****************************************************************************************************
@@ -38,17 +42,16 @@ endif()
 #****************************************************************************************************
 #custom project variables
 set(USE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
-option(HIGHP_LUT "Enable high precision when computing lookup tables" OFF)
-option(MEDIUMP_LUT "Enable medium precision when computing lookup tables" ON)
-option(LOWP_LUT "Enable low precision when computing lookup tables" OFF)
-
+option(LUT_HIGHP "Enable high precision when computing lookup tables." OFF)
+option(LUT_MEDIUMP "Enable medium precision when computing lookup tables." ON)
+option(LUT_LOWP "Enable low precision when computing lookup tables." OFF)
+option(BUILD_TESTS "Build unit tests." OFF)
 
 
 #****************************************************************************************************
 # Dependencies 
-
 # Command line utilities
-find_package(Boost COMPONENTS program_options REQUIRED)
+
 # GUI
 find_package(Qt6 COMPONENTS Gui REQUIRED)
 find_package(Qt6 COMPONENTS OpenGLWidgets REQUIRED)
@@ -59,10 +62,10 @@ find_package(SDL2_image REQUIRED)
 find_package(CUDAToolkit REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
-# Model imports 
-find_package(assimp REQUIRED)
-# Unit-Tests
-find_package(GTest REQUIRED)
+
+
+
+
 #****************************************************************************************************
 #Include and paths
 #Cuda
@@ -70,15 +73,29 @@ set(CUDA_GENERATED_OUTPUT_DIR ${CMAKE_BINARY_DIR}/cuda_generated)
 # UI files path
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${AXOMAE_UI_LOCATION})
 
-
 # Cache
+# Assimp
+set(ASSIMP_INCLUDE_PATH "" CACHE INTERNAL "")
+
 # STB
-set(STB_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb CACHE PATH "stb_image include path")
-if(NOT STB_INCLUDE_PATH)
-    message(FATAL_ERROR "STB image path needs to be valid!")
-endif()
+set(STB_INCLUDE_PATH "" CACHE INTERNAL "")
+
+# GLM
+set(GLM_INCLUDE_PATH "" CACHE INTERNAL "")
+
 # Optix
-set(OPTIX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/vendor/Optix CACHE PATH "Optix include path")
+set(OPTIX_INCLUDE_PATH "" CACHE INTERNAL "")
+
+# Boost
+set(BOOST_INCLUDE_PATH "" CACHE INTERNAL "")
+
+# Boost program options
+set(BOOST_PROGRAM_OPTIONS_INCLUDE_PATH "" CACHE INTERNAL "")
+
+# GTest
+set(GTEST_INCLUDE_PATH "" CACHE INTERNAL "")
+
+add_subdirectory(vendor)
 #****************************************************************************************************
 # Project setup
 qt_standard_project_setup()
@@ -87,7 +104,7 @@ qt_add_executable(${PROJECT_NAME} sources/main/main.cpp)
 add_subdirectory(sources)
 #****************************************************************************************************
 # Testing
-option(BUILD_TESTS "Build unit tests for the project" ON)
+
 if(BUILD_TESTS)
     enable_testing()
     # Subdirs include
@@ -104,4 +121,5 @@ endif()
 
 #****************************************************************************************************
 # Global preprocessor variables
+
 

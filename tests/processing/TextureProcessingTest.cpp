@@ -47,7 +47,7 @@ class RandomVecBuilder {
   T generate() { return T(math::random::nrandf(0, 1)); }
 };
 
-TEST(Texturing, WrapPixelCoords) {
+TEST(TexturingTest, WrapPixelCoords) {
   TextureBuilder<float> builder(128, 256);
   std::vector<float> texture_data_raw = builder.getData().data;
   TextureOperations<float> process(texture_data_raw, builder.getData().width, builder.getData().height);
@@ -63,7 +63,7 @@ TEST(Texturing, WrapPixelCoords) {
   }
 }
 
-TEST(Texturing, discreteSample) {
+TEST(TexturingTest, discreteSample) {
   TextureBuilder<float> builder(16, 16, false, 1.f);
   std::vector<float> texture_data_raw = builder.getData().data;
   TextureOperations process(texture_data_raw, builder.getData().width, builder.getData().height);
@@ -77,7 +77,7 @@ TEST(Texturing, discreteSample) {
     }
 }
 
-TEST(Texturing, uvSphericalCohesion) {
+TEST(TexturingTest, uvSphericalCohesion) {
   RandomVecBuilder<glm::vec2> builder;
   for (unsigned i = 0; i < SAMPLES; i++) {
     glm::vec2 uv = builder.generate();
@@ -87,7 +87,7 @@ TEST(Texturing, uvSphericalCohesion) {
   }
 }
 
-TEST(Texturing, uvCartesianCohesionNoApproximation) {
+TEST(TexturingTest, uvCartesianCohesionNoApproximation) {
   RandomVecBuilder<glm::dvec2> builder;
   for (unsigned i = 0; i < SAMPLES; i++) {
     glm::dvec2 sph = builder.generate();
@@ -97,7 +97,7 @@ TEST(Texturing, uvCartesianCohesionNoApproximation) {
   }
 }
 
-TEST(Texturing, uvCartesianCohesionApproximated) {
+TEST(TexturingTest, uvCartesianCohesionApproximated) {
   float epsilon_ = 5e-03;
   RandomVecBuilder<glm::dvec2> builder;
   for (unsigned i = 0; i < SAMPLES; i++) {

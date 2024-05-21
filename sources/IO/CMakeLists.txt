@@ -31,7 +31,7 @@ PRIVATE
     ax_geometry
 
 
-    assimp::assimp
+    assimp
     SDL2::SDL2
     SDL2_image::SDL2_image
 
@@ -39,7 +39,8 @@ PRIVATE
 
 
 target_include_directories(ax_io
-PUBLIC 
+PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${STB_INCLUDE_PATH}
+    ${ASSIMP_INCLUDE_PATH}
 )

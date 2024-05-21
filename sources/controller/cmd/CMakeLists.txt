@@ -7,8 +7,8 @@ add_library(ax_cmd
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_cmd)
 target_link_libraries(ax_cmd 
 PRIVATE
+    boost_program_options
     ax_config
-    Boost::program_options
     ax_io
     ax_database
     ax_editor
@@ -28,4 +28,5 @@ PRIVATE
 target_include_directories(ax_cmd
 PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${BOOST_PROGRAM_OPTIONS_PATH}
 )

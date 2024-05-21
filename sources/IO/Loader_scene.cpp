@@ -9,6 +9,11 @@
 #include "axomae_utils.h"
 #include <QImage>
 
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+#include <boost/libs/contract/include/boost/contract/core/exception.hpp>
+
 // TODO : code needs total uncoupling from any foreign structure : needs to return arrays of basic data
 
 namespace IO {
@@ -16,33 +21,6 @@ namespace IO {
 
   Loader::Loader(controller::ProgressStatus *prog_stat) : resource_database(&ResourceDatabaseManager::getInstance()) {
     setProgressManager(prog_stat);
-  }
-
-  constexpr unsigned int THREAD_POOL_SIZE = 8;
-  void thread_copy_buffer(unsigned int start_index, unsigned int end_index, const uint8_t *from, uint8_t *dest) {
-    for (unsigned i = start_index; i < end_index; i++)
-      dest[i] = from[i];
-  }
-
-  void async_copy_buffer(unsigned int width, unsigned int height, uint8_t *from, uint8_t *dest) {
-    size_t total_buffer_size = width * height * sizeof(uint32_t);
-    size_t thread_buffer_size = total_buffer_size / THREAD_POOL_SIZE;
-    uint8_t work_remainder = total_buffer_size % THREAD_POOL_SIZE;
-    size_t last_thread_job_size = thread_buffer_size + work_remainder;
-    size_t range_min = 0;
-    size_t range_max = 0;
-    std::vector<std::future<void>> future_results;
-    unsigned i = 0;
-    for (i = 0; i < THREAD_POOL_SIZE; i++) {
-      range_min = i * thread_buffer_size;
-      range_max = i * thread_buffer_size + thread_buffer_size;
-      if (i == THREAD_POOL_SIZE - 1)
-        range_max = i * thread_buffer_size + last_thread_job_size;
-      future_results.push_back(std::async(std::launch::async, thread_copy_buffer, range_min, range_max, from, dest));
-    }
-    for (auto &future_result : future_results) {
-      future_result.get();
-    }
   }
 
   /**
@@ -96,7 +74,7 @@ namespace IO {
         totexture->data.resize(image_width * image_height);
         uint8_t *dest_buffer = reinterpret_cast<uint8_t *>(&totexture->data[0]);
         uint8_t *from_buffer = image.bits();
-        async_copy_buffer(image_width, image_height, from_buffer, dest_buffer);
+        std::memcpy(dest_buffer, from_buffer, image_height * image_width * sizeof(uint32_t));
         progress_helper.notifyProgress(controller::ProgressManagerHelper::COMPLETE);
         totexture->width = image_width;
         totexture->height = image_height;
