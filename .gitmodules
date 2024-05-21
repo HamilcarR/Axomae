@@ -2,6 +2,10 @@
 	path = vendor/stb
 	url = https://github.com/nothings/stb
 
+[submodule "vendor/googletest"]
+	path = vendor/googletest
+	url = https://github.com/google/googletest
+
 [submodule "vendor/glm"]
 	path = vendor/glm
 	url = https://github.com/g-truc/glm
@@ -17,3 +21,11 @@
 [submodule "vendor/googletest"]
 	path = vendor/googletest
 	url = https://github.com/google/googletest
+
+[submodule "vendor/openexr"]
+	path = vendor/openexr
+	url = https://github.com/AcademySoftwareFoundation/openexr
+
+[submodule "vendor/zlib"]
+	path = vendor/zlib
+	url = https://github.com/madler/zlib
