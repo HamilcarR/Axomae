@@ -30,15 +30,5 @@ if(${BUILD_TESTS})
     add_subdirectory(googletest)
     set(GTEST_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/googletest/googletest/include PARENT_SCOPE)
 endif()
-   # FetchContent_Declare(
-   #         googletest
-#            GIT_REPOSITORY  https://github.com/google/googletest.git
-#            GIT_TAG         release-1.12.0
-#    )
-#    FetchContent_MakeAvailable(googletest)
-#    add_library(GTest::GTest INTERFACE IMPORTED GLOBAL)
-#    target_link_libraries(GTest::GTest INTERFACE gtest_main)
-
-
 
 

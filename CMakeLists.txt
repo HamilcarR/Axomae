@@ -42,17 +42,15 @@ endif()
 #****************************************************************************************************
 #custom project variables
 set(USE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
-option(HIGHP_LUT "Enable high precision when computing lookup tables." OFF)
-option(MEDIUMP_LUT "Enable medium precision when computing lookup tables." ON)
-option(LOWP_LUT "Enable low precision when computing lookup tables." OFF)
+option(LUT_HIGHP "Enable high precision when computing lookup tables." OFF)
+option(LUT_MEDIUMP "Enable medium precision when computing lookup tables." ON)
+option(LUT_LOWP "Enable low precision when computing lookup tables." OFF)
 option(BUILD_TESTS "Build unit tests." OFF)
 
 
 #****************************************************************************************************
 # Dependencies 
-
 # Command line utilities
-
 
 # GUI
 find_package(Qt6 COMPONENTS Gui REQUIRED)
