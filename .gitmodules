@@ -17,3 +17,6 @@
 [submodule "vendor/googletest"]
 	path = vendor/googletest
 	url = https://github.com/google/googletest
+[submodule "vendor/openexr"]
+	path = vendor/openexr
+	url = https://github.com/AcademySoftwareFoundation/openexr
