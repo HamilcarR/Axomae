@@ -92,7 +92,7 @@ namespace hdr_utils {
         image_data[(i * width + j) * final_channels] = std::clamp(static_cast<int>(b * 255), 0, 255);
         image_data[(i * width + j) * final_channels + 1] = std::clamp(static_cast<int>(g * 255), 0, 255);
         image_data[(i * width + j) * final_channels + 2] = std::clamp(static_cast<int>(r * 255), 0, 255);
-        image_data[(i * width + j) * final_channels + 3] = 0;
+        image_data[(i * width + j) * final_channels + 3] = channels == 4 ? rgb[index + 3] : 1.f;
       }
     }
     return image_data;
