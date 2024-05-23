@@ -31,7 +31,7 @@ namespace controller::cmd {
   void API::launchHdrTextureViewer(const std::string &file) {
     IO::Loader loader(nullptr);
     try {
-      auto data = loader.loadHdr(file.c_str(), false);
+      auto data = loader.loadHdrEnvmap(file.c_str(), false);
       QApplication qapp(*argv, argc);
       HdrTextureViewerWidget tex(data);
       tex.show();
@@ -44,7 +44,7 @@ namespace controller::cmd {
   void API::bakeTexture(const texturing::INPUTENVMAPDATA &envmap) {
     IO::Loader loader(nullptr);
     try {
-      image::ImageHolder<float> data = loader.loadHdr(envmap.path_input.c_str(), false);
+      image::ImageHolder<float> data = loader.loadHdrEnvmap(envmap.path_input.c_str(), false);
       TextureOperations<float> process_texture(data.data, data.metadata.width, data.metadata.height, data.metadata.channels);
       std::unique_ptr<TextureData> texture;
       if (envmap.baketype == "irradiance") {

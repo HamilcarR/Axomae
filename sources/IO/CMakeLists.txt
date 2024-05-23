@@ -30,7 +30,7 @@ PRIVATE
     ax_opengl
     ax_geometry
 
-
+    OpenEXR::OpenEXR
     assimp
     SDL2::SDL2
     SDL2_image::SDL2_image
@@ -43,4 +43,5 @@ PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${STB_INCLUDE_PATH}
     ${ASSIMP_INCLUDE_PATH}
+    ${OpenEXR_INCLUDE_DIRS}
 )

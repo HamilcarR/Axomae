@@ -62,7 +62,7 @@ namespace hdr_utils {
   template<class T>
   std::vector<uint8_t> hdr2image(const std::vector<T> &rgb, int width, int height, int channels, bool needs_color_correct) {
     ASSERT_IS_ARITHMETIC(T);
-    assert(rgb.size() == static_cast<unsigned>(width * height * channels));
+    AX_ASSERT(rgb.size() == static_cast<unsigned>(width * height * channels), "");
 
     std::vector<uint8_t> image_data;
     int final_channels = 4;
@@ -72,7 +72,7 @@ namespace hdr_utils {
     T max = 0;
     for (T i : rgb)
       max = std::max(max, i);
-    assert(max > 0);
+    AX_ASSERT(max > 0, "");
     if (needs_color_correct)
       max = color_correction(max);
     int index = 0;

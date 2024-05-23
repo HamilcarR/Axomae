@@ -1,19 +1,23 @@
 
-include(FetchContent)
 #########################################################################################
 # Assimp
-message(NOTICE "Generating Assimp build. ")
-set(ASSIMP_BUILD_TESTS OFF CACHE BOOL " " FORCE)
-set(BUILD_SHARED_LIBS OFF CACHE BOOL " " FORCE)
-set(ASSIMP_INSTALL OFF CACHE BOOL " " FORCE)
-set(ASSIMP_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
-add_subdirectory(assimp)
+find_package(Assimp QUIET)
+if(NOT Assimp_FOUND)
+    message(NOTICE "Assimp not found on the system : Initializing Assimp build from sources. ")
+    set(ASSIMP_BUILD_TESTS OFF CACHE BOOL " " FORCE)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL " " FORCE)
+    set(ASSIMP_INSTALL OFF CACHE BOOL " " FORCE)
+    set(ASSIMP_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
+    add_subdirectory(assimp EXCLUDE_FROM_ALL)
+endif()
 ########################################################################################
 #Boost
-message(NOTICE "Initializing Boost build. ")
-add_subdirectory(boost)
-set(BOOST_PROGRAM_OPTIONS_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/boost/libs/program_options/include PARENT_SCOPE)
-set(BOOST_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/boost/libs PARENT_SCOPE)
+find_package(Boost COMPONENTS program_options)
+if(NOT Boost_FOUND)
+    message(NOTICE "Boost not found on the system : Initializing Boost build from sources. ")
+    set(BOOST_INCLUDE_LIBRARIES program_options stacktrace)
+    add_subdirectory(boost EXCLUDE_FROM_ALL)
+endif()
 #########################################################################################
 # GLM
 set(GLM_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/glm PARENT_SCOPE)
@@ -24,10 +28,23 @@ set(OPTIX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Optix PARENT_SCOPE)
 # STB
 set(STB_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/stb PARENT_SCOPE)
 #########################################################################################
+# OpenExr
+message(NOTICE "OpenEXR not found on the system : Initializing OpenEXR build from sources. ")
+set(BUILD_SHARED_LIBS ON)  # Build static libraries instead of shared
+set(OpenEXR_BUILD_UTILS OFF)  # Do not build OpenEXR utilities
+set(OpenEXR_BUILD_TESTS OFF)  # Do not build OpenEXR tests
+set(OpenEXR_INSTALL OFF)  # Do not install OpenEXR
+
+add_subdirectory(imath EXCLUDE_FROM_ALL)
+add_subdirectory(openexr EXCLUDE_FROM_ALL)
+#find_package(OpenEXR CONFIG REQUIRED)
+
+
+#########################################################################################
 # Google test
 if(${BUILD_TESTS})
     message(NOTICE "Initializing GTest build. ")
-    add_subdirectory(googletest)
+    add_subdirectory(googletest EXCLUDE_FROM_ALL)
     set(GTEST_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/googletest/googletest/include PARENT_SCOPE)
 endif()
 

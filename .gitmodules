@@ -29,3 +29,7 @@
 [submodule "vendor/zlib"]
 	path = vendor/zlib
 	url = https://github.com/madler/zlib
+
+[submodule "vendor/imath"]
+	path = vendor/imath
+	url = https://github.com/AcademySoftwareFoundation/Imath

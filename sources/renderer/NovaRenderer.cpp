@@ -17,7 +17,6 @@
 #include "shape/Sphere.h"
 #include "shape/Square.h"
 #include "shape/Triangle.h"
-#include <boost/stacktrace/detail/frame_decl.hpp>
 #include <unistd.h>
 
 static constexpr int MAX_RECUR_DEPTH = 50;

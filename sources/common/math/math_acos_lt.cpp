@@ -5,9 +5,9 @@
 
 namespace math::spherical {
   namespace acos {
-#ifdef LUT_HIGHP
+#ifdef AXOMAE_LUT_HIGHP
     constexpr int lt_width = 1000000;
-#elif LUT_MEDIUMP
+#elif AXOMAE_LUT_MEDIUMP
     constexpr int lt_width = 500000;
 #else
     constexpr int lt_width = 10000;

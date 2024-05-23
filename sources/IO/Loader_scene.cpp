@@ -6,18 +6,22 @@
 #include "ShaderFactory.h"
 #include "TextureDatabase.h"
 #include "TextureFactory.h"
-#include "axomae_utils.h"
+#include "string/axomae_str_utils.h"
 #include <QImage>
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-#include <boost/libs/contract/include/boost/contract/core/exception.hpp>
 
 // TODO : code needs total uncoupling from any foreign structure : needs to return arrays of basic data
 
 namespace IO {
-  namespace exception {}
+  namespace exception {
+
+
+
+
+  }
 
   Loader::Loader(controller::ProgressStatus *prog_stat) : resource_database(&ResourceDatabaseManager::getInstance()) {
     setProgressManager(prog_stat);

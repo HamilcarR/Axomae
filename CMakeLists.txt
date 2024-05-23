@@ -17,8 +17,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(USE_GOLD "ON" CACHE BOOL "Use GOLD linker")
-set(USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
+set(AXOMAE_USE_GOLD "ON" CACHE BOOL "Use GOLD linker")
+set(AXOMAE_USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
 
 # CUDA Compilation
 set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr")
@@ -26,26 +26,35 @@ set(CMAKE_CUDA_ARCHITECTURES "75")
 enable_language(CUDA)
 #****************************************************************************************************
 # Debug 
-set(USE_ASAN "OFF" CACHE BOOL "Enable Address Sanitization")
-if(USE_ASAN)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
-    set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
-
+set(AXOMAE_USE_ASAN "OFF" CACHE BOOL "Enable Address Sanitization")
+if(AXOMAE_USE_ASAN)
+    target_compile_options(${PROJECT_NAME} PUBLIC
+        -fno-omit-frame-pointer
+        -fsanitize=address
+    )
+    target_link_options(${PROJECT_NAME} PUBLIC
+            -fno-omit-frame-pointer
+            -fsanitize=address
+    )
 endif()
 
-set(USE_TSAN "OFF" CACHE BOOL "Enable thread Sanitization")
-if(use_TSAN)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread")
-    set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fsanitize=thread")
+set(AXOMAE_USE_TSAN "OFF" CACHE BOOL "Enable thread Sanitization")
+if(AXOMAE_USE_TSAN)
+    target_compile_options(${PROJECT_NAME} PUBLIC
+            -fsanitize=thread
+    )
+    target_link_options(${PROJECT_NAME} PUBLIC
+            -fsanitize=thread
+    )
 endif()
 
 #****************************************************************************************************
 #custom project variables
-set(USE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
-option(LUT_HIGHP "Enable high precision when computing lookup tables." OFF)
-option(LUT_MEDIUMP "Enable medium precision when computing lookup tables." ON)
-option(LUT_LOWP "Enable low precision when computing lookup tables." OFF)
-option(BUILD_TESTS "Build unit tests." OFF)
+set(AXOMAE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
+option(AXOMAE_LUT_HIGHP "Enable high precision when computing lookup tables." OFF)
+option(AXOMAE_LUT_MEDIUMP "Enable medium precision when computing lookup tables." ON)
+option(AXOMAE_LUT_LOWP "Enable low precision when computing lookup tables." OFF)
+option(AXOMAE_BUILD_TESTS "Build unit tests." OFF)
 
 
 #****************************************************************************************************
@@ -89,8 +98,8 @@ set(OPTIX_INCLUDE_PATH "" CACHE INTERNAL "")
 # Boost
 set(BOOST_INCLUDE_PATH "" CACHE INTERNAL "")
 
-# Boost program options
-set(BOOST_PROGRAM_OPTIONS_INCLUDE_PATH "" CACHE INTERNAL "")
+# OpenEXR
+set(OPENEXR_INCLUDE_PATH "" CACHE INTERNAL "")
 
 # GTest
 set(GTEST_INCLUDE_PATH "" CACHE INTERNAL "")
@@ -105,16 +114,16 @@ add_subdirectory(sources)
 #****************************************************************************************************
 # Testing
 
-if(BUILD_TESTS)
+if(AXOMAE_BUILD_TESTS)
     enable_testing()
     # Subdirs include
     add_subdirectory(tests)
 endif()
 #****************************************************************************************************
 # Link
-if(USE_GOLD)
+if(AXOMAE_USE_GOLD)
     target_link_options(${PROJECT_NAME} PUBLIC -fuse-ld=gold)
-elseif(USE_MOLD)
+elseif(AXOMAE_USE_MOLD)
     target_link_options(${PROJECT_NAME} PUBLIC -fuse-ld=mold)
 endif()
 

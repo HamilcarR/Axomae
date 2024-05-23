@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QGraphicsScene>
 #include <stack>
 
 // TODO : Very old code , need refactoring²
@@ -503,12 +504,12 @@ namespace controller {
   }
   /**************************************************************************************************************/
   bool Controller::import_envmap() {
-    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("HDR images (*.hdr)"));
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("HDR images (*.hdr *.exr)"));
     if (filename.isEmpty())
       return false;
     try {
       IO::Loader loader(progress_manager.get());
-      loader.loadHdr(filename.toStdString().c_str());
+      loader.loadHdrEnvmap(filename.toStdString().c_str());
     } catch (exception::GenericException &e) {
       LOG(e.what(), LogLevel::ERROR);
       return false;

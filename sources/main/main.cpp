@@ -8,7 +8,6 @@
 #include <csignal>
 #include <cstdlib>
 #include <iostream>
-#include <string>
 using namespace axomae;
 
 static void init_graphics() {}

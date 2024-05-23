@@ -71,7 +71,7 @@ void EnvmapTextureManager::initializeDefaultEnvmap(ApplicationConfig *conf) {
   if (resource_database->getHdrDatabase()->empty()) {
     try {
       IO::Loader loader(nullptr);
-      loader.loadHdr(config.default_envmap_path.c_str());
+      loader.loadHdrEnvmap(config.default_envmap_path.c_str());
     } catch (const exception::GenericException &e) {
       LOG(e.what(), LogLevel::ERROR);
       createFurnace();

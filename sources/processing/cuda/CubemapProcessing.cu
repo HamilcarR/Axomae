@@ -1,7 +1,7 @@
 #include "CubemapProcessing.cuh"
 #include "math.h"
 
-#ifdef USE_STATS_TIMER
+#ifdef AXOMAE_STATS_TIMER
 #  include "PerformanceLogger.h"
 #endif
 constexpr unsigned MAX_ITER_THREAD = 100;
