@@ -6,9 +6,9 @@
 #include "Mesh.h"
 
 #define NODETYPE_LIST \
-  SceneTreeNode, Mesh, DirectionalLight, PointLight, SpotLight, BoundingBox, ArcballCamera, FreePerspectiveCamera, BoundingBoxMesh, CubeMesh, QuadMesh
+  SceneTreeNode, Mesh, DirectionalLight, PointLight, SpotLight, ArcballCamera, FreePerspectiveCamera, BoundingBoxMesh, CubeMesh, QuadMesh
 
-const int COUNT = 11;
+const int COUNT = 10;  // Number of subtypes
 namespace node_database_test {
   template<class HEAD, class... TAIL>
   constexpr void addNode(IResourceDB<int, NodeInterface> &database) {

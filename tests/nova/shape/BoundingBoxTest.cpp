@@ -1,11 +1,13 @@
-#include "BoundingBox.h"
+#include "shape/BoundingBox.h"
 #include "Test.h"
 #include "math_utils.h"
+#include "ray/Ray.h"
 #define f_rand math::random::nrandf(-10.040, 12.100)
+using namespace nova::shape;
 
 constexpr float EPSILON = 0.0001f;
 constexpr unsigned ITERATION_NUMBER = 5;
-std::vector<float> vertices = {
+constexpr std::vector<float> vertices = {
     -1, -1, -1,  // 0
     1,  -1, -1,  // 1
     -1, 1,  -1,  // 2
@@ -72,3 +74,5 @@ TEST(BoundingBoxTest, productOperatorTest) {
     EXPECT_LE(glm::abs(B2.getPosition().z - center_B1.z), EPSILON);
   }
 }
+
+TEST(BoundingBoxTest, intersect) { BoundingBox B1(vertices); }

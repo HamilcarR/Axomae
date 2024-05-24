@@ -1,6 +1,4 @@
 #include "Scene.h"
-#include "../common/math/math_camera.h"
-#include "BoundingBox.h"
 #include "Camera.h"
 #include "Drawable.h"
 #include "EventController.h"
@@ -10,6 +8,8 @@
 #include "Shader.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
+#include "math_camera.h"
+#include "shape/BoundingBox.h"
 #include "utils_3D.h"
 using namespace axomae;
 
@@ -34,7 +34,7 @@ inline void setUpIblData(TextureDatabase &texture_database, Mesh *mesh) {}
 static void make_drawable(std::vector<std::unique_ptr<Drawable>> &scene_drawables, std::vector<Scene::AABB> &bounding_boxes, Mesh *A) {
   Scene::AABB bbox_mesh;
   auto drawable = std::make_unique<Drawable>(A);
-  bbox_mesh.aabb = BoundingBox(A->getGeometry().vertices);
+  bbox_mesh.aabb = nova::shape::BoundingBox(A->getGeometry().vertices);
   bbox_mesh.drawable = drawable.get();
   bounding_boxes.push_back(bbox_mesh);
   scene_drawables.push_back(std::move(drawable));
@@ -232,17 +232,18 @@ void Scene::focusOnRenderable(int x, int y) {
   AX_ASSERT(dimensions, "Camera pointer on screen Dim structure not valid.");
   const math::camera::camera_ray r = math::camera::ray(
       x, y, (int)dimensions->width, (int)dimensions->height, scene_camera->getProjection(), scene_camera->getView());
-  nova::Ray ray(r.near, r.far);
+
   for (const std::pair<const float, AABB> &it : sorted_meshes) {  // replace by space partition
     AABB elem = it.second;
-    nova::hit_data hit;
-    nova::hit_options<glm::mat4> matrix_holder;
-    glm::mat4 world_mat = elem.drawable->getMeshPointer()->computeFinalTransformation();
-    matrix_holder.data = world_mat;
-    if (elem.aabb.hit(ray, scene_camera->getNear(), scene_camera->getFar(), hit, &matrix_holder)) {
-      std::string name = elem.drawable->getMeshPointer()->getName();
-      LOG("HIT OBJ : " + name + "   Distance :" + std::to_string(hit.t), LogLevel::INFO);
-      const glm::vec3 box_center_worldspace = world_mat * glm::vec4(elem.aabb.getPosition(), 1.f);
+    const glm::mat4 world_mat = elem.drawable->getMeshPointer()->computeFinalTransformation();
+    const glm::mat4 inv_world_mat = glm::inverse(world_mat);
+    const nova::Ray ray(inv_world_mat * glm::vec4(r.near, 1.f), inv_world_mat * glm::vec4(r.far, 0.f));
+    glm::vec3 normal{0};
+    float t = 0.f;
+
+    if (elem.aabb.intersect(ray, scene_camera->getNear(), scene_camera->getFar(), normal, t)) {
+      glm::vec3 pos = elem.aabb.getPosition();
+      const glm::vec3 box_center_worldspace = world_mat * glm::vec4(pos, 1.f);
       scene_camera->focus(box_center_worldspace);
       return;
     }

@@ -1,10 +1,10 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "BoundingBox.h"
 #include "Mesh.h"
 #include "ResourceDatabaseManager.h"
 #include "SceneHierarchy.h"
+#include "shape/BoundingBox.h"
 /**
  * @file Scene.h
  * @brief File implementing classes and functions relative to how the scene is represented and how to manage it
@@ -25,7 +25,7 @@ class LightingDatabase;
 class Scene : public EventInterface {
  public:
   struct AABB {
-    BoundingBox aabb;
+    nova::shape::BoundingBox aabb;
     Drawable *drawable;
   };
 
@@ -102,7 +102,8 @@ class Scene : public EventInterface {
   std::vector<Mesh *> getMeshCollectionPtr() const;
   void switchEnvmap(int cubemap_id, int irradiance_id, int prefiltered_id, int lut_id);
   void processEvent(const controller::event::Event *event) override;
-  void focusOnRenderable(int viewport_mouse_coord_x , int viewport_mouse_coord_y);
+  void focusOnRenderable(int viewport_mouse_coord_x, int viewport_mouse_coord_y);
+
  private:
   /**
    * @brief Sort meshes by distance to the camera : Will erase sorted_meshes and sorted_transparent_meshes beforehand

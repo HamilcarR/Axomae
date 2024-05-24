@@ -126,7 +126,7 @@ void AbstractHierarchy::bfs(NodeInterface *begin, F func, Args &&...args) {
     bfsTraverse(iterator, func, std::forward<Args>(args)...);
   }
 }
-#include <iostream>
+
 template<class F, class... Args>
 void AbstractHierarchy::bfsTraverse(NodeInterface *node, F func, Args &&...args) {
   if (!node)

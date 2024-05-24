@@ -1,12 +1,8 @@
 #include "BoundingBox.h"
-#include "Logger.h"
-#include "Ray.h"
-#include "utils_3D.h"
-#include <glm/gtx/matrix_operation.hpp>
-#include <utility>
-using namespace axomae;
+#include "ray/Ray.h"
+#include "scene/Hitable.h"
 
-constexpr unsigned int THREAD_NUMBERS = 8;
+using namespace nova::shape;
 glm::vec3 calculateCenter(glm::vec3 min_coords, glm::vec3 max_coords);
 
 glm::vec3 &update_min(glm::vec3 &min_vec, glm::vec3 &compared) {
@@ -68,63 +64,22 @@ BoundingBox::BoundingBox(const glm::vec3 &_min_coords, const glm::vec3 &_max_coo
   max_coords = _max_coords;
 }
 
-BoundingBox operator*(const glm::mat4 &matrix, const BoundingBox &bounding_box) {
-  glm::vec3 min_c = matrix * glm::vec4(bounding_box.getMinCoords(), 1.f);
-  glm::vec3 max_c = matrix * glm::vec4(bounding_box.getMaxCoords(), 1.f);
-  return BoundingBox(min_c, max_c);
-}
-
 BoundingBox::BoundingBox(const std::vector<float> &vertices) : BoundingBox() {
-  center = glm::vec3(0, 0, 0);
-  auto lambda_parallel_compute_bbox =
-      [](const std::vector<float> &vertices, unsigned min_index, unsigned max_index) -> std::pair<glm::vec3, glm::vec3> {
-    float x_max, y_max, z_max;
-    float x_min, y_min, z_min;
-    x_max = y_max = z_max = -INT_MAX;
-    x_min = y_min = z_min = INT_MAX;
-    for (unsigned i = min_index; i < max_index; i += 3) {
-      float x_compare = vertices[i], y_compare = vertices[i + 1], z_compare = vertices[i + 2];
-      x_max = x_max <= x_compare ? x_compare : x_max;
-      y_max = y_max <= y_compare ? y_compare : y_max;
-      z_max = z_max <= z_compare ? z_compare : z_max;
-      x_min = x_compare <= x_min ? x_compare : x_min;
-      y_min = y_compare <= y_min ? y_compare : y_min;
-      z_min = z_compare <= z_min ? z_compare : z_min;
-    }
-    return std::pair(glm::vec3(x_min, y_min, z_min), glm::vec3(x_max, y_max, z_max));
-  };
-  size_t indiv_thread_array_size = (vertices.size() / 3) / THREAD_NUMBERS;
-  if (indiv_thread_array_size == 0) {
-    max_coords = glm::vec3(-INT_MAX);
-    min_coords = glm::vec3(INT_MAX);
-    for (unsigned i = 0; i < vertices.size(); i += 3) {
-      glm::vec3 compare = glm::vec3(vertices[i], vertices[i + 1], vertices[i + 2]);
-      max_coords = update_max(max_coords, compare);
-      min_coords = update_min(min_coords, compare);
-    }
-  } else {
-    size_t remainder_vector_left = (vertices.size() / 3) % THREAD_NUMBERS;
-    size_t last_thread_job_left = indiv_thread_array_size + remainder_vector_left;
-    last_thread_job_left *= 3;
-    indiv_thread_array_size *= 3;
-    std::vector<std::future<std::pair<glm::vec3, glm::vec3>>> futures;
-    for (unsigned i = 0; i < THREAD_NUMBERS; i++) {
-      unsigned min_index = i * indiv_thread_array_size;
-      unsigned max_index = i * indiv_thread_array_size + indiv_thread_array_size;
-      if (i == THREAD_NUMBERS - 1)
-        max_index = i * indiv_thread_array_size + last_thread_job_left;
-      futures.push_back(std::async(lambda_parallel_compute_bbox, vertices, min_index, max_index));
-    }
-    max_coords = glm::vec3(-INT_MAX);
-    min_coords = glm::vec3(INT_MAX);
-    for (auto it = futures.begin(); it != futures.end(); it++) {
-      auto result = it->get();
-      glm::vec3 min_c = result.first;
-      glm::vec3 max_c = result.second;
-      max_coords = update_max(max_coords, max_c);
-      min_coords = update_min(min_coords, min_c);
-    }
+  float x_max, y_max, z_max;
+  float x_min, y_min, z_min;
+  x_max = y_max = z_max = -INT_MAX;
+  x_min = y_min = z_min = INT_MAX;
+  for (unsigned i = 0; i < vertices.size(); i += 3) {
+    float x_compare = vertices[i], y_compare = vertices[i + 1], z_compare = vertices[i + 2];
+    x_max = x_max <= x_compare ? x_compare : x_max;
+    y_max = y_max <= y_compare ? y_compare : y_max;
+    z_max = z_max <= z_compare ? z_compare : z_max;
+    x_min = x_compare <= x_min ? x_compare : x_min;
+    y_min = y_compare <= y_min ? y_compare : y_min;
+    z_min = z_compare <= z_min ? z_compare : z_min;
   }
+  min_coords = {x_min, y_min, z_min};
+  max_coords = {x_max, y_max, z_max};
   center = calculateCenter(min_coords, max_coords);
 }
 
@@ -163,7 +118,7 @@ static bool test_intersection(const glm::vec3 &x_axis,
                               const glm::vec3 &tmax_coords,
                               const float tmin,
                               const float tmax,
-                              nova::hit_data &returned_hit
+                              float &t
 
 ) {
   /* Intersections on X axis */
@@ -199,28 +154,19 @@ static bool test_intersection(const glm::vec3 &x_axis,
     return false;
   if (min < 0)
     return false;
-  returned_hit.t = min;
-  const glm::vec3 obj_space_hit_position = delta + ray_direction * min;
-  returned_hit.position = obj_space_hit_position;
+  t = min;
   return true;
 }
 
-bool BoundingBox::hit(const nova::Ray &ray, float tmin, float tmax, nova::hit_data &hit_data, const nova::base_options *user_opts) const {
-  auto opt_struct = dynamic_cast<const nova::hit_options<glm::mat4> *>(user_opts);
-  const glm::mat4 &world_matrix = opt_struct->data;
-  const glm::mat4 inv_W = glm::inverse(world_matrix);
+bool BoundingBox::intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &normal_at_intersection, float &t) const {
   const glm::vec3 x_axis = glm::vec3(1, 0, 0);
   const glm::vec3 y_axis = glm::vec3(0, 1, 0);
   const glm::vec3 z_axis = glm::vec3(0, 0, 1);
-  const glm::vec3 ray_origin = inv_W * glm::vec4(ray.origin.x, ray.origin.y, ray.origin.z, 1.f);
-  const glm::vec3 ray_direction = inv_W * glm::vec4(ray.direction.x, ray.direction.y, ray.direction.z, 0.f);
   const glm::vec3 tmin_coords = min_coords;
   const glm::vec3 tmax_coords = max_coords;
-  const glm::vec3 delta = ray_origin;
-  bool hit_success = test_intersection(x_axis, y_axis, z_axis, ray_origin, ray_direction, delta, tmin_coords, tmax_coords, tmin, tmax, hit_data);
+  const glm::vec3 delta = ray.origin;
+  bool hit_success = test_intersection(x_axis, y_axis, z_axis, ray.origin, ray.direction, delta, tmin_coords, tmax_coords, tmin, tmax, t);
   if (hit_success) {
-    const glm::vec3 world_space_hit_pos = world_matrix * glm::vec4(hit_data.position.x, hit_data.position.y, hit_data.position.z, 1.f);
-    hit_data.position = world_space_hit_pos;
     return true;
   }
   return false;

@@ -1,5 +1,4 @@
-add_library(ax_mesh 
-    BoundingBox.cpp
+add_library(ax_mesh
     Mesh.cpp
 )
 

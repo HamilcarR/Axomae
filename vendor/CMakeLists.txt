@@ -5,8 +5,8 @@ find_package(Assimp QUIET)
 if(NOT Assimp_FOUND)
     message(NOTICE "Assimp not found on the system : Initializing Assimp build from sources. ")
     set(ASSIMP_BUILD_TESTS OFF CACHE BOOL " " FORCE)
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL " " FORCE)
     set(ASSIMP_INSTALL OFF CACHE BOOL " " FORCE)
+    set(BUILD_SHARED_LIBS ON)
     set(ASSIMP_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
     add_subdirectory(assimp EXCLUDE_FROM_ALL)
 endif()
@@ -37,7 +37,6 @@ set(OpenEXR_INSTALL OFF)  # Do not install OpenEXR
 
 add_subdirectory(imath EXCLUDE_FROM_ALL)
 add_subdirectory(openexr EXCLUDE_FROM_ALL)
-#find_package(OpenEXR CONFIG REQUIRED)
 
 
 #########################################################################################

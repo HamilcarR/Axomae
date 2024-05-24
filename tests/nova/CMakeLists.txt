@@ -1,2 +1,8 @@
-set(NOVA_MODULE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/nova_utilsTest.cpp PARENT_SCOPE)
+add_subdirectory(shape)
+set(NOVA_MODULE_SHAPE_SOURCES "" CACHE INTERNAL "" )
+set(NOVA_MODULE_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/nova_utilsTest.cpp
+        ${NOVA_MODULE_SHAPE_SOURCES}
+        PARENT_SCOPE)
+
 

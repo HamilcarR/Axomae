@@ -268,14 +268,14 @@ BoundingBoxMesh::BoundingBoxMesh(Mesh *m, Shader *s) : BoundingBoxMesh(m) {
   shader_program = s;
   name = std::string("Boundingbox-") + m->getMeshName();
   const std::vector<float> &vertices = m->getGeometry().vertices;
-  bounding_box = BoundingBox(vertices);
+  bounding_box = nova::shape::BoundingBox(vertices);
   material->setShaderPointer(s);
   std::pair<std::vector<float>, std::vector<unsigned>> geom = bounding_box.getVertexArray();
   geometry.vertices = geom.first;
   geometry.indices = geom.second;
 }
 
-BoundingBoxMesh::BoundingBoxMesh(Mesh *m, const BoundingBox &bbox, Shader *s) : BoundingBoxMesh(m) {
+BoundingBoxMesh::BoundingBoxMesh(Mesh *m, const nova::shape::BoundingBox &bbox, Shader *s) : BoundingBoxMesh(m) {
   shader_program = s;
   name = std::string("Boundingbox-") + m->getMeshName();
   bounding_box = bbox;
