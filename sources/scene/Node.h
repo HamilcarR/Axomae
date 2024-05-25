@@ -4,7 +4,7 @@
 #include "NodeInterface.h"
 #include "SceneNodeInterface.h"
 #include "utils_3D.h"
-#include <memory>
+
 /**
  * @file Node.h
  * Implements the node class in the scene

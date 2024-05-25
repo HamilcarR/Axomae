@@ -13,10 +13,6 @@ void AbstractHierarchy::updateOwner() {
     dfs(root, scene_update_owner, this);
   }
 }
-void AbstractHierarchy::createGenericRootNode(IResourceDB<int, NodeInterface> &database) {
-  if (!root)
-    root = database::node::store<SceneTreeNode>(database, false).object;
-}
 
 void AbstractHierarchy::clear() { root = nullptr; }
 

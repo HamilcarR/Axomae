@@ -9,6 +9,7 @@ target_link_libraries(ax_scene
 PUBLIC
         ax_common
         ax_math
+        ax_datastructure
 PRIVATE
         ax_material
         ax_mesh

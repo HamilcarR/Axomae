@@ -2,6 +2,8 @@
 #include "math_camera.h"
 #include "nova_material.h"
 
+constexpr float RAND_DX = 0.002;
+constexpr float RAND_DY = 0.002;
 namespace nova {
   glm::vec4 NovaRenderEngineLR::engine_sample_color(const Ray &ray, const NovaResources *nova_resources, int depth) {
     hit_data hit_d;
@@ -34,8 +36,8 @@ namespace nova {
         glm::vec4 rgb{};
         const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
         for (int i = 0; i < tile.sample_per_tile; i++) {
-          const float dx = math::random::nrandf(0, 0.01);
-          const float dy = math::random::nrandf(0, 0.01);
+          const float dx = math::random::nrandf(-RAND_DX, RAND_DX);
+          const float dy = math::random::nrandf(-RAND_DY, RAND_DY);
           math::camera::camera_ray r = math::camera::ray_inv_mat(
               ndc.x + dx, ndc.y + dy, nova_resources->camera_data.inv_P, nova_resources->camera_data.inv_VM);
           Ray ray(r.near, r.far);

@@ -1,6 +1,5 @@
 #ifndef NodeInterface_H
 #define NodeInterface_H
-#include <cstdlib>
 #include <string>
 #include <vector>
 class AbstractHierarchy;

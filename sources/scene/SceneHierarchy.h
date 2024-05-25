@@ -2,8 +2,6 @@
 #define SCENEHIERARCHY_H
 #include "HierarchyInterface.h"
 #include "Node.h"
-#include "RenderingDatabaseInterface.h"
-#include <functional>
 /**
  * @file SceneGraph.h
  * @brief This file implements the hierarchy system of a scene.

@@ -7,7 +7,7 @@ using namespace nova::shape;
 
 constexpr float EPSILON = 0.0001f;
 constexpr unsigned ITERATION_NUMBER = 5;
-constexpr std::vector<float> vertices = {
+const std::vector<float> vertices = {
     -1, -1, -1,  // 0
     1,  -1, -1,  // 1
     -1, 1,  -1,  // 2
