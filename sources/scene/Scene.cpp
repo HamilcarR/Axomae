@@ -81,7 +81,7 @@ std::vector<Drawable *> Scene::getSortedSceneByTransparency() {
     Drawable *A = aabb.drawable;
     GLMaterial *mat = A->getMaterialPointer();
     glm::mat4 modelview_matrix = A->getMeshPointer()->getModelViewMatrix();
-    glm::vec3 updated_aabb_center = aabb.aabb.computeModelViewPosition(modelview_matrix);
+    glm::vec3 updated_aabb_center = modelview_matrix * glm::vec4(aabb.aabb.getPosition(), 1.f);
     float dist_to_camera = glm::length(updated_aabb_center);
     if (!mat->isTransparent())
       to_return.push_back(A);
@@ -101,7 +101,7 @@ void Scene::sortMeshesByDistanceToCamera() {
   for (auto bbox : scene) {
     GLMaterial *A = bbox.drawable->getMaterialPointer();
     glm::mat4 modelview_matrix = bbox.drawable->getMeshPointer()->getModelViewMatrix();
-    glm::vec3 updated_aabb_center = bbox.aabb.computeModelViewPosition(modelview_matrix);
+    glm::vec3 updated_aabb_center = modelview_matrix * glm::vec4(bbox.aabb.getPosition(), 1.f);
     float dist_to_camera = glm::length(updated_aabb_center);
     if (A->isTransparent()) {
       sorted_transparent_meshes[dist_to_camera] = bbox.drawable;

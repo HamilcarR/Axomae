@@ -32,18 +32,13 @@ namespace nova::shape {
     BoundingBox(BoundingBox &&move) noexcept;
     BoundingBox &operator=(const BoundingBox &copy);
     BoundingBox &operator=(BoundingBox &&move) noexcept;
-    [[nodiscard]] virtual const glm::vec3 &getPosition() const { return center; }
-    /**
-     * @brief Compute the position of the AABB in view space.
-     * @param modelview Modelview matrix : Model x View
-     * @return glm::vec4 Position of the AABB relative to the camera
-     */
-    [[nodiscard]] virtual glm::vec3 computeModelViewPosition(const glm::mat4 &modelview) const;
+    [[nodiscard]] const glm::vec3 &getPosition() const { return center; }
+
     /**
      * @brief Returns the index + vertices array representatives of the bounding box
      * @return std::pair<std::vector<float> , std::vector<unsigned>>
      */
-    [[nodiscard]] virtual std::pair<std::vector<float>, std::vector<unsigned>> getVertexArray() const;
+    [[nodiscard]] std::pair<std::vector<float>, std::vector<unsigned>> getVertexArray() const;
     [[nodiscard]] const glm::vec3 &getMaxCoords() const { return max_coords; }
     [[nodiscard]] const glm::vec3 &getMinCoords() const { return min_coords; }
     void setMaxCoords(glm::vec3 max) { max_coords = max; }

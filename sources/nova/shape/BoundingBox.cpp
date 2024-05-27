@@ -106,8 +106,6 @@ glm::vec3 calculateCenter(glm::vec3 min_coords, glm::vec3 max_coords) {
   return center;
 }
 
-glm::vec3 BoundingBox::computeModelViewPosition(const glm::mat4 &modelview) const { return {modelview * glm::vec4(center, 1.f)}; }
-
 static bool test_intersection(const glm::vec3 &x_axis,
                               const glm::vec3 &y_axis,
                               const glm::vec3 &z_axis,
