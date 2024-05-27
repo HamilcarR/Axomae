@@ -1,7 +1,7 @@
 #include "Node.h"
 #include <algorithm>
 
-SceneTreeNode::SceneTreeNode(SceneTreeNode *_parent, AbstractHierarchy *_owner) {
+SceneTreeNode::SceneTreeNode(SceneTreeNode *_parent, datastructure::AbstractHierarchy *_owner) {
   if (_parent != nullptr) {
     std::vector<NodeInterface *> ret = {_parent};
     SceneTreeNode::setParents(ret);
@@ -13,7 +13,10 @@ SceneTreeNode::SceneTreeNode(SceneTreeNode *_parent, AbstractHierarchy *_owner) 
   updated = true;
 }
 
-SceneTreeNode::SceneTreeNode(const std::string &_name, const glm::mat4 &transformation, SceneTreeNode *parent, AbstractHierarchy *owner)
+SceneTreeNode::SceneTreeNode(const std::string &_name,
+                             const glm::mat4 &transformation,
+                             SceneTreeNode *parent,
+                             datastructure::AbstractHierarchy *owner)
     : SceneTreeNode(parent, owner) {
   name = _name;
   local_transformation = transformation;
@@ -54,7 +57,7 @@ void SceneTreeNode::resetAccumulatedMatrix() { accumulated_transformation = glm:
  * is reached.
  * @return a pointer to a SceneNodeInterface object, specifically the root node of the scene tree.
  */
-NodeInterface *SceneTreeNode::returnRoot() {
+datastructure::NodeInterface *SceneTreeNode::returnRoot() {
   parents.erase(std::remove(parents.begin(), parents.end(), nullptr), parents.end());
   SceneTreeNode *iterator = getParent();
   if (iterator == nullptr)

@@ -90,7 +90,7 @@ class Scene : public EventInterface {
    */
   void setCameraPointer(Camera *_scene_camera);
   void updateTree();
-  std::vector<NodeInterface *> getNodeByName(const std::string &name);
+  std::vector<datastructure::NodeInterface *> getNodeByName(const std::string &name);
   void setPolygonFill();
   void setPolygonPoint();
   void setPolygonWireframe();

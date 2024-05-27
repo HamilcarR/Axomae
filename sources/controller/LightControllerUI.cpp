@@ -32,7 +32,7 @@ LightData LightController::loadFromUi() const {
   int red = 0, green = 0, blue = 0;
   float intensity = 0.f;
   NodeItem *selected = nullptr;
-  NodeInterface *node = nullptr;
+  datastructure::NodeInterface *node = nullptr;
   LightData data;
   if constexpr (type == AbstractLight::POINT) {
     red = ui.hslider_renderer_lighting_PointLights_colors_red->value();
@@ -54,10 +54,10 @@ LightData LightController::loadFromUi() const {
   if (!scene_list_view->selectedItems().empty())
     selected = static_cast<NodeItem *>(scene_list_view->selectedItems().at(0));
   if (selected)
-    node = static_cast<NodeInterface *>(scene_list_view->getSceneNode(selected));
+    node = static_cast<datastructure::NodeInterface *>(scene_list_view->getSceneNode(selected));
   else {
     NodeItem *root = scene_list_view->getRoot();
-    node = static_cast<NodeInterface *>(scene_list_view->getSceneNode(root));
+    node = static_cast<datastructure::NodeInterface *>(scene_list_view->getSceneNode(root));
   }
   // data.parent = node;
   LOG(node->getName(), LogLevel::INFO);

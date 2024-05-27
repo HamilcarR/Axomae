@@ -2,6 +2,7 @@
 #include "INodeDatabase.h"
 #include "INodeFactory.h"
 
+using namespace datastructure;
 void AbstractHierarchy::setAsRootChild(NodeInterface *node) {
   if (root != nullptr)
     root->addChildNode(node);

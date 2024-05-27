@@ -2,8 +2,8 @@
 #include "math_camera.h"
 #include "nova_material.h"
 
-constexpr float RAND_DX = 0.002;
-constexpr float RAND_DY = 0.002;
+constexpr float RAND_DX = 0.0005;
+constexpr float RAND_DY = 0.0005;
 namespace nova {
   glm::vec4 NovaRenderEngineLR::engine_sample_color(const Ray &ray, const NovaResources *nova_resources, int depth) {
     hit_data hit_d;

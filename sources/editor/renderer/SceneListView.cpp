@@ -8,7 +8,7 @@ void SceneListView::emptyTree() {
   node_lookup.clear();
 }
 
-NodeInterface *SceneListView::getSceneNode(const NodeItem *searched) {
+datastructure::NodeInterface *SceneListView::getSceneNode(const NodeItem *searched) {
   if (!searched)
     return nullptr;
   for (auto pair : node_lookup) {
@@ -27,26 +27,26 @@ void SceneListView::updateSceneList() { setScene(*current_scene); }
 void SceneListView::setScene(SceneTree &scene) {
   emptyTree();
   current_scene = &scene;
-  NodeInterface *root_node = scene.getRootNode();
-  auto layout_nodes_lambda = [](NodeInterface *node,
+  datastructure::NodeInterface *root_node = scene.getRootNode();
+  auto layout_nodes_lambda = [](datastructure::NodeInterface *node,
                                 SceneTree &scene,
                                 SceneListView &scene_view_list,
                                 std::vector<NodeItem *> &r_items,
-                                std::map<NodeInterface *, NodeItem *> &equiv_table) {
+                                std::map<datastructure::NodeInterface *, NodeItem *> &equiv_table) {
     if (node == scene.getRootNode()) {
       NodeItem *root = new NodeItem(node->getName(), QTreeWidgetItem::Type);
       root->setItemText(0);
       scene_view_list.addTopLevelItem(root);
       r_items.push_back(root);
-      std::pair<NodeInterface *, NodeItem *> node_treewidget_pair(static_cast<NodeInterface *>(node), root);
+      std::pair<datastructure::NodeInterface *, NodeItem *> node_treewidget_pair(static_cast<datastructure::NodeInterface *>(node), root);
       equiv_table.insert(node_treewidget_pair);
     } else {
-      NodeInterface *parent_inode = static_cast<NodeInterface *>(node->getParents()[0]);
+      datastructure::NodeInterface *parent_inode = static_cast<datastructure::NodeInterface *>(node->getParents()[0]);
       NodeItem *parent_nodeitem = equiv_table[parent_inode];
       NodeItem *current = new NodeItem(node->getName(), QTreeWidgetItem::Type, parent_nodeitem);
       current->setItemText(0);
       r_items.push_back(current);
-      std::pair<NodeInterface *, NodeItem *> node_treewidget_pair(static_cast<NodeInterface *>(node), current);
+      std::pair<datastructure::NodeInterface *, NodeItem *> node_treewidget_pair(static_cast<datastructure::NodeInterface *>(node), current);
       equiv_table.insert(node_treewidget_pair);
     }
   };

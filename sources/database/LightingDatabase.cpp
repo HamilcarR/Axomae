@@ -45,7 +45,7 @@ bool LightingDatabase::removeLight(AbstractLight *light) {
     for (auto it = array.second.begin(); it != array.second.end(); it++) {
       if (*it == light) {
         array.second.erase(it);
-        node_database->remove(static_cast<NodeInterface *>(*it));
+        node_database->remove(static_cast<datastructure::NodeInterface *>(*it));
         return true;
       }
     }
@@ -58,7 +58,7 @@ bool LightingDatabase::removeLight(const unsigned index) {
       if ((*it)->getID() == index) {
         AbstractLight *temp = *it;
         array.second.erase(it);
-        node_database->remove(static_cast<NodeInterface *>(*it));
+        node_database->remove(static_cast<datastructure::NodeInterface *>(*it));
         return true;
       }
     }

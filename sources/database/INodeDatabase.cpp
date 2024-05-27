@@ -1,6 +1,6 @@
 #include "INodeDatabase.h"
 #include <algorithm>
-
+using namespace datastructure;
 INodeDatabase::INodeDatabase(controller::ProgressStatus *progress_manager_) { progress_manager = progress_manager_; }
 
 void INodeDatabase::clean() {

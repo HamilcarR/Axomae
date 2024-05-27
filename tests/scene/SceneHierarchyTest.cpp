@@ -35,14 +35,14 @@ class SceneTreeBuilder {
   unsigned getLeafCount() const { return leaf_count; }
   unsigned getNodeCount() const { return node_count; }
   void clean() { tree.clear(); }
-  std::vector<NodeInterface *> findByName(const std::string &name) {
-    std::vector<NodeInterface *> names;
+  std::vector<datastructure::NodeInterface *> findByName(const std::string &name) {
+    std::vector<datastructure::NodeInterface *> names;
     findByNameRecursive(tree.getRootNode(), name, names);
     return names;
   }
 
  private:
-  void findByNameRecursive(NodeInterface *node, const std::string &name, std::vector<NodeInterface *> &collection) {
+  void findByNameRecursive(datastructure::NodeInterface *node, const std::string &name, std::vector<datastructure::NodeInterface *> &collection) {
     if (node != nullptr) {
       if (node->getName() == name)
         collection.push_back(node);
@@ -69,14 +69,14 @@ class SceneTreeBuilder {
 
 class PseudoFunctors {
  public:
-  static void testDummyFunction(NodeInterface *node) { std::cout << node << "\n"; }
-  static void testNodeCount(NodeInterface *node, unsigned int *i) { (*i)++; }
-  static void testTransformationPropagation(NodeInterface *node, std::vector<glm::mat4> &matrices) {
+  static void testDummyFunction(datastructure::NodeInterface *node) { std::cout << node << "\n"; }
+  static void testNodeCount(datastructure::NodeInterface *node, unsigned int *i) { (*i)++; }
+  static void testTransformationPropagation(datastructure::NodeInterface *node, std::vector<glm::mat4> &matrices) {
     SceneTreeNode *n = dynamic_cast<SceneTreeNode *>(node);
     glm::mat4 m = n->computeFinalTransformation();
     matrices.push_back(m);
   }
-  static void testLeafCount(NodeInterface *node, unsigned int *leaf_number) {
+  static void testLeafCount(datastructure::NodeInterface *node, unsigned int *leaf_number) {
     if (node->isLeaf())
       (*leaf_number)++;
   }

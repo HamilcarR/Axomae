@@ -10,7 +10,7 @@
 /**
  * @class SceneTree
  */
-class SceneTree : public AbstractHierarchy {
+class SceneTree : public datastructure::AbstractHierarchy {
  private:
   bool node_updated{};
 
@@ -26,7 +26,7 @@ class SceneTree : public AbstractHierarchy {
    */
   virtual void updateAccumulatedTransformations();
   virtual void pushNewRoot(SceneTreeNode *new_root);
-  std::vector<NodeInterface *> findByName(const std::string &name) override;
+  std::vector<datastructure::NodeInterface *> findByName(const std::string &name) override;
 };
 
 #endif

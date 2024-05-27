@@ -14,21 +14,24 @@
  * @class SceneTreeNode
  * @brief Provides implementation for a scene tree node
  */
-class SceneTreeNode : public SceneNodeInterface, public NodeInterface {
+class SceneTreeNode : public SceneNodeInterface, public datastructure::NodeInterface {
  protected:
-  bool mark;                              /*<Generic mark , for graph traversal*/
-  bool updated;                           /*<Lets the owning structure know if node has been modified */
-  std::string name;                       /*<Name of the node*/
-  std::vector<NodeInterface *> parents;   /*<List of parents*/
-  std::vector<NodeInterface *> children;  /*<List of children*/
-  AbstractHierarchy *owner{};             /*<Structure owning this hierarchy*/
-  int flag{};                             /*<Flag indicate what operations need to be done on this node*/
-  glm::mat4 local_transformation{};       /*<Local transformation of the node*/
-  glm::mat4 accumulated_transformation{}; /*<Matrix equal to all ancestors transformations*/
+  bool mark;                                 /*<Generic mark , for graph traversal*/
+  bool updated;                              /*<Lets the owning structure know if node has been modified */
+  std::string name;                          /*<Name of the node*/
+  std::vector<NodeInterface *> parents;      /*<List of parents*/
+  std::vector<NodeInterface *> children;     /*<List of children*/
+  datastructure::AbstractHierarchy *owner{}; /*<Structure owning this hierarchy*/
+  int flag{};                                /*<Flag indicate what operations need to be done on this node*/
+  glm::mat4 local_transformation{};          /*<Local transformation of the node*/
+  glm::mat4 accumulated_transformation{};    /*<Matrix equal to all ancestors transformations*/
 
  protected:
-  explicit SceneTreeNode(SceneTreeNode *parent = nullptr, AbstractHierarchy *owner = nullptr);
-  SceneTreeNode(const std::string &name, const glm::mat4 &transformation, SceneTreeNode *parent = nullptr, AbstractHierarchy *owner = nullptr);
+  explicit SceneTreeNode(SceneTreeNode *parent = nullptr, datastructure::AbstractHierarchy *owner = nullptr);
+  SceneTreeNode(const std::string &name,
+                const glm::mat4 &transformation,
+                SceneTreeNode *parent = nullptr,
+                datastructure::AbstractHierarchy *owner = nullptr);
 
  public:
   ~SceneTreeNode() override = default;
@@ -37,7 +40,6 @@ class SceneTreeNode : public SceneNodeInterface, public NodeInterface {
   SceneTreeNode &operator=(const SceneTreeNode &copy) = default;
   SceneTreeNode &operator=(SceneTreeNode &&move) noexcept = default;
 
- public:
   /**
    * Computes the final transformation of the node based on the transformation of it's parent.
    */
@@ -55,8 +57,8 @@ class SceneTreeNode : public SceneNodeInterface, public NodeInterface {
   [[nodiscard]] bool isMarked() const override { return mark; };
   void setName(const std::string &str) override { name = str; };
   [[nodiscard]] const std::string &getName() const override { return name; };
-  void setHierarchyOwner(AbstractHierarchy *_owner) override { owner = _owner; };
-  [[nodiscard]] AbstractHierarchy *getHierarchyOwner() const override { return owner; };
+  void setHierarchyOwner(datastructure::AbstractHierarchy *_owner) override { owner = _owner; };
+  [[nodiscard]] datastructure::AbstractHierarchy *getHierarchyOwner() const override { return owner; };
   [[nodiscard]] bool isRoot() const override;
   NodeInterface *returnRoot() override;
   [[nodiscard]] bool isUpdated() const override { return updated; }

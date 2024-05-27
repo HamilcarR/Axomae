@@ -16,12 +16,7 @@
 // TODO : code needs total uncoupling from any foreign structure : needs to return arrays of basic data
 
 namespace IO {
-  namespace exception {
-
-
-
-
-  }
+  namespace exception {}
 
   Loader::Loader(controller::ProgressStatus *prog_stat) : resource_database(&ResourceDatabaseManager::getInstance()) {
     setProgressManager(prog_stat);
@@ -294,7 +289,7 @@ namespace IO {
       for (auto A : add_node) {
         A->setLocalModelMatrix(transformation);
         A->setName(name);
-        std::vector<NodeInterface *> parents_array = {parent};
+        std::vector<datastructure::NodeInterface *> parents_array = {parent};
         A->setParents(parents_array);
       }
       for (unsigned i = 0; i < ai_node->mNumChildren; i++)
@@ -306,13 +301,11 @@ namespace IO {
 
   /**
    * The function generates a scene tree from a model scene and a lookup of mesh nodes.
-   *
    * @param modelScene The modelScene parameter is a pointer to an aiScene object, which represents a 3D
    * model scene loaded from a file using the Assimp library. It contains information about the model's
    * hierarchy, meshes, materials, textures, animations, etc.
    * @param node_lookup The `node_lookup` parameter is a vector of pointers to `Mesh` objects. It is used
    * to map the `aiNode` objects in the `modelScene` to their corresponding `Mesh` objects.
-   *
    * @return a SceneTree object.
    */
   SceneTree generateSceneTree(const aiScene *modelScene, const std::vector<Mesh *> &node_lookup) {
@@ -329,7 +322,6 @@ namespace IO {
   /**
    * The function "load_geometry_buffer" takes an array of aiVector3D objects, converts them to a
    * specified dimension, and stores the result in a destination vector.
-   *
    * @param dest The `dest` parameter is a reference to a `std::vector<T>` object, where `T` is the type
    * of the elements in the vector. This vector will be used to store the loaded geometry data.
    * @param from The "from" parameter is a pointer to an array of aiVector3D objects.
@@ -357,7 +349,6 @@ namespace IO {
 
   /**
    * The function `load_indices_buffer` loads the indices of a mesh's faces into a destination vector.
-   *
    * @param dest A reference to a vector of unsigned integers where the indices will be loaded into.
    * @param faces The `faces` parameter is a pointer to an array of `aiFace` objects. Each `aiFace`
    * object represents a face in a 3D model and contains an array of indices that define the vertices of

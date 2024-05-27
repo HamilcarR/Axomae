@@ -24,13 +24,13 @@ class NodeItemBuilder {
 class SceneListView : virtual public QTreeWidget {
  private:
   std::vector<NodeItem *> items;                     // Only used to keep track of elements in the tree.
-  std::map<NodeInterface *, NodeItem *> node_lookup; /*<Keeps track of the NodeItems and their corresponding INodes*/
+  std::map<datastructure::NodeInterface *, NodeItem *> node_lookup; /*<Keeps track of the NodeItems and their corresponding INodes*/
   SceneTree *current_scene;                          /*<Keeps track of the currently processed scene*/
 
  public:
   SceneListView(QWidget *parent = nullptr);
   virtual void emptyTree();
-  NodeInterface *getSceneNode(const NodeItem *searched);
+  datastructure::NodeInterface *getSceneNode(const NodeItem *searched);
   NodeItem *getRoot() const;
   const NodeItem *getConstRoot() const;
   void updateSceneList();
