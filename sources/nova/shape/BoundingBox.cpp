@@ -113,17 +113,17 @@ static bool test_intersection(const glm::vec3 &x_axis,
                               const glm::vec3 &z_axis,
                               const glm::vec3 &ray_origin,
                               const glm::vec3 &ray_direction,
-                              const glm::vec3 &delta,
                               const glm::vec3 &tmin_coords,
                               const glm::vec3 &tmax_coords,
-                              const float tmin,
-                              const float tmax,
+                              float /*tmin*/,
+                              float tmax,
                               float &t
 
 ) {
+  const glm::vec3 delta = ray_origin;
   /* Intersections on X axis */
   const float delta_x = glm::dot(delta, x_axis);
-  const float Dx = glm::dot(ray_direction, x_axis);
+  const float Dx = glm::dot(ray_direction, x_axis) + math::epsilon;
   float txmin = (tmin_coords.x - delta_x) / Dx;
   float txmax = (tmax_coords.x - delta_x) / Dx;
   if (txmin > txmax) {
@@ -132,7 +132,7 @@ static bool test_intersection(const glm::vec3 &x_axis,
 
   /* Intersections on Y axis */
   const float delta_y = glm::dot(delta, y_axis);
-  const float Dy = glm::dot(ray_direction, y_axis);
+  const float Dy = glm::dot(ray_direction, y_axis) + math::epsilon;
   float tymin = (tmin_coords.y - delta_y) / Dy;
   float tymax = (tmax_coords.y - delta_y) / Dy;
   if (tymin > tymax) {
@@ -141,7 +141,7 @@ static bool test_intersection(const glm::vec3 &x_axis,
 
   /* Intersections on Z axis */
   const float delta_z = glm::dot(delta, z_axis);
-  const float Dz = glm::dot(ray_direction, z_axis);
+  const float Dz = glm::dot(ray_direction, z_axis) + math::epsilon;
   float tzmin = (tmin_coords.z - delta_z) / Dz;
   float tzmax = (tmax_coords.z - delta_z) / Dz;
   if (tzmin > tzmax) {
@@ -150,11 +150,17 @@ static bool test_intersection(const glm::vec3 &x_axis,
 
   const float max = std::min(std::min(txmax, tymax), tzmax);
   const float min = std::max(std::max(txmin, tymin), tzmin);
+  t = min;
+
   if (max < min)
     return false;
+  if (max > 0) {
+    if (t > tmax)
+      return false;
+    return true;
+  }
   if (min < 0)
     return false;
-  t = min;
   return true;
 }
 
@@ -165,7 +171,7 @@ bool BoundingBox::intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &n
   const glm::vec3 tmin_coords = min_coords;
   const glm::vec3 tmax_coords = max_coords;
   const glm::vec3 delta = ray.origin;
-  bool hit_success = test_intersection(x_axis, y_axis, z_axis, ray.origin, ray.direction, delta, tmin_coords, tmax_coords, tmin, tmax, t);
+  bool hit_success = test_intersection(x_axis, y_axis, z_axis, ray.origin, ray.direction, tmin_coords, tmax_coords, tmin, tmax, t);
   if (hit_success) {
     return true;
   }
