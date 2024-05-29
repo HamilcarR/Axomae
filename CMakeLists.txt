@@ -24,29 +24,7 @@ set(AXOMAE_USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
 set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr")
 set(CMAKE_CUDA_ARCHITECTURES "75")
 enable_language(CUDA)
-#****************************************************************************************************
-# Debug 
-set(AXOMAE_USE_ASAN "OFF" CACHE BOOL "Enable Address Sanitization")
-if(AXOMAE_USE_ASAN)
-    target_compile_options(${PROJECT_NAME} PUBLIC
-        -fno-omit-frame-pointer
-        -fsanitize=address
-    )
-    target_link_options(${PROJECT_NAME} PUBLIC
-            -fno-omit-frame-pointer
-            -fsanitize=address
-    )
-endif()
 
-set(AXOMAE_USE_TSAN "OFF" CACHE BOOL "Enable thread Sanitization")
-if(AXOMAE_USE_TSAN)
-    target_compile_options(${PROJECT_NAME} PUBLIC
-            -fsanitize=thread
-    )
-    target_link_options(${PROJECT_NAME} PUBLIC
-            -fsanitize=thread
-    )
-endif()
 
 #****************************************************************************************************
 #custom project variables
@@ -127,7 +105,29 @@ elseif(AXOMAE_USE_MOLD)
     target_link_options(${PROJECT_NAME} PUBLIC -fuse-ld=mold)
 endif()
 
+#****************************************************************************************************
+# Debug
+set(AXOMAE_USE_ASAN "OFF" CACHE BOOL "Enable Address Sanitization")
+if(AXOMAE_USE_ASAN)
+    target_compile_options(${PROJECT_NAME} PUBLIC
+            -fno-omit-frame-pointer
+            -fsanitize=address
+    )
+    target_link_options(${PROJECT_NAME} PUBLIC
+            -fno-omit-frame-pointer
+            -fsanitize=address
+    )
+endif()
 
+set(AXOMAE_USE_TSAN "OFF" CACHE BOOL "Enable thread Sanitization")
+if(AXOMAE_USE_TSAN)
+    target_compile_options(${PROJECT_NAME} PUBLIC
+            -fsanitize=thread
+    )
+    target_link_options(${PROJECT_NAME} PUBLIC
+            -fsanitize=thread
+    )
+endif()
 #****************************************************************************************************
 # Global preprocessor variables
 

@@ -1,0 +1,3 @@
+set(GEOMETRY_MODULE_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/BoundingBoxTest.cpp
+        PARENT_SCOPE )

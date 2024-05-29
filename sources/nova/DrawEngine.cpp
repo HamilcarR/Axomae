@@ -11,12 +11,16 @@ namespace nova {
     bool hit = false;
     float min_t = MAXFLOAT;
     const primitive::NovaPrimitiveInterface *last_primit = nullptr;
-    for (const auto &primitive : nova_resources->scene_data.primitives)
-      if (primitive->hit(ray, 0.001f, min_t, hit_d, nullptr)) {
-        hit = true;
-        min_t = hit_d.t;
-        last_primit = primitive.get();
-      }
+    const aggregate::Bvhtl &bvh = nova_resources->acceleration_structure.accelerator;
+    aggregate::bvh_hit_data bvh_hit{min_t, nullptr};
+    aggregate::base_options_bvh opts;
+    opts.data = bvh_hit;
+    if (bvh.hit(ray, 0.001f, min_t, hit_d, &opts)) {
+      hit = true;
+      min_t = opts.data.tmin;
+      last_primit = opts.data.last_prim;
+    }
+
     if (hit) {
       Ray out{};
       if (!last_primit || !last_primit->scatter(ray, out, hit_d) || depth < 0)

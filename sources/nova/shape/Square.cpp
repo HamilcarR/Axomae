@@ -24,3 +24,4 @@ bool Square::intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &normal
     return true;
   return false;
 }
+geometry::BoundingBox Square::computeAABB() const { return {origin, origin + side_w + side_h}; }

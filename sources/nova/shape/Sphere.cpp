@@ -28,3 +28,5 @@ bool Sphere::intersect(const Ray &r, float tmin, float tmax, glm::vec3 &normal, 
   }
   return false;
 }
+
+geometry::BoundingBox Sphere::computeAABB() const { return {origin - glm::vec3(radius), origin + glm::vec3(radius)}; }

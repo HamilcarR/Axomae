@@ -82,10 +82,11 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
   nova_engine_data->scene_data.materials_collection.clear();
   nova_engine_data->scene_data.primitives.clear();
   nova_engine_data->scene_data.shapes.clear();
-  std::unique_ptr<nova_material::NovaMaterialInterface> mat1 = std::make_unique<nova_material::NovaDielectricMaterial>(glm::vec4(1.f, 1.f, 1.f, 1.f),
-                                                                                                                       2.54f);
+  std::unique_ptr<nova_material::NovaMaterialInterface> mat1 = std::make_unique<nova_material::NovaDielectricMaterial>(
+      glm::vec4(1.f, 0.3f, 0.2f, 1.f), 1.5f);
   nova_engine_data->scene_data.materials_collection.push_back(std::move(mat1));
   auto c1 = nova_engine_data->scene_data.materials_collection[0].get();
+
   for (const auto &elem : new_scene.mesh_list) {
     const Object3D &geometry = elem->getGeometry();
     for (int i = 0; i < geometry.indices.size(); i += 3) {
@@ -106,6 +107,10 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
       v3.y = geometry.vertices[idx + 1];
       v3.z = geometry.vertices[idx + 2];
 
+      v1 = elem->getAccumulatedModelMatrix() * glm::vec4(v1, 1.f);
+      v2 = elem->getAccumulatedModelMatrix() * glm::vec4(v2, 1.f);
+      v3 = elem->getAccumulatedModelMatrix() * glm::vec4(v3, 1.f);
+
       auto tri = nova::shape::NovaShapeInterface::create<nova_shape::Triangle>(v1, v2, v3);
       nova_engine_data->scene_data.shapes.push_back(std::move(tri));
       auto s1 = nova_engine_data->scene_data.shapes.back().get();
@@ -113,6 +118,10 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
       nova_engine_data->scene_data.primitives.push_back(std::move(primit));
     }
   }
+
+  /* Build accelerator */
+  const auto *primitive_collection_ptr = &nova_engine_data->scene_data.primitives;
+  nova_engine_data->acceleration_structure.accelerator.build(primitive_collection_ptr);
 }
 
 bool NovaRenderer::prep_draw() {

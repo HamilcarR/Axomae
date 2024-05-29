@@ -1,7 +1,9 @@
 add_library(ax_datastructure
-        btree/BTree.cpp
-        btree/BTree.h
+        AbstractHierarchy.cpp
+        AbstractNode.cpp
 
+        btree/BNode.hpp
+        btree/BTree.hpp
 )
 
 

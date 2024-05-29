@@ -1,16 +1,16 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
+
 #include "math_utils.h"
-#include "nova_shape.h"
+#include <vector>
 
 /**
- * @brief File implementing an OBB calculations
+ * @brief AABB
  * @file BoundingBox.h
  */
 
-namespace nova::shape {
-  /* Replace Inheritance from SceneTreeNode by SceneNodeInterface*/
-  class BoundingBox final : public NovaShapeInterface {
+namespace geometry {
+  class BoundingBox {
 
     friend BoundingBox operator*(const glm::mat4 &matrix, const BoundingBox &bounding_box) {
       glm::vec3 min_c = matrix * glm::vec4(bounding_box.getMinCoords(), 1.f);
@@ -25,15 +25,18 @@ namespace nova::shape {
 
    public:
     BoundingBox();
-    explicit BoundingBox(const std::vector<float> &geometry);
+    BoundingBox(const float min_coords[3], const float max_coords[3]);
     BoundingBox(const glm::vec3 &min_coords, const glm::vec3 &max_coords);
-    ~BoundingBox() override = default;
+    explicit BoundingBox(const std::vector<glm::vec3> &vertices);
+    explicit BoundingBox(const std::vector<float> &geometry);
+    /* Generates the maximum bounding box of a bounding boxes collection*/
+    explicit BoundingBox(const std::vector<BoundingBox> &bboxes);
+    ~BoundingBox() = default;
     BoundingBox(const BoundingBox &copy);
     BoundingBox(BoundingBox &&move) noexcept;
     BoundingBox &operator=(const BoundingBox &copy);
     BoundingBox &operator=(BoundingBox &&move) noexcept;
     [[nodiscard]] const glm::vec3 &getPosition() const { return center; }
-
     /**
      * @brief Returns the index + vertices array representatives of the bounding box
      * @return std::pair<std::vector<float> , std::vector<unsigned>>
@@ -43,11 +46,16 @@ namespace nova::shape {
     [[nodiscard]] const glm::vec3 &getMinCoords() const { return min_coords; }
     void setMaxCoords(glm::vec3 max) { max_coords = max; }
     void setMinCoords(glm::vec3 min) { min_coords = min; }
-    /**
-     * @brief tmin must be initialized to a small value (0.f) while tmax should be set at a highest value.
-     * Use camera near and far .
-     */
-    [[nodiscard]] bool intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &normal_at_intersection, float &t) const override;
+
+    [[nodiscard]] bool operator==(const BoundingBox &other) const;
+    [[nodiscard]] BoundingBox operator+(const BoundingBox &addbox) const;
   };
-}  // namespace nova::shape
+
+  class AABBInterface {
+   public:
+    virtual ~AABBInterface() = default;
+    [[nodiscard]] virtual BoundingBox computeAABB() const = 0;
+  };
+
+}  // namespace geometry
 #endif

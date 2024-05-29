@@ -1,12 +1,12 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include "BoundingBox.h"
 #include "Camera.h"
 #include "Material.h"
 #include "MeshInterface.h"
 #include "Object3D.h"
 #include "Visitor.h"
-#include "shape/BoundingBox.h"
 /**
  * @brief Mesh.h
  * Mesh class implementation
@@ -128,7 +128,7 @@ class FrameBufferMesh : public QuadMesh {
 
 class BoundingBoxMesh : public Mesh {
  protected:
-  nova::shape::BoundingBox bounding_box;
+  geometry::BoundingBox bounding_box;
 
  public:
   explicit BoundingBoxMesh(SceneTreeNode *parent = nullptr);
@@ -139,10 +139,10 @@ class BoundingBoxMesh : public Mesh {
    * @param bounding_box The pre-computed bounding box
    * @param display_shader Shader used to display the bounding box
    */
-  BoundingBoxMesh(Mesh *bound_mesh, const nova::shape::BoundingBox &bounding_box, Shader *display_shader);
+  BoundingBoxMesh(Mesh *bound_mesh, const geometry::BoundingBox &bounding_box, Shader *display_shader);
   void afterRenderSetup() override;
   void preRenderSetup() override;
-  virtual nova::shape::BoundingBox getBoundingBoxObject() { return bounding_box; }
+  virtual geometry::BoundingBox getBoundingBoxObject() { return bounding_box; }
 };
 
 #endif

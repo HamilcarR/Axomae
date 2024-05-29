@@ -1,9 +1,11 @@
-add_library(ax_geometry)
+add_library(ax_geometry
+        BoundingBox.cpp
+)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_geometry)
 target_link_libraries(ax_geometry
 PRIVATE
-    ax_common
+        ax_math
 )
 
 target_include_directories(ax_geometry 

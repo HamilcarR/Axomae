@@ -1,5 +1,6 @@
 #ifndef SCENEHIERARCHY_H
 #define SCENEHIERARCHY_H
+#include "AbstractHierarchy.h"
 #include "HierarchyInterface.h"
 #include "Node.h"
 /**
@@ -26,7 +27,6 @@ class SceneTree : public datastructure::AbstractHierarchy {
    */
   virtual void updateAccumulatedTransformations();
   virtual void pushNewRoot(SceneTreeNode *new_root);
-  std::vector<datastructure::NodeInterface *> findByName(const std::string &name) override;
 };
 
 #endif

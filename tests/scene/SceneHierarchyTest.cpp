@@ -82,7 +82,7 @@ class PseudoFunctors {
   }
 };
 
-TEST(DFSTest, dfsNodeCount) {
+TEST(SceneHierarchyTest, nodeCount_DFS) {
   SceneTreeBuilder builder;
   builder.buildSceneTree(TEST_TREE_MAX_DEPTH, TEST_TREE_MAX_NODE_DEGREE);
   SceneTree *tree = builder.getTreePointer();
@@ -92,7 +92,7 @@ TEST(DFSTest, dfsNodeCount) {
   EXPECT_EQ(i, builder.getNodeCount());
 }
 
-TEST(DFSTest, updateAccumulatedTransformations) {
+TEST(SceneHierarchyTest, updateAccumulatedTransformations_DFS) {
   SceneTreeBuilder builder;
   builder.buildSceneTree(TEST_TREE_MAX_DEPTH, TEST_TREE_MAX_NODE_DEGREE);
   SceneTree *tree = builder.getTreePointer();
@@ -109,7 +109,7 @@ TEST(DFSTest, updateAccumulatedTransformations) {
   builder.clean();
 }
 
-TEST(DFSTest, leafCount) {
+TEST(SceneHierarchyTest, leafCount_DFS) {
   SceneTreeBuilder builder;
   builder.buildSceneTree(TEST_TREE_MAX_DEPTH, TEST_TREE_MAX_NODE_DEGREE);
   SceneTree *tree = builder.getTreePointer();
@@ -118,7 +118,7 @@ TEST(DFSTest, leafCount) {
   EXPECT_EQ(i, builder.getLeafCount());
 }
 
-TEST(DFSTest, findName) {
+TEST(SceneHierarchyTest, findName_DFS) {
   SceneTreeBuilder builder;
   builder.buildSceneTree(TEST_TREE_MAX_DEPTH, TEST_TREE_MAX_NODE_DEGREE);
   SceneTree *tree = builder.getTreePointer();
@@ -136,7 +136,7 @@ TEST(DFSTest, findName) {
   }
 }
 
-TEST(BFSTEST, leafCountBFS) {
+TEST(SceneHierarchyTest, leafCount_BFS) {
   SceneTreeBuilder builder;
   builder.buildSceneTree(TEST_TREE_MAX_DEPTH, TEST_TREE_MAX_NODE_DEGREE);
   SceneTree *tree = builder.getTreePointer();

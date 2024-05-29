@@ -9,8 +9,7 @@
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
 #include "math_camera.h"
-#include "shape/BoundingBox.h"
-#include "utils_3D.h"
+
 using namespace axomae;
 
 Scene::Scene(ResourceDatabaseManager &rdm) : resource_manager(rdm), display_bbox(false) {
@@ -34,7 +33,7 @@ inline void setUpIblData(TextureDatabase &texture_database, Mesh *mesh) {}
 static void make_drawable(std::vector<std::unique_ptr<Drawable>> &scene_drawables, std::vector<Scene::AABB> &bounding_boxes, Mesh *A) {
   Scene::AABB bbox_mesh;
   auto drawable = std::make_unique<Drawable>(A);
-  bbox_mesh.aabb = nova::shape::BoundingBox(A->getGeometry().vertices);
+  bbox_mesh.aabb = nova::shape::Box(A->getGeometry().vertices);
   bbox_mesh.drawable = drawable.get();
   bounding_boxes.push_back(bbox_mesh);
   scene_drawables.push_back(std::move(drawable));
@@ -55,7 +54,7 @@ void Scene::generateBoundingBoxes(Shader *box_shader) {
   for (Scene::AABB &scene_drawable : scene) {
     Mesh *mesh = scene_drawable.drawable->getMeshPointer();
     BoundingBoxMesh *bbox_mesh =
-        database::node::store<BoundingBoxMesh>(*resource_manager.getNodeDatabase(), false, mesh, scene_drawable.aabb, box_shader).object;
+        database::node::store<BoundingBoxMesh>(*resource_manager.getNodeDatabase(), false, mesh, scene_drawable.aabb.computeAABB(), box_shader).object;
     auto bbox_drawable = std::make_unique<Drawable>(bbox_mesh);
     bounding_boxes_array.push_back(bbox_drawable.get());
     drawable_collection.push_back(std::move(bbox_drawable));

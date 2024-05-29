@@ -4,7 +4,7 @@
 #include "Mesh.h"
 #include "ResourceDatabaseManager.h"
 #include "SceneHierarchy.h"
-#include "shape/BoundingBox.h"
+#include "shape/Box.h"
 /**
  * @file Scene.h
  * @brief File implementing classes and functions relative to how the scene is represented and how to manage it
@@ -25,7 +25,7 @@ class LightingDatabase;
 class Scene : public EventInterface {
  public:
   struct AABB {
-    nova::shape::BoundingBox aabb;
+    nova::shape::Box aabb;
     Drawable *drawable;
   };
 

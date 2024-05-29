@@ -14,6 +14,7 @@ namespace nova {
     camera::CameraResourcesHolder camera_data{};
     engine::EngineResourcesHolder renderer_data{};
     scene::SceneResourcesHolder scene_data{};
+    scene::Accelerator acceleration_structure{};
   };
 
   class NovaRenderEngineLR;

@@ -1,5 +1,6 @@
 #ifndef SPHERE_H
 #define SPHERE_H
+#include "BoundingBox.h"
 #include "math_utils.h"
 #include "nova_shape.h"
 #include "scene/Hitable.h"
@@ -19,6 +20,8 @@ namespace nova::shape {
     Sphere &operator=(const Sphere &copy) = delete;
     Sphere &operator=(Sphere &&move) noexcept = default;
     bool intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &normal, float &t) const override;
+    [[nodiscard]] glm::vec3 centroid() const override { return origin; }
+    [[nodiscard]] geometry::BoundingBox computeAABB() const override;
   };
 }  // namespace nova::shape
 #endif  // SPHERE_H

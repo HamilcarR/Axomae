@@ -1,8 +1,10 @@
 add_subdirectory(shape)
+add_subdirectory(aggregate)
 set(NOVA_MODULE_SHAPE_SOURCES "" CACHE INTERNAL "" )
+set(NOVA_MODULE_AGGREGATE_SOURCES "" CACHE INTERNAL "")
 set(NOVA_MODULE_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/nova_utilsTest.cpp
         ${NOVA_MODULE_SHAPE_SOURCES}
+        ${NOVA_MODULE_AGGREGATE_SOURCES}
         PARENT_SCOPE)
-
 

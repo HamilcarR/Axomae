@@ -1,7 +1,7 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "NodeInterface.h"
+#include "AbstractNode.h"
 #include "SceneNodeInterface.h"
 #include "utils_3D.h"
 
@@ -14,17 +14,11 @@
  * @class SceneTreeNode
  * @brief Provides implementation for a scene tree node
  */
-class SceneTreeNode : public SceneNodeInterface, public datastructure::NodeInterface {
+class SceneTreeNode : public SceneNodeInterface, public datastructure::AbstractNode {
  protected:
-  bool mark;                                 /*<Generic mark , for graph traversal*/
-  bool updated;                              /*<Lets the owning structure know if node has been modified */
-  std::string name;                          /*<Name of the node*/
-  std::vector<NodeInterface *> parents;      /*<List of parents*/
-  std::vector<NodeInterface *> children;     /*<List of children*/
-  datastructure::AbstractHierarchy *owner{}; /*<Structure owning this hierarchy*/
-  int flag{};                                /*<Flag indicate what operations need to be done on this node*/
-  glm::mat4 local_transformation{};          /*<Local transformation of the node*/
-  glm::mat4 accumulated_transformation{};    /*<Matrix equal to all ancestors transformations*/
+  int flag{};                             /*<Flag indicate what operations need to be done on this node*/
+  glm::mat4 local_transformation{};       /*<Local transformation of the node*/
+  glm::mat4 accumulated_transformation{}; /*<Matrix equal to all ancestors transformations*/
 
  protected:
   explicit SceneTreeNode(SceneTreeNode *parent = nullptr, datastructure::AbstractHierarchy *owner = nullptr);
@@ -46,30 +40,14 @@ class SceneTreeNode : public SceneNodeInterface, public datastructure::NodeInter
   glm::mat4 computeFinalTransformation() override;
   virtual void setParent(NodeInterface *node);
   [[nodiscard]] virtual SceneTreeNode *getParent() const;
-  [[nodiscard]] const std::vector<NodeInterface *> &getChildren() const override { return children; };
-  [[nodiscard]] const std::vector<NodeInterface *> &getParents() const override { return parents; }
-  void setParents(std::vector<NodeInterface *> &parents) override;
-  void addChildNode(NodeInterface *node) override;
-  void emptyParents() override;
-  void emptyChildren() override;
-  [[nodiscard]] bool isLeaf() const override;
-  void setMark(bool marked) override { mark = marked; };
-  [[nodiscard]] bool isMarked() const override { return mark; };
-  void setName(const std::string &str) override { name = str; };
-  [[nodiscard]] const std::string &getName() const override { return name; };
-  void setHierarchyOwner(datastructure::AbstractHierarchy *_owner) override { owner = _owner; };
-  [[nodiscard]] datastructure::AbstractHierarchy *getHierarchyOwner() const override { return owner; };
-  [[nodiscard]] bool isRoot() const override;
-  NodeInterface *returnRoot() override;
-  [[nodiscard]] bool isUpdated() const override { return updated; }
-  void reset() override;
-
   [[nodiscard]] const glm::mat4 &getLocalModelMatrix() const override { return local_transformation; }
   void setLocalModelMatrix(const glm::mat4 &local_mat) override { local_transformation = local_mat; }
   void resetLocalModelMatrix() override;
   void resetAccumulatedMatrix() override;
   void setAccumulatedModelMatrix(const glm::mat4 &matrix) override { accumulated_transformation = matrix; };
   [[nodiscard]] const glm::mat4 &getAccumulatedModelMatrix() const override { return accumulated_transformation; };
+
+  void reset() override;
 };
 
 /***************************************************************************************************************************************************/

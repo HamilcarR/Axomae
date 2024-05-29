@@ -17,6 +17,7 @@ namespace datastructure {
     [[nodiscard]] virtual const std::vector<NodeInterface *> &getChildren() const = 0;
     [[nodiscard]] virtual const std::vector<NodeInterface *> &getParents() const = 0;
     virtual void addChildNode(NodeInterface *node) = 0;
+    virtual void addParentNode(NodeInterface *node) = 0;
     virtual void setParents(std::vector<NodeInterface *> &parents) = 0;
     virtual void emptyParents() = 0;
     virtual void emptyChildren() = 0;

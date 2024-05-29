@@ -14,6 +14,8 @@
 #include <ImfRgbaFile.h>
 #include <fstream>
 namespace exception {
+  const char *INVALID_PATH_ENVMAP = "Must be an HDR/EXR format .";
+
   class LoadImagePathException : public GenericException {
    public:
     explicit LoadImagePathException(const std::string &path) : GenericException() {
@@ -71,7 +73,7 @@ namespace IO {
     input_str.read(r_format, 31 * sizeof(char));
     if (!check_exr(r_format) && !check_radiance(r_format)) {
       input_str.close();
-      throw exception::InvalidImageFormat("Must be an HDR/EXR format .");
+      throw exception::InvalidImageFormat(exception::INVALID_PATH_ENVMAP);
     }
     input_str.close();
   }
@@ -84,6 +86,7 @@ namespace IO {
         return loadExrFile(path, store);
       if (check_radiance(format))
         return loadRadianceFile(path, store);
+      throw exception::InvalidImageFormat(exception::INVALID_PATH_ENVMAP);
     } catch (exception::GenericException &e) {
       throw;
     }
@@ -106,13 +109,10 @@ namespace IO {
       img.metadata.is_hdr = true;
       img.metadata.channels = alpha ? 4 : 3;
       img.data.resize(img.metadata.width * img.metadata.height * img.metadata.channels);
-
       Imf::FrameBuffer framebuffer;
-
       std::vector<float> pixels;
+
       pixels.resize(img.metadata.width * img.metadata.height * img.metadata.channels);
-      int dx = win.min.x;
-      int dy = win.min.y;
       framebuffer.insert("R",
                          Imf::Slice(Imf::FLOAT,
                                     (char *)(pixels.data()),

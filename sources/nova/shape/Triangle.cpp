@@ -7,6 +7,7 @@ using namespace nova::shape;
 Triangle::Triangle(const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_) : v0(v0_), v1(v1_), v2(v2_) {
   e1 = v1 - v0;
   e2 = v2 - v0;
+  center = (v0 + v1 + v2) * 0.3333f;
 }
 
 /*
@@ -40,4 +41,9 @@ bool Triangle::intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &norm
   normal_at_intersection = glm::normalize(normal_at_intersection);
 
   return true;
+}
+geometry::BoundingBox Triangle::computeAABB() const {
+  glm::vec3 min = glm::min(v0, glm::min(v1, v2));
+  glm::vec3 max = glm::max(v0, glm::max(v1, v2));
+  return {min, max};
 }

@@ -12,6 +12,7 @@ PRIVATE
     ax_macro
     ax_thread
     ax_processing
+    ax_geometry
 )
 
 target_include_directories(ax_nova
@@ -22,6 +23,7 @@ PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/material
         ${CMAKE_CURRENT_SOURCE_DIR}/scene
         ${CMAKE_CURRENT_SOURCE_DIR}/shape
+        ${CMAKE_CURRENT_SOURCE_DIR}/aggregate
 
 )
 
@@ -35,3 +37,4 @@ add_subdirectory(material)
 add_subdirectory(light)
 add_subdirectory(kernel)
 add_subdirectory(camera)
+add_subdirectory(aggregate)

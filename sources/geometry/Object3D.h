@@ -1,8 +1,6 @@
 #ifndef OBJECT3D_H
 #define OBJECT3D_H
-
-#include "constants.h"
-
+#include <vector>
 class Object3D {
  public:
   std::vector<float> vertices;       /*<Vertices array*/

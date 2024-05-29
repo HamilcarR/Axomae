@@ -30,10 +30,10 @@ set(STB_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/stb PARENT_SCOPE)
 #########################################################################################
 # OpenExr
 message(NOTICE "OpenEXR not found on the system : Initializing OpenEXR build from sources. ")
-set(BUILD_SHARED_LIBS ON)  # Build static libraries instead of shared
-set(OpenEXR_BUILD_UTILS OFF)  # Do not build OpenEXR utilities
-set(OpenEXR_BUILD_TESTS OFF)  # Do not build OpenEXR tests
-set(OpenEXR_INSTALL OFF)  # Do not install OpenEXR
+set(BUILD_SHARED_LIBS ON)
+set(OpenEXR_BUILD_UTILS OFF)
+set(OpenEXR_BUILD_TESTS OFF)
+set(OpenEXR_INSTALL OFF)
 
 add_subdirectory(imath EXCLUDE_FROM_ALL)
 add_subdirectory(openexr EXCLUDE_FROM_ALL)

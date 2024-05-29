@@ -26,7 +26,7 @@ namespace nova {
   class Hitable {
    public:
     virtual ~Hitable() = default;
-    virtual bool hit(const Ray &r, float tmin, float tmax, hit_data &data, const base_options *user_options) const = 0;
+    virtual bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const = 0;
   };
 }  // namespace nova
 #endif  // Hitable_H

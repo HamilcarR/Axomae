@@ -1,3 +1,3 @@
 set(NOVA_MODULE_SHAPE_SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/BoundingBoxTest.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/BoxTest.cpp
         PARENT_SCOPE)
