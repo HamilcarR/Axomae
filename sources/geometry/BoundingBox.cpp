@@ -173,3 +173,13 @@ BoundingBox BoundingBox::operator+(const BoundingBox &addbox) const {
 
   return {min, max};
 }
+
+bool BoundingBox::intersect(const glm::vec3 &ray_direction, const glm::vec3 &ray_origin) const {
+  float tx1 = (min_coords.x - ray_origin.x) / ray_direction.x, tx2 = (max_coords.x - ray_origin.x) / ray_direction.x;
+  float tmin = std::min(tx1, tx2), tmax = std::max(tx1, tx2);
+  float ty1 = (min_coords.y - ray_origin.y) / ray_direction.y, ty2 = (max_coords.y - ray_origin.y) / ray_direction.y;
+  tmin = std::max(tmin, std::min(ty1, ty2)), tmax = std::min(tmax, std::max(ty1, ty2));
+  float tz1 = (min_coords.z - ray_origin.z) / ray_direction.z, tz2 = (max_coords.z - ray_origin.z) / ray_direction.z;
+  tmin = std::max(tmin, std::min(tz1, tz2)), tmax = std::min(tmax, std::max(tz1, tz2));
+  return tmax >= tmin && tmax > 0;
+}

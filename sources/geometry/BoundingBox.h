@@ -49,6 +49,10 @@ namespace geometry {
 
     [[nodiscard]] bool operator==(const BoundingBox &other) const;
     [[nodiscard]] BoundingBox operator+(const BoundingBox &addbox) const;
+    /**
+     * @brief Takes normalized ray direction , in object space
+     */
+    [[nodiscard]] bool intersect(const glm::vec3 &ray_dir, const glm::vec3 &origin) const;
   };
 
   class AABBInterface {
