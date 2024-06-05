@@ -15,7 +15,6 @@ class ResourceDatabaseManager;
 class RenderPipeline;
 class GLMutablePixelBufferObject;
 class EnvmapTextureManager;
-template<class T>
 class NovaRenderEngineInterface;
 
 class NovaRenderer final : public IRenderer {
@@ -39,7 +38,7 @@ class NovaRenderer final : public IRenderer {
  private:
   Texture *framebuffer_texture{};
   std::unique_ptr<GLMutablePixelBufferObject> pbo_read;
-  std::unique_ptr<NovaLRengineInterface> nova_engine;
+  std::unique_ptr<NovaRenderEngineInterface> nova_engine;
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
   std::unique_ptr<nova::NovaResources> nova_engine_data;
   ApplicationConfig *global_application_config{};

@@ -17,25 +17,14 @@ namespace nova {
     scene::Accelerator acceleration_structure{};
   };
 
-  class NovaRenderEngineLR;
-  class NovaRenderEngineGR;
   struct Tile;
 }  // namespace nova
 
-template<class RENDERER_TYPE>
 class NovaRenderEngineInterface {
  public:
-  glm::vec4 sample_color(const nova::Ray &ray, const nova::NovaResources *nova_resources, int depth) {
-    return (static_cast<RENDERER_TYPE *>(this))->engine_sample_color(ray, nova_resources, depth);
-  }
-  void render_tile(nova::HdrBufferStruct *out_buffers, nova::Tile &tile, const nova::NovaResources *nova_resources) {
-    (static_cast<RENDERER_TYPE *>(this))->engine_render_tile(out_buffers, tile, nova_resources);
-  }
+  virtual ~NovaRenderEngineInterface() = default;
+  virtual glm::vec4 engine_sample_color(const nova::Ray &ray, nova::NovaResources *nova_resources, int depth) = 0;
+  virtual void engine_render_tile(nova::HdrBufferStruct *out_buffers, nova::Tile &tile, nova::NovaResources *nova_resources) = 0;
 };
 
-/* Use for local rays. */
-using NovaLRengineInterface = NovaRenderEngineInterface<nova::NovaRenderEngineLR>;
-
-/* Use for generalized rays.*/
-using NovaGRengineInterface = NovaRenderEngineInterface<nova::NovaRenderEngineGR>;
 #endif  // NOVAINTERFACE_H

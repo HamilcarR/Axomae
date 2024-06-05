@@ -14,12 +14,11 @@
 #include "Scene.h"
 #include "TextureProcessing.h"
 #include "nova_material.h"
-#include "shape/Sphere.h"
 #include "shape/Square.h"
 #include "shape/Triangle.h"
 #include <unistd.h>
 
-static constexpr int MAX_RECUR_DEPTH = 50;
+static constexpr int MAX_RECUR_DEPTH = 20;
 static std::mutex mutex;
 NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *widget) : NovaRenderer() {
   resource_database = &ResourceDatabaseManager::getInstance();
@@ -35,7 +34,7 @@ NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *wi
   accumulated_render_buffer.resize(resolution.width * resolution.height * 4);
   final_render_buffer.resize(resolution.width * resolution.height * 4);
   pbo_read = std::make_unique<GLMutablePixelBufferObject>(GLMutablePixelBufferObject::UP, partial_render_buffer.size() * sizeof(float));
-  nova_engine = std::make_unique<NovaLRengineInterface>();
+  nova_engine = std::make_unique<nova::NovaRenderEngineLR>();
   current_frame = next_frame = 0;
 }
 
@@ -83,10 +82,14 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
   nova_engine_data->scene_data.primitives.clear();
   nova_engine_data->scene_data.shapes.clear();
   std::unique_ptr<nova_material::NovaMaterialInterface> mat1 = std::make_unique<nova_material::NovaDielectricMaterial>(
-      glm::vec4(1.f, 0.3f, 0.2f, 1.f), 1.5f);
-  nova_engine_data->scene_data.materials_collection.push_back(std::move(mat1));
-  auto c1 = nova_engine_data->scene_data.materials_collection[0].get();
+      glm::vec4(0.6f, 0.5f, 0.4f, 1.f), 1.9f);
 
+  std::unique_ptr<nova_material::NovaMaterialInterface> mat2 = std::make_unique<nova_material::NovaConductorMaterial>(glm::vec4(1.f, 1.f, 1.f, 1.f),
+                                                                                                                      0.008f);
+  nova_engine_data->scene_data.materials_collection.push_back(std::move(mat1));
+  nova_engine_data->scene_data.materials_collection.push_back(std::move(mat2));
+  auto c1 = nova_engine_data->scene_data.materials_collection[0].get();
+  auto c2 = nova_engine_data->scene_data.materials_collection[1].get();
   for (const auto &elem : new_scene.mesh_list) {
     const Object3D &geometry = elem->getGeometry();
     for (int i = 0; i < geometry.indices.size(); i += 3) {
@@ -107,9 +110,9 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
       v3.y = geometry.vertices[idx + 1];
       v3.z = geometry.vertices[idx + 2];
 
-      v1 = elem->getAccumulatedModelMatrix() * glm::vec4(v1, 1.f);
-      v2 = elem->getAccumulatedModelMatrix() * glm::vec4(v2, 1.f);
-      v3 = elem->getAccumulatedModelMatrix() * glm::vec4(v3, 1.f);
+      v1 = elem->computeFinalTransformation() * glm::vec4(v1, 1.f);
+      v2 = elem->computeFinalTransformation() * glm::vec4(v2, 1.f);
+      v3 = elem->computeFinalTransformation() * glm::vec4(v3, 1.f);
 
       auto tri = nova::shape::NovaShapeInterface::create<nova_shape::Triangle>(v1, v2, v3);
       nova_engine_data->scene_data.shapes.push_back(std::move(tri));
