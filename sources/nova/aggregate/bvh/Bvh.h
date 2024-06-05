@@ -10,16 +10,11 @@ namespace nova::aggregate {
   constexpr unsigned int CACHE_LINE = 64;
 
   /* bvh node.*/
-  struct alignas(CACHE_LINE) Bvhnl {
+  struct Bvhnl {
     float min[3];
     float max[3];
     int32_t left;
-    int32_t right;
-    int32_t first_prim;
     int32_t primitive_count;
-
-    /**/
-    char _pad[24];
   };
 
   struct Bvht_data {
@@ -71,14 +66,14 @@ namespace nova::aggregate {
     bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const override;
 
    private:
-    bool intersect_bvh(const Ray &r,
-                       float tmin,
-                       float tmax,
-                       hit_data &data,
-                       base_options *user_options,
-                       const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives,
-                       const Bvht_data &bvh,
-                       int32_t node_id) const;
+    bool traverse(const Ray &r,
+                  float tmin,
+                  float tmax,
+                  hit_data &data,
+                  base_options *user_options,
+                  const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives,
+                  const Bvht_data &bvh,
+                  int32_t node_id) const;
   };
 
 }  // namespace nova::aggregate

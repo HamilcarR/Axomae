@@ -14,11 +14,10 @@ Bvht_data BvhtlBuilder::build(const std::vector<std::unique_ptr<primitive::NovaP
   for (int i = 0; i < primitives.size(); i++)
     bvh_data.prim_idx.push_back(i);
   Bvhnl &root = bvh_data.l_tree[0];
-  root.left = root.right = 0;
+  root.left = 0;
   root.primitive_count = prim_size;
-  root.first_prim = 0;
   update_aabb(primitives, 0, bvh_data);
-  int32_t node_count = 1;
+  int32_t node_count = 2;
   subdivide(primitives, 0, node_count, segmentation, bvh_data);
   return bvh_data;
 }
@@ -31,7 +30,7 @@ void BvhtlBuilder::update_aabb(const std::vector<std::unique_ptr<primitive::Nova
 
   Bvhnl &node = bvh_data.l_tree[node_id];
   geometry::BoundingBox node_box(glm::vec3(INT_MAX), glm::vec3(INT_MIN));
-  size_t offset = node.first_prim;
+  size_t offset = node.left;
   for (size_t i = 0; i < node.primitive_count; i++) {
     int32_t idx = bvh_data.prim_idx[i + offset];
     AX_ASSERT_LT(idx, primitives.size());
@@ -68,7 +67,7 @@ inline int32_t create_nodes(const std::vector<std::unique_ptr<nova::primitive::N
                             const float split_axis[3],
                             int axis) {
 
-  int32_t i = node.first_prim;
+  int32_t i = node.left;
   int32_t j = i + node.primitive_count - 1;
   /* i is the index of prim_idx under which every primitive is at the left of the split plane*/
   while (i <= j) {
@@ -101,22 +100,24 @@ void BvhtlBuilder::subdivide(const std::vector<std::unique_ptr<primitive::NovaPr
   /* Sort the index array for each primitive at the left of the split_axis*/
   int i = create_nodes(primitives, bvh_data.prim_idx, node, split_axis, axis);
 
-  int left_count = i - node.first_prim;
+  int left_count = i - node.left;
   if (left_count == 0 || left_count == node.primitive_count)
     return;
   int32_t left_idx = nodes_used++;
   int32_t right_idx = nodes_used++;
   Bvhnl &left = bvh_data.l_tree[left_idx];
   Bvhnl &right = bvh_data.l_tree[right_idx];
-  left.first_prim = node.first_prim;
+
+  left.left = node.left;
   left.primitive_count = left_count;
-  right.first_prim = i;
+
+  right.left = i;
   right.primitive_count = node.primitive_count - left_count;
+
   AX_ASSERT_GE(right.primitive_count, 0);
   AX_ASSERT_GE(left.primitive_count, 0);
   node.primitive_count = 0;
   node.left = left_idx;
-  node.right = right_idx;
   update_aabb(primitives, left_idx, bvh_data);
   update_aabb(primitives, right_idx, bvh_data);
   subdivide(primitives, left_idx, nodes_used, seg, bvh_data);
@@ -137,55 +138,48 @@ void Bvhtl::build(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInte
   bvh = BvhtlBuilder::build(*primitives, segmentation);
 }
 
-bool Bvhtl::intersect_bvh(const Ray &r,
-                          float tmin,
-                          float tmax,
-                          hit_data &data,
-                          base_options *user_options,
-                          const std::vector<std::unique_ptr<prim::NovaPrimitiveInterface>> *primitives,
-                          const Bvht_data &bvh,
-                          int32_t node_id) const {
+bool Bvhtl::traverse(const Ray &r,
+                     float tmin,
+                     float tmax,
+                     hit_data &data,
+                     base_options *user_options,
+                     const std::vector<std::unique_ptr<prim::NovaPrimitiveInterface>> *primitives,
+                     const Bvht_data &bvh,
+                     int32_t node_id) const {
 
-  AX_ASSERT_NOTNULL(hit_option);
+  AX_ASSERT_NOTNULL(user_option);
   const Bvhnl &node = bvh.l_tree[node_id];
   const geometry::BoundingBox node_bbox(node.min, node.max);
-  const nova::shape::Box hitable_bbox(node_bbox);
 
-  /* TODO : Messy ...
-   * 1) Add fast_hit() to Hitable .
-   * 2) implement fast_hit() in BoundingBox
-   * 3) test intersection using fast_hit()
-   */
-  glm::vec3 n;
-  float t;
-  if (!hitable_bbox.intersect(r, tmin, tmax, n, t))
+  if (!node_bbox.intersect(r.direction, r.origin))
     return false;
   if (node.primitive_count != 0) {  // node is a leaf
+    bool hit = false;
     for (int32_t i = 0; i < node.primitive_count; i++) {
-      int32_t offset = i + node.first_prim;
+      int32_t offset = i + node.left;
       AX_ASSERT_LT(offset, bvh.prim_idx.size());
       int32_t p_idx = bvh.prim_idx[offset];
       AX_ASSERT_LT(p_idx, primitives->size());
       const nova::primitive::NovaPrimitiveInterface *prim = (*primitives)[p_idx].get();
-      if (prim->hit(r, tmin, tmax, data, user_options)) {
+      auto *hit_option = (base_options_bvh *)user_options;
+      if (prim->hit(r, tmin, hit_option->data.tmin, data, nullptr)) {
+        hit = true;
         /* not the best solution , but dynamic cast here is worse */
-        base_options_bvh *hit_option = (base_options_bvh *)user_options;
-        if (data.t < hit_option->data.tmin) {
+        if (data.t <= hit_option->data.tmin) {
           hit_option->data.last_prim = prim;
           hit_option->data.tmin = data.t;
         }
-        return true;
       }
     }
-    return false;
+    return hit;
   }
-  bool left = intersect_bvh(r, tmin, tmax, data, user_options, primitives, bvh, node.left);
-  bool right = intersect_bvh(r, tmin, tmax, data, user_options, primitives, bvh, node.right);
+  bool left = traverse(r, tmin, tmax, data, user_options, primitives, bvh, node.left);
+  bool right = traverse(r, tmin, tmax, data, user_options, primitives, bvh, node.left + 1);
   return right || left;
 }
 
 bool Bvhtl::hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const {
   if (!primitives)
     return false;
-  return intersect_bvh(r, tmin, tmax, data, user_options, primitives, bvh, 0);
+  return traverse(r, tmin, tmax, data, user_options, primitives, bvh, 0);
 }
