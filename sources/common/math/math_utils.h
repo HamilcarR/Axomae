@@ -12,6 +12,6 @@
 #include <glm/vec3.hpp>
 
 namespace math {
-  constexpr long double epsilon = 1e-6;
+  inline constexpr double epsilon = 1e-6;
 }
 #endif

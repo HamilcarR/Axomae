@@ -17,7 +17,7 @@
 // clang-format on
 #define AX_UNREACHABLE assert(false && "Unreachable code executed!");
 
-#define AX_ASSERT_NOTNULL(expr) assert(expr != nullptr)
+#define AX_ASSERT_NOTNULL(expr) assert(expr)
 #define AX_ASSERT_FALSE(expr) assert(!expr)
 #define AX_ASSERT_TRUE(expr) assert(expr)
 #define AX_ASSERT_NEQ(expr1, expr2) assert(epxr1 != expr2)

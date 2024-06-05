@@ -16,12 +16,11 @@ Triangle::Triangle(const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &
 bool Triangle::intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &normal_at_intersection, float &t) const {
   glm::vec3 P = glm::cross(ray.direction, e2);
   const float det = glm::dot(P, e1);
-  const float inv_det = 1.f / det;
-
   /* backface cull */
-  if (det < math::epsilon && det > -math::epsilon)
-    return false;
+  // if (det < epsilon && det > -epsilon)
+  //  return false;
 
+  const float inv_det = 1.f / det;
   glm::vec3 T = ray.origin - v0;
   const float u = glm::dot(P, T) * inv_det;
   if (u < 0 || u > 1.f)
