@@ -5,7 +5,7 @@
 constexpr float RAND_DX = 0.0005;
 constexpr float RAND_DY = 0.0005;
 namespace nova {
-  glm::vec4 NovaRenderEngineLR::engine_sample_color(const Ray &ray, NovaResources *nova_resources, int depth) {
+  glm::vec4 NovaRenderEngineLR::engine_sample_color(const Ray &ray, const NovaResources *nova_resources, int depth) {
     hit_data hit_d;
     bool hit = false;
     float min_t = MAXFLOAT;
@@ -28,7 +28,7 @@ namespace nova {
     return {texturing::sample_cubemap(sample_vector, &nova_resources->envmap_data), 1.f};
   }
 
-  void NovaRenderEngineLR::engine_render_tile(HdrBufferStruct *buffers, Tile &tile, NovaResources *nova_resources) {
+  void NovaRenderEngineLR::engine_render_tile(HdrBufferStruct *buffers, Tile &tile, const NovaResources *nova_resources) {
     AX_ASSERT(nova_resources, "Scene description is invalid.");
     for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
       for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
