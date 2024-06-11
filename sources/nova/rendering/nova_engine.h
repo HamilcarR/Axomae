@@ -1,7 +1,7 @@
 #ifndef NOVA_ENGINE_H
 #define NOVA_ENGINE_H
 #include "nova_utils.h"
-
+#include <atomic>
 #include <map>
 
 namespace nova {
@@ -24,6 +24,8 @@ namespace nova {
       int aliasing_samples{};
       int renderer_max_samples{};
       int max_depth{};
+      std::atomic_long latency;
+      bool *cancel_render;
     };
   }  // namespace engine
 }  // namespace nova

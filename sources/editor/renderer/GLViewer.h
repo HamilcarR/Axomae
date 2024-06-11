@@ -59,7 +59,7 @@ class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
   [[nodiscard]] image::ImageHolder<uint8_t> getRenderScreenshotUint8(int width, int height) const;
   [[nodiscard]] image::ImageHolder<float> getRenderScreenshotFloat(int width, int height) const;
   [[nodiscard]] image::Rgb getFramebufferColor(int x, int y) const;
-
+  void closeEvent(QCloseEvent *event) override;
   template<RENDERER_CALLBACK_ENUM callback_id, class... Args>
   constexpr void rendererCallback(Args &&...args);
 

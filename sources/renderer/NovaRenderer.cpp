@@ -18,7 +18,7 @@
 #include "shape/Triangle.h"
 #include <unistd.h>
 
-static constexpr int MAX_RECUR_DEPTH = 20;
+static constexpr int MAX_RECUR_DEPTH = 10;
 static std::mutex mutex;
 NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *widget) : NovaRenderer() {
   resource_database = &ResourceDatabaseManager::getInstance();
@@ -165,6 +165,7 @@ void NovaRenderer::initializeEngine() {
   nova_engine_data->renderer_data.aliasing_samples = 8;
   nova_engine_data->renderer_data.renderer_max_samples = 10000;
   nova_engine_data->renderer_data.max_depth = MAX_RECUR_DEPTH;
+  nova_engine_data->renderer_data.cancel_render = &cancel_render;
 }
 
 void NovaRenderer::displayProgress(float current, float target) {
@@ -248,6 +249,12 @@ void NovaRenderer::onResize(unsigned int width, unsigned int height) {
   if (camera_framebuffer)
     camera_framebuffer->resize();
 }
+void NovaRenderer::onClose() {
+  cancel_render = true;
+  if (global_application_config && global_application_config->getThreadPool())
+    global_application_config->getThreadPool()->emptyQueue();
+  syncRenderEngineThreads();
+}
 
 void NovaRenderer::emptyAccumBuffer() {
   std::memset(accumulated_render_buffer.data(), 0, screen_size.width * screen_size.height * 4 * sizeof(float));
@@ -263,8 +270,11 @@ void NovaRenderer::emptyBuffers() {
 }
 
 void NovaRenderer::prepareRedraw() {
-  if (global_application_config)
+  if (global_application_config && global_application_config->getThreadPool())
     global_application_config->getThreadPool()->emptyQueue();
+  cancel_render = true;
+  syncRenderEngineThreads();
+  cancel_render = false;
   current_frame = 1;
   emptyBuffers();
 }

@@ -32,12 +32,20 @@ namespace nova {
     AX_ASSERT(nova_resources, "Scene description is invalid.");
     for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
       for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
+        if (*nova_resources->renderer_data.cancel_render)
+          return;
+
         const unsigned int idx = (y * tile.image_total_width + x) * 4;
         glm::vec4 rgb{};
+        /* Converts screen coordinates into NDC.*/
         const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
+
         for (int i = 0; i < tile.sample_per_tile; i++) {
+
+          /* Samples random direction around the pixel for AA. */
           const float dx = math::random::nrandf(-RAND_DX, RAND_DX);
           const float dy = math::random::nrandf(-RAND_DY, RAND_DY);
+
           math::camera::camera_ray r = math::camera::ray_inv_mat(
               ndc.x + dx, ndc.y + dy, nova_resources->camera_data.inv_P, nova_resources->camera_data.inv_VM);
           Ray ray(r.near, r.far);

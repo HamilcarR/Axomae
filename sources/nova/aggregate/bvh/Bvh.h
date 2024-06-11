@@ -4,10 +4,7 @@
 #include "primitive/nova_primitive.h"
 
 namespace nova::aggregate {
-  /* Assume 64 bytes cache line for now
-   * TODO: distributed arch may need tweaking
-   */
-  constexpr unsigned int CACHE_LINE = 64;
+
 
   /* bvh node.*/
   struct Bvhnl {

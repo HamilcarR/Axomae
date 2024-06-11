@@ -147,7 +147,7 @@ bool Bvhtl::traverse(const Ray &r,
                      const Bvht_data &bvh,
                      int32_t node_id) const {
 
-  AX_ASSERT_NOTNULL(user_option);
+  AX_ASSERT_NOTNULL(user_options);
   const Bvhnl &node = bvh.l_tree[node_id];
   const geometry::BoundingBox node_bbox(node.min, node.max);
 

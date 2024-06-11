@@ -72,6 +72,7 @@ class Renderer final : public IRenderer {
   void draw() override;
   void processEvent(const controller::event::Event *event) override;
   void onResize(unsigned int width, unsigned int height) override;
+  void onClose() override;
   void setDefaultFrameBufferId(unsigned id) override { default_framebuffer_id = id; }
   void getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) override;
   [[nodiscard]] unsigned int *getDefaultFrameBufferIdPointer() override { return &default_framebuffer_id; }

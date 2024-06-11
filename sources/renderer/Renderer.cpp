@@ -163,6 +163,7 @@ void Renderer::onResize(unsigned int width, unsigned int height) {
     camera_framebuffer->resize();
   }
 }
+void Renderer::onClose() {}
 
 void Renderer::setGammaValue(float value) {
   if (camera_framebuffer) {

@@ -18,6 +18,7 @@ class EnvmapTextureManager;
 class NovaRenderEngineInterface;
 
 class NovaRenderer final : public IRenderer {
+
  private:
   struct NovaInternalMetadata {
     float max_channel_color_value;
@@ -49,6 +50,7 @@ class NovaRenderer final : public IRenderer {
   Dim2 resolution{2048, 2048};
   int current_frame{}, next_frame{}, scanline{};
   bool needRedraw{false};
+  bool cancel_render{false};
   float *pbo_map_buffer{};
   NovaInternalMetadata renderer_data{};
   nova::HdrBufferStruct engine_render_buffers;
@@ -80,6 +82,7 @@ class NovaRenderer final : public IRenderer {
   void draw() override;
   void processEvent(const controller::event::Event *event) override;
   void onResize(unsigned int width, unsigned int height) override;
+  void onClose() override;
   void setDefaultFrameBufferId(unsigned id) override;
   void setNewScene(const SceneChangeData &new_scene) override;
   [[nodiscard]] unsigned int *getDefaultFrameBufferIdPointer() override;
