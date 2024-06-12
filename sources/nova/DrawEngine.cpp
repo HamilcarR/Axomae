@@ -11,7 +11,7 @@ namespace nova {
     float min_t = MAXFLOAT;
     const primitive::NovaPrimitiveInterface *last_primit = nullptr;
     const aggregate::Bvhtl &bvh = nova_resources->acceleration_structure.accelerator;
-    aggregate::bvh_hit_data bvh_hit{min_t, nullptr};
+    aggregate::bvh_helper_struct bvh_hit{min_t, nullptr, nova_resources->renderer_data.cancel_render};
     aggregate::base_options_bvh opts;
     opts.data = bvh_hit;
 
@@ -47,7 +47,7 @@ namespace nova {
           const float dy = math::random::nrandf(-RAND_DY, RAND_DY);
 
           math::camera::camera_ray r = math::camera::ray_inv_mat(
-              ndc.x + dx, ndc.y + dy, nova_resources->camera_data.inv_P, nova_resources->camera_data.inv_VM);
+              ndc.x + dx, ndc.y + dy, nova_resources->camera_data.inv_P, nova_resources->camera_data.inv_VM);  // TODO : move VM away
           Ray ray(r.near, r.far);
           rgb += engine_sample_color(ray, nova_resources, nova_resources->renderer_data.max_depth);
         }

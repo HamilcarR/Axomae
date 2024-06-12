@@ -67,6 +67,7 @@ namespace controller {
     void setApplicationConfig(ApplicationConfig &&configuration);
     Ui::MainWindow &getUi() { return main_window_ui; }
     static SDL_Surface *copy_surface(SDL_Surface *surface);
+    void closeEvent(QCloseEvent *event) override;
 
    private:
     void connect_all_slots();

@@ -5,7 +5,6 @@
 
 namespace nova::aggregate {
 
-
   /* bvh node.*/
   struct Bvhnl {
     float min[3];
@@ -38,11 +37,12 @@ namespace nova::aggregate {
 
   /****************************************************************************************************************************/
 
-  struct bvh_hit_data {
+  struct bvh_helper_struct {
     float tmin;
     const nova::primitive::NovaPrimitiveInterface *last_prim;
+    const bool *stop_traversal;
   };
-  struct base_options_bvh : public hit_options<bvh_hit_data> {};
+  struct base_options_bvh : public hit_options<bvh_helper_struct> {};
 
   class Bvhtl final : public Hitable {
    private:
@@ -71,6 +71,15 @@ namespace nova::aggregate {
                   const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives,
                   const Bvht_data &bvh,
                   int32_t node_id) const;
+
+    /* Doesn't use recursion */
+    bool linear_traverse(const Ray &r,
+                         float tmin,
+                         float tmax,
+                         hit_data &data,
+                         base_options *user_options,
+                         const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives,
+                         const Bvht_data &bvh) const;
   };
 
 }  // namespace nova::aggregate

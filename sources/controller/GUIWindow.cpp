@@ -310,7 +310,11 @@ namespace controller {
     } else
       return nullptr;
   }
-  //! replace by constexpr function here
+  void Controller::closeEvent(QCloseEvent *event) {
+    QMainWindow::closeEvent(event);
+    if (current_workspace->getContext() & UI_RENDERER_NOVA)
+      nova_viewer->closeEvent(event);
+  }
   /**************************************************************************************************************/
   QGraphicsView *Controller::get_corresponding_view(IMAGETYPE type) {
     switch (type) {

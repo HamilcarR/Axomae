@@ -77,7 +77,9 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
   namespace nova_shape = nova::shape;
 
   resetToBaseState();
+  cancel_render = true;
   syncRenderEngineThreads();
+  cancel_render = false;
   nova_engine_data->scene_data.materials_collection.clear();
   nova_engine_data->scene_data.primitives.clear();
   nova_engine_data->scene_data.shapes.clear();
@@ -186,8 +188,6 @@ void NovaRenderer::draw() {
   engine_render_buffers.accumulator_buffer = accumulated_render_buffer.data();
   engine_render_buffers.partial_buffer = partial_render_buffer.data();
   engine_render_buffers.byte_size_buffers = screen_size.height * screen_size.width * sizeof(float) * 4;
-  PerformanceLogger perf;
-  perf.startTimer();
 
   populateNovaSceneResources();
   if (needRedraw) {
@@ -213,7 +213,7 @@ void NovaRenderer::draw() {
   }
   framebuffer_texture->bindTexture();
   pbo_read->bind();
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // TODO : use wrappers
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
   // Set texture filtering mode
@@ -230,11 +230,7 @@ void NovaRenderer::draw() {
 
   pbo_read->unbind();
   framebuffer_texture->unbindTexture();
-
-  perf.endTimer();
-  perf.print();
   camera_framebuffer->renderFrameBufferMesh();
-
   displayProgress(current_frame, nova_engine_data->renderer_data.renderer_max_samples);
   current_frame++;
   scanline++;
