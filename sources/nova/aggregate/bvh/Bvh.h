@@ -1,39 +1,9 @@
 #ifndef BVH_H
 #define BVH_H
 #include "BoundingBox.h"
+#include "BvhBuilder.h"
 #include "primitive/nova_primitive.h"
-
 namespace nova::aggregate {
-
-  /* bvh node.*/
-  struct Bvhnl {
-    float min[3];
-    float max[3];
-    int32_t left;
-    int32_t primitive_count;
-  };
-
-  struct Bvht_data {
-    std::vector<Bvhnl> l_tree;
-    std::vector<int32_t> prim_idx;
-  };
-
-  /* Creates a linear bvh with good cache coherence*/
-  class BvhtlBuilder {
-   public:
-    enum SEGMENTATION : unsigned { SAH, HLBVH };
-
-   public:
-    static Bvht_data build(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> &primitives, SEGMENTATION segmentation = SAH);
-
-   private:
-    static void update_aabb(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> &primitives, int32_t node_id, Bvht_data &bvh_data);
-    static void subdivide(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> &primitives,
-                          int32_t node_id,
-                          int32_t &nodes_used,
-                          SEGMENTATION segmentation,
-                          Bvht_data &bvh_data);
-  };
 
   /****************************************************************************************************************************/
 
@@ -63,23 +33,22 @@ namespace nova::aggregate {
     bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const override;
 
    private:
-    bool traverse(const Ray &r,
-                  float tmin,
-                  float tmax,
-                  hit_data &data,
-                  base_options *user_options,
-                  const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives,
-                  const Bvht_data &bvh,
-                  int32_t node_id) const;
+    bool rec_traverse(const Ray &r,
+                      float tmin,
+                      float tmax,
+                      hit_data &data,
+                      base_options *user_options,
+                      const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives,
+                      const Bvht_data &bvh,
+                      int32_t node_id) const;
 
-    /* Doesn't use recursion */
-    bool linear_traverse(const Ray &r,
-                         float tmin,
-                         float tmax,
-                         hit_data &data,
-                         base_options *user_options,
-                         const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives,
-                         const Bvht_data &bvh) const;
+    bool iter_traverse(const Ray &r,
+                       float tmin,
+                       float tmax,
+                       hit_data &data,
+                       base_options *user_options,
+                       const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives,
+                       const Bvht_data &bvh) const;
   };
 
 }  // namespace nova::aggregate
