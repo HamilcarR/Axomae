@@ -11,7 +11,7 @@ vec3 sphericalToUv(in vec3 coord) {
   float x = coord.x;
   float y = coord.y;
   float z = coord.z;
-  float theta = atan(z, x);
+  float theta = atan(-z, x);
   float phi = acos(y);
   float u = theta / (2.0 * PI);
   float v = phi / PI;
