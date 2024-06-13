@@ -9,23 +9,22 @@
 #include "GLMutablePixelBufferObject.h"
 #include "GLViewer.h"
 #include "NovaGeoPrimitive.h"
-#include "PerformanceLogger.h"
 #include "RenderPipeline.h"
 #include "Scene.h"
 #include "TextureProcessing.h"
 #include "nova_material.h"
-#include "shape/Square.h"
-#include "shape/Triangle.h"
 #include <unistd.h>
 
-static constexpr int MAX_RECUR_DEPTH = 10;
+static constexpr int MAX_RECUR_DEPTH = 7;
+static constexpr int MAX_SAMPLES = 10000;
+static constexpr int NUM_TILES = 20;
 static std::mutex mutex;
 NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *widget) : NovaRenderer() {
   resource_database = &ResourceDatabaseManager::getInstance();
   camera_framebuffer = std::make_unique<CameraFrameBuffer>(*resource_database, &screen_size, &default_framebuffer_id);
   gl_widget = widget;
   render_pipeline = std::make_unique<RenderPipeline>(&default_framebuffer_id, gl_widget, resource_database);
-  scene_camera = database::node::store<ArcballCamera>(*resource_database->getNodeDatabase(), true, 90.f, 0.1f, 10000.f, 50.f, &screen_size).object;
+  scene_camera = database::node::store<ArcballCamera>(*resource_database->getNodeDatabase(), true, 45.f, 0.1f, 10000.f, 50.f, &screen_size).object;
   scene = std::make_unique<Scene>(*resource_database);
   envmap_manager = std::make_unique<EnvmapTextureManager>(
       *resource_database, screen_size, default_framebuffer_id, *render_pipeline, nullptr, EnvmapTextureManager::SELECTED);
@@ -60,73 +59,20 @@ void NovaRenderer::initialize(ApplicationConfig *app_conf) {
 void NovaRenderer::resetToBaseState() {
   current_frame = 1;
   nova_engine_data->renderer_data.max_depth = 1;
-  if (global_application_config && global_application_config->getThreadPool())
+  cancel_render = true;
+  if (global_application_config && global_application_config->getThreadPool()) {
     global_application_config->getThreadPool()->emptyQueue();
+    syncRenderEngineThreads();
+  }
   emptyAccumBuffer();
   populateNovaSceneResources();
+
+  cancel_render = false;
 }
 
 void NovaRenderer::syncRenderEngineThreads() {
   if (global_application_config && global_application_config->getThreadPool())
     global_application_config->getThreadPool()->fence();
-}
-
-void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
-  namespace nova_material = nova::material;
-  namespace nova_primitive = nova::primitive;
-  namespace nova_shape = nova::shape;
-
-  resetToBaseState();
-  cancel_render = true;
-  syncRenderEngineThreads();
-  cancel_render = false;
-  nova_engine_data->scene_data.materials_collection.clear();
-  nova_engine_data->scene_data.primitives.clear();
-  nova_engine_data->scene_data.shapes.clear();
-  std::unique_ptr<nova_material::NovaMaterialInterface> mat1 = std::make_unique<nova_material::NovaDielectricMaterial>(
-      glm::vec4(0.6f, 0.5f, 0.4f, 1.f), 1.9f);
-
-  std::unique_ptr<nova_material::NovaMaterialInterface> mat2 = std::make_unique<nova_material::NovaConductorMaterial>(glm::vec4(1.f, 1.f, 1.f, 1.f),
-                                                                                                                      0.008f);
-  nova_engine_data->scene_data.materials_collection.push_back(std::move(mat1));
-  nova_engine_data->scene_data.materials_collection.push_back(std::move(mat2));
-  auto c1 = nova_engine_data->scene_data.materials_collection[0].get();
-  auto c2 = nova_engine_data->scene_data.materials_collection[1].get();
-  for (const auto &elem : new_scene.mesh_list) {
-    const Object3D &geometry = elem->getGeometry();
-    for (int i = 0; i < geometry.indices.size(); i += 3) {
-      glm::vec3 v1{}, v2{}, v3{};
-      // V1
-      int idx = geometry.indices[i] * 3;
-      v1.x = geometry.vertices[idx];
-      v1.y = geometry.vertices[idx + 1];
-      v1.z = geometry.vertices[idx + 2];
-      // V2
-      idx = geometry.indices[i + 1] * 3;
-      v2.x = geometry.vertices[idx];
-      v2.y = geometry.vertices[idx + 1];
-      v2.z = geometry.vertices[idx + 2];
-
-      idx = geometry.indices[i + 2] * 3;
-      v3.x = geometry.vertices[idx];
-      v3.y = geometry.vertices[idx + 1];
-      v3.z = geometry.vertices[idx + 2];
-
-      v1 = elem->computeFinalTransformation() * glm::vec4(v1, 1.f);
-      v2 = elem->computeFinalTransformation() * glm::vec4(v2, 1.f);
-      v3 = elem->computeFinalTransformation() * glm::vec4(v3, 1.f);
-
-      auto tri = nova::shape::NovaShapeInterface::create<nova_shape::Triangle>(v1, v2, v3);
-      nova_engine_data->scene_data.shapes.push_back(std::move(tri));
-      auto s1 = nova_engine_data->scene_data.shapes.back().get();
-      auto primit = nova::primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s1, c1);
-      nova_engine_data->scene_data.primitives.push_back(std::move(primit));
-    }
-  }
-
-  /* Build accelerator */
-  const auto *primitive_collection_ptr = &nova_engine_data->scene_data.primitives;
-  nova_engine_data->acceleration_structure.accelerator.build(primitive_collection_ptr);
 }
 
 bool NovaRenderer::prep_draw() {
@@ -162,10 +108,10 @@ void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int ch
 }
 
 void NovaRenderer::initializeEngine() {
-  nova_engine_data->renderer_data.tiles_w = 20;
-  nova_engine_data->renderer_data.tiles_h = 20;
+  nova_engine_data->renderer_data.tiles_w = NUM_TILES;
+  nova_engine_data->renderer_data.tiles_h = NUM_TILES;
   nova_engine_data->renderer_data.aliasing_samples = 8;
-  nova_engine_data->renderer_data.renderer_max_samples = 10000;
+  nova_engine_data->renderer_data.renderer_max_samples = MAX_SAMPLES;
   nova_engine_data->renderer_data.max_depth = MAX_RECUR_DEPTH;
   nova_engine_data->renderer_data.cancel_render = &cancel_render;
 }
@@ -362,77 +308,4 @@ void NovaRenderer::setDefaultFrameBufferId(unsigned int id) {}
 
 unsigned int *NovaRenderer::getDefaultFrameBufferIdPointer() { return nullptr; }
 
-Scene &NovaRenderer::getScene() const { return *scene; }
-
 RenderPipeline &NovaRenderer::getRenderPipeline() const { return *render_pipeline; }
-
-void NovaRenderer::setGammaValue(float value) {
-  if (camera_framebuffer) {
-    camera_framebuffer->setGamma(value);
-  }
-}
-
-void NovaRenderer::setExposureValue(float value) {
-  if (camera_framebuffer) {
-    camera_framebuffer->setExposure(value);
-  }
-}
-
-void NovaRenderer::setNoPostProcess() {
-  if (camera_framebuffer) {
-    camera_framebuffer->setPostProcessDefault();
-  }
-}
-
-void NovaRenderer::setPostProcessEdge() {
-  if (camera_framebuffer) {
-    camera_framebuffer->setPostProcessEdge();
-  }
-}
-
-void NovaRenderer::setPostProcessSharpen() {
-  if (camera_framebuffer) {
-    camera_framebuffer->setPostProcessSharpen();
-  }
-}
-
-void NovaRenderer::setPostProcessBlurr() {
-  if (camera_framebuffer) {
-    camera_framebuffer->setPostProcessBlurr();
-  }
-}
-
-void NovaRenderer::resetSceneCamera() {
-  if (scene_camera) {
-    scene_camera->reset();
-  }
-}
-
-void NovaRenderer::setRasterizerFill() {
-  if (scene) {
-    scene->setPolygonFill();
-  }
-}
-
-void NovaRenderer::setRasterizerPoint() {
-  if (scene) {
-    scene->setPolygonPoint();
-  }
-}
-
-void NovaRenderer::setRasterizerWireframe() {
-  if (scene) {
-    scene->setPolygonWireframe();
-  }
-}
-
-void NovaRenderer::displayBoundingBoxes(bool display) {
-  if (scene) {
-    scene->displayBoundingBoxes(display);
-  }
-}
-void NovaRenderer::setViewerWidget(GLViewer *widget) {
-  gl_widget = widget;
-  if (render_pipeline)
-    render_pipeline->setContextSwitcher(widget);
-}

@@ -1,5 +1,6 @@
 add_library(ax_nova
         DrawEngine.cpp
+        aggregate/bvh/BvhBuilder.cpp
 
 )
 

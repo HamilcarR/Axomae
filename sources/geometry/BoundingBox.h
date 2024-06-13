@@ -53,6 +53,7 @@ namespace geometry {
      * @brief Takes normalized ray direction , in object space
      */
     [[nodiscard]] bool intersect(const glm::vec3 &ray_dir, const glm::vec3 &origin) const;
+    [[nodiscard]] float area() const;
   };
 
   class AABBInterface {

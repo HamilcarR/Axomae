@@ -1,8 +1,8 @@
 #include "BoundingBox.h"
-
 #include "Axomae_macros.h"
 
 using namespace geometry;
+
 glm::vec3 calculateCenter(glm::vec3 min_coords, glm::vec3 max_coords);
 
 glm::vec3 &update_min(glm::vec3 &min_vec, glm::vec3 &compared) {
@@ -27,8 +27,8 @@ glm::vec3 &update_max(glm::vec3 &max_vec, glm::vec3 &compared) {
 
 BoundingBox::BoundingBox() {
   center = glm::vec3(0.f);
-  max_coords = glm::vec3(0.f);
-  min_coords = glm::vec3(0.f);
+  max_coords = glm::vec3(INT_MIN);
+  min_coords = glm::vec3(INT_MAX);
 }
 BoundingBox::BoundingBox(const float min_coords_[3], const float max_coords_[3]) {
   AX_ASSERT_NOTNULL(min_coords_);
@@ -182,4 +182,9 @@ bool BoundingBox::intersect(const glm::vec3 &ray_direction, const glm::vec3 &ray
   float tz1 = (min_coords.z - ray_origin.z) / ray_direction.z, tz2 = (max_coords.z - ray_origin.z) / ray_direction.z;
   tmin = std::max(tmin, std::min(tz1, tz2)), tmax = std::min(tmax, std::max(tz1, tz2));
   return tmax >= tmin && tmax > 0;
+}
+
+float BoundingBox::area() const {
+  const glm::vec3 lwh = max_coords - min_coords;
+  return lwh.x * lwh.y + lwh.y * lwh.z + lwh.z * lwh.x;
 }

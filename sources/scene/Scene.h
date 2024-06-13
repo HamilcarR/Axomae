@@ -11,7 +11,6 @@
  *
  */
 
-// TODO: [AX-14] Add mouse picking
 // TODO: [AX-34] Add object lookup system
 
 class Camera;
