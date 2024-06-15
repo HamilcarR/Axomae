@@ -18,7 +18,6 @@ namespace nova::aggregate {
     std::vector<int32_t> prim_idx;
   };
 
-  /* Creates a linear bvh with good cache coherence*/
   class BvhtlBuilder {
    public:
     enum SEGMENTATION : unsigned { SAH, HLBVH };

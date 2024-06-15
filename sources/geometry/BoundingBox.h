@@ -53,6 +53,9 @@ namespace geometry {
      * @brief Takes normalized ray direction , in object space
      */
     [[nodiscard]] bool intersect(const glm::vec3 &ray_dir, const glm::vec3 &origin) const;
+
+    [[nodiscard]] float intersect(const glm::vec3 &ray_dir, const glm::vec3 &origin, float dist_min) const;
+
     [[nodiscard]] float area() const;
   };
 

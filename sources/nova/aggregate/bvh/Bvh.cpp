@@ -7,7 +7,6 @@
 
 using namespace nova::aggregate;
 
-
 namespace prim = nova::primitive;
 Bvhtl::Bvhtl(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives_, BvhtlBuilder::SEGMENTATION seg)
     : primitives(primitives_) {
@@ -65,10 +64,12 @@ bool Bvhtl::rec_traverse(const Ray &r,
   bool right = rec_traverse(r, tmin, tmax, data, user_options, primitives, bvh, node.left + 1);
   return right || left;
 }
+#pragma GCC push_option
+#pragma GCC optimize("O0")
 
 bool Bvhtl::iter_traverse(const Ray &r,
                           float tmin,
-                          float tmax,
+                          float /*tmax*/,
                           hit_data &data,
                           base_options *user_options,
                           const std::vector<primitive_ptr> *primitives,
@@ -79,21 +80,38 @@ bool Bvhtl::iter_traverse(const Ray &r,
   const Bvhnl *iterator_node = &bvh.l_tree[0];
   AX_ASSERT_NOTNULL(iterator_node);
   bool hit = false;
-  std::deque<const Bvhnl *> node_stack;
+  std::deque<const Bvhnl *> node_stack;  // TODO: profile this
   node_stack.push_back(iterator_node);
   while (!node_stack.empty() && !*options->data.stop_traversal) {
     iterator_node = node_stack.back();
     node_stack.pop_back();
-    const geometry::BoundingBox node_aabb(iterator_node->min, iterator_node->max);
-    if (!node_aabb.intersect(r.direction, r.origin))
-      continue;
-
     /* Is not a leaf */
     if (iterator_node->primitive_count == 0) {
-      AX_ASSERT_LT(iterator_node->left + 1, bvh.l_tree.size());
-      node_stack.push_back(&bvh.l_tree[iterator_node->left + 1]);
+
       AX_ASSERT_LT(iterator_node->left, bvh.l_tree.size());
-      node_stack.push_back(&bvh.l_tree[iterator_node->left]);
+      AX_ASSERT_LT(iterator_node->left + 1, bvh.l_tree.size());
+
+      const Bvhnl *left = &bvh.l_tree[iterator_node->left];
+      const Bvhnl *right = &bvh.l_tree[iterator_node->left + 1];
+      const geometry::BoundingBox left_aabb(left->min, left->max);
+      const geometry::BoundingBox right_aabb(right->min, right->max);
+      float left_intersect = left_aabb.intersect(r.direction, r.origin, options->data.tmin);
+      float right_intersect = right_aabb.intersect(r.direction, r.origin, options->data.tmin);
+      if (left_intersect > right_intersect) {
+        std::swap(left_intersect, right_intersect);
+        std::swap(left, right);
+      }
+
+      /* No intersection.*/
+      if (left_intersect == 1e30f)
+        continue;
+      /* Only intersection with left child aabb */
+      if (right_intersect == 1e30f) {
+        node_stack.push_back(left);
+        continue;
+      }
+      node_stack.push_back(right);
+      node_stack.push_back(left);
     }
 
     /* Is a leaf */
@@ -116,6 +134,7 @@ bool Bvhtl::iter_traverse(const Ray &r,
   }
   return hit;
 }
+#pragma GCC pop_option
 
 bool Bvhtl::hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const {
   if (!primitives)
