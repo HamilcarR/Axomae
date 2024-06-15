@@ -90,7 +90,7 @@ static float eval_sah(const Bvht_data &tree,
   const float cost = aabb_left.area() * (float)prim_left_count + aabb_right.area() * (float)prim_right_count;
   return cost > 0.f ? cost : INT_MAX;
 }
-
+#define SEGMENT_COUNT 32
 static int axis_subdiv_sah(const Bvht_data &bvh_tree_data,
                            const std::vector<std::unique_ptr<nova::primitive::NovaPrimitiveInterface>> &primitives,
                            int32_t node_id,
@@ -101,13 +101,16 @@ static int axis_subdiv_sah(const Bvht_data &bvh_tree_data,
   float best_position = 0.f;
   float best_cost = INT_MAX;
   const Bvhnl &node = bvh_tree_data.l_tree[node_id];
-  for (int axis = 0; axis < 3; axis++)
-    for (int32_t i = 0; i < node.primitive_count; i++) {
-      const int32_t offset = i + node.left;
-      AX_ASSERT_LT(offset, bvh_tree_data.prim_idx.size());
-      const int32_t p_idx = bvh_tree_data.prim_idx[offset];
-      const auto *primitive = primitives[p_idx].get();
-      const float candidate = glm::value_ptr(primitive->centroid())[axis];
+
+  for (int axis = 0; axis < 3; axis++) {
+    const float bound_min = node.min[axis];
+    const float bound_max = node.max[axis];
+    float aabb_axis_dist = bound_max - bound_min;
+    if (aabb_axis_dist == 0)
+      continue;
+    float segment_size = aabb_axis_dist / (float)SEGMENT_COUNT;
+    for (int i = 0; i < SEGMENT_COUNT; i++) {
+      float candidate = segment_size * i + bound_min;
       const float cost = eval_sah(bvh_tree_data, primitives, node, axis, candidate);
       if (cost < best_cost) {
         best_cost = cost;
@@ -115,6 +118,7 @@ static int axis_subdiv_sah(const Bvht_data &bvh_tree_data,
         best_position = candidate;
       }
     }
+  }
   subdivided_axis[best_axis] = best_position;
   best_coast_r = best_cost;
   return best_axis;

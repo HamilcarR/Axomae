@@ -64,8 +64,6 @@ bool Bvhtl::rec_traverse(const Ray &r,
   bool right = rec_traverse(r, tmin, tmax, data, user_options, primitives, bvh, node.left + 1);
   return right || left;
 }
-#pragma GCC push_option
-#pragma GCC optimize("O0")
 
 bool Bvhtl::iter_traverse(const Ray &r,
                           float tmin,
@@ -80,7 +78,8 @@ bool Bvhtl::iter_traverse(const Ray &r,
   const Bvhnl *iterator_node = &bvh.l_tree[0];
   AX_ASSERT_NOTNULL(iterator_node);
   bool hit = false;
-  std::deque<const Bvhnl *> node_stack;  // TODO: profile this
+
+  std::deque<const Bvhnl *> node_stack{};
   node_stack.push_back(iterator_node);
   while (!node_stack.empty() && !*options->data.stop_traversal) {
     iterator_node = node_stack.back();
@@ -134,7 +133,6 @@ bool Bvhtl::iter_traverse(const Ray &r,
   }
   return hit;
 }
-#pragma GCC pop_option
 
 bool Bvhtl::hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const {
   if (!primitives)
