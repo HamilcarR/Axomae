@@ -3,10 +3,10 @@ add_library(ax_renderer
         light/LightingSystem.cpp
         Renderer.cpp
         RenderPipeline.cpp
-        NovaRenderer.cpp
-        NovaRenderer_scene.cpp
-        NovaRenderer_postprocess.cpp
-        NovaRenderer_bake.cpp
+        nova/NovaRenderer.cpp
+        nova/NovaRenderer_scene.cpp
+        nova/NovaRenderer_postprocess.cpp
+        nova/NovaRenderer_bake.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_renderer)
@@ -36,5 +36,6 @@ target_include_directories(ax_renderer
 PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/light
+
 )
 

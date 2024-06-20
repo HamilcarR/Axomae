@@ -1,6 +1,6 @@
 #include "NovaViewerWidget.h"
 #include "GLViewer.h"
-#include "NovaRenderer.h"
+#include "nova/NovaRenderer.h"
 #include "metadata/RgbDisplayerLabel.h"
 
 #include <QGridLayout>

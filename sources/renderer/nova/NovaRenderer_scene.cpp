@@ -20,12 +20,26 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
       glm::vec4(0.6f, 0.5f, 0.4f, 1.f), 1.9f);
 
   std::unique_ptr<nova_material::NovaMaterialInterface> mat2 = std::make_unique<nova_material::NovaConductorMaterial>(glm::vec4(1.f, 1.f, 1.f, 1.f),
-                                                                                                                      0.008f);
+                                                                                                                      0.002f);
+
+  std::unique_ptr<nova_material::NovaMaterialInterface> mat3 = std::make_unique<nova_material::NovaDielectricMaterial>(
+      glm::vec4(1.0f, 0.2f, 0.1f, 1.f), 1.5f);
+
+  std::unique_ptr<nova_material::NovaMaterialInterface> mat4 = std::make_unique<nova_material::NovaDielectricMaterial>(
+      glm::vec4(0.3f, 0.9f, 0.1f, 1.f), 2.4f);
+
   nova_engine_data->scene_data.materials_collection.push_back(std::move(mat1));
   nova_engine_data->scene_data.materials_collection.push_back(std::move(mat2));
+  nova_engine_data->scene_data.materials_collection.push_back(std::move(mat3));
+  nova_engine_data->scene_data.materials_collection.push_back(std::move(mat4));
   auto c1 = nova_engine_data->scene_data.materials_collection[0].get();
   auto c2 = nova_engine_data->scene_data.materials_collection[1].get();
+  auto c3 = nova_engine_data->scene_data.materials_collection[2].get();
+  auto c4 = nova_engine_data->scene_data.materials_collection[3].get();
+  nova::material::NovaMaterialInterface *materials[4] = {c1, c2, c3, c4};
+  int x = 0;
   for (const auto &elem : new_scene.mesh_list) {
+    x = x > 3 ? 0 : x;
     const Object3D &geometry = elem->getGeometry();
     for (int i = 0; i < geometry.indices.size(); i += 3) {
       glm::vec3 v1{}, v2{}, v3{};
@@ -52,9 +66,10 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
       auto tri = nova::shape::NovaShapeInterface::create<nova_shape::Triangle>(v1, v2, v3);
       nova_engine_data->scene_data.shapes.push_back(std::move(tri));
       auto s1 = nova_engine_data->scene_data.shapes.back().get();
-      auto primit = nova::primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s1, c1);
+      auto primit = nova::primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(s1, materials[x]);
       nova_engine_data->scene_data.primitives.push_back(std::move(primit));
     }
+    x++;
   }
 
   /* Build accelerator */
