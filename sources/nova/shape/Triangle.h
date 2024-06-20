@@ -8,6 +8,7 @@ namespace nova::shape {
   class Triangle final : public NovaShapeInterface {
    private:
     glm::vec3 v0{}, v1{}, v2{};
+    glm::vec3 n1{}, n2{}, n3{};
     glm::vec3 e1{};
     glm::vec3 e2{};
     glm::vec3 center{};

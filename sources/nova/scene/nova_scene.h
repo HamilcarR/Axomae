@@ -7,6 +7,8 @@
 #include <memory>
 
 namespace nova::scene {
+
+  // TODO : use memory pool
   struct SceneResourcesHolder {
     std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> primitives;
     std::vector<std::unique_ptr<shape::NovaShapeInterface>> shapes;

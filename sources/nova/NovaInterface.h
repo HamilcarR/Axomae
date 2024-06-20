@@ -9,7 +9,8 @@
 #include <map>
 namespace nova {
 
-  struct NovaResources {
+  class NovaResources {
+   public:
     texturing::EnvmapResourcesHolder envmap_data{};
     camera::CameraResourcesHolder camera_data{};
     engine::EngineResourcesHolder renderer_data{};
