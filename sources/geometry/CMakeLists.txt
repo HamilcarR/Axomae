@@ -1,5 +1,6 @@
 add_library(ax_geometry
         BoundingBox.cpp
+        Object3D.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_geometry)

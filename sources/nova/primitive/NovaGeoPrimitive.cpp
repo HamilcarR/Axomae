@@ -9,7 +9,7 @@ NovaGeoPrimitive::NovaGeoPrimitive(shape::NovaShapeInterface *s, material::NovaM
 
 bool NovaGeoPrimitive::hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const {
   glm::vec3 normal{};
-  float t{};
+  float t = data.t;
   if (!shape->intersect(r, tmin, tmax, normal, t))
     return false;
   data.normal = glm::normalize(normal);

@@ -1,6 +1,6 @@
 #include "Triangle.h"
-
 #include "Ray.h"
+#include "math_utils.h"
 
 using namespace nova::shape;
 
@@ -8,6 +8,11 @@ Triangle::Triangle(const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &
   e1 = v1 - v0;
   e2 = v2 - v0;
   center = (v0 + v1 + v2) * 0.3333f;
+}
+Triangle::Triangle(const glm::vec3 vertices[3], const glm::vec3 normals[3]) : Triangle(vertices[0], vertices[1], vertices[2]) {
+  n0 = normals[0];
+  n1 = normals[1];
+  n2 = normals[2];
 }
 
 /*
@@ -30,17 +35,24 @@ bool Triangle::intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &norm
   const float v = glm::dot(Q, ray.direction) * inv_det;
   if (v < 0.f || (u + v) > 1.f)
     return false;
-
   t = glm::dot(Q, e2) * inv_det;
+  /* Early return in case this triangle is farther than the last intersected shape. */
   if (t < tmin || t > tmax)
     return false;
-  normal_at_intersection = glm::cross(e1, e2);
-  if (glm::dot(normal_at_intersection, -ray.direction) < 0)
-    normal_at_intersection = -normal_at_intersection;
-  normal_at_intersection = glm::normalize(normal_at_intersection);
+  if (!hasValidNormals()) {
+    normal_at_intersection = glm::cross(e1, e2);
+    if (glm::dot(normal_at_intersection, -ray.direction) < 0)
+      normal_at_intersection = -normal_at_intersection;
+    normal_at_intersection = glm::normalize(normal_at_intersection);
+  } else {
 
+    /* Returns barycentric interpolated normal at intersection t.  */
+    const float w = 1 - (u + v);
+    normal_at_intersection = glm::normalize(n0 * u + n1 * v + n2 * w);
+  }
   return true;
 }
+
 geometry::BoundingBox Triangle::computeAABB() const {
   glm::vec3 min = glm::min(v0, glm::min(v1, v2));
   glm::vec3 max = glm::max(v0, glm::max(v1, v2));

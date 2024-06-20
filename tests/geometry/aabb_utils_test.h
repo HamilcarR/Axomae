@@ -1,6 +1,6 @@
 #ifndef AABB_UTILS_TEST_H
 #define AABB_UTILS_TEST_H
-
+#include "geometry_shapes.h"
 #include "math_utils.h"
 #define f_rand math::random::nrandf(-2000.f, 2000.f)
 
@@ -9,16 +9,8 @@ constexpr unsigned ITERATION_NUMBER = 50;
 
 const float MIN_COORD = -200.f;
 const float MAX_COORD = 200.f;
-const std::vector<float> vertices = {
-    -1, -1, -1,  // 0
-    1,  -1, -1,  // 1
-    -1, 1,  -1,  // 2
-    1,  1,  -1,  // 3
-    -1, -1, 1,   // 4
-    1,  -1, 1,   // 5
-    -1, 1,  1,   // 6
-    1,  1,  1    // 7
-};
+
+const std::vector<float> vertices = CUBE::vertices;
 
 // clang-format off
 const std::vector<float> directions = {
