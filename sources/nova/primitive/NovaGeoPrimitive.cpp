@@ -5,16 +5,17 @@
 #include "nova_shape.h"
 using namespace nova::primitive;
 
-NovaGeoPrimitive::NovaGeoPrimitive(shape::NovaShapeInterface *s, material::NovaMaterialInterface *m) : material(m), shape(s) {}
+NovaGeoPrimitive::NovaGeoPrimitive(std::unique_ptr<shape::NovaShapeInterface> &shape_, std::unique_ptr<material::NovaMaterialInterface> &material_) {
+  shape = std::move(shape_);
+  material = std::move(material_);
+}
+NovaGeoPrimitive::~NovaGeoPrimitive() = default;
 
 bool NovaGeoPrimitive::hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const {
-  glm::vec3 normal{};
-  float t = data.t;
-  if (!shape->intersect(r, tmin, tmax, normal, t))
+  if (!shape->hit(r, tmin, tmax, data, user_options))
     return false;
-  data.normal = glm::normalize(normal);
-  data.position = r.pointAt(t);
-  data.t = t;
+  data.normal = glm::normalize(data.normal);
+  data.position = r.pointAt(data.t);
   return true;
 }
 

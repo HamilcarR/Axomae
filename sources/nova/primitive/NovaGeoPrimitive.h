@@ -2,19 +2,27 @@
 #define NOVAGEOPRIMITIVE_H
 #include "nova_primitive.h"
 
+namespace material {
+  class NovaMaterialInterface;
+}
+
+namespace shape {
+  class NovaShapeInterface;
+}
+
 namespace nova::primitive {
   class NovaGeoPrimitive final : public NovaPrimitiveInterface {
    private:
-    material::NovaMaterialInterface *material{};
-    shape::NovaShapeInterface *shape{};
+    std::unique_ptr<material::NovaMaterialInterface> material{};
+    std::unique_ptr<shape::NovaShapeInterface> shape{};
 
    public:
     NovaGeoPrimitive() = default;
-    NovaGeoPrimitive(shape::NovaShapeInterface *shape, material::NovaMaterialInterface *material);
-    ~NovaGeoPrimitive() override = default;
-    NovaGeoPrimitive(const NovaGeoPrimitive &other) = default;
+    NovaGeoPrimitive(std::unique_ptr<shape::NovaShapeInterface> &shape, std::unique_ptr<material::NovaMaterialInterface> &material);
+    ~NovaGeoPrimitive() override;
+    NovaGeoPrimitive(const NovaGeoPrimitive &other) = delete;
     NovaGeoPrimitive(NovaGeoPrimitive &&other) noexcept = default;
-    NovaGeoPrimitive &operator=(const NovaGeoPrimitive &other) = default;
+    NovaGeoPrimitive &operator=(const NovaGeoPrimitive &other) = delete;
     NovaGeoPrimitive &operator=(NovaGeoPrimitive &&other) noexcept = default;
 
     bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const override;

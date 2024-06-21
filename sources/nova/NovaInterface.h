@@ -11,7 +11,7 @@ namespace nova {
 
   class NovaResources {
    public:
-    texturing::EnvmapResourcesHolder envmap_data{};
+    texturing::TextureResourcesHolder envmap_data{};
     camera::CameraResourcesHolder camera_data{};
     engine::EngineResourcesHolder renderer_data{};
     scene::SceneResourcesHolder scene_data{};
