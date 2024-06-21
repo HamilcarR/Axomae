@@ -1,9 +1,9 @@
 #ifndef NOVA_MATERIAL_H
 #define NOVA_MATERIAL_H
 #include "Axomae_macros.h"
-#include "Hitable.h"
 #include "Ray.h"
 #include "nova_utils.h"
+#include "ray/Hitable.h"
 #include <memory>
 
 /* Lambertian shading */

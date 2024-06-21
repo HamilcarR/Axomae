@@ -20,6 +20,7 @@ namespace nova {
     glm::vec3 normal{};
     glm::vec3 position{};
     glm::vec4 attenuation{};
+    float u{}, v{};
   };
 
   class Ray;

@@ -18,7 +18,7 @@ Triangle::Triangle(const glm::vec3 vertices[3], const glm::vec3 normals[3]) : Tr
 /*
  * https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
  */
-bool Triangle::intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &normal_at_intersection, float &t) const {
+bool Triangle::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const {
   glm::vec3 P = glm::cross(ray.direction, e2);
   const float det = glm::dot(P, e1);
   /* backface cull */
@@ -35,20 +35,20 @@ bool Triangle::intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &norm
   const float v = glm::dot(Q, ray.direction) * inv_det;
   if (v < 0.f || (u + v) > 1.f)
     return false;
-  t = glm::dot(Q, e2) * inv_det;
+  data.t = glm::dot(Q, e2) * inv_det;
   /* Early return in case this triangle is farther than the last intersected shape. */
-  if (t < tmin || t > tmax)
+  if (data.t < tmin || data.t > tmax)
     return false;
   if (!hasValidNormals()) {
-    normal_at_intersection = glm::cross(e1, e2);
-    if (glm::dot(normal_at_intersection, -ray.direction) < 0)
-      normal_at_intersection = -normal_at_intersection;
-    normal_at_intersection = glm::normalize(normal_at_intersection);
+    data.normal = glm::cross(e1, e2);
+    if (glm::dot(data.normal, -ray.direction) < 0)
+      data.normal = -data.normal;
+    data.normal = glm::normalize(data.normal);
   } else {
 
     /* Returns barycentric interpolated normal at intersection t.  */
     const float w = 1 - (u + v);
-    normal_at_intersection = glm::normalize(n0 * u + n1 * v + n2 * w);
+    data.normal = glm::normalize(n0 * u + n1 * v + n2 * w);
   }
   return true;
 }

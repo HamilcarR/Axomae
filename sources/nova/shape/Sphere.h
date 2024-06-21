@@ -3,7 +3,7 @@
 #include "BoundingBox.h"
 #include "math_utils.h"
 #include "nova_shape.h"
-#include "scene/Hitable.h"
+#include "ray/Hitable.h"
 
 namespace nova::shape {
   class Sphere final : public NovaShapeInterface {
@@ -19,7 +19,7 @@ namespace nova::shape {
     Sphere(Sphere &&move) noexcept = default;
     Sphere &operator=(const Sphere &copy) = delete;
     Sphere &operator=(Sphere &&move) noexcept = default;
-    bool intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &normal, float &t) const override;
+    bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const override;
     [[nodiscard]] glm::vec3 centroid() const override { return origin; }
     [[nodiscard]] geometry::BoundingBox computeAABB() const override;
   };

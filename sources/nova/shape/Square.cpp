@@ -2,20 +2,20 @@
 #include "Ray.h"
 
 using namespace nova::shape;
-bool Square::intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &normal_r, float &t) const {
+bool Square::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const {
   glm::vec3 n = normal;
   if (glm::dot(ray.origin - origin, n) < 0)
     n = -n;
 
   float NdotTo_O = glm::dot(n, ray.origin - origin);
   float NdotD = glm::dot(n, -ray.direction);
-  normal_r = n;
+  data.normal = n;
   if (NdotD <= math::epsilon)
     return false;
-  t = NdotTo_O / NdotD;
-  if (t < tmin || t > tmax)
+  data.t = NdotTo_O / NdotD;
+  if (data.t < tmin || data.t > tmax)
     return false;
-  glm::vec3 p = ray.pointAt(t);
+  glm::vec3 p = ray.pointAt(data.t);
   glm::vec3 w_abs = glm::abs(side_w);
   glm::vec3 h_abs = glm::abs(side_h);
   float SdotP_w = glm::dot(p - origin, w_abs);

@@ -53,8 +53,9 @@ void Scene::setScene(const SceneTree &tree, const std::vector<Mesh *> &mesh_list
 void Scene::generateBoundingBoxes(Shader *box_shader) {
   for (Scene::AABB &scene_drawable : scene) {
     Mesh *mesh = scene_drawable.drawable->getMeshPointer();
-    BoundingBoxMesh *bbox_mesh =
-        database::node::store<BoundingBoxMesh>(*resource_manager.getNodeDatabase(), false, mesh, scene_drawable.aabb.computeAABB(), box_shader).object;
+    BoundingBoxMesh *bbox_mesh = database::node::store<BoundingBoxMesh>(
+                                     *resource_manager.getNodeDatabase(), false, mesh, scene_drawable.aabb.computeAABB(), box_shader)
+                                     .object;
     auto bbox_drawable = std::make_unique<Drawable>(bbox_mesh);
     bounding_boxes_array.push_back(bbox_drawable.get());
     drawable_collection.push_back(std::move(bbox_drawable));
@@ -232,15 +233,13 @@ void Scene::focusOnRenderable(int x, int y) {
   const math::camera::camera_ray r = math::camera::ray(
       x, y, (int)dimensions->width, (int)dimensions->height, scene_camera->getProjection(), scene_camera->getView());
 
-  for (const std::pair<const float, AABB> &it : sorted_meshes) {  // replace by space partition
+  for (const std::pair<const float, AABB> &it : sorted_meshes) {  // replace by space partition (or depth buffer picking)
     AABB elem = it.second;
     const glm::mat4 world_mat = elem.drawable->getMeshPointer()->computeFinalTransformation();
     const glm::mat4 inv_world_mat = glm::inverse(world_mat);
     const nova::Ray ray(inv_world_mat * glm::vec4(r.near, 1.f), inv_world_mat * glm::vec4(r.far, 0.f));
-    glm::vec3 normal{0};
-    float t = 0.f;
-
-    if (elem.aabb.intersect(ray, scene_camera->getNear(), scene_camera->getFar(), normal, t)) {
+    nova::hit_data data{};
+    if (elem.aabb.hit(ray, scene_camera->getNear(), scene_camera->getFar(), data, nullptr)) {
       glm::vec3 pos = elem.aabb.getPosition();
       const glm::vec3 box_center_worldspace = world_mat * glm::vec4(pos, 1.f);
       scene_camera->focus(box_center_worldspace);

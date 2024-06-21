@@ -49,28 +49,29 @@ static bool test_intersection(const glm::vec3 &x_axis,
 
   const float max = std::min(std::min(txmax, tymax), tzmax);
   const float min = std::max(std::max(txmin, tymin), tzmin);
-  t = min;
+  float ret = min;
 
   if (max < min)
     return false;
   if (max > 0) {
-    if (t > tmax)
+    if (ret > tmax)
       return false;
+    t = ret;
     return true;
   }
   if (min < 0)
     return false;
+  t = ret;
   return true;
 }
 
-bool Box::intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &normal_at_intersection, float &t) const {
+bool Box::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const {
   const glm::vec3 x_axis = glm::vec3(1, 0, 0);
   const glm::vec3 y_axis = glm::vec3(0, 1, 0);
   const glm::vec3 z_axis = glm::vec3(0, 0, 1);
   const glm::vec3 tmin_coords = aabb.getMinCoords();
   const glm::vec3 tmax_coords = aabb.getMaxCoords();
-  const glm::vec3 delta = ray.origin;
-  bool hit_success = test_intersection(x_axis, y_axis, z_axis, ray.origin, ray.direction, tmin_coords, tmax_coords, tmin, tmax, t);
+  bool hit_success = test_intersection(x_axis, y_axis, z_axis, ray.origin, ray.direction, tmin_coords, tmax_coords, tmin, tmax, data.t);
   if (hit_success) {
     return true;
   }

@@ -1,8 +1,8 @@
+#include "shape/Box.h"
 #include "BoundingBox.h"
 #include "Test.h"
 #include "geometry/aabb_utils_test.h"
 #include "ray/Ray.h"
-#include "shape/Box.h"
 
 using namespace geometry;
 using namespace nova::shape;
@@ -26,9 +26,8 @@ TEST(BoxTest, outIntersection) {
       isoutside = is_outside_box(out_position, B1.computeAABB());
     } while (!isoutside);
     const nova::Ray ray(out_position, glm::normalize(B1.getPosition() - out_position));
-    glm::vec3 n;
-    float intersect_dist = 0.f;
-    EXPECT_TRUE(B1.intersect(ray, 0.001, 10000.f, n, intersect_dist));
+    nova::hit_data data;
+    EXPECT_TRUE(B1.hit(ray, 0.001, 10000.f, data, nullptr));
   }
 }
 
@@ -49,8 +48,8 @@ TEST(BoxTest, inIntersection) {
       const glm::vec3 direction{directions[i], directions[i + 1], directions[i + 2]};
       const nova::Ray ray(out_position, direction);
       glm::vec3 n;
-      float intersect_dist = 0.f;
-      EXPECT_TRUE(B1.intersect(ray, 0.001, 10000.f, n, intersect_dist));
+      nova::hit_data data;
+      EXPECT_TRUE(B1.hit(ray, 0.001, 10000.f, data, nullptr));
     }
   }
 }

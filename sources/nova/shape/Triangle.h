@@ -22,7 +22,7 @@ namespace nova::shape {
     Triangle(Triangle &&other) noexcept = default;
     Triangle &operator=(const Triangle &other) = default;
     Triangle &operator=(Triangle &&other) noexcept = default;
-    bool intersect(const Ray &ray, float tmin, float tmax, glm::vec3 &normal_at_intersection, float &t) const override;
+    bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const override;
     [[nodiscard]] glm::vec3 centroid() const override { return center; }
     [[nodiscard]] geometry::BoundingBox computeAABB() const override;
 
