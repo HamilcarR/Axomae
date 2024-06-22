@@ -65,6 +65,13 @@ bool Bvhtl::rec_traverse(const Ray &r,
   return right || left;
 }
 
+static constexpr int MAX_STACK_SIZE = 2048;
+
+inline void add2stack(const Bvhnl *node_stack[MAX_STACK_SIZE], const Bvhnl *element, int &iterator_idx) {
+  if (iterator_idx + 1 < MAX_STACK_SIZE)
+    node_stack[++iterator_idx] = element;
+}
+
 bool Bvhtl::iter_traverse(const Ray &r,
                           float tmin,
                           float /*tmax*/,
@@ -78,12 +85,13 @@ bool Bvhtl::iter_traverse(const Ray &r,
   const Bvhnl *iterator_node = &bvh.l_tree[0];
   AX_ASSERT_NOTNULL(iterator_node);
   bool hit = false;
-
-  std::deque<const Bvhnl *> node_stack{};
-  node_stack.push_back(iterator_node);
-  while (!node_stack.empty() && !*options->data.stop_traversal) {
-    iterator_node = node_stack.back();
-    node_stack.pop_back();
+  // std::deque<const Bvhnl *> node_stack{};
+  const Bvhnl *node_stack[MAX_STACK_SIZE] = {nullptr};
+  node_stack[0] = iterator_node;
+  int iterator_idx = 0;
+  while (iterator_idx != -1 && !*options->data.stop_traversal) {
+    iterator_node = node_stack[iterator_idx];
+    iterator_idx--;
     /* Is not a leaf */
     if (iterator_node->primitive_count == 0) {
 
@@ -106,11 +114,12 @@ bool Bvhtl::iter_traverse(const Ray &r,
         continue;
       /* Only intersection with left child aabb */
       if (right_intersect == 1e30f) {
-        node_stack.push_back(left);
+        if (iterator_idx + 1 < MAX_STACK_SIZE)
+          add2stack(node_stack, left, iterator_idx);
         continue;
       }
-      node_stack.push_back(right);
-      node_stack.push_back(left);
+      add2stack(node_stack, right, iterator_idx);
+      add2stack(node_stack, left, iterator_idx);
     }
 
     /* Is a leaf */
