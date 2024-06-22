@@ -4,6 +4,8 @@
 #include "Ray.h"
 #include "nova_utils.h"
 #include "ray/Hitable.h"
+#include "texturing/nova_texturing.h"
+
 #include <memory>
 
 /* Lambertian shading */
@@ -25,46 +27,46 @@ namespace nova {
 
     class NovaDiffuseMaterial final : public NovaMaterialInterface {
      private:
-      glm::vec4 albedo;
+      std::unique_ptr<texturing::NovaTextureInterface> albedo;
 
      public:
-      explicit NovaDiffuseMaterial(const glm::vec4 &col) : albedo(col) {}
+      explicit NovaDiffuseMaterial(const glm::vec4 &col);
       ~NovaDiffuseMaterial() override = default;
-      NovaDiffuseMaterial(const NovaDiffuseMaterial &other) = default;
+      NovaDiffuseMaterial(const NovaDiffuseMaterial &other) = delete;
       NovaDiffuseMaterial(NovaDiffuseMaterial &&other) noexcept = default;
-      NovaDiffuseMaterial &operator=(const NovaDiffuseMaterial &other) = default;
+      NovaDiffuseMaterial &operator=(const NovaDiffuseMaterial &other) = delete;
       NovaDiffuseMaterial &operator=(NovaDiffuseMaterial &&other) noexcept = default;
       bool scatter(const Ray &in, Ray &out, hit_data &hit_d) const override;
     };
 
     class NovaConductorMaterial final : public NovaMaterialInterface {
      private:
-      glm::vec4 albedo;
+      std::unique_ptr<texturing::NovaTextureInterface> albedo;
       float fuzz{};
 
      public:
-      explicit NovaConductorMaterial(const glm::vec4 &color) : albedo(color) {}
-      NovaConductorMaterial(const glm::vec4 &color, float fuzz_) : albedo(color), fuzz(fuzz_) {}
+      explicit NovaConductorMaterial(const glm::vec4 &color);
+      NovaConductorMaterial(const glm::vec4 &color, float fuzz_);
       ~NovaConductorMaterial() override = default;
-      NovaConductorMaterial(const NovaConductorMaterial &other) = default;
+      NovaConductorMaterial(const NovaConductorMaterial &other) = delete;
       NovaConductorMaterial(NovaConductorMaterial &&other) noexcept = default;
-      NovaConductorMaterial &operator=(const NovaConductorMaterial &other) = default;
+      NovaConductorMaterial &operator=(const NovaConductorMaterial &other) = delete;
       NovaConductorMaterial &operator=(NovaConductorMaterial &&other) noexcept = default;
       bool scatter(const Ray &in, Ray &out, hit_data &hit_d) const override;
     };
 
     class NovaDielectricMaterial final : public NovaMaterialInterface {
      private:
-      glm::vec4 albedo;
+      std::unique_ptr<texturing::NovaTextureInterface> albedo;
       float eta;  // ior
 
      public:
-      explicit NovaDielectricMaterial(const glm::vec4 &color) : albedo(color), eta(1.f) {}
-      NovaDielectricMaterial(const glm::vec4 &color, float ior) : albedo(color), eta(ior) {}
+      explicit NovaDielectricMaterial(const glm::vec4 &color);
+      NovaDielectricMaterial(const glm::vec4 &color, float ior);
       ~NovaDielectricMaterial() override = default;
-      NovaDielectricMaterial(const NovaDielectricMaterial &other) = default;
+      NovaDielectricMaterial(const NovaDielectricMaterial &other) = delete;
       NovaDielectricMaterial(NovaDielectricMaterial &&other) noexcept = default;
-      NovaDielectricMaterial &operator=(const NovaDielectricMaterial &other) = default;
+      NovaDielectricMaterial &operator=(const NovaDielectricMaterial &other) = delete;
       NovaDielectricMaterial &operator=(NovaDielectricMaterial &&other) noexcept = default;
 
       bool scatter(const Ray &in, Ray &out, hit_data &hit_d) const override;

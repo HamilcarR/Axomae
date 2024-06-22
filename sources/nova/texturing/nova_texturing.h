@@ -12,8 +12,16 @@ namespace nova::texturing {
   };
 
   glm::vec3 sample_cubemap(const glm::vec3 &sample_vector, const TextureResourcesHolder *res_holder);
-
   glm::vec3 sample_cubemap_plane(const glm::vec3 &sample_vector, const glm::vec3 &up_vector, const TextureResourcesHolder *res_holder);
+
+  struct texture_sample_data {
+    glm::vec3 p;
+  };
+  class NovaTextureInterface {
+   public:
+    virtual ~NovaTextureInterface() = default;
+    [[nodiscard]] virtual glm::vec4 sample(float u, float v, const texture_sample_data &sample_data) const = 0;
+  };
 
 }  // namespace nova::texturing
 #endif  // NOVA_TEXTURING_H

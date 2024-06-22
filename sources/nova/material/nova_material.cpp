@@ -1,5 +1,5 @@
 #include "nova_material.h"
-
+#include "texturing/NovaTextures.h"
 #include <math.h>
 using namespace nova::material;
 
@@ -20,21 +20,45 @@ inline glm::vec3 rand_p_sphere() {
   return p;
 }
 
+NovaDiffuseMaterial::NovaDiffuseMaterial(const glm::vec4 &col) { albedo = std::make_unique<texturing::ConstantTexture>(col); }
+
 bool NovaDiffuseMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d) const {
   glm::vec3 hemi_rand = rand_p_sphere();
   glm::vec3 scattered = hit_d.position + hit_d.normal + hemi_rand;
   out.origin = hit_d.position;
   out.direction = glm::normalize(scattered);
-  hit_d.attenuation = albedo;
+  texturing::texture_sample_data sample_data{hit_d.position};
+  hit_d.attenuation = albedo->sample(hit_d.u, hit_d.v, sample_data);
   return true;
+}
+
+/********************************************************************************************************************************/
+
+NovaConductorMaterial::NovaConductorMaterial(const glm::vec4 &color) { albedo = std::make_unique<texturing::ConstantTexture>(color); }
+NovaConductorMaterial::NovaConductorMaterial(const glm::vec4 &color, float fuzz_) {
+  fuzz = fuzz_;
+  albedo = std::make_unique<texturing::ConstantTexture>(color);
 }
 
 bool NovaConductorMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d) const {
   glm::vec3 reflected = glm::reflect(in.direction, hit_d.normal);
   out.origin = hit_d.position;
   out.direction = glm::normalize(reflected + rand_p_sphere() * fuzz);
-  hit_d.attenuation = albedo;
+
+  texturing::texture_sample_data sample_data{hit_d.position};
+  hit_d.attenuation = albedo->sample(hit_d.u, hit_d.v, {sample_data});
   return glm::dot(out.direction, hit_d.normal) > 0.f;
+}
+
+/********************************************************************************************************************************/
+
+NovaDielectricMaterial::NovaDielectricMaterial(const glm::vec4 &color) {
+  albedo = std::make_unique<texturing::ConstantTexture>(color);
+  eta = 1.f;
+}
+NovaDielectricMaterial::NovaDielectricMaterial(const glm::vec4 &color, float ior) {
+  albedo = std::make_unique<texturing::ConstantTexture>(color);
+  eta = ior;
 }
 
 static bool refract(const glm::vec3 &v, const glm::vec3 &n, float eta, glm::vec3 &refracted) {
@@ -58,7 +82,8 @@ bool NovaDielectricMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d) c
   glm::vec3 direction = glm::normalize(in.direction);
   const glm::vec3 reflected = glm::reflect(direction, hit_d.normal);
   out.origin = hit_d.position;
-  hit_d.attenuation = albedo;
+  texturing::texture_sample_data sample_data{hit_d.position};
+  hit_d.attenuation = albedo->sample(hit_d.u, hit_d.v, sample_data);
   glm::vec3 normal = hit_d.normal;
   float index = eta;
   float reflect_prob = 0.f;
