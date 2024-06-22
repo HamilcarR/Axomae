@@ -8,16 +8,20 @@
 using namespace nova::aggregate;
 
 namespace prim = nova::primitive;
-Bvhtl::Bvhtl(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives_, BvhtlBuilder::SEGMENTATION seg)
+Bvhtl::Bvhtl(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives_,
+             BvhtlBuilder::BUILD_TYPE type,
+             BvhtlBuilder::SEGMENTATION seg)
     : primitives(primitives_) {
   AX_ASSERT_NOTNULL(primitives);
-  bvh = BvhtlBuilder::build(*primitives, seg);
+  bvh = BvhtlBuilder::build(*primitives, type, seg);
 }
 
-void Bvhtl::build(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives_, BvhtlBuilder::SEGMENTATION segmentation) {
+void Bvhtl::build(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives_,
+                  BvhtlBuilder::BUILD_TYPE type,
+                  BvhtlBuilder::SEGMENTATION segmentation) {
   AX_ASSERT_NOTNULL(primitives_);
   primitives = primitives_;
-  bvh = BvhtlBuilder::build(*primitives, segmentation);
+  bvh = BvhtlBuilder::build(*primitives, type, segmentation);
 }
 
 using primitive_ptr = std::unique_ptr<prim::NovaPrimitiveInterface>;

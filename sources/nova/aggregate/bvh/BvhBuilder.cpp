@@ -5,7 +5,9 @@
 using namespace nova::aggregate;
 using namespace nova::primitive;
 
-Bvht_data BvhtlBuilder::build(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> &primitives, SEGMENTATION segmentation) {
+Bvht_data BvhtlBuilder::build(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> &primitives,
+                              BUILD_TYPE type,
+                              SEGMENTATION segmentation) {
   Bvht_data bvh_data;
   const int32_t prim_size = primitives.size();
   /* max nodes for a btree is 2N-1*/
@@ -18,7 +20,7 @@ Bvht_data BvhtlBuilder::build(const std::vector<std::unique_ptr<primitive::NovaP
   root.primitive_count = prim_size;
   update_aabb(primitives, 0, bvh_data);
   int32_t node_count = 1;
-  subdivide(primitives, 0, node_count, segmentation, bvh_data);
+  subdivide(primitives, 0, node_count, type, segmentation, bvh_data);
   return bvh_data;
 }
 
@@ -90,13 +92,27 @@ static float eval_sah(const Bvht_data &tree,
   const float cost = aabb_left.area() * (float)prim_left_count + aabb_right.area() * (float)prim_right_count;
   return cost > 0.f ? cost : INT_MAX;
 }
-#define SEGMENT_COUNT 32
+
+static unsigned get_centroid_seg_number(BvhtlBuilder::BUILD_TYPE build_type) {
+  switch (build_type) {
+    case BvhtlBuilder::QUALITY:
+      return 256;
+    case BvhtlBuilder::MEDIUM:
+      return 32;
+    case BvhtlBuilder::PERFORMANCE:
+      return 4;
+  }
+  return 4;
+}
+
 static int axis_subdiv_sah(const Bvht_data &bvh_tree_data,
                            const std::vector<std::unique_ptr<nova::primitive::NovaPrimitiveInterface>> &primitives,
                            int32_t node_id,
                            float &best_coast_r,
-                           float subdivided_axis[3]) {
+                           float subdivided_axis[3],
+                           BvhtlBuilder::BUILD_TYPE build_type) {
 
+  const unsigned SEGMENT_COUNT = get_centroid_seg_number(build_type);
   int best_axis = -1;
   float best_position = 0.f;
   float best_cost = INT_MAX;
@@ -150,16 +166,21 @@ static int32_t create_nodes(const std::vector<std::unique_ptr<nova::primitive::N
 void BvhtlBuilder::subdivide(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> &primitives,
                              int32_t node_id,
                              int32_t &nodes_used,
+                             BUILD_TYPE build_type,
                              SEGMENTATION seg,
                              Bvht_data &bvh_data) {
   Bvhnl &node = bvh_data.l_tree[node_id];
   float split_axis[3] = {0};
   float best_cost = 0;
-  /* Retrieves longest axis */
-  // int axis = axis_subdiv(bvh_data.l_tree, node_id, split_axis);
 
-  /* SAH */
-  int axis = axis_subdiv_sah(bvh_data, primitives, node_id, best_cost, split_axis);
+  int axis = -1;
+  /* Retrieves longest axis */
+  if (seg != SAH)
+    axis = axis_subdiv(bvh_data.l_tree, node_id, split_axis);
+  else
+    /* SAH */
+    axis = axis_subdiv_sah(bvh_data, primitives, node_id, best_cost, split_axis, build_type);
+
   geometry::BoundingBox node_bbox(node.min, node.max);
   const float node_bbox_area = node_bbox.area();
   const float cost = node_bbox_area * (float)node.primitive_count;
@@ -188,6 +209,6 @@ void BvhtlBuilder::subdivide(const std::vector<std::unique_ptr<primitive::NovaPr
   node.left = left_idx;
   update_aabb(primitives, left_idx, bvh_data);
   update_aabb(primitives, right_idx, bvh_data);
-  subdivide(primitives, left_idx, nodes_used, seg, bvh_data);
-  subdivide(primitives, right_idx, nodes_used, seg, bvh_data);
+  subdivide(primitives, left_idx, nodes_used, build_type, seg, bvh_data);
+  subdivide(primitives, right_idx, nodes_used, build_type, seg, bvh_data);
 }

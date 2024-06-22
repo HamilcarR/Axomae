@@ -22,6 +22,7 @@ namespace nova::aggregate {
    public:
     Bvhtl() = default;
     explicit Bvhtl(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives,
+                   BvhtlBuilder::BUILD_TYPE build_type = BvhtlBuilder::PERFORMANCE,
                    BvhtlBuilder::SEGMENTATION segmentation = BvhtlBuilder::SAH);
     ~Bvhtl() override = default;
     Bvhtl(const Bvhtl &other) = default;
@@ -29,6 +30,7 @@ namespace nova::aggregate {
     Bvhtl &operator=(const Bvhtl &other) = default;
     Bvhtl &operator=(Bvhtl &&other) noexcept = default;
     void build(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives,
+               BvhtlBuilder::BUILD_TYPE build_type = BvhtlBuilder::PERFORMANCE,
                BvhtlBuilder::SEGMENTATION segmentation = BvhtlBuilder::SAH);
     bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const override;
 
