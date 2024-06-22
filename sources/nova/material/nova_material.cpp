@@ -20,7 +20,7 @@ inline glm::vec3 rand_p_sphere() {
   return p;
 }
 
-NovaDiffuseMaterial::NovaDiffuseMaterial(const glm::vec4 &col) { albedo = std::make_unique<texturing::ConstantTexture>(col); }
+NovaDiffuseMaterial::NovaDiffuseMaterial(texturing::NovaTextureInterface *texture) { albedo = texture; }
 
 bool NovaDiffuseMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d) const {
   glm::vec3 hemi_rand = rand_p_sphere();
@@ -34,10 +34,10 @@ bool NovaDiffuseMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d) cons
 
 /********************************************************************************************************************************/
 
-NovaConductorMaterial::NovaConductorMaterial(const glm::vec4 &color) { albedo = std::make_unique<texturing::ConstantTexture>(color); }
-NovaConductorMaterial::NovaConductorMaterial(const glm::vec4 &color, float fuzz_) {
+NovaConductorMaterial::NovaConductorMaterial(texturing::NovaTextureInterface *texture) { albedo = texture; }
+NovaConductorMaterial::NovaConductorMaterial(texturing::NovaTextureInterface *texture, float fuzz_) {
   fuzz = fuzz_;
-  albedo = std::make_unique<texturing::ConstantTexture>(color);
+  albedo = texture;
 }
 
 bool NovaConductorMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d) const {
@@ -52,15 +52,14 @@ bool NovaConductorMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d) co
 
 /********************************************************************************************************************************/
 
-NovaDielectricMaterial::NovaDielectricMaterial(const glm::vec4 &color) {
-  albedo = std::make_unique<texturing::ConstantTexture>(color);
+NovaDielectricMaterial::NovaDielectricMaterial(texturing::NovaTextureInterface *texture) {
+  albedo = texture;
   eta = 1.f;
 }
-NovaDielectricMaterial::NovaDielectricMaterial(const glm::vec4 &color, float ior) {
-  albedo = std::make_unique<texturing::ConstantTexture>(color);
+NovaDielectricMaterial::NovaDielectricMaterial(texturing::NovaTextureInterface *texture, float ior) {
+  albedo = texture;
   eta = ior;
 }
-
 static bool refract(const glm::vec3 &v, const glm::vec3 &n, float eta, glm::vec3 &refracted) {
   glm::vec3 inc = glm::normalize(v);
   float dt = glm::dot(inc, n);

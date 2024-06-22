@@ -48,7 +48,8 @@ bool Triangle::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_
 
     /* Returns barycentric interpolated normal at intersection t.  */
     const float w = 1 - (u + v);
-    data.normal = glm::normalize(n0 * u + n1 * v + n2 * w);
+    data.normal = glm::normalize(n0 * w + n1 * u + n2 * v);
+
   }
   return true;
 }

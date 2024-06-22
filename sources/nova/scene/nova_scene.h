@@ -5,7 +5,6 @@
 #include "nova_primitive.h"
 #include "shape/Sphere.h"
 #include <memory>
-
 namespace nova::scene {
 
   // TODO : use memory pool

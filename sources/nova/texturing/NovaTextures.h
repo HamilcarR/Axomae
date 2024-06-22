@@ -1,8 +1,18 @@
 #ifndef NOVATEXTURES_H
 #define NOVATEXTURES_H
-#include "nova_texturing.h"
-
+#include "math_utils.h"
 namespace nova::texturing {
+
+  struct texture_sample_data {
+    glm::vec3 p;
+  };
+
+  class NovaTextureInterface {
+   public:
+    virtual ~NovaTextureInterface() = default;
+    [[nodiscard]] virtual glm::vec4 sample(float u, float v, const texture_sample_data &sample_data) const = 0;
+  };
+
   class ConstantTexture : public NovaTextureInterface {
    private:
     glm::vec4 albedo{};

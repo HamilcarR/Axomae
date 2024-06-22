@@ -4,6 +4,7 @@
 #include "Object3D.h"
 #include "nova_material.h"
 #include "shape/Triangle.h"
+#include "texturing/NovaTextures.h"
 
 void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
   namespace nova_material = nova::material;
@@ -15,6 +16,8 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
   syncRenderEngineThreads();
   cancel_render = false;
   nova_engine_data->scene_data.primitives.clear();
+
+  auto *tex1 = nova_engine_data->textures_data.add_texture<nova::texturing::ConstantTexture>(glm::vec4(0.1f, 0.4, 0.3, 1.f));
   for (const auto &elem : new_scene.mesh_list) {
     glm::mat4 final_transfo = elem->computeFinalTransformation();
     glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(final_transfo)));
@@ -45,8 +48,7 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
       glm::vec3 vertices[3] = {v1, v2, v3};
       glm::vec3 normals[3] = {n1, n2, n3};
 
-      std::unique_ptr<nova_material::NovaMaterialInterface> mat2 = std::make_unique<nova_material::NovaConductorMaterial>(
-          glm::vec4(1.f, 1.f, 1.f, 1.f), 0.002f);
+      std::unique_ptr<nova_material::NovaMaterialInterface> mat2 = std::make_unique<nova_material::NovaDielectricMaterial>(tex1, 1.6f);
       auto tri = nova::shape::NovaShapeInterface::create<nova_shape::Triangle>(vertices, normals);
       auto primit = nova::primitive::NovaPrimitiveInterface::create<nova_primitive::NovaGeoPrimitive>(tri, mat2);
       nova_engine_data->scene_data.primitives.push_back(std::move(primit));

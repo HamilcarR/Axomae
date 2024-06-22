@@ -28,6 +28,16 @@ namespace nova {
     return {texturing::sample_cubemap(sample_vector, &nova_resources->envmap_data), 1.f};
   }
 
+  /**
+   * TODO : Will use different states :
+   * 1) Fast state : On move events , on redraw , on resize etc will trigger fast state .
+   * The scheduler needs to be emptied , threads synchronized and stopped , and we redraw with
+   * 1 ray/pixel , at 1 sample , at 1 depth in each tile , then copy the sampled value to the other pixels.
+   * 2) Intermediary state : increase logarithmically the amount of pixels sampled + number of samples , at half depth .
+   * 3) Final state : render at full depth , full sample size , full resolution.
+   * Allows proper synchronization.
+   *
+   */
   void NovaRenderEngineLR::engine_render_tile(HdrBufferStruct *buffers, Tile &tile, const NovaResources *nova_resources) {
     AX_ASSERT(nova_resources, "Scene description is invalid.");
     for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
