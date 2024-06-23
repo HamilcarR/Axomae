@@ -1,0 +1,7 @@
+# Suppressions for libdbus
+race:libdbus
+
+# Suppressions for Qt
+race:QtCore
+race:QtGui
+race:QtWidgets

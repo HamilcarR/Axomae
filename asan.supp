@@ -1,0 +1,7 @@
+# Suppressions for libdbus
+leak:libdbus
+
+# Suppressions for Qt
+leak:QtCore
+leak:QtGui
+leak:QtWidgets
