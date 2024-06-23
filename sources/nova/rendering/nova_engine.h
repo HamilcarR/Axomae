@@ -1,6 +1,6 @@
 #ifndef NOVA_ENGINE_H
 #define NOVA_ENGINE_H
-#include "nova_utils.h"
+#include "utils/nova_utils.h"
 #include <atomic>
 #include <map>
 

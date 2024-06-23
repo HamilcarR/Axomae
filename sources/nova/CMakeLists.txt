@@ -1,6 +1,5 @@
 add_library(ax_nova
         DrawEngine.cpp
-        aggregate/bvh/BvhBuilder.cpp
 
 )
 
@@ -19,12 +18,14 @@ PRIVATE
 target_include_directories(ax_nova
 PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
+PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/ray
         ${CMAKE_CURRENT_SOURCE_DIR}/primitive
         ${CMAKE_CURRENT_SOURCE_DIR}/material
         ${CMAKE_CURRENT_SOURCE_DIR}/scene
         ${CMAKE_CURRENT_SOURCE_DIR}/shape
         ${CMAKE_CURRENT_SOURCE_DIR}/aggregate
+        ${CMAKE_CURRENT_SOURCE_DIR}/integrator
 
 )
 

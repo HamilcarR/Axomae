@@ -4,11 +4,11 @@
 #include "EventController.h"
 #include "INodeDatabase.h"
 #include "Logger.h"
-#include "Ray.h"
 #include "Shader.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
 #include "math_camera.h"
+#include "ray/Ray.h"
 
 using namespace axomae;
 

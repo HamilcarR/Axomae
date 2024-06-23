@@ -8,11 +8,11 @@
 #include "EventController.h"
 #include "GLMutablePixelBufferObject.h"
 #include "GLViewer.h"
-#include "NovaGeoPrimitive.h"
+#include "primitive/NovaGeoPrimitive.h"
 #include "RenderPipeline.h"
 #include "Scene.h"
 #include "TextureProcessing.h"
-#include "nova_material.h"
+#include "material/nova_material.h"
 #include <unistd.h>
 
 static constexpr int MAX_RECUR_DEPTH = 7;
@@ -89,9 +89,9 @@ bool NovaRenderer::prep_draw() {
 void NovaRenderer::populateNovaSceneResources() {
   /*Setup envmap */
   image::ImageHolder<float> *current_envmap = envmap_manager->currentMutableEnvmapMetadata();
-  nova_engine_data->envmap_data.raw_data = &current_envmap->data;
-  nova_engine_data->envmap_data.width = (int)current_envmap->metadata.width;
-  nova_engine_data->envmap_data.height = (int)current_envmap->metadata.height;
+  nova_engine_data->scene_data.envmap_data.raw_data = &current_envmap->data;
+  nova_engine_data->scene_data.envmap_data.width = (int)current_envmap->metadata.width;
+  nova_engine_data->scene_data.envmap_data.height = (int)current_envmap->metadata.height;
   nova_engine_data->renderer_data.sample_increment = current_frame;
 }
 
@@ -225,37 +225,37 @@ void NovaRenderer::updateNovaCameraFields() {
   if (!scene_camera)
     return;
   scene_camera->computeViewProjection();
-  nova_engine_data->camera_data.up_vector = scene_camera->getUpVector();
+  nova_engine_data->scene_data.camera_data.up_vector = scene_camera->getUpVector();
 
-  nova_engine_data->camera_data.P = scene_camera->getProjection();
-  nova_engine_data->camera_data.inv_P = glm::inverse(nova_engine_data->camera_data.P);
+  nova_engine_data->scene_data.camera_data.P = scene_camera->getProjection();
+  nova_engine_data->scene_data.camera_data.inv_P = glm::inverse(nova_engine_data->scene_data.camera_data.P);
 
-  nova_engine_data->camera_data.V = scene_camera->getView();
-  nova_engine_data->camera_data.inv_V = glm::inverse(nova_engine_data->camera_data.V);
+  nova_engine_data->scene_data.camera_data.V = scene_camera->getView();
+  nova_engine_data->scene_data.camera_data.inv_V = glm::inverse(nova_engine_data->scene_data.camera_data.V);
 
-  nova_engine_data->camera_data.T = scene_camera->getSceneTranslationMatrix();
-  nova_engine_data->camera_data.inv_T = glm::inverse(scene_camera->getSceneTranslationMatrix());
+  nova_engine_data->scene_data.camera_data.T = scene_camera->getSceneTranslationMatrix();
+  nova_engine_data->scene_data.camera_data.inv_T = glm::inverse(scene_camera->getSceneTranslationMatrix());
 
-  nova_engine_data->camera_data.R = scene_camera->getSceneRotationMatrix();
-  nova_engine_data->camera_data.inv_R = glm::inverse(scene_camera->getSceneRotationMatrix());
+  nova_engine_data->scene_data.camera_data.R = scene_camera->getSceneRotationMatrix();
+  nova_engine_data->scene_data.camera_data.inv_R = glm::inverse(scene_camera->getSceneRotationMatrix());
 
-  nova_engine_data->camera_data.M = scene_camera->getLocalModelMatrix();
-  nova_engine_data->camera_data.inv_M = glm::inverse(nova_engine_data->camera_data.M);
+  nova_engine_data->scene_data.camera_data.M = scene_camera->getLocalModelMatrix();
+  nova_engine_data->scene_data.camera_data.inv_M = glm::inverse(nova_engine_data->scene_data.camera_data.M);
 
-  nova_engine_data->camera_data.PVM = nova_engine_data->camera_data.P * nova_engine_data->camera_data.V * nova_engine_data->camera_data.M;
-  nova_engine_data->camera_data.inv_PVM = glm::inverse(nova_engine_data->camera_data.PVM);
+  nova_engine_data->scene_data.camera_data.PVM = nova_engine_data->scene_data.camera_data.P * nova_engine_data->scene_data.camera_data.V * nova_engine_data->scene_data.camera_data.M;
+  nova_engine_data->scene_data.camera_data.inv_PVM = glm::inverse(nova_engine_data->scene_data.camera_data.PVM);
 
-  nova_engine_data->camera_data.VM = nova_engine_data->camera_data.V * nova_engine_data->camera_data.M;
-  nova_engine_data->camera_data.inv_VM = glm::inverse(nova_engine_data->camera_data.V * nova_engine_data->camera_data.M);
+  nova_engine_data->scene_data.camera_data.VM = nova_engine_data->scene_data.camera_data.V * nova_engine_data->scene_data.camera_data.M;
+  nova_engine_data->scene_data.camera_data.inv_VM = glm::inverse(nova_engine_data->scene_data.camera_data.V * nova_engine_data->scene_data.camera_data.M);
 
-  nova_engine_data->camera_data.N = glm::mat3(glm::transpose(nova_engine_data->camera_data.inv_M));
+  nova_engine_data->scene_data.camera_data.N = glm::mat3(glm::transpose(nova_engine_data->scene_data.camera_data.inv_M));
 
-  nova_engine_data->camera_data.position = scene_camera->getPosition();
+  nova_engine_data->scene_data.camera_data.position = scene_camera->getPosition();
 
-  nova_engine_data->camera_data.direction = scene_camera->getDirection();
+  nova_engine_data->scene_data.camera_data.direction = scene_camera->getDirection();
 
-  nova_engine_data->camera_data.screen_width = screen_size.width;
-  nova_engine_data->camera_data.screen_height = screen_size.height;
+  nova_engine_data->scene_data.camera_data.screen_width = screen_size.width;
+  nova_engine_data->scene_data.camera_data.screen_height = screen_size.height;
 }
 
 void NovaRenderer::processEvent(const controller::event::Event *event) {

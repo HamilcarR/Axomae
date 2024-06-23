@@ -1,6 +1,6 @@
 #include "BvhBuilder.h"
 
-#include "nova_primitive.h"
+#include "primitive/nova_primitive.h"
 
 using namespace nova::aggregate;
 using namespace nova::primitive;

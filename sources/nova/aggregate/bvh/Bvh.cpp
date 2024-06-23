@@ -1,7 +1,7 @@
 #include "Bvh.h"
 #include "BoundingBox.h"
-#include "Box.h"
 #include "ray/Ray.h"
+#include "shape/Box.h"
 
 #include <deque>
 

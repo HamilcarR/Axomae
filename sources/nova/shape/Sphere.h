@@ -1,8 +1,8 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 #include "BoundingBox.h"
+#include "ShapeInterface.h"
 #include "math_utils.h"
-#include "nova_shape.h"
 #include "ray/Hitable.h"
 
 namespace nova::shape {

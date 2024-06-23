@@ -1,7 +1,7 @@
 #ifndef NOVAINTERFACE_H
 #define NOVAINTERFACE_H
-#include "Ray.h"
 #include "camera/nova_camera.h"
+#include "ray/Ray.h"
 #include "rendering/nova_engine.h"
 #include "scene/nova_scene.h"
 #include "texturing/nova_texturing.h"
@@ -11,12 +11,8 @@ namespace nova {
 
   class NovaResources {
    public:
-    texturing::TextureRawData envmap_data{};
-    texturing::TextureResourcesHolder textures_data{};
-    camera::CameraResourcesHolder camera_data{};
     engine::EngineResourcesHolder renderer_data{};
     scene::SceneResourcesHolder scene_data{};
-    scene::Accelerator acceleration_structure{};
   };
 
   struct Tile;

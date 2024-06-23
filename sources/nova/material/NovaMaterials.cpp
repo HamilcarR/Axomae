@@ -1,6 +1,5 @@
-#include "nova_material.h"
-#include "texturing/NovaTextures.h"
-#include <math.h>
+#include "NovaMaterials.h"
+#include "ray/Ray.h"
 using namespace nova::material;
 
 inline glm::vec3 rand_p_hemisphere() {

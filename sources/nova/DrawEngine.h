@@ -1,11 +1,11 @@
 #ifndef NOVA_DRAW_ENGINE_H
 #define NOVA_DRAW_ENGINE_H
 #include "NovaInterface.h"
-#include "Ray.h"
 #include "ThreadPool.h"
 #include "math_camera.h"
-#include "nova_utils.h"
+#include "ray/Ray.h"
 #include "texturing/nova_texturing.h"
+#include "utils/nova_utils.h"
 #include <vector>
 
 namespace nova {

@@ -1,8 +1,8 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 #include "BoundingBox.h"
+#include "ShapeInterface.h"
 #include "math_utils.h"
-#include "nova_shape.h"
 
 namespace nova::shape {
   class Triangle final : public NovaShapeInterface {

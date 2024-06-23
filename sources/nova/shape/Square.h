@@ -1,8 +1,8 @@
 #ifndef PLANE_H
 #define PLANE_H
 #include "BoundingBox.h"
+#include "ShapeInterface.h"
 #include "math_utils.h"
-#include "nova_shape.h"
 
 namespace nova::shape {
   class Square final : public NovaShapeInterface {

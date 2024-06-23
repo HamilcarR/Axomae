@@ -1,5 +1,5 @@
 #include "Square.h"
-#include "Ray.h"
+#include "ray/Ray.h"
 
 using namespace nova::shape;
 bool Square::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const {

@@ -1,8 +1,7 @@
 #ifndef BOX_H
 #define BOX_H
 #include "BoundingBox.h"
-#include "nova_shape.h"
-
+#include "ShapeInterface.h"
 #include <glm/vec3.hpp>
 
 namespace nova::shape {

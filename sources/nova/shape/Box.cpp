@@ -1,6 +1,6 @@
 
 #include "Box.h"
-#include "Ray.h"
+#include "ray/Ray.h"
 using namespace nova::shape;
 
 Box::Box(const glm::vec3 &min_coords, const glm::vec3 &max_coords) : aabb(min_coords, max_coords) {}
