@@ -11,10 +11,10 @@ namespace nova {
 }
 namespace nova::shape {
 
-  struct ShapeResourceHolder {
+  struct ShapeResourcesHolder {
     std::vector<std::unique_ptr<NovaShapeInterface>> shapes;
 
-    RESOURCES_DEFINE_ADD(shape, NovaShapeInterface, shapes)
+    REGISTER_RESOURCE(shape, NovaShapeInterface, shapes)
   };
 
   RESOURCES_DEFINE_CREATE(NovaShapeInterface)

@@ -1,5 +1,6 @@
 #ifndef NOVA_ENGINE_H
 #define NOVA_ENGINE_H
+#include "Axomae_macros.h"
 #include "utils/nova_utils.h"
 #include <atomic>
 #include <map>
@@ -17,7 +18,8 @@ namespace nova {
   using HdrBufferStruct = RenderBuffers<float>;
 
   namespace engine {
-    struct EngineResourcesHolder {
+    class EngineResourcesHolder {
+     private:
       int tiles_w{};
       int tiles_h{};
       int sample_increment{};
@@ -26,6 +28,24 @@ namespace nova {
       int max_depth{};
       std::atomic_long latency;
       bool *cancel_render;
+
+     public:
+      CLASS_CM(EngineResourcesHolder)
+
+      void setTilesWidth(int width);
+      void setTilesHeight(int height);
+      void setSampleIncrement(int increment);
+      void setAliasingSamples(int samples);
+      void setMaxSamples(int samples);
+      void setMaxDepth(int depth);
+      void setCancelPtr(bool *cancel_ptr);
+      [[nodiscard]] int getTilesWidth() const;
+      [[nodiscard]] int getTilesHeight() const;
+      [[nodiscard]] int getSampleIncrement() const;
+      [[nodiscard]] int getAliasingSamples() const;
+      [[nodiscard]] int getMaxSamples() const;
+      [[nodiscard]] int getMaxDepth() const;
+      [[nodiscard]] bool *getCancelPtr() const;
     };
   }  // namespace engine
 }  // namespace nova

@@ -3,19 +3,17 @@
 #include "Axomae_macros.h"
 #include "NovaTextures.h"
 #include "math_utils.h"
+#include "utils/macros.h"
 #include <memory>
+
 namespace nova::texturing {
 
   struct TextureResourcesHolder {
     std::vector<std::unique_ptr<NovaTextureInterface>> textures;
 
-    template<class TYPE, class... Args>
-    NovaTextureInterface *add_texture(Args &&...args) {
-      ASSERT_SUBTYPE(NovaTextureInterface, TYPE);
-      textures.push_back(std::make_unique<TYPE>(std::forward<Args>(args)...));
-      return textures.back().get();
-    }
+    REGISTER_RESOURCE(texture, NovaTextureInterface, textures)
   };
+  RESOURCES_DEFINE_CREATE(NovaTextureInterface)
 
   struct TextureRawData {
     std::vector<float> *raw_data;

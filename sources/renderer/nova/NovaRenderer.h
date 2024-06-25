@@ -41,7 +41,7 @@ class NovaRenderer final : public IRenderer {
   std::unique_ptr<GLMutablePixelBufferObject> pbo_read;
   std::unique_ptr<NovaRenderEngineInterface> nova_engine;
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
-  std::unique_ptr<nova::NovaResources> nova_engine_data;
+  std::unique_ptr<nova::NovaResourceManager> nova_resource_manager;
   ApplicationConfig *global_application_config{};
   std::vector<std::future<void>> nova_result_futures;
   std::vector<float> partial_render_buffer;

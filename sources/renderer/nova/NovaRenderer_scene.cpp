@@ -1,6 +1,7 @@
 #include "Mesh.h"
 #include "NovaRenderer.h"
 #include "Object3D.h"
+#include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
 #include "primitive/NovaGeoPrimitive.h"
 #include "shape/nova_shape.h"
@@ -15,10 +16,10 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
   cancel_render = true;
   syncRenderEngineThreads();
   cancel_render = false;
-  nova_engine_data->scene_data.primitive_data.primitives.clear();
+  nova_resource_manager->getPrimitiveData().clear();
 
-  auto *tex1 = nova_engine_data->scene_data.textures_data.add_texture<nova::texturing::ConstantTexture>(glm::vec4(0.1f, 0.4, 0.3, 1.f));
-  auto *mat2 = nova_engine_data->scene_data.materials_data.add_material<nova_material::NovaDielectricMaterial>(tex1, 1.6f);
+  auto *tex1 = nova_resource_manager->getTexturesData().add_texture<nova::texturing::ConstantTexture>(glm::vec4(1.f, 1.f, 1.f, 1.f));
+  auto *mat1 = nova_resource_manager->getMaterialData().add_material<nova_material::NovaConductorMaterial>(tex1, 0.0001f);
 
   for (const auto &elem : new_scene.mesh_list) {
     glm::mat4 final_transfo = elem->computeFinalTransformation();
@@ -50,15 +51,14 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
       glm::vec3 vertices[3] = {v1, v2, v3};
       glm::vec3 normals[3] = {n1, n2, n3};
 
-      auto tri = nova_engine_data->scene_data.shape_data.add_shape<nova_shape::Triangle>(vertices, normals);
-      auto primit = nova::primitive::create<nova_primitive::NovaGeoPrimitive>(tri, mat2);
-      nova_engine_data->scene_data.primitive_data.primitives.push_back(std::move(primit));
+      auto tri = nova_resource_manager->getShapeData().add_shape<nova_shape::Triangle>(vertices, normals);
+      nova_resource_manager->getPrimitiveData().add_primitive<nova_primitive::NovaGeoPrimitive>(tri, mat1);
     }
   }
 
   /* Build acceleration. */
-  const auto *primitive_collection_ptr = &nova_engine_data->scene_data.primitive_data.primitives;
-  nova_engine_data->scene_data.acceleration_data.accelerator.build(primitive_collection_ptr);
+  const auto *primitive_collection_ptr = &nova_resource_manager->getPrimitiveData().get_primitives();
+  nova_resource_manager->getAccelerationData().build(primitive_collection_ptr);
 }
 
 Scene &NovaRenderer::getScene() const { return *scene; }

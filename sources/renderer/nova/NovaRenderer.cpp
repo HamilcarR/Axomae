@@ -8,11 +8,12 @@
 #include "EventController.h"
 #include "GLMutablePixelBufferObject.h"
 #include "GLViewer.h"
-#include "primitive/NovaGeoPrimitive.h"
 #include "RenderPipeline.h"
 #include "Scene.h"
 #include "TextureProcessing.h"
+#include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
+#include "primitive/NovaGeoPrimitive.h"
 #include <unistd.h>
 
 static constexpr int MAX_RECUR_DEPTH = 7;
@@ -28,7 +29,7 @@ NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *wi
   scene = std::make_unique<Scene>(*resource_database);
   envmap_manager = std::make_unique<EnvmapTextureManager>(
       *resource_database, screen_size, default_framebuffer_id, *render_pipeline, nullptr, EnvmapTextureManager::SELECTED);
-  nova_engine_data = std::make_unique<nova::NovaResources>();
+  nova_resource_manager = std::make_unique<nova::NovaResourceManager>();
   partial_render_buffer.resize(resolution.width * resolution.height * 4);
   accumulated_render_buffer.resize(resolution.width * resolution.height * 4);
   final_render_buffer.resize(resolution.width * resolution.height * 4);
@@ -58,7 +59,7 @@ void NovaRenderer::initialize(ApplicationConfig *app_conf) {
 
 void NovaRenderer::resetToBaseState() {
   current_frame = 1;
-  nova_engine_data->renderer_data.max_depth = 1;
+  nova_resource_manager->getEngineData().setMaxDepth(1);
   cancel_render = true;
   if (global_application_config && global_application_config->getThreadPool()) {
     global_application_config->getThreadPool()->emptyQueue();
@@ -89,10 +90,9 @@ bool NovaRenderer::prep_draw() {
 void NovaRenderer::populateNovaSceneResources() {
   /*Setup envmap */
   image::ImageHolder<float> *current_envmap = envmap_manager->currentMutableEnvmapMetadata();
-  nova_engine_data->scene_data.envmap_data.raw_data = &current_envmap->data;
-  nova_engine_data->scene_data.envmap_data.width = (int)current_envmap->metadata.width;
-  nova_engine_data->scene_data.envmap_data.height = (int)current_envmap->metadata.height;
-  nova_engine_data->renderer_data.sample_increment = current_frame;
+  nova_resource_manager->envmapSetData(
+      &current_envmap->data, current_envmap->metadata.width, current_envmap->metadata.height, current_envmap->metadata.channels);
+  nova_resource_manager->getEngineData().setSampleIncrement(current_frame);
 }
 
 void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int channels) {
@@ -108,12 +108,12 @@ void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int ch
 }
 
 void NovaRenderer::initializeEngine() {
-  nova_engine_data->renderer_data.tiles_w = NUM_TILES;
-  nova_engine_data->renderer_data.tiles_h = NUM_TILES;
-  nova_engine_data->renderer_data.aliasing_samples = 8;
-  nova_engine_data->renderer_data.renderer_max_samples = MAX_SAMPLES;
-  nova_engine_data->renderer_data.max_depth = MAX_RECUR_DEPTH;
-  nova_engine_data->renderer_data.cancel_render = &cancel_render;
+  nova_resource_manager->getEngineData().setTilesWidth(NUM_TILES);
+  nova_resource_manager->getEngineData().setTilesHeight(NUM_TILES);
+  nova_resource_manager->getEngineData().setAliasingSamples(8);
+  nova_resource_manager->getEngineData().setMaxSamples(MAX_SAMPLES);
+  nova_resource_manager->getEngineData().setMaxDepth(MAX_RECUR_DEPTH);
+  nova_resource_manager->getEngineData().setCancelPtr(&cancel_render);
 }
 
 void NovaRenderer::displayProgress(float current, float target) {
@@ -142,20 +142,20 @@ void NovaRenderer::draw() {
   }
 
   nova_result_futures.clear();
-  const float s1 = (-1 - std::sqrt(1.f + 8 * nova_engine_data->renderer_data.renderer_max_samples)) * 0.5f;
-  const float s2 = (-1 + std::sqrt(1.f + 8 * nova_engine_data->renderer_data.renderer_max_samples)) * 0.5f;
+  const float s1 = (-1 - std::sqrt(1.f + 8 * nova_resource_manager->getEngineData().getMaxSamples())) * 0.5f;
+  const float s2 = (-1 + std::sqrt(1.f + 8 * nova_resource_manager->getEngineData().getMaxSamples())) * 0.5f;
   const float smax = std::max(s1, s2);
 
   if (current_frame < smax) {
-    nova_engine_data->renderer_data.max_depth = nova_engine_data->renderer_data.max_depth < MAX_RECUR_DEPTH ?
-                                                    nova_engine_data->renderer_data.max_depth + 1 :
-                                                    MAX_RECUR_DEPTH;
+    nova_resource_manager->getEngineData().setMaxDepth(nova_resource_manager->getEngineData().getMaxDepth() < MAX_RECUR_DEPTH ?
+                                                           nova_resource_manager->getEngineData().getMaxDepth() + 1 :
+                                                           MAX_RECUR_DEPTH);
     nova_result_futures = nova::draw(&engine_render_buffers,
                                      screen_size.width,
                                      screen_size.height,
                                      nova_engine.get(),
                                      global_application_config->getThreadPool(),
-                                     nova_engine_data.get());
+                                     nova_resource_manager.get());
   }
   framebuffer_texture->bindTexture();
   pbo_read->bind();
@@ -177,7 +177,7 @@ void NovaRenderer::draw() {
   pbo_read->unbind();
   framebuffer_texture->unbindTexture();
   camera_framebuffer->renderFrameBufferMesh();
-  displayProgress(current_frame, nova_engine_data->renderer_data.renderer_max_samples);
+  displayProgress(current_frame, nova_resource_manager->getEngineData().getMaxSamples());
   current_frame++;
   scanline++;
 }
@@ -225,37 +225,31 @@ void NovaRenderer::updateNovaCameraFields() {
   if (!scene_camera)
     return;
   scene_camera->computeViewProjection();
-  nova_engine_data->scene_data.camera_data.up_vector = scene_camera->getUpVector();
+  nova::camera::CameraResourcesHolder &nova_camera_structure = nova_resource_manager->getCameraData();
+  nova::scene::SceneTransformations &nova_scene_transformations = nova_resource_manager->getSceneTransformation();
+  /* Camera data*/
+  nova_camera_structure.setUpVector(scene_camera->getUpVector());
+  nova_camera_structure.setProjection(scene_camera->getProjection());
+  nova_camera_structure.setInvProjection(glm::inverse(scene_camera->getProjection()));
+  nova_camera_structure.setView(scene_camera->getView());
+  nova_camera_structure.setInvView(glm::inverse(scene_camera->getView()));
+  nova_camera_structure.setPosition(scene_camera->getPosition());
+  nova_camera_structure.setDirection(scene_camera->getDirection());
+  nova_camera_structure.setScreenWidth((int)screen_size.width);
+  nova_camera_structure.setScreenHeight((int)screen_size.height);
 
-  nova_engine_data->scene_data.camera_data.P = scene_camera->getProjection();
-  nova_engine_data->scene_data.camera_data.inv_P = glm::inverse(nova_engine_data->scene_data.camera_data.P);
-
-  nova_engine_data->scene_data.camera_data.V = scene_camera->getView();
-  nova_engine_data->scene_data.camera_data.inv_V = glm::inverse(nova_engine_data->scene_data.camera_data.V);
-
-  nova_engine_data->scene_data.camera_data.T = scene_camera->getSceneTranslationMatrix();
-  nova_engine_data->scene_data.camera_data.inv_T = glm::inverse(scene_camera->getSceneTranslationMatrix());
-
-  nova_engine_data->scene_data.camera_data.R = scene_camera->getSceneRotationMatrix();
-  nova_engine_data->scene_data.camera_data.inv_R = glm::inverse(scene_camera->getSceneRotationMatrix());
-
-  nova_engine_data->scene_data.camera_data.M = scene_camera->getLocalModelMatrix();
-  nova_engine_data->scene_data.camera_data.inv_M = glm::inverse(nova_engine_data->scene_data.camera_data.M);
-
-  nova_engine_data->scene_data.camera_data.PVM = nova_engine_data->scene_data.camera_data.P * nova_engine_data->scene_data.camera_data.V * nova_engine_data->scene_data.camera_data.M;
-  nova_engine_data->scene_data.camera_data.inv_PVM = glm::inverse(nova_engine_data->scene_data.camera_data.PVM);
-
-  nova_engine_data->scene_data.camera_data.VM = nova_engine_data->scene_data.camera_data.V * nova_engine_data->scene_data.camera_data.M;
-  nova_engine_data->scene_data.camera_data.inv_VM = glm::inverse(nova_engine_data->scene_data.camera_data.V * nova_engine_data->scene_data.camera_data.M);
-
-  nova_engine_data->scene_data.camera_data.N = glm::mat3(glm::transpose(nova_engine_data->scene_data.camera_data.inv_M));
-
-  nova_engine_data->scene_data.camera_data.position = scene_camera->getPosition();
-
-  nova_engine_data->scene_data.camera_data.direction = scene_camera->getDirection();
-
-  nova_engine_data->scene_data.camera_data.screen_width = screen_size.width;
-  nova_engine_data->scene_data.camera_data.screen_height = screen_size.height;
+  /* Scene root transformations */
+  nova_scene_transformations.setTranslation(scene_camera->getSceneTranslationMatrix());
+  nova_scene_transformations.setInvTranslation(glm::inverse(scene_camera->getSceneTranslationMatrix()));
+  nova_scene_transformations.setRotation(scene_camera->getSceneRotationMatrix());
+  nova_scene_transformations.setInvRotation(glm::inverse(scene_camera->getSceneRotationMatrix()));
+  nova_scene_transformations.setModel(scene_camera->getLocalModelMatrix());
+  nova_scene_transformations.setInvModel(glm::inverse(scene_camera->getLocalModelMatrix()));
+  nova_scene_transformations.setPvm(scene_camera->getProjection() * scene_camera->getView() * scene_camera->getLocalModelMatrix());
+  nova_scene_transformations.setInvPvm(glm::inverse(nova_scene_transformations.getPvm()));
+  nova_scene_transformations.setVm(nova_camera_structure.getView() * nova_scene_transformations.getModel());
+  nova_scene_transformations.setInvVm(glm::inverse(nova_scene_transformations.getVm()));
+  nova_scene_transformations.setNormalMatrix(glm::mat3(glm::transpose(nova_scene_transformations.getInvModel())));
 }
 
 void NovaRenderer::processEvent(const controller::event::Event *event) {

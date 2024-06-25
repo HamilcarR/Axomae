@@ -1,4 +1,4 @@
-#include "nova_utils.h"
+#include "utils/nova_utils.h"
 #include "Test.h"
 
 TEST(NovaTests, divideByTiles) {

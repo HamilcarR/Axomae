@@ -11,7 +11,7 @@ namespace nova::primitive {
   struct PrimitivesResourcesHolder {
     std::vector<std::unique_ptr<NovaPrimitiveInterface>> primitives;
 
-    RESOURCES_DEFINE_ADD(primitive, NovaPrimitiveInterface, primitives)
+    REGISTER_RESOURCE(primitive, NovaPrimitiveInterface, primitives)
   };
 
   RESOURCES_DEFINE_CREATE(NovaPrimitiveInterface)

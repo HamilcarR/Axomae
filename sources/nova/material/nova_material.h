@@ -9,7 +9,7 @@ namespace nova::material {
   struct MaterialResourcesHolder {
     std::vector<std::unique_ptr<NovaMaterialInterface>> materials;
 
-    RESOURCES_DEFINE_ADD(material, NovaMaterialInterface, materials)
+    REGISTER_RESOURCE(material, NovaMaterialInterface, materials)
   };
 
   RESOURCES_DEFINE_CREATE(NovaMaterialInterface)

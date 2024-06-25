@@ -1,49 +1,46 @@
 #ifndef NOVA_CAMERA_H
 #define NOVA_CAMERA_H
+#include "Axomae_macros.h"
 #include "math_utils.h"
-namespace camera {
-  struct CameraResourcesHolder {
+namespace nova::camera {
+  class CameraResourcesHolder {
+   private:
     unsigned int screen_width;
     unsigned int screen_height;
-
     /*Projection*/
     glm::mat4 P;
     glm::mat4 inv_P;
-
     /*View*/
     glm::mat4 V;
     glm::mat4 inv_V;
-
     /* Projection * View*/
     glm::mat4 PV;
     glm::mat4 inv_PV;
-
-    /* View x Model */
-    glm::mat4 VM;
-    glm::mat4 inv_VM;
-
-    /* Projection * View * Model*/
-    glm::mat4 PVM;
-    glm::mat4 inv_PVM;
-
-    /* Primary scene rotation from camera*/
-    glm::mat4 R;
-    glm::mat4 inv_R;
-
-    /* Primary scene transformation from camera*/
-    glm::mat4 T;
-    glm::mat4 inv_T;
-
-    /* Primary scene transformation from camera (R x T)*/
-    glm::mat4 M;
-    glm::mat4 inv_M;
-
-    /* Normal matrix */
-    glm::mat3 N;
-
     glm::vec3 position;
     glm::vec3 up_vector;
     glm::vec3 direction;
+
+   public:
+    CLASS_CM(CameraResourcesHolder)
+
+    void setPosition(const glm::vec3 &position);
+    void setUpVector(const glm::vec3 &up);
+    void setProjection(const glm::mat4 &projection);
+    void setInvProjection(const glm::mat4 &inv_projection);
+    void setView(const glm::mat4 &view);
+    void setInvView(const glm::mat4 &view);
+    void setDirection(const glm::vec3 &direction);
+    void setScreenWidth(int width);
+    void setScreenHeight(int height);
+    [[nodiscard]] const glm::vec3 &getUpVector() const;
+    [[nodiscard]] const glm::mat4 &getProjection() const;
+    [[nodiscard]] const glm::mat4 &getInvProjection() const;
+    [[nodiscard]] const glm::mat4 &getView() const;
+    [[nodiscard]] const glm::mat4 &getInvView() const;
+    [[nodiscard]] const glm::vec3 &getPosition() const;
+    [[nodiscard]] const glm::vec3 &getDirection() const;
+    [[nodiscard]] int getScreenWidth() const;
+    [[nodiscard]] int getScreenHeight() const;
   };
-}  // namespace camera
+}  // namespace nova::camera
 #endif  // NOVA_CAMERA_H

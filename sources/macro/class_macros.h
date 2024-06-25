@@ -3,6 +3,10 @@
 
 // clang-format off
 
+#define GENERATE_GETTERS(return_type, func_field_name, variable) \
+  return_type &get## func_field_name() { return variable; } \
+  const return_type &get## func_field_name() const { return variable; }
+
 
 #define CLASS_CM(classname) \
   classname() = default;\
@@ -35,7 +39,6 @@
   classname(classname&& move) noexcept = delete;\
   classname& operator=(const classname& copy) = default;\
   classname& operator=(classname&& move) noexcept = delete;
-
 
 #define CLASS_OC(classname) \
   classname() = default;\
