@@ -43,7 +43,7 @@ class GLMaterial : public MaterialInterface {
 
  public:
   GLMaterial();
-  ~GLMaterial() = default;
+  ~GLMaterial() override = default;
   GLMaterial(const GLMaterial &copy);
   GLMaterial(GLMaterial &&move) noexcept;
   GLMaterial &operator=(const GLMaterial &copy);

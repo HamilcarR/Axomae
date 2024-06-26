@@ -4,6 +4,7 @@
 
 class MaterialInterface {
  public:
+  virtual ~MaterialInterface() = default;
   virtual void setEmissiveFactor(float factor) = 0;
   [[nodiscard]] virtual float getEmissiveFactor() const = 0;
   virtual void clean() = 0;
