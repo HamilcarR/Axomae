@@ -1,7 +1,7 @@
 #ifndef MaterialInterface_H
 #define MaterialInterface_H
 #include "Vector.h"
-
+class TextureGroup;
 class MaterialInterface {
  public:
   virtual ~MaterialInterface() = default;
@@ -19,5 +19,6 @@ class MaterialInterface {
   virtual void setRefractiveIndexValue(float n1, float n2) = 0;
   [[nodiscard]] virtual bool hasTextures() const = 0;
   virtual void addTexture(int image_database_index) = 0;
+  [[nodiscard]] virtual const TextureGroup &getTextureGroup() const = 0;
 };
 #endif  // MaterialInterface_H
