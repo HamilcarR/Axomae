@@ -15,6 +15,13 @@ Triangle::Triangle(const glm::vec3 vertices[3], const glm::vec3 normals[3]) : Tr
   n2 = normals[2];
 }
 
+Triangle::Triangle(const glm::vec3 vertices[3], const glm::vec3 normals[3], const glm::vec2 textures[3]) : Triangle(vertices, normals) {
+  uv0 = textures[0];
+  uv1 = textures[1];
+  uv2 = textures[2];
+  uv_valid = true;
+}
+
 /*
  * https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
  */
@@ -35,20 +42,25 @@ bool Triangle::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_
   const float v = glm::dot(Q, ray.direction) * inv_det;
   if (v < 0.f || (u + v) > 1.f)
     return false;
+
   data.t = glm::dot(Q, e2) * inv_det;
   /* Early return in case this triangle is farther than the last intersected shape. */
   if (data.t < tmin || data.t > tmax)
     return false;
+
+  const float w = 1 - (u + v);
   if (!hasValidNormals()) {
     data.normal = glm::cross(e1, e2);
     if (glm::dot(data.normal, -ray.direction) < 0)
       data.normal = -data.normal;
     data.normal = glm::normalize(data.normal);
   } else {
-
     /* Returns barycentric interpolated normal at intersection t.  */
-    const float w = 1 - (u + v);
     data.normal = glm::normalize(n0 * w + n1 * u + n2 * v);
+  }
+  if (hasValidUvs()) {
+    data.v = uv0.s * w + uv1.s * u + uv2.s * v;
+    data.u = uv0.t * w + uv1.t * u + uv2.t * v;
   }
   return true;
 }

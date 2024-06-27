@@ -89,6 +89,10 @@ class Texture {
   void setSamplerID(unsigned int id) { sampler2D = id; }
   void setTextureType(TYPE type_) { type = type_; }
   TYPE getTextureType() { return type; };
+  [[nodiscard]] const uint32_t *getData() const { return data.data(); }
+  [[nodiscard]] const float *getFData() const { return f_data.data(); }
+  [[nodiscard]] const unsigned getWidth() const { return width; }
+  [[nodiscard]] const unsigned getHeight() const { return height; }
   virtual bool isDummyTexture() { return is_dummy; }
   void setDummy(bool d) { is_dummy = d; }
   [[nodiscard]] const std::string &getName() const { return name; }

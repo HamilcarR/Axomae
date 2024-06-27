@@ -16,7 +16,7 @@ namespace nova::material {
 
   class NovaDiffuseMaterial final : public NovaMaterialInterface {
    private:
-    texturing::NovaTextureInterface *albedo;
+    texturing::NovaTextureInterface *albedo{};
 
    public:
     CLASS_OCM(NovaDiffuseMaterial)
@@ -27,7 +27,7 @@ namespace nova::material {
 
   class NovaConductorMaterial final : public NovaMaterialInterface {
    private:
-    texturing::NovaTextureInterface *albedo;
+    texturing::NovaTextureInterface *albedo{};
     float fuzz{};
 
    public:
@@ -40,8 +40,8 @@ namespace nova::material {
 
   class NovaDielectricMaterial final : public NovaMaterialInterface {
    private:
-    texturing::NovaTextureInterface *albedo;
-    float eta;  // ior
+    texturing::NovaTextureInterface *albedo{};
+    float eta{};  // ior
 
    public:
     CLASS_OCM(NovaDielectricMaterial)
