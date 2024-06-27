@@ -1,5 +1,6 @@
 #ifndef OBJECT3D_H
 #define OBJECT3D_H
+#include "Axomae_macros.h"
 #include <cstring>
 #include <vector>
 
@@ -34,6 +35,8 @@ namespace geometry {
     }
   }
 }  // namespace geometry
+
+/* Contains vertices data (a lot) */
 class Object3D {
  public:
   std::vector<float> vertices;       /*<Vertices array*/
@@ -45,7 +48,7 @@ class Object3D {
   std::vector<unsigned int> indices; /*<Indices of the vertices buffer*/
 
  public:
-  Object3D() = default;
+  CLASS_CM(Object3D)
 
   void get_tri(geometry::face_data_tri &geom, const unsigned int indices[3]) const;
 

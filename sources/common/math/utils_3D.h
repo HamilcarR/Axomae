@@ -13,6 +13,7 @@ namespace math::geometry {
     return {W1, W2, W3};
   }
 
+  inline glm::mat3 compute_normal_mat(const glm::mat4 &model) { return glm::transpose(glm::inverse(glm::mat3(model))); }
   inline glm::mat3 glm_extract_rotation(const glm::mat4 &model) { return {model}; }
   inline glm::vec3 glm_extract_translation(const glm::mat4 &model) { return {model[3]}; }
   inline glm::vec3 glm_extract_scale(const glm::mat4 &model) { return {model[0].x, model[1].y, model[2].z}; }

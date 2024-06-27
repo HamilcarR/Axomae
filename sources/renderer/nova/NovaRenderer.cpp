@@ -16,7 +16,7 @@
 #include "primitive/NovaGeoPrimitive.h"
 #include <unistd.h>
 
-static constexpr int MAX_RECUR_DEPTH = 7;
+static constexpr int MAX_RECUR_DEPTH = 20;
 static constexpr int MAX_SAMPLES = 10000;
 static constexpr int NUM_TILES = 20;
 static std::mutex mutex;
@@ -67,7 +67,6 @@ void NovaRenderer::resetToBaseState() {
   }
   emptyAccumBuffer();
   populateNovaSceneResources();
-
   cancel_render = false;
 }
 
