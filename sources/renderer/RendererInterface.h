@@ -31,7 +31,6 @@ class RendererInterface : public EventInterface {
   virtual void onResize(unsigned int width, unsigned int height) = 0;
   virtual void setDefaultFrameBufferId(unsigned id) = 0;
   virtual void onClose() = 0;
-
   /**
    * @brief Cleans up the former scene and replaces it with a new one.
    */
@@ -40,6 +39,7 @@ class RendererInterface : public EventInterface {
   virtual void getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) = 0;
   [[nodiscard]] virtual RenderPipeline &getRenderPipeline() const = 0;
   [[nodiscard]] virtual Scene &getScene() const = 0;
+  virtual void prepSceneChange() = 0;
 };
 
 class IRenderer : public RendererInterface {

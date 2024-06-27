@@ -35,6 +35,13 @@ namespace nova {
     GENERATE_GETTERS(aggregate::Accelerator, AccelerationData, resources.scene_data.acceleration_data)
     GENERATE_GETTERS(scene::SceneTransformations, SceneTransformation, resources.scene_data.scene_transformations)
 
+    void clearResources() {
+      getPrimitiveData().clear();
+      getTexturesData().clear();
+      getShapeData().clear();
+      getMaterialData().clear();
+    }
+
     /* Scene: Textures */
     void envmapSetData(std::vector<float> *raw_data, int width, int height, int channels);
   };

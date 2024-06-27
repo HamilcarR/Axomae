@@ -104,6 +104,7 @@ void GLViewer::closeEvent(QCloseEvent *event) {
   QOpenGLWidget::closeEvent(event);
   renderer->onClose();
 }
+void GLViewer::prepareRendererSceneChange() { renderer->prepSceneChange(); }
 
 void GLViewer::resizeGL(int w, int h) {
   QOpenGLWidget::resizeGL(w, h);

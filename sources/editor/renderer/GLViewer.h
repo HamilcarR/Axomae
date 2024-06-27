@@ -50,6 +50,7 @@ class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
   GLViewer &operator=(const GLViewer &copy) = delete;
   GLViewer &operator=(GLViewer &&move) noexcept;
   GLViewer(GLViewer &&move) noexcept;
+
   virtual void setNewScene(const SceneChangeData &new_scene);
   [[nodiscard]] RendererInterface &getRenderer() const;
   void setApplicationConfig(ApplicationConfig *app_conf);
@@ -60,6 +61,7 @@ class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
   [[nodiscard]] image::ImageHolder<float> getRenderScreenshotFloat(int width, int height) const;
   [[nodiscard]] image::Rgb getFramebufferColor(int x, int y) const;
   void closeEvent(QCloseEvent *event) override;
+  void prepareRendererSceneChange();
   template<RENDERER_CALLBACK_ENUM callback_id, class... Args>
   constexpr void rendererCallback(Args &&...args);
 

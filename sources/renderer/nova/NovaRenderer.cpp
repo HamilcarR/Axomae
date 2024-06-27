@@ -61,13 +61,16 @@ void NovaRenderer::resetToBaseState() {
   current_frame = 1;
   nova_resource_manager->getEngineData().setMaxDepth(1);
   cancel_render = true;
+  emptyScheduler();
+  emptyAccumBuffer();
+  populateNovaSceneResources();
+  cancel_render = false;
+}
+void NovaRenderer::emptyScheduler() {
   if (global_application_config && global_application_config->getThreadPool()) {
     global_application_config->getThreadPool()->emptyQueue();
     syncRenderEngineThreads();
   }
-  emptyAccumBuffer();
-  populateNovaSceneResources();
-  cancel_render = false;
 }
 
 void NovaRenderer::syncRenderEngineThreads() {

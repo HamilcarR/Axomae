@@ -56,7 +56,6 @@ class NovaRenderer final : public IRenderer {
   nova::HdrBufferStruct engine_render_buffers;
 
  private:
-  NovaRenderer() = default;
   void updateNovaCameraFields();
   void copyBufferToPbo(float *pbo_mapped_buffer, int width, int height, int channels);
   void initializeEngine();
@@ -64,16 +63,20 @@ class NovaRenderer final : public IRenderer {
   void emptyBuffers();
   void emptyAccumBuffer();
   void emptyRenderBuffer();
+  void emptyScheduler();
   void resetToBaseState();
   void displayProgress(float current, float target);
 
  public:
   NovaRenderer(unsigned width, unsigned height, GLViewer *widget = nullptr);
+  NovaRenderer() = default;
   ~NovaRenderer() override;
   NovaRenderer(const NovaRenderer &copy) = delete;
   NovaRenderer &operator=(const NovaRenderer &copy) = delete;
   NovaRenderer(NovaRenderer &&move) noexcept = default;
   NovaRenderer &operator=(NovaRenderer &&move) noexcept = default;
+
+  void prepSceneChange() override;
   void syncRenderEngineThreads();
   void getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) override;
   void populateNovaSceneResources();

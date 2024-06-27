@@ -55,10 +55,7 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
   namespace nova_shape = nova::shape;
 
   resetToBaseState();
-  nova_resource_manager->getPrimitiveData().clear();
-  nova_resource_manager->getTexturesData().clear();
-  nova_resource_manager->getShapeData().clear();
-  nova_resource_manager->getMaterialData().clear();
+  nova_resource_manager->clearResources();
   for (const auto &elem : new_scene.mesh_list) {
     glm::mat4 final_transfo = elem->computeFinalTransformation();
     glm::mat3 normal_matrix = math::geometry::compute_normal_mat(final_transfo);
@@ -77,10 +74,16 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
       nova_resource_manager->getPrimitiveData().add_primitive<nova_primitive::NovaGeoPrimitive>(tri, mat);
     }
   }
-
   /* Build acceleration. */
   const auto *primitive_collection_ptr = &nova_resource_manager->getPrimitiveData().get_primitives();
   nova_resource_manager->getAccelerationData().build(primitive_collection_ptr);
+  cancel_render = false;
+}
+
+void NovaRenderer::prepSceneChange() {
+  cancel_render = true;
+  emptyScheduler();
+  nova_resource_manager->clearResources();
 }
 
 Scene &NovaRenderer::getScene() const { return *scene; }

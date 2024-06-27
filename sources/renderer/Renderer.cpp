@@ -129,10 +129,13 @@ void Renderer::draw() {
   errorCheck(__FILE__, __LINE__);
 }
 
+void Renderer::prepSceneChange() {
+  scene->clear();
+}
+
 void Renderer::setNewScene(const SceneChangeData &new_scene) {
   AX_ASSERT(new_scene.scene, "");
   AX_ASSERT(camera_framebuffer, "Screen Framebuffer is not set.");
-  scene->clear();
   scene->setScene(*new_scene.scene, new_scene.mesh_list);
   scene->switchEnvmap(envmap_manager->currentCubemapId(),
                       envmap_manager->currentIrradianceId(),
@@ -235,3 +238,4 @@ void Renderer::setViewerWidget(GLViewer *widget) {
   if (render_pipeline)
     render_pipeline->setContextSwitcher(gl_widget);
 }
+

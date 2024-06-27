@@ -699,12 +699,17 @@ namespace controller {
     }
   }
   /**************************************************************************************************************/
+
   bool Controller::import_3DOBJ() {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
     if (!filename.isEmpty()) {
+      realtime_viewer->prepareRendererSceneChange();
+      nova_viewer->prepareRendererSceneChange();
+
       resource_database.getNodeDatabase()->clean();
       resource_database.getTextureDatabase()->clean();
       resource_database.getRawImgdatabase()->clean();
+
       IO::Loader loader(progress_manager.get());
       auto struct_holder = loader.load(filename.toStdString().c_str());
       std::vector<Mesh *> scene = struct_holder.first;
@@ -813,10 +818,11 @@ namespace controller {
 
   /**************************************************************************************************************/
   void Controller::set_renderer_gamma_value(int value) {
-    if (realtime_viewer != nullptr) {
-      float v = (float)value / POSTP_SLIDER_DIV;
+    float v = (float)value / POSTP_SLIDER_DIV;
+    if (realtime_viewer)
       realtime_viewer->rendererCallback<SET_GAMMA>(v);
-    }
+    if (nova_viewer)
+      nova_viewer->rendererCallback<SET_GAMMA>(v);
   }
 
   /**************************************************************************************************************/
@@ -831,10 +837,11 @@ namespace controller {
 
   /**************************************************************************************************************/
   void Controller::set_renderer_exposure_value(int value) {
-    if (realtime_viewer != nullptr) {
-      float v = (float)value / POSTP_SLIDER_DIV;
+    float v = (float)value / POSTP_SLIDER_DIV;
+    if (realtime_viewer)
       realtime_viewer->rendererCallback<SET_EXPOSURE>(v);
-    }
+    if (nova_viewer)
+      nova_viewer->rendererCallback<SET_EXPOSURE>(v);
   }
   /**************************************************************************************************************/
   void Controller::set_renderer_no_post_process() {

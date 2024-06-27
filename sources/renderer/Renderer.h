@@ -93,6 +93,7 @@ class Renderer final : public IRenderer {
   void setRasterizerWireframe() override;
   void displayBoundingBoxes(bool display) override;
   void setViewerWidget(GLViewer *widget) override;
+  void prepSceneChange() override;
 };
 
 #endif
