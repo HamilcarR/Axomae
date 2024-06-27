@@ -8,46 +8,56 @@ namespace nova {
 }
 
 namespace nova::material {
+  struct texture_pack {
+    const texturing::ImageTexture *albedo;
+    const texturing::ImageTexture *metallic;
+    const texturing::ImageTexture *roughness;
+    const texturing::ImageTexture *ao;
+    const texturing::ImageTexture *normalmap;
+    const texturing::ImageTexture *emissive;
+  };
   class NovaMaterialInterface {
    public:
     virtual ~NovaMaterialInterface() = default;
-    virtual bool scatter(const Ray &in, Ray &out, hit_data &hit_d) const = 0;
+    virtual bool scatter(const Ray &in,
+                         Ray &out,
+                         hit_data &hit_d) const = 0;  // replace by eval() , check metallic , roughness , emissive value and use correct function
   };
 
   class NovaDiffuseMaterial final : public NovaMaterialInterface {
    private:
-    texturing::NovaTextureInterface *albedo{};
+    texture_pack t_pack{};
 
    public:
     CLASS_OCM(NovaDiffuseMaterial)
 
-    explicit NovaDiffuseMaterial(texturing::NovaTextureInterface *texture);
+    explicit NovaDiffuseMaterial(const texture_pack &textures);
     bool scatter(const Ray &in, Ray &out, hit_data &hit_d) const override;
   };
 
   class NovaConductorMaterial final : public NovaMaterialInterface {
    private:
-    texturing::NovaTextureInterface *albedo{};
+    texture_pack t_pack{};
     float fuzz{};
 
    public:
     CLASS_OCM(NovaConductorMaterial)
 
-    explicit NovaConductorMaterial(texturing::NovaTextureInterface *texture);
-    NovaConductorMaterial(texturing::NovaTextureInterface *texture, float fuzz_);
+    explicit NovaConductorMaterial(const texture_pack &textures);
+    NovaConductorMaterial(const texture_pack &textures, float fuzz_);
     bool scatter(const Ray &in, Ray &out, hit_data &hit_d) const override;
   };
 
   class NovaDielectricMaterial final : public NovaMaterialInterface {
    private:
-    texturing::NovaTextureInterface *albedo{};
+    texture_pack t_pack{};
     float eta{};  // ior
 
    public:
     CLASS_OCM(NovaDielectricMaterial)
 
-    explicit NovaDielectricMaterial(texturing::NovaTextureInterface *texture);
-    NovaDielectricMaterial(texturing::NovaTextureInterface *texture, float ior);
+    explicit NovaDielectricMaterial(const texture_pack &textures);
+    NovaDielectricMaterial(const texture_pack &textures, float ior);
     bool scatter(const Ray &in, Ray &out, hit_data &hit_d) const override;
   };
 }  // namespace nova::material

@@ -22,8 +22,8 @@ namespace nova {
       if (!last_primit || !last_primit->scatter(ray, out, hit_d) || depth < 0)
         return glm::vec4(0.f);
       glm::vec4 color = hit_d.attenuation;
-      return color * engine_sample_color(out, nova_resources, depth - 1);
-      // return {hit_d.normal, 1.f};
+      glm::vec4 emit = hit_d.emissive;
+      return emit + color * engine_sample_color(out, nova_resources, depth - 1);
     }
     glm::vec3 sample_vector = ray.direction;
     return {texturing::sample_cubemap(sample_vector, &nova_resources->getEnvmapData()), 1.f};

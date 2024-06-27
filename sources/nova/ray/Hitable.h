@@ -16,11 +16,13 @@ namespace nova {
   };
 
   struct hit_data {
-    float t{};
-    glm::vec3 normal{};
-    glm::vec3 position{};
     glm::vec4 attenuation{};
-    float u{}, v{};
+    glm::vec4 emissive{};
+    glm::vec3 normal{};
+    glm::vec3 tangent{};
+    glm::vec3 bitangent{};
+    glm::vec3 position{};
+    float u{}, v{}, t{};
   };
 
   class Ray;

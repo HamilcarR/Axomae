@@ -13,6 +13,11 @@ namespace math::geometry {
     return {W1, W2, W3};
   }
 
+  template<class TYPE>
+  TYPE barycentric_lerp(const TYPE &p0, const TYPE &p1, const TYPE &p2, float w, float u, float v) {
+    return p0 * w + p1 * u + p2 * v;
+  }
+
   inline glm::mat3 compute_normal_mat(const glm::mat4 &model) { return glm::transpose(glm::inverse(glm::mat3(model))); }
   inline glm::mat3 glm_extract_rotation(const glm::mat4 &model) { return {model}; }
   inline glm::vec3 glm_extract_translation(const glm::mat4 &model) { return {model[3]}; }

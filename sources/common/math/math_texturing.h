@@ -3,7 +3,10 @@
 namespace math::texture {
   constexpr float ONE_255 = 1.f / 255.f;
 
-  inline float rgb_uint2float(uint8_t rgb) { return (float)rgb * ONE_255; }
+  template<class T>
+  inline float rgb_uint2float(T rgb) {
+    return (float)rgb * ONE_255;
+  }
 
   template<class D>
   double pixelToUv(D coord, const unsigned dim) {
