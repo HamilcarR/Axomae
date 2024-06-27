@@ -1,4 +1,4 @@
-#include "NovaTextures.h"
+#include "ConstantTexture.h"
 using namespace nova::texturing;
 
 ConstantTexture::ConstantTexture(const glm::vec4 &albedo_) : albedo(albedo_) {}
