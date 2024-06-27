@@ -113,7 +113,7 @@ static int axis_subdiv_sah(const Bvht_data &bvh_tree_data,
                            BvhtlBuilder::BUILD_TYPE build_type) {
 
   const unsigned SEGMENT_COUNT = get_centroid_seg_number(build_type);
-  int best_axis = -1;
+  int best_axis = 0;
   float best_position = 0.f;
   float best_cost = INT_MAX;
   const Bvhnl &node = bvh_tree_data.l_tree[node_id];
