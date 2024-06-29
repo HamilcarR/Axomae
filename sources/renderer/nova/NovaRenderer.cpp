@@ -233,8 +233,9 @@ void NovaRenderer::updateNovaCameraFields() {
   nova_camera_structure.setUpVector(scene_camera->getUpVector());
   nova_camera_structure.setProjection(scene_camera->getProjection());
   nova_camera_structure.setInvProjection(glm::inverse(scene_camera->getProjection()));
-  nova_camera_structure.setView(scene_camera->getView());
-  nova_camera_structure.setInvView(glm::inverse(scene_camera->getView()));
+  /* because we use the top transformation matrix also as a view matrix to simulate panning and camera rotation*/
+  nova_camera_structure.setView(scene_camera->getView() * scene_camera->getLocalModelMatrix());
+  nova_camera_structure.setInvView(glm::inverse(nova_camera_structure.getView()));
   nova_camera_structure.setPosition(scene_camera->getPosition());
   nova_camera_structure.setDirection(scene_camera->getDirection());
   nova_camera_structure.setScreenWidth((int)screen_size.width);

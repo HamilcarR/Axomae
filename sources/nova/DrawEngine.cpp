@@ -59,7 +59,7 @@ namespace nova {
           math::camera::camera_ray r = math::camera::ray_inv_mat(ndc.x + dx,
                                                                  ndc.y + dy,
                                                                  nova_resources->getCameraData().getInvProjection(),
-                                                                 nova_resources->getSceneTransformation().getInvVm());  // TODO : move VM away
+                                                                 nova_resources->getCameraData().getInvView());  // TODO : move VM away
           Ray ray(r.near, r.far);
           rgb += engine_sample_color(ray, nova_resources, nova_resources->getEngineData().getMaxDepth());
         }
