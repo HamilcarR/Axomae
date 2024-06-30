@@ -129,6 +129,7 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
     }
   }
   /* Build acceleration. */
+  setProgressStatus("Building BVH structure...");
   const auto *primitive_collection_ptr = &nova_resource_manager->getPrimitiveData().get_primitives();
   nova_resource_manager->getAccelerationData().build(primitive_collection_ptr);
   cancel_render = false;

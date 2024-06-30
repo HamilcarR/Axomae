@@ -60,11 +60,22 @@ class NovaRenderer final : public IRenderer {
   void copyBufferToPbo(float *pbo_mapped_buffer, int width, int height, int channels);
   void initializeEngine();
   void prepareRedraw();
+  void drawBatch();
   void emptyBuffers();
   void emptyAccumBuffer();
   void emptyRenderBuffer();
   void emptyScheduler();
+  /* When events happen : (not in order)
+   * 0) stop render
+   * 1) downscale everything
+   * 2) set samples and depth to minimum
+   * 3) update envmap data ,
+   * 4) clear the render queue and the scheduler
+   * 5) clear the accumulator buffer
+   */
   void resetToBaseState();
+  /* renders with the normal data , samples to max , depth to max etc*/
+  void doProgressiveRender();
   void displayProgress(float current, float target);
 
  public:
@@ -104,8 +115,8 @@ class NovaRenderer final : public IRenderer {
   void setRasterizerFill() override;
   void setRasterizerWireframe() override;
   void displayBoundingBoxes(bool display) override;
-
   void setViewerWidget(GLViewer *widget) override;
+  void setProgressStatus(const std::string &progress_status);
 };
 
 #endif  // NOVARENDERER_H

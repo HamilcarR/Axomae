@@ -7,6 +7,7 @@ add_library(ax_renderer
         nova/NovaRenderer_scene.cpp
         nova/NovaRenderer_postprocess.cpp
         nova/NovaRenderer_bake.cpp
+        nova/NovaRenderer_draw.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_renderer)
