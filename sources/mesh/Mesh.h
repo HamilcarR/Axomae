@@ -6,7 +6,7 @@
 #include "Material.h"
 #include "MeshInterface.h"
 #include "Object3D.h"
-#include "Visitor.h"
+
 /**
  * @brief Mesh.h
  * Mesh class implementation
