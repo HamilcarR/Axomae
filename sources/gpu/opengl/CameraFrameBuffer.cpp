@@ -2,7 +2,7 @@
 #include "DebugGL.h"
 #include "Drawable.h"
 #include "INodeFactory.h"
-#include "UniformNames.h"
+#include "shader/UniformNames.h"
 
 using namespace axomae;
 constexpr float GAMMA = 1.2f;
