@@ -5,7 +5,7 @@
 #include "shape/nova_shape.h"
 
 namespace nova::primitive {
-  NovaGeoPrimitive::NovaGeoPrimitive(shape::NovaShapeInterface *shape_, material::NovaMaterialInterface *material_) {
+  NovaGeoPrimitive::NovaGeoPrimitive(const shape::NovaShapeInterface *shape_, const material::NovaMaterialInterface *material_) {
     shape = shape_;
     material = material_;
   }

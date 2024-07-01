@@ -3,7 +3,10 @@ add_library(ax_controller
     LightControllerUI.cpp
     OP_ProgressStatus.cpp
     GUIWindow.cpp
-        WorkspaceTracker.cpp
+    GUIWindow_slots.cpp
+    WorkspaceTracker.cpp
+
+
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_controller)

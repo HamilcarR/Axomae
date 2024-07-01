@@ -17,13 +17,13 @@ namespace shape {
 namespace nova::primitive {
   class NovaGeoPrimitive final : public NovaPrimitiveInterface {
    private:
-    material::NovaMaterialInterface *material{};
-    shape::NovaShapeInterface *shape{};
+    const material::NovaMaterialInterface *material{};
+    const shape::NovaShapeInterface *shape{};
 
    public:
     CLASS_OCM(NovaGeoPrimitive)
 
-    NovaGeoPrimitive(shape::NovaShapeInterface *shape, material::NovaMaterialInterface *material);
+    NovaGeoPrimitive(const shape::NovaShapeInterface *shape, const material::NovaMaterialInterface *material);
 
     bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const override;
     bool scatter(const Ray &in, Ray &out, hit_data &data) const override;

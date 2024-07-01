@@ -41,6 +41,9 @@ namespace controller {
 
    private:
     Ui::MainWindow main_window_ui;
+
+    /* Raytracing engine */
+    GLViewer *nova_viewer;
     /* The 3D model viewer */
     GLViewer *realtime_viewer;
     SceneListView *renderer_scene_list;
@@ -51,8 +54,6 @@ namespace controller {
     /* UV editor*/
     MeshListView *uv_editor_mesh_list;
     SceneSelector uv_mesh_selector;
-    /* Raytracing engine */
-    GLViewer *nova_viewer;
     /* Tracks current workspace (which widgets are displayed)*/
     std::unique_ptr<WorkspaceTracker> current_workspace;
 
@@ -97,6 +98,7 @@ namespace controller {
     void compute_dudv();
     void change_dudv_nmap(int factor);
     void cubemap_baking();
+    void nova_baking();
     void next_mesh();
     void previous_mesh();
     void project_uv_normals();

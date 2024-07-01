@@ -481,7 +481,7 @@
     <item row="1" column="0">
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="sizeConstraint">
-       <enum>QLayout::SetMaximumSize</enum>
+       <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
       </property>
       <property name="rightMargin">
        <number>0</number>
@@ -499,7 +499,7 @@
              </sizepolicy>
             </property>
             <property name="tabShape">
-             <enum>QTabWidget::Rounded</enum>
+             <enum>QTabWidget::TabShape::Rounded</enum>
             </property>
             <property name="currentIndex">
              <number>2</number>
@@ -525,23 +525,23 @@
                   <item row="0" column="1">
                    <widget class="QGraphicsView" name="height_image">
                     <property name="frameShape">
-                     <enum>QFrame::NoFrame</enum>
+                     <enum>QFrame::Shape::NoFrame</enum>
                     </property>
                     <property name="sizeAdjustPolicy">
-                     <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+                     <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContentsOnFirstShow</enum>
                     </property>
                    </widget>
                   </item>
                   <item row="0" column="0">
                    <widget class="QGraphicsView" name="greyscale_image">
                     <property name="frameShape">
-                     <enum>QFrame::NoFrame</enum>
+                     <enum>QFrame::Shape::NoFrame</enum>
                     </property>
                     <property name="sizeAdjustPolicy">
-                     <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+                     <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContentsOnFirstShow</enum>
                     </property>
                     <property name="dragMode">
-                     <enum>QGraphicsView::NoDrag</enum>
+                     <enum>QGraphicsView::DragMode::NoDrag</enum>
                     </property>
                    </widget>
                   </item>
@@ -550,48 +550,48 @@
                 <item row="3" column="2">
                  <widget class="QGraphicsView" name="dudv_image">
                   <property name="frameShape">
-                   <enum>QFrame::NoFrame</enum>
+                   <enum>QFrame::Shape::NoFrame</enum>
                   </property>
                   <property name="sizeAdjustPolicy">
-                   <enum>QAbstractScrollArea::AdjustToContents</enum>
+                   <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
                   </property>
                   <property name="dragMode">
-                   <enum>QGraphicsView::ScrollHandDrag</enum>
+                   <enum>QGraphicsView::DragMode::ScrollHandDrag</enum>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="1">
                  <widget class="QGraphicsView" name="diffuse_image">
                   <property name="frameShape">
-                   <enum>QFrame::NoFrame</enum>
+                   <enum>QFrame::Shape::NoFrame</enum>
                   </property>
                   <property name="frameShadow">
-                   <enum>QFrame::Sunken</enum>
+                   <enum>QFrame::Shadow::Sunken</enum>
                   </property>
                   <property name="lineWidth">
                    <number>1</number>
                   </property>
                   <property name="sizeAdjustPolicy">
-                   <enum>QAbstractScrollArea::AdjustToContents</enum>
+                   <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
                   </property>
                   <property name="dragMode">
-                   <enum>QGraphicsView::ScrollHandDrag</enum>
+                   <enum>QGraphicsView::DragMode::ScrollHandDrag</enum>
                   </property>
                   <property name="viewportUpdateMode">
-                   <enum>QGraphicsView::FullViewportUpdate</enum>
+                   <enum>QGraphicsView::ViewportUpdateMode::FullViewportUpdate</enum>
                   </property>
                  </widget>
                 </item>
                 <item row="3" column="1">
                  <widget class="QGraphicsView" name="normal_image">
                   <property name="frameShape">
-                   <enum>QFrame::NoFrame</enum>
+                   <enum>QFrame::Shape::NoFrame</enum>
                   </property>
                   <property name="sizeAdjustPolicy">
-                   <enum>QAbstractScrollArea::AdjustToContents</enum>
+                   <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
                   </property>
                   <property name="dragMode">
-                   <enum>QGraphicsView::ScrollHandDrag</enum>
+                   <enum>QGraphicsView::DragMode::ScrollHandDrag</enum>
                   </property>
                  </widget>
                 </item>
@@ -624,7 +624,7 @@
                  <string notr="true"/>
                 </property>
                 <property name="tabShape">
-                 <enum>QTabWidget::Triangular</enum>
+                 <enum>QTabWidget::TabShape::Triangular</enum>
                 </property>
                 <property name="currentIndex">
                  <number>0</number>
@@ -731,10 +731,10 @@
                      <item>
                       <widget class="QTabWidget" name="tabWidget_2">
                        <property name="tabPosition">
-                        <enum>QTabWidget::North</enum>
+                        <enum>QTabWidget::TabPosition::North</enum>
                        </property>
                        <property name="tabShape">
-                        <enum>QTabWidget::Triangular</enum>
+                        <enum>QTabWidget::TabShape::Triangular</enum>
                        </property>
                        <property name="currentIndex">
                         <number>0</number>
@@ -818,7 +818,7 @@
                                 <number>10</number>
                                </property>
                                <property name="orientation">
-                                <enum>Qt::Horizontal</enum>
+                                <enum>Qt::Orientation::Horizontal</enum>
                                </property>
                               </widget>
                              </item>
@@ -843,7 +843,7 @@
                          <item row="0" column="0">
                           <layout class="QVBoxLayout" name="verticalLayout_17">
                            <property name="sizeConstraint">
-                            <enum>QLayout::SetNoConstraint</enum>
+                            <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
                            </property>
                            <item>
                             <widget class="QRadioButton" name="box_blur_radio">
@@ -881,7 +881,7 @@
                               <number>10</number>
                              </property>
                              <property name="orientation">
-                              <enum>Qt::Vertical</enum>
+                              <enum>Qt::Orientation::Vertical</enum>
                              </property>
                              <property name="invertedAppearance">
                               <bool>false</bool>
@@ -923,7 +923,7 @@
                      <item>
                       <widget class="QRadioButton" name="use_tangentSpace">
                        <property name="text">
-                        <string>Tangent space</string>
+                        <string>Tan&amp;gent space</string>
                        </property>
                       </widget>
                      </item>
@@ -958,7 +958,7 @@
                            <number>10</number>
                           </property>
                           <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
+                           <enum>Qt::Orientation::Horizontal</enum>
                           </property>
                          </widget>
                         </item>
@@ -978,7 +978,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
 }</string>
                           </property>
                           <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
+                           <enum>Qt::Orientation::Horizontal</enum>
                           </property>
                          </widget>
                         </item>
@@ -1025,7 +1025,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
 }</string>
                           </property>
                           <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
+                           <enum>Qt::Orientation::Horizontal</enum>
                           </property>
                          </widget>
                         </item>
@@ -1051,7 +1051,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                 <item>
                  <layout class="QVBoxLayout" name="verticalLayout_25">
                   <property name="sizeConstraint">
-                   <enum>QLayout::SetMinimumSize</enum>
+                   <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
                   </property>
                   <item>
                    <widget class="QTabWidget" name="tabWidget_3">
@@ -1179,16 +1179,16 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                  </sizepolicy>
                 </property>
                 <property name="tabPosition">
-                 <enum>QTabWidget::North</enum>
+                 <enum>QTabWidget::TabPosition::North</enum>
                 </property>
                 <property name="tabShape">
-                 <enum>QTabWidget::Rounded</enum>
+                 <enum>QTabWidget::TabShape::Rounded</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>4</number>
                 </property>
                 <property name="elideMode">
-                 <enum>Qt::ElideNone</enum>
+                 <enum>Qt::TextElideMode::ElideNone</enum>
                 </property>
                 <property name="tabsClosable">
                  <bool>false</bool>
@@ -1213,7 +1213,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                      </sizepolicy>
                     </property>
                     <property name="focusPolicy">
-                     <enum>Qt::NoFocus</enum>
+                     <enum>Qt::FocusPolicy::NoFocus</enum>
                     </property>
                     <property name="autoFillBackground">
                      <bool>false</bool>
@@ -1231,10 +1231,10 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                         <number>200</number>
                        </property>
                        <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
+                        <enum>Qt::Orientation::Horizontal</enum>
                        </property>
                        <property name="tickPosition">
-                        <enum>QSlider::TicksBelow</enum>
+                        <enum>QSlider::TickPosition::TicksBelow</enum>
                        </property>
                       </widget>
                      </item>
@@ -1244,10 +1244,10 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                         <number>200</number>
                        </property>
                        <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
+                        <enum>Qt::Orientation::Horizontal</enum>
                        </property>
                        <property name="tickPosition">
-                        <enum>QSlider::TicksBelow</enum>
+                        <enum>QSlider::TickPosition::TicksBelow</enum>
                        </property>
                       </widget>
                      </item>
@@ -1287,14 +1287,14 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                         <item>
                          <widget class="QRadioButton" name="set_standard_post_p">
                           <property name="text">
-                           <string>No Post-Processing</string>
+                           <string>&amp;No Post-Processing</string>
                           </property>
                          </widget>
                         </item>
                         <item>
                          <widget class="QRadioButton" name="set_edge_post_p">
                           <property name="text">
-                           <string>Edge</string>
+                           <string>Ed&amp;ge</string>
                           </property>
                          </widget>
                         </item>
@@ -1404,16 +1404,16 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                        </sizepolicy>
                       </property>
                       <property name="tabPosition">
-                       <enum>QTabWidget::North</enum>
+                       <enum>QTabWidget::TabPosition::North</enum>
                       </property>
                       <property name="tabShape">
-                       <enum>QTabWidget::Rounded</enum>
+                       <enum>QTabWidget::TabShape::Rounded</enum>
                       </property>
                       <property name="currentIndex">
                        <number>0</number>
                       </property>
                       <property name="elideMode">
-                       <enum>Qt::ElideNone</enum>
+                       <enum>Qt::TextElideMode::ElideNone</enum>
                       </property>
                       <property name="documentMode">
                        <bool>true</bool>
@@ -1437,7 +1437,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                              </sizepolicy>
                             </property>
                             <property name="focusPolicy">
-                             <enum>Qt::NoFocus</enum>
+                             <enum>Qt::FocusPolicy::NoFocus</enum>
                             </property>
                             <property name="acceptDrops">
                              <bool>false</bool>
@@ -1500,7 +1500,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                       <number>0</number>
                                      </property>
                                      <property name="orientation">
-                                      <enum>Qt::Horizontal</enum>
+                                      <enum>Qt::Orientation::Horizontal</enum>
                                      </property>
                                     </widget>
                                    </item>
@@ -1540,7 +1540,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                       <number>255</number>
                                      </property>
                                      <property name="orientation">
-                                      <enum>Qt::Horizontal</enum>
+                                      <enum>Qt::Orientation::Horizontal</enum>
                                      </property>
                                     </widget>
                                    </item>
@@ -1556,7 +1556,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                       <number>255</number>
                                      </property>
                                      <property name="orientation">
-                                      <enum>Qt::Horizontal</enum>
+                                      <enum>Qt::Orientation::Horizontal</enum>
                                      </property>
                                     </widget>
                                    </item>
@@ -1712,7 +1712,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                              </sizepolicy>
                             </property>
                             <property name="focusPolicy">
-                             <enum>Qt::NoFocus</enum>
+                             <enum>Qt::FocusPolicy::NoFocus</enum>
                             </property>
                             <property name="acceptDrops">
                              <bool>false</bool>
@@ -1796,7 +1796,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                       <number>255</number>
                                      </property>
                                      <property name="orientation">
-                                      <enum>Qt::Horizontal</enum>
+                                      <enum>Qt::Orientation::Horizontal</enum>
                                      </property>
                                     </widget>
                                    </item>
@@ -1812,7 +1812,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                       <number>255</number>
                                      </property>
                                      <property name="orientation">
-                                      <enum>Qt::Horizontal</enum>
+                                      <enum>Qt::Orientation::Horizontal</enum>
                                      </property>
                                     </widget>
                                    </item>
@@ -1851,7 +1851,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                       <number>0</number>
                                      </property>
                                      <property name="orientation">
-                                      <enum>Qt::Horizontal</enum>
+                                      <enum>Qt::Orientation::Horizontal</enum>
                                      </property>
                                     </widget>
                                    </item>
@@ -1915,7 +1915,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                              </sizepolicy>
                             </property>
                             <property name="focusPolicy">
-                             <enum>Qt::NoFocus</enum>
+                             <enum>Qt::FocusPolicy::NoFocus</enum>
                             </property>
                             <property name="acceptDrops">
                              <bool>false</bool>
@@ -1978,7 +1978,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                       <number>0</number>
                                      </property>
                                      <property name="orientation">
-                                      <enum>Qt::Horizontal</enum>
+                                      <enum>Qt::Orientation::Horizontal</enum>
                                      </property>
                                     </widget>
                                    </item>
@@ -2018,7 +2018,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                       <number>255</number>
                                      </property>
                                      <property name="orientation">
-                                      <enum>Qt::Horizontal</enum>
+                                      <enum>Qt::Orientation::Horizontal</enum>
                                      </property>
                                     </widget>
                                    </item>
@@ -2034,7 +2034,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                       <number>255</number>
                                      </property>
                                      <property name="orientation">
-                                      <enum>Qt::Horizontal</enum>
+                                      <enum>Qt::Orientation::Horizontal</enum>
                                      </property>
                                     </widget>
                                    </item>
@@ -2115,7 +2115,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                                       <number>180</number>
                                      </property>
                                      <property name="orientation">
-                                      <enum>Qt::Horizontal</enum>
+                                      <enum>Qt::Orientation::Horizontal</enum>
                                      </property>
                                      <property name="invertedAppearance">
                                       <bool>false</bool>
@@ -2188,6 +2188,79 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                   </item>
                  </layout>
                 </widget>
+                <widget class="QWidget" name="nova_bake">
+                 <attribute name="title">
+                  <string>Bake</string>
+                 </attribute>
+                 <layout class="QGridLayout" name="gridLayout_29">
+                  <item row="0" column="0">
+                   <widget class="QGroupBox" name="groupBox_8">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="title">
+                     <string>Bake Scene</string>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_32">
+                     <item>
+                      <layout class="QGridLayout" name="gridLayout_15">
+                       <item row="1" column="0">
+                        <widget class="QLabel" name="label_22">
+                         <property name="text">
+                          <string>Image height</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="1">
+                        <widget class="QSpinBox" name="nova_bake_height">
+                         <property name="minimum">
+                          <number>50</number>
+                         </property>
+                         <property name="maximum">
+                          <number>8096</number>
+                         </property>
+                         <property name="value">
+                          <number>500</number>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="0">
+                        <widget class="QLabel" name="label_24">
+                         <property name="text">
+                          <string>Image Width</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="1">
+                        <widget class="QSpinBox" name="nova_bake_width">
+                         <property name="minimum">
+                          <number>50</number>
+                         </property>
+                         <property name="maximum">
+                          <number>8096</number>
+                         </property>
+                         <property name="value">
+                          <number>500</number>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="nova_bake_button">
+                       <property name="text">
+                        <string>Bake</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </widget>
               </item>
               <item row="2" column="4">
@@ -2252,10 +2325,10 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                      <bool>true</bool>
                     </property>
                     <property name="frameShape">
-                     <enum>QFrame::StyledPanel</enum>
+                     <enum>QFrame::Shape::StyledPanel</enum>
                     </property>
                     <property name="frameShadow">
-                     <enum>QFrame::Sunken</enum>
+                     <enum>QFrame::Shadow::Sunken</enum>
                     </property>
                    </widget>
                   </item>
@@ -2273,7 +2346,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
               </sizepolicy>
              </property>
              <property name="layoutDirection">
-              <enum>Qt::LeftToRight</enum>
+              <enum>Qt::LayoutDirection::LeftToRight</enum>
              </property>
              <property name="autoFillBackground">
               <bool>false</bool>
@@ -2285,7 +2358,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
               <item row="0" column="2">
                <layout class="QGridLayout" name="gridLayout_14">
                 <property name="sizeConstraint">
-                 <enum>QLayout::SetDefaultConstraint</enum>
+                 <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
                 </property>
                 <item row="0" column="1">
                  <layout class="QGridLayout" name="gridLayout_8">
@@ -2326,7 +2399,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;List all meshes names in the 3D model&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                   <property name="frameShape">
-                   <enum>QFrame::NoFrame</enum>
+                   <enum>QFrame::Shape::NoFrame</enum>
                   </property>
                  </widget>
                 </item>
@@ -2335,7 +2408,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
               <item row="0" column="0">
                <layout class="QGridLayout" name="LAYOUT_uv">
                 <property name="sizeConstraint">
-                 <enum>QLayout::SetDefaultConstraint</enum>
+                 <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
                 </property>
                 <item row="0" column="1">
                  <widget class="TextureViewerWidget" name="uv_projection" native="true">
@@ -2425,14 +2498,14 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>E&amp;dit</string>
     </property>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>Tools</string>
+     <string>&amp;Tools</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -2503,7 +2576,7 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
   </action>
   <action name="actionImport_Environment_Map">
    <property name="text">
-    <string>Import Environment Map</string>
+    <string>Import Environment &amp;Map</string>
    </property>
   </action>
  </widget>
