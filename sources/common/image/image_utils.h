@@ -72,7 +72,7 @@ namespace hdr_utils {
     T max = 0;
     for (T i : rgb)
       max = std::max(max, i);
-    AX_ASSERT(max > 0, "");
+    max = max > 0 ? max : static_cast<T>(1);
     if (needs_color_correct)
       max = color_correction(max);
     int index = 0;
@@ -92,7 +92,7 @@ namespace hdr_utils {
         image_data[(i * width + j) * final_channels] = std::clamp(static_cast<int>(b * 255), 0, 255);
         image_data[(i * width + j) * final_channels + 1] = std::clamp(static_cast<int>(g * 255), 0, 255);
         image_data[(i * width + j) * final_channels + 2] = std::clamp(static_cast<int>(r * 255), 0, 255);
-        image_data[(i * width + j) * final_channels + 3] = channels == 4 ? rgb[index + 3] : 1.f;
+        image_data[(i * width + j) * final_channels + 3] = 255;  // std::clamp(static_cast<int>(rgb[index + 3] * 255), 0, 255) : 255;
       }
     }
     return image_data;

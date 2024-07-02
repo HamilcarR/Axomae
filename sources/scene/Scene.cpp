@@ -44,6 +44,7 @@ void Scene::setScene(const SceneTree &tree, const std::vector<Mesh *> &mesh_list
   scene_tree.pushNewRoot(scene_skybox);
   scene_skybox->setCubemapPointer(scene_skybox);
   make_drawable(drawable_collection, scene, scene_skybox);
+  mesh_collection = mesh_list;
   for (Mesh *A : mesh_list) {
     A->setCubemapPointer(scene_skybox);
     make_drawable(drawable_collection, scene, A);
@@ -203,8 +204,10 @@ void Scene::setPolygonFill() {
 std::vector<Mesh *> Scene::getMeshCollectionPtr() const {
   std::vector<Mesh *> to_ret;
   to_ret.reserve(scene.size());
-  for (auto &elem : scene)
-    to_ret.push_back(elem.drawable->getMeshPointer());
+  for (auto &elem : scene) {
+    if (elem.drawable->getMeshPointer() != scene_skybox)
+      to_ret.push_back(elem.drawable->getMeshPointer());
+  }
   return to_ret;
 }
 

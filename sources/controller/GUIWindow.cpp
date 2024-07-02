@@ -3,15 +3,15 @@
 
 #include "ImageImporter.h"
 
-#include "MeshListView.h"
-#include "ProgressStatusWidget.h"
-
 #include "EventController.h"
 #include "ImageManager.h"
+#include "MeshListView.h"
+#include "ProgressStatusWidget.h"
 #include "SceneSelector.h"
 #include "ShaderFactory.h"
 #include "TextureViewerWidget.h"
 #include "WorkspaceTracker.h"
+#include "manager/NovaResourceManager.h"
 #include <QTimer>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsItem>
@@ -465,6 +465,11 @@ namespace controller {
   }
 
   /**************************************************************************************************************/
+  std::string Controller::spawnSaveFileDialogueWidget() {
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save files"), "./", tr("All Files (*)"));
+    return filename.toStdString();
+  }
+  /**************************************************************************************************************/
   bool Controller::greyscale_average() {
     SDL_Surface *s = image_session_pointers::albedo;
     SDL_Surface *copy = Controller::copy_surface(s);
@@ -623,12 +628,6 @@ namespace controller {
   }
 
   /**************************************************************************************************************/
-  void Controller::nova_baking() {
-    int width = main_window_ui.nova_bake_width->value();
-    int height = main_window_ui.nova_bake_height->value();
-  }
-
-  /**************************************************************************************************************/
 
   // TODO: [AX-26] Optimize the normals projection on UVs in the UV tool
   void Controller::project_uv_normals() {
@@ -652,6 +651,7 @@ namespace controller {
   bool Controller::import_3DOBJ() {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
     if (!filename.isEmpty()) {
+      cleanupNova();
       realtime_viewer->prepareRendererSceneChange();
       nova_viewer->prepareRendererSceneChange();
 
@@ -846,6 +846,24 @@ namespace controller {
       realtime_viewer->rendererCallback<SET_DISPLAY_BOUNDINGBOX>(display);
     }
   }
+
+  /**************************************************************************************************************/
+
+  void Controller::cleanupWindowProcess(QWidget *widget) { cleanupNova(); }
+  void Controller::cleanupNova() {
+    /* Stop the threads. */
+    nova_baking_structure.stop = true;
+    if (global_application_config && global_application_config->getThreadPool()) {
+      /* Empty scheduler list. */
+      global_application_config->getThreadPool()->emptyQueue();
+      /* Synchronize the threads. */
+      global_application_config->getThreadPool()->fence();
+    }
+
+    nova_baking_structure.reinitialize();
+  }
+
+  void Controller::onClosedSpawnWindow(QWidget *address) { cleanupWindowProcess(address); }
 
   /**************************************************************************************************************/
   /* SLOTS */

@@ -1,16 +1,14 @@
 #ifndef GUIWINDOW_H
 #define GUIWINDOW_H
 
+#include "BakeRenderData.h"
 #include "LightControllerUI.h"
 #include "Renderer.h"
 #include "SceneListView.h"
 #include "SceneSelector.h"
 #include "constants.h"
 #include "ui_main_window.h"
-#include "utils_3D.h"
-#include <QtWidgets/qapplication.h>
 #include <QtWidgets/qmainwindow.h>
-#include <QtWidgets/qpushbutton.h>
 #include <SDL2/SDL_surface.h>
 
 /**
@@ -19,12 +17,19 @@
 
 class ApplicationConfig;
 class QTimer;
+
 namespace controller::event {
   class Event;
 }
+
+namespace nova {
+  class NovaResourceManager;
+}
+
 namespace gui {
   enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4, ALBEDO = 5, GREYSCALE_AVG = 6, PROJECTED_NMAP = 7, INVALID = 8 };
 }
+
 namespace controller {
 
   // TODO :  delete old memory management code
@@ -42,8 +47,6 @@ namespace controller {
    private:
     Ui::MainWindow main_window_ui;
 
-    /* Raytracing engine */
-    GLViewer *nova_viewer;
     /* The 3D model viewer */
     GLViewer *realtime_viewer;
     SceneListView *renderer_scene_list;
@@ -56,8 +59,11 @@ namespace controller {
     SceneSelector uv_mesh_selector;
     /* Tracks current workspace (which widgets are displayed)*/
     std::unique_ptr<WorkspaceTracker> current_workspace;
-
+    /* Timer for renderer synchro */
     std::unique_ptr<QTimer> timer;
+    /* Raytracing engine display*/
+    GLViewer *nova_viewer;
+    NovaBakingStructure nova_baking_structure;
 
    public:
     static HeapManagement *_MemManagement;  // TODO : Refactor
@@ -69,6 +75,12 @@ namespace controller {
     Ui::MainWindow &getUi() { return main_window_ui; }
     static SDL_Surface *copy_surface(SDL_Surface *surface);
     void closeEvent(QCloseEvent *event) override;
+    ProgressStatus *getProgress() const { return progress_manager.get(); }
+    [[nodiscard]] std::string spawnSaveFileDialogueWidget();
+    void cleanupWindowProcess(QWidget *window);
+    void cleanupNova();
+    [[nodiscard]] const NovaBakingStructure &getBakingStructure() const { return nova_baking_structure; }
+    [[nodiscard]] NovaBakingStructure &getBakingStructure() { return nova_baking_structure; }
 
    private:
     void connect_all_slots();
@@ -76,6 +88,7 @@ namespace controller {
     SDL_Surface *get_corresponding_session_pointer(gui::IMAGETYPE image);
     bool set_corresponding_session_pointer(image_type<SDL_Surface> *image_type_pointer);
     void display_image(SDL_Surface *surf, gui::IMAGETYPE image, bool save_in_heap);
+    void save_bake(const image::ImageHolder<float> &image);
 
     /* SLOTS */
    public slots:
@@ -117,7 +130,7 @@ namespace controller {
     void set_rasterizer_fill();
     void set_rasterizer_wireframe();
     void set_display_boundingbox(bool display);
-
+    void onClosedSpawnWindow(QWidget *address);
    protected slots:
     void update_smooth_factor(int factor);
     void select_uv_editor_item();

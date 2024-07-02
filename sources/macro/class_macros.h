@@ -44,17 +44,17 @@
   classname() = default;\
   ~classname() override = default;\
   classname(const classname& copy) = default;\
-  classname(classname&& move) = delete;\
+  classname(classname&& move)noexcept = delete;\
   classname& operator=(const classname& copy) = default;\
-  classname& operator=(classname&& move) = delete;
+  classname& operator=(classname&& move) noexcept = delete;
 
 #define CLASS_O(classname) \
   classname() = default;\
   ~classname() override = default;\
   classname(const classname& copy) = delete;\
-  classname(classname&& move) = delete;\
+  classname(classname&& move) noexcept = delete;\
   classname& operator=(const classname& copy) = delete;\
-  classname& operator=(classname&& move) = delete;
+  classname& operator=(classname&& move) noexcept = delete;
 
 #define CLASS_M(classname) \
   classname() = default;\

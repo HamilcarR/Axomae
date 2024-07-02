@@ -5,8 +5,8 @@
 #include "EnvmapTextureManager.h"
 #include "GLMutablePixelBufferObject.h"
 #include "NovaRenderer.h"
+#include "bake.h"
 #include "manager/NovaResourceManager.h"
-
 #include <sys/param.h>
 
 static constexpr int MAX_RECUR_DEPTH = 20;
@@ -27,8 +27,8 @@ bool NovaRenderer::prep_draw() {
 void NovaRenderer::populateNovaSceneResources() {
   /*Setup envmap */
   image::ImageHolder<float> *current_envmap = envmap_manager->currentMutableEnvmapMetadata();
-  nova_resource_manager->envmapSetData(
-      &current_envmap->data, current_envmap->metadata.width, current_envmap->metadata.height, current_envmap->metadata.channels);
+  nova_baker_utils::scene_envmap env{current_envmap};
+  nova_baker_utils::initialize_environment_texture(env, nova_resource_manager->getEnvmapData());
 }
 
 void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int channels) {
@@ -44,12 +44,15 @@ void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int ch
 }
 
 void NovaRenderer::initializeEngine() {
-  nova_resource_manager->getEngineData().setTilesWidth(NUM_TILES);
-  nova_resource_manager->getEngineData().setTilesHeight(NUM_TILES);
-  nova_resource_manager->getEngineData().setAliasingSamples(8);
-  nova_resource_manager->getEngineData().setMaxSamples(MAX_SAMPLES);
-  nova_resource_manager->getEngineData().setMaxDepth(MAX_RECUR_DEPTH);
-  nova_resource_manager->getEngineData().setCancelPtr(&cancel_render);
+
+  nova_baker_utils::engine_data engine_opts;
+  engine_opts.aa_samples = 8;
+  engine_opts.num_tiles_h = engine_opts.num_tiles_w = NUM_TILES;
+  engine_opts.depth_max = MAX_RECUR_DEPTH;
+  engine_opts.samples_max = MAX_SAMPLES;
+  engine_opts.stop_render_ptr = &cancel_render;
+
+  initialize_engine_opts(engine_opts, nova_resource_manager->getEngineData());
 }
 
 void NovaRenderer::drawBatch() {
@@ -154,28 +157,18 @@ void NovaRenderer::updateNovaCameraFields() {
   scene_camera->computeViewProjection();
   nova::camera::CameraResourcesHolder &nova_camera_structure = nova_resource_manager->getCameraData();
   nova::scene::SceneTransformations &nova_scene_transformations = nova_resource_manager->getSceneTransformation();
-  /* Camera data*/
-  nova_camera_structure.setUpVector(scene_camera->getUpVector());
-  nova_camera_structure.setProjection(scene_camera->getProjection());
-  nova_camera_structure.setInvProjection(glm::inverse(scene_camera->getProjection()));
-  /* because we use the top transformation matrix also as a view matrix to simulate panning and camera rotation*/
-  nova_camera_structure.setView(scene_camera->getView() * scene_camera->getLocalModelMatrix());
-  nova_camera_structure.setInvView(glm::inverse(nova_camera_structure.getView()));
-  nova_camera_structure.setPosition(scene_camera->getPosition());
-  nova_camera_structure.setDirection(scene_camera->getDirection());
+  nova_baker_utils::camera_data c_data{};
+  c_data.view = scene_camera->getTransformedView();
+  c_data.projection = scene_camera->getProjection();
+  c_data.up_vector = scene_camera->getUpVector();
+  c_data.position = scene_camera->getPosition();
+  c_data.direction = scene_camera->getDirection();
+  nova_baker_utils::scene_transform_data st_data{};
+  st_data.root_transformation = scene_camera->getLocalModelMatrix();
+  st_data.root_rotation = scene_camera->getSceneRotationMatrix();
+  st_data.root_translation = scene_camera->getSceneTranslationMatrix();
+
+  initialize_matrices(c_data, st_data, nova_scene_transformations, nova_camera_structure);
   nova_camera_structure.setScreenWidth((int)screen_size.width);
   nova_camera_structure.setScreenHeight((int)screen_size.height);
-
-  /* Scene root transformations */
-  nova_scene_transformations.setTranslation(scene_camera->getSceneTranslationMatrix());
-  nova_scene_transformations.setInvTranslation(glm::inverse(scene_camera->getSceneTranslationMatrix()));
-  nova_scene_transformations.setRotation(scene_camera->getSceneRotationMatrix());
-  nova_scene_transformations.setInvRotation(glm::inverse(scene_camera->getSceneRotationMatrix()));
-  nova_scene_transformations.setModel(scene_camera->getLocalModelMatrix());
-  nova_scene_transformations.setInvModel(glm::inverse(scene_camera->getLocalModelMatrix()));
-  nova_scene_transformations.setPvm(scene_camera->getProjection() * scene_camera->getView() * scene_camera->getLocalModelMatrix());
-  nova_scene_transformations.setInvPvm(glm::inverse(nova_scene_transformations.getPvm()));
-  nova_scene_transformations.setVm(nova_camera_structure.getView() * nova_scene_transformations.getModel());
-  nova_scene_transformations.setInvVm(glm::inverse(nova_scene_transformations.getVm()));
-  nova_scene_transformations.setNormalMatrix(glm::mat3(glm::transpose(nova_scene_transformations.getInvModel())));
 }

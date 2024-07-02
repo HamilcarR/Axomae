@@ -16,9 +16,10 @@
  */
 class SceneTreeNode : public SceneNodeInterface, public datastructure::AbstractNode {
  protected:
-  int flag{};                             /*<Flag indicate what operations need to be done on this node*/
   glm::mat4 local_transformation{};       /*<Local transformation of the node*/
   glm::mat4 accumulated_transformation{}; /*<Matrix equal to all ancestors transformations*/
+  int flag{};                             /*<Flag indicate what operations need to be done on this node*/
+  bool ignore{false};                     /*<If ignore is true , this node will not impact it's children transformations*/
 
  protected:
   explicit SceneTreeNode(SceneTreeNode *parent = nullptr, datastructure::AbstractHierarchy *owner = nullptr);
@@ -46,7 +47,8 @@ class SceneTreeNode : public SceneNodeInterface, public datastructure::AbstractN
   void resetAccumulatedMatrix() override;
   void setAccumulatedModelMatrix(const glm::mat4 &matrix) override { accumulated_transformation = matrix; };
   [[nodiscard]] const glm::mat4 &getAccumulatedModelMatrix() const override { return accumulated_transformation; };
-
+  [[nodiscard]] bool isIgnored() const override { return ignore; }
+  void setIgnore(bool ignore_) override { ignore = ignore_; }
   void reset() override;
 };
 

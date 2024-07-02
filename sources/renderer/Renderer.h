@@ -62,7 +62,7 @@ class Renderer final : public IRenderer {
    * @brief Method setting up the meshes , and the scene camera
    */
   bool prep_draw() override;
-
+  [[nodiscard]] const EnvmapTextureManager &getCurrentEnvmapId() const override { return *envmap_manager; }
   void setNewScene(const SceneChangeData &new_scene) override;
   /**
    * @brief Checks if all Drawable objects in the scene have been initialized
@@ -81,6 +81,8 @@ class Renderer final : public IRenderer {
   [[nodiscard]] RenderPipeline &getRenderPipeline() const override { return *render_pipeline; }
   [[nodiscard]] image::ImageHolder<float> getSnapshotFloat(int width, int height) const override;
   [[nodiscard]] image::ImageHolder<uint8_t> getSnapshotUint8(int width, int height) const override;
+  [[nodiscard]] const Camera *getCamera() const override { return scene_camera; }
+  [[nodiscard]] Camera *getCamera() override { return scene_camera; }
   void setGammaValue(float gamma) override;
   void setExposureValue(float exposure) override;
   void setNoPostProcess() override;

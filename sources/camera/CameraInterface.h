@@ -20,6 +20,9 @@ class CameraInterface : public EventInterface {
    * @param focus_point Point in worldspace
    */
   virtual void focus(const glm::vec3 &focus_point) = 0;
+  [[nodiscard]] virtual const glm::vec3 &getUpVector() const = 0;
+  [[nodiscard]] virtual const glm::vec3 &getDirection() const = 0;
+  [[nodiscard]] virtual const glm::vec3 &getPosition() const = 0;
   [[nodiscard]] virtual const glm::mat4 &getSceneRotationMatrix() const = 0;
   [[nodiscard]] virtual const glm::mat4 &getSceneTranslationMatrix() const = 0;
   [[nodiscard]] virtual const glm::mat4 &getViewProjection() const = 0;
@@ -28,6 +31,8 @@ class CameraInterface : public EventInterface {
   [[nodiscard]] virtual const Dim2 *getScreenDimensions() const = 0;
   [[nodiscard]] virtual float getFar() const = 0;
   [[nodiscard]] virtual float getNear() const = 0;
+  [[nodiscard]] virtual float getFov() const = 0;
+  [[nodiscard]] virtual float getRatio() const = 0;
 };
 
 #endif  // ICAMERA_H

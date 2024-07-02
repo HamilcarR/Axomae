@@ -17,15 +17,10 @@ namespace nova {
   /* Local ray engine */
   class NovaRenderEngineLR final : public NovaRenderEngineInterface {
    public:
-    NovaRenderEngineLR() = default;
-    ~NovaRenderEngineLR() override = default;
+    CLASS_OCM(NovaRenderEngineLR)
 
     glm::vec4 engine_sample_color(const Ray &ray, const NovaResourceManager *nova_resources, int depth) override;
     void engine_render_tile(HdrBufferStruct *dest_buffer, Tile &tile, const NovaResourceManager *nova_resources) override;
-    NovaRenderEngineLR(const NovaRenderEngineLR &copy) = delete;
-    NovaRenderEngineLR(NovaRenderEngineLR &&move) noexcept = default;
-    NovaRenderEngineLR &operator=(NovaRenderEngineLR &&move) noexcept = default;
-    NovaRenderEngineLR &operator=(const NovaRenderEngineLR &copy) = delete;
   };
 
   inline std::vector<std::future<void>> draw(HdrBufferStruct *buffers,

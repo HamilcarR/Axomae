@@ -42,14 +42,11 @@ class ImageDatabase : public IntegerResourceDB<image::ThumbnailImageHolder<DATAT
 
 namespace database::image {
   template<class TYPE>
-  void store(IResourceDB<int, ::image::ThumbnailImageHolder<TYPE>> &database_,
-             bool keep,
-             std::vector<TYPE> &args,
-             const ::image::Metadata &metadata) {
+  int store(IResourceDB<int, ::image::ThumbnailImageHolder<TYPE>> &database_, bool keep, std::vector<TYPE> &args, const ::image::Metadata &metadata) {
     ASSERT_IS_ARITHMETIC(TYPE);
     std::unique_ptr<::image::ThumbnailImageHolder<TYPE>> raw_image = std::make_unique<::image::ThumbnailImageHolder<TYPE>>(
         args, metadata, database_.getProgressManager());
-    database_.add(std::move(raw_image), keep);
+    return database_.add(std::move(raw_image), keep).id;
   }
 
   template<class TYPE>
@@ -95,7 +92,7 @@ void ImageDatabase<T>::clean() {
 
 template<class T>
 typename ImageDatabase<T>::HolderResult ImageDatabase<T>::add(HolderPointer element, bool keep) {
-  auto it = unique_elements.find(element->metadata().name);
+  auto it = unique_elements.find(element->metadata.name);
   if (it != unique_elements.end() && !it->first.empty()) {
     HolderResult result;
     result.id = it->second;
@@ -105,14 +102,14 @@ typename ImageDatabase<T>::HolderResult ImageDatabase<T>::add(HolderPointer elem
   }
   auto elem = BaseType::add(std::move(element), keep);
   notifyImageAdd(elem.id);
-  unique_elements.insert(std::pair<std::string, int>(elem.object->metadata().name, elem.id));
+  unique_elements.insert(std::pair<std::string, int>(elem.object->metadata.name, elem.id));
   return elem;
 }
 
 template<class T>
 image::Metadata ImageDatabase<T>::getMetadata(int index) const {
   image::ThumbnailImageHolder<T> *holder = BaseType::database_map.at(index).get();
-  return holder->metadata();
+  return holder->metadata;
 }
 
 template<class T>
