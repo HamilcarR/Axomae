@@ -56,10 +56,8 @@ namespace nova {
           const float dx = math::random::nrandf(-RAND_DX, RAND_DX);
           const float dy = math::random::nrandf(-RAND_DY, RAND_DY);
 
-          math::camera::camera_ray r = math::camera::ray_inv_mat(ndc.x + dx,
-                                                                 ndc.y + dy,
-                                                                 nova_resources->getCameraData().getInvProjection(),
-                                                                 nova_resources->getCameraData().getInvView());  // TODO : move VM away
+          math::camera::camera_ray r = math::camera::ray_inv_mat(
+              ndc.x + dx, ndc.y + dy, nova_resources->getCameraData().getInvProjection(), nova_resources->getCameraData().getInvView());
           Ray ray(r.near, r.far);
           rgb += engine_sample_color(ray, nova_resources, nova_resources->getEngineData().getMaxDepth());
         }

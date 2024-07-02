@@ -56,8 +56,12 @@ namespace controller {
     SceneSelector uv_mesh_selector;
     /* Tracks current workspace (which widgets are displayed)*/
     std::unique_ptr<WorkspaceTracker> current_workspace;
-
+    /* Timer for renderer synchro */
     std::unique_ptr<QTimer> timer;
+    /* Each time we queue a baking procedure , we register a stop condition here. */
+    std::unordered_map<int, bool> stop_list;
+    /* Generic windows spawned by the application*/
+    std::vector<std::unique_ptr<QWidget>> spawned_windows;
 
    public:
     static HeapManagement *_MemManagement;  // TODO : Refactor

@@ -98,6 +98,9 @@ class Scene : public EventInterface {
   CubeMapMesh &getSkybox() const { return *scene_skybox; }
   const SceneTree &getConstSceneTreeRef() const { return scene_tree; }
   SceneTree &getSceneTreeRef() { return scene_tree; }
+  /**
+   * Returns the addresses of all meshes except the skybox
+   */
   std::vector<Mesh *> getMeshCollectionPtr() const;
   void switchEnvmap(int cubemap_id, int irradiance_id, int prefiltered_id, int lut_id);
   void processEvent(const controller::event::Event *event) override;

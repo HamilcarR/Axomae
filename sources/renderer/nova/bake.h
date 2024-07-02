@@ -2,53 +2,107 @@
 #define NOVABAKE_H
 #include "NovaInterface.h"
 #include "Texture.h"
-#include "rendering/nova_engine.h"
 
+class Camera;
 class TextureGroup;
 class Mesh;
-namespace nova::texturing {
-  class ImageTexture;
-}
-namespace nova::material {
-  class NovaMaterialInterface;
-}
+
 namespace nova {
   class NovaResourceManager;
-}
+
+  namespace material {
+    class NovaMaterialInterface;
+  }
+  namespace texturing {
+    class ImageTexture;
+  }
+
+}  // namespace nova
 namespace geometry {
   struct face_data_tri;
 }
 namespace threading {
   class ThreadPool;
 }
-const nova::texturing::ImageTexture *extract_texture(const TextureGroup &tgroup, nova::NovaResourceManager &manager, Texture::TYPE type);
-const nova::material::NovaMaterialInterface *extract_materials(const Mesh *mesh, nova::NovaResourceManager &manager);
-void build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager);
-/* Uses the primitives in the SceneResourceHolder to build the acceleration structure stored in the manager's Accelerator structure*/
-void build_acceleration_structure(nova::NovaResourceManager &manager);
-void transform_vertices(const geometry::face_data_tri &tri_primitive, const glm::mat4 &final_transfo, glm::vec3 vertices[3]);
-void transform_normals(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 normals[3]);
-void transform_tangents(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 tangents[3]);
-void transform_bitangents(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 bitangents[3]);
-void extract_uvs(const geometry::face_data_tri &tri_primitive, glm::vec2 textures[3]);
+namespace image {
+  template<class T>
+  class ImageHolder;
+}
+namespace nova_baker_utils {
 
-struct nova_bake_struct {
-  nova::HdrBufferStruct *buffers;
-  int width, height;
-  NovaRenderEngineInterface *engine_instance;
-  nova::NovaResourceManager *nova_resource_manager;
-  threading::ThreadPool *thread_pool;
-};
+  const nova::texturing::ImageTexture *extract_texture(const TextureGroup &tgroup, nova::NovaResourceManager &manager, Texture::TYPE type);
+  const nova::material::NovaMaterialInterface *extract_materials(const Mesh *mesh, nova::NovaResourceManager &manager);
+  void build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager);
+  /* Uses the primitives in the SceneResourceHolder to build the acceleration structure stored in the manager's Accelerator structure*/
+  void build_acceleration_structure(nova::NovaResourceManager &manager);
+  void transform_vertices(const geometry::face_data_tri &tri_primitive, const glm::mat4 &final_transfo, glm::vec3 vertices[3]);
+  void transform_normals(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 normals[3]);
+  void transform_tangents(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 tangents[3]);
+  void transform_bitangents(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 bitangents[3]);
+  void extract_uvs(const geometry::face_data_tri &tri_primitive, glm::vec2 textures[3]);
 
-struct nova_render_data {
-  int samples_max;
-  int depth_max;
-  int num_tiles;
-  bool *stop_render_ptr;
-  const CameraInterface *camera;
-  const std::vector<Mesh *> *mesh_list;
-};
-/* Takes an initialized NovaResourceManager.*/
-void bake_scene(nova_bake_struct &rendering_data);
-void bake_initialize_manager(nova_bake_struct &bake_struct, const nova_render_data &render_data);
+  enum ENGINE_TYPE : int {
+    RGB = 1 << 0,
+    SPECTRAL = 1 << 1,
+    PATH = 1 << 2,
+    BIPATH = 1 << 3,
+    METROPOLIS = 1 << 4,
+    PHOTON = 1 << 5,
+    MARCHING = 1 << 6,
+    HYBRID = 1 << 7,
+    VOXEL = 1 << 8,
+
+  };
+
+  struct render_scene_data {
+    nova::HdrBufferStruct *buffers;
+    int width, height;
+    NovaRenderEngineInterface *engine_instance;
+    nova::NovaResourceManager *nova_resource_manager;
+    threading::ThreadPool *thread_pool;
+  };
+
+  struct camera_data {
+    glm::mat4 view;
+    glm::mat4 projection;
+    glm::vec3 up_vector;
+    glm::vec3 position;
+    glm::vec3 direction;
+  };
+
+  struct scene_transform_data {
+    glm::mat4 root_transformation;
+    glm::mat4 root_translation;
+    glm::mat4 root_rotation;
+  };
+
+  struct scene_envmap {
+    image::ImageHolder<float> *hdr_envmap;
+  };
+
+  struct engine_data {
+    camera_data camera;
+    scene_transform_data scene;
+    scene_envmap envmap;
+    const std::vector<Mesh *> *mesh_list;
+    bool *stop_render_ptr;
+    int samples_max, samples_increment, aa_samples;
+    int depth_max;
+    int num_tiles_w, num_tiles_h;
+    int engine_type_flag;
+  };
+
+  /* Takes an initialized NovaResourceManager.*/
+  void bake_scene(render_scene_data &rendering_data);
+  void initialize_manager(const engine_data &render_data, nova::NovaResourceManager &nova_resource_manager);
+  void initialize_matrices(const camera_data &scene_camera,
+                           const scene_transform_data &scene_data,
+                           nova::scene::SceneTransformations &scene_transform,
+                           nova::camera::CameraResourcesHolder &camera_resources_holder);
+  void initialize_engine_opts(const engine_data &engine_opts, nova::engine::EngineResourcesHolder &engine_resources_holder);
+  void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureRawData &texture_raw_data);
+  void cancel_render(engine_data &data);
+  std::unique_ptr<NovaRenderEngineInterface> create_engine(const engine_data &engine_type);
+  void synchronize_render_threads(render_scene_data &scene_data);
+}  // namespace nova_baker_utils
 #endif  // BAKE_H

@@ -623,12 +623,6 @@ namespace controller {
   }
 
   /**************************************************************************************************************/
-  void Controller::nova_baking() {
-    int width = main_window_ui.nova_bake_width->value();
-    int height = main_window_ui.nova_bake_height->value();
-  }
-
-  /**************************************************************************************************************/
 
   // TODO: [AX-26] Optimize the normals projection on UVs in the UV tool
   void Controller::project_uv_normals() {

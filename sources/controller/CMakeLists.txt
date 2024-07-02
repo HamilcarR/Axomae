@@ -4,6 +4,7 @@ add_library(ax_controller
     OP_ProgressStatus.cpp
     GUIWindow.cpp
     GUIWindow_slots.cpp
+    GUIWindow_nova_bake.cpp
     WorkspaceTracker.cpp
 
 

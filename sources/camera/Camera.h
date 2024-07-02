@@ -45,9 +45,10 @@ class Camera : public CameraInterface, public SceneTreeNode {
   void setTarget(const glm::vec3 &_target) { target = _target; }
   void setPosition(const glm::vec3 &new_pos) { position = new_pos; }
   void reset() override;
-  [[nodiscard]] const glm::vec3 &getUpVector() const { return camera_up; }
-  [[nodiscard]] const glm::vec3 &getDirection() const { return direction; }
-  [[nodiscard]] virtual const glm::vec3 &getPosition() const { return position; }
+  [[nodiscard]] virtual glm::mat4 getTransformedView() const;
+  [[nodiscard]] const glm::vec3 &getUpVector() const override { return camera_up; }
+  [[nodiscard]] const glm::vec3 &getDirection() const override { return direction; }
+  [[nodiscard]] const glm::vec3 &getPosition() const override { return position; }
   [[nodiscard]] const glm::mat4 &getViewProjection() const override { return view_projection; }
   [[nodiscard]] const glm::mat4 &getProjection() const override { return projection; }
   [[nodiscard]] const glm::mat4 &getView() const override { return view; }

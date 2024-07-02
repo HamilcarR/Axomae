@@ -20,6 +20,9 @@ class CameraInterface : public EventInterface {
    * @param focus_point Point in worldspace
    */
   virtual void focus(const glm::vec3 &focus_point) = 0;
+  [[nodiscard]] virtual const glm::vec3 &getUpVector() const = 0;
+  [[nodiscard]] virtual const glm::vec3 &getDirection() const = 0;
+  [[nodiscard]] virtual const glm::vec3 &getPosition() const = 0;
   [[nodiscard]] virtual const glm::mat4 &getSceneRotationMatrix() const = 0;
   [[nodiscard]] virtual const glm::mat4 &getSceneTranslationMatrix() const = 0;
   [[nodiscard]] virtual const glm::mat4 &getViewProjection() const = 0;

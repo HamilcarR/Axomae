@@ -13,10 +13,10 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
   AX_ASSERT_NOTNULL(nova_resource_manager);
   resetToBaseState();
   nova_resource_manager->clearResources();
-  build_scene(new_scene.mesh_list, *nova_resource_manager);
+  nova_baker_utils::build_scene(new_scene.mesh_list, *nova_resource_manager);
   /* Build acceleration. */
   setProgressStatus("Building BVH structure...");
-  build_acceleration_structure(*nova_resource_manager);
+  nova_baker_utils::build_acceleration_structure(*nova_resource_manager);
   cancel_render = false;
 }
 

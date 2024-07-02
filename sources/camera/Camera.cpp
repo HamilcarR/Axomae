@@ -50,3 +50,5 @@ void Camera::computeViewSpace() {
   camera_up = glm::cross(direction, right);
   view = glm::lookAt(position, target, camera_up);
 }
+
+glm::mat4 Camera::getTransformedView() const { return view; }

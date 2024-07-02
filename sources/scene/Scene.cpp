@@ -203,8 +203,10 @@ void Scene::setPolygonFill() {
 std::vector<Mesh *> Scene::getMeshCollectionPtr() const {
   std::vector<Mesh *> to_ret;
   to_ret.reserve(scene.size());
-  for (auto &elem : scene)
-    to_ret.push_back(elem.drawable->getMeshPointer());
+  for (auto &elem : scene) {
+    if (elem.drawable->getMeshPointer() != scene_skybox)
+      to_ret.push_back(elem.drawable->getMeshPointer());
+  }
   return to_ret;
 }
 
