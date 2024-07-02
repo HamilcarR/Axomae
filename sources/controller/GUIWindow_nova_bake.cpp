@@ -9,7 +9,7 @@
 #include <QFileDialog>
 namespace controller {
   /**************************************************************************************************************/
-  void __attribute((optimize("O0"))) Controller::nova_baking() {
+  void Controller::nova_baking() {
     if (!(current_workspace->getContext() & UI_RENDERER_RASTER))
       return;
     if (!realtime_viewer)
@@ -104,6 +104,5 @@ namespace controller {
 
     IO::Loader loader(progress_manager.get());
     loader.writeHdr(filename.toStdString().c_str(), image_holder, true);
-
   }
 }  // namespace controller
