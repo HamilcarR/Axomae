@@ -44,6 +44,7 @@ void Scene::setScene(const SceneTree &tree, const std::vector<Mesh *> &mesh_list
   scene_tree.pushNewRoot(scene_skybox);
   scene_skybox->setCubemapPointer(scene_skybox);
   make_drawable(drawable_collection, scene, scene_skybox);
+  mesh_collection = mesh_list;
   for (Mesh *A : mesh_list) {
     A->setCubemapPointer(scene_skybox);
     make_drawable(drawable_collection, scene, A);

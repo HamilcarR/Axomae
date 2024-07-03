@@ -19,6 +19,7 @@ class Camera : public CameraInterface, public SceneTreeNode {
   TYPE type{};
   float near{};
   float far{};
+  /* in degrees */
   float fov{};
   glm::mat4 projection{};
   glm::mat4 view{};
@@ -56,6 +57,13 @@ class Camera : public CameraInterface, public SceneTreeNode {
   [[nodiscard]] const Dim2 *getScreenDimensions() const override { return screen_dimensions; }
   [[nodiscard]] float getNear() const override { return near; }
   [[nodiscard]] float getFar() const override { return far; }
+  /* in degrees */
+  [[nodiscard]] float getFov() const override { return fov; }
+  [[nodiscard]] float getRatio() const override { return (float)screen_dimensions->width / (float)screen_dimensions->height; }
+
+  /* static */
+ public:
+  static glm::mat4 computeProjectionMatrix(float fov_degree, float near, float far, float ratio);
 };
 
 #endif

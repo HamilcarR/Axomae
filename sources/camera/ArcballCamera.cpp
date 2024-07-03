@@ -188,4 +188,4 @@ void ArcballCamera::focus(const glm::vec3 &pos) {
   computeViewSpace();
 }
 
-glm::mat4 ArcballCamera::getTransformedView() const { return view * getLocalModelMatrix(); }
+glm::mat4 ArcballCamera::getTransformedView() const { return view * local_transformation; }

@@ -31,6 +31,8 @@ class CameraInterface : public EventInterface {
   [[nodiscard]] virtual const Dim2 *getScreenDimensions() const = 0;
   [[nodiscard]] virtual float getFar() const = 0;
   [[nodiscard]] virtual float getNear() const = 0;
+  [[nodiscard]] virtual float getFov() const = 0;
+  [[nodiscard]] virtual float getRatio() const = 0;
 };
 
 #endif  // ICAMERA_H

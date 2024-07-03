@@ -40,8 +40,10 @@ class Scene : public EventInterface {
   CubeMapMesh *scene_skybox;
   bool display_bbox;
   std::vector<std::unique_ptr<Drawable>> drawable_collection;
+  std::vector<Mesh *> mesh_collection;
 
  public:
+  const std::vector<Mesh *> &getMeshCollection() const { return mesh_collection; }
   explicit Scene(ResourceDatabaseManager &manager);
   void setScene(const SceneTree &scene_tree, const std::vector<Mesh *> &mesh_list);
   virtual std::vector<Drawable *> getOpaqueElements() const;

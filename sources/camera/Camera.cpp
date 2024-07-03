@@ -52,3 +52,7 @@ void Camera::computeViewSpace() {
 }
 
 glm::mat4 Camera::getTransformedView() const { return view; }
+
+glm::mat4 Camera::computeProjectionMatrix(float fov, float near, float far, float ratio) {
+  return glm::perspective(glm::radians(fov), ratio, near, far);
+}

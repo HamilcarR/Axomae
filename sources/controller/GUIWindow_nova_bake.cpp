@@ -5,10 +5,10 @@
 #include "WorkspaceTracker.h"
 #include "manager/NovaResourceManager.h"
 #include "nova/bake.h"
-
 #include <QFileDialog>
 namespace controller {
   /**************************************************************************************************************/
+
   void Controller::nova_baking() {
     if (!(current_workspace->getContext() & UI_RENDERER_RASTER))
       return;
@@ -25,11 +25,12 @@ namespace controller {
       LOG("The current renderer doesn't have a camera.", LogLevel::ERROR);
       return;
     }
+
     nova::NovaResourceManager manager;
-    nova_baker_utils::engine_data engine_data;
+    nova_baker_utils::engine_data engine_data{};
     /* Meshes */
     const Scene &scene = renderer.getScene();
-    std::vector<Mesh *> mesh_collection = scene.getMeshCollectionPtr();
+    const std::vector<Mesh *> &mesh_collection = scene.getMeshCollection();
     if (mesh_collection.empty()) {
       LOG("Scene not initialized.", LogLevel::INFO);
       return;
@@ -38,10 +39,16 @@ namespace controller {
 
     /* Camera */
     nova_baker_utils::camera_data camera_data{};
+    const float fov_deg = renderer_camera->getFov();
+    const float near = renderer_camera->getNear();
+    const float far = renderer_camera->getFar();
+    const float ratio = (float)width / (float)height;
+    const glm::mat4 new_projection = Camera::computeProjectionMatrix(fov_deg, near, far, ratio);
+
     camera_data.position = renderer_camera->getPosition();
     camera_data.direction = renderer_camera->getDirection();
     camera_data.up_vector = renderer_camera->getUpVector();
-    camera_data.projection = renderer_camera->getProjection();
+    camera_data.projection = new_projection;
     camera_data.view = renderer_camera->getTransformedView();
 
     engine_data.camera = camera_data;
@@ -67,16 +74,18 @@ namespace controller {
     bool &b = stop_list.at(id);
     engine_data.aa_samples = 8;
     engine_data.depth_max = 2;
-    engine_data.samples_max = engine_data.samples_increment = 10;
+    engine_data.samples_max = engine_data.samples_increment = 50;
     engine_data.num_tiles_h = 20;
     engine_data.num_tiles_w = 20;
     engine_data.engine_type_flag = nova_baker_utils::ENGINE_TYPE::RGB;
     engine_data.stop_render_ptr = &b;
+
     nova_baker_utils::initialize_manager(engine_data, manager);
 
     /* buffers*/
     image::ImageHolder<float> image_holder;
     image_holder.data.resize(width * height * 4);
+    std::vector<float> accum = image_holder.data;
     image_holder.metadata.channels = 4;
     image_holder.metadata.color_corrected = false;
     image_holder.metadata.format = "hdr";
@@ -84,8 +93,8 @@ namespace controller {
     image_holder.metadata.width = width;
     image_holder.metadata.is_hdr = true;
     nova::HdrBufferStruct buffers;
+
     buffers.partial_buffer = image_holder.data.data();
-    std::vector<float> accum = image_holder.data;
     buffers.accumulator_buffer = accum.data();
 
     /* Engine type */
