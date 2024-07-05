@@ -4,13 +4,17 @@
 #include "Rgb.h"
 #include "metadata/RgbDisplayerLabel.h"
 #include "ui_texture_viewer.h"
+
 #include <QImage>
 #include <QMainWindow>
 #include <QResizeEvent>
 
-namespace controller::event {
-  class Event;
-}
+namespace controller {
+  namespace event {
+    class Event;
+  }
+  class Controller;
+}  // namespace controller
 
 class TextureViewerWidget : public QWidget {
  protected:
@@ -38,6 +42,7 @@ class TextureViewerWidget : public QWidget {
 };
 
 class HdrTextureViewerWidget : public TextureViewerWidget {
+  Q_OBJECT
  private:
   std::vector<float> raw_hdr_data{};
 
@@ -46,6 +51,34 @@ class HdrTextureViewerWidget : public TextureViewerWidget {
   ~HdrTextureViewerWidget() override;
   void mouseMoveEvent(QMouseEvent *event) override;
   void display(const std::vector<float> &image, int width, int height, int channels, bool color_corrected);
+};
+/*********************************************************************************************************************************************/
+
+class HdrRenderViewerWidget : public QWidget {
+  using EventManager = controller::event::Event;
+  Q_OBJECT
+ private:
+  const image::ImageHolder<float> *target_buffer;  // Read only, need to be stored in a database , or in the main controller class.
+  Ui::texture_viewer window{};
+  std::unique_ptr<editor::RgbDisplayerLabel> label{};
+  QImage image;
+  std::string rgb_under_mouse_str{};
+  std::unique_ptr<EventManager> widget_event_struct;
+  std::unique_ptr<QTimer> timer;
+
+ public:
+  HdrRenderViewerWidget(const image::ImageHolder<float> *tex, controller::Controller *app_controller, QWidget *parent = nullptr);
+  ~HdrRenderViewerWidget() override;
+  void mouseMoveEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  void resizeEvent(QResizeEvent *event) override;
+  void closeEvent(QCloseEvent *event) override;
+
+ signals:
+  void viewerClosed(QWidget *widget_address);
+
+ public slots:
+  void updateImage();
 };
 
 #endif  // TEXTUREVIEWERWIDGET_H

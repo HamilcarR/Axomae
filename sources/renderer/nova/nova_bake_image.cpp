@@ -79,12 +79,12 @@ namespace nova_baker_utils {
   }
 
   void bake_scene(render_scene_data &rendering_data) {
-    nova::draw(rendering_data.buffers,
+    nova::draw(rendering_data.buffers.get(),
                rendering_data.width,
                rendering_data.height,
-               rendering_data.engine_instance,
+               rendering_data.engine_instance.get(),
                rendering_data.thread_pool,
-               rendering_data.nova_resource_manager
+               rendering_data.nova_resource_manager.get()
 
     );
   }

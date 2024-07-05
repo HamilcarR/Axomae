@@ -6,8 +6,10 @@
 #include "SceneListView.h"
 #include "SceneSelector.h"
 #include "constants.h"
+#include "nova/bake.h"
 #include "ui_main_window.h"
 #include "utils_3D.h"
+
 #include <QtWidgets/qapplication.h>
 #include <QtWidgets/qmainwindow.h>
 #include <QtWidgets/qpushbutton.h>
@@ -19,12 +21,19 @@
 
 class ApplicationConfig;
 class QTimer;
+
 namespace controller::event {
   class Event;
 }
+
+namespace nova {
+  class NovaResourceManager;
+}
+
 namespace gui {
   enum IMAGETYPE : unsigned { GREYSCALE_LUMI = 1, HEIGHT = 2, NMAP = 3, DUDV = 4, ALBEDO = 5, GREYSCALE_AVG = 6, PROJECTED_NMAP = 7, INVALID = 8 };
 }
+
 namespace controller {
 
   // TODO :  delete old memory management code
@@ -34,6 +43,12 @@ namespace controller {
   struct image_type;
 
   class WorkspaceTracker;
+
+  struct bake_temp_buffers {
+    image::ThumbnailImageHolder<float> image_holder;
+    std::vector<float> accumulator;
+    std::vector<float> partial;
+  };
 
   /* Controls the main editor window , deals with event management between main window and the rest of the app */
   class Controller final : public QMainWindow {
@@ -58,10 +73,14 @@ namespace controller {
     std::unique_ptr<WorkspaceTracker> current_workspace;
     /* Timer for renderer synchro */
     std::unique_ptr<QTimer> timer;
+
+    std::unique_ptr<HdrImageDatabase> nova_baked_images;
+    bake_temp_buffers bake_buffers;
     /* Each time we queue a baking procedure , we register a stop condition here. */
     std::unordered_map<int, bool> stop_list;
     /* Generic windows spawned by the application*/
     std::vector<std::unique_ptr<QWidget>> spawned_windows;
+    std::vector<nova_baker_utils::render_scene_data> nova_render_scene_list;
 
    public:
     static HeapManagement *_MemManagement;  // TODO : Refactor
@@ -73,6 +92,11 @@ namespace controller {
     Ui::MainWindow &getUi() { return main_window_ui; }
     static SDL_Surface *copy_surface(SDL_Surface *surface);
     void closeEvent(QCloseEvent *event) override;
+    ProgressStatus *getProgress() const { return progress_manager.get(); }
+    [[nodiscard]] std::string spawnSaveFileDialogueWidget();
+    [[nodiscard]] HdrImageDatabase *getBakedImagesCollection() const { return nova_baked_images.get(); }
+    [[nodiscard]] std::vector<std::unique_ptr<QWidget>> &getWindowsList() { return spawned_windows; }
+    void cleanupWindowProcess(QWidget *window);
 
    private:
     void connect_all_slots();
@@ -80,6 +104,7 @@ namespace controller {
     SDL_Surface *get_corresponding_session_pointer(gui::IMAGETYPE image);
     bool set_corresponding_session_pointer(image_type<SDL_Surface> *image_type_pointer);
     void display_image(SDL_Surface *surf, gui::IMAGETYPE image, bool save_in_heap);
+    void save_bake(const image::ImageHolder<float> &image);
 
     /* SLOTS */
    public slots:
@@ -121,7 +146,7 @@ namespace controller {
     void set_rasterizer_fill();
     void set_rasterizer_wireframe();
     void set_display_boundingbox(bool display);
-
+    void onClosedSpawnWindow(QWidget *address);
    protected slots:
     void update_smooth_factor(int factor);
     void select_uv_editor_item();

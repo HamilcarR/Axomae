@@ -3,15 +3,15 @@
 
 #include "ImageImporter.h"
 
-#include "MeshListView.h"
-#include "ProgressStatusWidget.h"
-
 #include "EventController.h"
 #include "ImageManager.h"
+#include "MeshListView.h"
+#include "ProgressStatusWidget.h"
 #include "SceneSelector.h"
 #include "ShaderFactory.h"
 #include "TextureViewerWidget.h"
 #include "WorkspaceTracker.h"
+#include "manager/NovaResourceManager.h"
 #include <QTimer>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsItem>
@@ -262,6 +262,9 @@ namespace controller {
     light_controller = std::make_unique<LightController>(main_window_ui);
     light_controller->setup(realtime_viewer, renderer_scene_list);
 
+    /* Collection of baked renders */
+    nova_baked_images = std::make_unique<HdrImageDatabase>();
+
     /* Undo pointers setup*/
     init_image_session_ptr();
 
@@ -464,6 +467,11 @@ namespace controller {
     return true;
   }
 
+  /**************************************************************************************************************/
+  std::string Controller::spawnSaveFileDialogueWidget() {
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save files"), "./", tr("All Files (*)"));
+    return filename.toStdString();
+  }
   /**************************************************************************************************************/
   bool Controller::greyscale_average() {
     SDL_Surface *s = image_session_pointers::albedo;
@@ -839,6 +847,32 @@ namespace controller {
     if (realtime_viewer) {
       realtime_viewer->rendererCallback<SET_DISPLAY_BOUNDINGBOX>(display);
     }
+  }
+
+  /**************************************************************************************************************/
+
+  void Controller::cleanupWindowProcess(QWidget *widget) {
+
+    // Temporary here :
+    int c = stop_list.size() - 1;
+    stop_list[c] = true;
+
+    global_application_config->getThreadPool()->emptyQueue();
+    global_application_config->getThreadPool()->fence();
+    bake_buffers.image_holder.data.clear();
+    bake_buffers.accumulator.clear();
+    bake_buffers.partial.clear();
+  }
+
+  void Controller::onClosedSpawnWindow(QWidget *address) {
+    std::vector<std::vector<std::unique_ptr<QWidget>>::iterator> to_delete;
+    for (auto it = spawned_windows.begin(); it != spawned_windows.end(); it++)
+      if (it->get() == address) {
+        to_delete.push_back(it);
+        cleanupWindowProcess(it->get());
+      }
+    for (auto &iterator : to_delete)
+      spawned_windows.erase(iterator);
   }
 
   /**************************************************************************************************************/

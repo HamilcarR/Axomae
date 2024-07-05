@@ -1,8 +1,9 @@
 #include "TextureViewerWidget.h"
 #include "EventController.h"
+#include "GUIWindow.h"
 #include "Logger.h"
 #include "image_utils.h"
-
+#include <QTimer>
 static QPoint mapToImage(int image_width, int image_height, const QPoint &pos, int width, int height) {
   // Calculate the mapped position based on the image size and label size
   int imageX = pos.x() * image_width / width;
@@ -109,4 +110,76 @@ void HdrTextureViewerWidget::mouseMoveEvent(QMouseEvent *event) {
     }
   }
   widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_MOVE;
+}
+
+/************************************************************************************************************************************************************/
+
+HdrRenderViewerWidget::HdrRenderViewerWidget(const image::ImageHolder<float> *tex, controller::Controller *app_controller, QWidget *parent)
+    : QWidget(parent) {
+
+  window.setupUi(this);
+  widget_event_struct = std::make_unique<EventManager>();
+  target_buffer = tex;
+  timer = std::make_unique<QTimer>();
+  QObject::connect(timer.get(), &QTimer::timeout, this, &HdrRenderViewerWidget::updateImage);
+  QObject::connect(this, &HdrRenderViewerWidget::viewerClosed, app_controller, &controller::Controller::onClosedSpawnWindow);
+  label = std::make_unique<editor::RgbDisplayerLabel>(this);
+  label->setScaledContents(true);
+  setMouseTracking(true);
+
+  timer->start(30);
+}
+
+HdrRenderViewerWidget::~HdrRenderViewerWidget() = default;
+
+void HdrRenderViewerWidget::mouseMoveEvent(QMouseEvent *event) {
+  QWidget::mouseMoveEvent(event);
+  if (!target_buffer)
+    return;
+  QPoint p = event->pos();
+
+  widget_event_struct->flag |= EventManager::EVENT_MOUSE_MOVE;
+  if (p.x() < width() && p.y() < height() && p.x() >= 0 && p.y() >= 0) {
+    p = mapToImage(static_cast<int>(target_buffer->metadata.width), static_cast<int>(target_buffer->metadata.height), p, width(), height());
+    unsigned int index = (p.y() * target_buffer->metadata.width + p.x()) * target_buffer->metadata.channels;
+    if (!target_buffer->data.empty()) {
+      float r_ = target_buffer->data[index];
+      float g_ = target_buffer->data[index + 1];
+      float b_ = target_buffer->data[index + 2];
+      float a_ = 1.f;
+      const float rgb[4] = {r_, g_, b_, a_};
+      label->updateLabel(rgb, false);
+    }
+  }
+  widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_MOVE;
+}
+void HdrRenderViewerWidget::mouseReleaseEvent(QMouseEvent *event) {
+  QWidget::mouseReleaseEvent(event);
+  QPoint p = event->pos();
+
+  widget_event_struct->flag |= EventManager::EVENT_MOUSE_R_RELEASE;
+  // context menu
+}
+
+void HdrRenderViewerWidget::resizeEvent(QResizeEvent *event) {
+  QWidget::resizeEvent(event);
+  if (label)
+    label->resize(event->size().width(), event->size().height());
+}
+void HdrRenderViewerWidget::closeEvent(QCloseEvent *event) {
+  QWidget::closeEvent(event);
+  emit viewerClosed(this);
+}
+
+void HdrRenderViewerWidget::updateImage() {
+  AX_ASSERT_EQ(target_buffer->data.size(), target_buffer->metadata.width * target_buffer->metadata.height * target_buffer->metadata.channels);
+
+  std::vector<uint8_t> normalized = hdr_utils::hdr2image(target_buffer->data,
+                                                         target_buffer->metadata.width,
+                                                         target_buffer->metadata.height,
+                                                         target_buffer->metadata.channels,
+                                                         !target_buffer->metadata.color_corrected);
+
+  image = QImage(normalized.data(), target_buffer->metadata.width, target_buffer->metadata.height, QImage::Format_ARGB32);
+  label->setPixmap(QPixmap::fromImage(image));
 }

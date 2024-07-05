@@ -4,6 +4,7 @@
 #include "Loader.h"
 
 namespace controller {
+
   void Controller::connect_all_slots() {
 
     /*Main Window -> Toolbar menu -> Files*/

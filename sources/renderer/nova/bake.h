@@ -55,10 +55,10 @@ namespace nova_baker_utils {
   };
 
   struct render_scene_data {
-    nova::HdrBufferStruct *buffers;
+    std::unique_ptr<nova::HdrBufferStruct> buffers;
     int width, height;
-    NovaRenderEngineInterface *engine_instance;
-    nova::NovaResourceManager *nova_resource_manager;
+    std::unique_ptr<NovaRenderEngineInterface> engine_instance;
+    std::unique_ptr<nova::NovaResourceManager> nova_resource_manager;
     threading::ThreadPool *thread_pool;
   };
 

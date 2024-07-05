@@ -123,13 +123,13 @@ void EnvmapTextureManager::deleteFromCollection(int index) {
 
 static TextureData texture_metadata(image::ThumbnailImageHolder<float> *raw_image_data) {
   TextureData envmap;
-  envmap.width = raw_image_data->metadata().width;
-  envmap.height = raw_image_data->metadata().height;
-  envmap.name = raw_image_data->metadata().name;
+  envmap.width = raw_image_data->metadata.width;
+  envmap.height = raw_image_data->metadata.height;
+  envmap.name = raw_image_data->metadata.name;
   envmap.data_type = Texture::FLOAT;
   envmap.internal_format = Texture::RGB32F;
   envmap.data_format = Texture::RGB;
-  envmap.nb_components = raw_image_data->metadata().channels;
+  envmap.nb_components = raw_image_data->metadata.channels;
   envmap.f_data = raw_image_data->data;
   return envmap;
 }
