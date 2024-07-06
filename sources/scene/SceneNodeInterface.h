@@ -15,6 +15,8 @@ class SceneNodeInterface {
   virtual void resetAccumulatedMatrix() = 0;
   virtual void setAccumulatedModelMatrix(const glm::mat4 &matrix) = 0;
   [[nodiscard]] virtual const glm::mat4 &getAccumulatedModelMatrix() const = 0;
+  [[nodiscard]] virtual bool isIgnored() const = 0;
+  virtual void setIgnore(bool ignore) = 0;
 };
 
 #endif  // SceneNodeInterface_H

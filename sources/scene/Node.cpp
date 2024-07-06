@@ -33,10 +33,14 @@ void SceneTreeNode::resetLocalModelMatrix() { local_transformation = glm::mat4(1
 void SceneTreeNode::resetAccumulatedMatrix() { accumulated_transformation = glm::mat4(1.f); }
 
 glm::mat4 SceneTreeNode::computeFinalTransformation() {
-  if (parents.empty() || parents[0] == nullptr)
-    return local_transformation;
-  else
-    return accumulated_transformation * local_transformation;
+  if (ignore)
+    return accumulated_transformation;
+  else {
+    if (parents.empty() || parents[0] == nullptr)
+      return local_transformation;
+    else
+      return accumulated_transformation * local_transformation;
+  }
 }
 
 void SceneTreeNode::setParent(NodeInterface *node) {

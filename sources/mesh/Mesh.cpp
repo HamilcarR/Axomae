@@ -214,6 +214,8 @@ void CubeMapMesh::preRenderSetup() {
 }
 
 glm::mat4 CubeMapMesh::computeFinalTransformation() {
+  if (ignore)
+    return glm::mat4(1.f);
   accumulated_transformation = getParent()->computeFinalTransformation();
   return accumulated_transformation;
 }

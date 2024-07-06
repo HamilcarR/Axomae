@@ -104,7 +104,7 @@ namespace nova_baker_utils {
 
   void build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager) {
     for (const auto &elem : meshes) {
-      glm::mat4 final_transfo = elem->getLocalModelMatrix();
+      glm::mat4 final_transfo = elem->computeFinalTransformation();
       glm::mat3 normal_matrix = math::geometry::compute_normal_mat(final_transfo);
       const nova::material::NovaMaterialInterface *mat = extract_materials(elem, manager);
       const Object3D &geometry = elem->getGeometry();
