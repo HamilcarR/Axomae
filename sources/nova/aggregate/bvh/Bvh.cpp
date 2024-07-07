@@ -88,8 +88,7 @@ namespace nova::aggregate {
     const Bvhnl *iterator_node = &bvh.l_tree[0];
     AX_ASSERT_NOTNULL(iterator_node);
     bool hit = false;
-    // std::deque<const Bvhnl *> node_stack{};
-    const Bvhnl *node_stack[MAX_STACK_SIZE] = {nullptr};
+    const Bvhnl *node_stack[MAX_STACK_SIZE];
     node_stack[0] = iterator_node;
     int iterator_idx = 0;
     while (iterator_idx != -1 && !*options->data.stop_traversal) {
