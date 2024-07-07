@@ -14,7 +14,7 @@
 #include <ImfRgbaFile.h>
 #include <fstream>
 namespace exception {
-  const char *INVALID_PATH_ENVMAP = "Must be an HDR/EXR format .";
+  const char *const INVALID_PATH_ENVMAP = "Must be an HDR/EXR format .";
 
   class LoadImagePathException : public GenericException {
    public:

@@ -40,7 +40,7 @@ namespace nova_baker_utils {
     nova::material::NovaMaterialInterface *mat_ptr = nullptr;
     switch (r) {
       case 0:
-        mat_ptr = manager.getMaterialData().add_material<nova::material::NovaConductorMaterial>(tpack, 0.0001);
+        mat_ptr = manager.getMaterialData().add_material<nova::material::NovaConductorMaterial>(tpack, math::random::nrandf(0.001, 0.5));
         break;
       case 1:
         mat_ptr = manager.getMaterialData().add_material<nova::material::NovaDielectricMaterial>(tpack, math::random::nrandf(1.5, 2.4));

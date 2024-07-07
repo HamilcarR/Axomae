@@ -127,7 +127,7 @@ HdrRenderViewerWidget::HdrRenderViewerWidget(const image::ImageHolder<float> *te
   label->setScaledContents(true);
   setMouseTracking(true);
 
-  timer->start(30);
+  timer->start(1000);
 }
 
 HdrRenderViewerWidget::~HdrRenderViewerWidget() = default;
