@@ -262,9 +262,6 @@ namespace controller {
     light_controller = std::make_unique<LightController>(main_window_ui);
     light_controller->setup(realtime_viewer, renderer_scene_list);
 
-    /* Collection of baked renders */
-    nova_baked_images = std::make_unique<HdrImageDatabase>();
-
     /* Undo pointers setup*/
     init_image_session_ptr();
 
@@ -654,6 +651,7 @@ namespace controller {
   bool Controller::import_3DOBJ() {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
     if (!filename.isEmpty()) {
+      cleanupNova();
       realtime_viewer->prepareRendererSceneChange();
       nova_viewer->prepareRendererSceneChange();
 
@@ -851,29 +849,21 @@ namespace controller {
 
   /**************************************************************************************************************/
 
-  void Controller::cleanupWindowProcess(QWidget *widget) {
+  void Controller::cleanupWindowProcess(QWidget *widget) { cleanupNova(); }
+  void Controller::cleanupNova() {
+    /* Stop the threads. */
+    nova_baking_structure.stop = true;
+    if (global_application_config && global_application_config->getThreadPool()) {
+      /* Empty scheduler list. */
+      global_application_config->getThreadPool()->emptyQueue();
+      /* Synchronize the threads. */
+      global_application_config->getThreadPool()->fence();
+    }
 
-    // Temporary here :
-    int c = stop_list.size() - 1;
-    stop_list[c] = true;
-
-    global_application_config->getThreadPool()->emptyQueue();
-    global_application_config->getThreadPool()->fence();
-    bake_buffers.image_holder.data.clear();
-    bake_buffers.accumulator.clear();
-    bake_buffers.partial.clear();
+    nova_baking_structure.reinitialize();
   }
 
-  void Controller::onClosedSpawnWindow(QWidget *address) {
-    std::vector<std::vector<std::unique_ptr<QWidget>>::iterator> to_delete;
-    for (auto it = spawned_windows.begin(); it != spawned_windows.end(); it++)
-      if (it->get() == address) {
-        to_delete.push_back(it);
-        cleanupWindowProcess(it->get());
-      }
-    for (auto &iterator : to_delete)
-      spawned_windows.erase(iterator);
-  }
+  void Controller::onClosedSpawnWindow(QWidget *address) { cleanupWindowProcess(address); }
 
   /**************************************************************************************************************/
   /* SLOTS */

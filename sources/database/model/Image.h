@@ -22,6 +22,7 @@ namespace image {
     ImageHolder<TYPE> &operator=(ImageHolder<TYPE> &&assign) noexcept = default;
     void flip_v();
     void flip_u();
+    void clear() { data.clear(); }
   };
 
   template<class T>

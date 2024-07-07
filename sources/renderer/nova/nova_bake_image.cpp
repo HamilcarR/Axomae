@@ -49,6 +49,7 @@ namespace nova_baker_utils {
     engine_resources_holder.setSampleIncrement(engine_opts.samples_increment);
     engine_resources_holder.setTilesHeight(engine_opts.num_tiles_w);
     engine_resources_holder.setTilesWidth(engine_opts.num_tiles_h);
+    engine_resources_holder.setVAxisInversed(engine_opts.flip_v);
   }
 
   void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureRawData &texture_raw_data) {

@@ -90,6 +90,7 @@ namespace nova_baker_utils {
     int depth_max;
     int num_tiles_w, num_tiles_h;
     int engine_type_flag;
+    bool flip_v;
   };
 
   /* Takes an initialized NovaResourceManager.*/

@@ -45,7 +45,11 @@ namespace nova {
     for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
       for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
 
-        const unsigned int idx = (y * tile.image_total_width + x) * 4;
+        unsigned int idx = 0;
+        if (!nova_resources->getEngineData().isAxisVInverted())
+          idx = (y * tile.image_total_width + x) * 4;
+        else
+          idx = ((tile.image_total_height - 1 - y) * tile.image_total_width + x) * 4;
         glm::vec4 rgb{};
         const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
         for (int i = 0; i < tile.sample_per_tile; i++) {
