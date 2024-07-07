@@ -35,10 +35,11 @@ namespace controller {
   // TODO :  delete old memory management code
   class HeapManagement;
 
+  class WorkspaceTracker;
+  struct ui_render_options;
+  struct engine_misc_options;
   template<typename T>
   struct image_type;
-
-  class WorkspaceTracker;
 
   /* Controls the main editor window , deals with event management between main window and the rest of the app */
   class Controller final : public QMainWindow {
@@ -89,6 +90,7 @@ namespace controller {
     bool set_corresponding_session_pointer(image_type<SDL_Surface> *image_type_pointer);
     void display_image(SDL_Surface *surf, gui::IMAGETYPE image, bool save_in_heap);
     void save_bake(const image::ImageHolder<float> &image);
+    void do_nova_render(const ui_render_options &render_options, const engine_misc_options &misc_options);
 
     /* SLOTS */
    public slots:
@@ -111,7 +113,7 @@ namespace controller {
     void compute_dudv();
     void change_dudv_nmap(int factor);
     void cubemap_baking();
-    void nova_baking();
+    void slot_nova_bake();
     void next_mesh();
     void previous_mesh();
     void project_uv_normals();

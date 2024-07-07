@@ -850,18 +850,6 @@ namespace controller {
   /**************************************************************************************************************/
 
   void Controller::cleanupWindowProcess(QWidget *widget) { cleanupNova(); }
-  void Controller::cleanupNova() {
-    /* Stop the threads. */
-    nova_baking_structure.stop = true;
-    if (global_application_config && global_application_config->getThreadPool()) {
-      /* Empty scheduler list. */
-      global_application_config->getThreadPool()->emptyQueue();
-      /* Synchronize the threads. */
-      global_application_config->getThreadPool()->fence();
-    }
-
-    nova_baking_structure.reinitialize();
-  }
 
   void Controller::onClosedSpawnWindow(QWidget *address) { cleanupWindowProcess(address); }
 

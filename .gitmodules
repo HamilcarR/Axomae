@@ -1,35 +1,49 @@
 [submodule "vendor/stb"]
 	path = vendor/stb
 	url = https://github.com/nothings/stb
+  ignore = all 
 
 [submodule "vendor/googletest"]
 	path = vendor/googletest
 	url = https://github.com/google/googletest
+  ignore = all 
 
 [submodule "vendor/glm"]
 	path = vendor/glm
 	url = https://github.com/g-truc/glm
+  ignore = all
 
 [submodule "vendor/boost"]
 	path = vendor/boost
 	url = https://github.com/boostorg/boost
+  ignore = all 
 
 [submodule "vendor/assimp"]
 	path = vendor/assimp
 	url = https://github.com/assimp/assimp
+  ignore = all 
 
 [submodule "vendor/googletest"]
 	path = vendor/googletest
 	url = https://github.com/google/googletest
+  ignore = all 
 
 [submodule "vendor/openexr"]
 	path = vendor/openexr
 	url = https://github.com/AcademySoftwareFoundation/openexr
+  ignore = all 
 
 [submodule "vendor/zlib"]
 	path = vendor/zlib
 	url = https://github.com/madler/zlib
+  ignore = all 
 
 [submodule "vendor/imath"]
 	path = vendor/imath
 	url = https://github.com/AcademySoftwareFoundation/Imath
+  ignore = all 
+
+[submodule "vendor/libdeflate"]
+	path = vendor/libdeflate
+	url = https://github.com/ebiggers/libdeflate 
+  ignore = all 

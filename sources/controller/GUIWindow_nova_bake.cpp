@@ -1,21 +1,43 @@
 
 #include "Config.h"
 #include "GUIWindow.h"
+#include "GenericException.h"
 #include "ImageImporter.h"
 #include "Logger.h"
 #include "WorkspaceTracker.h"
+#include "exception_macros.h"
 #include "manager/NovaResourceManager.h"
 #include "nova/bake.h"
 #include <QFileDialog>
 
-static constexpr int AA_SAMPLES = 8;
-static constexpr int MAX_SAMPLES = 1000;
-static constexpr int MAX_DEPTH = 5;
-static constexpr int TILES = 22;
+namespace exception {
+  EXPTN_DEFINE(InValidCameraException, "No valid camera present in the scene , or the camera hasn't been initialized.")
+  EXPTN_DEFINE(InValidRendererException, "The rasterizer hasn't been intialized.")
+  EXPTN_DEFINE(InvalidSceneException, "Current scene is not initialized.")
+  EXPTN_DEFINE(InvalidInputException, "Invalid input.")
+  EXPTN_DEFINE(InvalidRenderBufferStateException, "Render buffers are in an invalid state.")
+
+}  // namespace exception
+
 static std::mutex mutex;
+
 /**************************************************************************************************************/
 namespace controller {
-  static void cleanup() {}
+  /* To read options from the UI and transmit them to the bakery*/
+  struct ui_render_options {
+    int aa_samples;
+    int max_samples;
+    int max_depth;
+    int tiles;
+    int width;
+    int height;
+  };
+  struct engine_misc_options {
+    bool *cancel_ptr;
+    int engine_type_flag;
+    bool flip_v;
+  };
+
   static void init_camera(nova_baker_utils::engine_data &engine_data, const Camera &renderer_camera, float render_width, float render_height) {
     /* Camera */
     nova_baker_utils::camera_data camera_data{};
@@ -53,17 +75,6 @@ namespace controller {
     engine_data.envmap = envmap;
   }
 
-  struct ui_render_options {
-    int aa_samples;
-    int max_samples;
-    int max_depth;
-    int tiles;
-  };
-  struct engine_misc_options {
-    bool *cancel_ptr;
-    int engine_type_flag;
-    bool flip_v;
-  };
   static void init_engine(nova_baker_utils::engine_data &engine_data,
                           const ui_render_options &engine_options,
                           const engine_misc_options &misc_options) {
@@ -86,13 +97,6 @@ namespace controller {
     }
   }
 
-  void save_bake(const image::ImageHolder<float> &image_holder, const std::string &filename) {
-    if (!filename.empty()) {
-      IO::Loader loader(nullptr);
-      loader.writeHdr(filename.c_str(), image_holder, false);
-    }
-  }
-
   static std::unique_ptr<HdrRenderViewerWidget> texture_display_render(Controller *app_controller, const image::ThumbnailImageHolder<float> &img) {
     return std::make_unique<HdrRenderViewerWidget>(&img, app_controller);
   }
@@ -108,11 +112,11 @@ namespace controller {
       float interpolated = accumulated + 0.5f * (partial - accumulated);
       image_holder.data[i] = interpolated;
     }
-    // image_holder.flip_v();
   }
 
   static void do_progressive_render(nova_baker_utils::render_scene_data &render_scene_data, image::ImageHolder<float> &image_holder) {
     int i = 1;
+    int MAX_DEPTH = render_scene_data.nova_resource_manager->getEngineData().getMaxDepth();
     const int N = render_scene_data.nova_resource_manager->getEngineData().getMaxSamples();
     const int smax = math::calculus::compute_serie_term(N);
     const bool *stop_ptr = render_scene_data.nova_resource_manager->getEngineData().getCancelPtr();
@@ -128,8 +132,6 @@ namespace controller {
       color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)i);
       i++;
     }
-    std::lock_guard lock(mutex);
-    save_bake(image_holder, "4k_bananum");
   }
 
   static void start_baking(nova_baker_utils::render_scene_data &render_scene_data,
@@ -153,20 +155,18 @@ namespace controller {
     img_ptr->show();
   }
 
-  void Controller::nova_baking() {
+  void Controller::do_nova_render(const ui_render_options &render_options, const engine_misc_options &misc_options) {
     nova_baking_structure.reinitialize();
     if (!(current_workspace->getContext() & UI_RENDERER_RASTER))
       return;
     if (!realtime_viewer)
-      return;
-    int width = main_window_ui.nova_bake_width->value();
-    int height = main_window_ui.nova_bake_height->value();
+      throw exception::InValidRendererException();
 
     const RendererInterface &renderer = realtime_viewer->getRenderer();
     const Camera *renderer_camera = renderer.getCamera();
     if (!renderer_camera) {
       LOG("The current renderer doesn't have a camera.", LogLevel::ERROR);
-      return;
+      throw exception::InValidCameraException();
     }
 
     std::unique_ptr<nova::NovaResourceManager> manager = std::make_unique<nova::NovaResourceManager>();
@@ -185,20 +185,8 @@ namespace controller {
 
     engine_data.mesh_list = &mesh_collection;
 
-    ui_render_options render_options;
-    engine_misc_options misc_options;
-    render_options.aa_samples = AA_SAMPLES;
-    render_options.max_depth = MAX_DEPTH;
-    render_options.max_samples = MAX_SAMPLES;
-    render_options.tiles = TILES;
-
-    bool &b = nova_baking_structure.stop;
-    misc_options.cancel_ptr = &b;
-    misc_options.engine_type_flag = nova_baker_utils::ENGINE_TYPE::RGB;
-    misc_options.flip_v = true;
-
     init_engine(engine_data, render_options, misc_options);
-    init_camera(engine_data, *renderer_camera, width, height);
+    init_camera(engine_data, *renderer_camera, render_options.width, render_options.height);
     init_scene_transfo(engine_data, *renderer_camera);
     init_envmap(engine_data, renderer);
     nova_baker_utils::initialize_manager(engine_data, *manager);
@@ -207,15 +195,15 @@ namespace controller {
     image::ThumbnailImageHolder<float> &image_holder = nova_baking_structure.bake_buffers.image_holder;
     std::vector<float> &partial = nova_baking_structure.bake_buffers.partial;
     std::vector<float> &accumulator = nova_baking_structure.bake_buffers.accumulator;
-    image_holder.data.resize(width * height * 4);
-    partial.resize(width * height * 4);
-    accumulator.resize(width * height * 4);
+    image_holder.data.resize(render_options.width * render_options.height * 4);
+    partial.resize(render_options.width * render_options.height * 4);
+    accumulator.resize(render_options.width * render_options.height * 4);
 
     image_holder.metadata.channels = 4;
     image_holder.metadata.color_corrected = false;
     image_holder.metadata.format = "hdr";
-    image_holder.metadata.height = height;
-    image_holder.metadata.width = width;
+    image_holder.metadata.height = render_options.height;
+    image_holder.metadata.width = render_options.width;
     image_holder.metadata.is_hdr = true;
     std::unique_ptr<nova::HdrBufferStruct> buffers = std::make_unique<nova::HdrBufferStruct>();
 
@@ -227,8 +215,8 @@ namespace controller {
     nova_baking_structure.nova_render_scene = nova_baker_utils::render_scene_data{};
     nova_baker_utils::render_scene_data &render_scene_data = nova_baking_structure.nova_render_scene;
     render_scene_data.buffers = std::move(buffers);
-    render_scene_data.width = width;
-    render_scene_data.height = height;
+    render_scene_data.width = render_options.width;
+    render_scene_data.height = render_options.height;
     render_scene_data.engine_instance = std::move(engine_instance);
     render_scene_data.nova_resource_manager = std::move(manager);
     render_scene_data.thread_pool = global_application_config->getThreadPool();
@@ -237,6 +225,50 @@ namespace controller {
 
     skybox.ignoreTransformation(false);
     scene_ref.updateTree();
-    // save_bake(image_holder);
   }
+
+  void Controller::slot_nova_bake() {
+    int width = main_window_ui.nova_bake_width->value();
+    int height = main_window_ui.nova_bake_height->value();
+    int samples_per_pixel = main_window_ui.spinbox_sample_per_pixel->value();
+    int depth = main_window_ui.spinbox_render_depth->value();
+    int tiles_number = main_window_ui.spinbox_tile_number->value();
+    bool flip_v = main_window_ui.checkbox_flip_y_axis->isChecked();
+    if (width <= 0 || height <= 0 || tiles_number <= 0 || depth < 1 || samples_per_pixel <= 0) {
+      LOG("Invalid input.", LogLevel::WARNING);
+      return;
+    }
+    ui_render_options render_options{};
+    engine_misc_options misc_options{};
+    render_options.aa_samples = 1;
+    render_options.max_depth = depth;
+    render_options.max_samples = samples_per_pixel;
+    render_options.tiles = tiles_number;
+    render_options.width = width;
+    render_options.height = height;
+
+    bool &b = nova_baking_structure.stop;
+    misc_options.cancel_ptr = &b;
+    misc_options.engine_type_flag = nova_baker_utils::ENGINE_TYPE::RGB;
+    misc_options.flip_v = flip_v;
+    try {
+      do_nova_render(render_options, misc_options);
+    } catch (const exception::GenericException &e) {
+      LOGS(e.what());
+    }
+  }
+
+  void Controller::cleanupNova() {
+    /* Stop the threads. */
+    nova_baking_structure.stop = true;
+    if (global_application_config && global_application_config->getThreadPool()) {
+      /* Empty scheduler list. */
+      global_application_config->getThreadPool()->emptyQueue();
+      /* Synchronize the threads. */
+      global_application_config->getThreadPool()->fence();
+    }
+
+    nova_baking_structure.reinitialize();
+  }
+
 }  // namespace controller
