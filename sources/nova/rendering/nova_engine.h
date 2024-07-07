@@ -28,6 +28,7 @@ namespace nova {
       int max_depth{};
       std::atomic_long latency;
       bool *cancel_render;
+      bool v_invert{false};
 
      public:
       CLASS_CM(EngineResourcesHolder)
@@ -39,6 +40,7 @@ namespace nova {
       void setMaxSamples(int samples);
       void setMaxDepth(int depth);
       void setCancelPtr(bool *cancel_ptr);
+      void setVAxisInversed(bool invert) { v_invert = invert; }
       [[nodiscard]] int getTilesWidth() const;
       [[nodiscard]] int getTilesHeight() const;
       [[nodiscard]] int getSampleIncrement() const;
@@ -46,6 +48,7 @@ namespace nova {
       [[nodiscard]] int getMaxSamples() const;
       [[nodiscard]] int getMaxDepth() const;
       [[nodiscard]] bool *getCancelPtr() const;
+      [[nodiscard]] bool isAxisVInverted() const { return v_invert; }
     };
   }  // namespace engine
 }  // namespace nova
