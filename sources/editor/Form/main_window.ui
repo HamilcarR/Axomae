@@ -1193,6 +1193,9 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                 <property name="tabsClosable">
                  <bool>false</bool>
                 </property>
+                <property name="movable">
+                 <bool>true</bool>
+                </property>
                 <widget class="QWidget" name="PostProTab">
                  <property name="enabled">
                   <bool>true</bool>
@@ -2188,69 +2191,180 @@ qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 r
                   </item>
                  </layout>
                 </widget>
-                <widget class="QWidget" name="nova_bake">
+                <widget class="QWidget" name="nova_bake_layout">
                  <attribute name="title">
                   <string>Bake</string>
                  </attribute>
                  <layout class="QGridLayout" name="gridLayout_29">
                   <item row="0" column="0">
-                   <widget class="QGroupBox" name="groupBox_8">
+                   <widget class="QGroupBox" name="groupbox_render_options">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
                     <property name="title">
-                     <string>Bake Scene</string>
+                     <string>Render Options</string>
                     </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_32">
+                    <layout class="QVBoxLayout" name="verticalLayout_34">
                      <item>
-                      <layout class="QGridLayout" name="gridLayout_15">
-                       <item row="1" column="0">
-                        <widget class="QLabel" name="label_22">
-                         <property name="text">
-                          <string>Image height</string>
+                      <layout class="QVBoxLayout" name="verticalLayout_33">
+                       <item>
+                        <widget class="QGroupBox" name="groupBox_12">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
                          </property>
+                         <property name="title">
+                          <string>Sampling</string>
+                         </property>
+                         <layout class="QGridLayout" name="gridLayout_33">
+                          <item row="0" column="0">
+                           <layout class="QGridLayout" name="gridLayout_31">
+                            <item row="0" column="1">
+                             <widget class="QSpinBox" name="spinbox_sample_per_pixel">
+                              <property name="maximum">
+                                <number>1000000</number>
+                              </property>
+                            </widget>
+                           </item>
+                            <item row="0" column="0">
+                             <widget class="QLabel" name="label_25">
+                              <property name="text">
+                               <string>Sample per pixel</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="1" column="1">
+                              <widget class="QSpinBox" name="spinbox_render_depth">
+                                <property name="maximum">
+                                  <number>1000000</number>
+                                </property>
+                              </widget>
+                            </item>
+                            <item row="1" column="0">
+                             <widget class="QLabel" name="label_26">
+                              <property name="text">
+                               <string>Render depth</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="2" column="0">
+                             <widget class="QLabel" name="label_27">
+                              <property name="text">
+                               <string>Tile number</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="2" column="1">
+                              <widget class="QSpinBox" name="spinbox_tile_number">
+                                <property name="maximum">
+                                  <number>100000</number>
+                                </property>
+                              </widget>
+                            </item>
+                           </layout>
+                          </item>
+                         </layout>
                         </widget>
                        </item>
-                       <item row="1" column="1">
-                        <widget class="QSpinBox" name="nova_bake_height">
-                         <property name="minimum">
-                          <number>50</number>
+                       <item>
+                        <widget class="QGroupBox" name="groupBox_8">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
                          </property>
-                         <property name="maximum">
-                          <number>8096</number>
+                         <property name="title">
+                          <string>Texture Dimensions</string>
                          </property>
-                         <property name="value">
-                          <number>500</number>
-                         </property>
+                         <layout class="QVBoxLayout" name="verticalLayout_32">
+                          <item>
+                           <layout class="QGridLayout" name="gridLayout_15">
+                            <item row="0" column="1">
+                             <widget class="QSpinBox" name="nova_bake_width">
+                              <property name="minimum">
+                               <number>50</number>
+                              </property>
+                              <property name="maximum">
+                               <number>8096</number>
+                              </property>
+                              <property name="value">
+                               <number>500</number>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="1" column="1">
+                             <widget class="QSpinBox" name="nova_bake_height">
+                              <property name="minimum">
+                               <number>50</number>
+                              </property>
+                              <property name="maximum">
+                               <number>8096</number>
+                              </property>
+                              <property name="value">
+                               <number>500</number>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="0" column="0">
+                             <widget class="QLabel" name="label_24">
+                              <property name="text">
+                               <string>Image Width</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="1" column="0">
+                             <widget class="QLabel" name="label_22">
+                              <property name="text">
+                               <string>Image height</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="2" column="0">
+                             <widget class="QCheckBox" name="checkbox_flip_y_axis">
+                              <property name="text">
+                               <string> Flip Y Axis</string>
+                              </property>
+                             </widget>
+                            </item>
+                           </layout>
+                          </item>
+                         </layout>
                         </widget>
                        </item>
-                       <item row="0" column="0">
-                        <widget class="QLabel" name="label_24">
-                         <property name="text">
-                          <string>Image Width</string>
+                       <item>
+                        <widget class="QGroupBox" name="groupBox_13">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
                          </property>
-                        </widget>
-                       </item>
-                       <item row="0" column="1">
-                        <widget class="QSpinBox" name="nova_bake_width">
-                         <property name="minimum">
-                          <number>50</number>
+                         <property name="title">
+                          <string>Engine Options</string>
                          </property>
-                         <property name="maximum">
-                          <number>8096</number>
-                         </property>
-                         <property name="value">
-                          <number>500</number>
-                         </property>
+                         <layout class="QGridLayout" name="gridLayout_35">
+                          <item row="0" column="0">
+                           <layout class="QGridLayout" name="gridLayout_34"/>
+                          </item>
+                         </layout>
                         </widget>
                        </item>
                       </layout>
                      </item>
                      <item>
                       <widget class="QPushButton" name="nova_bake_button">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
                        <property name="text">
                         <string>Bake</string>
                        </property>

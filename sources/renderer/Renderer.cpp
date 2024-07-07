@@ -12,6 +12,7 @@ Renderer::Renderer()
   INodeDatabase *node_db = resource_database->getNodeDatabase();
   scene_camera = database::node::store<ArcballCamera>(*node_db, true, 45.f, 0.1f, 10000.f, 50.f, &screen_size).object;
   scene = std::make_unique<Scene>(ResourceDatabaseManager::getInstance());
+  AX_ASSERT_NOTNULL(scene);
   scene->setLightDatabasePointer(&light_database);
   LightData default_dir_light;
   default_dir_light.direction = glm::vec3(0.f, 100.f, 0.f);
@@ -129,9 +130,7 @@ void Renderer::draw() {
   errorCheck(__FILE__, __LINE__);
 }
 
-void Renderer::prepSceneChange() {
-  scene->clear();
-}
+void Renderer::prepSceneChange() { scene->clear(); }
 
 void Renderer::setNewScene(const SceneChangeData &new_scene) {
   AX_ASSERT(new_scene.scene, "");
@@ -238,4 +237,3 @@ void Renderer::setViewerWidget(GLViewer *widget) {
   if (render_pipeline)
     render_pipeline->setContextSwitcher(gl_widget);
 }
-
