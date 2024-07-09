@@ -27,6 +27,12 @@ void Scene::setCameraPointer(Camera *_scene_camera) {
 }
 
 void Scene::initialize() { scene_skybox->setShader(resource_manager.getShaderDatabase()->get(Shader::CUBEMAP)); }
+void Scene::ignoreSkyboxTransformation(bool ignore) {
+  if (!scene_skybox)
+    return;
+  scene_skybox->ignoreTransformation(ignore);
+  updateTree();
+}
 
 inline void setUpIblData(TextureDatabase &texture_database, Mesh *mesh) {}
 

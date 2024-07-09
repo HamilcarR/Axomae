@@ -6,6 +6,7 @@ add_library(ax_controller
     GUIWindow_slots.cpp
     GUIWindow_nova_bake.cpp
     WorkspaceTracker.cpp
+    ExceptionHandlerUI.cpp
 
 
 )

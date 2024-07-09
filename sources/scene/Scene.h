@@ -48,6 +48,7 @@ class Scene : public EventInterface {
   void setScene(const SceneTree &scene_tree, const std::vector<Mesh *> &mesh_list);
   virtual std::vector<Drawable *> getOpaqueElements() const;
   void initialize();
+  void ignoreSkyboxTransformation(bool ignore);
 
   /**
    * @brief This method returns a vector of transparent meshes sorted in reverse order based on their
