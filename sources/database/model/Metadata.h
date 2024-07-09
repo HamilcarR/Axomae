@@ -5,6 +5,7 @@
 namespace image {
   struct Metadata {
     std::string name{};
+    /* File format */
     std::string format{};
     unsigned int height{};
     unsigned int width{};
