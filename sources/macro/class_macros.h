@@ -64,5 +64,37 @@
   classname& operator=(const classname& copy) = delete;\
   classname& operator=(classname&& move) noexcept = default;
 
+#define CLASS_VCM(classname) \
+  classname() = default;\
+  virtual ~classname() = default;\
+  classname(const classname& copy) = default;\
+  classname(classname&& move) noexcept = default;\
+  classname& operator=(const classname& copy) = default;\
+  classname& operator=(classname&& move) noexcept = default;
+
+#define CLASS_VM(classname) \
+  classname() = default;\
+  virtual ~classname() = default;\
+  classname(const classname& copy) = delete;\
+  classname(classname&& move) noexcept = default;\
+  classname& operator=(const classname& copy) = delete;\
+  classname& operator=(classname&& move) noexcept = default;
+
+#define CLASS_VC(classname) \
+  classname() = default;\
+  virtual ~classname() = default;\
+  classname(const classname& copy) = default;\
+  classname(classname&& move)noexcept = delete;\
+  classname& operator=(const classname& copy) = default;\
+  classname& operator=(classname&& move) noexcept = delete;
+
+#define CLASS_V(classname) \
+  classname() = default;\
+  virtual ~classname() = default;\
+  classname(const classname& copy) = delete;\
+  classname(classname&& move) noexcept = delete;\
+  classname& operator=(const classname& copy) = delete;\
+  classname& operator=(classname&& move) noexcept = delete;
+
 // clang-format on
 #endif  // CLASS_MACROS_H
