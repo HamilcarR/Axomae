@@ -73,6 +73,7 @@ namespace controller {
     explicit Controller(QWidget *parent = nullptr);
     ~Controller() override;
     void setApplicationConfig(ApplicationConfig &&configuration);
+    [[nodiscard]] ApplicationConfig *getApplicationConfig() const { return global_application_config.get(); }
     Ui::MainWindow &getUi() { return main_window_ui; }
     static SDL_Surface *copy_surface(SDL_Surface *surface);
     void closeEvent(QCloseEvent *event) override;
@@ -89,17 +90,21 @@ namespace controller {
     SDL_Surface *get_corresponding_session_pointer(gui::IMAGETYPE image);
     bool set_corresponding_session_pointer(image_type<SDL_Surface> *image_type_pointer);
     void display_image(SDL_Surface *surf, gui::IMAGETYPE image, bool save_in_heap);
-    void save_bake(const image::ImageHolder<float> &image);
     void do_nova_render(const ui_render_options &render_options, const engine_misc_options &misc_options);
 
     /* SLOTS */
    public slots:
+    void slot_nova_save_bake(const image::ImageHolder<float> &image);
+    void slot_nova_stop_bake();
+    void slot_nova_start_bake();
+
     bool import_image();
     bool import_3DOBJ();
     bool import_envmap();
     bool open_project();
     bool save_project();
     bool save_image();
+
     bool greyscale_average();
     bool greyscale_luminance();
     void use_scharr();
@@ -113,7 +118,6 @@ namespace controller {
     void compute_dudv();
     void change_dudv_nmap(int factor);
     void cubemap_baking();
-    void slot_nova_bake();
     void next_mesh();
     void previous_mesh();
     void project_uv_normals();

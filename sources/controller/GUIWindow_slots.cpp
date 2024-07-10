@@ -63,6 +63,6 @@ namespace controller {
     QObject::connect(uv_editor_mesh_list, SIGNAL(itemSelectionChanged()), this, SLOT(select_uv_editor_item()));
 
     /*Renderer tab -> Nova baking*/
-    QObject::connect(main_window_ui.nova_bake_button, SIGNAL(pressed()), this, SLOT(slot_nova_bake()));
+    QObject::connect(main_window_ui.nova_bake_button, SIGNAL(pressed()), this, SLOT(slot_nova_start_bake()));
   }
 }  // namespace controller

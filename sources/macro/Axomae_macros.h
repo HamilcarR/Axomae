@@ -1,6 +1,7 @@
 #ifndef AXOMAE_MACROS_H
 #define AXOMAE_MACROS_H
 #include "class_macros.h"
+#include "exception_macros.h"
 #include <cassert>
 #include <cstdlib>
 #include <type_traits>

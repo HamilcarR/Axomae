@@ -1,5 +1,6 @@
 #ifndef TEXTUREVIEWERWIDGET_H
 #define TEXTUREVIEWERWIDGET_H
+#include "ContextMenuWidget.h"
 #include "Image.h"
 #include "Rgb.h"
 #include "metadata/RgbDisplayerLabel.h"
@@ -8,6 +9,10 @@
 #include <QImage>
 #include <QMainWindow>
 #include <QResizeEvent>
+
+namespace threading {
+  class ThreadPool;
+}
 
 namespace controller {
   namespace event {
@@ -65,10 +70,15 @@ class HdrRenderViewerWidget : public QWidget {
   std::string rgb_under_mouse_str{};
   std::unique_ptr<EventManager> widget_event_struct;
   std::unique_ptr<QTimer> timer;
+  std::unique_ptr<ContextMenuWidget> context_menu;
 
  public:
   HdrRenderViewerWidget(const image::ImageHolder<float> *tex, controller::Controller *app_controller, QWidget *parent = nullptr);
   ~HdrRenderViewerWidget() override;
+  HdrRenderViewerWidget(const HdrRenderViewerWidget &other) = delete;
+  HdrRenderViewerWidget(HdrRenderViewerWidget &&other) noexcept = delete;
+  HdrRenderViewerWidget &operator=(const HdrRenderViewerWidget &other) = delete;
+  HdrRenderViewerWidget &operator=(HdrRenderViewerWidget &&other) noexcept = delete;
   void mouseMoveEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
@@ -76,7 +86,8 @@ class HdrRenderViewerWidget : public QWidget {
 
  signals:
   void viewerClosed(QWidget *widget_address);
-
+  void onSaveRenderQuery(const image::ImageHolder<float> &target_buffer);
+  void onStopRenderQuery();
  public slots:
   void updateImage();
 };

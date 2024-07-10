@@ -1,5 +1,8 @@
 #include "TextureViewerWidget.h"
+
+#include "Config.h"
 #include "EventController.h"
+#include "ExceptionHandlerUI.h"
 #include "GUIWindow.h"
 #include "Logger.h"
 #include "image_utils.h"
@@ -123,8 +126,12 @@ HdrRenderViewerWidget::HdrRenderViewerWidget(const image::ImageHolder<float> *te
   timer = std::make_unique<QTimer>();
   QObject::connect(timer.get(), &QTimer::timeout, this, &HdrRenderViewerWidget::updateImage);
   QObject::connect(this, &HdrRenderViewerWidget::viewerClosed, app_controller, &controller::Controller::onClosedSpawnWindow);
+  QObject::connect(this, &HdrRenderViewerWidget::onSaveRenderQuery, app_controller, &controller::Controller::slot_nova_save_bake);
+  QObject::connect(this, &HdrRenderViewerWidget::onStopRenderQuery, app_controller, &controller::Controller::slot_nova_stop_bake);
   label = std::make_unique<editor::RgbDisplayerLabel>(this);
   label->setScaledContents(true);
+  context_menu = std::make_unique<ContextMenuWidget>(this);
+
   setMouseTracking(true);
 
   timer->start(1000);
@@ -156,9 +163,17 @@ void HdrRenderViewerWidget::mouseMoveEvent(QMouseEvent *event) {
 void HdrRenderViewerWidget::mouseReleaseEvent(QMouseEvent *event) {
   QWidget::mouseReleaseEvent(event);
   QPoint p = event->pos();
-
-  widget_event_struct->flag |= EventManager::EVENT_MOUSE_R_RELEASE;
-  // context menu
+  if (event->button() == Qt::RightButton) {
+    widget_event_struct->flag |= EventManager::EVENT_MOUSE_R_RELEASE;
+    ContextMenuWidget::ACTION action = context_menu->spawnMenuOnPos(p);
+    if (action == ContextMenuWidget::SAVE) {
+      if (target_buffer)
+        emit onSaveRenderQuery(*target_buffer);
+    } else if (action == ContextMenuWidget::STOP) {
+      emit onStopRenderQuery();
+    }
+    widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_R_RELEASE;
+  }
 }
 
 void HdrRenderViewerWidget::resizeEvent(QResizeEvent *event) {

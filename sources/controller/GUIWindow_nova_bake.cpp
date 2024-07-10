@@ -154,14 +154,6 @@ namespace controller {
 
   /**************************************************************************************************************/
 
-  void Controller::save_bake(const image::ImageHolder<float> &image_holder) {
-    std::string filename = spawnSaveFileDialogueWidget();
-    if (!filename.empty()) {
-      IO::Loader loader(getProgress());
-      loader.writeHdr(filename.c_str(), image_holder, false);
-    }
-  }
-
   static std::unique_ptr<HdrRenderViewerWidget> texture_display_render(Controller *app_controller, const image::ThumbnailImageHolder<float> &img) {
     return std::make_unique<HdrRenderViewerWidget>(&img, app_controller);
   }
@@ -312,7 +304,7 @@ namespace controller {
     return true;
   }
 
-  void Controller::slot_nova_bake() {
+  void Controller::slot_nova_start_bake() {
     ui_inputs inputs{};
     inputs.width = main_window_ui.nova_bake_width->value();
     inputs.height = main_window_ui.nova_bake_height->value();
@@ -332,6 +324,7 @@ namespace controller {
     render_options.width = inputs.width;
     render_options.height = inputs.height;
 
+    nova_baking_structure.stop = false;
     bool &b = nova_baking_structure.stop;
     misc_options.cancel_ptr = &b;
     misc_options.engine_type_flag = nova_baker_utils::ENGINE_TYPE::RGB;
@@ -348,8 +341,25 @@ namespace controller {
       /* Synchronize the threads. */
       global_application_config->getThreadPool()->fence();
     }
-
     nova_baking_structure.reinitialize();
+  }
+
+  void Controller::slot_nova_stop_bake() {
+    nova_baking_structure.stop = true;
+    if (global_application_config && global_application_config->getThreadPool()) {
+      /* Empty scheduler list. */
+      global_application_config->getThreadPool()->emptyQueue();
+      /* Synchronize the threads. */
+      global_application_config->getThreadPool()->fence();
+    }
+  }
+
+  void Controller::slot_nova_save_bake(const image::ImageHolder<float> &image_holder) {
+    std::string filename = spawnSaveFileDialogueWidget();
+    if (!filename.empty()) {
+      IO::Loader loader(getProgress());
+      loader.writeHdr(filename.c_str(), image_holder, false);
+    }
   }
 
 }  // namespace controller

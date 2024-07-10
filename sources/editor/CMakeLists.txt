@@ -2,19 +2,15 @@ add_library(ax_editor
         ProgressStatusWidget.cpp
         TextureViewerWidget.cpp
         MessageBoxWidget.cpp
-
         renderer/GLViewer.cpp
         renderer/HdrListView.cpp
         renderer/SceneListView.cpp
-
         image/Thumbnail.cpp
-
         UV/MeshListView.cpp
         UV/SceneSelector.cpp
-
         nova/NovaViewerWidget.cpp
-
         metadata/RgbDisplayerLabel.cpp
+        ContextMenuWidget.cpp
 )
 
 
