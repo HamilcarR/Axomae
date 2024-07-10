@@ -10,7 +10,6 @@ PRIVATE
     ax_math
     ax_macro
     ax_thread
-    ax_processing
     ax_geometry
 )
 
