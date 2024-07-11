@@ -154,6 +154,11 @@ void GLViewer::wheelEvent(QWheelEvent *event) {
   widget_input_events->flag &= ~EventManager::EVENT_MOUSE_WHEEL;
   update();
 }
+void GLViewer::showEvent(QShowEvent *event) { QOpenGLWidget::showEvent(event); }
+void GLViewer::hideEvent(QHideEvent *event) {
+  QOpenGLWidget::hideEvent(event);
+  renderer->onHideEvent();
+}
 
 void GLViewer::mousePressEvent(QMouseEvent *event) {
   QOpenGLWidget::mousePressEvent(event);

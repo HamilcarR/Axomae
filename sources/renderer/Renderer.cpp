@@ -131,6 +131,7 @@ void Renderer::draw() {
 }
 
 void Renderer::prepSceneChange() { scene->clear(); }
+void Renderer::onHideEvent() { EMPTY_FUNCBODY; }
 
 void Renderer::setNewScene(const SceneChangeData &new_scene) {
   AX_ASSERT(new_scene.scene, "");

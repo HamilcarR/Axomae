@@ -30,6 +30,7 @@ class RendererInterface : public EventInterface {
   virtual bool prep_draw() = 0;
   virtual void draw() = 0;
   virtual void onResize(unsigned int width, unsigned int height) = 0;
+  virtual void onHideEvent() = 0;
   virtual void setDefaultFrameBufferId(unsigned id) = 0;
   virtual void onClose() = 0;
   /**

@@ -77,7 +77,8 @@ class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
   void mouseReleaseEvent(QMouseEvent *event) override;
   void mouseDoubleClickEvent(QMouseEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;
-
+  void showEvent(QShowEvent *event) override;
+  void hideEvent(QHideEvent *event) override;
  public slots:
   void onUpdateDrawEvent();
   void onTimerTimeout();

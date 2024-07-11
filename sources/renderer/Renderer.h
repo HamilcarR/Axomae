@@ -96,6 +96,7 @@ class Renderer final : public IRenderer {
   void displayBoundingBoxes(bool display) override;
   void setViewerWidget(GLViewer *widget) override;
   void prepSceneChange() override;
+  void onHideEvent() override;
 };
 
 #endif
