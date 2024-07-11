@@ -7,8 +7,6 @@ PRIVATE
     ax_math
     ax_image
     ax_exception
-    ax_thread
-    ax_controller
 )
 
 target_include_directories(ax_common 
