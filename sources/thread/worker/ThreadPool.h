@@ -5,16 +5,17 @@
 #include <future>
 #include <mutex>
 #include <queue>
+#include <stack>
 #include <thread>
 #include <unistd.h>
 #include <utility>
 #include <vector>
 
 namespace threading {
-
+  const char *const ALL_TASK = "_ALL_";
   struct Task {
     std::function<void()> function;
-    bool terminable;
+    std::string context_name;
   };
 
   class ThreadPool {
@@ -26,7 +27,7 @@ namespace threading {
     std::condition_variable condition_variable;
     std::vector<std::thread> threads;
     bool shutdown_requested{false};
-    std::queue<Task> queue;
+    std::deque<Task> queue;
 
    public:
     explicit ThreadPool(const int size) : busy_threads(size), threads(std::vector<std::thread>(size)) {
@@ -48,11 +49,17 @@ namespace threading {
       std::unique_lock lock(mutex);
       condition_variable.wait(lock, [this] { return busy_threads == 0; });
     }
+
+    void fence(const std::string &tag) {
+      std::unique_lock lock(mutex);
+      condition_variable.wait(lock, [this, tag] { return busy_threads == 0 && tasksFinished(tag); });
+    }
+
     // Waits until threads finish their current task and shutdowns the pool
     void Shutdown() {
       {
 
-        emptyQueue();
+        emptyQueue(ALL_TASK);
         std::lock_guard<std::mutex> lock(mutex);
         shutdown_requested = true;
         condition_variable.notify_all();
@@ -65,26 +72,26 @@ namespace threading {
       }
     }
 
-    void emptyQueue() {
+    void emptyQueue(const std::string &context_name) {
       std::lock_guard<std::mutex> lock(mutex);
-      std::queue<Task> to_finish;
+      std::deque<Task> to_finish;
       while (!queue.empty()) {
         Task elem = queue.front();
-        queue.pop();
-        if (!elem.terminable)
-          to_finish.push(elem);
+        queue.pop_front();
+        if (context_name == ALL_TASK || elem.context_name == context_name)
+          to_finish.push_back(elem);
       }
       queue = to_finish;
     }
 
     template<typename F, typename... Args>
-    auto addTask(bool terminable, F &&f, Args &&...args) -> std::future<decltype(f(args...))> {
+    auto addTask(const std::string &tag_id, F &&f, Args &&...args) -> std::future<decltype(f(args...))> {
       auto task_ptr = std::make_shared<std::packaged_task<decltype(f(args...))()>>(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
       auto wrapper_func = [task_ptr]() { (*task_ptr)(); };
-      Task task{wrapper_func, terminable};
+      Task task{wrapper_func, tag_id};
       {
         std::lock_guard<std::mutex> lock(mutex);
-        queue.push(task);
+        queue.push_back(task);
         // Wake up one thread if its waiting
         condition_variable.notify_one();
       }
@@ -95,6 +102,15 @@ namespace threading {
     size_t QueueSize() const {
       std::unique_lock<std::mutex> lock(mutex);
       return queue.size();
+    }
+
+   private:
+    bool tasksFinished(const std::string &tag) {
+      for (const auto &elem : queue) {
+        if (elem.context_name == tag)
+          return false;
+      }
+      return true;
     }
 
    private:
@@ -116,7 +132,7 @@ namespace threading {
 
           if (!this->thread_pool->queue.empty()) {
             auto func = thread_pool->queue.front().function;
-            thread_pool->queue.pop();
+            thread_pool->queue.pop_front();
 
             lock.unlock();
             func();

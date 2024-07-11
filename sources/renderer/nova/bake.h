@@ -91,6 +91,7 @@ namespace nova_baker_utils {
     int num_tiles_w, num_tiles_h;
     int engine_type_flag;
     bool flip_v;
+    std::string threadpool_tag;
   };
 
   /* Takes an initialized NovaResourceManager.*/
@@ -104,6 +105,6 @@ namespace nova_baker_utils {
   void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureRawData &texture_raw_data);
   void cancel_render(engine_data &data);
   std::unique_ptr<NovaRenderEngineInterface> create_engine(const engine_data &engine_type);
-  void synchronize_render_threads(render_scene_data &scene_data);
+  void synchronize_render_threads(render_scene_data &scene_data, const std::string &tag);
 }  // namespace nova_baker_utils
 #endif  // BAKE_H

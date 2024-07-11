@@ -56,20 +56,16 @@ void NovaRenderer::initialize(ApplicationConfig *app_conf) {
 
 void NovaRenderer::emptyScheduler() {
   if (global_application_config && global_application_config->getThreadPool()) {
-    global_application_config->getThreadPool()->emptyQueue();
+    global_application_config->getThreadPool()->emptyQueue(nova_resource_manager->getEngineData().getTag());
     syncRenderEngineThreads();
   }
-}
-
-void NovaRenderer::syncRenderEngineThreads() {
-  if (global_application_config && global_application_config->getThreadPool())
-    global_application_config->getThreadPool()->fence();
 }
 
 void NovaRenderer::setProgressStatus(const std::string &status) {
   gl_widget->setProgressStatusText(status);
   gl_widget->notifyProgress();
 }
+void NovaRenderer::onHideEvent() { onClose(); }
 
 void NovaRenderer::displayProgress(float current, float target) {
   if (current > target)
@@ -94,9 +90,7 @@ void NovaRenderer::onResize(unsigned int width, unsigned int height) {
 }
 void NovaRenderer::onClose() {
   cancel_render = true;
-  if (global_application_config && global_application_config->getThreadPool())
-    global_application_config->getThreadPool()->emptyQueue();
-  syncRenderEngineThreads();
+  emptyScheduler();
 }
 
 void NovaRenderer::processEvent(const controller::event::Event *event) {

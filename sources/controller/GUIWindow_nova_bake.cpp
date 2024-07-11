@@ -31,6 +31,7 @@ namespace exception {
 }  // namespace exception
 
 static std::mutex mutex;
+const char *const NOVABAKE_POOL_TAG = "_NOVABAKE_POOL_TAG_";
 
 /**************************************************************************************************************/
 namespace controller {
@@ -97,6 +98,7 @@ namespace controller {
     engine_data.engine_type_flag = misc_options.engine_type_flag;
     engine_data.stop_render_ptr = misc_options.cancel_ptr;
     engine_data.flip_v = misc_options.flip_v;
+    engine_data.threadpool_tag = NOVABAKE_POOL_TAG;
   }
 
   std::unique_ptr<nova::HdrBufferStruct> generate_buffers(NovaBakingStructure &nova_baking_structure, const ui_render_options &render_options) {
@@ -185,7 +187,7 @@ namespace controller {
               MAX_DEPTH);
 
       nova_baker_utils::bake_scene(render_scene_data);
-      nova_baker_utils::synchronize_render_threads(render_scene_data);
+      nova_baker_utils::synchronize_render_threads(render_scene_data, NOVABAKE_POOL_TAG);
       color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)i);
       i++;
     }
@@ -332,27 +334,23 @@ namespace controller {
     do_nova_render(render_options, misc_options);
   }
 
-  void Controller::cleanupNova() {
+  void Controller::novaStopBake() {
     /* Stop the threads. */
     nova_baking_structure.stop = true;
     if (global_application_config && global_application_config->getThreadPool()) {
       /* Empty scheduler list. */
-      global_application_config->getThreadPool()->emptyQueue();
+      global_application_config->getThreadPool()->emptyQueue(NOVABAKE_POOL_TAG);
       /* Synchronize the threads. */
-      global_application_config->getThreadPool()->fence();
+      global_application_config->getThreadPool()->fence(NOVABAKE_POOL_TAG);
     }
+  }
+
+  void Controller::cleanupNova() {
+    novaStopBake();
     nova_baking_structure.reinitialize();
   }
 
-  void Controller::slot_nova_stop_bake() {
-    nova_baking_structure.stop = true;
-    if (global_application_config && global_application_config->getThreadPool()) {
-      /* Empty scheduler list. */
-      global_application_config->getThreadPool()->emptyQueue();
-      /* Synchronize the threads. */
-      global_application_config->getThreadPool()->fence();
-    }
-  }
+  void Controller::slot_nova_stop_bake() { novaStopBake(); }
 
   void Controller::slot_nova_save_bake(const image::ImageHolder<float> &image_holder) {
     std::string filename = spawnSaveFileDialogueWidget();

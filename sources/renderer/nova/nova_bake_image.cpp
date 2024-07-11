@@ -50,6 +50,7 @@ namespace nova_baker_utils {
     engine_resources_holder.setTilesHeight(engine_opts.num_tiles_w);
     engine_resources_holder.setTilesWidth(engine_opts.num_tiles_h);
     engine_resources_holder.setVAxisInversed(engine_opts.flip_v);
+    engine_resources_holder.setTag(engine_opts.threadpool_tag);
   }
 
   void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureRawData &texture_raw_data) {
@@ -100,9 +101,9 @@ namespace nova_baker_utils {
     return nullptr;
   }
 
-  void synchronize_render_threads(render_scene_data &scene_data) {
+  void synchronize_render_threads(render_scene_data &scene_data, const std::string &tag) {
     if (scene_data.thread_pool) {
-      scene_data.thread_pool->fence();
+      scene_data.thread_pool->fence(tag);
     }
   }
 

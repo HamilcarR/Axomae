@@ -120,6 +120,7 @@ class NovaRenderer final : public IRenderer {
   void displayBoundingBoxes(bool display) override;
   void setViewerWidget(GLViewer *widget) override;
   void setProgressStatus(const std::string &progress_status);
+  void onHideEvent() override;
 };
 
 #endif  // NOVARENDERER_H

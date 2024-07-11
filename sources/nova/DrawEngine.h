@@ -43,7 +43,8 @@ namespace nova {
       elem.sample_per_tile = nova_resources->getEngineData().getSampleIncrement();
       elem.image_total_height = height_resolution;
       elem.image_total_width = width_resolution;
-      futs.push_back(thread_pool->addTask(true, renderer_callback, buffers, elem, nova_resources));
+      const std::string &tag = nova_resources->getEngineData().getTag();
+      futs.push_back(thread_pool->addTask(tag, renderer_callback, buffers, elem, nova_resources));
     }
     return futs;
   }

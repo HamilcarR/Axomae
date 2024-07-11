@@ -14,6 +14,10 @@ namespace nova::engine {
 
   void EngineResourcesHolder::setCancelPtr(bool *cancel_ptr) { cancel_render = cancel_ptr; }
 
+  void EngineResourcesHolder::setVAxisInversed(bool invert) { v_invert = invert; }
+
+  void EngineResourcesHolder::setTag(const std::string &tag) { threadpool_tag = tag; }
+
   int EngineResourcesHolder::getTilesWidth() const { return tiles_w; }
 
   int EngineResourcesHolder::getTilesHeight() const { return tiles_h; }
@@ -27,4 +31,9 @@ namespace nova::engine {
   int EngineResourcesHolder::getMaxDepth() const { return max_depth; }
 
   bool *EngineResourcesHolder::getCancelPtr() const { return cancel_render; }
+
+  [[nodiscard]] bool EngineResourcesHolder::isAxisVInverted() const { return v_invert; }
+
+  [[nodiscard]] const std::string &EngineResourcesHolder::getTag() const { return threadpool_tag; }
+
 }  // namespace nova::engine

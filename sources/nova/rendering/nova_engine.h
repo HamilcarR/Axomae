@@ -4,6 +4,7 @@
 #include "utils/nova_utils.h"
 #include <atomic>
 #include <map>
+#include <string>
 
 namespace nova {
 
@@ -29,6 +30,7 @@ namespace nova {
       std::atomic_long latency;
       bool *cancel_render;
       bool v_invert{false};
+      std::string threadpool_tag;
 
      public:
       CLASS_CM(EngineResourcesHolder)
@@ -40,7 +42,8 @@ namespace nova {
       void setMaxSamples(int samples);
       void setMaxDepth(int depth);
       void setCancelPtr(bool *cancel_ptr);
-      void setVAxisInversed(bool invert) { v_invert = invert; }
+      void setVAxisInversed(bool invert);
+      void setTag(const std::string &tag);
       [[nodiscard]] int getTilesWidth() const;
       [[nodiscard]] int getTilesHeight() const;
       [[nodiscard]] int getSampleIncrement() const;
@@ -48,7 +51,8 @@ namespace nova {
       [[nodiscard]] int getMaxSamples() const;
       [[nodiscard]] int getMaxDepth() const;
       [[nodiscard]] bool *getCancelPtr() const;
-      [[nodiscard]] bool isAxisVInverted() const { return v_invert; }
+      [[nodiscard]] bool isAxisVInverted() const;
+      [[nodiscard]] const std::string &getTag() const;
     };
   }  // namespace engine
 }  // namespace nova

@@ -13,6 +13,7 @@ static constexpr int MAX_RECUR_DEPTH = 20;
 static constexpr int MAX_SAMPLES = 10000;
 static constexpr int NUM_TILES = 20;
 
+const char *const NOVA_REALTIME_TAG = "_NOVAREALTIME_POOL_TAG_";
 bool NovaRenderer::prep_draw() {
   if (camera_framebuffer && camera_framebuffer->getDrawable()->ready())
     camera_framebuffer->startDraw();
@@ -44,13 +45,13 @@ void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int ch
 }
 
 void NovaRenderer::initializeEngine() {
-
   nova_baker_utils::engine_data engine_opts;
   engine_opts.aa_samples = 8;
   engine_opts.num_tiles_h = engine_opts.num_tiles_w = NUM_TILES;
   engine_opts.depth_max = MAX_RECUR_DEPTH;
   engine_opts.samples_max = MAX_SAMPLES;
   engine_opts.stop_render_ptr = &cancel_render;
+  engine_opts.threadpool_tag = NOVA_REALTIME_TAG;
 
   initialize_engine_opts(engine_opts, nova_resource_manager->getEngineData());
 }
@@ -141,9 +142,14 @@ void NovaRenderer::emptyBuffers() {
   }
 }
 
+void NovaRenderer::syncRenderEngineThreads() {
+  if (global_application_config && global_application_config->getThreadPool())
+    global_application_config->getThreadPool()->fence(NOVA_REALTIME_TAG);
+}
+
 void NovaRenderer::prepareRedraw() {
   if (global_application_config && global_application_config->getThreadPool())
-    global_application_config->getThreadPool()->emptyQueue();
+    global_application_config->getThreadPool()->emptyQueue(NOVA_REALTIME_TAG);
   cancel_render = true;
   syncRenderEngineThreads();
   cancel_render = false;

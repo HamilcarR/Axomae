@@ -83,6 +83,7 @@ namespace controller {
     void cleanupNova();
     [[nodiscard]] const NovaBakingStructure &getBakingStructure() const { return nova_baking_structure; }
     [[nodiscard]] NovaBakingStructure &getBakingStructure() { return nova_baking_structure; }
+    void novaStopBake();
 
    private:
     void connect_all_slots();
