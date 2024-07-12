@@ -1,24 +1,23 @@
 #include "CubemapProcessing.cuh"
-#include "math.h"
+#include <cmath>
 
 #ifdef AXOMAE_STATS_TIMER
 #  include "PerformanceLogger.h"
 #endif
-constexpr unsigned MAX_ITER_THREAD = 100;
 
 namespace spherical_math {
 
-  __device__ inline const float3 sphericalToCartesian(const float phi, const float theta);
+  GPU_ONLY inline float3 sphericalToCartesian(const float phi, const float theta);
 
-  __device__ inline const float2 cartesianToSpherical(const float x, const float y, const float z);
+  GPU_ONLY inline float2 cartesianToSpherical(const float x, const float y, const float z);
 
-  __device__ inline const float2 uvToSpherical(const float u, const float v);
+  GPU_ONLY inline float2 uvToSpherical(const float u, const float v);
 
-  __device__ inline const float2 sphericalToUv(const float u, const float v);
+  GPU_ONLY inline float2 sphericalToUv(const float u, const float v);
 
-  __device__ inline float3 gpu_pgc3d(unsigned x, unsigned y, unsigned z);
+  GPU_ONLY inline float3 gpu_pgc3d(unsigned x, unsigned y, unsigned z);
 
-  __device__ inline const float3 sphericalToCartesian(const float phi, const float theta) {
+  GPU_ONLY float3 sphericalToCartesian(const float phi, const float theta) {
     float z = cos(theta);
     float x = sin(theta) * cos(phi);
     float y = sin(theta) * sin(phi);
@@ -29,7 +28,7 @@ namespace spherical_math {
     return xyz;
   }
 
-  __device__ inline const float2 cartesianToSpherical(const float x, const float y, const float z) {
+  GPU_ONLY inline float2 cartesianToSpherical(const float x, const float y, const float z) {
     const float theta = acos(z);
     const float phi = atan2f(y, x);
     float2 sph;
@@ -38,7 +37,7 @@ namespace spherical_math {
     return sph;
   }
 
-  __device__ inline const float2 uvToSpherical(const float u, const float v) {
+  GPU_ONLY inline float2 uvToSpherical(const float u, const float v) {
     float phi = 2 * PI * u;
     float theta = PI * v;
     float2 spherical;
@@ -47,7 +46,7 @@ namespace spherical_math {
     return spherical;
   }
 
-  __device__ inline const float2 sphericalToUv(const float phi, const float theta) {
+  GPU_ONLY inline float2 sphericalToUv(const float phi, const float theta) {
     const float u = phi / (2 * PI);
     const float v = theta / PI;
     float2 uv;
@@ -56,7 +55,7 @@ namespace spherical_math {
     return uv;
   }
 
-  __device__ inline float3 gpu_pgc3d(unsigned x, unsigned y, unsigned z) {
+  GPU_ONLY inline float3 gpu_pgc3d(unsigned x, unsigned y, unsigned z) {
     x = x * 1664525u + 1013904223u;
     y = y * 1664525u + 1013904223u;
     z = z * 1664525u + 1013904223u;
@@ -80,11 +79,11 @@ namespace spherical_math {
   }
 };  // End namespace spherical_math
 
-__device__ inline float dot(const float2 &vec1, const float2 &vec2) { return vec1.x * vec2.x + vec1.y * vec2.y; }
+GPU_ONLY inline float dot(const float2 &vec1, const float2 &vec2) { return vec1.x * vec2.x + vec1.y * vec2.y; }
 
-__device__ inline float dot(const float3 &vec1, const float3 &vec2) { return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z; }
+GPU_ONLY inline float dot(const float3 &vec1, const float3 &vec2) { return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z; }
 
-__device__ inline float3 cross(const float3 &A, const float3 &B) {
+GPU_ONLY inline float3 cross(const float3 &A, const float3 &B) {
   float3 C;
   C.x = A.y * B.z - A.z * B.y;
   C.y = A.z * B.x - A.x * B.z;
@@ -92,7 +91,7 @@ __device__ inline float3 cross(const float3 &A, const float3 &B) {
   return C;
 }
 
-__device__ inline float3 normalize(const float3 &A) {
+GPU_ONLY inline float3 normalize(const float3 &A) {
   float d = sqrt(A.x * A.x + A.y * A.y + A.z * A.z);
   float3 A1;
   A1.x = A.x / d;
@@ -100,14 +99,14 @@ __device__ inline float3 normalize(const float3 &A) {
   A1.z = A.z / d;
   return A1;
 }
-__device__ inline float3 operator*(float k, float3 vec) {
+GPU_ONLY inline float3 operator*(float k, float3 vec) {
   float3 res;
   res.x = vec.x * k;
   res.y = vec.y * k;
   res.z = vec.z * k;
   return res;
 }
-__device__ inline float3 operator+(float3 vec1, float3 vec2) {
+GPU_ONLY inline float3 operator+(float3 vec1, float3 vec2) {
   float3 res;
   res.x = vec1.x + vec2.x;
   res.y = vec1.y + vec2.y;
@@ -116,21 +115,19 @@ __device__ inline float3 operator+(float3 vec1, float3 vec2) {
 }
 
 template<class T>
-__device__ inline void gpgpu_device_write_buffer(T *D_result_buffer, const float3 val, const int x, const int y, const unsigned _width) {
+GPU_ONLY void gpgpu_device_write_buffer(T *D_result_buffer, const float3 val, const int x, const int y, const unsigned _width) {
   D_result_buffer[(y * _width + x) * 4] = val.x;
   D_result_buffer[(y * _width + x) * 4 + 1] = val.y;
   D_result_buffer[(y * _width + x) * 4 + 2] = val.z;
   D_result_buffer[(y * _width + x) * 4 + 3] = 1.f;
 }
 
-__global__ void gpgpu_functions::irradiance_mapping::gpgpu_device_compute_diffuse_irradiance(
+KERNEL void gpgpu_functions::irradiance_mapping::gpgpu_device_compute_diffuse_irradiance(
     float *D_result_buffer, cudaTextureObject_t texture, unsigned width, unsigned height, unsigned _width, unsigned _height, unsigned total_samples) {
 
   int i = blockDim.x * blockIdx.x + threadIdx.x;
   int j = blockDim.y * blockIdx.y + threadIdx.y;
 
-  int x = threadIdx.x;
-  int y = threadIdx.y;
   if (i < _width && j < _height) {
     float u = (float)i / (float)_width;
     float v = (float)j / (float)_height;
@@ -173,7 +170,7 @@ __global__ void gpgpu_functions::irradiance_mapping::gpgpu_device_compute_diffus
   }
 }
 
-__host__ void gpgpu_functions::irradiance_mapping::gpgpu_kernel_call(
+void gpgpu_functions::irradiance_mapping::gpgpu_kernel_call(
     void (*device_function)(float *, cudaTextureObject_t, unsigned, unsigned, unsigned, unsigned, unsigned),
     float *D_result_buffer,
     cudaTextureObject_t texture,

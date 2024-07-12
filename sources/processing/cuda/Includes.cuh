@@ -2,6 +2,7 @@
 #define INCLUDES_CUH
 #include "Logger.h"
 #include "constants.h"
+#include "cu_macro.h"
 #include "utils_3D.h"
 #include <cuda.h>
 #include <cuda_device_runtime_api.h>
@@ -26,16 +27,16 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort =
 
 constexpr glm::dvec3 UP_VECTOR = glm::dvec3(0.f, 1.f, 0.f);
 
-__host__ __device__ inline float magnitude(float x, float y) { return sqrtf(x * x + y * y); }
+GPU_CALLABLE inline float magnitude(float x, float y) { return sqrtf(x * x + y * y); }
 
 template<typename U, typename T>
-__host__ __device__ inline T normalize(U maxx, U minn, T pixel) {
+GPU_CALLABLE inline T normalize(U maxx, U minn, T pixel) {
   assert(maxx - minn != 0);
   return ((pixel - minn) * 255 / (maxx - minn) + 0);
 }
 
 template<typename T, typename D>
-__host__ __device__ auto lerp(T value1, T value2, D cste) {
+GPU_CALLABLE auto lerp(T value1, T value2, D cste) {
   return (1 - cste) * value1 + cste * value2;
 }
 

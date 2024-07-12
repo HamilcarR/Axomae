@@ -21,6 +21,7 @@ set(AXOMAE_USE_GOLD "ON" CACHE BOOL "Use GOLD linker")
 set(AXOMAE_USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
 
 # CUDA Compilation
+option(AXOMAE_USE_CUDA "Enable cuda" OFF)
 set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr")
 set(CMAKE_CUDA_ARCHITECTURES "75")
 enable_language(CUDA)
