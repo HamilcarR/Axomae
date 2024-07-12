@@ -6,22 +6,16 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ax_mesh)
 target_link_libraries(ax_mesh 
 PRIVATE
     ax_scene
-    ax_math
-    ax_common
     ax_camera
     ax_material
     ax_shader
-    ax_macro
     ax_texture
-    ax_thread
+    ax_core
     ax_controller
     ax_opengl
     ax_database
-    ax_geometry
-    ax_debug
     ax_io
-PUBLIC
-    ax_nova
+
 )
 target_include_directories(ax_mesh 
 PUBLIC 

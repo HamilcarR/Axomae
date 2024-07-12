@@ -1,7 +1,7 @@
 #include "GLMutablePixelBufferObject.h"
 
-#include "Axomae_macros.h"
 #include "DebugGL.h"
+#include "project_macros.h"
 
 GLMutablePixelBufferObject::GLMutablePixelBufferObject(TRANSFER t, size_t size) : buffer_type(t), buffer_size(size) {}
 

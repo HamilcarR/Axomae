@@ -1,10 +1,9 @@
 #ifndef TEXTUREFACTORY_H
 #define TEXTUREFACTORY_H
-
-#include "Axomae_macros.h"
 #include "Factory.h"
 #include "RenderingDatabaseInterface.h"
 #include "Texture.h"
+#include "project_macros.h"
 /**
  * @file TextureFactory.h
  * Class definition of the factory system for the textures

@@ -38,7 +38,6 @@ PUBLIC
         gtest
         gtest_main
 PRIVATE
-        ax_common
         ax_processing
         ax_texture
         ax_camera
@@ -49,9 +48,8 @@ PRIVATE
         ax_renderer
         ax_mesh
         ax_material
-        ax_geometry
         ax_event
-        ax_datastructure
+        ax_core
 )
 
 target_include_directories(Axomae_test

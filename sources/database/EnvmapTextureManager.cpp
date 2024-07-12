@@ -1,11 +1,11 @@
 #include "EnvmapTextureManager.h"
-#include "Axomae_macros.h"
 #include "Config.h"
 #include "Loader.h"
 #include "Logger.h"
 #include "Mesh.h"
 #include "RenderPipeline.h"
 #include "Scene.h"
+#include "project_macros.h"
 
 std::vector<texture::envmap::EnvmapTextureGroup> EnvmapTextureManager::bakes_id{};
 

@@ -10,12 +10,8 @@ target_link_libraries(ax_texture
 PRIVATE
     ax_io
     ax_renderer
-    ax_debug
-    ax_common
-    ax_math
     ax_shader
-    ax_thread
-    ax_macro
+    ax_core
     ax_opengl
 PUBLIC
     ax_controller

@@ -1,8 +1,8 @@
 #include "ImageManager.h"
-#include "Axomae_macros.h"
 #include "Kernel.cuh"
 #include "Rgb.h"
 #include "constants.h"
+#include "project_macros.h"
 #include <SDL2/SDL.h>
 #include <assert.h>
 

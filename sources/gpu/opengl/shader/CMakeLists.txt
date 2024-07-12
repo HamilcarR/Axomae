@@ -1,6 +1,3 @@
-
-
-
 # Encode shaders as byte arrays
 set(GEN_INCLUDE_DIR "${CMAKE_BINARY_DIR}/lib/shader/include" )
 file(MAKE_DIRECTORY ${GEN_INCLUDE_DIR})
@@ -35,8 +32,7 @@ PRIVATE
     ax_opengl
     ax_camera
     ax_scene
-    ax_debug
-
+    ax_core
 )
 
 #****************************************************************************************************

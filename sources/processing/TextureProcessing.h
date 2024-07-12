@@ -1,10 +1,9 @@
 #ifndef OFFLINECUBEMAPPROCESSING_H
 #define OFFLINECUBEMAPPROCESSING_H
-#include "Axomae_macros.h"
 #include "GenericException.h"
-
 #include "ThreadPool.h"
 #include "math_utils.h"
+#include "project_macros.h"
 
 inline bool isDimPowerOfTwo(int dimension) { return (dimension & (dimension - 1)) == 0; }
 inline bool isValidDim(int dimension) { return dimension > 0; }

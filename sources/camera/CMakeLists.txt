@@ -6,13 +6,11 @@ add_library(ax_camera
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_camera)
 target_link_libraries(ax_camera
 PUBLIC
-        ax_math
-        ax_common
-        ax_macro
         ax_event
 PRIVATE
         ax_scene
         ax_io
+        ax_core
 )
 target_include_directories(ax_camera
 PUBLIC

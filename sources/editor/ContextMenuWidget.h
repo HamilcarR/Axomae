@@ -1,6 +1,6 @@
 #ifndef CONTEXTMENUWIDGET_H
 #define CONTEXTMENUWIDGET_H
-#include "Axomae_macros.h"
+#include "project_macros.h"
 #include <QMenu>
 
 class ContextMenuWidget : public QMenu {

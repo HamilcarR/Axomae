@@ -19,28 +19,21 @@ target_link_libraries(ax_editor
 PUBLIC
     Qt6::Widgets
     Qt6::OpenGLWidgets
-    ax_common
     ax_database
-    ax_macro
-    ax_image
-    ax_math
     ax_io
     ax_config
-
 
 PRIVATE
     ax_mesh
     ax_scene
-    ax_thread
+    ax_core
     ax_controller
     ax_camera
     ax_material
     ax_shader
     ax_texture
     ax_opengl
-    ax_geometry
     ax_renderer
-    ax_debug
     ax_event
 )
 

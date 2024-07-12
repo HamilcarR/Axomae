@@ -6,6 +6,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ax_config)
 target_link_libraries(ax_config 
 PUBLIC
     ax_io
+    ax_core
 )
 
 

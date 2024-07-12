@@ -88,6 +88,7 @@ add_subdirectory(vendor)
 qt_standard_project_setup()
 qt_add_executable(${PROJECT_NAME} sources/main/main.cpp)
 
+add_subdirectory(corelib)
 add_subdirectory(sources)
 #****************************************************************************************************
 # Testing

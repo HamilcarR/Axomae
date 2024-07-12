@@ -12,23 +12,16 @@ add_library(ax_opengl
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_opengl)
 target_link_libraries(ax_opengl 
-PUBLIC
-    ax_common
-    ax_math
 
 PRIVATE
     ax_mesh
-    ax_geometry
     ax_texture
-    ax_debug
     ax_renderer
     ax_camera
     ax_shader
     ax_scene
     ax_material
-
-
-
+    ax_core
     OpenGL::GL
     OpenGL::GLU
     GLEW::GLEW 

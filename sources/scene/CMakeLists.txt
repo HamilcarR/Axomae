@@ -6,10 +6,6 @@ add_library(ax_scene
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_scene)
 target_link_libraries(ax_scene 
-PUBLIC
-        ax_common
-        ax_math
-        ax_datastructure
 PRIVATE
         ax_material
         ax_mesh
@@ -17,12 +13,10 @@ PRIVATE
         ax_database
         ax_shader
         ax_texture
-        ax_thread
+        ax_core
         ax_opengl
-        ax_geometry
         ax_renderer
         ax_event
-        ax_nova
 
 
 

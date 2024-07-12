@@ -1,12 +1,12 @@
 #ifndef INODEFACTORY_H
 #define INODEFACTORY_H
-#include "Axomae_macros.h"
 #include "Factory.h"
 #include "Logger.h"
 #include "Node.h"
 #include "RenderingDatabaseInterface.h"
 #include "constants.h"
 
+#include "project_macros.h"
 /**
  * @file INodeFactory.h
  * class definition of a node factory

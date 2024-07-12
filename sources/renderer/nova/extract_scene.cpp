@@ -1,4 +1,3 @@
-#include "Axomae_macros.h"
 #include "Logger.h"
 #include "MaterialInterface.h"
 #include "Mesh.h"
@@ -6,6 +5,7 @@
 #include "bake.h"
 #include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
+#include "project_macros.h"
 #include "texturing/nova_texturing.h"
 
 namespace nova_baker_utils {

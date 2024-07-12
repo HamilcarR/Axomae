@@ -1,7 +1,7 @@
 #include "Mesh.h"
-#include "Axomae_macros.h"
 #include "DebugGL.h"
 #include "PerformanceLogger.h"
+#include "project_macros.h"
 Mesh::Mesh(SceneTreeNode *parent) : SceneTreeNode(parent) {
   mesh_initialized = false;
   face_culling_enabled = false;

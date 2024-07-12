@@ -4,13 +4,9 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ax_material)
 target_link_libraries(ax_material 
 PRIVATE
     ax_shader
-    ax_common
     ax_texture
-    ax_macro
-    ax_thread
+    ax_core
     ax_opengl
-    ax_math
-    ax_debug
     ax_io
 
 )

@@ -1,11 +1,11 @@
 #ifndef THUMBNAIL_H
 #define THUMBNAIL_H
-#include "Axomae_macros.h"
 #include "IAxObject.h"
 #include "Metadata.h"
 #include "OP_ProgressStatus.h"
 #include "constants.h"
 #include "image_utils.h"
+#include "project_macros.h"
 #include <QPixmap>
 /**
  * @file ThumbnailList.h

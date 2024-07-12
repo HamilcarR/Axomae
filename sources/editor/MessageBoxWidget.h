@@ -1,6 +1,6 @@
 #ifndef MESSAGEBOXWIDGET_H
 #define MESSAGEBOXWIDGET_H
-#include "Axomae_macros.h"
+#include "project_macros.h"
 #include <QMessageBox>
 
 class WarningBoxWidget : public QMessageBox {

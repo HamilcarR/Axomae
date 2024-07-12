@@ -8,8 +8,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ax_cmd)
 target_link_libraries(ax_cmd 
 PRIVATE
 
-        Boost::program_options
-        ax_config
+    Boost::program_options
+    ax_config
     ax_io
     ax_database
     ax_editor
@@ -20,9 +20,8 @@ PRIVATE
     ax_shader
     ax_texture
     ax_opengl
-    ax_geometry
     ax_processing
-
+    ax_core
 
 )
 

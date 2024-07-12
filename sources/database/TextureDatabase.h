@@ -1,10 +1,9 @@
 #ifndef TEXTUREDATABASE_H
 #define TEXTUREDATABASE_H
-
-#include "Axomae_macros.h"
 #include "Factory.h"
 #include "RenderingDatabaseInterface.h"
 #include "Texture.h"
+#include "project_macros.h"
 
 /**
  * @file TextureDatabase.h

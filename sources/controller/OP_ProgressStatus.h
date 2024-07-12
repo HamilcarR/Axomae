@@ -1,8 +1,7 @@
 #ifndef OP_PROGRESSSTATUS_H
 #define OP_PROGRESSSTATUS_H
-#include "Axomae_macros.h"
 #include "Operator.h"
-
+#include "project_macros.h"
 class ProgressStatusWidget;
 namespace controller {
   namespace progress_bar {

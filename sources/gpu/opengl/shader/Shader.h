@@ -1,10 +1,10 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "Axomae_macros.h"
 #include "ShaderInterface.h"
 #include "Texture.h"
 #include "init_3D.h"
+#include "project_macros.h"
 #include <glm/ext/matrix_float3x3.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float2.hpp>

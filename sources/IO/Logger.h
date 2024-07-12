@@ -1,8 +1,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
-#include "Axomae_macros.h"
 #include "ILockable.h"
 #include "Mutex.h"
+#include "project_macros.h"
 #include <chrono>
 #include <cstdlib>
 #include <fstream>
