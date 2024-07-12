@@ -21,7 +21,6 @@ add_custom_target(axcustom_glsl_generate ALL
 add_library(ax_shader
     Shader.cpp
     utils/glsl.cpp
-        ShaderInterface.h
 )
 add_dependencies(ax_shader axcustom_glsl_generate)
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_shader)

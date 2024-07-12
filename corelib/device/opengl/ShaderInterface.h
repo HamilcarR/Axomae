@@ -1,6 +1,5 @@
 #ifndef ShaderInterface_H
 #define ShaderInterface_H
-#include <cstdlib>
 #include <string>
 
 class ShaderInterface {

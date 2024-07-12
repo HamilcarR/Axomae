@@ -1,9 +1,9 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "../../../../corelib/device/opengl/init_3D.h"
 #include "ShaderInterface.h"
 #include "Texture.h"
+#include "init_3D.h"
 #include "project_macros.h"
 #include <glm/ext/matrix_float3x3.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
