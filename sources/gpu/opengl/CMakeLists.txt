@@ -4,11 +4,9 @@
 add_library(ax_opengl
         CameraFrameBuffer.cpp
         IFrameBuffer.cpp
-        GLFrameBuffer.cpp
         GLGeometryBuffer.cpp
         RenderCubeMap.cpp
         RenderQuad.cpp
-        FramebufferInterface.h
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_opengl)

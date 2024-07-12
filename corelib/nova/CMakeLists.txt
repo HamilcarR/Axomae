@@ -10,6 +10,7 @@ PRIVATE
         ax_core_geometry
         ax_core_common
         ax_core_thread
+        ax_core_macro
 )
 
 target_include_directories(ax_core_nova

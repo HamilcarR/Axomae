@@ -42,7 +42,7 @@ void GLFrameBuffer::initializeBuffers() {
 
 bool GLFrameBuffer::isReady() const { return framebuffer_id != 0; }
 
-void GLFrameBuffer::fillBuffers() { EMPTY_FUNCBODY; }
+void GLFrameBuffer::fillBuffers() { AX_UNREACHABLE }
 
 void GLFrameBuffer::bind() { GL_ERROR_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id)); }
 

@@ -5,6 +5,7 @@
 #include "EnvmapTextureManager.h"
 #include "EventController.h"
 #include "RenderPipeline.h"
+#include "ShaderDatabase.h"
 using namespace axomae;
 
 Renderer::Renderer()

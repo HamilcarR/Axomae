@@ -2,8 +2,9 @@
 #include "DebugGL.h"
 #include "Drawable.h"
 #include "INodeFactory.h"
+#include "Shader.h"
+#include "ShaderDatabase.h"
 #include "shader/UniformNames.h"
-
 using namespace axomae;
 constexpr float GAMMA = 1.2f;
 constexpr float EXPOSURE = 0.3f;

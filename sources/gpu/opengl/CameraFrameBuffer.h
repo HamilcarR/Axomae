@@ -10,7 +10,7 @@
  */
 class Mesh;
 class Drawable;
-
+class ScreenFramebufferShader;
 /**
  * @class CameraFrameBuffer
  */

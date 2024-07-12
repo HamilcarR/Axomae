@@ -3,7 +3,7 @@ add_library(ax_core_common)
 
 target_link_libraries(ax_core PUBLIC ax_core_common)
 target_link_libraries(ax_core_common
-PUBLIC
+PRIVATE
         ax_core_math
         ax_core_image
         ax_core_exception

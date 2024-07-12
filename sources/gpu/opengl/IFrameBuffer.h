@@ -3,9 +3,7 @@
 
 #include "FramebufferInterface.h"
 #include "GLFrameBuffer.h"
-#include "ShaderDatabase.h"
 #include "TextureDatabase.h"
-#include "TextureFactory.h"
 /**
  * @file IFrameBuffer.h
  * This file implements an interface for framebuffers

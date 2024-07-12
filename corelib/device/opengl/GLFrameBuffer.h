@@ -1,10 +1,9 @@
 #ifndef GLFRAMEBUFFER_H
 #define GLFRAMEBUFFER_H
 
-#include "../../../corelib/device/opengl/GLRenderBuffer.h"
 #include "GLBufferInterface.h"
-#include "Texture.h"
-
+#include "GLRenderBuffer.h"
+#include <memory>
 class GLFrameBuffer : public GLMutableBufferInterface {
  public:
   enum INTERNAL_FORMAT : signed {
@@ -33,25 +32,14 @@ class GLFrameBuffer : public GLMutableBufferInterface {
   };
 
  protected:
-  TEXTURE_TARGET target_texture_type;                  /*<Type of the target texture */
-  std::unique_ptr<GLRenderBuffer> renderbuffer_object; /*<Pointer on the renderbuffer */
-  unsigned int framebuffer_id{};                       /*<Framebuffer ID*/
-  unsigned int texture_id{};                           /*<ID of the texture rendered to*/
-  unsigned int *pointer_on_default_fbo_id{};           /*<Pointer on default fbo variable*/
+  TEXTURE_TARGET target_texture_type{};
+  std::unique_ptr<GLRenderBuffer> renderbuffer_object{};
+  unsigned int framebuffer_id{};
+  unsigned int texture_id{};
+  unsigned int *pointer_on_default_fbo_id{};  // Needed for QT, since it's default framebuffer isn't 0. Bad ... but necessary for now.
 
  public:
   GLFrameBuffer();
-
-  /**
-   * @brief Construct a new GLFrameBuffer with a render buffer attached
-   *
-   * @param width Width to pass to GLRenderBuffer renderbuffer_objet variable creation
-   * @param height Height to pass to GLRenderBuffer renderbuffer_object variable creation
-   * @param renderbuffer_internal_format Depth format to use for the attached GLRenderBuffer
-   * @param default_fbo_id_pointer A pointer on the ID of the default framebuffer . In the case of only one context ,
-   * will be nullptr .
-   * @param target_texture_type Target texture type
-   */
   GLFrameBuffer(unsigned width,
                 unsigned height,
                 GLRenderBuffer::INTERNAL_FORMAT renderbuffer_internal_format = GLRenderBuffer::EMPTY,
@@ -60,9 +48,6 @@ class GLFrameBuffer : public GLMutableBufferInterface {
 
   void initializeBuffers() override;
   [[nodiscard]] bool isReady() const override;
-  /**
-   * @brief Attach a texture to the framebuffer
-   */
   void attachTexture2D(INTERNAL_FORMAT color_attachment, TEXTURE_TARGET target, unsigned int texture_id, unsigned int mipmap_level = 0);
   void bind() override;
   void unbind() override;

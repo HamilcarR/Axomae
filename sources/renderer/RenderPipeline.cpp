@@ -6,6 +6,7 @@
 #include "RenderCubeMap.h"
 #include "RenderQuad.h"
 #include "Renderer.h"
+#include "ShaderDatabase.h"
 
 const float FOV = FOV;
 const float NEAR = NEAR;

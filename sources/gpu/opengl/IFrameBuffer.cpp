@@ -11,7 +11,7 @@ IFrameBuffer::IFrameBuffer(TextureDatabase *_texture_database, Dim2 *_texture_di
   texture_dim = _texture_dim;
   texture_database = _texture_database;
   default_framebuffer_pointer = default_fbo;
-  assert(texture_dim != nullptr);
+  AX_ASSERT_NOTNULL(texture_dim);
 }
 
 IFrameBuffer::IFrameBuffer(IFrameBuffer &&move) noexcept {

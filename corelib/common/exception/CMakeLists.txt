@@ -4,7 +4,7 @@ add_library(ax_core_exception
 
 target_link_libraries(ax_core_common PUBLIC ax_core_exception)
 target_link_libraries(ax_core_exception
-    PRIVATE
+ PRIVATE
         ax_core_macro
 )
 

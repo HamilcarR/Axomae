@@ -7,6 +7,7 @@ target_link_libraries(ax_core PUBLIC ax_core_geometry)
 target_link_libraries(ax_core_geometry
 PRIVATE
         ax_core_common
+        ax_core_macro
 )
 
 target_include_directories(ax_core_geometry
