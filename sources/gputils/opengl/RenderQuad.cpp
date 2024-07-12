@@ -2,7 +2,7 @@
 
 #include "Logger.h"
 
-RenderQuadFBO::RenderQuadFBO(TextureDatabase *database, Dim2 *screen, unsigned int *default_fbo) : IFrameBuffer(database, screen, default_fbo) {}
+RenderQuadFBO::RenderQuadFBO(TextureDatabase *database, Dim2 *screen, unsigned int *default_fbo) : FramebufferHelper(database, screen, default_fbo) {}
 
 void RenderQuadFBO::renderToTexture(GLFrameBuffer::INTERNAL_FORMAT color_attachment) {
   Texture *tex = fbo_attachment_texture_collection[color_attachment];

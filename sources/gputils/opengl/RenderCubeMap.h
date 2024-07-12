@@ -1,14 +1,14 @@
 #ifndef RENDERCUBEMAP_H
 #define RENDERCUBEMAP_H
 
-#include "IFrameBuffer.h"
+#include "FramebufferHelper.h"
 #include "Shader.h"
 
 /**
  * @brief A Framebuffer that renders to a cubemap
  *
  */
-class RenderCubeMap : public IFrameBuffer {
+class RenderCubeMap : public FramebufferHelper {
  public:
   RenderCubeMap() = default;
   ~RenderCubeMap() override = default;

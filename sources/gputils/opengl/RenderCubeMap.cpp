@@ -1,7 +1,7 @@
 #include "RenderCubeMap.h"
 #include "Logger.h"
 
-RenderCubeMap::RenderCubeMap(TextureDatabase *database, Dim2 *screen, unsigned int *default_fbo) : IFrameBuffer(database, screen, default_fbo) {}
+RenderCubeMap::RenderCubeMap(TextureDatabase *database, Dim2 *screen, unsigned int *default_fbo) : FramebufferHelper(database, screen, default_fbo) {}
 
 void RenderCubeMap::renderToTexture(unsigned i, GLFrameBuffer::INTERNAL_FORMAT color_attachment, unsigned mip_level) {
   Texture *tex = fbo_attachment_texture_collection[color_attachment];

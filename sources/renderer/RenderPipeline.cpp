@@ -1,7 +1,7 @@
 #include "RenderPipeline.h"
 #include "DebugGL.h"
+#include "FramebufferHelper.h"
 #include "FreePerspectiveCamera.h"
-#include "IFrameBuffer.h"
 #include "INodeFactory.h"
 #include "RenderCubeMap.h"
 #include "RenderQuad.h"

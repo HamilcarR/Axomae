@@ -9,7 +9,7 @@ using namespace axomae;
 constexpr float GAMMA = 1.2f;
 constexpr float EXPOSURE = 0.3f;
 CameraFrameBuffer::CameraFrameBuffer(ResourceDatabaseManager &resource_database, Dim2 *screen_size_pointer, unsigned int *default_fbo_pointer)
-    : IFrameBuffer(resource_database.getTextureDatabase(), screen_size_pointer, default_fbo_pointer),
+    : FramebufferHelper(resource_database.getTextureDatabase(), screen_size_pointer, default_fbo_pointer),
       shader_database(resource_database.getShaderDatabase()),
       texture_database(resource_database.getTextureDatabase()),
       node_database(resource_database.getNodeDatabase()) {
@@ -38,7 +38,7 @@ void CameraFrameBuffer::initializeFrameBuffer() {
   auto result = database::node::store<FrameBufferMesh>(*node_database, true, database_texture_id, shader_framebuffer);
   mesh_screen_quad = result.object;
   drawable_screen_quad = std::make_unique<Drawable>(mesh_screen_quad);
-  IFrameBuffer::initializeFrameBuffer();
+  FramebufferHelper::initializeFrameBuffer();
   bindFrameBuffer();
   gl_framebuffer_object->attachTexture2D(GLFrameBuffer::COLOR0, GLFrameBuffer::TEXTURE2D, fbo_texture->getSamplerID());
   unbindFrameBuffer();
@@ -47,7 +47,7 @@ void CameraFrameBuffer::initializeFrameBuffer() {
 void CameraFrameBuffer::clean() {
   if (drawable_screen_quad)
     drawable_screen_quad->clean();
-  IFrameBuffer::clean();
+  FramebufferHelper::clean();
 }
 
 void CameraFrameBuffer::startDraw() {

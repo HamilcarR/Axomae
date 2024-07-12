@@ -1,20 +1,13 @@
-#ifndef FRAMEBUFFERINTERFACE_H
-#define FRAMEBUFFERINTERFACE_H
+#ifndef FRAMEBUFFERHELPER_H
+#define FRAMEBUFFERHELPER_H
 
 #include "FramebufferInterface.h"
 #include "GLFrameBuffer.h"
 #include "TextureDatabase.h"
-/**
- * @file IFrameBuffer.h
- * This file implements an interface for framebuffers
- */
 
 class TextureDatabase;
-/**
- * @class IFrameBuffer
- * This class implements a generic framebuffer
- */
-class IFrameBuffer : public FramebufferInterface {
+
+class FramebufferHelper : public FramebufferInterface {
  protected:
   std::unique_ptr<GLFrameBuffer> gl_framebuffer_object;
   Dim2 *texture_dim;
@@ -23,11 +16,11 @@ class IFrameBuffer : public FramebufferInterface {
   unsigned int *default_framebuffer_pointer;
 
  public:
-  IFrameBuffer();
-  ~IFrameBuffer() override = default;
-  IFrameBuffer(TextureDatabase *texture_database, Dim2 *texture_size, unsigned int *default_fbo_id_pointer = nullptr);
-  IFrameBuffer(IFrameBuffer &&move) noexcept;
-  IFrameBuffer(const IFrameBuffer &copy) = delete;
+  FramebufferHelper();
+  ~FramebufferHelper() override = default;
+  FramebufferHelper(TextureDatabase *texture_database, Dim2 *texture_size, unsigned int *default_fbo_id_pointer = nullptr);
+  FramebufferHelper(FramebufferHelper &&move) noexcept;
+  FramebufferHelper(const FramebufferHelper &copy) = delete;
   void resize() override;
   void setTextureDimensions(Dim2 *pointer_on_texture_size) override;
   void bindFrameBuffer() override;
@@ -36,7 +29,7 @@ class IFrameBuffer : public FramebufferInterface {
   void clean() override;
   void setDefaultFrameBufferIdPointer(unsigned *id) override;
   Texture *getFrameBufferTexturePointer(GLFrameBuffer::INTERNAL_FORMAT color_attachment);
-  GLFrameBuffer *getFramebufferObject() const { return gl_framebuffer_object.get(); }
+  [[nodiscard]] GLFrameBuffer *getFramebufferObject() const { return gl_framebuffer_object.get(); }
   /**
    * @brief Initialize an empty target texture to be rendered to , saves it in the database , and returns it's database
    * ID
@@ -78,13 +71,13 @@ class IFrameBuffer : public FramebufferInterface {
 /************************************************************************************************************************************/
 
 template<class TEXTYPE>
-int IFrameBuffer::setUpEmptyTexture(unsigned width,
-                                    unsigned height,
-                                    bool persistence,
-                                    Texture::FORMAT internal_format,
-                                    Texture::FORMAT data_format,
-                                    Texture::FORMAT data_type,
-                                    unsigned int mipmaps) {
+int FramebufferHelper::setUpEmptyTexture(unsigned width,
+                                         unsigned height,
+                                         bool persistence,
+                                         Texture::FORMAT internal_format,
+                                         Texture::FORMAT data_format,
+                                         Texture::FORMAT data_type,
+                                         unsigned int mipmaps) {
   TextureData temp_empty_data_texture;
   temp_empty_data_texture.width = width;
   temp_empty_data_texture.height = height;
@@ -101,14 +94,14 @@ int IFrameBuffer::setUpEmptyTexture(unsigned width,
  * database
  */
 template<class TEXTYPE>
-void IFrameBuffer::initializeFrameBufferTexture(GLFrameBuffer::INTERNAL_FORMAT color_attachment,
-                                                bool persistence,
-                                                Texture::FORMAT internal_format,
-                                                Texture::FORMAT data_format,
-                                                Texture::FORMAT data_type,
-                                                unsigned width,
-                                                unsigned height,
-                                                unsigned int mipmaps) {
+void FramebufferHelper::initializeFrameBufferTexture(GLFrameBuffer::INTERNAL_FORMAT color_attachment,
+                                                     bool persistence,
+                                                     Texture::FORMAT internal_format,
+                                                     Texture::FORMAT data_format,
+                                                     Texture::FORMAT data_type,
+                                                     unsigned width,
+                                                     unsigned height,
+                                                     unsigned int mipmaps) {
 
   unsigned int texture_id = setUpEmptyTexture<TEXTYPE>(width, height, persistence, internal_format, data_format, data_type, mipmaps);
   fbo_attachment_texture_collection[color_attachment] = texture_database->get((int)texture_id);

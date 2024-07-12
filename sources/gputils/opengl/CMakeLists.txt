@@ -3,7 +3,7 @@
 
 add_library(ax_opengl
         CameraFrameBuffer.cpp
-        IFrameBuffer.cpp
+        FramebufferHelper.cpp
         GLGeometryBuffer.cpp
         RenderCubeMap.cpp
         RenderQuad.cpp

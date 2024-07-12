@@ -1,9 +1,9 @@
 #ifndef RENDERQUAD_H
 #define RENDERQUAD_H
 
-#include "IFrameBuffer.h"
+#include "FramebufferHelper.h"
 
-class RenderQuadFBO : public IFrameBuffer {
+class RenderQuadFBO : public FramebufferHelper {
  public:
   RenderQuadFBO() = default;
   ~RenderQuadFBO() override = default;

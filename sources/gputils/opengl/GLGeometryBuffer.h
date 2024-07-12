@@ -1,8 +1,8 @@
 #ifndef GLGEOMETRYBUFFER_H
 #define GLGEOMETRYBUFFER_H
-#include "../../../corelib/device/opengl/init_3D.h"
 #include "GLBufferInterface.h"
 #include "Object3D.h"
+#include "init_3D.h"
 /**
  * @file GLGeometryBuffer.h
  * Wrapper for opengl buffers functions , related to geometry and vertices attributes

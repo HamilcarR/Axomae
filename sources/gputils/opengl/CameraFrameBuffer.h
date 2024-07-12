@@ -1,7 +1,7 @@
 #ifndef CAMERAFRAMEBUFFER_H
 #define CAMERAFRAMEBUFFER_H
 
-#include "IFrameBuffer.h"
+#include "FramebufferHelper.h"
 #include "ResourceDatabaseManager.h"
 
 /**
@@ -14,7 +14,7 @@ class ScreenFramebufferShader;
 /**
  * @class CameraFrameBuffer
  */
-class CameraFrameBuffer : public IFrameBuffer {
+class CameraFrameBuffer : public FramebufferHelper {
  protected:
   std::unique_ptr<Drawable> drawable_screen_quad; /*<Drawable of the screen quad*/
   Mesh *mesh_screen_quad;                         /*<Pointer on the screen quad mesh*/

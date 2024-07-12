@@ -1,20 +1,20 @@
-#include "IFrameBuffer.h"
+#include "FramebufferHelper.h"
 #include "TextureDatabase.h"
-IFrameBuffer::IFrameBuffer() {
+FramebufferHelper::FramebufferHelper() {
   gl_framebuffer_object = nullptr;
   texture_dim = nullptr;
   texture_database = nullptr;
   default_framebuffer_pointer = nullptr;
 }
 
-IFrameBuffer::IFrameBuffer(TextureDatabase *_texture_database, Dim2 *_texture_dim, unsigned int *default_fbo) : IFrameBuffer() {
+FramebufferHelper::FramebufferHelper(TextureDatabase *_texture_database, Dim2 *_texture_dim, unsigned int *default_fbo) : FramebufferHelper() {
   texture_dim = _texture_dim;
   texture_database = _texture_database;
   default_framebuffer_pointer = default_fbo;
   AX_ASSERT_NOTNULL(texture_dim);
 }
 
-IFrameBuffer::IFrameBuffer(IFrameBuffer &&move) noexcept {
+FramebufferHelper::FramebufferHelper(FramebufferHelper &&move) noexcept {
   std::swap(gl_framebuffer_object, move.gl_framebuffer_object);
   texture_dim = move.texture_dim;
   texture_database = move.texture_database;
@@ -27,7 +27,7 @@ IFrameBuffer::IFrameBuffer(IFrameBuffer &&move) noexcept {
   move.default_framebuffer_pointer = nullptr;
 }
 
-void IFrameBuffer::resize() {
+void FramebufferHelper::resize() {
   if (texture_dim && gl_framebuffer_object) {
     for (auto &A : fbo_attachment_texture_collection) {
       A.second->setNewSize(texture_dim->width, texture_dim->height);
@@ -36,31 +36,31 @@ void IFrameBuffer::resize() {
   }
 }
 
-void IFrameBuffer::bindFrameBuffer() {
+void FramebufferHelper::bindFrameBuffer() {
   if (gl_framebuffer_object)
     gl_framebuffer_object->bind();
 }
 
-void IFrameBuffer::unbindFrameBuffer() {
+void FramebufferHelper::unbindFrameBuffer() {
   if (gl_framebuffer_object)
     gl_framebuffer_object->unbind();
 }
 
-void IFrameBuffer::clean() {
+void FramebufferHelper::clean() {
   if (gl_framebuffer_object)
     gl_framebuffer_object->clean();
 }
 
-void IFrameBuffer::initializeFrameBuffer() {
+void FramebufferHelper::initializeFrameBuffer() {
   gl_framebuffer_object = std::make_unique<GLFrameBuffer>(
       texture_dim->width, texture_dim->height, GLRenderBuffer::DEPTH24_STENCIL8, default_framebuffer_pointer);
   gl_framebuffer_object->initializeBuffers();
 }
 
-Texture *IFrameBuffer::getFrameBufferTexturePointer(GLFrameBuffer::INTERNAL_FORMAT color_attachment) {
+Texture *FramebufferHelper::getFrameBufferTexturePointer(GLFrameBuffer::INTERNAL_FORMAT color_attachment) {
   return fbo_attachment_texture_collection[color_attachment];
 }
 
-void IFrameBuffer::setDefaultFrameBufferIdPointer(unsigned *id) { default_framebuffer_pointer = id; }
+void FramebufferHelper::setDefaultFrameBufferIdPointer(unsigned *id) { default_framebuffer_pointer = id; }
 
-void IFrameBuffer::setTextureDimensions(Dim2 *pointer_on_texture_size) { texture_dim = pointer_on_texture_size; }
+void FramebufferHelper::setTextureDimensions(Dim2 *pointer_on_texture_size) { texture_dim = pointer_on_texture_size; }

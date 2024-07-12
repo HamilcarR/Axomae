@@ -1,7 +1,7 @@
 add_subdirectory(main)
 add_subdirectory(renderer)
 add_subdirectory(scene)
-add_subdirectory(gpu)
+add_subdirectory(gputils)
 add_subdirectory(camera)
 add_subdirectory(config)
 add_subdirectory(controller)
