@@ -1,12 +1,11 @@
 add_library(ax_database 
-    ImageDatabase.cpp 
-    INodeDatabase.cpp 
-    LightingDatabase.cpp 
-    ResourceDatabaseManager.cpp 
-    ShaderDatabase.cpp 
-    TextureDatabase.cpp
-    EnvmapTextureManager.cpp
-    model/ImageModel.cpp
+        INodeDatabase.cpp
+        LightingDatabase.cpp
+        ResourceDatabaseManager.cpp
+        ShaderDatabase.cpp
+        TextureDatabase.cpp
+        EnvmapTextureManager.cpp
+        model/ImageModel.cpp
         QueryResult.h
         DatabaseStorage.h
         DatabaseInterface.h

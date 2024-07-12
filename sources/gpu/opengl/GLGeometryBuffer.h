@@ -1,8 +1,8 @@
 #ifndef GLGEOMETRYBUFFER_H
 #define GLGEOMETRYBUFFER_H
+#include "../../../corelib/device/opengl/init_3D.h"
 #include "GLBufferInterface.h"
 #include "Object3D.h"
-#include "init_3D.h"
 /**
  * @file GLGeometryBuffer.h
  * Wrapper for opengl buffers functions , related to geometry and vertices attributes
@@ -20,7 +20,7 @@ class GLGeometryBuffer : public GLMutableBufferInterface {
   GLuint texture_buffer;    /**<Texture buffer ID*/
   GLuint color_buffer;      /**<Color buffer ID*/
   GLuint tangent_buffer;    /**<Tangent buffer ID*/
-  const Object3D *geometry; /**<Pointer to the meshe's geometry*/
+  const Object3D *geometry; /**<Pointer to the mesh's geometry*/
   bool buffers_filled;
 
  public:

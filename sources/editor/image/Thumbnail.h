@@ -1,6 +1,5 @@
 #ifndef THUMBNAIL_H
 #define THUMBNAIL_H
-#include "IAxObject.h"
 #include "Metadata.h"
 #include "OP_ProgressStatus.h"
 #include "constants.h"
@@ -11,7 +10,7 @@
  * @file ThumbnailList.h
  *
  */
-class Thumbnail : public IAxObject {
+class Thumbnail : public controller::IProgressManager {
  private:
   std::unique_ptr<QPixmap> icon;
   std::unique_ptr<QImage> image;

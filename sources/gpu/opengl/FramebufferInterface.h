@@ -1,7 +1,6 @@
 #ifndef FramebufferInterface_H
 #define FramebufferInterface_H
 #include "math_utils.h"
-class Texture;
 
 class FramebufferInterface {
  public:

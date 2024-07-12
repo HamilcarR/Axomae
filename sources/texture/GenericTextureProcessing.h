@@ -1,7 +1,6 @@
 #ifndef GENERICTEXTUREPROCESSING_H
 #define GENERICTEXTUREPROCESSING_H
 
-#include "IAxObject.h"
 #include "constants.h"
 
 /**

@@ -1,8 +1,8 @@
 #ifndef GLFRAMEBUFFER_H
 #define GLFRAMEBUFFER_H
 
+#include "../../../corelib/device/opengl/GLRenderBuffer.h"
 #include "GLBufferInterface.h"
-#include "GLRenderBuffer.h"
 #include "Texture.h"
 
 class GLFrameBuffer : public GLMutableBufferInterface {

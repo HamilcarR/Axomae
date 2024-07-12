@@ -1,9 +1,9 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+#include "../../corelib/device/opengl/init_3D.h"
 #include "GenericTextureProcessing.h"
 #include "constants.h"
-#include "init_3D.h"
 #include "utils_3D.h"
 
 /**

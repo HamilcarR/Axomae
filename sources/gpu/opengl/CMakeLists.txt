@@ -1,13 +1,14 @@
-add_library(ax_opengl 
+
+# This module needs a rework
+
+add_library(ax_opengl
         CameraFrameBuffer.cpp
         IFrameBuffer.cpp
         GLFrameBuffer.cpp
         GLGeometryBuffer.cpp
-        GLRenderBuffer.cpp
         RenderCubeMap.cpp
         RenderQuad.cpp
         FramebufferInterface.h
-        GLMutablePixelBufferObject.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_opengl)

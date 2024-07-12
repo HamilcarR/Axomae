@@ -3,15 +3,13 @@ add_library(ax_io
     Loader_file.cpp 
     Loader_image.cpp
     Loader_scene.cpp 
-    Logger.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_io)
 target_link_libraries(ax_io 
-PUBLIC
-    ax_core
-    ax_controller
+
 PRIVATE
+    ax_controller
     ax_editor
     ax_scene
     ax_database
@@ -21,6 +19,7 @@ PRIVATE
     ax_shader
     ax_texture
     ax_opengl
+    ax_core
 
     OpenEXR::OpenEXR
     assimp

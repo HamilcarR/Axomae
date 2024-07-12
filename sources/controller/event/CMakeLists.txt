@@ -1,5 +1,4 @@
 add_library(ax_event
-        EventController.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_event)

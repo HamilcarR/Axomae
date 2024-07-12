@@ -46,7 +46,7 @@ namespace controller {
     void setProgressStatusText(const std::string &mes) { message = mes; }
     void resetProgress();
     void setCurrent(float current_val) { current = current_val; }
-    float getTarget() { return target; }
+    float getTarget() const { return target; }
 
    protected:
     ProgressStatus *progress_manager{};

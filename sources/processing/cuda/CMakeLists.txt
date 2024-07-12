@@ -5,6 +5,8 @@ add_library(ax_processing_cuda
 
 target_link_libraries(ax_processing PUBLIC ax_processing_cuda)
 target_link_libraries(ax_processing_cuda
+PRIVATE
+        ax_controller
 PUBLIC
         ax_io
         ax_gpu_cuda

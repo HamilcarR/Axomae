@@ -1,5 +1,6 @@
 #include "GLRenderBuffer.h"
 #include "DebugGL.h"
+
 GLRenderBuffer::GLRenderBuffer() {
   width = 0;
   height = 0;

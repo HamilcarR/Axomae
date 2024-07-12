@@ -2,7 +2,6 @@
 #define RENDERINGDATABASEINTERFACE_H
 
 #include "DatabaseInterface.h"
-#include "IAxObject.h"
 #include "Mutex.h"
 #include "OP_ProgressStatus.h"
 #include "constants.h"
@@ -15,13 +14,12 @@
  * @tparam T Class type of the object stored in the database
  */
 template<class U, class T>
-class IResourceDB : public DatabaseInterface<U, T>, public IAxObject {
+class IResourceDB : public DatabaseInterface<U, T>, public ILockable, public controller::IProgressManager {
  protected:
   using DATABASE = std::map<U, database::Storage<U, T>>;
 
  protected:
   DATABASE database_map;
-  controller::ProgressStatus *progress_manager{};
 
  public:
   void clean() override;

@@ -1,4 +1,5 @@
 #include "NovaRenderer.h"
+#include "../../../corelib/device/opengl/GLMutablePixelBufferObject.h"
 #include "ArcballCamera.h"
 #include "CameraFrameBuffer.h"
 #include "Config.h"
@@ -6,7 +7,6 @@
 #include "DrawEngine.h"
 #include "EnvmapTextureManager.h"
 #include "EventController.h"
-#include "GLMutablePixelBufferObject.h"
 #include "GLViewer.h"
 #include "RenderPipeline.h"
 #include "Scene.h"
