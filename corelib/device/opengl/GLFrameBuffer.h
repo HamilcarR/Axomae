@@ -1,10 +1,10 @@
 #ifndef GLFRAMEBUFFER_H
 #define GLFRAMEBUFFER_H
 
-#include "GLBufferInterface.h"
+#include "../DeviceBufferInterface.h"
 #include "GLRenderBuffer.h"
 #include <memory>
-class GLFrameBuffer : public GLMutableBufferInterface {
+class GLFrameBuffer : public DeviceMutableBufferInterface {
  public:
   enum INTERNAL_FORMAT : signed {
     EMPTY = -1,

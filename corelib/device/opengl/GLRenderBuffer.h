@@ -1,6 +1,6 @@
 #ifndef GLRENDERBUFFER_H
 #define GLRENDERBUFFER_H
-#include "GLBufferInterface.h"
+#include "../DeviceBufferInterface.h"
 #include "init_3D.h"
 /**
  * @file GLRenderBuffer.h
@@ -11,7 +11,7 @@
  * @class GLRenderBuffer
  * @brief Provides a wrapper for render buffers
  */
-class GLRenderBuffer : public GLMutableBufferInterface {
+class GLRenderBuffer : public DeviceMutableBufferInterface {
  public:
   enum INTERNAL_FORMAT : signed {
     EMPTY = -1,

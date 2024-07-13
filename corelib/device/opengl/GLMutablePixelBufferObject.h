@@ -1,9 +1,9 @@
 #ifndef GLPIXELBUFFEROBJECT_H
 #define GLPIXELBUFFEROBJECT_H
+#include "../DeviceBufferInterface.h"
 #include "DebugGL.h"
-#include "GLBufferInterface.h"
 #include "init_3D.h"
-class GLMutablePixelBufferObject final : public GLMutableBufferInterface {
+class GLMutablePixelBufferObject final : public DeviceMutableBufferInterface {
  public:
   enum TRANSFER : unsigned { DOWN = GL_PIXEL_PACK_BUFFER, UP = GL_PIXEL_UNPACK_BUFFER };
   enum ACCESS : unsigned { R = GL_READ_ONLY, W = GL_WRITE_ONLY, RW = GL_READ_WRITE };

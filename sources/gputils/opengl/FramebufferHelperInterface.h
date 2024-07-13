@@ -1,9 +1,9 @@
 #ifndef FramebufferInterface_H
 #define FramebufferInterface_H
-#include "GLBufferInterface.h"
+#include "DeviceBufferInterface.h"
 #include "math_utils.h"
 
-class FramebufferHelperInterface : public GLBaseBufferInterface {
+class FramebufferHelperInterface : public DeviceBaseBufferInterface {
  public:
   /**
    * @brief Resizes the textures used by the framebuffer .
