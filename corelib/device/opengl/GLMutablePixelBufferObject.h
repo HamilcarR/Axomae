@@ -20,9 +20,9 @@ class GLMutablePixelBufferObject final : public GLMutableBufferInterface {
   GLMutablePixelBufferObject(TRANSFER type, size_t size);
   ~GLMutablePixelBufferObject() override = default;
 
-  void initializeBuffers() override;
+  void initialize() override;
   [[nodiscard]] bool isReady() const override;
-  void fillBuffers() override;
+  void fill() override;
   void fillBuffersAddress(void *address);
   void fillSubBuffers(void *buffer, size_t offset, size_t length);
   void flushMappedRange(size_t offset, size_t length);

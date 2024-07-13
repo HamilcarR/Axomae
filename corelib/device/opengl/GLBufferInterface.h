@@ -9,7 +9,7 @@
 class GLBaseBufferInterface {
  public:
   virtual ~GLBaseBufferInterface() = default;
-  virtual void initializeBuffers() = 0;
+  virtual void initialize() = 0;
   [[nodiscard]] virtual bool isReady() const = 0;
   virtual void bind() = 0;
   virtual void unbind() = 0;
@@ -18,11 +18,11 @@ class GLBaseBufferInterface {
 
 class GLMutableBufferInterface : public GLBaseBufferInterface {
  public:
-  virtual void fillBuffers() = 0;
+  virtual void fill() = 0;
 };
 
 class GLImmutableBufferInterface : public GLBaseBufferInterface {
  public:
-  virtual void fillStorageBuffers(const void *data) = 0;
+  virtual void fillStorage(const void *data) = 0;
 };
 #endif

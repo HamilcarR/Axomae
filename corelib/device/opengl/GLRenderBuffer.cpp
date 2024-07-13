@@ -13,7 +13,7 @@ GLRenderBuffer::GLRenderBuffer(unsigned int _width, unsigned int _height, INTERN
   format = _format;
 }
 
-void GLRenderBuffer::initializeBuffers() {
+void GLRenderBuffer::initialize() {
   GL_ERROR_CHECK(glGenRenderbuffers(1, &renderbuffer_id));
   bind();
   GL_ERROR_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, format, width, height));
@@ -21,7 +21,7 @@ void GLRenderBuffer::initializeBuffers() {
 
 bool GLRenderBuffer::isReady() const { return renderbuffer_id != 0; }
 
-void GLRenderBuffer::fillBuffers() { EMPTY_FUNCBODY; }
+void GLRenderBuffer::fill() { EMPTY_FUNCBODY; }
 
 void GLRenderBuffer::bind() { GL_ERROR_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer_id)); }
 

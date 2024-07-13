@@ -1,20 +1,16 @@
 #ifndef FramebufferInterface_H
 #define FramebufferInterface_H
+#include "GLBufferInterface.h"
 #include "math_utils.h"
 
-class FramebufferInterface {
+class FramebufferHelperInterface : public GLBaseBufferInterface {
  public:
-  virtual ~FramebufferInterface() = default;
   /**
    * @brief Resizes the textures used by the framebuffer .
    * Will use the values stored inside the texture_dim pointer property
    */
   virtual void resize() = 0;
   virtual void setTextureDimensions(Dim2 *pointer_on_texture_size) = 0;
-  virtual void bindFrameBuffer() = 0;
-  virtual void unbindFrameBuffer() = 0;
-  virtual void initializeFrameBuffer() = 0;
-  virtual void clean() = 0;
   virtual void setDefaultFrameBufferIdPointer(unsigned *id) = 0;
 };
 

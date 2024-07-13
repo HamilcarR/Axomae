@@ -1,9 +1,9 @@
-#include "../../../corelib/device/opengl/GLMutablePixelBufferObject.h"
 #include "CameraFrameBuffer.h"
 #include "Config.h"
 #include "DrawEngine.h"
 #include "Drawable.h"
 #include "EnvmapTextureManager.h"
+#include "GLMutablePixelBufferObject.h"
 #include "NovaRenderer.h"
 #include "bake.h"
 #include "manager/NovaResourceManager.h"
@@ -21,7 +21,7 @@ bool NovaRenderer::prep_draw() {
     glClearColor(0.f, 0.f, 0.4f, 1.f);
   AX_ASSERT(pbo_read->isReady(), "");
   pbo_read->bind();
-  pbo_read->fillBuffers();
+  pbo_read->fill();
   return true;
 }
 

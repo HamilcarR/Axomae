@@ -96,7 +96,7 @@ void Renderer::initialize(ApplicationConfig *app_conf) {
   /*Initialize a reusable lut texture*/
   scene->initialize();
   envmap_manager->initializeDefaultEnvmap(app_conf);
-  camera_framebuffer->initializeFrameBuffer();
+  camera_framebuffer->initialize();
 }
 
 void Renderer::getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) { EMPTY_FUNCBODY; }
@@ -122,11 +122,11 @@ bool Renderer::prep_draw() {
 }
 void Renderer::draw() {
   scene->updateTree();
-  camera_framebuffer->bindFrameBuffer();
+  camera_framebuffer->bind();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   scene->drawForwardTransparencyMode();
   scene->drawBoundingBoxes();
-  camera_framebuffer->unbindFrameBuffer();
+  camera_framebuffer->unbind();
   camera_framebuffer->renderFrameBufferMesh();
   errorCheck(__FILE__, __LINE__);
 }

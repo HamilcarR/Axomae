@@ -46,7 +46,7 @@ class GLFrameBuffer : public GLMutableBufferInterface {
                 unsigned int *default_fbo_id_pointer = nullptr,
                 TEXTURE_TARGET target_texture_type = TEXTURE2D);
 
-  void initializeBuffers() override;
+  void initialize() override;
   [[nodiscard]] bool isReady() const override;
   void attachTexture2D(INTERNAL_FORMAT color_attachment, TEXTURE_TARGET target, unsigned int texture_id, unsigned int mipmap_level = 0);
   void bind() override;
@@ -55,7 +55,7 @@ class GLFrameBuffer : public GLMutableBufferInterface {
   void resize(unsigned int width, unsigned int height);
 
  private:
-  void fillBuffers() override;
+  void fill() override;
 };
 
 #endif

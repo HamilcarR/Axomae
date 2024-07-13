@@ -5,7 +5,7 @@
 
 GLMutablePixelBufferObject::GLMutablePixelBufferObject(TRANSFER t, size_t size) : buffer_type(t), buffer_size(size) {}
 
-void GLMutablePixelBufferObject::initializeBuffers() { GL_ERROR_CHECK(glGenBuffers(1, &pbo)); }
+void GLMutablePixelBufferObject::initialize() { GL_ERROR_CHECK(glGenBuffers(1, &pbo)); }
 
 bool GLMutablePixelBufferObject::isReady() const { return pbo != 0; }
 
@@ -28,10 +28,10 @@ bool GLMutablePixelBufferObject::unmapBuffer() { return GL_ERROR_CHECK(glUnmapBu
 
 void GLMutablePixelBufferObject::setNewSize(size_t new_size) {
   setBufferSize(new_size);
-  fillBuffers();
+  fill();
 }
 
-void GLMutablePixelBufferObject::fillBuffers() {
+void GLMutablePixelBufferObject::fill() {
   GL_ERROR_CHECK(glBufferData(buffer_type, buffer_size, nullptr, GL_DYNAMIC_DRAW));
   buffer_filled = true;
 }

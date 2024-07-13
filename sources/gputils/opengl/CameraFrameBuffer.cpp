@@ -27,7 +27,7 @@ void CameraFrameBuffer::updateFrameBufferShader() {
   mesh_screen_quad->setShader(shader_framebuffer);
 }
 
-void CameraFrameBuffer::initializeFrameBuffer() {
+void CameraFrameBuffer::initialize() {
   initializeFrameBufferTexture<FrameBufferTexture>(
       GLFrameBuffer::COLOR0, true, Texture::RGBA16F, Texture::BGRA, Texture::UBYTE, texture_dim->width, texture_dim->height);
   shader_framebuffer = dynamic_cast<ScreenFramebufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
@@ -38,10 +38,10 @@ void CameraFrameBuffer::initializeFrameBuffer() {
   auto result = database::node::store<FrameBufferMesh>(*node_database, true, database_texture_id, shader_framebuffer);
   mesh_screen_quad = result.object;
   drawable_screen_quad = std::make_unique<Drawable>(mesh_screen_quad);
-  FramebufferHelper::initializeFrameBuffer();
-  bindFrameBuffer();
+  FramebufferHelper::initialize();
+  bind();
   gl_framebuffer_object->attachTexture2D(GLFrameBuffer::COLOR0, GLFrameBuffer::TEXTURE2D, fbo_texture->getSamplerID());
-  unbindFrameBuffer();
+  unbind();
 }
 
 void CameraFrameBuffer::clean() {

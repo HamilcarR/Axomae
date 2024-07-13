@@ -22,11 +22,11 @@ void GLFrameBuffer::attachTexture2D(INTERNAL_FORMAT color_attachment, TEXTURE_TA
   GL_ERROR_CHECK(glFramebufferTexture2D(GL_FRAMEBUFFER, color_attachment, target, texture_id, mip_level));
 }
 
-void GLFrameBuffer::initializeBuffers() {
+void GLFrameBuffer::initialize() {
   GL_ERROR_CHECK(glGenFramebuffers(1, &framebuffer_id));
   bind();
   if (renderbuffer_object != nullptr) {
-    renderbuffer_object->initializeBuffers();
+    renderbuffer_object->initialize();
     if (renderbuffer_object->isReady()) {
       renderbuffer_object->bind();
       GL_ERROR_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, DEPTH_STENCIL, GL_RENDERBUFFER, renderbuffer_object->getID()));
@@ -42,7 +42,7 @@ void GLFrameBuffer::initializeBuffers() {
 
 bool GLFrameBuffer::isReady() const { return framebuffer_id != 0; }
 
-void GLFrameBuffer::fillBuffers() { AX_UNREACHABLE }
+void GLFrameBuffer::fill() { AX_UNREACHABLE }
 
 void GLFrameBuffer::bind() { GL_ERROR_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id)); }
 

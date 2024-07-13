@@ -1,5 +1,4 @@
 #include "NovaRenderer.h"
-#include "../../../corelib/device/opengl/GLMutablePixelBufferObject.h"
 #include "ArcballCamera.h"
 #include "CameraFrameBuffer.h"
 #include "Config.h"
@@ -7,6 +6,7 @@
 #include "DrawEngine.h"
 #include "EnvmapTextureManager.h"
 #include "EventController.h"
+#include "GLMutablePixelBufferObject.h"
 #include "GLViewer.h"
 #include "RenderPipeline.h"
 #include "Scene.h"
@@ -46,9 +46,9 @@ void NovaRenderer::initialize(ApplicationConfig *app_conf) {
   namespace nova_primitive = nova::primitive;
   namespace nova_shape = nova::shape;
 
-  camera_framebuffer->initializeFrameBuffer();
+  camera_framebuffer->initialize();
   framebuffer_texture = camera_framebuffer->getFrameBufferTexturePointer(GLFrameBuffer::COLOR0);
-  pbo_read->initializeBuffers();
+  pbo_read->initialize();
   global_application_config = app_conf;
   scene_camera->computeProjectionSpace();
   initializeEngine();

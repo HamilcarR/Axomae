@@ -30,12 +30,12 @@ class GLGeometryBuffer : public GLMutableBufferInterface {
   /**
    * @brief Initialize glGenBuffers for all vertex attributes
    */
-  void initializeBuffers() override;
+  void initialize() override;
   bool isReady() const override;
   void clean() override;
   void bind() override;
   void unbind() override;
-  void fillBuffers() override;
+  void fill() override;
 
   void bindVao();
   void unbindVao();

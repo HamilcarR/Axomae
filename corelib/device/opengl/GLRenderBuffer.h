@@ -36,7 +36,7 @@ class GLRenderBuffer : public GLMutableBufferInterface {
    * @brief Creates a render buffer ID
    *
    */
-  void initializeBuffers() override;
+  void initialize() override;
   [[nodiscard]] bool isReady() const override;
   void bind() override;
   void unbind() override;
@@ -45,7 +45,7 @@ class GLRenderBuffer : public GLMutableBufferInterface {
   [[nodiscard]] unsigned int getID() const { return renderbuffer_id; }
   INTERNAL_FORMAT getFormat() { return format; }
   virtual void resize(unsigned width, unsigned height);
-  void fillBuffers() override;
+  void fill() override;
 };
 
 #endif

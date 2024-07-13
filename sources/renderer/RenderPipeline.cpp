@@ -114,7 +114,7 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap,
       &resize_dim, false, GLFrameBuffer::COLOR0, Texture::RGB32F, Texture::RGB, Texture::FLOAT, prefilter_shader, max_mip_level);
 
   cubemap_prefilter_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0)->generateMipmap();
-  cubemap_prefilter_fbo.bindFrameBuffer();
+  cubemap_prefilter_fbo.bind();
   Drawable cube_drawable = constructCube(prefilter_shader, cube_envmap, Texture::CUBEMAP, &camera);
   cube_drawable.startDraw();
   cube_drawable.bind();
@@ -144,7 +144,7 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap,
   glViewport(0, 0, (int)default_dim.width, (int)default_dim.height);
   cube_drawable.unbind();
   cube_drawable.clean();
-  cubemap_prefilter_fbo.unbindFrameBuffer();
+  cubemap_prefilter_fbo.unbind();
   cubemap_prefilter_fbo.clean();
 
   TextureDatabase *texture_database = resource_database->getTextureDatabase();
@@ -189,7 +189,7 @@ void RenderPipeline::renderToCubemap(Drawable &cube_drawable,
                                      const Dim2 render_viewport,
                                      const Dim2 origin_viewport,
                                      unsigned int mip_level) {
-  cubemap_framebuffer.bindFrameBuffer();
+  cubemap_framebuffer.bind();
   cube_drawable.startDraw();
   glViewport(0, 0, (int)render_viewport.width, (int)render_viewport.height);
   for (unsigned i = 0; i < 6; i++) {
@@ -201,7 +201,7 @@ void RenderPipeline::renderToCubemap(Drawable &cube_drawable,
     glDrawElements(GL_TRIANGLES, (int)cube_draw_mesh_ptr->getGeometry().indices.size(), GL_UNSIGNED_INT, nullptr);
   }
   cube_drawable.unbind();
-  cubemap_framebuffer.unbindFrameBuffer();
+  cubemap_framebuffer.unbind();
   glViewport(0, 0, (int)origin_viewport.width, (int)origin_viewport.height);
 }
 
@@ -211,7 +211,7 @@ void RenderPipeline::renderToQuad(Drawable &quad_drawable,
                                   const Dim2 render_viewport,
                                   const Dim2 origin_viewport,
                                   unsigned int mip_level) {
-  quad_framebuffer.bindFrameBuffer();
+  quad_framebuffer.bind();
   quad_drawable.startDraw();
   glViewport(0, 0, (int)render_viewport.width, (int)render_viewport.height);
   quad_drawable.bind();
@@ -220,7 +220,7 @@ void RenderPipeline::renderToQuad(Drawable &quad_drawable,
   Mesh *quad_draw_mesh_ptr = quad_drawable.getMeshPointer();
   glDrawElements(GL_TRIANGLES, (int)quad_draw_mesh_ptr->getGeometry().indices.size(), GL_UNSIGNED_INT, nullptr);
   quad_drawable.unbind();
-  quad_framebuffer.unbindFrameBuffer();
+  quad_framebuffer.unbind();
   glViewport(0, 0, (int)origin_viewport.width, (int)origin_viewport.height);
 }
 
@@ -262,7 +262,7 @@ RenderCubeMap RenderPipeline::constructCubemapFbo(Dim2 *dimensions,
   auto fb_tpoint = cubemap_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0);
   fb_tpoint->setGlData(shader);
   shader->release();
-  cubemap_fbo.initializeFrameBuffer();
+  cubemap_fbo.initialize();
   errorCheck(__FILE__, __LINE__);
   return cubemap_fbo;
 }
@@ -285,7 +285,7 @@ RenderQuadFBO RenderPipeline::constructQuadFbo(Dim2 *dimensions,
   shader->bind();
   quad_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0)->setGlData(shader);
   shader->release();
-  quad_fbo.initializeFrameBuffer();
+  quad_fbo.initialize();
   errorCheck(__FILE__, __LINE__);
   return quad_fbo;
 }

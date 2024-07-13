@@ -43,7 +43,7 @@ void GLGeometryBuffer::clean() {
   }
 }
 
-void GLGeometryBuffer::initializeBuffers() {
+void GLGeometryBuffer::initialize() {
   GL_ERROR_CHECK(glGenVertexArrays(1, &vao));
   bindVao();
   GL_ERROR_CHECK(glGenBuffers(1, &vertex_buffer));
@@ -75,7 +75,7 @@ void GLGeometryBuffer::bindTangentBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRA
 void GLGeometryBuffer::unbindVao() { GL_ERROR_CHECK(glBindVertexArray(0)); }
 
 // TODO: [AX-20] Provide methods to fill individual buffer , or to modify them
-void GLGeometryBuffer::fillBuffers() {
+void GLGeometryBuffer::fill() {
   if (!buffers_filled) {
     bindVao();
     bindVertexBuffer();

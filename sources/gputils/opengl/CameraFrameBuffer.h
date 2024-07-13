@@ -33,7 +33,7 @@ class CameraFrameBuffer : public FramebufferHelper {
    * @brief Initializes the textures used by the framebuffer , the shader , and creates the quad mesh that the
    * framebuffer will draw on
    */
-  void initializeFrameBuffer() override;
+  void initialize() override;
   /**
    * @brief Send the uniforms used by the post processing effects , like gamma and exposure , and sets up the mesh used
    */

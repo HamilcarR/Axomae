@@ -1,32 +1,30 @@
 #ifndef FRAMEBUFFERHELPER_H
 #define FRAMEBUFFERHELPER_H
 
-#include "FramebufferInterface.h"
+#include "FramebufferHelperInterface.h"
 #include "GLFrameBuffer.h"
 #include "TextureDatabase.h"
 
 class TextureDatabase;
 
-class FramebufferHelper : public FramebufferInterface {
+class FramebufferHelper : public FramebufferHelperInterface {
  protected:
-  std::unique_ptr<GLFrameBuffer> gl_framebuffer_object;
-  Dim2 *texture_dim;
-  TextureDatabase *texture_database;
-  std::map<GLFrameBuffer::INTERNAL_FORMAT, Texture *> fbo_attachment_texture_collection;
-  unsigned int *default_framebuffer_pointer;
+  std::unique_ptr<GLFrameBuffer> gl_framebuffer_object{};
+  Dim2 *texture_dim{};
+  TextureDatabase *texture_database{};
+  std::map<GLFrameBuffer::INTERNAL_FORMAT, Texture *> fbo_attachment_texture_collection{};
+  unsigned int *default_framebuffer_pointer{};
 
  public:
-  FramebufferHelper();
-  ~FramebufferHelper() override = default;
+  CLASS_OM(FramebufferHelper)
   FramebufferHelper(TextureDatabase *texture_database, Dim2 *texture_size, unsigned int *default_fbo_id_pointer = nullptr);
-  FramebufferHelper(FramebufferHelper &&move) noexcept;
-  FramebufferHelper(const FramebufferHelper &copy) = delete;
   void resize() override;
   void setTextureDimensions(Dim2 *pointer_on_texture_size) override;
-  void bindFrameBuffer() override;
-  void unbindFrameBuffer() override;
-  void initializeFrameBuffer() override;
+  void bind() override;
+  void unbind() override;
+  void initialize() override;
   void clean() override;
+  [[nodiscard]] bool isReady() const override;
   void setDefaultFrameBufferIdPointer(unsigned *id) override;
   Texture *getFrameBufferTexturePointer(GLFrameBuffer::INTERNAL_FORMAT color_attachment);
   [[nodiscard]] GLFrameBuffer *getFramebufferObject() const { return gl_framebuffer_object.get(); }

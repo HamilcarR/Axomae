@@ -21,7 +21,7 @@ bool Drawable::initialize() {
   if (mesh_object == nullptr)
     return false;
   mesh_object->initializeGlData();
-  gl_buffers.initializeBuffers();
+  gl_buffers.initialize();
   errorCheck(__FILE__, __LINE__);
   return gl_buffers.isReady();
   ;
@@ -31,7 +31,7 @@ void Drawable::startDraw() {
   if (mesh_object != nullptr) {
     mesh_object->bindShaders();
     gl_buffers.bindVao();
-    gl_buffers.fillBuffers();
+    gl_buffers.fill();
 
     gl_buffers.bindVertexBuffer();
     mesh_object->getShader()->enableAttributeArray(0);
