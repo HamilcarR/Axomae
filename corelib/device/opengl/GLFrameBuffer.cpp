@@ -18,18 +18,18 @@ GLFrameBuffer::GLFrameBuffer(
 }
 
 void GLFrameBuffer::attachTexture2D(INTERNAL_FORMAT color_attachment, TEXTURE_TARGET target, unsigned int texture_id, unsigned mip_level) {
-  assert(texture_id != 0);
-  GL_ERROR_CHECK(glFramebufferTexture2D(GL_FRAMEBUFFER, color_attachment, target, texture_id, mip_level));
+  AX_ASSERT_NEQ(texture_id, 0);
+  ax_glFramebufferTexture2D(GL_FRAMEBUFFER, color_attachment, target, texture_id, mip_level);
 }
 
 void GLFrameBuffer::initialize() {
-  GL_ERROR_CHECK(glGenFramebuffers(1, &framebuffer_id));
+  ax_glGenFramebuffers(1, &framebuffer_id);
   bind();
   if (renderbuffer_object != nullptr) {
     renderbuffer_object->initialize();
     if (renderbuffer_object->isReady()) {
       renderbuffer_object->bind();
-      GL_ERROR_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, DEPTH_STENCIL, GL_RENDERBUFFER, renderbuffer_object->getID()));
+      ax_glFramebufferRenderbuffer(GL_FRAMEBUFFER, DEPTH_STENCIL, GL_RENDERBUFFER, renderbuffer_object->getID());
     } else
       LOG("Problem initializing render buffer", LogLevel::ERROR);
     auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -44,13 +44,13 @@ bool GLFrameBuffer::isReady() const { return framebuffer_id != 0; }
 
 void GLFrameBuffer::fill() { AX_UNREACHABLE }
 
-void GLFrameBuffer::bind() { GL_ERROR_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id)); }
+void GLFrameBuffer::bind() { ax_glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id); }
 
 void GLFrameBuffer::unbind() {
   if (pointer_on_default_fbo_id) {
-    GL_ERROR_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, *pointer_on_default_fbo_id));
+    ax_glBindFramebuffer(GL_FRAMEBUFFER, *pointer_on_default_fbo_id);
   } else {
-    GL_ERROR_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+    ax_glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
 }
 
@@ -59,7 +59,7 @@ void GLFrameBuffer::clean() {
     renderbuffer_object->clean();
   }
   unbind();
-  GL_ERROR_CHECK(glDeleteFramebuffers(1, &framebuffer_id));
+  ax_glDeleteFramebuffers(1, &framebuffer_id);
 }
 
 void GLFrameBuffer::resize(unsigned _width, unsigned _height) {

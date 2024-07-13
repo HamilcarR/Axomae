@@ -1,10 +1,9 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "DebugGL.h"
-#include "GL_static_wrappers.h"
 #include "UniformNames.h"
 #include "glsl.h"
-
+#include "init_3D.h"
 #include <cstring>
 #include <stdexcept>
 

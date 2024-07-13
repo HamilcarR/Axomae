@@ -1,27 +1,8 @@
-#ifndef GL_STATIC_WRAPPERS_H
-#define GL_STATIC_WRAPPERS_H
-#include "init_3D.h"
+#ifndef GL_STATIC_WRAPPERS_SHADERS_H
+#define GL_STATIC_WRAPPERS_SHADERS_H
+#include "DebugGL.h"
+#include "gl_headers.h"
 
-#include <DebugGL.h>
-
-inline void ax_glPolygonMode(GLenum face, GLenum mode) { GL_ERROR_CHECK(glPolygonMode(face, mode)); }
-inline void ax_glDepthFunc(GLenum func) { GL_ERROR_CHECK(glDepthFunc(func)); }
-inline void ax_glDepthMask(GLboolean flag) { GL_ERROR_CHECK(glDepthMask(flag)); }
-inline void ax_glEnable(GLenum cap) { GL_ERROR_CHECK(glEnable(cap)); }
-inline void ax_glDisable(GLenum cap) { GL_ERROR_CHECK(glDisable(cap)); }
-inline void ax_glCullFace(GLenum mode) { GL_ERROR_CHECK(glCullFace(mode)); }
-
-/*******************************************************************************************************************************/
-inline void ax_glTexSubImage2D(
-    GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels) {
-  GL_ERROR_CHECK(glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels));
-}
-inline void ax_glTextureSubImage2D(
-    GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels) {
-  GL_ERROR_CHECK(glTexSubImage2D(texture, level, xoffset, yoffset, width, height, format, type, pixels));
-}
-
-/*******************************************************************************************************************************/
 inline void ax_glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLint stride, const void *ptr) {
   GL_ERROR_CHECK(glVertexAttribPointer(index, size, type, normalized, stride, ptr));
 }
@@ -55,4 +36,4 @@ inline void ax_glShaderSource(GLuint shader, GLsizei count, const GLchar **strin
   GL_ERROR_CHECK(glShaderSource(shader, count, string, length));
 }
 inline void ax_glEnableVertexAttribArray(GLuint attribute) { GL_ERROR_CHECK(glEnableVertexAttribArray(attribute)); }
-#endif  // GL_STATIC_WRAPPERS_H
+#endif  // GL_STATIC_WRAPPERS_SHADERS_H

@@ -42,12 +42,12 @@ class GLMutablePixelBufferObject final : public DeviceMutableBufferInterface {
 };
 template<class T>
 T *GLMutablePixelBufferObject::mapBuffer(ACCESS access) {
-  return static_cast<T *>(glMapBuffer(buffer_type, access));
+  return static_cast<T *>(ax_glMapBuffer(buffer_type, access));
 }
 
 template<class T>
 T *GLMutablePixelBufferObject::mapBufferRange(size_t offset, size_t size, GLbitfield flag) {
-  return static_cast<T *>(glMapBufferRange(buffer_type, offset, size, GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | flag));
+  return static_cast<T *>(ax_glMapBufferRange(buffer_type, offset, size, GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | flag));
 }
 
 #endif

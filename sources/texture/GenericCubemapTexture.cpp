@@ -13,17 +13,17 @@ GenericCubemapTexture::GenericCubemapTexture(FORMAT internal_format, FORMAT data
 GenericCubemapTexture::GenericCubemapTexture(TextureData *data) : CubemapTexture(data) { type = GENERIC_CUBE; }
 
 void GenericCubemapTexture::bindTexture() {
-  glActiveTexture(GL_TEXTURE0 + texture_unit);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, sampler2D);
+  ax_glActiveTexture(GL_TEXTURE0 + texture_unit);
+  ax_glBindTexture(GL_TEXTURE_CUBE_MAP, sampler2D);
 }
 
 void GenericCubemapTexture::unbindTexture() {
-  glActiveTexture(GL_TEXTURE0 + texture_unit);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+  ax_glActiveTexture(GL_TEXTURE0 + texture_unit);
+  ax_glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 void GenericCubemapTexture::setGlData(Shader *shader) {
-  glGenTextures(1, &sampler2D);
+  ax_glGenTextures(1, &sampler2D);
   bindTexture();
   initializeTexture2D();
   shader->setTextureUniforms(location_name, texture_unit);

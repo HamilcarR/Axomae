@@ -1,7 +1,7 @@
 #include "Mesh.h"
 #include "DebugGL.h"
-#include "GL_static_wrappers.h"
 #include "PerformanceLogger.h"
+#include "init_3D.h"
 #include "project_macros.h"
 
 Mesh::Mesh(SceneTreeNode *parent) : SceneTreeNode(parent) {

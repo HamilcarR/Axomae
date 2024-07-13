@@ -10,22 +10,22 @@ Generic2DTexture::Generic2DTexture() { type = GENERIC; }
 Generic2DTexture::Generic2DTexture(TextureData *data) : GenericTexture(data) { type = GENERIC; }
 
 void Generic2DTexture::setGlData(Shader *shader) {
-  glGenTextures(1, &sampler2D);
-  glActiveTexture(GL_TEXTURE0 + texture_unit);
-  glBindTexture(GL_TEXTURE_2D, sampler2D);
+  ax_glGenTextures(1, &sampler2D);
+  ax_glActiveTexture(GL_TEXTURE0 + texture_unit);
+  ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
   if (!data.empty())
     GenericTexture::initializeTexture2D();
   shader->setTextureUniforms(location_name, texture_unit);
 }
 
 void Generic2DTexture::bindTexture() {
-  glActiveTexture(GL_TEXTURE0 + texture_unit);
-  glBindTexture(GL_TEXTURE_2D, sampler2D);
+  ax_glActiveTexture(GL_TEXTURE0 + texture_unit);
+  ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
 }
 
 void Generic2DTexture::unbindTexture() {
-  glActiveTexture(GL_TEXTURE0 + texture_unit);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  ax_glActiveTexture(GL_TEXTURE0 + texture_unit);
+  ax_glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 const char *Generic2DTexture::getTextureTypeCStr() { return location_name.c_str(); }

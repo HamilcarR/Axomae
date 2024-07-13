@@ -9,7 +9,7 @@
  * than .hdr files
  *
  */
-class TextureData {  // TODO : Make this inherit RawImageHolder
+class TextureData {
  public:
   enum CHANNELS : unsigned { RGB = 0, RGBA = 1 };
 

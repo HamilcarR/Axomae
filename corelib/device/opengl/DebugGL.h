@@ -1,10 +1,8 @@
 #ifndef DEBUGGL_H
 #define DEBUGGL_H
 #include "Logger.h"
-#include "init_3D.h"
+#include "gl_headers.h"
 #include <iostream>
-#include <sstream>
-
 #define GL_ERROR_CHECK(function) \
   do { \
     function; \

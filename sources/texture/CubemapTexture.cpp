@@ -44,31 +44,29 @@ void CubemapTexture::initializeTexture2D() {
   if (!data.empty())
     for (unsigned int i = 1; i <= 6; i++) {
       uint32_t *pointer_to_data = data.data() + (i - 1) * width * height;
-      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (i - 1), 0, internal_format, (int)width, (int)height, 0, data_format, data_type, pointer_to_data);
-      errorCheck(__FILE__, __LINE__);
+      ax_glTexImage2D(
+          GL_TEXTURE_CUBE_MAP_POSITIVE_X + (i - 1), 0, internal_format, (int)width, (int)height, 0, data_format, data_type, pointer_to_data);
     }
   else
-    for (unsigned i = 0; i < 6; i++) {
-      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internal_format, (int)width, (int)height, 0, data_format, data_type, nullptr);
-      errorCheck(__FILE__, __LINE__);
-    }
+    for (unsigned i = 0; i < 6; i++)
+      ax_glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internal_format, (int)width, (int)height, 0, data_format, data_type, nullptr);
 
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  ax_glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  ax_glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  ax_glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_REPEAT);
+  ax_glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  ax_glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
 void CubemapTexture::generateMipmap() {
   bindTexture();
-  glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  ax_glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+  ax_glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   unbindTexture();
 }
 
 void CubemapTexture::setGlData(Shader *shader) {
-  glGenTextures(1, &sampler2D);
+  ax_glGenTextures(1, &sampler2D);
   bindTexture();
   initializeTexture2D();
   shader->setTextureUniforms(type2str(CUBEMAP), CUBEMAP);
@@ -76,17 +74,15 @@ void CubemapTexture::setGlData(Shader *shader) {
 }
 
 void CubemapTexture::bindTexture() {
-  glActiveTexture(GL_TEXTURE0 + CUBEMAP);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, sampler2D);
+  ax_glActiveTexture(GL_TEXTURE0 + CUBEMAP);
+  ax_glBindTexture(GL_TEXTURE_CUBE_MAP, sampler2D);
 }
 
 void CubemapTexture::unbindTexture() {
-  glActiveTexture(GL_TEXTURE0 + CUBEMAP);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+  ax_glActiveTexture(GL_TEXTURE0 + CUBEMAP);
+  ax_glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
-void CubemapTexture::setNewSize(unsigned w, unsigned h) {
-  //! Implements this
-}
+void CubemapTexture::setNewSize(unsigned w, unsigned h) { AX_UNREACHABLE }
 
 const char *CubemapTexture::getTextureTypeCStr() { return type2str(CUBEMAP); }

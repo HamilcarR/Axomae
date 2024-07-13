@@ -26,7 +26,7 @@ class GLVertexBufferObject final : public DeviceBaseBufferInterface {
 
 template<class T>
 void GLVertexBufferObject<T>::initialize() {
-  GL_ERROR_CHECK(glGenBuffers(1, &id));
+  ax_glGenBuffers(1, &id);
 }
 
 template<class T>
@@ -36,22 +36,22 @@ bool GLVertexBufferObject<T>::isReady() const {
 
 template<class T>
 void GLVertexBufferObject<T>::bind() {
-  GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, id));
+  ax_glBindBuffer(GL_ARRAY_BUFFER, id);
 }
 
 template<class T>
 void GLVertexBufferObject<T>::unbind() {
-  GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, 0));
+  ax_glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 template<class T>
 void GLVertexBufferObject<T>::clean() {
   if (id != 0)
-    GL_ERROR_CHECK(glDeleteBuffers(1, &id));
+    ax_glDeleteBuffers(1, &id);
 }
 
 template<class T>
-void __attribute((optimize("O0"))) GLVertexBufferObject<T>::fill(const T *buffer, size_t elements, DRAW_MODE draw) {
-  GL_ERROR_CHECK(glBufferData(GL_ARRAY_BUFFER, elements, static_cast<const void *>(buffer), static_cast<GLenum>(draw)));
+void GLVertexBufferObject<T>::fill(const T *buffer, size_t elements, DRAW_MODE draw) {
+  ax_glBufferData(GL_ARRAY_BUFFER, elements, static_cast<const void *>(buffer), static_cast<GLenum>(draw));
 }
 #endif  // GLVERTEXBUFFEROBJECT_H

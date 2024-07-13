@@ -1,6 +1,5 @@
 #include "DiffuseTexture.h"
 #include "Shader.h"
-
 DiffuseTexture::DiffuseTexture() { type = DIFFUSE; }
 
 DiffuseTexture::DiffuseTexture(TextureData *data) : GenericTexture(data) {
@@ -10,22 +9,22 @@ DiffuseTexture::DiffuseTexture(TextureData *data) : GenericTexture(data) {
 }
 
 void DiffuseTexture::setGlData(Shader *shader) {
-  glGenTextures(1, &sampler2D);
-  glActiveTexture(GL_TEXTURE0 + DIFFUSE);
-  glBindTexture(GL_TEXTURE_2D, sampler2D);
+  ax_glGenTextures(1, &sampler2D);
+  ax_glActiveTexture(GL_TEXTURE0 + DIFFUSE);
+  ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
   if (!data.empty())
     GenericTexture::initializeTexture2D();
   shader->setTextureUniforms(type2str(DIFFUSE), DIFFUSE);
 }
 
 void DiffuseTexture::bindTexture() {
-  glActiveTexture(GL_TEXTURE0 + DIFFUSE);
-  glBindTexture(GL_TEXTURE_2D, sampler2D);
+  ax_glActiveTexture(GL_TEXTURE0 + DIFFUSE);
+  ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
 }
 
 void DiffuseTexture::unbindTexture() {
-  glActiveTexture(GL_TEXTURE0 + DIFFUSE);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  ax_glActiveTexture(GL_TEXTURE0 + DIFFUSE);
+  ax_glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void DiffuseTexture::set(TextureData *texture) {

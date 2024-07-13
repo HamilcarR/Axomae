@@ -5,6 +5,7 @@ add_library(ax_core_opengl
         GLVertexBufferObject.cpp
         GLVertexArrayObject.cpp
         GLIndexBufferObject.cpp
+        GL_static_wrappers_buffer.h
 )
 
 target_link_libraries(ax_core_device PUBLIC ax_core_opengl)

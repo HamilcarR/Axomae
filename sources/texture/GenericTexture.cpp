@@ -36,22 +36,22 @@ void GenericTexture::set(TextureData *texture) {
 void GenericTexture::clean() { cleanGlData(); }
 
 void GenericTexture::setTextureParametersOptions() {
-  GL_ERROR_CHECK(glGenerateMipmap(GL_TEXTURE_2D));
-  GL_ERROR_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-  GL_ERROR_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-  GL_ERROR_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
-  GL_ERROR_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+  ax_glGenerateMipmap(GL_TEXTURE_2D);
+  ax_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  ax_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  ax_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  ax_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
 void GenericTexture::initializeTexture2D() {
-  GL_ERROR_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, data.data()));
+  ax_glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, data.data());
   setTextureParametersOptions();
 }
 
 void GenericTexture::generateMipmap() {
   bindTexture();
-  GL_ERROR_CHECK(glGenerateMipmap(GL_TEXTURE_2D));
-  GL_ERROR_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
+  ax_glGenerateMipmap(GL_TEXTURE_2D);
+  ax_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   unbindTexture();
 }
 
@@ -59,7 +59,7 @@ void GenericTexture::setNewSize(unsigned _width, unsigned _height) {
   width = _width;
   height = _height;
   bindTexture();
-  GL_ERROR_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, internal_format, _width, _height, 0, data_format, data_type, nullptr));
+  ax_glTexImage2D(GL_TEXTURE_2D, 0, internal_format, _width, _height, 0, data_format, data_type, nullptr);
   unbindTexture();
 }
 

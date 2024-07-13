@@ -5,9 +5,7 @@
 #include "Texture.h"
 #include "init_3D.h"
 #include "project_macros.h"
-
 #include <DebugGL.h>
-
 #include <string>
 
 // TODO : implement uniform buffer objects
