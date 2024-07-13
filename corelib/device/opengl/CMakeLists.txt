@@ -2,9 +2,11 @@ add_library(ax_core_opengl
         GLRenderBuffer.cpp
         GLMutablePixelBufferObject.cpp
         GLFrameBuffer.cpp
+        GLVertexBufferObject.cpp
+        GLVertexArrayObject.cpp
 )
 
-target_link_libraries(ax_core PUBLIC ax_core_opengl)
+target_link_libraries(ax_core_device PUBLIC ax_core_opengl)
 
 target_link_libraries(ax_core_opengl
 PRIVATE
