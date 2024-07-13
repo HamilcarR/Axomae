@@ -10,7 +10,7 @@ const int COUNT = 16;
 namespace texture_database_test {
 
   template<class HEAD, class... TAIL>
-  constexpr void addTexture(IResourceDB<int, Texture> &database, TextureData *data) {
+  constexpr void addTexture(IResourceDB<int, GenericTexture> &database, TextureData *data) {
     bool persistence = math::random::randb();
     database::texture::store<HEAD>(database, persistence, data);
     if constexpr (sizeof...(TAIL) > 0)
@@ -18,17 +18,17 @@ namespace texture_database_test {
   }
 }  // namespace texture_database_test
 
-class TextureDatabaseTest final : public DatabaseBuilderTest<int, Texture> {
+class TextureDatabaseTest final : public DatabaseBuilderTest<int, GenericTexture> {
  public:
-  explicit TextureDatabaseTest(IResourceDB<int, Texture> &db, int total) : DatabaseBuilderTest<int, Texture>(db) {
+  explicit TextureDatabaseTest(IResourceDB<int, GenericTexture> &db, int total) : DatabaseBuilderTest<int, GenericTexture>(db) {
     total = (total < COUNT) ? COUNT : total;
     buildDatabase();
   }
-  explicit TextureDatabaseTest(IResourceDB<int, Texture> &db) : DatabaseBuilderTest<int, Texture>(db) { buildDatabase(); }
+  explicit TextureDatabaseTest(IResourceDB<int, GenericTexture> &db) : DatabaseBuilderTest<int, GenericTexture>(db) { buildDatabase(); }
   template<class TYPE, class... Args>
-  database::Result<int, Texture> add(bool persistence, Args &&...args) {
+  database::Result<int, GenericTexture> add(bool persistence, Args &&...args) {
     auto result = database::texture::store<TYPE>(database, persistence, std::forward<Args>(args)...);
-    database::Result<int, Texture> cast = {result.id, static_cast<Texture *>(result.object)};
+    database::Result<int, GenericTexture> cast = {result.id, static_cast<GenericTexture *>(result.object)};
     return cast;
   }
 
@@ -112,7 +112,7 @@ TEST(TextureDatabaseTest, remove) {
 TEST(TextureDatabaseTest, get) {
   TextureDatabase database;
   TextureDatabaseTest test(database);
-  std::vector<Texture *> ptr_list;
+  std::vector<GenericTexture *> ptr_list;
   for (const auto &elem : database.getConstData())
     ptr_list.push_back(elem.second.get());
   /* Checks that the database isn't modified */
@@ -127,7 +127,7 @@ TEST(TextureDatabaseTest, get) {
     EXPECT_EQ(database.get(i), elem);
     i++;
   }
-  Texture *ptr = database.get(-1);
+  GenericTexture *ptr = database.get(-1);
   EXPECT_EQ(ptr, nullptr);
   ptr = database.get(database.size() + 1);
   EXPECT_EQ(ptr, nullptr);

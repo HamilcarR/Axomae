@@ -6,7 +6,7 @@ TextureDatabase::TextureDatabase(controller::ProgressStatus *progress_manager_) 
 
 void TextureDatabase::purge() {
   Mutex::Lock lock(mutex);
-  for (std::pair<const int, database::Storage<int, Texture>> &A : database_map) {
+  for (std::pair<const int, database::Storage<int, GenericTexture>> &A : database_map) {
     A.second.get()->clean();
     A.second.setValidity(false);
   }
@@ -33,22 +33,22 @@ void TextureDatabase::clean() {
   }
 }
 
-std::vector<database::Result<int, Texture>> TextureDatabase::getTexturesByType(Texture::TYPE type) const {
-  std::vector<database::Result<int, Texture>> type_collection;
+std::vector<database::Result<int, GenericTexture>> TextureDatabase::getTexturesByType(GenericTexture::TYPE type) const {
+  std::vector<database::Result<int, GenericTexture>> type_collection;
   Mutex::Lock lock(mutex);
   for (const auto &A : database_map) {
     if (A.second.get()->getTextureType() == type) {
-      database::Result<int, Texture> result = {A.first, A.second.get()};
+      database::Result<int, GenericTexture> result = {A.first, A.second.get()};
       type_collection.push_back(result);
     }
   }
   return type_collection;
 }
 
-database::Result<int, Texture> TextureDatabase::add(std::unique_ptr<Texture> texture, bool keep) {
+database::Result<int, GenericTexture> TextureDatabase::add(std::unique_ptr<GenericTexture> texture, bool keep) {
   bool dummy = texture->isDummyTexture();
-  Texture::TYPE type = texture->getTextureType();
-  Texture *ptr = texture.get();
+  GenericTexture::TYPE type = texture->getTextureType();
+  GenericTexture *ptr = texture.get();
   std::string name = texture->getName();
   /* Checks if the texture is named and exists in the database (to avoid duplicates)*/
   if (!name.empty()) {
@@ -63,7 +63,7 @@ database::Result<int, Texture> TextureDatabase::add(std::unique_ptr<Texture> tex
    * If it is not a dummy , looks for the first available slot */
   if (!dummy) {
     int id = firstFreeId();
-    database::Storage<int, Texture> storage(std::move(texture), id, keep);
+    database::Storage<int, GenericTexture> storage(std::move(texture), id, keep);
     Mutex::Lock lock(mutex);
     database_map[id] = std::move(storage);
     unique_textures.insert(std::pair<std::string, int>(name, id));
@@ -80,7 +80,7 @@ database::Result<int, Texture> TextureDatabase::add(std::unique_ptr<Texture> tex
     }
     int id = firstFreeId();
     Mutex::Lock lock(mutex);
-    database::Storage<int, Texture> storage(std::move(texture), id, true);  // Persistence for dummies is always true.
+    database::Storage<int, GenericTexture> storage(std::move(texture), id, true);  // Persistence for dummies is always true.
     database_map[id] = std::move(storage);
     unique_textures.insert(std::pair<std::string, int>(name, id));
     return {id, ptr};
@@ -88,7 +88,7 @@ database::Result<int, Texture> TextureDatabase::add(std::unique_ptr<Texture> tex
 }
 
 bool TextureDatabase::remove(const int index) {
-  Texture *tex = get(index);
+  GenericTexture *tex = get(index);
   Mutex::Lock lock(mutex);
   if (tex) {
     tex->clean();
@@ -99,7 +99,7 @@ bool TextureDatabase::remove(const int index) {
   return false;
 }
 
-bool TextureDatabase::remove(const Texture *address) {
+bool TextureDatabase::remove(const GenericTexture *address) {
   Mutex::Lock lock(mutex);
   for (auto it = database_map.begin(); it != database_map.end(); it++) {
     if (address && it->second.get() == address) {
@@ -112,7 +112,7 @@ bool TextureDatabase::remove(const Texture *address) {
   return false;
 }
 
-database::Result<int, Texture> TextureDatabase::getUniqueTexture(const std::string &name) const {
+database::Result<int, GenericTexture> TextureDatabase::getUniqueTexture(const std::string &name) const {
   auto it = unique_textures.find(name);
   if (it != unique_textures.end()) {
     return {it->second, get(it->second)};

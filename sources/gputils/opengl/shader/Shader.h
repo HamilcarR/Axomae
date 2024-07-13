@@ -7,11 +7,7 @@
 #include "project_macros.h"
 
 #include <DebugGL.h>
-#include <glm/ext/matrix_float3x3.hpp>
-#include <glm/ext/matrix_float4x4.hpp>
-#include <glm/ext/vector_float2.hpp>
-#include <glm/ext/vector_float3.hpp>
-#include <glm/ext/vector_float4.hpp>
+
 #include <string>
 
 // TODO : implement uniform buffer objects
@@ -82,7 +78,7 @@ class Shader : public ShaderInterface {
   template<typename T>
   void setUniform(const std::string &name, const T &value);
   [[nodiscard]] bool isInitialized() const override { return shader_program != 0; }
-  virtual void setTextureUniforms(const std::string &texture_name, Texture::TYPE texture_type);
+  virtual void setTextureUniforms(const std::string &texture_name, GenericTexture::TYPE texture_type);
   virtual void setTextureUniforms(const std::string &texture_name, int location);
 
  protected:

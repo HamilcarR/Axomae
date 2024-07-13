@@ -12,7 +12,7 @@ class FramebufferHelper : public FramebufferHelperInterface {
   std::unique_ptr<GLFrameBuffer> gl_framebuffer_object{};
   Dim2 *texture_dim{};
   TextureDatabase *texture_database{};
-  std::map<GLFrameBuffer::INTERNAL_FORMAT, Texture *> fbo_attachment_texture_collection{};
+  std::map<GLFrameBuffer::INTERNAL_FORMAT, GenericTexture *> fbo_attachment_texture_collection{};
   unsigned int *default_framebuffer_pointer{};
 
  public:
@@ -26,7 +26,7 @@ class FramebufferHelper : public FramebufferHelperInterface {
   void clean() override;
   [[nodiscard]] bool isReady() const override;
   void setDefaultFrameBufferIdPointer(unsigned *id) override;
-  Texture *getFrameBufferTexturePointer(GLFrameBuffer::INTERNAL_FORMAT color_attachment);
+  GenericTexture *getFrameBufferTexturePointer(GLFrameBuffer::INTERNAL_FORMAT color_attachment);
   [[nodiscard]] GLFrameBuffer *getFramebufferObject() const { return gl_framebuffer_object.get(); }
   /**
    * @brief Initialize an empty target texture to be rendered to , saves it in the database , and returns it's database
@@ -46,9 +46,9 @@ class FramebufferHelper : public FramebufferHelperInterface {
   int setUpEmptyTexture(unsigned width,
                         unsigned height,
                         bool persistence,
-                        Texture::FORMAT internal_format,
-                        Texture::FORMAT data_format,
-                        Texture::FORMAT data_type,
+                        GenericTexture::FORMAT internal_format,
+                        GenericTexture::FORMAT data_format,
+                        GenericTexture::FORMAT data_type,
                         unsigned int mipmaps = 0);
 
   /**
@@ -58,9 +58,9 @@ class FramebufferHelper : public FramebufferHelperInterface {
   template<class TEXTYPE>
   void initializeFrameBufferTexture(GLFrameBuffer::INTERNAL_FORMAT color_attachment,
                                     bool persistence,
-                                    Texture::FORMAT internal_format,
-                                    Texture::FORMAT data_format,
-                                    Texture::FORMAT data_type,
+                                    GenericTexture::FORMAT internal_format,
+                                    GenericTexture::FORMAT data_format,
+                                    GenericTexture::FORMAT data_type,
                                     unsigned width,
                                     unsigned height,
                                     unsigned int mipmaps = 0);
@@ -72,9 +72,9 @@ template<class TEXTYPE>
 int FramebufferHelper::setUpEmptyTexture(unsigned width,
                                          unsigned height,
                                          bool persistence,
-                                         Texture::FORMAT internal_format,
-                                         Texture::FORMAT data_format,
-                                         Texture::FORMAT data_type,
+                                         GenericTexture::FORMAT internal_format,
+                                         GenericTexture::FORMAT data_format,
+                                         GenericTexture::FORMAT data_type,
                                          unsigned int mipmaps) {
   TextureData temp_empty_data_texture;
   temp_empty_data_texture.width = width;
@@ -94,9 +94,9 @@ int FramebufferHelper::setUpEmptyTexture(unsigned width,
 template<class TEXTYPE>
 void FramebufferHelper::initializeFrameBufferTexture(GLFrameBuffer::INTERNAL_FORMAT color_attachment,
                                                      bool persistence,
-                                                     Texture::FORMAT internal_format,
-                                                     Texture::FORMAT data_format,
-                                                     Texture::FORMAT data_type,
+                                                     GenericTexture::FORMAT internal_format,
+                                                     GenericTexture::FORMAT data_format,
+                                                     GenericTexture::FORMAT data_type,
                                                      unsigned width,
                                                      unsigned height,
                                                      unsigned int mipmaps) {

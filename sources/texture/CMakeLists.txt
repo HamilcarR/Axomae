@@ -1,8 +1,40 @@
 add_library(ax_texture 
-    Texture.cpp 
-    TextureGroup.cpp
-    texture_utils.cpp
-    GenericTextureProcessing.cpp
+        Texture.cpp
+        TextureGroup.cpp
+        texture_utils.cpp
+        GenericTextureProcessing.cpp
+        GenericTexture.cpp
+        GenericTexture.h
+        DiffuseTexture.cpp
+        DiffuseTexture.h
+        NormalTexture.cpp
+        NormalTexture.h
+        MetallicTexture.cpp
+        MetallicTexture.h
+        RoughnessTexture.cpp
+        RoughnessTexture.h
+        AmbiantOcclusionTexture.cpp
+        AmbiantOcclusionTexture.h
+        SpecularTexture.cpp
+        SpecularTexture.h
+        EmissiveTexture.cpp
+        EmissiveTexture.h
+        OpacityTexture.cpp
+        OpacityTexture.h
+        Generic2DTexture.cpp
+        Generic2DTexture.h
+        CubemapTexture.cpp
+        CubemapTexture.h
+        GenericCubemapTexture.cpp
+        GenericCubemapTexture.h
+        IrradianceTexture.cpp
+        IrradianceTexture.h
+        EnvironmentMap2DTexture.cpp
+        EnvironmentMap2DTexture.h
+        FrameBufferTexture.cpp
+        FrameBufferTexture.h
+        BRDFLookupTexture.cpp
+        BRDFLookupTexture.h
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_texture)

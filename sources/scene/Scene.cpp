@@ -223,12 +223,12 @@ void Scene::switchEnvmap(int cubemap_id, int irradiance_id, int prefiltered_id, 
     auto *material = dynamic_cast<GLMaterial *>(mesh->getMaterial());
     TextureGroup &texgroup = material->getTextureGroupRef();
     if (mesh != scene_skybox) {
-      texgroup.removeTexture(Texture::IRRADIANCE);
+      texgroup.removeTexture(GenericTexture::IRRADIANCE);
       texgroup.addTexture(irradiance_id);
-      texgroup.removeTexture(Texture::CUBEMAP);
+      texgroup.removeTexture(GenericTexture::CUBEMAP);
       texgroup.addTexture(prefiltered_id);
     } else {
-      texgroup.removeTexture(Texture::CUBEMAP);
+      texgroup.removeTexture(GenericTexture::CUBEMAP);
       texgroup.addTexture(cubemap_id);
     }
   }

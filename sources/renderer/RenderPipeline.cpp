@@ -43,12 +43,12 @@ int RenderPipeline::bakeEnvmapToCubemap(EnvironmentMap2DTexture *hdri_map, CubeM
   Shader *bake_shader = shader_database.get(Shader::ENVMAP_CUBEMAP_CONVERTER);
   Dim2 tex_dim{width, height};
   RenderCubeMap cubemap_renderer_framebuffer = constructCubemapFbo<CubemapTexture>(
-      &tex_dim, false, GLFrameBuffer::COLOR0, Texture::RGB32F, Texture::RGB, Texture::FLOAT, bake_shader);
+      &tex_dim, false, GLFrameBuffer::COLOR0, GenericTexture::RGB32F, GenericTexture::RGB, GenericTexture::FLOAT, bake_shader);
   auto query_envmap_result = texture_database.contains(hdri_map);
   int database_id_envmap = query_envmap_result.id;
   Dim2 cam_dim{width, height};
   FreePerspectiveCamera camera(FOV, &cam_dim, NEAR, FAR);  // Generic camera
-  Drawable cube_drawable = constructCube(bake_shader, database_id_envmap, Texture::ENVMAP2D, &camera);
+  Drawable cube_drawable = constructCube(bake_shader, database_id_envmap, GenericTexture::ENVMAP2D, &camera);
   Dim2 default_dim{default_dim_.width, default_dim_.height};
   renderToCubemap(cube_drawable, cubemap_renderer_framebuffer, camera, tex_dim, default_dim);
   cube_drawable.clean();
@@ -73,10 +73,10 @@ int RenderPipeline::bakeIrradianceCubemap(int cube_envmap, unsigned width, unsig
   ShaderDatabase *shader_database = resource_database->getShaderDatabase();
   Shader *irradiance_shader = shader_database->get(Shader::IRRADIANCE_CUBEMAP_COMPUTE);
   RenderCubeMap cubemap_irradiance_framebuffer = constructCubemapFbo<IrradianceTexture>(
-      &irrad_dim, false, GLFrameBuffer::COLOR0, Texture::RGB32F, Texture::RGB, Texture::FLOAT, irradiance_shader);
+      &irrad_dim, false, GLFrameBuffer::COLOR0, GenericTexture::RGB32F, GenericTexture::RGB, GenericTexture::FLOAT, irradiance_shader);
   Dim2 cam_dim{width, height};
   FreePerspectiveCamera camera(FOV, &cam_dim, NEAR, FAR);
-  Drawable cube_drawable = constructCube(irradiance_shader, cube_envmap, Texture::CUBEMAP, &camera);
+  Drawable cube_drawable = constructCube(irradiance_shader, cube_envmap, GenericTexture::CUBEMAP, &camera);
   Dim2 default_dim{default_dim_.width, default_dim_.height};
   renderToCubemap(cube_drawable, cubemap_irradiance_framebuffer, camera, irrad_dim, default_dim);
   cube_drawable.clean();
@@ -111,11 +111,11 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap,
   ShaderDatabase *shader_database = resource_database->getShaderDatabase();
   auto *prefilter_shader = dynamic_cast<EnvmapPrefilterBakerShader *>(shader_database->get(Shader::ENVMAP_PREFILTER));
   RenderCubeMap &&cubemap_prefilter_fbo = constructCubemapFbo<CubemapTexture>(
-      &resize_dim, false, GLFrameBuffer::COLOR0, Texture::RGB32F, Texture::RGB, Texture::FLOAT, prefilter_shader, max_mip_level);
+      &resize_dim, false, GLFrameBuffer::COLOR0, GenericTexture::RGB32F, GenericTexture::RGB, GenericTexture::FLOAT, prefilter_shader, max_mip_level);
 
   cubemap_prefilter_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0)->generateMipmap();
   cubemap_prefilter_fbo.bind();
-  Drawable cube_drawable = constructCube(prefilter_shader, cube_envmap, Texture::CUBEMAP, &camera);
+  Drawable cube_drawable = constructCube(prefilter_shader, cube_envmap, GenericTexture::CUBEMAP, &camera);
   cube_drawable.startDraw();
   cube_drawable.bind();
 
@@ -148,7 +148,7 @@ int RenderPipeline::preFilterEnvmap(int cube_envmap,
   cubemap_prefilter_fbo.clean();
 
   TextureDatabase *texture_database = resource_database->getTextureDatabase();
-  database::Result<int, Texture> query_prefiltered_cubemap_texture = texture_database->contains(
+  database::Result<int, GenericTexture> query_prefiltered_cubemap_texture = texture_database->contains(
       cubemap_prefilter_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
 
   AX_ASSERT(query_prefiltered_cubemap_texture.object, "");
@@ -168,14 +168,14 @@ int RenderPipeline::generateBRDFLookupTexture(unsigned int width, unsigned int h
   FreePerspectiveCamera camera(FOV, &camera_dim, NEAR, FAR);
   Dim2 tex_dim{width, height};
   RenderQuadFBO quad_fbo = constructQuadFbo<BRDFLookupTexture>(
-      &tex_dim, false, GLFrameBuffer::COLOR0, Texture::RGB16F, Texture::RG, Texture::FLOAT, brdf_lut_shader);
+      &tex_dim, false, GLFrameBuffer::COLOR0, GenericTexture::RGB16F, GenericTexture::RG, GenericTexture::FLOAT, brdf_lut_shader);
   Drawable quad_drawable = constructQuad(brdf_lut_shader, &camera);
   Dim2 original_dim = default_dim_;
   renderToQuad(quad_drawable, quad_fbo, camera, tex_dim, original_dim);
   quad_drawable.clean();
   quad_fbo.clean();
 
-  database::Result<int, Texture> query_brdf_lut = resource_database->getTextureDatabase()->contains(
+  database::Result<int, GenericTexture> query_brdf_lut = resource_database->getTextureDatabase()->contains(
       quad_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0));
   errorCheck(__FILE__, __LINE__);
   AX_ASSERT(query_brdf_lut.object, "");
@@ -224,7 +224,7 @@ void RenderPipeline::renderToQuad(Drawable &quad_drawable,
   glViewport(0, 0, (int)origin_viewport.width, (int)origin_viewport.height);
 }
 
-Drawable RenderPipeline::constructCube(Shader *shader, int database_texture_id, Texture::TYPE type, Camera *camera) {
+Drawable RenderPipeline::constructCube(Shader *shader, int database_texture_id, GenericTexture::TYPE type, Camera *camera) {
   assert(shader != nullptr);
   CubeMesh *cube = database::node::store<CubeMesh>(*resource_database->getNodeDatabase(), false).object;
   cube->setShader(shader);
@@ -246,9 +246,9 @@ template<class TEXTYPE>
 RenderCubeMap RenderPipeline::constructCubemapFbo(Dim2 *dimensions,
                                                   bool persistence,
                                                   GLFrameBuffer::INTERNAL_FORMAT color_attachment,
-                                                  Texture::FORMAT internal_format,
-                                                  Texture::FORMAT data_format,
-                                                  Texture::FORMAT data_type,
+                                                  GenericTexture::FORMAT internal_format,
+                                                  GenericTexture::FORMAT data_format,
+                                                  GenericTexture::FORMAT data_type,
                                                   Shader *shader,
                                                   unsigned int mipmaps_level) {
 
@@ -271,9 +271,9 @@ template<class TEXTYPE>
 RenderQuadFBO RenderPipeline::constructQuadFbo(Dim2 *dimensions,
                                                bool persistence,
                                                GLFrameBuffer::INTERNAL_FORMAT color_attachment,
-                                               Texture::FORMAT internal_format,
-                                               Texture::FORMAT data_format,
-                                               Texture::FORMAT data_type,
+                                               GenericTexture::FORMAT internal_format,
+                                               GenericTexture::FORMAT data_format,
+                                               GenericTexture::FORMAT data_type,
                                                Shader *shader) {
 
   TextureDatabase *texture_database = resource_database->getTextureDatabase();

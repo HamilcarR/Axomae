@@ -10,8 +10,8 @@
 
 namespace nova_baker_utils {
 
-  const nova::texturing::ImageTexture *extract_texture(const TextureGroup &tgroup, nova::NovaResourceManager &manager, Texture::TYPE type) {
-    const Texture *gltexture = tgroup.getTexturePointer(type);
+  const nova::texturing::ImageTexture *extract_texture(const TextureGroup &tgroup, nova::NovaResourceManager &manager, GenericTexture::TYPE type) {
+    const GenericTexture *gltexture = tgroup.getTexturePointer(type);
     if (!gltexture) {
       LOG("Texture lookup in Nova scene initialization has returned null.", LogLevel::WARNING);
       return nullptr;
@@ -30,12 +30,12 @@ namespace nova_baker_utils {
     }
     const TextureGroup &texture_group = material->getTextureGroup();
     nova::material::texture_pack tpack{};
-    tpack.albedo = extract_texture(texture_group, manager, Texture::DIFFUSE);
-    tpack.normalmap = extract_texture(texture_group, manager, Texture::NORMAL);
-    tpack.metallic = extract_texture(texture_group, manager, Texture::METALLIC);
-    tpack.roughness = extract_texture(texture_group, manager, Texture::ROUGHNESS);
-    tpack.ao = extract_texture(texture_group, manager, Texture::AMBIANTOCCLUSION);
-    tpack.emissive = extract_texture(texture_group, manager, Texture::EMISSIVE);
+    tpack.albedo = extract_texture(texture_group, manager, GenericTexture::DIFFUSE);
+    tpack.normalmap = extract_texture(texture_group, manager, GenericTexture::NORMAL);
+    tpack.metallic = extract_texture(texture_group, manager, GenericTexture::METALLIC);
+    tpack.roughness = extract_texture(texture_group, manager, GenericTexture::ROUGHNESS);
+    tpack.ao = extract_texture(texture_group, manager, GenericTexture::AMBIANTOCCLUSION);
+    tpack.emissive = extract_texture(texture_group, manager, GenericTexture::EMISSIVE);
     int r = math::random::nrandi(0, 2);
     nova::material::NovaMaterialInterface *mat_ptr = nullptr;
     switch (r) {

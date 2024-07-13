@@ -73,7 +73,7 @@ class RenderPipeline : public controller::IProgressManager {
 
  protected:
   Drawable constructQuad(Shader *shader, Camera *camera);
-  Drawable constructCube(Shader *shader, int database_texture_id, Texture::TYPE type, Camera *camera);
+  Drawable constructCube(Shader *shader, int database_texture_id, GenericTexture::TYPE type, Camera *camera);
 
   /**
    * @brief Constructs a framebuffer object that will render to a cubemap
@@ -93,18 +93,18 @@ class RenderPipeline : public controller::IProgressManager {
   RenderCubeMap constructCubemapFbo(Dim2 *dimensions,
                                     bool persistence,
                                     GLFrameBuffer::INTERNAL_FORMAT color_attachment,
-                                    Texture::FORMAT internal_format,
-                                    Texture::FORMAT data_format,
-                                    Texture::FORMAT data_type,
+                                    GenericTexture::FORMAT internal_format,
+                                    GenericTexture::FORMAT data_format,
+                                    GenericTexture::FORMAT data_type,
                                     Shader *shader,
                                     unsigned level = 0);
   template<class TEXTYPE>
   RenderQuadFBO constructQuadFbo(Dim2 *dimensions,
                                  bool persistence,
                                  GLFrameBuffer::INTERNAL_FORMAT color_attachment,
-                                 Texture::FORMAT internal_format,
-                                 Texture::FORMAT data_format,
-                                 Texture::FORMAT data_type,
+                                 GenericTexture::FORMAT internal_format,
+                                 GenericTexture::FORMAT data_format,
+                                 GenericTexture::FORMAT data_type,
                                  Shader *shader);
 
   static void renderToCubemap(Drawable &cube_drawable,

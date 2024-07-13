@@ -37,7 +37,7 @@ class NovaRenderer final : public IRenderer {
   GLViewer *gl_widget{};
 
  private:
-  Texture *framebuffer_texture{};
+  GenericTexture *framebuffer_texture{};
   std::unique_ptr<GLMutablePixelBufferObject> pbo_read;
   std::unique_ptr<NovaRenderEngineInterface> nova_engine;
   std::unique_ptr<EnvmapTextureManager> envmap_manager;

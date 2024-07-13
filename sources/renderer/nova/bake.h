@@ -30,7 +30,7 @@ namespace image {
 }
 namespace nova_baker_utils {
 
-  const nova::texturing::ImageTexture *extract_texture(const TextureGroup &tgroup, nova::NovaResourceManager &manager, Texture::TYPE type);
+  const nova::texturing::ImageTexture *extract_texture(const TextureGroup &tgroup, nova::NovaResourceManager &manager, GenericTexture::TYPE type);
   const nova::material::NovaMaterialInterface *extract_materials(const Mesh *mesh, nova::NovaResourceManager &manager);
   void build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager);
   /* Uses the primitives in the SceneResourceHolder to build the acceleration structure stored in the manager's Accelerator structure*/

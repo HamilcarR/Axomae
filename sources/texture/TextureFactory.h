@@ -24,7 +24,7 @@ class TextureBuilder {
    */
   template<class TEXTYPE, class... Args>
   [[maybe_unused]] static std::unique_ptr<TEXTYPE> build(Args &&...args) {
-    ASSERT_SUBTYPE(Texture, TEXTYPE);
+    ASSERT_SUBTYPE(GenericTexture, TEXTYPE);
     return std::make_unique<PRVINTERFACE<TEXTYPE, Args...>>(std::forward<Args>(args)...);
   }
 };

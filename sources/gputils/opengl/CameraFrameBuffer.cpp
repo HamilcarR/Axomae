@@ -29,10 +29,10 @@ void CameraFrameBuffer::updateFrameBufferShader() {
 
 void CameraFrameBuffer::initialize() {
   initializeFrameBufferTexture<FrameBufferTexture>(
-      GLFrameBuffer::COLOR0, true, Texture::RGBA16F, Texture::BGRA, Texture::UBYTE, texture_dim->width, texture_dim->height);
+      GLFrameBuffer::COLOR0, true, GenericTexture::RGBA16F, GenericTexture::BGRA, GenericTexture::UBYTE, texture_dim->width, texture_dim->height);
   shader_framebuffer = dynamic_cast<ScreenFramebufferShader *>(shader_database->get(Shader::SCREEN_FRAMEBUFFER));
-  Texture *fbo_texture = fbo_attachment_texture_collection[GLFrameBuffer::COLOR0];
-  database::Result<int, Texture> query_fbo_texture = texture_database->contains(fbo_texture);
+  GenericTexture *fbo_texture = fbo_attachment_texture_collection[GLFrameBuffer::COLOR0];
+  database::Result<int, GenericTexture> query_fbo_texture = texture_database->contains(fbo_texture);
   AX_ASSERT(query_fbo_texture.object != nullptr, "Query fbo texture is not valid.");
   int database_texture_id = query_fbo_texture.id;
   auto result = database::node::store<FrameBufferMesh>(*node_database, true, database_texture_id, shader_framebuffer);

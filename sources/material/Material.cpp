@@ -57,8 +57,8 @@ GLMaterial &GLMaterial::operator=(GLMaterial &&move) noexcept {
 }
 
 bool GLMaterial::isTransparent() const {
-  Texture *tex_opacity = textures_group.getTexturePointer(Texture::OPACITY);
-  Texture *tex_diffuse = textures_group.getTexturePointer(Texture::DIFFUSE);
+  GenericTexture *tex_opacity = textures_group.getTexturePointer(GenericTexture::OPACITY);
+  GenericTexture *tex_diffuse = textures_group.getTexturePointer(GenericTexture::DIFFUSE);
   return alpha_factor < 1.f || (tex_opacity && !tex_opacity->isDummyTexture()) ||
          (tex_diffuse && dynamic_cast<DiffuseTexture *>(tex_diffuse)->hasTransparency());
 }

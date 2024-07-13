@@ -149,7 +149,7 @@ namespace IO {
                                     ResourceDatabaseManager &resource_manager,
                                     controller::IProgressManager *progress_manager) {
     GLMaterial mesh_material;
-    std::vector<Texture::TYPE> dummy_textures_type;
+    std::vector<GenericTexture::TYPE> dummy_textures_type;
     TextureData diffuse, metallic, roughness, normal, ambiantocclusion, emissive, specular, opacity;
     diffuse.name = "diffuse";
     metallic.name = "metallic";

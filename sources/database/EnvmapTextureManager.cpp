@@ -61,7 +61,7 @@ void EnvmapTextureManager::createFurnace() {
 
 void EnvmapTextureManager::initializeDefaultEnvmap(ApplicationConfig *conf) {
   /* Need to compute the LUT beforehand , because of the add event in the HDR database*/
-  if (resource_database->getTextureDatabase()->getTexturesByType(Texture::BRDFLUT).empty())
+  if (resource_database->getTextureDatabase()->getTexturesByType(GenericTexture::BRDFLUT).empty())
     resource_database->getTextureDatabase()->setPersistence(
         render_pipeline->generateBRDFLookupTexture(config.lut.width, config.lut.height, screen_dim));
   /*
@@ -126,9 +126,9 @@ static TextureData texture_metadata(image::ThumbnailImageHolder<float> *raw_imag
   envmap.width = raw_image_data->metadata.width;
   envmap.height = raw_image_data->metadata.height;
   envmap.name = raw_image_data->metadata.name;
-  envmap.data_type = Texture::FLOAT;
-  envmap.internal_format = Texture::RGB32F;
-  envmap.data_format = Texture::RGB;
+  envmap.data_type = GenericTexture::FLOAT;
+  envmap.internal_format = GenericTexture::RGB32F;
+  envmap.data_format = GenericTexture::RGB;
   envmap.nb_components = raw_image_data->metadata.channels;
   envmap.f_data = raw_image_data->data;
   return envmap;
@@ -162,6 +162,6 @@ void EnvmapTextureManager::addToCollection(int index) {
     texture_database->setPersistence(texgroup.irradiance_id);
     texture_database->setPersistence(texgroup.prefiltered_id);
   }
-  texgroup.lut_id = texture_database->getTexturesByType(Texture::BRDFLUT)[0].id;
+  texgroup.lut_id = texture_database->getTexturesByType(GenericTexture::BRDFLUT)[0].id;
   bakes_id.push_back(texgroup);
 }

@@ -15,7 +15,7 @@
  * GL texture database with no duplicates.
  *
  */
-class TextureDatabase final : public IntegerResourceDB<Texture> {
+class TextureDatabase final : public IntegerResourceDB<GenericTexture> {
  private:
   std::map<std::string, int> unique_textures;
 
@@ -25,26 +25,26 @@ class TextureDatabase final : public IntegerResourceDB<Texture> {
   void clean() override;
   void purge() override;
   bool remove(int index) override;
-  bool remove(const Texture *texture) override;
+  bool remove(const GenericTexture *texture) override;
   /**
    * @brief Add a texture object to the database . In case the object is already present , this method will return the
    * existing texture's id
    * @param keep True if texture is to be kept
    * @return int Database ID of the texture
    */
-  database::Result<int, Texture> add(std::unique_ptr<Texture> texture, bool keep) override;
-  std::vector<database::Result<int, Texture>> getTexturesByType(Texture::TYPE texture_type) const;
+  database::Result<int, GenericTexture> add(std::unique_ptr<GenericTexture> texture, bool keep) override;
+  std::vector<database::Result<int, GenericTexture>> getTexturesByType(GenericTexture::TYPE texture_type) const;
   bool empty() const override { return database_map.empty(); }
-  database::Result<int, Texture> getUniqueTexture(const std::string &name) const;
+  database::Result<int, GenericTexture> getUniqueTexture(const std::string &name) const;
   bool removeUniqueTextureReference(int id);
 };
 
 namespace database::texture {
   template<class TEXTYPE, class... Args>
-  static database::Result<int, TEXTYPE> store(IResourceDB<int, Texture> &database, bool keep, Args &&...args) {
-    ASSERT_SUBTYPE(Texture, TEXTYPE);
-    std::unique_ptr<Texture> temp = std::make_unique<PRVINTERFACE<TEXTYPE, Args...>>(std::forward<Args>(args)...);
-    database::Result<int, Texture> result = database.add(std::move(temp), keep);
+  static database::Result<int, TEXTYPE> store(IResourceDB<int, GenericTexture> &database, bool keep, Args &&...args) {
+    ASSERT_SUBTYPE(GenericTexture, TEXTYPE);
+    std::unique_ptr<GenericTexture> temp = std::make_unique<PRVINTERFACE<TEXTYPE, Args...>>(std::forward<Args>(args)...);
+    database::Result<int, GenericTexture> result = database.add(std::move(temp), keep);
     database::Result<int, TEXTYPE> cast = {result.id, static_cast<TEXTYPE *>(result.object)};
     return cast;
   }

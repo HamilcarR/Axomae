@@ -12,6 +12,16 @@ inline void ax_glDisable(GLenum cap) { GL_ERROR_CHECK(glDisable(cap)); }
 inline void ax_glCullFace(GLenum mode) { GL_ERROR_CHECK(glCullFace(mode)); }
 
 /*******************************************************************************************************************************/
+inline void ax_glTexSubImage2D(
+    GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels) {
+  GL_ERROR_CHECK(glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels));
+}
+inline void ax_glTextureSubImage2D(
+    GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels) {
+  GL_ERROR_CHECK(glTexSubImage2D(texture, level, xoffset, yoffset, width, height, format, type, pixels));
+}
+
+/*******************************************************************************************************************************/
 inline void ax_glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLint stride, const void *ptr) {
   GL_ERROR_CHECK(glVertexAttribPointer(index, size, type, normalized, stride, ptr));
 }

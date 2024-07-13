@@ -64,7 +64,7 @@ void Shader::setAttributeBuffer(GLuint location, GLenum etype, int offset, int t
   ax_glVertexAttribPointer(location, tuplesize, etype, GL_FALSE, stride, (void *)0);
 }
 
-void Shader::setTextureUniforms(const std::string &texture_name, Texture::TYPE texture_type) {
+void Shader::setTextureUniforms(const std::string &texture_name, GenericTexture::TYPE texture_type) {
   try {
     setTextureUniforms(texture_name, static_cast<int>(texture_type));
   } catch (const std::exception &e) {

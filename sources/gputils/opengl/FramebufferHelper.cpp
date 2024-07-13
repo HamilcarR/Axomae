@@ -38,7 +38,7 @@ void FramebufferHelper::initialize() {
   gl_framebuffer_object->initialize();
 }
 
-Texture *FramebufferHelper::getFrameBufferTexturePointer(GLFrameBuffer::INTERNAL_FORMAT color_attachment) {
+GenericTexture *FramebufferHelper::getFrameBufferTexturePointer(GLFrameBuffer::INTERNAL_FORMAT color_attachment) {
   return fbo_attachment_texture_collection[color_attachment];
 }
 

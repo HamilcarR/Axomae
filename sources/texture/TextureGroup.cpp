@@ -36,18 +36,18 @@ TextureGroup &TextureGroup::operator=(TextureGroup &&move) noexcept {
 
 void TextureGroup::addTexture(int index) { texture_collection.push_back(index); }
 
-Texture *TextureGroup::getTexturePointer(Texture::TYPE type) const {
+GenericTexture *TextureGroup::getTexturePointer(GenericTexture::TYPE type) const {
   for (int id : texture_collection) {
-    Texture *A = texture_database->get(id);
+    GenericTexture *A = texture_database->get(id);
     if (A && A->getTextureType() == type)
       return A;
   }
   return nullptr;
 }
 
-bool TextureGroup::containsType(Texture::TYPE type) {
+bool TextureGroup::containsType(GenericTexture::TYPE type) {
   for (int id : texture_collection) {
-    Texture *A = texture_database->get(id);
+    GenericTexture *A = texture_database->get(id);
     if (A && A->getTextureType() == type)
       return true;
   }
@@ -56,7 +56,7 @@ bool TextureGroup::containsType(Texture::TYPE type) {
 
 void TextureGroup::initializeGlTextureData(Shader *shader) {
   for (int id : texture_collection) {
-    Texture *A = texture_database->get(id);
+    GenericTexture *A = texture_database->get(id);
     if (A && !A->isInitialized())
       A->setGlData(shader);
   }
@@ -72,7 +72,7 @@ void TextureGroup::synchronizeWithDatabaseState() {
   std::vector<unsigned int> to_delete;
   unsigned delete_index = 0;
   for (int id : texture_collection) {
-    Texture *A = texture_database->get(id);
+    GenericTexture *A = texture_database->get(id);
     if (!A)
       to_delete.push_back(delete_index);
     delete_index++;
@@ -85,7 +85,7 @@ void TextureGroup::bind() {
   std::vector<unsigned int> to_delete;
   unsigned delete_index = 0;
   for (int id : texture_collection) {
-    Texture *A = texture_database->get(id);
+    GenericTexture *A = texture_database->get(id);
     if (A)
       A->bindTexture();
     else
@@ -98,7 +98,7 @@ void TextureGroup::bind() {
 
 void TextureGroup::unbind() {
   for (int id : texture_collection) {
-    Texture *A = texture_database->get(id);
+    GenericTexture *A = texture_database->get(id);
     if (A)
       A->unbindTexture();
   }
@@ -113,7 +113,7 @@ bool TextureGroup::removeTexture(int id) {
   return false;
 }
 
-bool TextureGroup::removeTexture(Texture::TYPE type) {
+bool TextureGroup::removeTexture(GenericTexture::TYPE type) {
   std::vector collection = texture_database->getTexturesByType(type);
   bool val = false;
   for (auto &elem : collection) {
