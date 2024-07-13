@@ -22,7 +22,6 @@ bool Drawable::initialize() {
     return false;
   mesh_object->initializeGlData();
   gl_buffers.initialize();
-  errorCheck(__FILE__, __LINE__);
   return gl_buffers.isReady();
   ;
 }
@@ -55,7 +54,6 @@ void Drawable::startDraw() {
 
     gl_buffers.unbindVao();
     mesh_object->releaseShaders();
-    errorCheck(__FILE__, __LINE__);
   }
 }
 

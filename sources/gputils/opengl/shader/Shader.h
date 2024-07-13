@@ -5,6 +5,8 @@
 #include "Texture.h"
 #include "init_3D.h"
 #include "project_macros.h"
+
+#include <DebugGL.h>
 #include <glm/ext/matrix_float3x3.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float2.hpp>
@@ -100,6 +102,7 @@ class Shader : public ShaderInterface {
 template<typename T>
 void Shader::setUniform(const char *name, const T &value) {
   int location = glGetUniformLocation(shader_program, name);
+  errorCheck(__FILE__, __func__, __LINE__);
   setUniformValue(location, value);
 }
 

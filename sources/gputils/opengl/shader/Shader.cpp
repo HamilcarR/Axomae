@@ -1,15 +1,16 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "DebugGL.h"
+#include "GL_static_wrappers.h"
 #include "UniformNames.h"
 #include "glsl.h"
+
 #include <cstring>
 #include <stdexcept>
 
 /**
  * @file Shader.cpp
  * Implements functions and methods relative to the shading
- *
  */
 
 using namespace shader_utils;
@@ -22,20 +23,20 @@ constexpr const char *RUNTIME_ERROR_NEGATIVE_TEXTURE_UNIT = "Texture unit provid
 
 inline void shaderCompilationErrorCheck(unsigned int shader_id) {
   success = 0;
-  memset(infoLog, 0, SHADER_ERROR_LOG_SIZE);
-  glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
+  std::memset(infoLog, 0, SHADER_ERROR_LOG_SIZE);
+  ax_glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(shader_id, SHADER_ERROR_LOG_SIZE, nullptr, infoLog);
+    ax_glGetShaderInfoLog(shader_id, SHADER_ERROR_LOG_SIZE, nullptr, infoLog);
     LOG("Shader compilation failed with error : " + std::string(infoLog), LogLevel::ERROR);
   }
 }
 
 inline void programLinkingErrorCheck(unsigned int program_id) {
   success = 0;
-  memset(infoLog, 0, SHADER_ERROR_LOG_SIZE);
-  glGetProgramiv(program_id, GL_LINK_STATUS, &success);
+  std::memset(infoLog, 0, SHADER_ERROR_LOG_SIZE);
+  ax_glGetProgramiv(program_id, GL_LINK_STATUS, &success);
   if (!success) {
-    glGetProgramInfoLog(program_id, SHADER_ERROR_LOG_SIZE, nullptr, infoLog);
+    ax_glGetProgramInfoLog(program_id, SHADER_ERROR_LOG_SIZE, nullptr, infoLog);
     LOG("Shader linkage failed with error : " + std::string(infoLog), LogLevel::ERROR);
   }
 }
@@ -57,10 +58,10 @@ Shader::Shader(const std::string &vertex_code, const std::string &fragment_code)
   vertex_shader_txt = vertex_code;
 }
 
-void Shader::enableAttributeArray(GLuint att) { glEnableVertexAttribArray(att); }
+void Shader::enableAttributeArray(GLuint att) { ax_glEnableVertexAttribArray(att); }
 
 void Shader::setAttributeBuffer(GLuint location, GLenum etype, int offset, int tuplesize, int stride) {
-  glVertexAttribPointer(location, tuplesize, etype, GL_FALSE, stride, (void *)0);
+  ax_glVertexAttribPointer(location, tuplesize, etype, GL_FALSE, stride, (void *)0);
 }
 
 void Shader::setTextureUniforms(const std::string &texture_name, Texture::TYPE texture_type) {
@@ -152,50 +153,39 @@ void Shader::setModelViewProjection(const glm::mat4 &projection, const glm::mat4
   setModelViewProjectionMatricesUniforms(projection, view, model);
 }
 
-void Shader::setUniformValue(int location, const int value) { glUniform1i(location, value); }
+void Shader::setUniformValue(int location, const int value) { ax_glUniform1i(location, value); }
 
-void Shader::setUniformValue(int location, const float value) { glUniform1f(location, value); }
+void Shader::setUniformValue(int location, const float value) { ax_glUniform1f(location, value); }
 
-void Shader::setUniformValue(int location, const unsigned int value) { glUniform1ui(location, value); }
+void Shader::setUniformValue(int location, const unsigned int value) { ax_glUniform1ui(location, value); }
 
-void Shader::setUniformValue(int location, const glm::mat4 &matrix) { glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix)); }
+void Shader::setUniformValue(int location, const glm::mat4 &matrix) { ax_glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix)); }
 
-void Shader::setUniformValue(int location, const glm::mat3 &matrix) { glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix)); }
+void Shader::setUniformValue(int location, const glm::mat3 &matrix) { ax_glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix)); }
 
-void Shader::setUniformValue(int location, const glm::vec4 &value) { glUniform4f(location, value.x, value.y, value.z, value.w); }
+void Shader::setUniformValue(int location, const glm::vec4 &value) { ax_glUniform4f(location, value.x, value.y, value.z, value.w); }
 
-void Shader::setUniformValue(int location, const glm::vec3 &value) { glUniform3f(location, value.x, value.y, value.z); }
+void Shader::setUniformValue(int location, const glm::vec3 &value) { ax_glUniform3f(location, value.x, value.y, value.z); }
 
-void Shader::setUniformValue(int location, const glm::vec2 &value) { glUniform2f(location, value.x, value.y); }
+void Shader::setUniformValue(int location, const glm::vec2 &value) { ax_glUniform2f(location, value.x, value.y); }
 
 void Shader::initializeShader() {
   if (!is_initialized) {
-
-    errorCheck(__FILE__, __LINE__);
     const char *vertex_shader_source = (const char *)vertex_shader_txt.c_str();
     const char *fragment_shader_source = (const char *)fragment_shader_txt.c_str();
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-
-    glShaderSource(vertex_shader, 1, &vertex_shader_source, nullptr);
-    glCompileShader(vertex_shader);
-
-    errorCheck(__FILE__, __LINE__);
+    ax_glShaderSource(vertex_shader, 1, &vertex_shader_source, nullptr);
+    ax_glCompileShader(vertex_shader);
     shaderCompilationErrorCheck(vertex_shader);
     fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_source, nullptr);
-    glCompileShader(fragment_shader);
-    errorCheck(__FILE__, __LINE__);
+    ax_glShaderSource(fragment_shader, 1, &fragment_shader_source, nullptr);
+    ax_glCompileShader(fragment_shader);
     shaderCompilationErrorCheck(fragment_shader);
     shader_program = glCreateProgram();
-    glAttachShader(shader_program, vertex_shader);
-    glAttachShader(shader_program, fragment_shader);
-
-    errorCheck(__FILE__, __LINE__);
-    glLinkProgram(shader_program);
-
-    errorCheck(__FILE__, __LINE__);
+    ax_glAttachShader(shader_program, vertex_shader);
+    ax_glAttachShader(shader_program, fragment_shader);
+    ax_glLinkProgram(shader_program);
     programLinkingErrorCheck(shader_program);
-    errorCheck(__FILE__, __LINE__);
     is_initialized = true;
   }
 }
@@ -204,16 +194,16 @@ void Shader::recompile() {
   initializeShader();
 }
 
-void Shader::bind() { glUseProgram(shader_program); }
+void Shader::bind() { ax_glUseProgram(shader_program); }
 
-void Shader::release() { glUseProgram(0); }
+void Shader::release() { ax_glUseProgram(0); }
 
 void Shader::clean() {
   if (shader_program != 0) {
     LOG("Destroying shader : " + std::to_string(shader_program), LogLevel::INFO);
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
-    glDeleteProgram(shader_program);
+    ax_glDeleteShader(vertex_shader);
+    ax_glDeleteShader(fragment_shader);
+    ax_glDeleteProgram(shader_program);
     shader_program = 0;
     is_initialized = false;
   }

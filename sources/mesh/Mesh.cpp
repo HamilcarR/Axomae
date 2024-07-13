@@ -1,7 +1,9 @@
 #include "Mesh.h"
 #include "DebugGL.h"
+#include "GL_static_wrappers.h"
 #include "PerformanceLogger.h"
 #include "project_macros.h"
+
 Mesh::Mesh(SceneTreeNode *parent) : SceneTreeNode(parent) {
   mesh_initialized = false;
   face_culling_enabled = false;
@@ -67,7 +69,7 @@ void Mesh::preRenderSetup() {
   face_culling_enabled = true;
   setDepthMask(true);
   setDepthFunc(LESS);
-  glPolygonMode(GL_FRONT_AND_BACK, polygon_mode);
+  ax_glPolygonMode(GL_FRONT_AND_BACK, polygon_mode);
   depth_mask_enabled = true;
   glm::mat4 model_mat = computeFinalTransformation();
   modelview_matrix = camera->getView() * model_mat;
@@ -90,9 +92,7 @@ void Mesh::setShader(Shader *shader) {
 void Mesh::setupAndBind() {
   if (shader_program) {
     bindShaders();
-    errorCheck(__FILE__, __LINE__);
     preRenderSetup();
-    errorCheck(__FILE__, __LINE__);
   }
 }
 
@@ -120,11 +120,11 @@ void Mesh::setSceneCameraPointer(Camera *camera) {
     shader_program->setSceneCameraPointer(camera);
 }
 
-void Mesh::cullBackFace() { glCullFace(GL_BACK); }
+void Mesh::cullBackFace() { ax_glCullFace(GL_BACK); }
 
-void Mesh::cullFrontFace() { glCullFace(GL_FRONT); }
+void Mesh::cullFrontFace() { ax_glCullFace(GL_FRONT); }
 
-void Mesh::cullFrontAndBackFace() { glCullFace(GL_FRONT_AND_BACK); }
+void Mesh::cullFrontAndBackFace() { ax_glCullFace(GL_FRONT_AND_BACK); }
 
 void Mesh::afterRenderSetup() { EMPTY_FUNCBODY; }
 
@@ -132,20 +132,20 @@ void Mesh::setPolygonDrawMode(RASTERMODE mode) { polygon_mode = mode; }
 
 void Mesh::setFaceCulling(bool value) {
   if (value) {
-    glEnable(GL_CULL_FACE);
+    ax_glEnable(GL_CULL_FACE);
     face_culling_enabled = true;
   } else {
-    glDisable(GL_CULL_FACE);
+    ax_glDisable(GL_CULL_FACE);
     face_culling_enabled = false;
   }
 }
 
 void Mesh::setDepthMask(bool val) {
-  glDepthMask(val ? GL_TRUE : GL_FALSE);
+  ax_glDepthMask(val ? GL_TRUE : GL_FALSE);
   depth_mask_enabled = val;
 }
 
-void Mesh::setDepthFunc(DEPTHFUNC func) { glDepthFunc(func); }
+void Mesh::setDepthFunc(DEPTHFUNC func) { ax_glDepthFunc(func); }
 
 /*****************************************************************************************************************/
 CubeMesh::CubeMesh(SceneTreeNode *parent) : Mesh(parent) {
@@ -187,7 +187,7 @@ void CubeMesh::preRenderSetup() {
   setFaceCulling(true);
   setDepthMask(true);
   setDepthFunc(ALWAYS);
-  glPolygonMode(GL_FRONT_AND_BACK, FILL);
+  ax_glPolygonMode(GL_FRONT_AND_BACK, FILL);
   glm::mat4 model_mat = computeFinalTransformation();
   modelview_matrix = camera->getView() * model_mat;
   if (shader_program) {
@@ -202,7 +202,7 @@ CubeMapMesh::CubeMapMesh(SceneTreeNode *parent) : CubeMesh(parent) { name = "Cub
 void CubeMapMesh::preRenderSetup() {
   setFaceCulling(false);
   setDepthFunc(LESS_OR_EQUAL);
-  glPolygonMode(GL_FRONT_AND_BACK, FILL);
+  ax_glPolygonMode(GL_FRONT_AND_BACK, FILL);
   glm::mat4 view = glm::mat4(glm::mat3(camera->getView()));
   glm::mat4 projection = camera->getProjection();
   glm::mat4 local = camera->getSceneRotationMatrix();
@@ -235,7 +235,7 @@ void QuadMesh::preRenderSetup() {
   setFaceCulling(false);
   setDepthMask(true);
   setDepthFunc(LESS);
-  glPolygonMode(GL_FRONT_AND_BACK, FILL);
+  ax_glPolygonMode(GL_FRONT_AND_BACK, FILL);
   glm::mat4 model_mat = computeFinalTransformation();
   modelview_matrix = camera->getView() * model_mat;
   if (shader_program) {
@@ -258,7 +258,7 @@ void FrameBufferMesh::preRenderSetup() {
   setFaceCulling(false);
   face_culling_enabled = false;
   setDepthFunc(ALWAYS);
-  glPolygonMode(GL_FRONT_AND_BACK, FILL);
+  ax_glPolygonMode(GL_FRONT_AND_BACK, FILL);
 }
 
 /*****************************************************************************************************************/
@@ -292,7 +292,7 @@ void BoundingBoxMesh::preRenderSetup() {
   face_culling_enabled = true;
   setDepthMask(true);
   setDepthFunc(LESS);
-  glPolygonMode(GL_FRONT_AND_BACK, LINE);
+  ax_glPolygonMode(GL_FRONT_AND_BACK, LINE);
   depth_mask_enabled = true;
   glm::mat4 model = computeFinalTransformation();
   modelview_matrix = camera->getView() * model;
@@ -303,4 +303,4 @@ void BoundingBoxMesh::preRenderSetup() {
   }
 }
 
-void BoundingBoxMesh::afterRenderSetup() { glPolygonMode(GL_FRONT_AND_BACK, polygon_mode); }
+void BoundingBoxMesh::afterRenderSetup() { ax_glPolygonMode(GL_FRONT_AND_BACK, polygon_mode); }
