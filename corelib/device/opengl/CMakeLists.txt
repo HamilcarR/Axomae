@@ -4,6 +4,7 @@ add_library(ax_core_opengl
         GLFrameBuffer.cpp
         GLVertexBufferObject.cpp
         GLVertexArrayObject.cpp
+        GLIndexBufferObject.cpp
 )
 
 target_link_libraries(ax_core_device PUBLIC ax_core_opengl)

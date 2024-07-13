@@ -24,7 +24,11 @@ void GLMutablePixelBufferObject::clean() {
   buffer_filled = false;
 }
 
-bool GLMutablePixelBufferObject::unmapBuffer() { return GL_ERROR_CHECK(glUnmapBuffer(buffer_type)); }
+bool GLMutablePixelBufferObject::unmapBuffer() {
+  bool ret = glUnmapBuffer(buffer_type);
+  errorCheck(__FILE__, __func__, __LINE__);
+  return ret;
+}
 
 void GLMutablePixelBufferObject::setNewSize(size_t new_size) {
   setBufferSize(new_size);

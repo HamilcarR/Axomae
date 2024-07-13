@@ -2,7 +2,11 @@
 #define GLGEOMETRYBUFFER_H
 #include "../DeviceBufferInterface.h"
 #include "Object3D.h"
-#include "init_3D.h"
+
+#include "GLIndexBufferObject.h"
+#include "GLVertexArrayObject.h"
+#include "GLVertexBufferObject.h"
+
 /**
  * Wrapper for opengl buffers functions , related to geometry and vertices attributes
  */
@@ -12,15 +16,15 @@
  */
 class PackedGLGeometryBuffer : public DeviceMutableBufferInterface {
  private:
-  GLuint vao;               /**<VAO ID*/
-  GLuint vertex_buffer;     /**<Vertex buffer ID*/
-  GLuint normal_buffer;     /**<Normal buffer ID*/
-  GLuint index_buffer;      /**<Index buffer ID*/
-  GLuint texture_buffer;    /**<Texture buffer ID*/
-  GLuint color_buffer;      /**<Color buffer ID*/
-  GLuint tangent_buffer;    /**<Tangent buffer ID*/
-  const Object3D *geometry; /**<Pointer to the mesh's geometry*/
-  bool buffers_filled;
+  GLVertexArrayObject vao{};
+  GLVertexBufferObject<float> vertex_buffer{};
+  GLVertexBufferObject<float> normal_buffer{};
+  GLVertexBufferObject<float> texture_buffer{};
+  GLVertexBufferObject<float> color_buffer{};
+  GLVertexBufferObject<float> tangent_buffer{};
+  GLIndexBufferObject index_buffer{};
+  const Object3D *geometry{};
+  bool buffers_filled{false};
 
  public:
   PackedGLGeometryBuffer();

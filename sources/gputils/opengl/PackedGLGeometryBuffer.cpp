@@ -1,95 +1,83 @@
-#include "DebugGL.h"
 #include "PackedGLGeometryBuffer.h"
+#include "DebugGL.h"
+
 PackedGLGeometryBuffer::PackedGLGeometryBuffer() {
   geometry = nullptr;
-  vao = 0;
-  vertex_buffer = 0;
-  normal_buffer = 0;
-  index_buffer = 0;
-  texture_buffer = 0;
-  color_buffer = 0;
-  tangent_buffer = 0;
   buffers_filled = false;
 }
 
 PackedGLGeometryBuffer::PackedGLGeometryBuffer(const Object3D *geometry) : PackedGLGeometryBuffer() { this->geometry = geometry; }
 
 bool PackedGLGeometryBuffer::isReady() const {
-  return vao && vertex_buffer && normal_buffer && index_buffer && texture_buffer && color_buffer && tangent_buffer && geometry;
+  return vao.isReady() && vertex_buffer.isReady() && normal_buffer.isReady() && index_buffer.isReady() && texture_buffer.isReady() &&
+         color_buffer.isReady() && tangent_buffer.isReady() && geometry;
 }
 
 void PackedGLGeometryBuffer::clean() {
-  unbindVao();
-  if (vertex_buffer != 0) {
-    GL_ERROR_CHECK(glDeleteBuffers(1, &vertex_buffer));
-  }
-  if (normal_buffer != 0) {
-    GL_ERROR_CHECK(glDeleteBuffers(1, &normal_buffer));
-  }
-  if (index_buffer != 0) {
-    GL_ERROR_CHECK(glDeleteBuffers(1, &index_buffer));
-  }
-  if (texture_buffer != 0) {
-    GL_ERROR_CHECK(glDeleteBuffers(1, &texture_buffer));
-  }
-  if (color_buffer != 0) {
-    GL_ERROR_CHECK(glDeleteBuffers(1, &color_buffer));
-  }
-  if (tangent_buffer != 0) {
-    GL_ERROR_CHECK(glDeleteBuffers(1, &tangent_buffer));
-  }
-  if (vao != 0) {
-    GL_ERROR_CHECK(glDeleteVertexArrays(1, &vao));
-  }
+  vao.unbind();
+  vertex_buffer.unbind();
+  normal_buffer.unbind();
+  index_buffer.unbind();
+  texture_buffer.unbind();
+  color_buffer.unbind();
+  tangent_buffer.unbind();
+
+  vertex_buffer.clean();
+  normal_buffer.clean();
+  index_buffer.clean();
+  texture_buffer.clean();
+  color_buffer.clean();
+  tangent_buffer.clean();
+  vao.clean();
 }
 
 void PackedGLGeometryBuffer::initialize() {
-  GL_ERROR_CHECK(glGenVertexArrays(1, &vao));
-  bindVao();
-  GL_ERROR_CHECK(glGenBuffers(1, &vertex_buffer));
-  GL_ERROR_CHECK(glGenBuffers(1, &normal_buffer));
-  GL_ERROR_CHECK(glGenBuffers(1, &color_buffer));
-  GL_ERROR_CHECK(glGenBuffers(1, &texture_buffer));
-  GL_ERROR_CHECK(glGenBuffers(1, &tangent_buffer));
-  GL_ERROR_CHECK(glGenBuffers(1, &index_buffer));
+  vao.initialize();
+  vao.bind();
+  vertex_buffer.initialize();
+  normal_buffer.initialize();
+  index_buffer.initialize();
+  texture_buffer.initialize();
+  color_buffer.initialize();
+  tangent_buffer.initialize();
 }
 
 void PackedGLGeometryBuffer::bind() { bindVao(); }
 
 void PackedGLGeometryBuffer::unbind() { unbindVao(); }
 
-void PackedGLGeometryBuffer::bindVao() { GL_ERROR_CHECK(glBindVertexArray(vao)); }
+void PackedGLGeometryBuffer::bindVao() { vao.bind(); }
 
-void PackedGLGeometryBuffer::bindVertexBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)); }
+void PackedGLGeometryBuffer::unbindVao() { vao.unbind(); }
 
-void PackedGLGeometryBuffer::bindNormalBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, normal_buffer)); }
+void PackedGLGeometryBuffer::bindVertexBuffer() { vertex_buffer.bind(); }
 
-void PackedGLGeometryBuffer::bindTextureBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, texture_buffer)); }
+void PackedGLGeometryBuffer::bindNormalBuffer() { normal_buffer.bind(); }
 
-void PackedGLGeometryBuffer::bindColorBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, color_buffer)); }
+void PackedGLGeometryBuffer::bindTextureBuffer() { texture_buffer.bind(); }
 
-void PackedGLGeometryBuffer::bindIndexBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer)); }
+void PackedGLGeometryBuffer::bindColorBuffer() { color_buffer.bind(); }
 
-void PackedGLGeometryBuffer::bindTangentBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, tangent_buffer)); }
+void PackedGLGeometryBuffer::bindIndexBuffer() { index_buffer.bind(); }
 
-void PackedGLGeometryBuffer::unbindVao() { GL_ERROR_CHECK(glBindVertexArray(0)); }
+void PackedGLGeometryBuffer::bindTangentBuffer() { tangent_buffer.bind(); }
 
 // TODO: [AX-20] Provide methods to fill individual buffer , or to modify them
-void PackedGLGeometryBuffer::fill() {
+void __attribute((optimize("O0"))) PackedGLGeometryBuffer::fill() {
   if (!buffers_filled) {
     bindVao();
     bindVertexBuffer();
-    GL_ERROR_CHECK(glBufferData(GL_ARRAY_BUFFER, geometry->vertices.size() * sizeof(float), geometry->vertices.data(), GL_STATIC_DRAW));
+    vertex_buffer.fill(geometry->vertices.data(), geometry->vertices.size() * sizeof(float), GLVertexBufferObject<float>::STATIC);
     bindColorBuffer();
-    GL_ERROR_CHECK(glBufferData(GL_ARRAY_BUFFER, geometry->colors.size() * sizeof(float), geometry->colors.data(), GL_STATIC_DRAW));
+    color_buffer.fill(geometry->colors.data(), geometry->colors.size() * sizeof(float), GLVertexBufferObject<float>::STATIC);
     bindNormalBuffer();
-    GL_ERROR_CHECK(glBufferData(GL_ARRAY_BUFFER, geometry->normals.size() * sizeof(float), geometry->normals.data(), GL_STATIC_DRAW));
+    normal_buffer.fill(geometry->normals.data(), geometry->normals.size() * sizeof(float), GLVertexBufferObject<float>::STATIC);
     bindTextureBuffer();
-    GL_ERROR_CHECK(glBufferData(GL_ARRAY_BUFFER, geometry->uv.size() * sizeof(float), geometry->uv.data(), GL_STATIC_DRAW));
+    texture_buffer.fill(geometry->uv.data(), geometry->uv.size() * sizeof(float), GLVertexBufferObject<float>::STATIC);
     bindTangentBuffer();
-    GL_ERROR_CHECK(glBufferData(GL_ARRAY_BUFFER, geometry->tangents.size() * sizeof(float), geometry->tangents.data(), GL_STATIC_DRAW));
+    tangent_buffer.fill(geometry->tangents.data(), geometry->tangents.size() * sizeof(float), GLVertexBufferObject<float>::STATIC);
     bindIndexBuffer();
-    GL_ERROR_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, geometry->indices.size() * sizeof(unsigned int), geometry->indices.data(), GL_STATIC_DRAW));
+    index_buffer.fill(geometry->indices.data(), geometry->indices.size() * sizeof(unsigned), GLIndexBufferObject::STATIC);
     buffers_filled = true;
   }
 }

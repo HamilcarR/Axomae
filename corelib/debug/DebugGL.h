@@ -6,8 +6,10 @@
 #include <sstream>
 
 #define GL_ERROR_CHECK(function) \
-  function; \
-  errorCheck(__FILE__, __func__, __LINE__)
+  do { \
+    function; \
+    errorCheck(__FILE__, __func__, __LINE__); \
+  } while (0)
 
 inline void errorCheck(const char *filename, const char *function, unsigned int line) {
 #ifndef NDEBUG
