@@ -1,17 +1,16 @@
 #ifndef GLGEOMETRYBUFFER_H
 #define GLGEOMETRYBUFFER_H
-#include "GLBufferInterface.h"
+#include "../DeviceBufferInterface.h"
 #include "Object3D.h"
 #include "init_3D.h"
 /**
- * @file GLGeometryBuffer.h
  * Wrapper for opengl buffers functions , related to geometry and vertices attributes
  */
 
 /**
  * @brief Wrapper class for Opengl vertices attributes buffers
  */
-class GLGeometryBuffer : public GLMutableBufferInterface {
+class PackedGLGeometryBuffer : public DeviceMutableBufferInterface {
  private:
   GLuint vao;               /**<VAO ID*/
   GLuint vertex_buffer;     /**<Vertex buffer ID*/
@@ -24,8 +23,8 @@ class GLGeometryBuffer : public GLMutableBufferInterface {
   bool buffers_filled;
 
  public:
-  GLGeometryBuffer();
-  explicit GLGeometryBuffer(const Object3D *geometry);
+  PackedGLGeometryBuffer();
+  explicit PackedGLGeometryBuffer(const Object3D *geometry);
   virtual void setGeometryPointer(const Object3D *geo) { geometry = geo; };
   /**
    * @brief Initialize glGenBuffers for all vertex attributes

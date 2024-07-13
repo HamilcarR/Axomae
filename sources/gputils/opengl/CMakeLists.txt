@@ -1,10 +1,7 @@
-
-# This module needs a rework
-
 add_library(ax_opengl
         CameraFrameBuffer.cpp
         FramebufferHelper.cpp
-        GLGeometryBuffer.cpp
+        PackedGLGeometryBuffer.cpp
         RenderCubeMap.cpp
         RenderQuad.cpp
 )

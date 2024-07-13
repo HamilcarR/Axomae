@@ -1,6 +1,6 @@
-#include "GLGeometryBuffer.h"
 #include "DebugGL.h"
-GLGeometryBuffer::GLGeometryBuffer() {
+#include "PackedGLGeometryBuffer.h"
+PackedGLGeometryBuffer::PackedGLGeometryBuffer() {
   geometry = nullptr;
   vao = 0;
   vertex_buffer = 0;
@@ -12,13 +12,13 @@ GLGeometryBuffer::GLGeometryBuffer() {
   buffers_filled = false;
 }
 
-GLGeometryBuffer::GLGeometryBuffer(const Object3D *geometry) : GLGeometryBuffer() { this->geometry = geometry; }
+PackedGLGeometryBuffer::PackedGLGeometryBuffer(const Object3D *geometry) : PackedGLGeometryBuffer() { this->geometry = geometry; }
 
-bool GLGeometryBuffer::isReady() const {
+bool PackedGLGeometryBuffer::isReady() const {
   return vao && vertex_buffer && normal_buffer && index_buffer && texture_buffer && color_buffer && tangent_buffer && geometry;
 }
 
-void GLGeometryBuffer::clean() {
+void PackedGLGeometryBuffer::clean() {
   unbindVao();
   if (vertex_buffer != 0) {
     GL_ERROR_CHECK(glDeleteBuffers(1, &vertex_buffer));
@@ -43,7 +43,7 @@ void GLGeometryBuffer::clean() {
   }
 }
 
-void GLGeometryBuffer::initialize() {
+void PackedGLGeometryBuffer::initialize() {
   GL_ERROR_CHECK(glGenVertexArrays(1, &vao));
   bindVao();
   GL_ERROR_CHECK(glGenBuffers(1, &vertex_buffer));
@@ -54,28 +54,28 @@ void GLGeometryBuffer::initialize() {
   GL_ERROR_CHECK(glGenBuffers(1, &index_buffer));
 }
 
-void GLGeometryBuffer::bind() { bindVao(); }
+void PackedGLGeometryBuffer::bind() { bindVao(); }
 
-void GLGeometryBuffer::unbind() { unbindVao(); }
+void PackedGLGeometryBuffer::unbind() { unbindVao(); }
 
-void GLGeometryBuffer::bindVao() { GL_ERROR_CHECK(glBindVertexArray(vao)); }
+void PackedGLGeometryBuffer::bindVao() { GL_ERROR_CHECK(glBindVertexArray(vao)); }
 
-void GLGeometryBuffer::bindVertexBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)); }
+void PackedGLGeometryBuffer::bindVertexBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)); }
 
-void GLGeometryBuffer::bindNormalBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, normal_buffer)); }
+void PackedGLGeometryBuffer::bindNormalBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, normal_buffer)); }
 
-void GLGeometryBuffer::bindTextureBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, texture_buffer)); }
+void PackedGLGeometryBuffer::bindTextureBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, texture_buffer)); }
 
-void GLGeometryBuffer::bindColorBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, color_buffer)); }
+void PackedGLGeometryBuffer::bindColorBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, color_buffer)); }
 
-void GLGeometryBuffer::bindIndexBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer)); }
+void PackedGLGeometryBuffer::bindIndexBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer)); }
 
-void GLGeometryBuffer::bindTangentBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, tangent_buffer)); }
+void PackedGLGeometryBuffer::bindTangentBuffer() { GL_ERROR_CHECK(glBindBuffer(GL_ARRAY_BUFFER, tangent_buffer)); }
 
-void GLGeometryBuffer::unbindVao() { GL_ERROR_CHECK(glBindVertexArray(0)); }
+void PackedGLGeometryBuffer::unbindVao() { GL_ERROR_CHECK(glBindVertexArray(0)); }
 
 // TODO: [AX-20] Provide methods to fill individual buffer , or to modify them
-void GLGeometryBuffer::fill() {
+void PackedGLGeometryBuffer::fill() {
   if (!buffers_filled) {
     bindVao();
     bindVertexBuffer();

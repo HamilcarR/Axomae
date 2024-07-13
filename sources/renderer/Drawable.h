@@ -2,9 +2,9 @@
 #define DRAWABLE_H
 
 #include "Camera.h"
-#include "GLGeometryBuffer.h"
 #include "LightingDatabase.h"
 #include "Mesh.h"
+#include "PackedGLGeometryBuffer.h"
 #include "TextureGroup.h"
 
 /**
@@ -20,7 +20,7 @@ class Drawable {
  protected:
   Mesh *mesh_object;           /**<Pointer to the mesh */
   Camera *camera_pointer;      /**<Pointer to the camera*/
-  GLGeometryBuffer gl_buffers; /**<OpenGL buffers*/
+  PackedGLGeometryBuffer gl_buffers; /**<OpenGL buffers*/
 
  public:
   Drawable();

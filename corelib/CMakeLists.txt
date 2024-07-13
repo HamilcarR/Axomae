@@ -2,7 +2,10 @@
 
 add_library(ax_core)
 
-target_include_directories(ax_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(ax_core
+PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
 
 
