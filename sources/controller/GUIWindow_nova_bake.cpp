@@ -6,6 +6,7 @@
 #include "Logger.h"
 #include "WorkspaceTracker.h"
 #include "exception_macros.h"
+#include "integrator/Integrator.h"
 #include "manager/NovaResourceManager.h"
 #include "nova/bake.h"
 #include <QFileDialog>
@@ -64,6 +65,9 @@ namespace controller {
     camera_data.up_vector = renderer_camera.getUpVector();
     camera_data.projection = new_projection;
     camera_data.view = renderer_camera.getTransformedView();
+    camera_data.far = far;
+    camera_data.near = near;
+    camera_data.fov = glm::radians(fov_deg);
 
     engine_data.camera = camera_data;
   }
@@ -101,15 +105,23 @@ namespace controller {
     engine_data.threadpool_tag = NOVABAKE_POOL_TAG;
   }
 
-  std::unique_ptr<nova::HdrBufferStruct> generate_buffers(NovaBakingStructure &nova_baking_structure, const ui_render_options &render_options) {
+  std::unique_ptr<nova::HdrBufferStruct> allocate_buffers(NovaBakingStructure &nova_baking_structure, const ui_render_options &render_options) {
 
     /* buffers*/
     image::ThumbnailImageHolder<float> &image_holder = nova_baking_structure.bake_buffers.image_holder;
     std::vector<float> &partial = nova_baking_structure.bake_buffers.partial;
     std::vector<float> &accumulator = nova_baking_structure.bake_buffers.accumulator;
-    image_holder.data.resize(render_options.width * render_options.height * 4);
-    partial.resize(render_options.width * render_options.height * 4);
-    accumulator.resize(render_options.width * render_options.height * 4);
+    std::vector<float> &depth = nova_baking_structure.bake_buffers.depth;
+    size_t color_buffer_size = render_options.width * render_options.height * 4;
+    size_t depth_buffer_size = render_options.width * render_options.height * 2;
+    image_holder.data.resize(color_buffer_size);
+    partial.resize(color_buffer_size);
+    accumulator.resize(color_buffer_size);
+    depth.reserve(depth_buffer_size);  // only 2 channel needed one for min distance , one for max , initialized at max/min distance.
+    for (int i = 0; i < depth_buffer_size; i += 2) {
+      depth.push_back(1e30f);
+      depth.push_back(-1e30f);
+    }
 
     image_holder.metadata.channels = 4;
     image_holder.metadata.color_corrected = false;
@@ -121,6 +133,7 @@ namespace controller {
 
     buffers->partial_buffer = partial.data();
     buffers->accumulator_buffer = accumulator.data();
+    buffers->depth_buffer = depth.data();
     return buffers;
   }
 
@@ -146,7 +159,7 @@ namespace controller {
     /* Engine type */
     nova_baking_structure.nova_render_scene = nova_baker_utils::render_scene_data{};
     nova_baker_utils::render_scene_data &render_scene_data = nova_baking_structure.nova_render_scene;
-    render_scene_data.buffers = generate_buffers(nova_baking_structure, render_options);
+    render_scene_data.buffers = allocate_buffers(nova_baking_structure, render_options);
     render_scene_data.width = render_options.width;
     render_scene_data.height = render_options.height;
     render_scene_data.engine_instance = std::move(engine_instance);
@@ -280,6 +293,7 @@ namespace controller {
 
   struct ui_inputs {
     int width, height, tiles_number, depth, samples_per_pixel;
+    int render_type_mode_flag;
   };
 
   bool input_check(const ui_inputs &inputs) {
@@ -303,7 +317,46 @@ namespace controller {
       exception::ErrHandler::handle("Invalid sample number.", exception::WARNING);
       return false;
     }
+
     return true;
+  }
+
+  static int get_render_type_mode(const Ui::MainWindow &main_window_ui) {
+    int flag = 0;
+
+    /* color modes */
+    if (main_window_ui.checkbox_rendermode_combined->isChecked())
+      flag |= nova::integrator::COMBINED;
+    if (main_window_ui.checkbox_rendermode_depth->isChecked())
+      flag |= nova::integrator::DEPTH;
+    if (main_window_ui.checkbox_rendermode_normal->isChecked())
+      flag |= nova::integrator::NORMAL;
+    if (main_window_ui.checkbox_rendermode_diffuse->isChecked())
+      flag |= nova::integrator::DIFFUSE;
+    if (main_window_ui.checkbox_rendermode_emissive->isChecked())
+      flag |= nova::integrator::EMISSIVE;
+    if (main_window_ui.checkbox_rendermode_specular->isChecked())
+      flag |= nova::integrator::SPECULAR;
+
+    /* renderer type */
+    std::string render_type = main_window_ui.combobox_enginetype_selector->currentText().toStdString();
+    if (render_type == "Path")
+      flag |= nova::integrator::PATH;
+    else if (render_type == "Bidirectional Path")
+      flag |= nova::integrator::BIPATH;
+    else if (render_type == "Spectral")
+      flag |= nova::integrator::SPECTRAL;
+    else if (render_type == "Metropolis")
+      flag |= nova::integrator::METROPOLIS;
+    else if (render_type == "Photon Mapping")
+      flag |= nova::integrator::PHOTON;
+    else if (render_type == "Marching")
+      flag |= nova::integrator::MARCHING;
+    else if (render_type == "Hybrid")
+      flag |= nova::integrator::HYBRID;
+    else if (render_type == "Voxel")
+      flag |= nova::integrator::VOXEL;
+    return flag;
   }
 
   void Controller::slot_nova_start_bake() {
@@ -313,6 +366,7 @@ namespace controller {
     inputs.samples_per_pixel = main_window_ui.spinbox_sample_per_pixel->value();
     inputs.depth = main_window_ui.spinbox_render_depth->value();
     inputs.tiles_number = main_window_ui.spinbox_tile_number->value();
+    inputs.render_type_mode_flag = get_render_type_mode(main_window_ui);
     bool flip_v = main_window_ui.checkbox_flip_y_axis->isChecked();
     if (!input_check(inputs))
       return;
@@ -329,7 +383,7 @@ namespace controller {
     nova_baking_structure.stop = false;
     bool &b = nova_baking_structure.stop;
     misc_options.cancel_ptr = &b;
-    misc_options.engine_type_flag = nova_baker_utils::ENGINE_TYPE::RGB;
+    misc_options.engine_type_flag = inputs.render_type_mode_flag;
     misc_options.flip_v = flip_v;
     do_nova_render(render_options, misc_options);
   }

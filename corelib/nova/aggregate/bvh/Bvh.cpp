@@ -112,10 +112,10 @@ namespace nova::aggregate {
         }
 
         /* No intersection.*/
-        if (left_intersect == 1e30f)
+        if (left_intersect == MAXFLOAT)
           continue;
         /* Only intersection with left child aabb */
-        if (right_intersect == 1e30f) {
+        if (right_intersect == MAXFLOAT) {
           if (iterator_idx + 1 < MAX_STACK_SIZE)
             add2stack(node_stack, left, iterator_idx);
           continue;

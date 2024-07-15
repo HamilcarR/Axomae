@@ -1,5 +1,4 @@
 add_library(ax_core_cuda
-    cu_macro.h
 )
 
 target_link_libraries(ax_core_device PUBLIC ax_core_cuda)

@@ -8,6 +8,12 @@ namespace nova::camera {
 
   void CameraResourcesHolder::setScreenHeight(int height) { screen_height = height; }
 
+  void CameraResourcesHolder::setFar(float far_) { far = far_; }
+
+  void CameraResourcesHolder::setNear(float near_) { near = near_; }
+
+  void CameraResourcesHolder::setFov(float fov_) { fov = fov_; }
+
   void CameraResourcesHolder::setUpVector(const glm::vec3 &up) { up_vector = up; }
 
   void CameraResourcesHolder::setProjection(const glm::mat4 &projection) { P = projection; }
@@ -35,4 +41,11 @@ namespace nova::camera {
   int CameraResourcesHolder::getScreenWidth() const { return screen_width; }
 
   int CameraResourcesHolder::getScreenHeight() const { return screen_height; }
+
+  float CameraResourcesHolder::getFov() const { return fov; }
+
+  float CameraResourcesHolder::getFar() const { return far; }
+
+  float CameraResourcesHolder::getNear() const { return near; }
+
 }  // namespace nova::camera

@@ -2,13 +2,9 @@
 #define INCLUDES_CUH
 #include "Logger.h"
 #include "constants.h"
-#include "cu_macro.h"
+#include "cuda_utils.h"
 #include "utils_3D.h"
-#include <cuda.h>
-#include <cuda_device_runtime_api.h>
-#include <cuda_runtime_api.h>
-#include <device_launch_parameters.h>
-#include <texture_fetch_functions.h>
+
 #include <texture_types.h>
 
 #define cudaErrCheck(ans) \

@@ -27,9 +27,15 @@ NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *wi
   envmap_manager = std::make_unique<EnvmapTextureManager>(
       *resource_database, screen_size, default_framebuffer_id, *render_pipeline, nullptr, EnvmapTextureManager::SELECTED);
   nova_resource_manager = std::make_unique<nova::NovaResourceManager>();
+  // TODO: Replace by a NovaBakingStructure
   partial_render_buffer.resize(resolution.width * resolution.height * 4);
   accumulated_render_buffer.resize(resolution.width * resolution.height * 4);
   final_render_buffer.resize(resolution.width * resolution.height * 4);
+  depth_buffer.reserve(resolution.width * resolution.height * 2);
+  for (int i = 0; i < resolution.width * resolution.height; i += 2) {
+    depth_buffer.push_back(1e30f);
+    depth_buffer.push_back(-1e30f);
+  }
   pbo_read = std::make_unique<GLMutablePixelBufferObject>(GLMutablePixelBufferObject::UP, partial_render_buffer.size() * sizeof(float));
   nova_engine = std::make_unique<nova::NovaRenderEngineLR>();
   current_frame = next_frame = 0;

@@ -41,19 +41,6 @@ namespace nova_baker_utils {
   void transform_bitangents(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 bitangents[3]);
   void extract_uvs(const geometry::face_data_tri &tri_primitive, glm::vec2 textures[3]);
 
-  enum ENGINE_TYPE : int {
-    RGB = 1 << 0,
-    SPECTRAL = 1 << 1,
-    PATH = 1 << 2,
-    BIPATH = 1 << 3,
-    METROPOLIS = 1 << 4,
-    PHOTON = 1 << 5,
-    MARCHING = 1 << 6,
-    HYBRID = 1 << 7,
-    VOXEL = 1 << 8,
-
-  };
-
   struct render_scene_data {
     std::unique_ptr<nova::HdrBufferStruct> buffers;
     int width, height;
@@ -68,6 +55,8 @@ namespace nova_baker_utils {
     glm::vec3 up_vector;
     glm::vec3 position;
     glm::vec3 direction;
+    int width, height;
+    float far, near, fov;
   };
 
   struct scene_transform_data {
@@ -97,10 +86,10 @@ namespace nova_baker_utils {
   /* Takes an initialized NovaResourceManager.*/
   void bake_scene(render_scene_data &rendering_data);
   void initialize_manager(const engine_data &render_data, nova::NovaResourceManager &nova_resource_manager);
-  void initialize_matrices(const camera_data &scene_camera,
-                           const scene_transform_data &scene_data,
-                           nova::scene::SceneTransformations &scene_transform,
-                           nova::camera::CameraResourcesHolder &camera_resources_holder);
+  void initialize_scene_data(const camera_data &scene_camera,
+                             const scene_transform_data &scene_data,
+                             nova::scene::SceneTransformations &scene_transform,
+                             nova::camera::CameraResourcesHolder &camera_resources_holder);
   void initialize_engine_opts(const engine_data &engine_opts, nova::engine::EngineResourcesHolder &engine_resources_holder);
   void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureRawData &texture_raw_data);
   void cancel_render(engine_data &data);

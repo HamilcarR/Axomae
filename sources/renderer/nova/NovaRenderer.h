@@ -47,6 +47,7 @@ class NovaRenderer final : public IRenderer {
   std::vector<float> partial_render_buffer;
   std::vector<float> accumulated_render_buffer;
   std::vector<float> final_render_buffer;
+  std::vector<float> depth_buffer;
   Dim2 resolution{2048, 2048};
   int current_frame{}, next_frame{}, scanline{};
   bool needRedraw{false};

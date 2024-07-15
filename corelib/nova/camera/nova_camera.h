@@ -7,6 +7,8 @@ namespace nova::camera {
    private:
     unsigned int screen_width;
     unsigned int screen_height;
+    float far, near;
+    float fov;  // In radians
     /*Projection*/
     glm::mat4 P;
     glm::mat4 inv_P;
@@ -32,6 +34,9 @@ namespace nova::camera {
     void setDirection(const glm::vec3 &direction);
     void setScreenWidth(int width);
     void setScreenHeight(int height);
+    void setFar(float far);
+    void setNear(float near);
+    void setFov(float fov);
     [[nodiscard]] const glm::vec3 &getUpVector() const;
     [[nodiscard]] const glm::mat4 &getProjection() const;
     [[nodiscard]] const glm::mat4 &getInvProjection() const;
@@ -41,6 +46,9 @@ namespace nova::camera {
     [[nodiscard]] const glm::vec3 &getDirection() const;
     [[nodiscard]] int getScreenWidth() const;
     [[nodiscard]] int getScreenHeight() const;
+    [[nodiscard]] float getFar() const;
+    [[nodiscard]] float getNear() const;
+    [[nodiscard]] float getFov() const;
   };
 }  // namespace nova::camera
 #endif  // NOVA_CAMERA_H

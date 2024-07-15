@@ -191,7 +191,7 @@ float BoundingBox::intersect(const glm::vec3 &ray_direction, const glm::vec3 &ra
   tmin = std::max(tmin, std::min(tz1, tz2)), tmax = std::min(tmax, std::max(tz1, tz2));
   if (tmax >= tmin && tmax > 0 && tmin <= dist_min)
     return tmin;
-  return 1e30f;
+  return MAXFLOAT;
 }
 
 float BoundingBox::area() const {

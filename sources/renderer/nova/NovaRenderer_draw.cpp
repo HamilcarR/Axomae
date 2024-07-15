@@ -6,6 +6,7 @@
 #include "GLMutablePixelBufferObject.h"
 #include "NovaRenderer.h"
 #include "bake.h"
+#include "integrator/Integrator.h"
 #include "manager/NovaResourceManager.h"
 #include <sys/param.h>
 
@@ -52,6 +53,7 @@ void NovaRenderer::initializeEngine() {
   engine_opts.samples_max = MAX_SAMPLES;
   engine_opts.stop_render_ptr = &cancel_render;
   engine_opts.threadpool_tag = NOVA_REALTIME_TAG;
+  engine_opts.engine_type_flag = nova::integrator::COMBINED | nova::integrator::PATH;
 
   initialize_engine_opts(engine_opts, nova_resource_manager->getEngineData());
 }
@@ -93,6 +95,7 @@ void NovaRenderer::resetToBaseState() {
 void NovaRenderer::draw() {
   engine_render_buffers.accumulator_buffer = accumulated_render_buffer.data();
   engine_render_buffers.partial_buffer = partial_render_buffer.data();
+  engine_render_buffers.depth_buffer = depth_buffer.data();
   engine_render_buffers.byte_size_buffers = screen_size.height * screen_size.width * sizeof(float) * 4;
 
   populateNovaSceneResources();
@@ -106,13 +109,13 @@ void NovaRenderer::draw() {
 
   framebuffer_texture->bind();
   pbo_read->bind();
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // TODO : use wrappers
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  ax_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  ax_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
   // Set texture filtering mode
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  GL_ERROR_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, screen_size.width, screen_size.height, 0, GL_RGBA, GL_FLOAT, nullptr));
+  ax_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  ax_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  ax_glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, screen_size.width, screen_size.height, 0, GL_RGBA, GL_FLOAT, nullptr);
 
   pbo_map_buffer = pbo_read->mapBufferRange<float>(0, screen_size.width * screen_size.height * 4 * sizeof(float), 0);
   if (pbo_map_buffer) {
@@ -174,7 +177,7 @@ void NovaRenderer::updateNovaCameraFields() {
   st_data.root_rotation = scene_camera->getSceneRotationMatrix();
   st_data.root_translation = scene_camera->getSceneTranslationMatrix();
 
-  initialize_matrices(c_data, st_data, nova_scene_transformations, nova_camera_structure);
+  initialize_scene_data(c_data, st_data, nova_scene_transformations, nova_camera_structure);
   nova_camera_structure.setScreenWidth((int)screen_size.width);
   nova_camera_structure.setScreenHeight((int)screen_size.height);
 }

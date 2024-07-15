@@ -15,6 +15,7 @@ namespace nova {
     size_t byte_size_buffers{};
     int channels{};
     std::vector<Tile> tiles;
+    T *depth_buffer;
   };
   using HdrBufferStruct = RenderBuffers<float>;
 
@@ -27,10 +28,11 @@ namespace nova {
       int aliasing_samples{};
       int renderer_max_samples{};
       int max_depth{};
-      std::atomic_long latency;
-      bool *cancel_render;
+      std::atomic_long latency{};
+      bool *cancel_render{};  // hold bool value here , and point elsewhere you donkey .
       bool v_invert{false};
       std::string threadpool_tag;
+      int integrator_flag;
 
      public:
       CLASS_CM(EngineResourcesHolder)
@@ -44,6 +46,8 @@ namespace nova {
       void setCancelPtr(bool *cancel_ptr);
       void setVAxisInversed(bool invert);
       void setTag(const std::string &tag);
+      void setIntegratorType(int type);
+
       [[nodiscard]] int getTilesWidth() const;
       [[nodiscard]] int getTilesHeight() const;
       [[nodiscard]] int getSampleIncrement() const;
@@ -53,6 +57,7 @@ namespace nova {
       [[nodiscard]] bool *getCancelPtr() const;
       [[nodiscard]] bool isAxisVInverted() const;
       [[nodiscard]] const std::string &getTag() const;
+      [[nodiscard]] int getIntegratorType() const;
     };
   }  // namespace engine
 }  // namespace nova

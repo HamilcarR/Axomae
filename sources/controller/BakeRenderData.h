@@ -11,6 +11,7 @@ namespace controller {
     image::ThumbnailImageHolder<float> image_holder;
     std::vector<float> accumulator;
     std::vector<float> partial;
+    std::vector<float> depth;
   };
 
   struct NovaBakingStructure {

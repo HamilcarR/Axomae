@@ -18,6 +18,10 @@ namespace nova::engine {
 
   void EngineResourcesHolder::setTag(const std::string &tag) { threadpool_tag = tag; }
 
+  void EngineResourcesHolder::setIntegratorType(int type) { integrator_flag = type; }
+
+  int EngineResourcesHolder::getIntegratorType() const { return integrator_flag; }
+
   int EngineResourcesHolder::getTilesWidth() const { return tiles_w; }
 
   int EngineResourcesHolder::getTilesHeight() const { return tiles_h; }

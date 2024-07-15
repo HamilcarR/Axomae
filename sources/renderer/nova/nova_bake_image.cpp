@@ -13,10 +13,10 @@ namespace exception {
   };
 }  // namespace exception
 namespace nova_baker_utils {
-  void initialize_matrices(const camera_data &scene_camera,
-                           const scene_transform_data &scene_data,
-                           nova::scene::SceneTransformations &nova_scene_transformations,
-                           nova::camera::CameraResourcesHolder &nova_camera_structure) {
+  void initialize_scene_data(const camera_data &scene_camera,
+                             const scene_transform_data &scene_data,
+                             nova::scene::SceneTransformations &nova_scene_transformations,
+                             nova::camera::CameraResourcesHolder &nova_camera_structure) {
 
     /* Camera data*/
     nova_camera_structure.setUpVector(scene_camera.up_vector);
@@ -26,6 +26,11 @@ namespace nova_baker_utils {
     nova_camera_structure.setInvView(glm::inverse(nova_camera_structure.getView()));
     nova_camera_structure.setPosition(scene_camera.position);
     nova_camera_structure.setDirection(scene_camera.direction);
+    nova_camera_structure.setFar(scene_camera.far);
+    nova_camera_structure.setNear(scene_camera.near);
+    nova_camera_structure.setScreenWidth(scene_camera.width);
+    nova_camera_structure.setScreenHeight(scene_camera.height);
+    nova_camera_structure.setFov(scene_camera.fov);
 
     /* Scene root transformations */
     nova_scene_transformations.setTranslation(scene_data.root_translation);
@@ -51,6 +56,7 @@ namespace nova_baker_utils {
     engine_resources_holder.setTilesWidth(engine_opts.num_tiles_h);
     engine_resources_holder.setVAxisInversed(engine_opts.flip_v);
     engine_resources_holder.setTag(engine_opts.threadpool_tag);
+    engine_resources_holder.setIntegratorType(engine_opts.engine_type_flag);
   }
 
   void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureRawData &texture_raw_data) {
@@ -64,7 +70,7 @@ namespace nova_baker_utils {
     /* Initialize every matrix of the scene , and camera structures*/
     nova::camera::CameraResourcesHolder &camera_resources_holder = manager.getCameraData();
     nova::scene::SceneTransformations &scene_transformations = manager.getSceneTransformation();
-    initialize_matrices(engine_opts.camera, engine_opts.scene, scene_transformations, camera_resources_holder);
+    initialize_scene_data(engine_opts.camera, engine_opts.scene, scene_transformations, camera_resources_holder);
 
     /* Initialize engine options */
     nova::engine::EngineResourcesHolder &engine_resources_holder = manager.getEngineData();
@@ -93,13 +99,7 @@ namespace nova_baker_utils {
 
   void cancel_render(engine_data &data) { *data.stop_render_ptr = true; }
 
-  std::unique_ptr<NovaRenderEngineInterface> create_engine(const engine_data &engine_type) {
-    if (engine_type.engine_type_flag & RGB) {
-      return std::make_unique<nova::NovaRenderEngineLR>();
-    }
-    AX_UNREACHABLE
-    return nullptr;
-  }
+  std::unique_ptr<NovaRenderEngineInterface> create_engine(const engine_data &engine_type) { return std::make_unique<nova::NovaRenderEngineLR>(); }
 
   void synchronize_render_threads(render_scene_data &scene_data, const std::string &tag) {
     if (scene_data.thread_pool) {

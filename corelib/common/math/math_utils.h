@@ -17,7 +17,6 @@ struct Dim2 {
 };
 namespace math {
   inline constexpr double epsilon = 1e-6;
-
   namespace calculus {
 
     /* Will compute X in :

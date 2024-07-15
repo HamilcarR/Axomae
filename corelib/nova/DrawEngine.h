@@ -19,7 +19,6 @@ namespace nova {
    public:
     CLASS_OCM(NovaRenderEngineLR)
 
-    glm::vec4 engine_sample_color(const Ray &ray, const NovaResourceManager *nova_resources, int depth) override;
     void engine_render_tile(HdrBufferStruct *dest_buffer, Tile &tile, const NovaResourceManager *nova_resources) override;
   };
 

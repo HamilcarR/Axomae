@@ -11,6 +11,8 @@ PRIVATE
         ax_core_common
         ax_core_thread
         ax_core_macro
+        ax_core_device
+        ax_core_debug
 )
 
 target_include_directories(ax_core_nova
@@ -29,4 +31,5 @@ add_subdirectory(integrator)
 add_subdirectory(kernel)
 add_subdirectory(camera)
 add_subdirectory(aggregate)
+add_subdirectory(sampler)
 add_subdirectory(manager)
