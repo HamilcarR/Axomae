@@ -28,12 +28,13 @@ class CubemapTexture : public GenericTexture {
    */
 
   void initializeTexture2D() override;
-  void bindTexture() override;
-  void unbindTexture() override;
+  void bind() override;
+  void unbind() override;
   void setNewSize(unsigned _width, unsigned _height) override;
-  void setGlData(Shader *shader) override;
+  void initialize(Shader *shader) override;
   void generateMipmap() override;
   static const char *getTextureTypeCStr();
+  [[nodiscard]] TYPE getTextureType() const override { return CUBEMAP; }
 
  protected:
   virtual void setCubeMapTextureData(TextureData *texture);

@@ -2,8 +2,7 @@
 #include "Shader.h"
 
 CubemapTexture::CubemapTexture(FORMAT _internal_format, FORMAT _data_format, FORMAT _data_type, unsigned _width, unsigned _height)
-    : GenericTexture() {  //! Move arguments to Texture()
-  type = CUBEMAP;
+    : GenericTexture() {
   internal_format = _internal_format;
   data_format = _data_format;
   data_type = _data_type;
@@ -35,7 +34,6 @@ void CubemapTexture::setCubeMapTextureData(TextureData *texture) {
 }
 
 CubemapTexture::CubemapTexture(TextureData *data) : CubemapTexture() {
-  type = CUBEMAP;
   if (data)
     CubemapTexture::setCubeMapTextureData(data);
 }
@@ -59,26 +57,26 @@ void CubemapTexture::initializeTexture2D() {
 }
 
 void CubemapTexture::generateMipmap() {
-  bindTexture();
+  bind();
   ax_glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
   ax_glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  unbindTexture();
+  unbind();
 }
 
-void CubemapTexture::setGlData(Shader *shader) {
+void CubemapTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
-  bindTexture();
+  bind();
   initializeTexture2D();
   shader->setTextureUniforms(type2str(CUBEMAP), CUBEMAP);
-  unbindTexture();
+  unbind();
 }
 
-void CubemapTexture::bindTexture() {
+void CubemapTexture::bind() {
   ax_glActiveTexture(GL_TEXTURE0 + CUBEMAP);
   ax_glBindTexture(GL_TEXTURE_CUBE_MAP, sampler2D);
 }
 
-void CubemapTexture::unbindTexture() {
+void CubemapTexture::unbind() {
   ax_glActiveTexture(GL_TEXTURE0 + CUBEMAP);
   ax_glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }

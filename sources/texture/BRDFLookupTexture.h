@@ -13,15 +13,15 @@
  */
 class BRDFLookupTexture : public GenericTexture {
  protected:
-  BRDFLookupTexture();
   explicit BRDFLookupTexture(TextureData *data);
 
  public:
-  void bindTexture() override;
-  void unbindTexture() override;
-  void setGlData(Shader *shader) override;
+  void bind() override;
+  void unbind() override;
+  void initialize(Shader *shader) override;
   void initializeTexture2D() override;
   static const char *getTextureTypeCStr();
+  [[nodiscard]] TYPE getTextureType() const override { return BRDFLUT; }
 };
 
 #endif  // BRDFLOOKUPTEXTURE_H

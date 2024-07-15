@@ -41,8 +41,8 @@ namespace image {
   }
   template<class T>
   void ImageHolder<T>::flip_u() {
-    for (int y = 0; y < metadata.height / 2; y++) {
-      for (int x = 0; x < metadata.width; x++) {
+    for (int y = 0; y < metadata.height; y++) {
+      for (int x = 0; x < metadata.width / 2; x++) {
         int cur = (y * metadata.width + x) * metadata.channels;
         int inv = (y * metadata.width + (metadata.width - 1 - x)) * metadata.channels;
         for (int k = 0; k < metadata.channels; k++)

@@ -3,14 +3,14 @@
 #include "GenericTexture.h"
 class OpacityTexture : public GenericTexture {
  protected:
-  OpacityTexture();
   explicit OpacityTexture(TextureData *data);
 
  public:
-  void bindTexture() override;
-  void unbindTexture() override;
-  void setGlData(Shader *shader) override;
+  void bind() override;
+  void unbind() override;
+  void initialize(Shader *shader) override;
   static const char *getTextureTypeCStr();
+  [[nodiscard]] TYPE getTextureType() const override { return OPACITY; }
 };
 
 #endif  // OPACITYTEXTURE_H

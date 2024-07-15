@@ -1,10 +1,6 @@
 
+#include "../texture/texture_list.h"
 #include "DatabaseBuilderTest.h"
-
-#define TYPE_LIST \
-  DiffuseTexture, NormalTexture, MetallicTexture, RoughnessTexture, AmbiantOcclusionTexture, SpecularTexture, EmissiveTexture, OpacityTexture, \
-      CubemapTexture, EnvironmentMap2DTexture, IrradianceTexture, BRDFLookupTexture, FrameBufferTexture, GenericCubemapTexture, Generic2DTexture, \
-      RoughnessTexture
 
 const int COUNT = 16;
 namespace texture_database_test {

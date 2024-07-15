@@ -1,10 +1,10 @@
-#ifndef ShaderInterface_H
-#define ShaderInterface_H
+#ifndef DEVICESHADERINTERFACE_H
+#define DEVICESHADERINTERFACE_H
 #include <string>
 
-class ShaderInterface {
+class DeviceShaderInterface {
  public:
-  virtual ~ShaderInterface() = default;
+  virtual ~DeviceShaderInterface() = default;
   virtual void initializeShader() = 0;
   virtual void recompile() = 0;
   virtual void bind() = 0;
@@ -14,4 +14,4 @@ class ShaderInterface {
   [[nodiscard]] virtual bool isInitialized() const = 0;
 };
 
-#endif  // ShaderInterface_H
+#endif

@@ -1,6 +1,7 @@
 #ifndef GENERICTEXTURE_H
 #define GENERICTEXTURE_H
 
+#include "DeviceTextureInterface.h"
 #include "GenericTextureProcessing.h"
 #include "constants.h"
 #include "init_3D.h"
@@ -12,7 +13,7 @@ class Shader;
 /**
  * @brief Texture class
  */
-class GenericTexture {
+class GenericTexture : public DeviceTextureInterface {
  public:
   enum FORMAT : unsigned {
     /*Internal and data formats*/
@@ -51,7 +52,6 @@ class GenericTexture {
 
  protected:
   std::string name{};
-  TYPE type{};
   FORMAT internal_format{};
   FORMAT data_format{};
   FORMAT data_type{};
@@ -69,7 +69,7 @@ class GenericTexture {
   explicit GenericTexture(TextureData *tex);
 
  public:
-  virtual ~GenericTexture() = default;
+  ~GenericTexture() override = default;
   GenericTexture(const GenericTexture &copy) = default;
   GenericTexture(GenericTexture &&move) noexcept = default;
   GenericTexture &operator=(const GenericTexture &copy) = default;
@@ -83,28 +83,27 @@ class GenericTexture {
    * This method will also not free or tamper with the previous sampler2D value.
    */
   void setSamplerID(unsigned int id) { sampler2D = id; }
-  void setTextureType(TYPE type_) { type = type_; }
-  TYPE getTextureType() { return type; };
+  [[nodiscard]] virtual TYPE getTextureType() const { return EMPTY; };
   [[nodiscard]] const uint32_t *getData() const { return data.data(); }
   [[nodiscard]] const float *getFData() const { return f_data.data(); }
-  [[nodiscard]] const unsigned getWidth() const { return width; }
-  [[nodiscard]] const unsigned getHeight() const { return height; }
-  virtual bool isDummyTexture() { return is_dummy; }
+  [[nodiscard]] unsigned getWidth() const { return width; }
+  [[nodiscard]] unsigned getHeight() const { return height; }
+  [[nodiscard]] bool isDummyTexture() const { return is_dummy; }
   void setDummy(bool d) { is_dummy = d; }
   [[nodiscard]] const std::string &getName() const { return name; }
   virtual bool empty() { return data.empty() && f_data.empty(); }
-  virtual bool isInitialized() { return sampler2D != 0; }
+  [[nodiscard]] bool isInitialized() const override { return sampler2D != 0; }
   virtual void setMipmapsLevel(unsigned level) { mipmaps = level; }
   virtual unsigned int getMipmapsLevel() { return mipmaps; }
   virtual void generateMipmap();
-  virtual void bindTexture() = 0;
-  virtual void unbindTexture() = 0;
-  virtual void setGlData(Shader *shader) = 0;
+  virtual void bind() = 0;
+  virtual void unbind() = 0;
+  virtual void initialize(Shader *shader) = 0;
   void cleanGlData();
   virtual void setNewSize(unsigned width, unsigned height);
   template<class T>
   void setNewData(const std::vector<T> &new_buffer, FORMAT format, FORMAT type);
-  void clean();
+  void clean() override;
 
  protected:
   /**
@@ -122,7 +121,7 @@ constexpr unsigned int DUMMY_TEXTURE_DIM = 1;
 constexpr uint32_t DEFAULT_NORMAL_DUMMY_PIXEL_RGBA = 0x007F7FFF;   // Default pixel color for a normal map
 constexpr uint32_t DEFAULT_OPACITY_DUMMY_PIXEL_RGBA = 0xFF000000;  // Default pixel color for other textures
 
-inline constexpr const char *type2str(GenericTexture::TYPE type) {
+constexpr const char *type2str(GenericTexture::TYPE type) {
   switch (type) {
     case GenericTexture::DIFFUSE:
       return "diffuse_map";
@@ -154,6 +153,40 @@ inline constexpr const char *type2str(GenericTexture::TYPE type) {
       return "brdf_lookup_map";
     default:
       return "unknown_map";
+  }
+}
+
+constexpr GenericTexture::TYPE str2type(const char *str) {
+  if (std::strcmp(str, "diffuse_map") == 0) {
+    return GenericTexture::DIFFUSE;
+  } else if (std::strcmp(str, "normal_map") == 0) {
+    return GenericTexture::NORMAL;
+  } else if (std::strcmp(str, "metallic_map") == 0) {
+    return GenericTexture::METALLIC;
+  } else if (std::strcmp(str, "roughness_map") == 0) {
+    return GenericTexture::ROUGHNESS;
+  } else if (std::strcmp(str, "ambiantocclusion_map") == 0) {
+    return GenericTexture::AMBIANTOCCLUSION;
+  } else if (std::strcmp(str, "specular_map") == 0) {
+    return GenericTexture::SPECULAR;
+  } else if (std::strcmp(str, "emissive_map") == 0) {
+    return GenericTexture::EMISSIVE;
+  } else if (std::strcmp(str, "opacity_map") == 0) {
+    return GenericTexture::OPACITY;
+  } else if (std::strcmp(str, "cubemap") == 0) {
+    return GenericTexture::CUBEMAP;
+  } else if (std::strcmp(str, "environment_map") == 0) {
+    return GenericTexture::ENVMAP2D;
+  } else if (std::strcmp(str, "irradiance_map") == 0) {
+    return GenericTexture::IRRADIANCE;
+  } else if (std::strcmp(str, "generic_map") == 0) {
+    return GenericTexture::GENERIC;
+  } else if (std::strcmp(str, "framebuffer_map") == 0) {
+    return GenericTexture::FRAMEBUFFER;
+  } else if (std::strcmp(str, "brdf_lookup_map") == 0) {
+    return GenericTexture::BRDFLUT;
+  } else {
+    return GenericTexture::EMPTY;
   }
 }
 

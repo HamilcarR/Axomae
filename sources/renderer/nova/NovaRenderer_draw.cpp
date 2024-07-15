@@ -104,7 +104,7 @@ void NovaRenderer::draw() {
 
   doProgressiveRender();
 
-  framebuffer_texture->bindTexture();
+  framebuffer_texture->bind();
   pbo_read->bind();
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // TODO : use wrappers
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -122,7 +122,7 @@ void NovaRenderer::draw() {
   }
 
   pbo_read->unbind();
-  framebuffer_texture->unbindTexture();
+  framebuffer_texture->unbind();
   camera_framebuffer->renderFrameBufferMesh();
   displayProgress(current_frame, nova_resource_manager->getEngineData().getMaxSamples());
   current_frame++;

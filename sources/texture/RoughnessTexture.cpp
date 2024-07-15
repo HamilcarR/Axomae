@@ -1,19 +1,12 @@
-//
-// Created by hamilcar on 7/13/24.
-//
-
 #include "RoughnessTexture.h"
 #include "Shader.h"
 
-RoughnessTexture::RoughnessTexture() { type = ROUGHNESS; }
-
 RoughnessTexture::RoughnessTexture(TextureData *data) : GenericTexture(data) {
-  type = ROUGHNESS;
   if (!data)
     set_dummy_TextureData(this);
 }
 
-void RoughnessTexture::setGlData(Shader *shader) {
+void RoughnessTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + ROUGHNESS);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
@@ -22,12 +15,12 @@ void RoughnessTexture::setGlData(Shader *shader) {
   shader->setTextureUniforms(type2str(ROUGHNESS), ROUGHNESS);
 }
 
-void RoughnessTexture::bindTexture() {
+void RoughnessTexture::bind() {
   ax_glActiveTexture(GL_TEXTURE0 + ROUGHNESS);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
 }
 
-void RoughnessTexture::unbindTexture() {
+void RoughnessTexture::unbind() {
   ax_glActiveTexture(GL_TEXTURE0 + ROUGHNESS);
   ax_glBindTexture(GL_TEXTURE_2D, 0);
 }

@@ -6,14 +6,14 @@
 class Shader;
 class AmbiantOcclusionTexture : public GenericTexture {
  protected:
-  AmbiantOcclusionTexture();
   explicit AmbiantOcclusionTexture(TextureData *data);
 
  public:
-  void bindTexture() override;
-  void unbindTexture() override;
-  void setGlData(Shader *shader) override;
+  void bind() override;
+  void unbind() override;
+  void initialize(Shader *shader) override;
   static const char *getTextureTypeCStr();
+  [[nodiscard]] TYPE getTextureType() const override { return AMBIANTOCCLUSION; }
 };
 
 #endif  // AMBIANTOCCLUSIONTEXTURE_H

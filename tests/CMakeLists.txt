@@ -7,6 +7,7 @@ set(CONTROLLER_MODULE_SOURCES "" CACHE INTERNAL "")
 set(NOVA_MODULE_SOURCES "" CACHE INTERNAL "")
 set(DATASTRUCTURE_MODULE_SOURCES "" CACHE INTERNAL "" )
 set(GEOMETRY_MODULE_SOURCES "" CACHE INTERNAL "" )
+set(TEXTURE_MODULE_SOURCES "" CACHE INTERNAL "")
 
 #2) add subdir
 add_subdirectory(database)
@@ -18,6 +19,7 @@ add_subdirectory(common)
 add_subdirectory(nova)
 add_subdirectory(datastructure)
 add_subdirectory(geometry)
+add_subdirectory(texture)
 
 #3) link sources
 add_executable(Axomae_test
@@ -30,6 +32,7 @@ add_executable(Axomae_test
         ${NOVA_MODULE_SOURCES}
         ${DATASTRUCTURE_MODULE_SOURCES}
         ${GEOMETRY_MODULE_SOURCES}
+        ${TEXTURE_MODULE_SOURCES}
 )
 
 #4) link lib

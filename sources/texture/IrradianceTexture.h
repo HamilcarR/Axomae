@@ -1,6 +1,4 @@
-//
-// Created by hamilcar on 7/13/24.
-//
+
 
 #ifndef IRRADIANCETEXTURE_H
 #define IRRADIANCETEXTURE_H
@@ -15,6 +13,7 @@ class IrradianceTexture : public CubemapTexture {
 
  public:
   const char *getTextureTypeCStr();
+  [[nodiscard]] TYPE getTextureType() const override { return IRRADIANCE; }
 };
 
 #endif  // IRRADIANCETEXTURE_H

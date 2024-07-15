@@ -1,5 +1,7 @@
 add_library(ax_core_device
-    DeviceBufferInterface.h
+        DeviceBufferInterface.h
+        DeviceShaderInterface.h
+        DeviceTextureInterface.h
 )
 
 target_link_libraries(ax_core PUBLIC ax_core_device)

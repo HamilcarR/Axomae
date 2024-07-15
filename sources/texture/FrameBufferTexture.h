@@ -1,7 +1,3 @@
-//
-// Created by hamilcar on 7/13/24.
-//
-
 #ifndef FRAMEBUFFERTEXTURE_H
 #define FRAMEBUFFERTEXTURE_H
 #include "GenericTexture.h"
@@ -20,11 +16,12 @@ class FrameBufferTexture : public GenericTexture {
   FrameBufferTexture(unsigned width, unsigned height);
 
  public:
-  void bindTexture() override;
-  void unbindTexture() override;
-  void setGlData(Shader *shader) override;
+  void bind() override;
+  void unbind() override;
+  void initialize(Shader *shader) override;
   void initializeTexture2D() override;
   static const char *getTextureTypeCStr();
+  [[nodiscard]] TYPE getTextureType() const override { return FRAMEBUFFER; }
 };
 
 #endif  // FRAMEBUFFERTEXTURE_H

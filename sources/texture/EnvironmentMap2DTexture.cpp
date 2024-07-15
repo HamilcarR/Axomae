@@ -1,7 +1,3 @@
-//
-// Created by hamilcar on 7/13/24.
-//
-
 #include "EnvironmentMap2DTexture.h"
 #include "Shader.h"
 
@@ -11,7 +7,6 @@
 
 EnvironmentMap2DTexture::EnvironmentMap2DTexture(FORMAT _internal_format, FORMAT _data_format, FORMAT _data_type, unsigned _width, unsigned _height)
     : GenericTexture() {
-  type = ENVMAP2D;
   internal_format = _internal_format;
   data_format = _data_format;
   data_type = _data_type;
@@ -19,7 +14,7 @@ EnvironmentMap2DTexture::EnvironmentMap2DTexture(FORMAT _internal_format, FORMAT
   height = _height;
 }
 
-EnvironmentMap2DTexture::EnvironmentMap2DTexture(TextureData *data) : GenericTexture(data) { type = ENVMAP2D; }
+EnvironmentMap2DTexture::EnvironmentMap2DTexture(TextureData *data) : GenericTexture(data) {}
 
 void EnvironmentMap2DTexture::initializeTexture2D() {
   ax_glTexImage2D(GL_TEXTURE_2D, 0, internal_format, (int)width, (int)height, 0, data_format, data_type, f_data.data());
@@ -30,21 +25,21 @@ void EnvironmentMap2DTexture::initializeTexture2D() {
   ax_glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-void EnvironmentMap2DTexture::setGlData(Shader *shader) {
+void EnvironmentMap2DTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + ENVMAP2D);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
   if (!f_data.empty())
     EnvironmentMap2DTexture::initializeTexture2D();
-  shader->setTextureUniforms(type2str(type), type);
+  shader->setTextureUniforms(type2str(ENVMAP2D), ENVMAP2D);
 }
 
-void EnvironmentMap2DTexture::bindTexture() {
+void EnvironmentMap2DTexture::bind() {
   ax_glActiveTexture(GL_TEXTURE0 + ENVMAP2D);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
 }
 
-void EnvironmentMap2DTexture::unbindTexture() {
+void EnvironmentMap2DTexture::unbind() {
   ax_glActiveTexture(GL_TEXTURE0 + ENVMAP2D);
   ax_glBindTexture(GL_TEXTURE_2D, 0);
 }

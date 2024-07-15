@@ -58,7 +58,7 @@ void TextureGroup::initializeGlTextureData(Shader *shader) {
   for (int id : texture_collection) {
     GenericTexture *A = texture_database->get(id);
     if (A && !A->isInitialized())
-      A->setGlData(shader);
+      A->initialize(shader);
   }
   initialized = true;
 }
@@ -87,7 +87,7 @@ void TextureGroup::bind() {
   for (int id : texture_collection) {
     GenericTexture *A = texture_database->get(id);
     if (A)
-      A->bindTexture();
+      A->bind();
     else
       to_delete.push_back(delete_index);
     delete_index++;
@@ -100,7 +100,7 @@ void TextureGroup::unbind() {
   for (int id : texture_collection) {
     GenericTexture *A = texture_database->get(id);
     if (A)
-      A->unbindTexture();
+      A->unbind();
   }
 }
 

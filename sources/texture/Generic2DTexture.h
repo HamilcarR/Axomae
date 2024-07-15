@@ -9,16 +9,16 @@ class Generic2DTexture : public GenericTexture {
   std::string location_name;
 
  protected:
-  Generic2DTexture();
   explicit Generic2DTexture(TextureData *data);
 
  public:
-  void bindTexture() override;
-  void unbindTexture() override;
-  void setGlData(Shader *shader) override;
+  void bind() override;
+  void unbind() override;
+  void initialize(Shader *shader) override;
   virtual void setTextureUnit(unsigned int texture_unit);
   void setLocationName(const std::string &name);
   const char *getTextureTypeCStr();
+  [[nodiscard]] TYPE getTextureType() const override { return GENERIC; }
 };
 
 #endif  // GENERIC2DTEXTURE_H

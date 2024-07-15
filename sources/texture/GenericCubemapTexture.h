@@ -1,6 +1,4 @@
-//
-// Created by hamilcar on 7/13/24.
-//
+
 
 #ifndef GENERICCUBEMAPTEXTURE_H
 #define GENERICCUBEMAPTEXTURE_H
@@ -18,14 +16,15 @@ class GenericCubemapTexture : public CubemapTexture {
   explicit GenericCubemapTexture(TextureData *data);
 
  public:
-  void bindTexture() override;
-  void unbindTexture() override;
-  void setGlData(Shader *shader) override;
+  void bind() override;
+  void unbind() override;
+  void initialize(Shader *shader) override;
   const char *getTextureTypeCStr();
   void setTextureUnit(unsigned int tex_unit) { texture_unit = tex_unit; }
   void setLocationName(const std::string &loc_name) { location_name = loc_name; }
   [[nodiscard]] unsigned int getTextureUnit() const { return texture_unit; }
   std::string getLocationName() { return location_name; }
+  [[nodiscard]] TYPE getTextureType() const override { return GENERIC_CUBE; }
 };
 
 #endif  // GENERICCUBEMAPTEXTURE_H

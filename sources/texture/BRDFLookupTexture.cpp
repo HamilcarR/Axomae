@@ -1,23 +1,22 @@
 
 #include "BRDFLookupTexture.h"
 #include "Shader.h"
-BRDFLookupTexture::BRDFLookupTexture() : GenericTexture() { type = BRDFLUT; }
 
-BRDFLookupTexture::BRDFLookupTexture(TextureData *data) : GenericTexture(data) { type = BRDFLUT; }
+BRDFLookupTexture::BRDFLookupTexture(TextureData *data) : GenericTexture(data) {}
 
-void BRDFLookupTexture::bindTexture() {
+void BRDFLookupTexture::bind() {
   ax_glActiveTexture(GL_TEXTURE0 + BRDFLUT);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
 }
 
-void BRDFLookupTexture::unbindTexture() {
+void BRDFLookupTexture::unbind() {
   ax_glActiveTexture(GL_TEXTURE0 + BRDFLUT);
   ax_glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void BRDFLookupTexture::setGlData(Shader *shader) {
+void BRDFLookupTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
-  bindTexture();
+  bind();
   initializeTexture2D();
   shader->setTextureUniforms(type2str(BRDFLUT), BRDFLUT);
 }

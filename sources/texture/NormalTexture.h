@@ -1,6 +1,4 @@
-//
-// Created by hamilcar on 7/13/24.
-//
+
 
 #ifndef NORMALTEXTURE_H
 #define NORMALTEXTURE_H
@@ -8,14 +6,15 @@
 
 class NormalTexture : public GenericTexture {
  protected:
-  NormalTexture();
+  NormalTexture() = default;
   explicit NormalTexture(TextureData *data);
 
  public:
-  void bindTexture() override;
-  void unbindTexture() override;
-  void setGlData(Shader *shader) override;
+  void bind() override;
+  void unbind() override;
+  void initialize(Shader *shader) override;
   static const char *getTextureTypeCStr();
+  [[nodiscard]] TYPE getTextureType() const override { return NORMAL; }
 };
 
 #endif  // NORMALTEXTURE_H

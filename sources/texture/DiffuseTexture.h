@@ -1,26 +1,21 @@
-//
-// Created by hamilcar on 7/13/24.
-//
-
 #ifndef DIFFUSETEXTURE_H
 #define DIFFUSETEXTURE_H
 #include "GenericTexture.h"
 
 class DiffuseTexture : public GenericTexture {
  protected:
-  bool has_transparency;
+  bool has_transparency{};
 
  protected:
-  DiffuseTexture();
   explicit DiffuseTexture(TextureData *data);
 
  public:
-  void bindTexture() override;
-  void unbindTexture() override;
+  void bind() override;
+  void unbind() override;
   /**
    * @brief Set the OpenGL texture data infos
    */
-  void setGlData(Shader *shader) override;
+  void initialize(Shader *shader) override;
   /**
    * @brief This overriden method will additionally check for the presence of
    * transparency in the map. If alpha < 1.f , the texture is considered as
@@ -30,6 +25,7 @@ class DiffuseTexture : public GenericTexture {
   void set(TextureData *texture) override;
   virtual bool hasTransparency() { return has_transparency; }
   static const char *getTextureTypeCStr();
+  [[nodiscard]] TYPE getTextureType() const override { return DIFFUSE; }
 };
 
 #endif  // DIFFUSETEXTURE_H

@@ -1,12 +1,7 @@
-//
-// Created by hamilcar on 7/13/24.
-//
-
 #include "FrameBufferTexture.h"
 #include "Shader.h"
 
 FrameBufferTexture::FrameBufferTexture() : GenericTexture() {
-  type = FRAMEBUFFER;
   internal_format = RGBA16F;
   data_format = BGRA;
   data_type = UBYTE;
@@ -36,7 +31,7 @@ void FrameBufferTexture::initializeTexture2D() {
   ax_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
-void FrameBufferTexture::setGlData(Shader *shader) {
+void FrameBufferTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + FRAMEBUFFER);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
@@ -44,12 +39,12 @@ void FrameBufferTexture::setGlData(Shader *shader) {
   shader->setTextureUniforms(type2str(FRAMEBUFFER), FRAMEBUFFER);
 }
 
-void FrameBufferTexture::bindTexture() {
+void FrameBufferTexture::bind() {
   ax_glActiveTexture(GL_TEXTURE0 + FRAMEBUFFER);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
 }
 
-void FrameBufferTexture::unbindTexture() {
+void FrameBufferTexture::unbind() {
   ax_glActiveTexture(GL_TEXTURE0 + FRAMEBUFFER);
   ax_glBindTexture(GL_TEXTURE_2D, 0);
 }

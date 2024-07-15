@@ -4,15 +4,15 @@
 
 class EmissiveTexture : public GenericTexture {
  protected:
-  EmissiveTexture();
   explicit EmissiveTexture(TextureData *data);
 
  public:
   void initializeTexture2D() override;
-  void bindTexture() override;
-  void unbindTexture() override;
-  void setGlData(Shader *shader) override;
+  void bind() override;
+  void unbind() override;
+  void initialize(Shader *shader) override;
   static const char *getTextureTypeCStr();
+  [[nodiscard]] TYPE getTextureType() const override { return EMISSIVE; }
 };
 
 #endif  // EMISSIVETEXTURE_H

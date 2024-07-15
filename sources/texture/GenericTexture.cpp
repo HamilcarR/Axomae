@@ -2,7 +2,6 @@
 #include "Shader.h"
 
 GenericTexture::GenericTexture() {
-  type = EMPTY;
   is_dummy = false;
   width = 0;
   height = 0;
@@ -49,18 +48,18 @@ void GenericTexture::initializeTexture2D() {
 }
 
 void GenericTexture::generateMipmap() {
-  bindTexture();
+  bind();
   ax_glGenerateMipmap(GL_TEXTURE_2D);
   ax_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  unbindTexture();
+  unbind();
 }
 
 void GenericTexture::setNewSize(unsigned _width, unsigned _height) {
   width = _width;
   height = _height;
-  bindTexture();
+  bind();
   ax_glTexImage2D(GL_TEXTURE_2D, 0, internal_format, _width, _height, 0, data_format, data_type, nullptr);
-  unbindTexture();
+  unbind();
 }
 
 void GenericTexture::cleanGlData() {

@@ -1,15 +1,9 @@
-//
-// Created by hamilcar on 7/13/24.
-//
-
 #include "Generic2DTexture.h"
 #include "Shader.h"
 
-Generic2DTexture::Generic2DTexture() { type = GENERIC; }
+Generic2DTexture::Generic2DTexture(TextureData *data) : GenericTexture(data) {}
 
-Generic2DTexture::Generic2DTexture(TextureData *data) : GenericTexture(data) { type = GENERIC; }
-
-void Generic2DTexture::setGlData(Shader *shader) {
+void Generic2DTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + texture_unit);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
@@ -18,12 +12,12 @@ void Generic2DTexture::setGlData(Shader *shader) {
   shader->setTextureUniforms(location_name, texture_unit);
 }
 
-void Generic2DTexture::bindTexture() {
+void Generic2DTexture::bind() {
   ax_glActiveTexture(GL_TEXTURE0 + texture_unit);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
 }
 
-void Generic2DTexture::unbindTexture() {
+void Generic2DTexture::unbind() {
   ax_glActiveTexture(GL_TEXTURE0 + texture_unit);
   ax_glBindTexture(GL_TEXTURE_2D, 0);
 }

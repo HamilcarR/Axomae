@@ -1,7 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "ShaderInterface.h"
+#include "DeviceShaderInterface.h"
 #include "Texture.h"
 #include "init_3D.h"
 #include "project_macros.h"
@@ -15,7 +15,7 @@
 
 class Camera;
 
-class Shader : public ShaderInterface {
+class Shader : public DeviceShaderInterface {
  public:
   enum TYPE : signed {
     EMPTY = -1,

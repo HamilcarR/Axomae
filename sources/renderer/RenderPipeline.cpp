@@ -260,7 +260,7 @@ RenderCubeMap RenderPipeline::constructCubemapFbo(Dim2 *dimensions,
     shader->initializeShader();
   shader->bind();
   auto fb_tpoint = cubemap_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0);
-  fb_tpoint->setGlData(shader);
+  fb_tpoint->initialize(shader);
   shader->release();
   cubemap_fbo.initialize();
   errorCheck(__FILE__, __LINE__);
@@ -283,7 +283,7 @@ RenderQuadFBO RenderPipeline::constructQuadFbo(Dim2 *dimensions,
   if (!shader->isInitialized())
     shader->initializeShader();
   shader->bind();
-  quad_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0)->setGlData(shader);
+  quad_fbo.getFrameBufferTexturePointer(GLFrameBuffer::COLOR0)->initialize(shader);
   shader->release();
   quad_fbo.initialize();
   errorCheck(__FILE__, __LINE__);

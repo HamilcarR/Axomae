@@ -1,7 +1,3 @@
-//
-// Created by hamilcar on 7/13/24.
-//
-
 #ifndef ENVIRONMENTMAP2DTEXTURE_H
 #define ENVIRONMENTMAP2DTEXTURE_H
 
@@ -18,10 +14,11 @@ class EnvironmentMap2DTexture : public GenericTexture {
 
  public:
   void initializeTexture2D() override;
-  void bindTexture() override;
-  void unbindTexture() override;
-  void setGlData(Shader *shader) override;
+  void bind() override;
+  void unbind() override;
+  void initialize(Shader *shader) override;
   static const char *getTextureTypeCStr();
+  [[nodiscard]] TYPE getTextureType() const override { return ENVMAP2D; }
 };
 
 #endif  // ENVIRONMENTMAP2DTEXTURE_H

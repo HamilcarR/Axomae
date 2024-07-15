@@ -1,33 +1,27 @@
-//
-// Created by hamilcar on 7/13/24.
-//
-
 #include "NormalTexture.h"
 
 #include "Shader.h"
-NormalTexture::NormalTexture() { type = NORMAL; }
 
 NormalTexture::NormalTexture(TextureData *texture) : GenericTexture(texture) {
-  type = NORMAL;
   if (data.empty())
     set_dummy_TextureData_normals(this);
 }
 
-void NormalTexture::setGlData(Shader *shader) {
+void NormalTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + NORMAL);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
   if (!data.empty())
     GenericTexture::initializeTexture2D();
-  shader->setTextureUniforms(type2str(type), type);
+  shader->setTextureUniforms(type2str(NORMAL), NORMAL);
 }
 
-void NormalTexture::bindTexture() {
+void NormalTexture::bind() {
   ax_glActiveTexture(GL_TEXTURE0 + NORMAL);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
 }
 
-void NormalTexture::unbindTexture() {
+void NormalTexture::unbind() {
   ax_glActiveTexture(GL_TEXTURE0 + NORMAL);
   ax_glBindTexture(GL_TEXTURE_2D, 0);
 }

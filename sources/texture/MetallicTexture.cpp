@@ -1,19 +1,13 @@
-//
-// Created by hamilcar on 7/13/24.
-//
-
 #include "MetallicTexture.h"
 
 #include "Shader.h"
-MetallicTexture::MetallicTexture() { type = METALLIC; }
 
 MetallicTexture::MetallicTexture(TextureData *data) : GenericTexture(data) {
-  type = METALLIC;
   if (!data)
     set_dummy_TextureData(this);
 }
 
-void MetallicTexture::setGlData(Shader *shader) {
+void MetallicTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + METALLIC);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
@@ -22,12 +16,12 @@ void MetallicTexture::setGlData(Shader *shader) {
   shader->setTextureUniforms(type2str(METALLIC), METALLIC);
 }
 
-void MetallicTexture::bindTexture() {
+void MetallicTexture::bind() {
   ax_glActiveTexture(GL_TEXTURE0 + METALLIC);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
 }
 
-void MetallicTexture::unbindTexture() {
+void MetallicTexture::unbind() {
   ax_glActiveTexture(GL_TEXTURE0 + METALLIC);
   ax_glBindTexture(GL_TEXTURE_2D, 0);
 }
