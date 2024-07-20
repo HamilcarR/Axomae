@@ -89,7 +89,6 @@ namespace nova::material {
     TexturePackSampler texture_pack_sampler(t_pack);
     const glm::mat3 tbn = math::geometry::construct_tbn(hit_d.normal, hit_d.tangent, hit_d.bitangent);
     glm::vec3 normal = compute_map_normal(hit_d, texture_pack_sampler, tbn);
-
     out.direction = hemi_sample(tbn, sampler);
     out.origin = hit_d.position + normal * 1e-7f;
     texturing::texture_sample_data sample_data{hit_d.position};
