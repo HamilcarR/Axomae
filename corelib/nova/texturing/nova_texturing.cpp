@@ -27,7 +27,7 @@ namespace nova::texturing {
     int index = (y * res_holder->width + x) * res_holder->channels;
     AX_ASSERT_LT(index + 2, res_holder->width * res_holder->height * res_holder->channels);
     const std::vector<float> &data = *res_holder->raw_data;
-    return {data[index], data[index + 1], data[index + 2]};
+    return {data[index], data[index + 1], data[index + 2]};  // TODO : sync threads before swap ?
   }
 
   glm::vec3 sample_cubemap_plane(const glm::vec3 &sample_vector, const glm::vec3 &up_vector, const TextureRawData *res_holder) {

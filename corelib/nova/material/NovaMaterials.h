@@ -2,6 +2,7 @@
 #define NOVAMATERIALS_H
 #include "project_macros.h"
 #include "ray/Hitable.h"
+#include "sampler/Sampler.h"
 #include "texturing/nova_texturing.h"
 namespace nova {
   class Ray;
@@ -19,9 +20,8 @@ namespace nova::material {
   class NovaMaterialInterface {
    public:
     virtual ~NovaMaterialInterface() = default;
-    virtual bool scatter(const Ray &in,
-                         Ray &out,
-                         hit_data &hit_d) const = 0;  // replace by eval() , check metallic , roughness , emissive value and use correct function
+    virtual bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler)
+        const = 0;  // replace by eval() , check metallic , roughness , emissive value and use correct function
   };
 
   class NovaDiffuseMaterial final : public NovaMaterialInterface {
@@ -32,7 +32,7 @@ namespace nova::material {
     CLASS_OCM(NovaDiffuseMaterial)
 
     explicit NovaDiffuseMaterial(const texture_pack &textures);
-    bool scatter(const Ray &in, Ray &out, hit_data &hit_d) const override;
+    bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const override;
   };
 
   class NovaConductorMaterial final : public NovaMaterialInterface {
@@ -45,7 +45,7 @@ namespace nova::material {
 
     explicit NovaConductorMaterial(const texture_pack &textures);
     NovaConductorMaterial(const texture_pack &textures, float fuzz_);
-    bool scatter(const Ray &in, Ray &out, hit_data &hit_d) const override;
+    bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const override;
   };
 
   class NovaDielectricMaterial final : public NovaMaterialInterface {
@@ -58,7 +58,7 @@ namespace nova::material {
 
     explicit NovaDielectricMaterial(const texture_pack &textures);
     NovaDielectricMaterial(const texture_pack &textures, float ior);
-    bool scatter(const Ray &in, Ray &out, hit_data &hit_d) const override;
+    bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const override;
   };
 }  // namespace nova::material
 #endif  // NOVAMATERIALS_H

@@ -6,6 +6,9 @@
 #include <glm/glm.hpp>
 
 constexpr double PI = M_PI;
+constexpr double INV_PI = 1.f / PI;
+constexpr double INV_2PI = 1.f / (2.f * PI);
+
 namespace math::spherical {
   float acos_lt(float a);
 

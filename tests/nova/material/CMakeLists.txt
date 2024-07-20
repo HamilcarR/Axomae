@@ -1,0 +1,4 @@
+set(NOVA_MODULE_MATERIAL_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/NovaDiffuseMaterialTest.cpp
+        PARENT_SCOPE
+)

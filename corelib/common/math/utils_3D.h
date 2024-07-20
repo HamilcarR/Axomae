@@ -24,6 +24,16 @@ namespace math::geometry {
   inline glm::vec3 glm_extract_xaxis(const glm::mat4 &model) { return {glm::normalize(model[0])}; }
   inline glm::vec3 glm_extract_yaxis(const glm::mat4 &model) { return {glm::normalize(model[1])}; }
   inline glm::vec3 glm_extract_zaxis(const glm::mat4 &model) { return {glm::normalize(model[2])}; }
+  inline glm::mat3 construct_tbn(const glm::vec3 &normal, const glm::vec3 &tangent, const glm::vec3 &bitangent) {
+    return {tangent, bitangent, normal};
+  }
+  inline glm::mat3 construct_tbn(const glm::vec3 &normal) {
+    glm::vec3 up{0.f, 1.f, 0.f};
+    glm::vec3 tangent = glm::cross(normal, up);
+    glm::vec3 bitangent = glm::cross(normal, tangent);
+    return {tangent, bitangent, normal};
+  }
+
 }  // namespace math::geometry
 
 #endif

@@ -48,9 +48,9 @@ namespace nova::integrator {
   class AbstractIntegrator {
    public:
     void render(RenderBuffers<float> *buffers, Tile &tile, const NovaResourceManager *nova_resource_manager) const {
-
       constexpr float RAND_DX = 0.0005;
       constexpr float RAND_DY = 0.0005;
+      sampler::SamplerInterface sampler = sampler::SobolSampler(tile.sample_per_tile, 3);
       for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
         for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
           unsigned int idx = 0;
@@ -71,7 +71,7 @@ namespace nova::integrator {
                                                                    nova_resource_manager->getCameraData().getInvProjection(),
                                                                    nova_resource_manager->getCameraData().getInvView());
             Ray ray(r.near, r.far);
-            rgb += Li(ray, nova_resource_manager, nova_resource_manager->getEngineData().getMaxDepth());
+            rgb += Li(ray, nova_resource_manager, nova_resource_manager->getEngineData().getMaxDepth(), sampler);
           }
           rgb /= (float)(tile.sample_per_tile);
           for (int k = 0; k < 3; k++)
@@ -83,14 +83,20 @@ namespace nova::integrator {
         }
       tile.finished_render = true;
     }
-    [[nodiscard]] glm::vec4 Li(const Ray &ray, const NovaResourceManager *nova_resources_manager, int depth) const {
-      return static_cast<const T *>(this)->Li(ray, nova_resources_manager, depth);
+    [[nodiscard]] glm::vec4 Li(const Ray &ray,
+                               const NovaResourceManager *nova_resources_manager,
+                               int depth,
+                               sampler::SamplerInterface &sampler) const {
+      return static_cast<const T *>(this)->Li(ray, nova_resources_manager, depth, sampler);
     }
   };
 
   class PathIntegrator : public AbstractIntegrator<PathIntegrator> {
    public:
-    [[nodiscard]] glm::vec4 Li(const Ray &ray, const NovaResourceManager *nova_resources_manager, int depth) const;
+    [[nodiscard]] glm::vec4 Li(const Ray &ray,
+                               const NovaResourceManager *nova_resources_manager,
+                               int depth,
+                               sampler::SamplerInterface &sampler) const;
   };
 
 }  // namespace nova::integrator

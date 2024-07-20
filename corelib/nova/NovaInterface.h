@@ -1,8 +1,8 @@
 #ifndef NOVAINTERFACE_H
 #define NOVAINTERFACE_H
 #include "camera/nova_camera.h"
+#include "engine/nova_engine.h"
 #include "ray/Ray.h"
-#include "rendering/nova_engine.h"
 #include "scene/nova_scene.h"
 #include "texturing/nova_texturing.h"
 

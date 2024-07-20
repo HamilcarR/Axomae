@@ -5,7 +5,6 @@
 #include "project_macros.h"
 #include "ray/Hitable.h"
 #include "ray/Ray.h"
-#include <memory>
 namespace material {
   class NovaMaterialInterface;
 }
@@ -26,7 +25,7 @@ namespace nova::primitive {
     NovaGeoPrimitive(const shape::NovaShapeInterface *shape, const material::NovaMaterialInterface *material);
 
     bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const override;
-    bool scatter(const Ray &in, Ray &out, hit_data &data) const override;
+    bool scatter(const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler) const override;
     [[nodiscard]] glm::vec3 centroid() const override;
 
     [[nodiscard]] geometry::BoundingBox computeAABB() const override;

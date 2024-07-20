@@ -1,9 +1,9 @@
 #ifndef NOVARESOURCEMANAGER_H
 #define NOVARESOURCEMANAGER_H
 #include "camera/nova_camera.h"
+#include "engine/nova_engine.h"
 #include "project_macros.h"
 #include "ray/Ray.h"
-#include "rendering/nova_engine.h"
 #include "scene/nova_scene.h"
 #include "texturing/nova_texturing.h"
 
@@ -20,6 +20,7 @@ namespace nova {
   class NovaResourceManager {
    private:
     NovaResources resources;
+    mutable int error_flag;
 
    public:
     CLASS_CM(NovaResourceManager)
@@ -42,6 +43,7 @@ namespace nova {
       getMaterialData().clear();
     }
 
+    int checkErrorStatus() const { return error_flag; }
     /* Scene: Textures */
     void envmapSetData(std::vector<float> *raw_data, int width, int height, int channels);
   };

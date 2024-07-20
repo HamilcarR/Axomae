@@ -1,6 +1,6 @@
 #ifndef MATH_RANDOM_H
 #define MATH_RANDOM_H
-#include <chrono>
+
 #include <ctime>
 #include <random>
 namespace math::random {
@@ -28,11 +28,7 @@ namespace math::random {
     return distrib(gen);
   }
 
-  /* nrandi(0 , 1) */
-  inline int fast_randb() {
-    uint8_t n;
-    return n & 0x01;
-  }
+
 
   inline bool randb() { return nrandi(0, 1); }
 };      // namespace math::random

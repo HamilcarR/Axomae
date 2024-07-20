@@ -13,6 +13,9 @@ PRIVATE
         ax_core_macro
         ax_core_device
         ax_core_debug
+
+PUBLIC
+        Boost::random
 )
 
 target_include_directories(ax_core_nova
@@ -23,7 +26,7 @@ PUBLIC
 add_subdirectory(texturing)
 add_subdirectory(shape)
 add_subdirectory(scene)
-add_subdirectory(rendering)
+add_subdirectory(engine)
 add_subdirectory(ray)
 add_subdirectory(primitive)
 add_subdirectory(material)

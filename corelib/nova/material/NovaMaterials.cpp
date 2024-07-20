@@ -1,5 +1,7 @@
 #include "NovaMaterials.h"
 #include "ray/Ray.h"
+#include "utils_3D.h"
+#include <sampler/Sampler.h>
 
 namespace nova::material {
 
@@ -66,28 +68,33 @@ namespace nova::material {
     }
   };
 
-  static glm::mat3 construct_tbn(const glm::vec3 &normal, const glm::vec3 &tangent, const glm::vec3 &bitangent) {
-    return {tangent, bitangent, normal};
-  }
+  static glm::vec3 compute_map_normal(const hit_data &hit_d, const TexturePackSampler &t_pack, const glm::mat3 &tbn) {
 
-  static glm::vec3 compute_map_normal(const hit_data &hit_d, const TexturePackSampler &sampler) {
-    const glm::mat3 tbn = construct_tbn(hit_d.normal, hit_d.tangent, hit_d.bitangent);
-    const glm::vec3 map_normal = sampler.normal(hit_d.u, hit_d.v, {}) * 2.f - 1.f;
+    const glm::vec3 map_normal = t_pack.normal(hit_d.u, hit_d.v, {}) * 2.f - 1.f;
     return glm::normalize(tbn * map_normal);
   }
 
   NovaDiffuseMaterial::NovaDiffuseMaterial(const texture_pack &texture) { t_pack = texture; }
 
-  bool NovaDiffuseMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d) const {
-    TexturePackSampler sampler(t_pack);
-    glm::vec3 normal = compute_map_normal(hit_d, sampler);
-    glm::vec3 hemi_rand = math::spherical::rand_p_sphere();
-    glm::vec3 scattered = hit_d.position + normal + hemi_rand;
-    out.origin = hit_d.position;
-    out.direction = glm::normalize(scattered);
+  static glm::vec3 hemi_sample(const glm::mat3 &tbn, sampler::SamplerInterface &sampler) {
+    using namespace math::random;
+    using namespace math::spherical;
+    int err_flag = 0;
+    auto random_sample = std::visit([&err_flag](auto &&s) -> glm::vec3 { return s.sample(err_flag); }, sampler);
+
+    return glm::normalize(random_sample);
+  }
+
+  bool NovaDiffuseMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const {
+    TexturePackSampler texture_pack_sampler(t_pack);
+    const glm::mat3 tbn = math::geometry::construct_tbn(hit_d.normal, hit_d.tangent, hit_d.bitangent);
+    glm::vec3 normal = compute_map_normal(hit_d, texture_pack_sampler, tbn);
+
+    out.direction = hemi_sample(tbn, sampler);
+    out.origin = hit_d.position + normal * 1e-7f;
     texturing::texture_sample_data sample_data{hit_d.position};
-    hit_d.attenuation = sampler.albedo(hit_d.u, hit_d.v, sample_data);
-    hit_d.emissive = sampler.emissive(hit_d.u, hit_d.v, sample_data);
+    hit_d.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, sample_data);
+    hit_d.emissive = texture_pack_sampler.emissive(hit_d.u, hit_d.v, sample_data);
     hit_d.normal = normal;
     return true;
   }
@@ -100,15 +107,16 @@ namespace nova::material {
     t_pack = texture;
   }
 
-  bool NovaConductorMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d) const {
-    TexturePackSampler sampler(t_pack);
-    glm::vec3 normal = compute_map_normal(hit_d, sampler);
+  bool NovaConductorMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const {
+    TexturePackSampler texture_pack_sampler(t_pack);
+    const glm::mat3 tbn = math::geometry::construct_tbn(hit_d.normal, hit_d.tangent, hit_d.bitangent);
+    glm::vec3 normal = compute_map_normal(hit_d, texture_pack_sampler, tbn);
     glm::vec3 reflected = glm::reflect(in.direction, normal);
     out.origin = hit_d.position;
-    out.direction = glm::normalize(reflected + math::spherical::rand_p_sphere() * fuzz);
+    out.direction = glm::normalize(reflected + hemi_sample(tbn, sampler) * fuzz);
     texturing::texture_sample_data sample_data{hit_d.position};
-    hit_d.attenuation = sampler.albedo(hit_d.u, hit_d.v, {sample_data});
-    hit_d.emissive = sampler.emissive(hit_d.u, hit_d.v, sample_data);
+    hit_d.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, {sample_data});
+    hit_d.emissive = texture_pack_sampler.emissive(hit_d.u, hit_d.v, sample_data);
     hit_d.normal = normal;
     return glm::dot(out.direction, normal) > 0.f;
   }
@@ -140,16 +148,17 @@ namespace nova::material {
     return r0 + (1 - r0) * std::pow((1 - cosine), 5);
   }
 
-  bool NovaDielectricMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d) const {
-    TexturePackSampler sampler(t_pack);
-    hit_d.normal = compute_map_normal(hit_d, sampler);
+  bool NovaDielectricMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const {
+    TexturePackSampler texture_pack_sampler(t_pack);
+    const glm::mat3 tbn = math::geometry::construct_tbn(hit_d.normal, hit_d.tangent, hit_d.bitangent);
+    hit_d.normal = compute_map_normal(hit_d, texture_pack_sampler, tbn);
     glm::vec3 normal = hit_d.normal;
     glm::vec3 direction = glm::normalize(in.direction);
     const glm::vec3 reflected = glm::reflect(direction, hit_d.normal);
     out.origin = hit_d.position;
     texturing::texture_sample_data sample_data{hit_d.position};
-    hit_d.attenuation = sampler.albedo(hit_d.u, hit_d.v, sample_data);
-    hit_d.emissive = sampler.emissive(hit_d.u, hit_d.v, sample_data);
+    hit_d.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, sample_data);
+    hit_d.emissive = texture_pack_sampler.emissive(hit_d.u, hit_d.v, sample_data);
     float index = eta;
     float reflect_prob = 0.f;
     float cosine = 0.f;

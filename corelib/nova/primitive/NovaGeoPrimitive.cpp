@@ -2,6 +2,7 @@
 #include "material/nova_material.h"
 #include "nova_primitive.h"
 #include "ray/Ray.h"
+#include "sampler/Sampler.h"
 #include "shape/nova_shape.h"
 
 namespace nova::primitive {
@@ -18,9 +19,9 @@ namespace nova::primitive {
     return true;
   }
 
-  bool NovaGeoPrimitive::scatter(const Ray &in, Ray &out, hit_data &data) const {
+  bool NovaGeoPrimitive::scatter(const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler) const {
     AX_ASSERT(material, "Material structure is not initialized.");
-    return material->scatter(in, out, data);
+    return material->scatter(in, out, data, sampler);
   }
 
   glm::vec3 NovaGeoPrimitive::centroid() const { return shape->centroid(); }

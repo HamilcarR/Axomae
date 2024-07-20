@@ -9,6 +9,8 @@
 #include "ray/Ray.h"
 #include "sampler/Sampler.h"
 
+#include <engine/nova_engine.h>
+
 namespace nova::integrator {
 
   void integrator_dispatch(RenderBuffers<float> *buffers, Tile &tile, const NovaResourceManager *nova_resource_manager) {
@@ -47,15 +49,16 @@ namespace nova::integrator {
     return hit_ret;
   }
 
-  glm::vec4 PathIntegrator::Li(const Ray &ray, const NovaResourceManager *nova_resources, int depth) const {
+  glm::vec4 PathIntegrator::Li(const Ray &ray, const NovaResourceManager *nova_resources, int depth, sampler::SamplerInterface &sampler) const {
     bvh_hit_data hit = bvh_hit(ray, nova_resources);
+
     if (hit.is_hit) {
       Ray out{};
-      if (!hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d) || depth < 0)
+      if (!hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, sampler) || depth < 0)
         return glm::vec4(0.f);
       glm::vec4 color = hit.hit_d.attenuation;
       glm::vec4 emit = hit.hit_d.emissive;
-      return emit + color * Li(out, nova_resources, depth - 1);
+      return 10.f * emit + color * Li(out, nova_resources, depth - 1, sampler);
     }
     glm::vec3 sample_vector = ray.direction;
     return {texturing::sample_cubemap(sample_vector, &nova_resources->getEnvmapData()), 1.f};

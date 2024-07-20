@@ -27,7 +27,8 @@ namespace nova::integrator {
         math::camera::camera_ray r = math::camera::ray_inv_mat(
             ndc.x, ndc.y, nova_resource_manager->getCameraData().getInvProjection(), nova_resource_manager->getCameraData().getInvView());
         Ray ray(r.near, r.far);
-        glm::vec4 distance = Li(ray, nova_resource_manager, 0);
+        sampler::SamplerInterface sampler = sampler::HammersleySampler();
+        glm::vec4 distance = Li(ray, nova_resource_manager, 0, sampler);
 
         float depth = 1 - (distance.x - near) / (far - near);
         depth = normalize_depth(depth, near, far) * 2.f - 1.f;
@@ -47,7 +48,10 @@ namespace nova::integrator {
   }
 
   /* returns closest primitive distance (intersection) , and farthest primitive distance*/
-  glm::vec4 DepthIntegrator::Li(const Ray &ray, const NovaResourceManager *nova_resources, int /*depth*/) const {
+  glm::vec4 DepthIntegrator::Li(const Ray &ray,
+                                const NovaResourceManager *nova_resources,
+                                int /*depth*/,
+                                sampler::SamplerInterface & /*sampler*/) const {
     bvh_hit_data hit = bvh_hit(ray, nova_resources);
     if (hit.is_hit) {
       glm::vec3 min_max_intersect{hit.hit_d.t, hit.prim_max_t, MAXFLOAT};

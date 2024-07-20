@@ -1,9 +1,9 @@
 #ifndef NOVA_ENGINE_H
 #define NOVA_ENGINE_H
 #include "project_macros.h"
+#include "sampler/Sampler.h"
 #include "utils/nova_utils.h"
 #include <atomic>
-#include <map>
 #include <string>
 
 namespace nova {

@@ -7,7 +7,10 @@ namespace nova::integrator {
   class DepthIntegrator : public AbstractIntegrator<DepthIntegrator> {
    public:
     void render(RenderBuffers<float> *buffers, Tile &tile, const NovaResourceManager *nova_resource_manager) const;
-    [[nodiscard]] glm::vec4 Li(const Ray &ray, const NovaResourceManager *nova_resource_manager, int depth) const;
+    [[nodiscard]] glm::vec4 Li(const Ray &ray,
+                               const NovaResourceManager *nova_resource_manager,
+                               int depth,
+                                sampler::SamplerInterface &sampler) const;
   };
 }  // namespace nova::integrator
 

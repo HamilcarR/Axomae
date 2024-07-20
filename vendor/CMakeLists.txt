@@ -12,11 +12,13 @@ if(NOT Assimp_FOUND)
 endif()
 ########################################################################################
 #Boost
-find_package(Boost COMPONENTS program_options)
+find_package(Boost COMPONENTS program_options random stacktrace)
 if(NOT Boost_FOUND)
     message(NOTICE "Boost not found on the system : Initializing Boost build from sources. ")
-    set(BOOST_INCLUDE_LIBRARIES program_options stacktrace)
-    add_subdirectory(boost EXCLUDE_FROM_ALL)
+    set(BOOST_INCLUDE_LIBRARIES program_options stacktrace random)
+    set(BUILD_SHARED_LIBS OFF)
+    add_subdirectory(boost)
+
 endif()
 #########################################################################################
 # GLM
