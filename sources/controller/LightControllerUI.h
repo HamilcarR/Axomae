@@ -9,10 +9,15 @@
  */
 class LightController : public QObject {
   Q_OBJECT
+
+ private:
+  Ui::MainWindow &ui;
+  GLViewer *viewer_3d{};
+  SceneListView *scene_list_view{};
+
  public:
-  LightController(Ui::MainWindow &_ui) : ui(_ui) {}
-  virtual ~LightController() {}
-  void connect_all_slots();
+  explicit LightController(Ui::MainWindow &_ui) : ui(_ui) {}
+  void connectAllSlots();
   void setup(GLViewer *viewer, SceneListView *list_view) {
     viewer_3d = viewer;
     scene_list_view = list_view;
@@ -22,21 +27,14 @@ class LightController : public QObject {
   LightData loadFromUi() const;
 
  protected slots:
-  void addPointLight();
-  void deletePointLight();
+  void slot_add_point_light();
+  void slot_delete_point_light();
 
-  void addDirectionalLight();
-  void deleteDirectionalLight();
+  void slot_add_directional_light();
+  void slot_delete_directional_light();
 
-  void addSpotLight();
-  void deleteSpotLight();
-
- public:
-  Ui::MainWindow &ui;
-  GLViewer *viewer_3d;
-
- private:
-  SceneListView *scene_list_view;
+  void slot_add_spot_light();
+  void slot_delete_spot_light();
 };
 
 #endif

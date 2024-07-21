@@ -14,7 +14,7 @@ namespace axomae {
 
   bool ImageManager::gpu = false;
   static bool CHECK_IF_CUDA_AVAILABLE() {
-    if (!ImageManager::USING_GPU())
+    if (!ImageManager::isUsingGPU())
       return false;
     else
       return true;
@@ -37,7 +37,7 @@ namespace axomae {
   }
 
   /**************************************************************************************************************/
-  Rgb ImageManager::get_pixel_color(SDL_Surface *surface, int x, int y) {
+  Rgb ImageManager::getPixelColor(SDL_Surface *surface, int x, int y) {
     int bpp = surface->format->BytesPerPixel;
     uint8_t *color = (uint8_t *)(surface->pixels) + x * bpp + y * surface->pitch;
     float red = 0, blue = 0, green = 0, alpha = 0;
@@ -93,7 +93,7 @@ namespace axomae {
   }
 
   /**************************************************************************************************************/
-  void ImageManager::set_pixel_color(SDL_Surface *surface, int x, int y, uint32_t color) {
+  void ImageManager::setPixelColor(SDL_Surface *surface, int x, int y, uint32_t color) {
     // TODO : Add Tiling management when uv coordinates greater than limit
     int bpp = surface->format->BytesPerPixel;
     SDL_LockSurface(surface);
@@ -120,7 +120,7 @@ namespace axomae {
 
   /**************************************************************************************************************/
 
-  void ImageManager::print_pixel(uint32_t color) {
+  void ImageManager::printPixel(uint32_t color) {
     uint8_t red = color >> 24 & 0XFF;
     uint8_t green = color >> 16 & 0XFF;
     uint8_t blue = color >> 8 & 0XFF;
@@ -134,7 +134,7 @@ namespace axomae {
 
   /**************************************************************************************************************/
 
-  void ImageManager::display_info_surface(SDL_Surface *image) {
+  void ImageManager::displayInfoSurface(SDL_Surface *image) {
     std::cout << "Bytes per pixel : " << std::to_string(image->format->BytesPerPixel) << "\n";
     std::cout << "Padding on X : " << std::to_string(image->format->padding[0]) << "\n";
     std::cout << "Padding on Y : " << std::to_string(image->format->padding[1]) << "\n";
@@ -142,14 +142,14 @@ namespace axomae {
 
   /**************************************************************************************************************/
 
-  void ImageManager::set_pixel_color(SDL_Surface *surface, Rgb **arrayc, int w, int h) {
+  void ImageManager::setPixelColor(SDL_Surface *surface, Rgb **arrayc, int w, int h) {
     for (int i = 0; i < w; i++)
       for (int j = 0; j < h; j++)
-        set_pixel_color(surface, i, j, arrayc[i][j].rgb_to_int());
+        setPixelColor(surface, i, j, arrayc[i][j].rgb_to_int());
   }
 
   /**************************************************************************************************************/
-  void ImageManager::set_greyscale_average(SDL_Surface *image, uint8_t factor) {
+  void ImageManager::setGrayscaleAverage(SDL_Surface *image, uint8_t factor) {
     assert(factor > 0);
     assert(image != nullptr);
     if (CHECK_IF_CUDA_AVAILABLE())
@@ -157,12 +157,12 @@ namespace axomae {
     else
       for (int i = 0; i < image->w; i++)
         for (int j = 0; j < image->h; j++) {
-          Rgb rgb = get_pixel_color(image, i, j);
+          Rgb rgb = getPixelColor(image, i, j);
           rgb.red = (rgb.red + rgb.blue + rgb.green) / factor;
           rgb.green = rgb.red;
           rgb.blue = rgb.red;
           uint32_t gray = rgb.rgb_to_int();
-          set_pixel_color(image, i, j, gray);
+          setPixelColor(image, i, j, gray);
         }
   }
 
@@ -216,7 +216,7 @@ namespace axomae {
   }
 
   /**************************************************************************************************************/
-  void ImageManager::set_greyscale_luminance(SDL_Surface *image) {
+  void ImageManager::setGrayscaleLuminance(SDL_Surface *image) {
     bool cuda = CHECK_IF_CUDA_AVAILABLE();
     std::clock_t clock;
     if (cuda) {
@@ -225,12 +225,12 @@ namespace axomae {
       assert(image != nullptr);
       for (int i = 0; i < image->w; i++)
         for (int j = 0; j < image->h; j++) {
-          Rgb rgb = get_pixel_color(image, i, j);
+          Rgb rgb = getPixelColor(image, i, j);
           rgb.red = floor(rgb.red * 0.3 + rgb.blue * 0.11 + rgb.green * 0.59);
           rgb.green = rgb.red;
           rgb.blue = rgb.red;
           uint32_t gray = rgb.rgb_to_int();
-          set_pixel_color(image, i, j, gray);
+          setPixelColor(image, i, j, gray);
         }
     }
   }
@@ -268,7 +268,7 @@ namespace axomae {
   }
 
   /**************************************************************************************************************/
-  void ImageManager::compute_edge(SDL_Surface *surface, uint8_t flag, uint8_t border) {
+  void ImageManager::computeEdge(SDL_Surface *surface, uint8_t flag, uint8_t border) {
     bool cuda = CHECK_IF_CUDA_AVAILABLE();
     if (cuda)
       GPU_compute_height(surface, flag, border);
@@ -288,7 +288,7 @@ namespace axomae {
       float min_red = 0, min_blue = 0, min_green = 0;
       for (int i = 0; i < w; i++) {
         for (int j = 0; j < h; j++) {
-          Rgb rgb = get_pixel_color(surface, i, j);
+          Rgb rgb = getPixelColor(surface, i, j);
           max_red = (rgb.red >= max_red) ? rgb.red : max_red;
           max_green = (rgb.green >= max_green) ? rgb.green : max_green;
           max_blue = (rgb.blue >= max_blue) ? rgb.blue : max_blue;
@@ -336,7 +336,7 @@ namespace axomae {
             float g = magnitude(setpix_v_green, setpix_h_green);
             float b = magnitude(setpix_v_blue, setpix_h_blue);
             Rgb rgb = Rgb(r, g, b, 0);
-            set_pixel_color(surface, i, j, rgb.rgb_to_int());
+            setPixelColor(surface, i, j, rgb.rgb_to_int());
           }
         }
       }
@@ -349,13 +349,13 @@ namespace axomae {
   }
 
   /**************************************************************************************************************/
-  max_colors *ImageManager::get_colors_max_variation(SDL_Surface *image) {
+  max_colors *ImageManager::getColorsMaxVariations(SDL_Surface *image) {
     max_colors *max_min = new max_colors;
     const int INT_MAXX = 0;
     int max_red = 0, max_green = 0, max_blue = 0, min_red = INT_MAX, min_blue = INT_MAX, min_green = INT_MAXX;
     for (int i = 0; i < image->w; i++) {
       for (int j = 0; j < image->h; j++) {
-        Rgb rgb = get_pixel_color(image, i, j);
+        Rgb rgb = getPixelColor(image, i, j);
         max_red = (rgb.red >= max_red) ? rgb.red : max_red;
         max_green = (rgb.green >= max_green) ? rgb.green : max_green;
         max_blue = (rgb.blue >= max_blue) ? rgb.blue : max_blue;
@@ -374,42 +374,42 @@ namespace axomae {
   }
 
   /**************************************************************************************************************/
-  void ImageManager::set_contrast(SDL_Surface *image, int level) {
+  void ImageManager::setContrast(SDL_Surface *image, int level) {
     double correction_factor = (259 * (level + 255)) / (255 * (259 - level));
-    max_colors *maxmin = get_colors_max_variation(image);
+    max_colors *maxmin = getColorsMaxVariations(image);
     for (int i = 0; i < image->w; i++) {
       for (int j = 0; j < image->h; j++) {
-        Rgb col = get_pixel_color(image, i, j);
+        Rgb col = getPixelColor(image, i, j);
         col.red = floor(truncate(correction_factor * (col.red - 128) + 128));
         col.green = floor(truncate(correction_factor * (col.green - 128) + 128));
         col.blue = floor(truncate(correction_factor * (col.blue - 128) + 128));
         col.alpha = 0;
-        set_pixel_color(image, i, j, col.rgb_to_int());
+        setPixelColor(image, i, j, col.rgb_to_int());
       }
     }
     delete maxmin;
   }
 
   /**************************************************************************************************************/
-  void ImageManager::set_contrast(SDL_Surface *image) {
+  void ImageManager::setContrast(SDL_Surface *image) {
     const int val = 200;
     for (int i = 0; i < image->w; i++) {
       for (int j = 0; j < image->h; j++) {
-        Rgb col = get_pixel_color(image, i, j);
+        Rgb col = getPixelColor(image, i, j);
         col.red = col.red <= val ? 0 : 255;
         col.blue = col.blue <= val ? 0 : 255;
         col.green = col.green <= val ? 0 : 255;
-        set_pixel_color(image, i, j, col.rgb_to_int());
+        setPixelColor(image, i, j, col.rgb_to_int());
       }
     }
   }
 
   /***************************************************************************************************************/
   /*TODO : Contrast image enhancement */
-  void ImageManager::set_contrast_sigmoid(SDL_Surface *image, int threshold) {
+  void ImageManager::setContrastSigmoid(SDL_Surface *image, int threshold) {
     for (int i = 0; i < image->w; i++) {
       for (int j = 0; j < image->h; j++) {
-        Rgb color = get_pixel_color(image, i, j);
+        Rgb color = getPixelColor(image, i, j);
         // RGB normalized = normalize_0_1(color);
       }
     }
@@ -421,7 +421,7 @@ namespace axomae {
   constexpr double get_pixel_height(double color_component) { return (255 - color_component); }
 
   /**************************************************************************************************************/
-  void ImageManager::compute_normal_map(SDL_Surface *surface, double fact, float attenuation) {
+  void ImageManager::computeNormalMap(SDL_Surface *surface, double fact, float attenuation) {
     bool cuda = CHECK_IF_CUDA_AVAILABLE();
     if (cuda)
       GPU_compute_normal(surface, fact, AXOMAE_REPEAT);
@@ -433,7 +433,7 @@ namespace axomae {
         data[i] = new Rgb[height];
       for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++)
-          data[i][j] = get_pixel_color(surface, i, j);
+          data[i][j] = getPixelColor(surface, i, j);
       }
       for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
@@ -459,14 +459,14 @@ namespace axomae {
           auto Ny = normalize(-1, 1, lerp(dx, ddx, 0.5));
           auto Nz = 255.0;  // the normal vector
           Rgb col = Rgb(floor(truncate(Nx)), floor(truncate(Ny)), Nz);
-          set_pixel_color(surface, i, j, col.rgb_to_int());
+          setPixelColor(surface, i, j, col.rgb_to_int());
         }
       }
     }
   }
 
   /***************************************************************************************************************/
-  void ImageManager::compute_dudv(SDL_Surface *surface, double factor) {
+  void ImageManager::computeDUDV(SDL_Surface *surface, double factor) {
     int height = surface->h;
     int width = surface->w;
     Rgb **data = new Rgb *[width];
@@ -474,7 +474,7 @@ namespace axomae {
       data[i] = new Rgb[height];
     for (int i = 0; i < width; i++) {
       for (int j = 0; j < height; j++)
-        data[i][j] = get_pixel_color(surface, i, j);
+        data[i][j] = getPixelColor(surface, i, j);
     }
     for (int i = 0; i < width; i++) {
       for (int j = 0; j < height; j++) {
@@ -503,13 +503,13 @@ namespace axomae {
         auto red_var = normalize(-1, 1, lerp(dx_red + dy_red, ddx_red + ddy_red, 0.5));
         auto green_var = normalize(-1, 1, lerp(dx_green + dy_green, ddx_green + ddy_green, 0.5));
         Rgb col = Rgb(truncate(red_var), truncate(green_var), 0.0);
-        set_pixel_color(surface, i, j, col.rgb_to_int());
+        setPixelColor(surface, i, j, col.rgb_to_int());
       }
     }
   }
 
   /**************************************************************************************************************/
-  void ImageManager::smooth_image(SDL_Surface *surface, FILTER filter, const unsigned int factor) {
+  void ImageManager::smoothImage(SDL_Surface *surface, FILTER filter, const unsigned int factor) {
     if (surface != nullptr) {
       int height = surface->h;
       int width = surface->w;
@@ -518,7 +518,7 @@ namespace axomae {
         data[i] = new Rgb[height];
       for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++)
-          data[i][j] = get_pixel_color(surface, i, j);
+          data[i][j] = getPixelColor(surface, i, j);
       }
       int n = 0;
       void *convolution_kernel = nullptr;
@@ -553,7 +553,7 @@ namespace axomae {
         for (unsigned int j = middle; j < height - middle; j++) {
           Rgb col;
           col = compute_generic_kernel_pixel(const_cast<const Rgb **>(data), n, const_cast<const float **>(blur), i, j);
-          set_pixel_color(surface, i, j, col.rgb_to_int());
+          setPixelColor(surface, i, j, col.rgb_to_int());
         }
       }
       for (int i = 0; i < n; i++)
@@ -561,11 +561,11 @@ namespace axomae {
       delete[] blur;
 
       if (factor != 0)
-        smooth_image(surface, filter, factor - 1);
+        smoothImage(surface, filter, factor - 1);
     }
   }
   /**************************************************************************************************************/
-  void ImageManager::sharpen_image(SDL_Surface *surface, FILTER filter, const unsigned int factor) {
+  void ImageManager::sharpenImage(SDL_Surface *surface, FILTER filter, const unsigned int factor) {
     if (surface != nullptr) {
       int height = surface->h;
       int width = surface->w;
@@ -574,7 +574,7 @@ namespace axomae {
         data[i] = new Rgb[height];
       for (int i = 0; i < width; i++)
         for (int j = 0; j < height; j++)
-          data[i][j] = get_pixel_color(surface, i, j);
+          data[i][j] = getPixelColor(surface, i, j);
 
       int n = 0;
       void *convolution_kernel = nullptr;
@@ -606,7 +606,7 @@ namespace axomae {
           Rgb col;
           col = compute_generic_kernel_pixel(const_cast<const Rgb **>(data), n, const_cast<const float **>(sharp), i, j);
           col.clamp();
-          set_pixel_color(surface, i, j, col.rgb_to_int());
+          setPixelColor(surface, i, j, col.rgb_to_int());
         }
       }
       for (int i = 0; i < n; i++)

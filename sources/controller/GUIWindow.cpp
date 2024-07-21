@@ -426,7 +426,7 @@ namespace controller {
   /**************************************************************************************************************/
   /*SLOTS*/
   /**************************************************************************************************************/
-  bool Controller::import_image() {
+  bool Controller::slot_import_image() {
     HeapManagement *temp = _MemManagement;
     _MemManagement = new HeapManagement;
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("Images (*.png *.bmp *.jpg)"));
@@ -450,7 +450,7 @@ namespace controller {
     }
   }
   /**************************************************************************************************************/
-  bool Controller::import_envmap() {
+  bool Controller::slot_import_envmap() {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("HDR images (*.hdr *.exr)"));
     if (filename.isEmpty())
       return false;
@@ -470,13 +470,13 @@ namespace controller {
     return filename.toStdString();
   }
   /**************************************************************************************************************/
-  bool Controller::greyscale_average() {
+  bool Controller::slot_greyscale_average() {
     SDL_Surface *s = image_session_pointers::albedo;
     SDL_Surface *copy = Controller::copy_surface(s);
 
     if (copy != nullptr) {
       //_MemManagement->addToHeap({ copy , GREYSCALE_AVG });
-      ImageManager::set_greyscale_average(copy, 3);
+      ImageManager::setGrayscaleAverage(copy, 3);
       display_image(copy, GREYSCALE_AVG, true);
       image_session_pointers::greyscale = copy;
       return true;
@@ -486,12 +486,12 @@ namespace controller {
 
   /**************************************************************************************************************/
 
-  bool Controller::greyscale_luminance() {
+  bool Controller::slot_greyscale_luminance() {
     SDL_Surface *s = image_session_pointers::albedo;
     SDL_Surface *copy = Controller::copy_surface(s);
     if (copy != nullptr) {
       //_MemManagement->addToHeap({ copy , GREYSCALE_LUMI });
-      ImageManager::set_greyscale_luminance(copy);
+      ImageManager::setGrayscaleLuminance(copy);
       display_image(copy, GREYSCALE_LUMI, true);
       image_session_pointers::greyscale = copy;
 
@@ -502,16 +502,16 @@ namespace controller {
 
   /**************************************************************************************************************/
 
-  void Controller::use_gpgpu(bool checked) { global_application_config->flag |= CONF_USE_CUDA; }
+  void Controller::slot_use_gpgpu(bool checked) { global_application_config->flag |= CONF_USE_CUDA; }
 
   /**************************************************************************************************************/
 
-  void Controller::use_scharr() {
+  void Controller::slot_use_scharr() {
     SDL_Surface *s = image_session_pointers::greyscale;
     SDL_Surface *copy = Controller::copy_surface(s);
     if (copy != nullptr) {
       //_MemManagement->addToHeap({ copy , HEIGHT });
-      ImageManager::compute_edge(copy, AXOMAE_USE_SCHARR, AXOMAE_REPEAT);
+      ImageManager::computeEdge(copy, AXOMAE_USE_SCHARR, AXOMAE_REPEAT);
       display_image(copy, HEIGHT, true);
       image_session_pointers::height = copy;
 
@@ -521,12 +521,12 @@ namespace controller {
   }
 
   /**************************************************************************************************************/
-  void Controller::use_prewitt() {
+  void Controller::slot_use_prewitt() {
     SDL_Surface *s = image_session_pointers::greyscale;
     SDL_Surface *copy = Controller::copy_surface(s);
     if (copy != nullptr) {
       //_MemManagement->addToHeap({ copy , HEIGHT });
-      ImageManager::compute_edge(copy, AXOMAE_USE_PREWITT, AXOMAE_REPEAT);
+      ImageManager::computeEdge(copy, AXOMAE_USE_PREWITT, AXOMAE_REPEAT);
       display_image(copy, HEIGHT, true);
       image_session_pointers::height = copy;
 
@@ -536,12 +536,12 @@ namespace controller {
   }
 
   /**************************************************************************************************************/
-  void Controller::use_sobel() {
+  void Controller::slot_use_sobel() {
     SDL_Surface *s = image_session_pointers::greyscale;
     SDL_Surface *copy = Controller::copy_surface(s);
     if (copy != nullptr) {
       //_MemManagement->addToHeap({ copy , HEIGHT });
-      ImageManager::compute_edge(copy, AXOMAE_USE_SOBEL, AXOMAE_REPEAT);
+      ImageManager::computeEdge(copy, AXOMAE_USE_SOBEL, AXOMAE_REPEAT);
       display_image(copy, HEIGHT, true);
       image_session_pointers::height = copy;
 
@@ -552,12 +552,12 @@ namespace controller {
 
   /**************************************************************************************************************/
 
-  void Controller::use_tangent_space() {
+  void Controller::slot_use_tangent_space() {
     SDL_Surface *s = image_session_pointers::height;
     SDL_Surface *copy = Controller::copy_surface(s);
     if (copy != nullptr) {
       //_MemManagement->addToHeap({ copy , NMAP });
-      ImageManager::compute_normal_map(copy, NORMAL_FACTOR, NORMAL_ATTENUATION);
+      ImageManager::computeNormalMap(copy, NORMAL_FACTOR, NORMAL_ATTENUATION);
       display_image(copy, NMAP, true);
       image_session_pointers::normalmap = copy;
 
@@ -568,36 +568,36 @@ namespace controller {
 
   /**************************************************************************************************************/
 
-  void Controller::use_object_space() {}
+  void Controller::slot_use_object_space() {}
 
   /**************************************************************************************************************/
 
-  void Controller::change_nmap_factor(int f) {
+  void Controller::slot_change_nmap_factor(int f) {
     NORMAL_FACTOR = f / dividor;
     main_window_ui.factor_nmap->setValue(NORMAL_FACTOR);
     if (main_window_ui.use_tangentSpace->isChecked()) {
-      use_tangent_space();
+      slot_use_tangent_space();
     } else if (main_window_ui.use_objectSpace->isChecked()) {
-      use_object_space();
+      slot_use_object_space();
     }
   }
 
-  void Controller::change_nmap_attenuation(int f) {
+  void Controller::slot_change_nmap_attenuation(int f) {
     NORMAL_ATTENUATION = f / dividor;
     if (main_window_ui.use_tangentSpace->isChecked()) {
-      use_tangent_space();
+      slot_use_tangent_space();
     } else if (main_window_ui.use_objectSpace->isChecked()) {
-      use_object_space();
+      slot_use_object_space();
     }
   }
 
   /**************************************************************************************************************/
-  void Controller::compute_dudv() {
+  void Controller::slot_compute_dudv() {
     SDL_Surface *s = image_session_pointers::normalmap;
     SDL_Surface *copy = Controller::copy_surface(s);
     if (copy != nullptr) {
       //_MemManagement->addToHeap({ copy , DUDV });
-      ImageManager::compute_dudv(copy, DUDV_FACTOR);
+      ImageManager::computeDUDV(copy, DUDV_FACTOR);
       display_image(copy, DUDV, true);
       image_session_pointers::dudv = copy;
 
@@ -607,14 +607,14 @@ namespace controller {
   }
 
   /**************************************************************************************************************/
-  void Controller::change_dudv_nmap(int factor) {
+  void Controller::slot_change_dudv_nmap(int factor) {
     DUDV_FACTOR = factor / dividor;
     main_window_ui.factor_dudv->setValue(DUDV_FACTOR);
     SDL_Surface *s = image_session_pointers::normalmap;
     SDL_Surface *copy = Controller::copy_surface(s);
     if (copy != nullptr) {
       //_MemManagement->addToHeap({ copy , DUDV });
-      ImageManager::compute_dudv(copy, DUDV_FACTOR);
+      ImageManager::computeDUDV(copy, DUDV_FACTOR);
       display_image(copy, DUDV, true);
       image_session_pointers::dudv = copy;
     } else {
@@ -623,14 +623,14 @@ namespace controller {
   }
 
   /**************************************************************************************************************/
-  void Controller::cubemap_baking() {  // TODO : complete uv projection method , implement baking
+  void Controller::slot_cubemap_baking() {  // TODO : complete uv projection method , implement baking
     EMPTY_FUNCBODY;
   }
 
   /**************************************************************************************************************/
 
   // TODO: [AX-26] Optimize the normals projection on UVs in the UV tool
-  void Controller::project_uv_normals() {
+  void Controller::slot_project_uv_normals() {
     Mesh *retrieved_mesh = uv_mesh_selector.getCurrent();
     if (retrieved_mesh) {
       TextureViewerWidget *view = main_window_ui.uv_projection;
@@ -639,7 +639,7 @@ namespace controller {
         int height = global_application_config->getUvEditorResolutionHeight();
         bool tangent = global_application_config->flag & CONF_UV_TSPACE;
         LOG("Tangent : " + std::to_string(tangent), LogLevel::INFO);
-        std::vector<uint8_t> surf = ImageManager::project_uv_normals(retrieved_mesh->getGeometry(), width, height, tangent);
+        std::vector<uint8_t> surf = ImageManager::projectUVNormals(retrieved_mesh->getGeometry(), width, height, tangent);
         view->display(surf, width, height, 3);
       } catch (const exception::GenericException &e) {
         LOG(std::string("The application has encountered an error : ") + e.what(), LogLevel::ERROR);
@@ -648,7 +648,7 @@ namespace controller {
   }
   /**************************************************************************************************************/
 
-  bool Controller::import_3DOBJ() {
+  bool Controller::slot_import_3DOBJ() {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
     if (!filename.isEmpty()) {
       cleanupNova();
@@ -674,26 +674,26 @@ namespace controller {
     return false;
   }
   /**************************************************************************************************************/
-  void Controller::next_mesh() {
+  void Controller::slot_next_mesh() {
     uv_mesh_selector.toNext();
     uv_editor_mesh_list->setSelected(uv_mesh_selector.getCurrentId());
-    project_uv_normals();
+    slot_project_uv_normals();
   }
   /**************************************************************************************************************/
-  void Controller::previous_mesh() {
+  void Controller::slot_previous_mesh() {
     uv_mesh_selector.toPrevious();
     uv_editor_mesh_list->setSelected(uv_mesh_selector.getCurrentId());
-    project_uv_normals();
+    slot_project_uv_normals();
   }
 
   /**************************************************************************************************************/
-  bool Controller::open_project() { return false; }
+  bool Controller::slot_open_project() { return false; }
 
   /**************************************************************************************************************/
-  bool Controller::save_project() { return false; }
+  bool Controller::slot_save_project() { return false; }
 
   /**************************************************************************************************************/
-  bool Controller::save_image() {
+  bool Controller::slot_save_image() {
     QString filename = QFileDialog::getSaveFileName(this, tr("Save files"), "./", tr("All Files (*)"));
     uint64_t flag = current_workspace->getContext();
     if (flag & UI_RENDERER_NOVA) {
@@ -712,7 +712,7 @@ namespace controller {
   }
 
   /**************************************************************************************************************/
-  void Controller::smooth_edge() {
+  void Controller::slot_smooth_edge() {
     SDL_Surface *surface = image_session_pointers::height;
     SDL_Surface *copy = Controller::copy_surface(surface);
     if (copy != nullptr) {
@@ -722,14 +722,14 @@ namespace controller {
                                                                                                 ImageManager::FILTER_NULL;
       ImageManager::FILTER gaussian_blur_3_3 = main_window_ui.gaussian_3_3_radio->isChecked() ? ImageManager::GAUSSIAN_SMOOTH_3_3 :
                                                                                                 ImageManager::FILTER_NULL;
-      ImageManager::smooth_image(copy, static_cast<ImageManager::FILTER>(box_blur | gaussian_blur_5_5 | gaussian_blur_3_3), factor);
+      ImageManager::smoothImage(copy, static_cast<ImageManager::FILTER>(box_blur | gaussian_blur_5_5 | gaussian_blur_3_3), factor);
       display_image(copy, HEIGHT, true);
       image_session_pointers::height = copy;
     }
   }
 
   /**************************************************************************************************************/
-  void Controller::sharpen_edge() {
+  void Controller::slot_sharpen_edge() {
     SDL_Surface *surface = image_session_pointers::greyscale;
     SDL_Surface *copy = Controller::copy_surface(surface);
     if (copy != nullptr) {
@@ -737,14 +737,14 @@ namespace controller {
       ImageManager::FILTER sharpen = main_window_ui.sharpen_radio->isChecked() ? ImageManager::SHARPEN : ImageManager::FILTER_NULL;
       ImageManager::FILTER unsharp_masking = main_window_ui.sharpen_masking_radio->isChecked() ? ImageManager::UNSHARP_MASKING :
                                                                                                  ImageManager::FILTER_NULL;
-      ImageManager::sharpen_image(copy, static_cast<ImageManager::FILTER>(sharpen | unsharp_masking), factor);
+      ImageManager::sharpenImage(copy, static_cast<ImageManager::FILTER>(sharpen | unsharp_masking), factor);
       display_image(copy, HEIGHT, true);
       image_session_pointers::height = copy;
     }
   }
   /**************************************************************************************************************/
 
-  void Controller::undo() {
+  void Controller::slot_undo() {
     image_type<SDL_Surface> previous = _MemManagement->topStack();
     if (previous.image != nullptr && previous.imagetype != INVALID) {
       display_image(previous.image, previous.imagetype, false);
@@ -755,7 +755,7 @@ namespace controller {
 
   /**************************************************************************************************************/
 
-  void Controller::redo() {
+  void Controller::slot_redo() {
     // TODO: [AX-41] Fix crash when processing using undo / redo values on the Stack
     _MemManagement->addTemptoStack();
     image_type<SDL_Surface> next = _MemManagement->topStack();
@@ -766,7 +766,7 @@ namespace controller {
   }
 
   /**************************************************************************************************************/
-  void Controller::set_renderer_gamma_value(int value) {
+  void Controller::slot_set_renderer_gamma_value(int value) {
     float v = (float)value / POSTP_SLIDER_DIV;
     if (realtime_viewer)
       realtime_viewer->rendererCallback<SET_GAMMA>(v);
@@ -775,7 +775,7 @@ namespace controller {
   }
 
   /**************************************************************************************************************/
-  void Controller::reset_renderer_camera() {
+  void Controller::slot_reset_renderer_camera() {
     if (realtime_viewer != nullptr) {
       realtime_viewer->rendererCallback<SET_DISPLAY_RESET_CAMERA>();
     }
@@ -785,7 +785,7 @@ namespace controller {
   }
 
   /**************************************************************************************************************/
-  void Controller::set_renderer_exposure_value(int value) {
+  void Controller::slot_set_renderer_exposure_value(int value) {
     float v = (float)value / POSTP_SLIDER_DIV;
     if (realtime_viewer)
       realtime_viewer->rendererCallback<SET_EXPOSURE>(v);
@@ -793,55 +793,55 @@ namespace controller {
       nova_viewer->rendererCallback<SET_EXPOSURE>(v);
   }
   /**************************************************************************************************************/
-  void Controller::set_renderer_no_post_process() {
+  void Controller::slot_set_renderer_no_post_process() {
     if (realtime_viewer != nullptr) {
       realtime_viewer->rendererCallback<SET_POSTPROCESS_NOPROCESS>();
     }
   }
   /**************************************************************************************************************/
-  void Controller::set_renderer_edge_post_process() {
+  void Controller::slot_set_renderer_edge_post_process() {
     if (realtime_viewer != nullptr) {
       realtime_viewer->rendererCallback<SET_POSTPROCESS_EDGE>();
     }
   }
 
   /**************************************************************************************************************/
-  void Controller::set_renderer_sharpen_post_process() {
+  void Controller::slot_set_renderer_sharpen_post_process() {
     if (realtime_viewer != nullptr) {
       realtime_viewer->rendererCallback<SET_POSTPROCESS_SHARPEN>();
     }
   }
 
   /**************************************************************************************************************/
-  void Controller::set_renderer_blurr_post_process() {
+  void Controller::slot_set_renderer_blurr_post_process() {
     if (realtime_viewer != nullptr) {
       realtime_viewer->rendererCallback<SET_POSTPROCESS_BLURR>();
     }
   }
 
   /**************************************************************************************************************/
-  void Controller::set_rasterizer_point() {
+  void Controller::slot_set_rasterizer_point() {
     if (realtime_viewer) {
       realtime_viewer->rendererCallback<SET_RASTERIZER_POINT>();
     }
   }
 
   /**************************************************************************************************************/
-  void Controller::set_rasterizer_fill() {
+  void Controller::slot_set_rasterizer_fill() {
     if (realtime_viewer) {
       realtime_viewer->rendererCallback<SET_RASTERIZER_FILL>();
     }
   }
 
   /**************************************************************************************************************/
-  void Controller::set_rasterizer_wireframe() {
+  void Controller::slot_set_rasterizer_wireframe() {
     if (realtime_viewer) {
       realtime_viewer->rendererCallback<SET_RASTERIZER_WIREFRAME>();
     }
   }
 
   /**************************************************************************************************************/
-  void Controller::set_display_boundingbox(bool display) {
+  void Controller::slot_set_display_boundingbox(bool display) {
     if (realtime_viewer) {
       realtime_viewer->rendererCallback<SET_DISPLAY_BOUNDINGBOX>(display);
     }
@@ -851,12 +851,12 @@ namespace controller {
 
   void Controller::cleanupWindowProcess(QWidget *widget) { cleanupNova(); }
 
-  void Controller::onClosedSpawnWindow(QWidget *address) { cleanupWindowProcess(address); }
+  void Controller::slot_on_closed_spawn_window(QWidget *address) { cleanupWindowProcess(address); }
 
   /**************************************************************************************************************/
   /* SLOTS */
 
-  void Controller::select_uv_editor_item() {
+  void Controller::slot_select_uv_editor_item() {
     if (!uv_editor_mesh_list)
       return;
     QList<QListWidgetItem *> selected_items = uv_editor_mesh_list->selectedItems();
@@ -865,10 +865,10 @@ namespace controller {
     int index = uv_editor_mesh_list->row(selected_items.first());
     bool valid = uv_mesh_selector.setCurrent(index);
     if (valid)
-      project_uv_normals();
+      slot_project_uv_normals();
   }
 
-  void Controller::update_smooth_factor(int factor) { main_window_ui.smooth_factor->setValue(factor); }
+  void Controller::slot_update_smooth_factor(int factor) { main_window_ui.smooth_factor->setValue(factor); }
 
   // TODO: add custom QGraphicsView class , reimplement resizeEvent() to scale GraphicsView to window size
 }  // namespace controller

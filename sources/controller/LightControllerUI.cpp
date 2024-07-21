@@ -6,26 +6,26 @@
 
 // TODO : refactor for cleaner controller system : Implement light control system after free camera
 
-void LightController::connect_all_slots() {
-  QObject::connect(ui.button_renderer_lighting_PointLights_add, SIGNAL(pressed()), this, SLOT(addPointLight()));
-  QObject::connect(ui.button_renderer_lighting_PointLights_delete, SIGNAL(pressed()), this, SLOT(deletePointLight()));
-  QObject::connect(ui.button_renderer_lighting_DirectionalLights_add, SIGNAL(pressed()), this, SLOT(addDirectionalLight()));
-  QObject::connect(ui.button_renderer_lighting_DirectionalLights_delete, SIGNAL(pressed()), this, SLOT(deleteDirectionalLight()));
-  QObject::connect(ui.button_renderer_lighting_SpotLights_add, SIGNAL(pressed()), this, SLOT(addSpotLight()));
-  QObject::connect(ui.button_renderer_lighting_SpotLights_delete, SIGNAL(pressed()), this, SLOT(deleteSpotLight()));
+void LightController::connectAllSlots() {
+  QObject::connect(ui.button_renderer_lighting_PointLights_add, SIGNAL(pressed()), this, SLOT(slot_add_point_light()));
+  QObject::connect(ui.button_renderer_lighting_PointLights_delete, SIGNAL(pressed()), this, SLOT(slot_delete_point_light()));
+  QObject::connect(ui.button_renderer_lighting_DirectionalLights_add, SIGNAL(pressed()), this, SLOT(slot_add_directional_light()));
+  QObject::connect(ui.button_renderer_lighting_DirectionalLights_delete, SIGNAL(pressed()), this, SLOT(slot_delete_directional_light()));
+  QObject::connect(ui.button_renderer_lighting_SpotLights_add, SIGNAL(pressed()), this, SLOT(slot_add_spot_light()));
+  QObject::connect(ui.button_renderer_lighting_SpotLights_delete, SIGNAL(pressed()), this, SLOT(slot_delete_spot_light()));
   // QObject::connect(&realtime_viewer->getRenderer(), &Renderer::sceneModified, [this]() { scene_list_view->updateSceneList(); });
 }
 
-void LightController::addPointLight() {
+void LightController::slot_add_point_light() {
   // LightData data = loadFromUi<AbstractLight::POINT>();
   //  realtime_viewer->getRenderer().pushEvent<Renderer::ON_LEFT_CLICK>(RENDERER_CALLBACK_ENUM::ADD_ELEMENT_POINTLIGHT, data);
 }
 
-void LightController::deletePointLight() {}
-void LightController::addDirectionalLight() {}
-void LightController::deleteDirectionalLight() {}
-void LightController::addSpotLight() {}
-void LightController::deleteSpotLight() {}
+void LightController::slot_delete_point_light() {}
+void LightController::slot_add_directional_light() {}
+void LightController::slot_delete_directional_light() {}
+void LightController::slot_add_spot_light() {}
+void LightController::slot_delete_spot_light() {}
 
 template<AbstractLight::TYPE type>
 LightData LightController::loadFromUi() const {

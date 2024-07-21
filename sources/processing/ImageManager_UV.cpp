@@ -121,7 +121,7 @@ void throwIfNotValid(const Object3D &object) {
  * This function allows us to check the distribution of normals across the mesh.
  * Returns std::vector of size width * height * 3 as we work with an RGB image .
  */
-std::vector<uint8_t> ImageManager::project_uv_normals(const Object3D &object, int width, int height, bool tangent_space) {
+std::vector<uint8_t> ImageManager::projectUVNormals(const Object3D &object, int width, int height, bool tangent_space) {
   try {
     throwIfNotValid(object);
   } catch (const exception::GenericException &e) {

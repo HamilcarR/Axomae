@@ -125,7 +125,7 @@ HdrRenderViewerWidget::HdrRenderViewerWidget(const image::ImageHolder<float> *te
   target_buffer = tex;
   timer = std::make_unique<QTimer>();
   QObject::connect(timer.get(), &QTimer::timeout, this, &HdrRenderViewerWidget::updateImage);
-  QObject::connect(this, &HdrRenderViewerWidget::viewerClosed, app_controller, &controller::Controller::onClosedSpawnWindow);
+  QObject::connect(this, &HdrRenderViewerWidget::viewerClosed, app_controller, &controller::Controller::slot_on_closed_spawn_window);
   QObject::connect(this, &HdrRenderViewerWidget::onSaveRenderQuery, app_controller, &controller::Controller::slot_nova_save_bake);
   QObject::connect(this, &HdrRenderViewerWidget::onStopRenderQuery, app_controller, &controller::Controller::slot_nova_stop_bake);
   label = std::make_unique<editor::RgbDisplayerLabel>(this);
