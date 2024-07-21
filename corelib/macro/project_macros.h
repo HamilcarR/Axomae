@@ -22,7 +22,7 @@
 #define AX_ASSERT_NOTNULL(expr) assert(expr)
 #define AX_ASSERT_FALSE(expr) assert(!expr)
 #define AX_ASSERT_TRUE(expr) assert(expr)
-#define AX_ASSERT_NEQ(expr1, expr2) assert(epxr1 != expr2)
+#define AX_ASSERT_NEQ(expr1, expr2) assert(expr1 != expr2)
 #define AX_ASSERT_EQ(expr1, expr2) assert(expr1 == expr2)
 #define AX_ASSERT_LE(expr1, expr2) assert(expr1 <= expr2)
 #define AX_ASSERT_GE(expr1, expr2) assert(expr1 >= expr2)
