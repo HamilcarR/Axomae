@@ -81,6 +81,6 @@ void CubemapTexture::unbind() {
   ax_glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
-void CubemapTexture::setNewSize(unsigned w, unsigned h) { AX_UNREACHABLE }
+void CubemapTexture::setNewSize(unsigned w, unsigned h) { EMPTY_FUNCBODY }
 
 const char *CubemapTexture::getTextureTypeCStr() { return type2str(CUBEMAP); }
