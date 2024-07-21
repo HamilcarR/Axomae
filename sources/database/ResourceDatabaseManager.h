@@ -18,8 +18,8 @@ class ImageDatabase;
 using RawImageDatabase = ImageDatabase<uint8_t>;
 using HdrImageDatabase = ImageDatabase<float>;
 namespace controller {
-  class OP_ProgressStatus;
-  using ProgressStatus = OP_ProgressStatus;
+  class OperatorProgressStatus;
+  using ProgressStatus = OperatorProgressStatus;
 }  // namespace controller
 
 /**

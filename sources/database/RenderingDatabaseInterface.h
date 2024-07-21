@@ -3,7 +3,7 @@
 
 #include "DatabaseInterface.h"
 #include "Mutex.h"
-#include "OP_ProgressStatus.h"
+#include "OperatorProgressStatus.h"
 #include "constants.h"
 #include <map>
 

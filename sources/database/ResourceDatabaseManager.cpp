@@ -2,7 +2,7 @@
 #include "ResourceDatabaseManager.h"
 #include "INodeDatabase.h"
 #include "ImageDatabase.h"
-#include "OP_ProgressStatus.h"
+#include "OperatorProgressStatus.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
 

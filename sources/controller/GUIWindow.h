@@ -1,11 +1,11 @@
 #ifndef GUIWINDOW_H
 #define GUIWINDOW_H
 
-#include "BakeRenderData.h"
 #include "LightControllerUI.h"
 #include "Renderer.h"
 #include "SceneListView.h"
 #include "SceneSelector.h"
+#include "bake_render_data.h"
 #include "constants.h"
 #include "ui_main_window.h"
 #include <QtWidgets/qmainwindow.h>

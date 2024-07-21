@@ -24,15 +24,15 @@ namespace controller {
     }
   }  // namespace progress_bar
 
-  class OP_ProgressStatus final : public ioperator::UiOperatorInterface<ProgressStatusWidget, progress_bar::ProgressBarTextFormat> {
+  class OperatorProgressStatus final : public ioperator::UiOperatorInterface<ProgressStatusWidget, progress_bar::ProgressBarTextFormat> {
 
    public:
-    explicit OP_ProgressStatus(ProgressStatusWidget *progress_bar);
+    explicit OperatorProgressStatus(ProgressStatusWidget *progress_bar);
     bool op(ioperator::OpData<progress_bar::ProgressBarTextFormat> *data) const override;
     void reset() const override;
   };
 
-  using ProgressStatus = OP_ProgressStatus;
+  using ProgressStatus = OperatorProgressStatus;
 
   /* Use this interface for every object needing to communicate with a progress bar*/
   class IProgressManager {

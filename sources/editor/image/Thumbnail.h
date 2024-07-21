@@ -1,7 +1,7 @@
 #ifndef THUMBNAIL_H
 #define THUMBNAIL_H
 #include "Metadata.h"
-#include "OP_ProgressStatus.h"
+#include "OperatorProgressStatus.h"
 #include "constants.h"
 #include "image_utils.h"
 #include "project_macros.h"
