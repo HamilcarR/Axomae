@@ -1,5 +1,5 @@
-#ifndef CMDARGS_H
-#define CMDARGS_H
+#ifndef PROGRAMOPTIONSMANAGER_H
+#define PROGRAMOPTIONSMANAGER_H
 
 #include "constants.h"
 /**

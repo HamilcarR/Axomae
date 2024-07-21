@@ -1,7 +1,7 @@
-#include "CmdArgs.h"
 #include "API.h"
 #include "GenericException.h"
 #include "Operator.h"
+#include "ProgramOptionsManager.h"
 #include <boost/program_options.hpp>
 #include <iostream>
 #include <regex>

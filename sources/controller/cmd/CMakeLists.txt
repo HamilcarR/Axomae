@@ -1,7 +1,7 @@
 add_library(ax_cmd 
-    api_initapp.cpp 
+    API_initapp.cpp
     API.cpp 
-    CmdArgs.cpp
+    ProgramOptionsManager.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_cmd)
