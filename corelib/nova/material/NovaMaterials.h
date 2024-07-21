@@ -16,6 +16,8 @@ namespace nova::material {
     const texturing::ImageTexture *ao;
     const texturing::ImageTexture *normalmap;
     const texturing::ImageTexture *emissive;
+
+    CLASS_CM(texture_pack)
   };
   class NovaMaterialInterface {
    public:
