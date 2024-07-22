@@ -50,7 +50,7 @@ namespace nova::integrator {
     void render(RenderBuffers<float> *buffers, Tile &tile, const NovaResourceManager *nova_resource_manager) const {
       constexpr float RAND_DX = 0.0005;
       constexpr float RAND_DY = 0.0005;
-      sampler::SamplerInterface sampler = sampler::SobolSampler(tile.sample_per_tile, 3);
+      sampler::SamplerInterface sampler = sampler::SobolSampler(nova_resource_manager->getEngineData().getMaxSamples(), 5);
       for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
         for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
           unsigned int idx = 0;
@@ -61,6 +61,7 @@ namespace nova::integrator {
           glm::vec4 rgb{};
           const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
           for (int i = 0; i < tile.sample_per_tile; i++) {
+
             if (*nova_resource_manager->getEngineData().getCancelPtr())
               return;
             /* Samples random direction around the pixel for AA. */
