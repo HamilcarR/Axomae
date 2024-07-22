@@ -97,7 +97,6 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
  private:
   void deleteFromCollection(int index);
   void addToCollection(int index);
-  void createFurnace();
 };
 
 #endif

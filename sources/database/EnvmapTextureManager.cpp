@@ -46,7 +46,7 @@ EnvmapTextureManager::EnvmapTextureManager(ResourceDatabaseManager &resource_dat
     skybox_mesh = &scene->getSkybox();
 }
 
-void EnvmapTextureManager::createFurnace() {
+static void createFurnace(HdrImageDatabase &database) {
   std::vector<float> image_data(256 * 256 * 3, 0.1f);
   image::Metadata metadata;
   metadata.name = "Furnace.hdr";
@@ -55,8 +55,19 @@ void EnvmapTextureManager::createFurnace() {
   metadata.channels = 3;
   metadata.color_corrected = true;
   metadata.is_hdr = true;
-  HdrImageDatabase *hdr_database = resource_database->getHdrDatabase();
-  database::image::store<float>(*hdr_database, true, image_data, metadata);
+  database::image::store<float>(database, true, image_data, metadata);
+}
+
+static void createBlack(HdrImageDatabase &database) {
+  std::vector<float> image_data(256 * 256 * 3, 0.f);
+  image::Metadata metadata;
+  metadata.name = "Black.hdr";
+  metadata.width = 256;
+  metadata.height = 256;
+  metadata.channels = 3;
+  metadata.color_corrected = true;
+  metadata.is_hdr = true;
+  database::image::store<float>(database, true, image_data, metadata);
 }
 
 void EnvmapTextureManager::initializeDefaultEnvmap(ApplicationConfig *conf) {
@@ -74,7 +85,8 @@ void EnvmapTextureManager::initializeDefaultEnvmap(ApplicationConfig *conf) {
       loader.loadHdrEnvmap(config.default_envmap_path.c_str());
     } catch (const exception::GenericException &e) {
       LOG(e.what(), LogLevel::ERROR);
-      createFurnace();
+      createBlack(*resource_database->getHdrDatabase());
+      createFurnace(*resource_database->getHdrDatabase());
     }
   }
   current = bakes_id.back();
