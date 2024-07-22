@@ -28,7 +28,7 @@ namespace nova::material {
         glm::vec4 value = tpack.albedo->sample(u, v, sample_data);
         return {rgb_uint2float(value.r), rgb_uint2float(value.g), rgb_uint2float(value.b), value.a};
       }
-      return glm::vec4(0.f);
+      return glm::vec4(1.f);
     }
 
     [[nodiscard]] glm::vec4 metallic(float u, float v, const texturing::texture_sample_data &sample_data) const {
@@ -81,7 +81,6 @@ namespace nova::material {
     using namespace math::spherical;
     int err_flag = 0;
     auto random_sample = std::visit([&err_flag](auto &&s) -> glm::vec3 { return s.sample(err_flag); }, sampler);
-
     return glm::normalize(random_sample);
   }
 
@@ -93,9 +92,9 @@ namespace nova::material {
     out.origin = hit_d.position + normal * 1e-7f;
     texturing::texture_sample_data sample_data{hit_d.position};
     hit_d.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, sample_data);
-    hit_d.emissive = texture_pack_sampler.emissive(hit_d.u, hit_d.v, sample_data);
     hit_d.normal = normal;
-    return true;
+    hit_d.emissive = texture_pack_sampler.emissive(hit_d.u, hit_d.v, sample_data);
+    return glm::dot(normal, out.direction) > 0;
   }
 
   /********************************************************************************************************************************/
