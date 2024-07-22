@@ -14,7 +14,7 @@ namespace datastructure {
     NodeInterface *root{};
 
    private:
-    mutable NodeInterface *iterator{};
+    mutable NodeInterface *iterator{};  // TODO : why mutable ??
     mutable const NodeInterface *const_iterator{};
 
    protected:
