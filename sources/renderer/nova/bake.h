@@ -3,6 +3,8 @@
 #include "NovaInterface.h"
 #include "Texture.h"
 
+#include <engine/nova_exception.h>
+
 class Camera;
 class TextureGroup;
 class Mesh;
@@ -95,5 +97,8 @@ namespace nova_baker_utils {
   void cancel_render(engine_data &data);
   std::unique_ptr<NovaRenderEngineInterface> create_engine(const engine_data &engine_type);
   void synchronize_render_threads(render_scene_data &scene_data, const std::string &tag);
+  uint64_t get_error_status(const nova::NovaResourceManager &nova_resource_manager);
+  std::vector<nova::exception::ERROR> get_error_list(const nova::NovaResourceManager &nova_resource_manager);
+
 }  // namespace nova_baker_utils
 #endif  // BAKE_H

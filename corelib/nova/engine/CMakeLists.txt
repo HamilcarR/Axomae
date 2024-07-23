@@ -1,5 +1,6 @@
 add_library(ax_core_nova_engine
     nova_engine.cpp
+        nova_exception.cpp
 )
 
 

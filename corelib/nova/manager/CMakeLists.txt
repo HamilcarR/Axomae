@@ -1,5 +1,5 @@
 add_library(ax_core_nova_manager
-    NovaResourceManager_texturing.cpp
+    NovaResourceManager.cpp
 )
 
 target_link_libraries(ax_core_nova_manager PRIVATE

@@ -7,6 +7,8 @@
 #include "scene/nova_scene.h"
 #include "texturing/nova_texturing.h"
 
+#include <engine/nova_exception.h>
+
 namespace nova {
   class NovaResources {
    public:
@@ -20,7 +22,7 @@ namespace nova {
   class NovaResourceManager {
    private:
     NovaResources resources;
-    mutable int error_flag;
+    mutable nova::exception::NovaException exception;
 
    public:
     CLASS_CM(NovaResourceManager)
@@ -43,7 +45,10 @@ namespace nova {
       getMaterialData().clear();
     }
 
-    int checkErrorStatus() const { return error_flag; }
+    uint64_t checkErrorStatus() const { return exception.errorCheck(); }
+    void addError(nova::exception::ERROR error_id) const { exception.addErrorType(error_id); }
+    void addError(const nova::exception::NovaException &other_exception) const;
+    std::vector<nova::exception::ERROR> getErrorList() const { return exception.getErrorList(); }
     /* Scene: Textures */
     void envmapSetData(std::vector<float> *raw_data, int width, int height, int channels);
   };

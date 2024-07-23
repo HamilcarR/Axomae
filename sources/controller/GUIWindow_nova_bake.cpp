@@ -5,6 +5,7 @@
 #include "GenericException.h"
 #include "Logger.h"
 #include "WorkspaceTracker.h"
+#include "engine/nova_exception.h"
 #include "exception_macros.h"
 #include "integrator/Integrator.h"
 #include "manager/NovaResourceManager.h"
@@ -186,6 +187,48 @@ namespace controller {
     }
   }
 
+  /* returns true if exception needs to shutdown renderer  */
+  static bool on_exception_shutdown(const nova::NovaResourceManager &nova_resource_manager) {
+    using namespace nova::exception;
+    if (nova_baker_utils::get_error_status(nova_resource_manager) != 0) {
+      auto exception_list = nova_baker_utils::get_error_list(nova_resource_manager);
+      bool must_shutdown = false;
+      for (const auto &elem : exception_list) {
+        switch (elem) {
+          case NOERR:
+            must_shutdown |= false;
+            break;
+          case INVALID_RENDER_MODE:
+            LOGS("Render mode not selected.");
+            must_shutdown = true;
+            break;
+          case INVALID_INTEGRATOR:
+            LOGS("Provided integrator is invalid.");
+            must_shutdown = true;
+            break;
+          case INVALID_SAMPLER_DIM:
+          case SAMPLER_INIT_ERROR:
+          case SAMPLER_DOMAIN_EXHAUSTED:
+          case SAMPLER_INVALID_ARG:
+          case SAMPLER_INVALID_ALLOC:
+            LOGS("Sampler initialization error");
+            must_shutdown = true;
+            break;
+          case GENERAL_ERROR:
+            LOGS("Renderer general error.");
+            must_shutdown = true;
+            break;
+
+          default:
+            must_shutdown |= false;
+            break;
+        }
+      }
+      return must_shutdown;
+    }
+    return false;
+  }
+
   static void do_progressive_render(nova_baker_utils::render_scene_data &render_scene_data, image::ImageHolder<float> &image_holder) {
     int i = 1;
     int MAX_DEPTH = render_scene_data.nova_resource_manager->getEngineData().getMaxDepth();
@@ -200,7 +243,11 @@ namespace controller {
               MAX_DEPTH);
 
       nova_baker_utils::bake_scene(render_scene_data);
+
       nova_baker_utils::synchronize_render_threads(render_scene_data, NOVABAKE_POOL_TAG);
+
+      if (on_exception_shutdown(*render_scene_data.nova_resource_manager))
+        return;
       color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)i);
       i++;
     }

@@ -47,12 +47,26 @@ namespace nova::integrator {
   template<class T>
   class AbstractIntegrator {
    public:
+    /* leave this here in case there's some memory pools to free */
+    void prepareAbortRender() const {}
+
+    void validate(const sampler::SamplerInterface &sampler, const NovaResourceManager *nova_resource_manager) const {
+      nova::exception::NovaException exception = nova::sampler::retrieve_sampler_error(sampler);
+      nova_resource_manager->addError(exception);
+    }
+
     void render(RenderBuffers<float> *buffers, Tile &tile, const NovaResourceManager *nova_resource_manager) const {
       constexpr float RAND_DX = 0.0005;
       constexpr float RAND_DY = 0.0005;
-      sampler::SamplerInterface sampler = sampler::SobolSampler(nova_resource_manager->getEngineData().getMaxSamples(), 5);
+
+      sampler::SamplerInterface sampler = sampler::SobolSampler(nova_resource_manager->getEngineData().getMaxSamples(), 20);
       for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
         for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
+          validate(sampler, nova_resource_manager);
+          if (nova_resource_manager->checkErrorStatus() != 0) {
+            prepareAbortRender();
+            return;
+          }
           unsigned int idx = 0;
           if (!nova_resource_manager->getEngineData().isAxisVInverted())
             idx = (y * tile.image_total_width + x) * 4;

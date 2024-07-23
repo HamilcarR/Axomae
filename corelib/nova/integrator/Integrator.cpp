@@ -4,7 +4,6 @@
 #include "Logger.h"
 #include "NormalIntegrator.h"
 #include "manager/NovaResourceManager.h"
-#include "math_camera.h"
 #include "ray/Hitable.h"
 #include "ray/Ray.h"
 #include "sampler/Sampler.h"
@@ -18,21 +17,26 @@ namespace nova::integrator {
     const engine::EngineResourcesHolder &engine = nova_resource_manager->getEngineData();
     int integrator_type = engine.getIntegratorType();
     if (integrator_type & PATH) {
+      bool processed = false;
       if (integrator_type & COMBINED) {
+        processed = true;
         const PathIntegrator path_integrator;
         path_integrator.render(buffers, tile, nova_resource_manager);
       }
       if (integrator_type & NORMAL) {
+        processed = true;
         const NormalIntegrator normal_integrator;
         normal_integrator.render(buffers, tile, nova_resource_manager);
       }
       if (integrator_type & DEPTH) {
+        processed = true;
         const DepthIntegrator depth_integrator;
         depth_integrator.render(buffers, tile, nova_resource_manager);
       }
+      if (!processed)
+        nova_resource_manager->addError(nova::exception::INVALID_RENDER_MODE);
     } else {
-      std::lock_guard lock(mutex);
-      LOGS("Unknown integrator provided.");
+      nova_resource_manager->addError(nova::exception::INVALID_INTEGRATOR);
     }
   }
 

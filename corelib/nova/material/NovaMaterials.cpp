@@ -80,7 +80,7 @@ namespace nova::material {
     using namespace math::random;
     using namespace math::spherical;
     int err_flag = 0;
-    auto random_sample = std::visit([&err_flag](auto &&s) -> glm::vec3 { return s.sample(err_flag); }, sampler);
+    auto random_sample = std::visit([](auto &&s) -> glm::vec3 { return s.sample(); }, sampler);
     return glm::normalize(random_sample);
   }
 

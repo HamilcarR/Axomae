@@ -31,7 +31,7 @@ namespace nova {
       bool *cancel_render{};  // hold bool value here , and point elsewhere you donkey .
       bool v_invert{false};
       std::string threadpool_tag;
-      int integrator_flag;
+      int integrator_flag{};
 
      public:
       CLASS_CM(EngineResourcesHolder)

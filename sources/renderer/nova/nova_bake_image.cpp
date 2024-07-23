@@ -106,5 +106,8 @@ namespace nova_baker_utils {
       scene_data.thread_pool->fence(tag);
     }
   }
-
+  uint64_t get_error_status(const nova::NovaResourceManager &nova_resource_manager) { return nova_resource_manager.checkErrorStatus(); }
+  std::vector<nova::exception::ERROR> get_error_list(const nova::NovaResourceManager &nova_resource_manager) {
+    return nova_resource_manager.getErrorList();
+  }
 }  // namespace nova_baker_utils
