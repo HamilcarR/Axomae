@@ -54,7 +54,7 @@ TEST(nova_exception_test, merge) {
   origin.addErrorType(nova::exception::SAMPLER_INIT_ERROR | nova::exception::INVALID_SAMPLER_DIM);
   nova::exception::NovaException target;
   target.addErrorType(nova::exception::SAMPLER_INVALID_ARG | nova::exception::SAMPLER_INVALID_ALLOC);
-  int a = target.merge(origin.getErrorFlag());
+  target.merge(origin.getErrorFlag());
   auto err_list = target.getErrorList();
   ASSERT_TRUE(is_present(err_list, nova::exception::SAMPLER_INIT_ERROR));
   ASSERT_TRUE(is_present(err_list, nova::exception::INVALID_SAMPLER_DIM));
