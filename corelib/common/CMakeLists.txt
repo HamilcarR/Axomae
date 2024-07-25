@@ -7,7 +7,7 @@ PRIVATE
         ax_core_math
         ax_core_image
         ax_core_exception
-
+        ax_core_macro
 
 
 )
