@@ -6,7 +6,7 @@
 using namespace nova::sampler;
 HammersleySampler::HammersleySampler(int N_) : N(N_) {}
 
-GPU_CALLABLE glm::vec3 HammersleySampler::sample() {
+AX_DEVICE_CALLABLE glm::vec3 HammersleySampler::sample() {
   if (N <= 0) {
     exception.addErrorType(nova::exception::INVALID_SAMPLER_DIM);
     return glm::vec3(0.f);
@@ -33,7 +33,7 @@ SobolSampler::SobolSampler(int seed, int dimension) : N(seed) {
   }
 }
 
-GPU_CALLABLE glm::vec3 SobolSampler::sample() {
+AX_DEVICE_CALLABLE glm::vec3 SobolSampler::sample() {
   float x, y, z;
   glm::vec3 p;
   x = dist(*sobol_engine) * 2.f - 1.f;

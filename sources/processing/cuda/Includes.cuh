@@ -23,16 +23,16 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort =
 
 constexpr glm::dvec3 UP_VECTOR = glm::dvec3(0.f, 1.f, 0.f);
 
-GPU_CALLABLE inline float magnitude(float x, float y) { return sqrtf(x * x + y * y); }
+AX_DEVICE_CALLABLE inline float magnitude(float x, float y) { return sqrtf(x * x + y * y); }
 
 template<typename U, typename T>
-GPU_CALLABLE inline T normalize(U maxx, U minn, T pixel) {
+AX_DEVICE_CALLABLE inline T normalize(U maxx, U minn, T pixel) {
   assert(maxx - minn != 0);
   return ((pixel - minn) * 255 / (maxx - minn) + 0);
 }
 
 template<typename T, typename D>
-GPU_CALLABLE auto lerp(T value1, T value2, D cste) {
+AX_DEVICE_CALLABLE auto lerp(T value1, T value2, D cste) {
   return (1 - cste) * value1 + cste * value2;
 }
 
