@@ -1,11 +1,10 @@
-#include "Test.h"
 #include "type_list.h"
-
-#define TYPES char, int, double, float, long double, long long, char *, float *, const char *, void *
+#include "Test.h"
+#include "type_listTest.h"
 
 template<class T, class... Ts>
 constexpr void check_true(int i) {
-  using pack = core::type_list<TYPES>;
+  using pack = core::type_list<PACKTYPES>;
   constexpr int idx = core::type_id<T, pack>::index;
   ASSERT_EQ(idx, i);
   if constexpr (sizeof...(Ts) > 0)
@@ -14,7 +13,7 @@ constexpr void check_true(int i) {
 
 template<class T, class... Ts>
 constexpr void check_false(int i) {
-  using pack = core::type_list<TYPES>;
+  using pack = core::type_list<PACKTYPES>;
   constexpr int idx = core::type_id<T, pack>::index;
   ASSERT_NE(idx, i);
   if constexpr (sizeof...(Ts) > 0)
@@ -22,13 +21,13 @@ constexpr void check_false(int i) {
 }
 
 TEST(type_pack_test, type_id) {
-  check_true<TYPES>(0);
-  check_false<void *, TYPES>(0);
+  check_true<PACKTYPES>(0);
+  check_false<void *, PACKTYPES>(0);
 }
 
 template<class T, class... Ts>
 constexpr bool has_all() {
-  using pack = core::type_list<TYPES>;
+  using pack = core::type_list<PACKTYPES>;
   constexpr bool has = core::has<T, pack>::has_type;
   if constexpr (!has)
     return false;
@@ -38,8 +37,8 @@ constexpr bool has_all() {
 }
 
 TEST(type_pack_test, has_type) {
-  constexpr bool has_a = has_all<TYPES>();
+  constexpr bool has_a = has_all<PACKTYPES>();
   ASSERT_TRUE(has_a);
-  constexpr bool has_no = has_all<TYPES, uint64_t>();
+  constexpr bool has_no = has_all<PACKTYPES, uint64_t>();
   ASSERT_FALSE(has_no);
 }
