@@ -5,7 +5,8 @@
 #include <utility>
 /*
  * This is an implementation of a tag pointer hack. Obviously it is not very portable to other archs than ADM64 , and Aarch64 ,
- * but other cases would be out of scope to this project.
+ * but other cases would be out of scope to this project. (NB : Distributed rendering using smartphone/smart-fridge/arduino/microwave/toaster could be
+ * interesting ?  )
  * Needed because :
  * 1) virtual dynamic dispatch between host and device is not really compatible due to the vtable.
  * 2) the padding added by the vtable quickly leaves a big memory footprint when using lot of geometry on Nova.
@@ -24,8 +25,10 @@
 namespace core {
   template<class... Ts>
   class tag_ptr {
-   private:
+   public:
     using type_pack = type_list<Ts...>;
+
+   private:
     static constexpr int shift = 57;
     static constexpr int tagbits = 64 - shift;
     static constexpr uintptr_t tagmask = ~((1ull << shift) - 1);
@@ -33,14 +36,26 @@ namespace core {
     uintptr_t bits = 0;
 
    public:
-    CLASS_CM(tag_ptr)
-
     template<class T>
     AX_DEVICE_CALLABLE tag_ptr(T *ptr) {
       auto conv = reinterpret_cast<uintptr_t>(ptr);
       constexpr uintptr_t type_index = index<T>();
       bits = (type_index << shift) | conv;
     }
+
+    AX_DEVICE_CALLABLE tag_ptr(std::nullptr_t) {}
+
+    AX_DEVICE_CALLABLE tag_ptr() = default;
+
+    AX_DEVICE_CALLABLE ~tag_ptr() = default;
+
+    AX_DEVICE_CALLABLE tag_ptr(const tag_ptr &tptr) = default;
+
+    AX_DEVICE_CALLABLE tag_ptr(tag_ptr &&tptr) noexcept = default;
+
+    AX_DEVICE_CALLABLE tag_ptr &operator=(const tag_ptr &tptr) = default;
+
+    AX_DEVICE_CALLABLE tag_ptr &operator=(tag_ptr &&tptr) noexcept = default;
 
     template<class T>
     AX_DEVICE_CALLABLE static constexpr unsigned int index() {
@@ -101,7 +116,7 @@ namespace core {
 
     AX_DEVICE_CALLABLE void *get() { return reinterpret_cast<void *>(bits & ptrmask); }
 
-    AX_DEVICE_CALLABLE [[nodiscard]] const void *get() const { return reinterpret_cast<void *>(bits & ptrmask); }
+    AX_DEVICE_CALLABLE [[nodiscard]] const void *get() const { return reinterpret_cast<const void *>(bits & ptrmask); }
 
     AX_DEVICE_CALLABLE static constexpr int tagSize() { return sizeof...(Ts); }
 

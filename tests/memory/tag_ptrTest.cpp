@@ -42,24 +42,26 @@ TEST(tag_ptr_test, get) { check_deref<PACKTYPES>(); }
 
 class TestClass1 {
  public:
-  std::string say_hello() { return "TestClass1"; }
+  std::string toString() { return "TestClass1"; }
+  int getNum(int n) { return n + 1; }
 };
 class TestClass2 {
  public:
-  std::string say_hello() { return "TestClass2"; }
+  std::string toString() { return "TestClass2"; }
+  int getNum(int n) { return n + 2; }
 };
 class TestClass3 {
  public:
-  std::string say_hello() { return "TestClass3"; }
+  std::string toString() { return "TestClass3"; }
+  int getNum(int n) { return n + 3; }
 };
 
 class DispatchTest : public core::tag_ptr<TestClass1, TestClass2, TestClass3> {
  public:
-  template<class T>
-  DispatchTest(T *ptr) : core::tag_ptr<TestClass1, TestClass2, TestClass3>(ptr) {}
+  using tag_ptr::tag_ptr;
 
-  [[nodiscard]] std::string say_hello() {
-    auto d = [](auto ptr) { return ptr->say_hello(); };
+  [[nodiscard]] std::string toString() {
+    auto d = [](auto ptr) { return ptr->toString(); };
     return host_dispatch(d);
   }
 };
@@ -67,19 +69,19 @@ class DispatchTest : public core::tag_ptr<TestClass1, TestClass2, TestClass3> {
 TEST(tag_ptr_test, host_dispatch) {
   TestClass1 test1;
   DispatchTest dt = &test1;
-  ASSERT_TRUE(dt.say_hello() == "TestClass1");
-  ASSERT_FALSE(dt.say_hello() == "TestClass2");
-  ASSERT_FALSE(dt.say_hello() == "TestClass3");
+  ASSERT_TRUE(dt.toString() == "TestClass1");
+  ASSERT_FALSE(dt.toString() == "TestClass2");
+  ASSERT_FALSE(dt.toString() == "TestClass3");
 
   TestClass2 test2;
   dt = &test2;
-  ASSERT_FALSE(dt.say_hello() == "TestClass1");
-  ASSERT_TRUE(dt.say_hello() == "TestClass2");
-  ASSERT_FALSE(dt.say_hello() == "TestClass3");
+  ASSERT_FALSE(dt.toString() == "TestClass1");
+  ASSERT_TRUE(dt.toString() == "TestClass2");
+  ASSERT_FALSE(dt.toString() == "TestClass3");
 
   TestClass3 test3;
   dt = &test3;
-  ASSERT_FALSE(dt.say_hello() == "TestClass1");
-  ASSERT_FALSE(dt.say_hello() == "TestClass2");
-  ASSERT_TRUE(dt.say_hello() == "TestClass3");
+  ASSERT_FALSE(dt.toString() == "TestClass1");
+  ASSERT_FALSE(dt.toString() == "TestClass2");
+  ASSERT_TRUE(dt.toString() == "TestClass3");
 }

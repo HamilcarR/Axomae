@@ -4,6 +4,7 @@
 #include "math_random.h"
 #include "math_utils.h"
 #include "project_macros.h"
+#include "tag_ptr.h"
 
 #include <boost/random/sobol.hpp>
 #include <boost/random/uniform_01.hpp>
@@ -22,7 +23,7 @@ namespace nova::sampler {
 
     explicit HammersleySampler(int N);
     /* Will increment the index*/
-    GPU_CALLABLE glm::vec3 sample();
+    AX_DEVICE_CALLABLE glm::vec3 sample();
     nova::exception::NovaException getErrorState() const { return exception; }
   };
 
@@ -35,14 +36,25 @@ namespace nova::sampler {
    public:
     CLASS_M(SobolSampler)
     explicit SobolSampler(int seed, int dimension = 1);
-    GPU_CALLABLE glm::vec3 sample();
-    nova::exception::NovaException getErrorState() const { return exception; }
+    AX_DEVICE_CALLABLE glm::vec3 sample();
+    AX_DEVICE_CALLABLE nova::exception::NovaException getErrorState() const { return exception; }
   };
 
-  using SamplerInterface = std::variant<HammersleySampler, SobolSampler>;
+  class SamplerInterface : public core::tag_ptr<HammersleySampler, SobolSampler> {
+   public:
+    using tag_ptr::tag_ptr;
 
-  inline nova::exception::NovaException retrieve_sampler_error(const SamplerInterface &sampler) {
-    return std::visit([](auto &&sampler) { return sampler.getErrorState(); }, sampler);
-  }
+    AX_DEVICE_CALLABLE [[nodiscard]] nova::exception::NovaException getErrorState() const {
+      auto d = [](auto ptr) { return ptr->getErrorState(); };
+      return dispatch(d);
+    }
+
+    AX_DEVICE_CALLABLE [[nodiscard]] glm::vec3 sample() {
+      auto d = [](auto ptr) { return ptr->sample(); };
+      return dispatch(d);
+    }
+  };
+
+  inline nova::exception::NovaException retrieve_sampler_error(const SamplerInterface &sampler) { return sampler.getErrorState(); }
 }  // namespace nova::sampler
 #endif  // SAMPLER_H

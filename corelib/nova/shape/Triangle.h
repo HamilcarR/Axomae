@@ -1,16 +1,16 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 #include "BoundingBox.h"
-#include "ShapeInterface.h"
 #include "math_utils.h"
 #include "project_macros.h"
+#include "ray/Hitable.h"
 
 namespace nova::shape {
 
   /* Not cache efficient , for now.
    * leave this optimization for later.
    */
-  class Triangle final : public NovaShapeInterface {
+  class Triangle {
    private:
     glm::vec3 e1{};
     glm::vec3 e2{};
@@ -23,16 +23,16 @@ namespace nova::shape {
     bool uv_valid{false};
 
    public:
-    CLASS_OCM(Triangle)
+    CLASS_CM(Triangle)
 
     explicit Triangle(const glm::vec3 vertices[3],
                       const glm::vec3 normals[3] = nullptr,
                       const glm::vec2 textures[3] = nullptr,
                       const glm::vec3 tangents[3] = nullptr,
                       const glm::vec3 bitangents[3] = nullptr);
-    bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const override;
-    [[nodiscard]] glm::vec3 centroid() const override { return center; }
-    [[nodiscard]] geometry::BoundingBox computeAABB() const override;
+    bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const;
+    [[nodiscard]] glm::vec3 centroid() const { return center; }
+    [[nodiscard]] geometry::BoundingBox computeAABB() const;
 
     [[nodiscard]] bool hasValidTangents() const { return t0 != glm::vec3(0.f) || t1 != glm::vec3(0.f) || t2 != glm::vec3(0.f); }
     [[nodiscard]] bool hasValidBitangents() const { return b0 != glm::vec3(0.f) || b1 != glm::vec3(0.f) || b2 != glm::vec3(0.f); }

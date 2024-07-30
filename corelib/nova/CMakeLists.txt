@@ -8,7 +8,7 @@ target_link_libraries(ax_core PUBLIC ax_core_nova)
 target_link_libraries(ax_core_nova
 PRIVATE
         ax_core_geometry
-        ax_core_common
+        ax_core_memory
         ax_core_thread
         ax_core_macro
         ax_core_device

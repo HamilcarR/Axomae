@@ -8,6 +8,7 @@ target_link_libraries(ax_core_nova_primitive PRIVATE
         ax_core_math
         ax_core_macro
         ax_core_nova_sampler
+        ax_core_memory
 
 )
 

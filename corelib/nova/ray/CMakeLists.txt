@@ -5,7 +5,7 @@ add_library(ax_core_nova_ray
 target_link_libraries(ax_core_nova_ray PRIVATE
         ax_core_math
         ax_core_macro
-
+        ax_core_memory
 
 )
 target_link_libraries(ax_core_nova PUBLIC ax_core_nova_ray)

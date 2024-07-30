@@ -4,7 +4,8 @@ namespace nova::integrator {
 
   void NormalIntegrator::render(RenderBuffers<float> *buffers, Tile &tile, const NovaResourceManager *nova_resource_manager) const {
 
-    sampler::SamplerInterface sampler = sampler::SobolSampler(tile.sample_per_tile, 2);
+    sampler::SobolSampler sobol = sampler::SobolSampler(tile.sample_per_tile, 2);
+    sampler::SamplerInterface sampler = &sobol;
     for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
       for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
         unsigned int idx = 0;

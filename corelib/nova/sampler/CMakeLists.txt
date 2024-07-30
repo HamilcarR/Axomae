@@ -3,6 +3,7 @@ add_library(ax_core_nova_sampler
 )
 
 target_link_libraries(ax_core_nova_sampler PRIVATE
+        ax_core_memory
         ax_core_geometry
         ax_core_math
         ax_core_macro

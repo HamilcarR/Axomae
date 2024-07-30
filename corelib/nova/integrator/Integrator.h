@@ -58,8 +58,8 @@ namespace nova::integrator {
     void render(RenderBuffers<float> *buffers, Tile &tile, const NovaResourceManager *nova_resource_manager) const {
       constexpr float RAND_DX = 0.0005;
       constexpr float RAND_DY = 0.0005;
-
-      sampler::SamplerInterface sampler = sampler::SobolSampler(nova_resource_manager->getEngineData().getMaxSamples(), 20);
+      sampler::SobolSampler sobol = sampler::SobolSampler(nova_resource_manager->getEngineData().getMaxSamples(), 20);
+      sampler::SamplerInterface sampler = &sobol;
       for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
         for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
           validate(sampler, nova_resource_manager);

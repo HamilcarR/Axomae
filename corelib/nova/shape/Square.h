@@ -1,11 +1,11 @@
 #ifndef PLANE_H
 #define PLANE_H
 #include "BoundingBox.h"
-#include "ShapeInterface.h"
 #include "math_utils.h"
+#include "ray/Hitable.h"
 
 namespace nova::shape {
-  class Square final : public NovaShapeInterface {
+  class Square {
    private:
     glm::vec3 origin{};
     glm::vec3 side_w{};
@@ -23,15 +23,15 @@ namespace nova::shape {
       normal = glm::normalize(glm::cross(side_w, side_h));
       center = (side_h + side_w) * 0.5f;
     }
-    ~Square() override = default;
+    ~Square() = default;
     Square(const Square &other) = default;
     Square(Square &&other) noexcept = default;
     Square &operator=(const Square &other) = default;
     Square &operator=(Square &&other) noexcept = default;
 
-    bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const override;
-    [[nodiscard]] glm::vec3 centroid() const override { return center; }
-    [[nodiscard]] geometry::BoundingBox computeAABB() const override;
+    bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const;
+    [[nodiscard]] glm::vec3 centroid() const { return center; }
+    [[nodiscard]] geometry::BoundingBox computeAABB() const;
   };
 }  // namespace nova::shape
 

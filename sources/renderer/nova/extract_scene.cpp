@@ -109,7 +109,7 @@ namespace nova_baker_utils {
       const nova::material::NovaMaterialInterface *mat = extract_materials(elem, manager);
       const Object3D &geometry = elem->getGeometry();
       for (int i = 0; i < geometry.indices.size(); i += 3) {
-        geometry::face_data_tri tri_primitive;
+        geometry::face_data_tri tri_primitive{};
         unsigned idx[3] = {geometry.indices[i], geometry.indices[i + 1], geometry.indices[i + 2]};
         geometry.get_tri(tri_primitive, idx);
         glm::vec3 vertices[3], normals[3], tangents[3], bitangents[3];
