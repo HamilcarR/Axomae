@@ -1,4 +1,5 @@
 #include "Test.h"
+#include "sampler/Sampler.h"
 
 #include <material/NovaMaterials.h>
 #include <ray/Ray.h>
@@ -40,7 +41,8 @@ TEST(NovaDiffuseMaterialTest, scatter_direction) {
   /* We set up a horizontal plane , with y as normal , centered on 0 */
   hit_data.position = {0.f, 0.f, 0.f};
   const nova::Ray ray(glm::vec3(-1.f, 1.f, 0.f), glm::vec3(1.f, -1.f, 0.f));
-  nova::sampler::SamplerInterface sampler = nova::sampler::SobolSampler(1000, 3);
+  nova::sampler::SobolSampler sobol = nova::sampler::SobolSampler(1000, 3);
+  nova::sampler::SamplerInterface sampler = &sobol;
   nova::Ray out{};
   for (int i = 0; i < MAX_ITER; i++) {
     hit_data.u = math::random::nrandf(0, 1);
@@ -65,7 +67,8 @@ TEST(NovaDiffuseMaterialTest, sample_normal) {
   /* We set up a horizontal plane , with y as normal , centered on 0 */
   hit_data.position = {0.f, 0.f, 0.f};
   const nova::Ray ray(glm::vec3(-1.f, 1.f, 0.f), glm::vec3(1.f, -1.f, 0.f));
-  nova::sampler::SamplerInterface sampler = nova::sampler::SobolSampler(1000, 3);
+  nova::sampler::SobolSampler sobol = nova::sampler::SobolSampler(1000, 3);
+  nova::sampler::SamplerInterface sampler = &sobol;
   nova::Ray out{};
   ASSERT_TRUE(diffuse_material.scatter(ray, out, hit_data, sampler));
   const glm::vec3 transformed_normal_computed = hit_data.normal;
