@@ -2,13 +2,25 @@
 
 #include "primitive/nova_primitive.h"
 
+#include <GenericException.h>
+
+namespace exception {
+  class BadSizeException : public GenericException {
+   public:
+    explicit BadSizeException(const char *error_msg) : GenericException() { saveErrorString(error_msg); }
+  };
+}  // namespace exception
+
 namespace nova::aggregate {
 
   Bvht_data BvhtlBuilder::build(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> &primitives,
                                 BUILD_TYPE type,
                                 SEGMENTATION segmentation) {
+
     Bvht_data bvh_data;
     const int32_t prim_size = primitives.size();
+    if (prim_size == 0)
+      throw ::exception::BadSizeException("Primitives list is empty.");
     /* max nodes for a btree is 2N-1*/
     bvh_data.l_tree.resize(2 * prim_size - 1);
     bvh_data.prim_idx.reserve(primitives.size());
