@@ -10,6 +10,7 @@ namespace core {
     static constexpr int size = sizeof...(Ts);
   };
 
+  /**************************************************************************************************************/
   template<class T, class... Ts>
   struct type_id {
     static constexpr int index = 0;
@@ -26,6 +27,7 @@ namespace core {
     static constexpr int index = 1 + type_id<T, type_list<Ts...>>::index;
   };
 
+  /**************************************************************************************************************/
   template<class T, class... Ts>
   struct has {
     static constexpr bool has_type = false;
@@ -36,6 +38,7 @@ namespace core {
     static constexpr bool has_type = ISTYPE(T, U) || has<T, type_list<Ts...>>::has_type;
   };
 
+  /**************************************************************************************************************/
   template<class... Ts>
   struct is_same_type;
 
@@ -72,5 +75,14 @@ namespace core {
   struct return_const_type {
     using RETURN_TYPE = typename same_type<typename std::invoke_result_t<F, const Args *>...>::type;
   };
+
+  /**************************************************************************************************************/
+  template<class T, class... Ts>
+  constexpr std::size_t pack_size() {
+    if constexpr (sizeof...(Ts) == 0)
+      return sizeof(T);
+    return sizeof(T) + pack_size<Ts...>();
+  }
+
 }  // namespace core
 #endif  // TYPE_LIST_H
