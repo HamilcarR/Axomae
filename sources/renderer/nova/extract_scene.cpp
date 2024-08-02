@@ -96,13 +96,42 @@ namespace nova_baker_utils {
     bitangents[2] = normal_matrix * b2;
   }
 
+  static void normalize_uv(glm::vec2 &textures) {
+    if (textures.s > 1 || textures.s < 0)
+      textures.s = textures.s - std::floor(textures.s);
+    if (textures.t > 1 || texutres.t < 0)
+      textures.t = textures.t - std::floor(textures.t);
+  }
+
   void extract_uvs(const geometry::face_data_tri &tri_primitive, glm::vec2 textures[3]) {
     textures[0] = {tri_primitive.uv0[0], tri_primitive.uv0[1]};
     textures[1] = {tri_primitive.uv1[0], tri_primitive.uv1[1]};
     textures[2] = {tri_primitive.uv2[0], tri_primitive.uv2[1]};
+    normalize_uv(textures[0]);
+    normalize_uv(textures[1]);
+    normalize_uv(textures[2]);
+  }
+
+  static std::size_t compute_element_size(const std::vector<Mesh *> &meshes, int indices_padding = 3) {
+    std::size_t acc = 0;
+    for (const auto &elem : meshes) {
+      const Object3D &geometry = elem->getGeometry();
+      for (int i = 0; i < geometry.indices.size(); i += indices_padding)
+        acc++;
+    }
+    return acc;
+  }
+
+  template<class U>
+  static U *allocate_pool_memory(core::memory::Arena<> &memory_pool, std::size_t number_elements) {
+    return memory_pool.construct<U>(number_elements, false);
   }
 
   void build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager) {
+    /* Allocate for triangles */
+    std::size_t num_elements = compute_element_size(meshes);
+    auto *triangle_buffer = allocate_pool_memory<nova::shape::Triangle>(manager.getMemoryPool(), num_elements);
+    std::size_t alloc_offset = 0;
     for (const auto &elem : meshes) {
       glm::mat4 final_transfo = elem->computeFinalTransformation();
       glm::mat3 normal_matrix = math::geometry::compute_normal_mat(final_transfo);
@@ -119,7 +148,9 @@ namespace nova_baker_utils {
         transform_bitangents(tri_primitive, normal_matrix, bitangents);
         transform_vertices(tri_primitive, final_transfo, vertices);
         transform_normals(tri_primitive, normal_matrix, normals);
-        auto tri = manager.getShapeData().add_shape<nova::shape::Triangle>(vertices, normals, uv, tangents, bitangents);
+        auto tri = manager.getShapeData().add_shape<nova::shape::Triangle>(
+            triangle_buffer, alloc_offset, vertices, normals, uv, tangents, bitangents);
+        alloc_offset++;
         manager.getPrimitiveData().add_primitive<nova::primitive::NovaGeoPrimitive>(tri, mat);
       }
     }
