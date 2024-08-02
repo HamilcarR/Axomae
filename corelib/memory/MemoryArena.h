@@ -38,7 +38,7 @@ namespace core::memory {
     Arena &operator=(const Arena &) = delete;
     Arena &operator=(Arena &&) noexcept = default;
 
-    explicit Arena(std::size_t block_size_ = 262144) : block_size(block_size_) {}
+    Arena(std::size_t block_size_ = 262144) : block_size(block_size_) {}
 
     ~Arena() {
       freeAlign(current_block_ptr);
@@ -64,10 +64,12 @@ namespace core::memory {
     }
 
     template<class U>
-    U *construct(std::size_t num_instances) {
+    U *construct(std::size_t num_instances, bool constructor = true) {
       U *memory_alloc = static_cast<U *>(alloc(num_instances * sizeof(U)));
-      for (std::size_t i = 0; i < num_instances; i++)
-        ::new (&memory_alloc[i]) U();
+      if (constructor) {
+        for (std::size_t i = 0; i < num_instances; i++)
+          ::new (&memory_alloc[i]) U();
+      }
       return memory_alloc;
     }
 
@@ -96,20 +98,24 @@ namespace core::memory {
         }
         current_block_offset = 0;
       }
-      T *ret_ptr = current_block_ptr + current_alloc_size;
+      T *ret_ptr = current_block_ptr + current_block_offset;
       current_block_offset += size_bytes;
       return ret_ptr;
     }
 
    private:
-    void *allocAlign(std::size_t size_bytes, std::size_t alignment = L1_DEF_ALIGN) { return aligned_alloc(alignment, size_bytes); }
-
     template<class U>
-    U *allocAlign(std::size_t count, std::size_t alignment = L1_DEF_ALIGN) {
-      return static_cast<U *>(allocAlign(count * sizeof(U), alignment));
+    U *allocAlign(std::size_t count) {
+      std::size_t total_size = count * sizeof(U);
+      std::align_val_t alignment = static_cast<std::align_val_t>(L1_DEF_ALIGN);
+      void *ptr = ::operator new(total_size, alignment);
+      return static_cast<U *>(ptr);
     }
 
-    void freeAlign(void *ptr) { std::free(ptr); }
+    void freeAlign(void *ptr) {
+      std::align_val_t alignment = static_cast<std::align_val_t>(L1_DEF_ALIGN);
+      ::operator delete(ptr, alignment);
+    }
   };
 
 }  // namespace core::memory
