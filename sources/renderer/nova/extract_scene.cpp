@@ -99,7 +99,7 @@ namespace nova_baker_utils {
   static void normalize_uv(glm::vec2 &textures) {
     if (textures.s > 1 || textures.s < 0)
       textures.s = textures.s - std::floor(textures.s);
-    if (textures.t > 1 || texutres.t < 0)
+    if (textures.t > 1 || textures.t < 0)
       textures.t = textures.t - std::floor(textures.t);
   }
 
