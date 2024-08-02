@@ -23,22 +23,31 @@ namespace nova {
    private:
     NovaResources resources;
     mutable nova::exception::NovaException exception;
+    /* Holds the actual objects refered to by the resource structures.*/
+    core::memory::Arena<std::byte> resource_mempool;
 
    public:
-    CLASS_CM(NovaResourceManager)
+    NovaResourceManager() = default;
+    ~NovaResourceManager() = default;
+    NovaResourceManager(const NovaResourceManager &) = delete;
+    NovaResourceManager(NovaResourceManager &&) noexcept = default;
+    NovaResourceManager &operator=(const NovaResourceManager &) = delete;
+    NovaResourceManager &operator=(NovaResourceManager &&) noexcept = default;
 
     GENERATE_GETTERS(engine::EngineResourcesHolder, EngineData, resources.renderer_data)
     GENERATE_GETTERS(scene::SceneResourcesHolder, SceneData, resources.scene_data)
     GENERATE_GETTERS(texturing::TextureRawData, EnvmapData, resources.scene_data.envmap_data)
     GENERATE_GETTERS(texturing::TextureResourcesHolder, TexturesData, resources.scene_data.textures_data)
-    GENERATE_GETTERS(material::MaterialResourcesHolder, MaterialData, resources.scene_data.materials_data);
+    GENERATE_GETTERS(material::MaterialResourcesHolder, MaterialData, resources.scene_data.materials_data)
     GENERATE_GETTERS(camera::CameraResourcesHolder, CameraData, resources.scene_data.camera_data)
     GENERATE_GETTERS(primitive::PrimitivesResourcesHolder, PrimitiveData, resources.scene_data.primitive_data)
     GENERATE_GETTERS(shape::ShapeResourcesHolder, ShapeData, resources.scene_data.shape_data)
     GENERATE_GETTERS(aggregate::Accelerator, AccelerationData, resources.scene_data.acceleration_data)
     GENERATE_GETTERS(scene::SceneTransformations, SceneTransformation, resources.scene_data.scene_transformations)
+    GENERATE_GETTERS(core::memory::Arena<>, MemoryPool, resource_mempool)
 
     void clearResources() {
+      resource_mempool.reset();
       getPrimitiveData().clear();
       getTexturesData().clear();
       getShapeData().clear();
