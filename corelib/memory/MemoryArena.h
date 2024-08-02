@@ -12,6 +12,9 @@
  * sizes , and deallocate the entire chunk when not needed.
  */
 namespace core::memory {
+
+  static constexpr std::size_t L1_DEF_ALIGN = 64;
+  static constexpr std::size_t DEFAULT_BLOCK_SIZE = 262144;
   template<class T = std::byte>
   class Arena {
    private:
@@ -24,8 +27,6 @@ namespace core::memory {
     using block_list_t = std::list<block_t>;
 
    private:
-    static constexpr std::size_t L1_DEF_ALIGN = 64;
-
    private:
     const std::size_t block_size;
     T *current_block_ptr{nullptr};
@@ -38,7 +39,7 @@ namespace core::memory {
     Arena &operator=(const Arena &) = delete;
     Arena &operator=(Arena &&) noexcept = default;
 
-    Arena(std::size_t block_size_ = 262144) : block_size(block_size_) {}
+    Arena(std::size_t block_size_ = DEFAULT_BLOCK_SIZE) : block_size(block_size_) {}
 
     ~Arena() {
       freeAlign(current_block_ptr);
@@ -47,6 +48,14 @@ namespace core::memory {
       for (auto &block : free_blocks)
         freeAlign(block.current_block_ptr);
     }
+
+    std::size_t getFreeBlocksNum() const { return free_blocks.size(); }
+
+    std::size_t getUsedBlocksNum() const { return used_blocks.size(); }
+
+    const block_list_t &getFreeBlocks() const { return free_blocks; }
+
+    const block_list_t &getUsedBlocks() const { return used_blocks; }
 
     std::size_t getTotalSize() {
       std::size_t acc = current_alloc_size;
@@ -60,7 +69,7 @@ namespace core::memory {
 
     void reset() {
       current_block_offset = 0;
-      free_blocks.splice(free_blocks.begin(), free_blocks);
+      free_blocks.splice(free_blocks.begin(), used_blocks);
     }
 
     template<class U>
