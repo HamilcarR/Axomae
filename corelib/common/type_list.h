@@ -1,6 +1,7 @@
 #ifndef TYPE_LIST_H
 #define TYPE_LIST_H
 #include "project_macros.h"
+#include <algorithm>
 
 /* maybe rename to type.h*/
 
