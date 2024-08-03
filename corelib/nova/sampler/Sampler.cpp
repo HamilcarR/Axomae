@@ -4,6 +4,12 @@
 #include <glm/gtc/matrix_access.hpp>
 
 using namespace nova::sampler;
+
+AX_DEVICE_CALLABLE glm::vec3 RandomSampler::sample() {
+  return {math::random::nrandi(-1, 1), math::random::nrandi(-1, 1), math::random::nrandi(-1, 1)};
+}
+nova::exception::NovaException RandomSampler::getErrorState() const { return exception; }
+
 HammersleySampler::HammersleySampler(int N_) : N(N_) {}
 
 AX_DEVICE_CALLABLE glm::vec3 HammersleySampler::sample() {

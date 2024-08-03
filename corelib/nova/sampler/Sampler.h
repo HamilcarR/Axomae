@@ -14,6 +14,16 @@
 
 namespace nova::sampler {
 
+  class RandomSampler {
+    mutable nova::exception::NovaException exception{};
+
+   public:
+    CLASS_M(RandomSampler)
+
+    AX_DEVICE_CALLABLE glm::vec3 sample();
+    nova::exception::NovaException getErrorState() const;
+  };
+
   class HammersleySampler {
     int i{0}, N{0};
     mutable nova::exception::NovaException exception{};
@@ -40,7 +50,7 @@ namespace nova::sampler {
     AX_DEVICE_CALLABLE nova::exception::NovaException getErrorState() const { return exception; }
   };
 
-  class SamplerInterface : public core::tag_ptr<HammersleySampler, SobolSampler> {
+  class SamplerInterface : public core::tag_ptr<HammersleySampler, SobolSampler, RandomSampler> {
    public:
     using tag_ptr::tag_ptr;
 

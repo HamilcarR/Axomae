@@ -27,8 +27,8 @@ namespace nova::integrator {
         math::camera::camera_ray r = math::camera::ray_inv_mat(
             ndc.x, ndc.y, nova_resource_manager->getCameraData().getInvProjection(), nova_resource_manager->getCameraData().getInvView());
         Ray ray(r.near, r.far);
-        sampler::HammersleySampler ham = sampler::HammersleySampler();
-        sampler::SamplerInterface sampler = &ham;
+        sampler::RandomSampler random_sampler = sampler::RandomSampler();
+        sampler::SamplerInterface sampler = &random_sampler;
         glm::vec4 distance = Li(ray, nova_resource_manager, 0, sampler);
 
         float depth = 1 - (distance.x - near) / (far - near);
