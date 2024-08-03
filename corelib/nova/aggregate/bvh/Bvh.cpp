@@ -1,21 +1,19 @@
 #include "Bvh.h"
 #include "BoundingBox.h"
+#include "primitive/PrimitiveInterface.h"
 #include "ray/Ray.h"
 #include "shape/Box.h"
-
 #include <deque>
 
 namespace nova::aggregate {
   namespace prim = nova::primitive;
-  Bvhtl::Bvhtl(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives_,
-               BvhtlBuilder::BUILD_TYPE type,
-               BvhtlBuilder::SEGMENTATION seg)
+  Bvhtl::Bvhtl(const std::vector<primitive::NovaPrimitiveInterface> *primitives_, BvhtlBuilder::BUILD_TYPE type, BvhtlBuilder::SEGMENTATION seg)
       : primitives(primitives_) {
     AX_ASSERT_NOTNULL(primitives);
     bvh = BvhtlBuilder::build(*primitives, type, seg);
   }
 
-  void Bvhtl::build(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> *primitives_,
+  void Bvhtl::build(const std::vector<primitive::NovaPrimitiveInterface> *primitives_,
                     BvhtlBuilder::BUILD_TYPE type,
                     BvhtlBuilder::SEGMENTATION segmentation) {
     AX_ASSERT_NOTNULL(primitives_);
@@ -23,7 +21,7 @@ namespace nova::aggregate {
     bvh = BvhtlBuilder::build(*primitives, type, segmentation);
   }
 
-  using primitive_ptr = std::unique_ptr<prim::NovaPrimitiveInterface>;
+  using primitive_ptr = prim::NovaPrimitiveInterface;
 
   bool Bvhtl::rec_traverse(const Ray &r,
                            float tmin,
@@ -51,7 +49,7 @@ namespace nova::aggregate {
         AX_ASSERT_LT(offset, bvh.prim_idx.size());
         int32_t p_idx = bvh.prim_idx[offset];
         AX_ASSERT_LT(p_idx, primitives->size());
-        const nova::primitive::NovaPrimitiveInterface *prim = (*primitives)[p_idx].get();
+        const primitive::NovaPrimitiveInterface *prim = &(*primitives)[p_idx];
 
         if (prim->hit(r, tmin, hit_option->data.tmin, data, nullptr)) {
           hit = true;
@@ -131,7 +129,7 @@ namespace nova::aggregate {
           AX_ASSERT_LT(primitive_offset, bvh.prim_idx.size());
           int32_t p_idx = bvh.prim_idx[primitive_offset];
           AX_ASSERT_LT(p_idx, primitives->size());
-          const nova::primitive::NovaPrimitiveInterface *prim = (*primitives)[p_idx].get();
+          const primitive::NovaPrimitiveInterface *prim = &(*primitives)[p_idx];
           if (!prim->hit(r, tmin, options->data.tmin, data, nullptr))
             continue;
           hit = true;

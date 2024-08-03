@@ -1,23 +1,23 @@
 
 #ifndef PRIMITIVEINTERFACE_H
 #define PRIMITIVEINTERFACE_H
+#include "NovaGeoPrimitive.h"
+#include "cuda_utils.h"
 #include "ray/Hitable.h"
 #include "sampler/Sampler.h"
-namespace nova::shape {
-  class NovaShapeInterface;
-}
-namespace nova::material {
-  class NovaMaterialInterface;
-}
+#include "tag_ptr.h"
 
 namespace nova::primitive {
-  class NovaPrimitiveInterface : public Hitable, public geometry::AABBInterface {
+  class NovaPrimitiveInterface : public core::tag_ptr<NovaGeoPrimitive> {
    public:
-    ~NovaPrimitiveInterface() override = default;
-    virtual bool scatter(const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler) const = 0;
-    [[nodiscard]] virtual glm::vec3 centroid() const = 0;
+    using tag_ptr::tag_ptr;
+    AX_DEVICE_CALLABLE [[nodiscard]] bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const;
+    AX_DEVICE_CALLABLE [[nodiscard]] bool scatter(const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler) const;
+    AX_DEVICE_CALLABLE [[nodiscard]] glm::vec3 centroid() const;
+    [[nodiscard]] geometry::BoundingBox computeAABB() const;
   };
 
+  using TYPELIST = NovaPrimitiveInterface::type_pack;
 }  // namespace nova::primitive
 
 #endif  // PRIMITIVEINTERFACE_H

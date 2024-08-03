@@ -112,7 +112,7 @@ namespace nova_baker_utils {
     normalize_uv(textures[2]);
   }
 
-  static std::size_t compute_element_size(const std::vector<Mesh *> &meshes, int indices_padding = 3) {
+  static std::size_t compute_primitive_number(const std::vector<Mesh *> &meshes, int indices_padding = 3) {
     std::size_t acc = 0;
     for (const auto &elem : meshes) {
       const Object3D &geometry = elem->getGeometry();
@@ -129,8 +129,10 @@ namespace nova_baker_utils {
 
   void build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager) {
     /* Allocate for triangles */
-    std::size_t num_elements = compute_element_size(meshes);
-    auto *triangle_buffer = allocate_pool_memory<nova::shape::Triangle>(manager.getMemoryPool(), num_elements);
+    std::size_t primitive_number = compute_primitive_number(meshes);
+    auto *triangle_buffer = allocate_pool_memory<nova::shape::Triangle>(manager.getMemoryPool(), primitive_number);
+    auto *primitive_buffer = allocate_pool_memory<nova::primitive::NovaGeoPrimitive>(manager.getMemoryPool(), primitive_number);
+
     std::size_t alloc_offset = 0;
     for (const auto &elem : meshes) {
       glm::mat4 final_transfo = elem->computeFinalTransformation();
@@ -150,8 +152,8 @@ namespace nova_baker_utils {
         transform_normals(tri_primitive, normal_matrix, normals);
         auto tri = manager.getShapeData().add_shape<nova::shape::Triangle>(
             triangle_buffer, alloc_offset, vertices, normals, uv, tangents, bitangents);
+        manager.getPrimitiveData().add_primitive<nova::primitive::NovaGeoPrimitive>(primitive_buffer, alloc_offset, tri, mat);
         alloc_offset++;
-        manager.getPrimitiveData().add_primitive<nova::primitive::NovaGeoPrimitive>(tri, mat);
       }
     }
   }

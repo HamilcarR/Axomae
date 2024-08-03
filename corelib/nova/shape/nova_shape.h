@@ -19,9 +19,9 @@ namespace nova::shape {
     /* Since the creation of shapes is incremental (we don't copy a whole array here) , provide the current offset of the object to create.*/
     template<class T, class... Args>
     NovaShapeInterface add_shape(T *allocation_buffer, std::size_t offset, Args &&...args) {
-      static_assert(core::has<T, TYPELIST_SHAPE>::has_type, "Provided type is not a Shape type.");
-      allocation_buffer[offset] = std::move(T(std::forward<Args>(args)...));
-      shapes.push_back(&allocation_buffer[offset]);
+      static_assert(core::has<T, TYPELIST>::has_type, "Provided type is not a Shape type.");
+      T *allocated_ptr = core::memory::Arena<>::construct<T>(&allocation_buffer[offset], std::forward<Args>(args)...);
+      shapes.push_back(allocated_ptr);
       AX_ASSERT_NOTNULL(shapes.back().get());
       return shapes.back();
     }

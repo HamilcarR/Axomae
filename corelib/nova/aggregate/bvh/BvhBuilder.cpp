@@ -13,9 +13,7 @@ namespace exception {
 
 namespace nova::aggregate {
 
-  Bvht_data BvhtlBuilder::build(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> &primitives,
-                                BUILD_TYPE type,
-                                SEGMENTATION segmentation) {
+  Bvht_data BvhtlBuilder::build(const std::vector<primitive::NovaPrimitiveInterface> &primitives, BUILD_TYPE type, SEGMENTATION segmentation) {
 
     Bvht_data bvh_data;
     const int32_t prim_size = primitives.size();
@@ -35,9 +33,7 @@ namespace nova::aggregate {
     return bvh_data;
   }
 
-  void BvhtlBuilder::update_aabb(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> &primitives,
-                                 int32_t node_id,
-                                 Bvht_data &bvh_data) {
+  void BvhtlBuilder::update_aabb(const std::vector<primitive::NovaPrimitiveInterface> &primitives, int32_t node_id, Bvht_data &bvh_data) {
     AX_ASSERT_FALSE(primitives.empty());
     AX_ASSERT_LT(node_id, bvh_data.l_tree.size());
 
@@ -48,7 +44,7 @@ namespace nova::aggregate {
       int32_t idx = bvh_data.prim_idx[i + offset];
       AX_ASSERT_LT(idx, primitives.size());
       AX_ASSERT_NOTNULL(primitives[idx]);
-      geometry::BoundingBox current = primitives[idx]->computeAABB();
+      geometry::BoundingBox current = primitives[idx].computeAABB();
       node_box = node_box + current;
 
       node.min[0] = node_box.getMinCoords().x;
@@ -74,11 +70,8 @@ namespace nova::aggregate {
     return axis;
   }
 
-  static float eval_sah(const Bvht_data &tree,
-                        const std::vector<std::unique_ptr<nova::primitive::NovaPrimitiveInterface>> &primitives,
-                        const Bvhnl &node,
-                        int axis,
-                        float candidate_pos) {
+  static float eval_sah(
+      const Bvht_data &tree, const std::vector<primitive::NovaPrimitiveInterface> &primitives, const Bvhnl &node, int axis, float candidate_pos) {
     AX_ASSERT_LT(axis, 3);
     AX_ASSERT_GE(axis, 0);
     geometry::BoundingBox aabb_left, aabb_right;
@@ -88,10 +81,10 @@ namespace nova::aggregate {
       AX_ASSERT_LT(offset, tree.prim_idx.size());
       const int32_t p_idx = tree.prim_idx[offset];
       AX_ASSERT_LT(p_idx, primitives.size());
-      const nova::primitive::NovaPrimitiveInterface *primitive = primitives[p_idx].get();
-      const glm::vec3 centroid_vec = primitive->centroid();
+      const nova::primitive::NovaPrimitiveInterface primitive = primitives[p_idx];
+      const glm::vec3 centroid_vec = primitive.centroid();
       const float *centroid_ptr = glm::value_ptr(centroid_vec);
-      const geometry::BoundingBox prim_aabb = primitive->computeAABB();
+      const geometry::BoundingBox prim_aabb = primitive.computeAABB();
       if (centroid_ptr[axis] < candidate_pos) {
         prim_left_count++;
         aabb_left = aabb_left + prim_aabb;
@@ -117,7 +110,7 @@ namespace nova::aggregate {
   }
 
   static int axis_subdiv_sah(const Bvht_data &bvh_tree_data,
-                             const std::vector<std::unique_ptr<nova::primitive::NovaPrimitiveInterface>> &primitives,
+                             const std::vector<primitive::NovaPrimitiveInterface> &primitives,
                              int32_t node_id,
                              float &best_coast_r,
                              float subdivided_axis[3],
@@ -151,7 +144,7 @@ namespace nova::aggregate {
     return best_axis;
   }
 
-  static int32_t create_nodes(const std::vector<std::unique_ptr<nova::primitive::NovaPrimitiveInterface>> &primitives,
+  static int32_t create_nodes(const std::vector<primitive::NovaPrimitiveInterface> &primitives,
                               std::vector<int32_t> &prim_idx,
                               Bvhnl &node,
                               const float split_axis[3],
@@ -164,8 +157,8 @@ namespace nova::aggregate {
       AX_ASSERT_GE(j, 0);
       int32_t p_idx = prim_idx[i];
       AX_ASSERT_LT(p_idx, primitives.size());
-      const nova::primitive::NovaPrimitiveInterface *primitive = primitives[p_idx].get();
-      float centroid = axis == 0 ? primitive->centroid().x : axis == 1 ? primitive->centroid().y : primitive->centroid().z;
+      const nova::primitive::NovaPrimitiveInterface primitive = primitives[p_idx];
+      float centroid = axis == 0 ? primitive.centroid().x : axis == 1 ? primitive.centroid().y : primitive.centroid().z;
       if (centroid < split_axis[axis])
         i++;
       else
@@ -174,7 +167,7 @@ namespace nova::aggregate {
     return i;
   }
 
-  void BvhtlBuilder::subdivide(const std::vector<std::unique_ptr<primitive::NovaPrimitiveInterface>> &primitives,
+  void BvhtlBuilder::subdivide(const std::vector<primitive::NovaPrimitiveInterface> &primitives,
                                int32_t node_id,
                                int32_t &nodes_used,
                                BUILD_TYPE build_type,

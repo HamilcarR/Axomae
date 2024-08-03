@@ -1,5 +1,6 @@
 add_library(ax_core_nova_primitive
         NovaGeoPrimitive.cpp
+        PrimitiveInterface.cpp
 )
 
 

@@ -82,6 +82,14 @@ namespace core::memory {
       return memory_alloc;
     }
 
+    template<class U, class... Args>
+    static U *construct(U *ptr, Args &&...args) {
+      if (!ptr)
+        throw std::bad_alloc();
+      ::new (ptr) U(std::forward<Args>(args)...);
+      return ptr;
+    }
+
     void *alloc(std::size_t size_bytes) {
       /* Needs 16 bytes alignment */
       size_bytes = (size_bytes + 0xF) & ~0xF;

@@ -18,6 +18,6 @@ namespace nova::shape {
     AX_DEVICE_CALLABLE [[nodiscard]] bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const;
   };
 
-  using TYPELIST_SHAPE = NovaShapeInterface::type_pack;
+  using TYPELIST = NovaShapeInterface::type_pack;
 }  // namespace nova::shape
 #endif  // SHAPEINTERFACE_H
