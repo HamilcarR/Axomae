@@ -77,12 +77,37 @@ namespace core {
   };
 
   /**************************************************************************************************************/
+  /* returns the total size of the template argument pack*/
   template<class T, class... Ts>
   constexpr std::size_t pack_size() {
     if constexpr (sizeof...(Ts) == 0)
       return sizeof(T);
     return sizeof(T) + pack_size<Ts...>();
   }
+
+  /* Returns the size of the biggest type */
+  template<class T, class... Ts>
+  constexpr std::size_t max_type_size() {
+    if constexpr (sizeof...(Ts) == 0)
+      return sizeof(T);
+    return std::max(sizeof(T), sizeof(max_type_size<Ts...>()));
+  }
+
+  template<class... Ts>
+  struct max_type;
+
+  template<class T>
+  struct max_type<type_list<T>> {
+    using type = T;
+  };
+
+  /* Returns the type with the biggest size */
+  template<class T, class U, class... Ts>
+  struct max_type<type_list<T, U, Ts...>> {
+    using TLIST = max_type<type_list<T, Ts...>>;
+    using ULIST = max_type<type_list<U, Ts...>>;
+    using type = std::conditional_t<(sizeof(T) > sizeof(U)), typename TLIST::type, typename ULIST::type>;
+  };
 
 }  // namespace core
 #endif  // TYPE_LIST_H

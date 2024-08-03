@@ -97,6 +97,11 @@ namespace nova::material {
     return glm::dot(normal, out.direction) > 0;
   }
 
+  bool NovaMaterialInterface::scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const {
+    auto disp = [&](auto material) { return material->scatter(in, out, hit_d, sampler); };
+    return dispatch(disp);
+  }
+
   /********************************************************************************************************************************/
 
   NovaConductorMaterial::NovaConductorMaterial(const texture_pack &texture) { t_pack = texture; }

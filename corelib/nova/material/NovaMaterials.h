@@ -19,48 +19,55 @@ namespace nova::material {
 
     CLASS_CM(texture_pack)
   };
-  class NovaMaterialInterface {
+  class NovaDiffuseMaterial;
+  class NovaDielectricMaterial;
+  class NovaConductorMaterial;
+
+  class NovaMaterialInterface : public core::tag_ptr<NovaDiffuseMaterial, NovaDielectricMaterial, NovaConductorMaterial> {
    public:
-    virtual ~NovaMaterialInterface() = default;
-    virtual bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler)
-        const = 0;  // replace by eval() , check metallic , roughness , emissive value and use correct function
+    using tag_ptr::tag_ptr;
+    /*replace by eval() , check metallic , roughness , emissive value and use correct function*/
+    AX_DEVICE_CALLABLE bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const;
   };
 
-  class NovaDiffuseMaterial final : public NovaMaterialInterface {
+  class NovaDiffuseMaterial {
    private:
     texture_pack t_pack{};
 
    public:
-    CLASS_OCM(NovaDiffuseMaterial)
+    CLASS_CM(NovaDiffuseMaterial)
 
     explicit NovaDiffuseMaterial(const texture_pack &textures);
-    bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const override;
+    AX_DEVICE_CALLABLE bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const;
   };
 
-  class NovaConductorMaterial final : public NovaMaterialInterface {
+  class NovaConductorMaterial {
    private:
     texture_pack t_pack{};
     float fuzz{};
 
    public:
-    CLASS_OCM(NovaConductorMaterial)
+    CLASS_CM(NovaConductorMaterial)
 
     explicit NovaConductorMaterial(const texture_pack &textures);
     NovaConductorMaterial(const texture_pack &textures, float fuzz_);
-    bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const override;
+    AX_DEVICE_CALLABLE bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const;
   };
 
-  class NovaDielectricMaterial final : public NovaMaterialInterface {
+  class NovaDielectricMaterial {
    private:
     texture_pack t_pack{};
     float eta{};  // ior
 
    public:
-    CLASS_OCM(NovaDielectricMaterial)
+    CLASS_CM(NovaDielectricMaterial)
 
     explicit NovaDielectricMaterial(const texture_pack &textures);
     NovaDielectricMaterial(const texture_pack &textures, float ior);
-    bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const override;
+    AX_DEVICE_CALLABLE bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const;
   };
+
+  using TYPELIST = NovaMaterialInterface::type_pack;
+
 }  // namespace nova::material
 #endif  // NOVAMATERIALS_H
