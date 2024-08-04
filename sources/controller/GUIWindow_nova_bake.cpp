@@ -174,19 +174,6 @@ namespace controller {
     return std::make_unique<HdrRenderViewerWidget>(&img, app_controller);
   }
 
-  static void color_correct_buffers(const nova::HdrBufferStruct *buffers, image::ImageHolder<float> &image_holder, float current_sample_num) {
-    if (!buffers) {
-      LOG("Render buffers are in an invalid state.", LogLevel::CRITICAL);
-      return;
-    }
-    for (int i = 0; i < image_holder.metadata.height * image_holder.metadata.width * image_holder.metadata.channels; i++) {
-      float accumulated = buffers->accumulator_buffer[i] / (current_sample_num + 1);
-      float partial = buffers->partial_buffer[i];
-      float interpolated = accumulated + 0.5f * (partial - accumulated);
-      image_holder.data[i] = interpolated;
-    }
-  }
-
   /* returns true if exception needs to shutdown renderer  */
   static bool on_exception_shutdown(const nova::NovaResourceManager &nova_resource_manager) {
     using namespace nova::exception;
@@ -218,7 +205,18 @@ namespace controller {
             LOGS("Renderer general error.");
             must_shutdown = true;
             break;
-
+          case INVALID_RENDERBUFFER_STATE:
+            LOGS("Render buffer is invalid.");
+            must_shutdown = true;
+            break;
+          case INVALID_ENGINE_INSTANCE:
+            LOGS("Engine instance is invalid.");
+            must_shutdown = true;
+            break;
+          case INVALID_RENDERBUFFER_DIM:
+            LOGS("Wrong buffer width / height dimension.");
+            must_shutdown = true;
+            break;
           default:
             must_shutdown |= false;
             break;
@@ -227,6 +225,19 @@ namespace controller {
       return must_shutdown;
     }
     return false;
+  }
+
+  static void color_correct_buffers(const nova::HdrBufferStruct *buffers, image::ImageHolder<float> &image_holder, float current_sample_num) {
+    if (!buffers) {
+      LOG("Render buffers are in an invalid state.", LogLevel::CRITICAL);
+      return;
+    }
+    for (int i = 0; i < image_holder.metadata.height * image_holder.metadata.width * image_holder.metadata.channels; i++) {
+      float accumulated = buffers->accumulator_buffer[i] / (current_sample_num + 1);
+      float partial = buffers->partial_buffer[i];
+      float interpolated = accumulated + 0.5f * (partial - accumulated);
+      image_holder.data[i] = interpolated;
+    }
   }
 
   static void do_progressive_render(nova_baker_utils::render_scene_data &render_scene_data, image::ImageHolder<float> &image_holder) {
@@ -241,9 +252,14 @@ namespace controller {
           render_scene_data.nova_resource_manager->getEngineData().getMaxDepth() < MAX_DEPTH ?
               render_scene_data.nova_resource_manager->getEngineData().getMaxDepth() + 1 :
               MAX_DEPTH);
-
-      nova_baker_utils::bake_scene(render_scene_data);
-
+      render_scene_data.width = 0;
+      try {
+        nova_baker_utils::bake_scene(render_scene_data);
+      } catch (const exception::GenericException &e) {
+        exception::ErrHandler::handle(e);
+        nova_baker_utils::synchronize_render_threads(render_scene_data, NOVABAKE_POOL_TAG);
+        return;
+      }
       nova_baker_utils::synchronize_render_threads(render_scene_data, NOVABAKE_POOL_TAG);
 
       if (on_exception_shutdown(*render_scene_data.nova_resource_manager))
