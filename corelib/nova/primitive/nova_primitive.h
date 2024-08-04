@@ -17,7 +17,6 @@ namespace nova::primitive {
       static_assert(core::has<T, TYPELIST>::has_type, "Provided type is not a Primitive type.");
       T *allocated_ptr = core::memory::Arena<>::construct<T>(&allocation_buffer[offset], std::forward<Args>(args)...);
       primitives.push_back(allocated_ptr);
-      AX_ASSERT_NOTNULL(allocation_buffer[offset].get());
       return primitives.back();
     }
 

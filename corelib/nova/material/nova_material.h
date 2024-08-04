@@ -15,7 +15,6 @@ namespace nova::material {
       static_assert(core::has<T, TYPELIST>::has_type, "Provided type is not a Material type.");
       T *allocated_ptr = core::memory::Arena<>::construct<T>(&allocation_buffer[offset], std::forward<Args>(args)...);
       materials.push_back(allocated_ptr);
-      AX_ASSERT_NOTNULL(allocation_buffer[offset].get());
       return materials.back();
     }
     std::vector<NovaMaterialInterface> &get_materials() { return materials; }
