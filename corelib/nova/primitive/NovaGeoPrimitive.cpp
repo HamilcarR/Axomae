@@ -18,7 +18,6 @@ namespace nova::primitive {
   }
 
   bool NovaGeoPrimitive::scatter(const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler) const {
-    AX_ASSERT(material, "Material structure is not initialized.");
     return material.scatter(in, out, data, sampler);
   }
 

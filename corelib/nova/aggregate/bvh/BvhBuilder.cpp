@@ -43,7 +43,7 @@ namespace nova::aggregate {
     for (size_t i = 0; i < node.primitive_count; i++) {
       int32_t idx = bvh_data.prim_idx[i + offset];
       AX_ASSERT_LT(idx, primitives.size());
-      AX_ASSERT_NOTNULL(primitives[idx]);
+      AX_ASSERT_NOTNULL(primitives[idx].get());
       geometry::BoundingBox current = primitives[idx].computeAABB();
       node_box = node_box + current;
 
