@@ -252,7 +252,6 @@ namespace controller {
           render_scene_data.nova_resource_manager->getEngineData().getMaxDepth() < MAX_DEPTH ?
               render_scene_data.nova_resource_manager->getEngineData().getMaxDepth() + 1 :
               MAX_DEPTH);
-      render_scene_data.width = 0;
       try {
         nova_baker_utils::bake_scene(render_scene_data);
       } catch (const exception::GenericException &e) {
