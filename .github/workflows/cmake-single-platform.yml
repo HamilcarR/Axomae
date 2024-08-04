@@ -30,7 +30,7 @@ jobs:
         host: 'linux'
         target: 'desktop'
         arch: 'gcc_64'
-        modules: 'qtgui qtopenglwidgets qtwidgets'
+        install-deps : 'true'
 
     - name: Install SDL2 and SDL2_image
       run: |
