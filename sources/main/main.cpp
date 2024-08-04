@@ -1,6 +1,5 @@
 #include "GUIWindow.h"
 #include "GenericException.h"
-#include "ImageImporter.h"
 #include "cmd/API.h"
 #include "cmd/ProgramOptionsManager.h"
 #include <boost/program_options.hpp>

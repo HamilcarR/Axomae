@@ -2,7 +2,6 @@ add_library(ax_config STATIC
     Config.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ax_config)
 target_link_libraries(ax_config
 PUBLIC
     ax_io

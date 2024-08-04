@@ -41,7 +41,7 @@ class TextureDatabase final : public IntegerResourceDB<GenericTexture> {
 
 namespace database::texture {
   template<class TEXTYPE, class... Args>
-  static database::Result<int, TEXTYPE> store(IResourceDB<int, GenericTexture> &database, bool keep, Args &&...args) {
+   database::Result<int, TEXTYPE> store(IResourceDB<int, GenericTexture> &database, bool keep, Args &&...args) {
     ASSERT_SUBTYPE(GenericTexture, TEXTYPE);
     std::unique_ptr<GenericTexture> temp = std::make_unique<PRVINTERFACE<TEXTYPE, Args...>>(std::forward<Args>(args)...);
     database::Result<int, GenericTexture> result = database.add(std::move(temp), keep);

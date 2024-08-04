@@ -16,14 +16,11 @@ add_custom_target(axcustom_glsl_generate ALL
         VERBATIM
 )
 
-
-
 add_library(ax_shader STATIC
     Shader.cpp
     utils/glsl.cpp
 )
 add_dependencies(ax_shader axcustom_glsl_generate)
-target_link_libraries(${PROJECT_NAME} PUBLIC ax_shader)
 
 target_link_libraries(ax_shader
 PRIVATE

@@ -40,7 +40,7 @@ class ShaderDatabase final : public IResourceDB<Shader::TYPE, Shader> {
 
 namespace database::shader {
   template<class TYPE, class... Args>
-  static database::Result<Shader::TYPE, TYPE> store(IResourceDB<Shader::TYPE, Shader> &database, bool keep, Args &&...args) {
+  database::Result<Shader::TYPE, TYPE> store(IResourceDB<Shader::TYPE, Shader> &database, bool keep, Args &&...args) {
     ASSERT_SUBTYPE(Shader, TYPE);
     Shader::TYPE type = TYPE::getType_static();
     Shader *seek = database.get(type);

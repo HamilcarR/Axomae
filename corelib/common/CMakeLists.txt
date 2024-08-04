@@ -1,5 +1,5 @@
 
-add_library(ax_core_common)
+add_library(ax_core_common STATIC)
 
 target_link_libraries(ax_core PUBLIC ax_core_common)
 target_link_libraries(ax_core_common

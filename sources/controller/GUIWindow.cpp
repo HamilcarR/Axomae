@@ -1,7 +1,7 @@
 #include "GUIWindow.h"
 #include "Config.h"
-
 #include "ImageImporter.h"
+#include <SDL_surface.h>
 
 #include "ExceptionHandlerUI.h"
 #include "ImageManager.h"
@@ -271,7 +271,7 @@ namespace controller {
 
     setMouseTracking(true);
 
-   QCoreApplication::setAttribute(Qt::AA_DontUseNativeDialogs);
+    QCoreApplication::setAttribute(Qt::AA_DontUseNativeDialogs);
   }
 
   Controller::~Controller() { delete _MemManagement; }

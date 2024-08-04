@@ -4,12 +4,15 @@ add_library(ax_processing STATIC
     TextureProcessing.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ax_processing)
+
 target_link_libraries(ax_processing
 PRIVATE
         ax_texture
         ax_controller
         ax_core
+
+        SDL2::SDL2
+        SDL2_image::SDL2_image
 )
 
 target_include_directories(ax_processing 

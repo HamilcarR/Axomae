@@ -4,8 +4,6 @@ add_library(ax_scene STATIC
     SceneHierarchy.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ax_scene)
-
 target_link_libraries(ax_scene
 PRIVATE
         ax_material

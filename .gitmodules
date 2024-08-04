@@ -47,3 +47,13 @@
 	path = vendor/libdeflate
 	url = https://github.com/ebiggers/libdeflate 
   ignore = all 
+
+[submodule "vendor/SDL_image"]
+	path = vendor/SDL_image
+	url = https://github.com/libsdl-org/SDL_image
+	branch = SDL2
+
+[submodule "vendor/SDL"]
+	path = vendor/SDL
+	url = https://github.com/libsdl-org/SDL
+	branch = SDL2
