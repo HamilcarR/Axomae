@@ -8,9 +8,22 @@
 #include "project_macros.h"
 #include "texturing/nova_texturing.h"
 
+#include <GenericException.h>
+
+namespace exception {
+  class InvalidTexTypeConversionException : public CatastrophicFailureException {
+   public:
+    InvalidTexTypeConversionException() : CatastrophicFailureException() { saveErrorString("Invalid tag pointer conversion."); }
+  };
+}  // namespace exception
+
 namespace nova_baker_utils {
 
-  const nova::texturing::ImageTexture *extract_texture(const TextureGroup &tgroup, nova::NovaResourceManager &manager, GenericTexture::TYPE type) {
+  nova::texturing::ImageTexture *extract_texture(nova::texturing::ImageTexture *alloc_buffer,
+                                                 std::size_t offset,
+                                                 const TextureGroup &tgroup,
+                                                 nova::NovaResourceManager &manager,
+                                                 GenericTexture::TYPE type) {
     const GenericTexture *gltexture = tgroup.getTexturePointer(type);
     if (!gltexture) {
       LOG("Texture lookup in Nova scene initialization has returned null.", LogLevel::WARNING);
@@ -19,8 +32,11 @@ namespace nova_baker_utils {
     const auto *buffer_ptr = gltexture->getData();
     int w = (int)gltexture->getWidth();
     int h = (int)gltexture->getHeight();
-
-    return dynamic_cast<nova::texturing::ImageTexture *>(manager.getTexturesData().add_texture<nova::texturing::ImageTexture>(buffer_ptr, w, h, 4));
+    auto ret = manager.getTexturesData().add_texture<nova::texturing::ImageTexture>(alloc_buffer, offset, buffer_ptr, w, h, 4);
+    nova::texturing::ImageTexture *image_tex = ret.get<nova::texturing::ImageTexture>();
+    if (!image_tex)
+      throw exception::InvalidTexTypeConversionException();
+    return image_tex;
   }
 
   struct material_buffers_t {
@@ -38,6 +54,7 @@ namespace nova_baker_utils {
     buffers.diffuse_alloc_buffer = memory_pool.construct<nova::material::NovaDiffuseMaterial>(number_elements, false);
     return buffers;
   }
+
   nova::material::NovaMaterialInterface extract_materials(material_buffers_t &buffers,
                                                           std::size_t offset,
                                                           const Mesh *mesh,
@@ -48,12 +65,14 @@ namespace nova_baker_utils {
     }
     const TextureGroup &texture_group = material->getTextureGroup();
     nova::material::texture_pack tpack{};
-    tpack.albedo = extract_texture(texture_group, manager, GenericTexture::DIFFUSE);
-    tpack.normalmap = extract_texture(texture_group, manager, GenericTexture::NORMAL);
-    tpack.metallic = extract_texture(texture_group, manager, GenericTexture::METALLIC);
-    tpack.roughness = extract_texture(texture_group, manager, GenericTexture::ROUGHNESS);
-    tpack.ao = extract_texture(texture_group, manager, GenericTexture::AMBIANTOCCLUSION);
-    tpack.emissive = extract_texture(texture_group, manager, GenericTexture::EMISSIVE);
+    auto &memory_pool = manager.getMemoryPool();
+    auto *allocated_texture_buffer = memory_pool.construct<nova::texturing::ImageTexture>(6, false);
+    tpack.albedo = extract_texture(allocated_texture_buffer, 0, texture_group, manager, GenericTexture::DIFFUSE);
+    tpack.normalmap = extract_texture(allocated_texture_buffer, 1, texture_group, manager, GenericTexture::NORMAL);
+    tpack.metallic = extract_texture(allocated_texture_buffer, 2, texture_group, manager, GenericTexture::METALLIC);
+    tpack.roughness = extract_texture(allocated_texture_buffer, 3, texture_group, manager, GenericTexture::ROUGHNESS);
+    tpack.ao = extract_texture(allocated_texture_buffer, 4, texture_group, manager, GenericTexture::AMBIANTOCCLUSION);
+    tpack.emissive = extract_texture(allocated_texture_buffer, 5, texture_group, manager, GenericTexture::EMISSIVE);
     int r = math::random::nrandi(0, 2);
     nova::material::NovaMaterialInterface mat_ptr{};
     switch (r) {

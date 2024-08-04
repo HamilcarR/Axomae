@@ -7,7 +7,6 @@
 #include "material/nova_material.h"
 #include "primitive/NovaGeoPrimitive.h"
 #include "shape/nova_shape.h"
-#include "texturing/ConstantTexture.h"
 
 void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
   AX_ASSERT_NOTNULL(nova_resource_manager);

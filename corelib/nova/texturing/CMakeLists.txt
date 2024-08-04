@@ -1,11 +1,12 @@
 add_library(ax_core_nova_texturing
         nova_texturing.cpp
-        ConstantTexture.cpp
+        NovaTexture.cpp
 )
 target_link_libraries(ax_core_nova_texturing PRIVATE
     ax_core_macro
     ax_core_math
-
+    ax_core_memory
+    ax_core_device
 )
 target_link_libraries(ax_core_nova PUBLIC ax_core_nova_texturing)
 
