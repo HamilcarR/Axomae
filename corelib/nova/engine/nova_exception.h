@@ -15,9 +15,13 @@ namespace nova::exception {
 
     INVALID_SAMPLER_DIM = 1 << 2,
     SAMPLER_INIT_ERROR = 1 << 3,
-    SAMPLER_DOMAIN_EXHAUSTED = 1 << 4,  // Internal exception of third parties low discrep generators
+    SAMPLER_DOMAIN_EXHAUSTED = 1 << 4,
     SAMPLER_INVALID_ALLOC = 1 << 5,
     SAMPLER_INVALID_ARG = 1 << 6,
+
+    INVALID_RENDERBUFFER_STATE = 1 << 7,
+    INVALID_ENGINE_INSTANCE = 1 << 8,
+    INVALID_RENDERBUFFER_DIM = 1 << 9,
 
     GENERAL_ERROR = 1ULL << 32,
 
