@@ -4,7 +4,9 @@ name: Tests
 
 on:
   push:
-    branches: [ "Feature-CI_CD" ]
+    branches:
+    - "Feature-CI_CD"
+    - "master"
   pull_request:
     branches: [ "master" ]
 
