@@ -1,29 +1,33 @@
 # Axomae
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 
-## Overview:
 
-Axomae is an image processing tool used for texture baking and viewing 3D models.  
+
+# Table Of Contents:
+* [Introduction](#Introduction)
+* [Features](#Features)
+
+## Introduction 
+
+Axomae is a 3D rendering engine and raytracer, designed as a foundation to explore advanced rendering techniques .    
+The goal of the software is to facilitate the implementation of research papers , testing , and display of photorealistic images. 
 
 ## Features:
+### Nova 
+Nova is the first iteration of our multithreaded path tracing engine
+
+![final](Documentation/Screenshots/final.jpeg)
+![chess](Documentation/Screenshots/chess2.png)
+
+Nova will also integrate a wave optic rendering engine in the near future. 
 
 ### Physically Based 3D renderer : 
-![Mirror](Documentation/Screenshots/mirror.png)
 ![Spheres](Documentation/Screenshots/spheres.png)
 ![Helmet](Documentation/Screenshots/helmet.png)
-### Normal Map baking : 
 
-![Wood texture](Documentation/Screenshots/wood-map-bake.png)
+### Normal Map baking :
 ![Pistol texture](Documentation/Screenshots/texture_baking.png)
 ![Normal map baking](Documentation/Screenshots/normal-map-baked.png)
 
-
-### Normal Distribution , UV layout : 
+### UV Editor:
 ![Boat UV](Documentation/Screenshots/UV_normals.png)
-
-## Upcoming features : 
-
-- Command line irradiance baking. 
-- Traditional normal map baking. 
-- Raytracing engine. 
-- Automatic occluder generation for occlusion culling. 
