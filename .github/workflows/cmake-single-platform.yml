@@ -23,23 +23,28 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Install dependencies
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: '6.2.4'
+        host: 'linux'
+        target: 'desktop'
+        arch: 'gcc_64'
+        modules: 'qtgui qtopenglwidgets qtwidgets'
+
+    - name: Install SDL2 and SDL2_image
       run: |
         sudo apt-get update
-        
-        # Install Qt6
-        sudo apt-get install -y software-properties-common
-        sudo add-apt-repository ppa:beineri/opt-qt-6.4.0-focal
-        sudo apt-get update
-        sudo apt-get install -y qt6base-dev qt6base-dev-tools qt6base-private-dev qt6opengl-dev
-        
-        # Install SDL2 and SDL2_image
         sudo apt-get install -y libsdl2-dev libsdl2-image-dev
 
-        # Install CUDA Toolkit
-        sudo apt-get install -y nvidia-cuda-toolkit
+    - name: Install CUDA Toolkit
+      uses: Jimver/cuda-toolkit@v0.2.11
+      id: cuda-toolkit
+      with:
+        cuda: '12.2.0'
 
-        # Install OpenGL and GLEW
+    - name: Install OpenGL and GLEW
+      run: |
         sudo apt-get install -y libgl1-mesa-dev libglew-dev
         
     - name: Configure CMake
