@@ -45,7 +45,7 @@ namespace exception {
   class CatastrophicFailureException : public std::exception, public ExceptionData {
    public:
     CatastrophicFailureException()
-        : std::exception(), ExceptionData(std::string("The program has encoutered a critical exception and will now shut down \n"), CRITICAL) {}
+        : std::exception(), ExceptionData(std::string("The program has encoutered a critical exception and will now shut down: \n"), CRITICAL) {}
     [[nodiscard]] const char *what() const noexcept override { return this_error_string.c_str(); }
   };
 

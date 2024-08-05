@@ -1,3 +1,4 @@
+#include "ExceptionHandlerUI.h"
 #include "Logger.h"
 #include "Mesh.h"
 #include "NovaRenderer.h"
@@ -8,15 +9,24 @@
 #include "primitive/NovaGeoPrimitive.h"
 #include "shape/nova_shape.h"
 
+#include <GenericException.h>
+
 void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
-  AX_ASSERT_NOTNULL(nova_resource_manager);
-  resetToBaseState();
-  nova_resource_manager->clearResources();
-  nova_baker_utils::build_scene(new_scene.mesh_list, *nova_resource_manager);
-  /* Build acceleration. */
-  setProgressStatus("Building BVH structure...");
-  nova_baker_utils::build_acceleration_structure(*nova_resource_manager);
-  cancel_render = false;
+  try {
+    AX_ASSERT_NOTNULL(nova_resource_manager);
+    resetToBaseState();
+    nova_resource_manager->clearResources();
+    nova_baker_utils::build_scene(new_scene.mesh_list, *nova_resource_manager);
+    /* Build acceleration. */
+    setProgressStatus("Building BVH structure...");
+    nova_baker_utils::build_acceleration_structure(*nova_resource_manager);
+    cancel_render = false;
+  } catch (const exception::CatastrophicFailureException &e) {
+    LOGS(e.what(), LogLevel::CRITICAL);
+    controller::ExceptionInfoBoxHandler::handle(e);
+    nova_resource_manager->clearResources();
+    abort();
+  }
 }
 
 void NovaRenderer::prepSceneChange() {

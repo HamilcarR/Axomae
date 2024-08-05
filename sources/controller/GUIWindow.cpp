@@ -4,6 +4,7 @@
 #include "ImageImporter.h"
 
 #include "EventController.h"
+#include "ExceptionHandlerUI.h"
 #include "ImageManager.h"
 #include "MeshListView.h"
 #include "ProgressStatusWidget.h"
@@ -469,6 +470,7 @@ namespace controller {
     QString filename = QFileDialog::getSaveFileName(this, tr("Save files"), "./", tr("All Files (*)"));
     return filename.toStdString();
   }
+
   /**************************************************************************************************************/
   bool Controller::slot_greyscale_average() {
     SDL_Surface *s = image_session_pointers::albedo;

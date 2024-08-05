@@ -15,15 +15,10 @@ static void init_graphics() {}
 static void cleanup() {}
 
 static void sigsegv_handler(int signal) {
-  try {
-    LOG("Application crash", LogLevel::CRITICAL);
-    LOGFLUSH();
-    std::cerr << boost::stacktrace::stacktrace();
-    cleanup();
-  } catch (const std::exception &e) {
-    std::cerr << e.what();
-  }
-  abort();
+  LOG("Application crash", LogLevel::CRITICAL);
+  LOGFLUSH();
+  std::cerr << boost::stacktrace::stacktrace();
+  cleanup();
 }
 
 static int exception_cleanup(const char *except_error) {
@@ -33,40 +28,42 @@ static int exception_cleanup(const char *except_error) {
 }
 
 int main(int argv, char **argc) {
-  signal(SIGSEGV, sigsegv_handler);
-  controller::cmd::API api(argv, argc);
-  controller::cmd::ProgramOptionsManager options_manager(&api);
-  api.configureDefault();
-  init_graphics();
-  if (argv >= 2) {
-    try {
+  try {
+    signal(SIGSEGV, sigsegv_handler);
+    controller::cmd::API api(argv, argc);
+    controller::cmd::ProgramOptionsManager options_manager(&api);
+    api.configureDefault();
+    init_graphics();
+    if (argv >= 2) {
       options_manager.processArgs(argv, argc);
-    } catch (const boost::program_options::error &e) {
-      return exception_cleanup(e.what());
-    } catch (const exception::CatastrophicFailureException &e) {
-      return exception_cleanup(e.what());
-    }
-    api.configure();
-    ApplicationConfig &&configuration = api.getConfig();
-    if (configuration.flag & CONF_USE_EDITOR) {
-      QApplication app(argv, argc);
-      controller::Controller win;
-      win.setApplicationConfig(std::forward<ApplicationConfig>(configuration));
-      win.show();
-      int ret = app.exec();
+      api.configure();
+      ApplicationConfig &&configuration = api.getConfig();
+      if (configuration.flag & CONF_USE_EDITOR) {
+        QApplication app(argv, argc);
+        controller::Controller win;
+        win.setApplicationConfig(std::forward<ApplicationConfig>(configuration));
+        win.show();
+        int ret = app.exec();
+        cleanup();
+        return ret;
+      }
       cleanup();
-      return ret;
+      return EXIT_SUCCESS;
     }
+    QApplication app(argv, argc);
+    controller::Controller win;
+    api.configureDefault();
+    ApplicationConfig &&configuration = api.getConfig();
+    win.setApplicationConfig(std::forward<ApplicationConfig>(configuration));
+    win.show();
+    int ret = app.exec();
     cleanup();
-    return EXIT_SUCCESS;
+    return ret;
+  } catch (const boost::program_options::error &e) {
+    return exception_cleanup(e.what());
+  } catch (const exception::CatastrophicFailureException &e) {
+    return exception_cleanup(e.what());
+  } catch (const std::exception &e) {
+    std::cerr << e.what();
   }
-  QApplication app(argv, argc);
-  controller::Controller win;
-  api.configureDefault();
-  ApplicationConfig &&configuration = api.getConfig();
-  win.setApplicationConfig(std::forward<ApplicationConfig>(configuration));
-  win.show();
-  int ret = app.exec();
-  cleanup();
-  return ret;
 }
