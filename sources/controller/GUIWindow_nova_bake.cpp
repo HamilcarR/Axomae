@@ -22,14 +22,6 @@ namespace exception {
   GENERIC_EXCEPT_DEFINE(NullTextureWidgetException, "Failed to create output texture.", CRITICAL)
   const char *const CRITICAL_TXT = "A critical error occured. \nSee the logs for more precision.";
 
-  class ErrHandler {
-   public:
-    static void handle(const std::string &message, SEVERITY severity) { controller::ExceptionHandlerUI::launchInfoBox(message, severity); }
-    static void handle(const ExceptionData &e) {
-      SEVERITY s = controller::ExceptionHandlerUI::intToSeverity(e.getSeverity());
-      controller::ExceptionHandlerUI::launchInfoBox(e.getErrorMessage(), s);
-    }
-  };
 }  // namespace exception
 
 static std::mutex mutex;
@@ -255,7 +247,7 @@ namespace controller {
       try {
         nova_baker_utils::bake_scene(render_scene_data);
       } catch (const exception::GenericException &e) {
-        exception::ErrHandler::handle(e);
+        ExceptionInfoBoxHandler::handle(e);
         nova_baker_utils::synchronize_render_threads(render_scene_data, NOVABAKE_POOL_TAG);
         return;
       }
@@ -316,7 +308,7 @@ namespace controller {
     const Camera *renderer_camera = renderer.getCamera();
     if (!renderer_camera) {
       LOG("The current renderer doesn't have a camera.", LogLevel::CRITICAL);
-      exception::ErrHandler::handle("No camera initialized in the renderer!", exception::CRITICAL);
+      ExceptionInfoBoxHandler::handle("No camera initialized in the renderer!", exception::CRITICAL);
       return;
     }
 
@@ -326,7 +318,7 @@ namespace controller {
     const std::vector<Mesh *> &mesh_collection = scene.getMeshCollection();
     if (mesh_collection.empty()) {
       LOG("Scene is empty!", LogLevel::WARNING);
-      exception::ErrHandler::handle("Scene is empty!", exception::WARNING);
+      ExceptionInfoBoxHandler::handle("Scene is empty!", exception::WARNING);
       ignore_skybox(renderer, false);
       return;
     }
@@ -344,12 +336,12 @@ namespace controller {
       ignore_skybox(renderer, false);
       LOG(e.what(), LogLevel::CRITICAL);
       cleanupNova();
-      exception::ErrHandler::handle(exception::CRITICAL_TXT, exception::CRITICAL);
+      ExceptionInfoBoxHandler::handle(exception::CRITICAL_TXT, exception::CRITICAL);
     } catch (const std::exception &e) {
       ignore_skybox(renderer, false);
       LOG(e.what(), LogLevel::CRITICAL);
       cleanupNova();
-      exception::ErrHandler::handle(exception::CRITICAL_TXT, exception::CRITICAL);
+      ExceptionInfoBoxHandler::handle(exception::CRITICAL_TXT, exception::CRITICAL);
     }
   }
 
@@ -360,23 +352,23 @@ namespace controller {
 
   bool input_check(const ui_inputs &inputs) {
     if (inputs.width <= 0) {
-      exception::ErrHandler::handle("Invalid width.", exception::WARNING);
+      ExceptionInfoBoxHandler::handle("Invalid width.", exception::WARNING);
       return false;
     }
     if (inputs.height <= 0) {
-      exception::ErrHandler::handle("Invalid height.", exception::WARNING);
+      ExceptionInfoBoxHandler::handle("Invalid height.", exception::WARNING);
       return false;
     }
     if (inputs.tiles_number <= 0) {
-      exception::ErrHandler::handle("Invalid tile numbers.", exception::WARNING);
+      ExceptionInfoBoxHandler::handle("Invalid tile numbers.", exception::WARNING);
       return false;
     }
     if (inputs.depth < 1) {
-      exception::ErrHandler::handle("Invalid depth.", exception::WARNING);
+      ExceptionInfoBoxHandler::handle("Invalid depth.", exception::WARNING);
       return false;
     }
     if (inputs.samples_per_pixel <= 0) {
-      exception::ErrHandler::handle("Invalid sample number.", exception::WARNING);
+      ExceptionInfoBoxHandler::handle("Invalid sample number.", exception::WARNING);
       return false;
     }
 
