@@ -8,6 +8,7 @@
 #include <texture_fetch_functions.h>
 
 #define AX_DEVICE_CALLABLE __host__ __device__
+#define AX_DEVICE_SHARED __shared__
 #define AX_DEVICE_ONLY __device__
 #define AX_HOST_ONLY __host__
 #define AX_KERNEL __global__

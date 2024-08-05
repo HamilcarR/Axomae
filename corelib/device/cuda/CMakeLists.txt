@@ -13,3 +13,5 @@ target_include_directories(ax_core_cuda
 PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+add_subdirectory(optix)
