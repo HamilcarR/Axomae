@@ -22,7 +22,7 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
     nova_baker_utils::build_acceleration_structure(*nova_resource_manager);
     cancel_render = false;
   } catch (const exception::CatastrophicFailureException &e) {
-    LOGS(e.what(), LogLevel::CRITICAL);
+    LOG(e.what(), LogLevel::CRITICAL);
     controller::ExceptionInfoBoxHandler::handle(e);
     nova_resource_manager->clearResources();
     abort();
