@@ -1,4 +1,11 @@
 add_library(ax_core_cuda
+        cuda_utils.cpp
+        CudaDevice.cpp
+        CudaDevice.h
+        CudaParams.cpp
+        CudaParams.h
+        kernel/kernel_launcher.cuh
+        kernel/kernel_launcher.cu
 )
 
 target_link_libraries(ax_core_device PUBLIC ax_core_cuda)
@@ -6,6 +13,9 @@ target_link_libraries(ax_core_device PUBLIC ax_core_cuda)
 target_link_libraries(ax_core_cuda
 PUBLIC
         ax_core_macro
+        ax_core_debug
+        ax_core_common
+        ax_core_thread
         CUDA::cudart
 )
 
