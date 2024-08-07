@@ -7,6 +7,8 @@
   return_type &get## func_field_name() { return variable; } \
   const return_type &get## func_field_name() const { return variable; }
 
+#define GENERATE_SETTERS(variable_type, func_field_name , variable)\
+  void set## func_field_name(variable_type var){variable = var;}
 
 #define CLASS_CM(classname) \
   classname() = default;\
