@@ -7,20 +7,6 @@
 
 #include <texture_types.h>
 
-#define cudaErrCheck(ans) \
-  { \
-    gpuAssert((ans), __FILE__, __LINE__); \
-  }
-inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort = true) {
-  if (code != cudaSuccess) {
-    const char *err_str = cudaGetErrorString(code);
-    std::string err = "CUDA GPU assert :" + std::string(err_str);
-    LOG(err, LogLevel::ERROR);
-    if (abort)
-      exit(code);
-  }
-}
-
 constexpr glm::dvec3 UP_VECTOR = glm::dvec3(0.f, 1.f, 0.f);
 
 AX_DEVICE_CALLABLE inline float magnitude(float x, float y) { return sqrtf(x * x + y * y); }
