@@ -1,7 +1,7 @@
 #include "CubemapProcessing.cuh"
-#include "CudaDevice.h"
-#include "CudaParams.h"
-
+#include "cuda/CudaDevice.h"
+#include "cuda/CudaParams.h"
+#include "device_utils.h"
 #include <cmath>
 #ifdef AXOMAE_STATS_TIMER
 #  include "PerformanceLogger.h"
@@ -214,8 +214,30 @@ void gpgpu_functions::irradiance_mapping::gpgpu_kernel_call(
   blocks.z = 1;
   size_t shared_mem = threads_per_blocks.x * threads_per_blocks.y * sizeof(float);
   kernel_argpack_t argpack{blocks, threads_per_blocks, shared_mem};
-  ax_cuda::exec_kernel(argpack, device_function, D_result_buffer, texture, width, height, _width, _height, samples);
+  exec_kernel(argpack, device_function, D_result_buffer, texture, width, height, _width, _height, samples);
 #endif
+}
+
+static void init_device_default(ax_cuda::CudaDevice &device, ax_cuda::CudaParams &cuda_device_params) {
+  cuda_device_params.setDeviceID(0);
+  cuda_device_params.setDeviceFlags(cudaInitDeviceFlagsAreValid);
+  cuda_device_params.setFlags(cudaDeviceScheduleAuto);
+  AXCUDA_ERROR_CHECK(device.init(cuda_device_params));
+}
+
+static void init_descriptors(cudaArray_t cuda_array, ax_cuda::CudaParams &cuda_device_params) {
+  cudaResourceDesc resource_descriptor{};
+  cudaTextureDesc texture_descriptor{};
+  resource_descriptor.resType = cudaResourceTypeArray;
+  resource_descriptor.res.array.array = cuda_array;
+  // Initialize texture descriptors
+  texture_descriptor.addressMode[0] = cudaAddressModeWrap;
+  texture_descriptor.addressMode[1] = cudaAddressModeWrap;
+  texture_descriptor.filterMode = cudaFilterModeLinear;
+  texture_descriptor.readMode = cudaReadModeElementType;
+  texture_descriptor.normalizedCoords = 1;
+  cuda_device_params.setResourceDesc(resource_descriptor);
+  cuda_device_params.setTextureDesc(texture_descriptor);
 }
 
 void gpgpu_functions::irradiance_mapping::GPU_compute_irradiance(float *src_texture,
@@ -226,31 +248,24 @@ void gpgpu_functions::irradiance_mapping::GPU_compute_irradiance(float *src_text
                                                                  unsigned dest_texture_width,
                                                                  unsigned dest_texture_height,
                                                                  unsigned samples) {
-  std::unique_ptr<GPUBackendInterface> device = std::make_unique<ax_cuda::CudaDevice>(0);
+
+  /* Init device */
+  std::unique_ptr<ax_cuda::CudaDevice> device = std::make_unique<ax_cuda::CudaDevice>(0);
+  if (!device)
+    return;
   ax_cuda::CudaParams cuda_device_params;
-  cudaResourceDesc resource_descriptor;
-  std::memset(&resource_descriptor, 0, sizeof(resource_descriptor));
-  cudaTextureDesc texture_descriptor;
-  std::memset(&texture_descriptor, 0, sizeof(texture_descriptor));
-  cudaTextureObject_t texture_object = 0;
+  init_device_default(*device, cuda_device_params);
   // Initialize Cuda array and copy to device
-  cudaArray_t cuda_array;
-  cudaChannelFormatDesc format_desc = cudaCreateChannelDesc(32, 32, 32, 32, cudaChannelFormatKindFloat);
+  cudaArray_t cuda_array = nullptr;
+  cuda_device_params.setChanDescriptors(32, 32, 32, 32, cudaChannelFormatKindFloat);
+  AXCUDA_ERROR_CHECK(device->allocateMemoryArray(&cuda_array, cuda_device_params, src_texture_width, src_texture_height));
   size_t pitch = src_texture_width * channels * sizeof(float);
-  CUDA_ERROR_CHECK(cudaMallocArray(&cuda_array, &format_desc, src_texture_width, src_texture_height));
-  CUDA_ERROR_CHECK(cudaMemcpy2DToArray(
-      cuda_array, 0, 0, src_texture, pitch, src_texture_width * channels * sizeof(float), src_texture_height, cudaMemcpyHostToDevice));
-  // Initialize resource descriptors
-  resource_descriptor.resType = cudaResourceTypeArray;
-  resource_descriptor.res.array.array = cuda_array;
-  // Initialize texture descriptors
-  texture_descriptor.addressMode[0] = cudaAddressModeWrap;
-  texture_descriptor.addressMode[1] = cudaAddressModeWrap;
-  texture_descriptor.filterMode = cudaFilterModeLinear;
-  texture_descriptor.readMode = cudaReadModeElementType;
-  texture_descriptor.normalizedCoords = 1;
-  // Initialize texture object
-  CUDA_ERROR_CHECK(cudaCreateTextureObject(&texture_object, &resource_descriptor, &texture_descriptor, nullptr));
+  cuda_device_params.setMemcpyKind(cudaMemcpyHostToDevice);
+  AXCUDA_ERROR_CHECK(device->copy2DToArray(
+      cuda_array, 0, 0, src_texture, pitch, src_texture_width * channels * sizeof(float), src_texture_height, cuda_device_params));
+  init_descriptors(cuda_array, cuda_device_params);
+  cudaTextureObject_t texture_object = 0;
+  AXCUDA_ERROR_CHECK(device->createTextureObject(&texture_object, cuda_device_params));
   cuda_device_params.setFlags(1);
   AXCUDA_ERROR_CHECK(
       device->allocateMemoryManaged((void **)dest_texture, dest_texture_height * dest_texture_width * channels * sizeof(float), cuda_device_params));
@@ -262,7 +277,7 @@ void gpgpu_functions::irradiance_mapping::GPU_compute_irradiance(float *src_text
                     dest_texture_width,
                     dest_texture_height,
                     samples);
-  CUDA_ERROR_CHECK(cudaDeviceSynchronize());
-  CUDA_ERROR_CHECK(cudaDestroyTextureObject(texture_object));
-  CUDA_ERROR_CHECK(cudaFreeArray(cuda_array));
+  AXCUDA_ERROR_CHECK(device->synchronize());
+  AXCUDA_ERROR_CHECK(device->destroyTextureObject(texture_object));
+  AXCUDA_ERROR_CHECK(device->deallocateMemoryArray(cuda_array));
 }

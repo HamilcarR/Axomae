@@ -25,3 +25,7 @@ PUBLIC
 )
 
 add_subdirectory(optix)
+
+if(AXOMAE_USE_CUDA)
+    target_compile_definitions(ax_core_cuda PUBLIC AXOMAE_USE_CUDA)
+endif (AXOMAE_USE_CUDA)
