@@ -1,8 +1,8 @@
 #include "DrawEngine.h"
+#include "GenericException.h"
+#include "device_utils.h"
 #include "integrator/Integrator.h"
 #include "manager/NovaResourceManager.h"
-
-#include <GenericException.h>
 
 namespace exception {
   class InvalidThreadpoolStateException final : public GenericException {

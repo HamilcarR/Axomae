@@ -3,7 +3,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 cmake_minimum_required(VERSION 3.27)
-project(Axomae VERSION 1.0 LANGUAGES C CXX)
+project(Axomae VERSION 1.0 LANGUAGES C CXX CUDA )
 
 # Custom variables
 set(AXOMAE_UI_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/sources/editor/Form")
@@ -24,7 +24,6 @@ set(AXOMAE_USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
 option(AXOMAE_USE_CUDA "Enable cuda" OFF)
 set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr")
 set(CMAKE_CUDA_ARCHITECTURES "75")
-enable_language(CUDA)
 
 
 #****************************************************************************************************

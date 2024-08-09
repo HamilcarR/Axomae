@@ -29,5 +29,5 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort =
 
 namespace ax_cuda::utils {
   std::string cuda_info_device();
-}  // namespace cuda::utils
+}  // namespace ax_cuda::utils
 #endif  // CU_MACRO_H
