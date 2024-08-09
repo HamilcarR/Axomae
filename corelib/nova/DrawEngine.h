@@ -28,5 +28,11 @@ namespace nova {
                                       threading::ThreadPool *thread_pool,
                                       const NovaResourceManager *nova_resources);
 
+  void gpu_draw(HdrBufferStruct *buffers,
+                unsigned width_resolution,
+                unsigned height_resolution,
+                NovaRenderEngineInterface *engine_interface,
+                const NovaResourceManager *nova_resources_manager);
+
 }  // namespace nova
 #endif

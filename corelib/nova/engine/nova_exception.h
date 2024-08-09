@@ -23,6 +23,7 @@ namespace nova::exception {
     INVALID_ENGINE_INSTANCE = 1 << 8,
     INVALID_RENDERBUFFER_DIM = 1 << 9,
 
+    GENERAL_GPU_ERROR = 1ULL << 31,
     GENERAL_ERROR = 1ULL << 32,
 
   };

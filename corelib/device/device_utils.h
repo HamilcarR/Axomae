@@ -16,7 +16,9 @@ struct kernel_argpack_t {
 
 template<class F, class... Args>
 void exec_kernel(const kernel_argpack_t &argpack, F &&func, Args &&...args) {
+#if defined(__NVCC__)
   func<<<argpack.num_blocks, argpack.block_size, argpack.shared_mem_bytes, argpack.stream>>>(std::forward<Args>(args)...);
+#endif
 }
 
 #endif  // DEVICE_UTILS_H

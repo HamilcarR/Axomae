@@ -39,11 +39,20 @@ namespace ax_cuda {
       cudaArray_t array, size_t wOffset, size_t hOffset, const void *src, size_t spitch, size_t width, size_t height, const CudaParams &params) {
     return DeviceError(cudaMemcpy2DToArray(array, wOffset, hOffset, src, spitch, width, height, static_cast<cudaMemcpyKind>(params.getMemcpyKind())));
   }
+
   DeviceError CudaDevice::createTextureObject(cudaTextureObject_t *tex, const CudaParams &params, bool use_resc_view) {
     if (use_resc_view)
       return DeviceError(cudaCreateTextureObject(tex, &params.getResourceDesc(), &params.getTextureDesc(), &params.getResourceViewDesc()));
     return DeviceError(cudaCreateTextureObject(tex, &params.getResourceDesc(), &params.getTextureDesc(), nullptr));
   }
   DeviceError CudaDevice::destroyTextureObject(cudaTextureObject_t texture_object) { return DeviceError(cudaDestroyTextureObject(texture_object)); }
+
+  DeviceError CudaDevice::registerMemoryHost(void *ptr, std::size_t size_bytes, unsigned flags) {
+    return DeviceError(cudaHostRegister(ptr, size_bytes, flags));
+  }
+  DeviceError CudaDevice::getHostDevicePtr(void **ptr_device, void *ptr_host, unsigned flags) {
+    return DeviceError(cudaHostGetDevicePointer(ptr_device, ptr_host, flags));
+  }
+  DeviceError CudaDevice::unregisterMemoryHost(void *ptr_host) { return DeviceError(cudaHostUnregister(ptr_host)); }
 
 }  // namespace ax_cuda

@@ -24,6 +24,7 @@ class NovaRenderer final : public IRenderer {
     float max_channel_color_value;
   };
 
+  // TODO Make private ?
  public:
   std::unique_ptr<RenderPipeline> render_pipeline;
   std::unique_ptr<CameraFrameBuffer> camera_framebuffer;
@@ -54,7 +55,7 @@ class NovaRenderer final : public IRenderer {
   bool cancel_render{false};
   float *pbo_map_buffer{};
   NovaInternalMetadata renderer_data{};
-  nova::HdrBufferStruct engine_render_buffers;
+  nova::HdrBufferStruct engine_render_buffers;  // TODO : replace by render_scene_data
 
  private:
   void updateNovaCameraFields();

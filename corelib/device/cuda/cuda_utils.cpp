@@ -1,21 +1,15 @@
 #include "cuda_utils.h"
 #include "GenericException.h"
 
-namespace exception {
-  class CudaInvalidDeviceQueryException : public GenericException {
-   public:
-    CudaInvalidDeviceQueryException() : GenericException() { saveErrorString("No information on the GPU."); }
-  };
-}  // namespace exception
-
 namespace ax_cuda::utils {
 
   /* Get device info . Throws GenericException*/
   std::string cuda_info_device() {
-    int device_count;
+    int device_count = 0;
     cudaError_t err = cudaGetDeviceCount(&device_count);
     if (err != cudaSuccess) {
-      throw exception::CudaInvalidDeviceQueryException();
+      CUDA_ERROR_CHECK(err);
+      return "";
     }
     std::ostringstream os;
     for (int i = 0; i < device_count; i++) {
