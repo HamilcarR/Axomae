@@ -222,7 +222,7 @@ static void init_device_default(ax_cuda::CudaDevice &device, ax_cuda::CudaParams
   cuda_device_params.setDeviceID(0);
   cuda_device_params.setDeviceFlags(cudaInitDeviceFlagsAreValid);
   cuda_device_params.setFlags(cudaDeviceScheduleAuto);
-  AXCUDA_ERROR_CHECK(device.init(cuda_device_params));
+  AXCUDA_ERROR_CHECK(device.GPUInitDevice(cuda_device_params));
 }
 
 static void init_descriptors(cudaArray_t cuda_array, ax_cuda::CudaParams &cuda_device_params) {
@@ -258,17 +258,17 @@ void gpgpu_functions::irradiance_mapping::GPU_compute_irradiance(float *src_text
   // Initialize Cuda array and copy to device
   cudaArray_t cuda_array = nullptr;
   cuda_device_params.setChanDescriptors(32, 32, 32, 32, cudaChannelFormatKindFloat);
-  AXCUDA_ERROR_CHECK(device->allocateMemoryArray(&cuda_array, cuda_device_params, src_texture_width, src_texture_height));
+  AXCUDA_ERROR_CHECK(device->GPUMallocArray(&cuda_array, cuda_device_params, src_texture_width, src_texture_height));
   size_t pitch = src_texture_width * channels * sizeof(float);
   cuda_device_params.setMemcpyKind(cudaMemcpyHostToDevice);
-  AXCUDA_ERROR_CHECK(device->copy2DToArray(
+  AXCUDA_ERROR_CHECK(device->GPUMemcpy2DToArray(
       cuda_array, 0, 0, src_texture, pitch, src_texture_width * channels * sizeof(float), src_texture_height, cuda_device_params));
   init_descriptors(cuda_array, cuda_device_params);
   cudaTextureObject_t texture_object = 0;
-  AXCUDA_ERROR_CHECK(device->createTextureObject(&texture_object, cuda_device_params));
+  AXCUDA_ERROR_CHECK(device->GPUCreateTextureObject(&texture_object, cuda_device_params));
   cuda_device_params.setFlags(1);
   AXCUDA_ERROR_CHECK(
-      device->allocateMemoryManaged((void **)dest_texture, dest_texture_height * dest_texture_width * channels * sizeof(float), cuda_device_params));
+      device->GPUMallocManaged((void **)dest_texture, dest_texture_height * dest_texture_width * channels * sizeof(float), cuda_device_params));
   gpgpu_kernel_call(gpgpu_device_compute_diffuse_irradiance,
                     *dest_texture,
                     texture_object,
@@ -277,7 +277,7 @@ void gpgpu_functions::irradiance_mapping::GPU_compute_irradiance(float *src_text
                     dest_texture_width,
                     dest_texture_height,
                     samples);
-  AXCUDA_ERROR_CHECK(device->synchronize());
-  AXCUDA_ERROR_CHECK(device->destroyTextureObject(texture_object));
-  AXCUDA_ERROR_CHECK(device->deallocateMemoryArray(cuda_array));
+  AXCUDA_ERROR_CHECK(device->GPUDeviceSynchronize());
+  AXCUDA_ERROR_CHECK(device->GPUDestroyTextureObject(texture_object));
+  AXCUDA_ERROR_CHECK(device->GPUFreeArray(cuda_array));
 }
