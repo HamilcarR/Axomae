@@ -14,9 +14,6 @@ namespace nova {
     int idx = y * width + x;
 
     if (idx < width * height) {
-      for (int s = 0; s < samples; s++)
-        for (int i = 0; i < 3; i++)
-          ptr[idx * 4 + i] += 0.0001f;
     }
   }
 
