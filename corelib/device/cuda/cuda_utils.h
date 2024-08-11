@@ -13,6 +13,18 @@
 #define AX_HOST_ONLY __host__
 #define AX_KERNEL __global__
 
+#define GPU_SYNCTHREAD __syncthreads()
+#define GPU_SYNCWARP __syncwarp()
+
+#define GPU_FASTCOS(value) __cosf(value)
+#define GPU_FASTSIN(value) __sinf(value)
+#define GPU_FASTEXP(value) __expf(value)
+
+#define GPU_ATOMICADD(address, val) atomicAdd(address, val)
+#define GPU_ATOMICSUB(address, val) atomicSub(address, val)
+#define GPU_ATOMICMIN(address, val) atomicMin(address, val)
+#define GPU_ATOMICMAX(address, val) atomicMax(address, val)
+
 #define CUDA_ERROR_CHECK(ans) \
   { \
     gpuAssert((ans), __FILE__, __LINE__); \
