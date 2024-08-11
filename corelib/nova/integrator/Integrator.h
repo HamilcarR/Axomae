@@ -76,7 +76,7 @@ namespace nova::integrator {
           const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
           for (int i = 0; i < tile.sample_per_tile; i++) {
 
-            if (*nova_resource_manager->getEngineData().getCancelPtr())
+            if (!nova_resource_manager->getEngineData().isRendering())
               return;
             /* Samples random direction around the pixel for AA. */
             const float dx = math::random::nrandf(-RAND_DX, RAND_DX);

@@ -43,7 +43,7 @@ namespace nova::aggregate {
     if (node.primitive_count != 0) {  // node is a leaf
       bool hit = false;
       for (int32_t i = 0; i < node.primitive_count; i++) {
-        if (*hit_option->data.stop_traversal)
+        if (!*hit_option->data.is_rendering)
           return false;
         int32_t offset = i + node.left;
         AX_ASSERT_LT(offset, bvh.prim_idx.size());
@@ -89,7 +89,7 @@ namespace nova::aggregate {
     const Bvhnl *node_stack[MAX_STACK_SIZE];
     node_stack[0] = iterator_node;
     int iterator_idx = 0;
-    while (iterator_idx != -1 && !*options->data.stop_traversal) {
+    while (iterator_idx != -1 && *options->data.is_rendering) {
       iterator_node = node_stack[iterator_idx];
       iterator_idx--;
       /* Is not a leaf */
@@ -124,7 +124,7 @@ namespace nova::aggregate {
 
       /* Is a leaf */
       if (iterator_node->primitive_count != 0) {
-        for (int32_t i = 0; i < iterator_node->primitive_count && !*options->data.stop_traversal; i++) {
+        for (int32_t i = 0; i < iterator_node->primitive_count && *options->data.is_rendering; i++) {
           int32_t primitive_offset = iterator_node->left + i;
           AX_ASSERT_LT(primitive_offset, bvh.prim_idx.size());
           int32_t p_idx = bvh.prim_idx[primitive_offset];

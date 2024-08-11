@@ -44,7 +44,7 @@ namespace nova::integrator {
     bvh_hit_data hit_ret;
     const primitive::NovaPrimitiveInterface *last_primit = nullptr;
     const aggregate::Bvhtl &bvh = nova_resources->getAccelerationData().accelerator;
-    aggregate::bvh_helper_struct bvh_hit{MAXFLOAT, nullptr, nova_resources->getEngineData().getCancelPtr()};
+    aggregate::bvh_helper_struct bvh_hit{MAXFLOAT, nullptr, &nova_resources->getEngineData().isRendering()};
     aggregate::base_options_bvh opts;
     opts.data = bvh_hit;
     hit_ret.is_hit = bvh.hit(ray, 0.0001f, MAXFLOAT, hit_ret.hit_d, &opts);

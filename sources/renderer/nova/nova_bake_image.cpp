@@ -48,7 +48,7 @@ namespace nova_baker_utils {
 
   void initialize_engine_opts(const engine_data &engine_opts, nova::engine::EngineResourcesHolder &engine_resources_holder) {
     engine_resources_holder.setAliasingSamples(engine_opts.aa_samples);
-    engine_resources_holder.setCancelPtr(engine_opts.stop_render_ptr);
+    engine_resources_holder.startRender();
     engine_resources_holder.setMaxDepth(engine_opts.depth_max);
     engine_resources_holder.setMaxSamples(engine_opts.samples_max);
     engine_resources_holder.setSampleIncrement(engine_opts.samples_increment);
@@ -95,9 +95,16 @@ namespace nova_baker_utils {
                rendering_data.nova_resource_manager.get()
 
     );
+
+    /* nova::gpu_draw(rendering_data.buffers.get(),
+                    rendering_data.width,
+                    rendering_data.height,
+                    rendering_data.engine_instance.get(),
+                    rendering_data.nova_resource_manager.get());*/
   }
 
-  void cancel_render(engine_data &data) { *data.stop_render_ptr = true; }
+  void cancel_render(render_scene_data &rendering_data) { rendering_data.nova_resource_manager->getEngineData().stopRender(); }
+  void start_render(render_scene_data &rendering_data) { rendering_data.nova_resource_manager->getEngineData().startRender(); }
 
   std::unique_ptr<NovaRenderEngineInterface> create_engine(const engine_data &engine_type) { return std::make_unique<nova::NovaRenderEngineLR>(); }
 

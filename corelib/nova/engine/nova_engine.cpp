@@ -12,13 +12,15 @@ namespace nova::engine {
 
   void EngineResourcesHolder::setMaxDepth(int depth) { max_depth = depth; }
 
-  void EngineResourcesHolder::setCancelPtr(bool *cancel_ptr) { cancel_render = cancel_ptr; }
-
   void EngineResourcesHolder::setVAxisInversed(bool invert) { v_invert = invert; }
 
   void EngineResourcesHolder::setTag(const std::string &tag) { threadpool_tag = tag; }
 
   void EngineResourcesHolder::setIntegratorType(int type) { integrator_flag = type; }
+
+  void EngineResourcesHolder::stopRender() { is_rendering = false; }
+
+  void EngineResourcesHolder::startRender() { is_rendering = true; }
 
   int EngineResourcesHolder::getIntegratorType() const { return integrator_flag; }
 
@@ -34,10 +36,10 @@ namespace nova::engine {
 
   int EngineResourcesHolder::getMaxDepth() const { return max_depth; }
 
-  bool *EngineResourcesHolder::getCancelPtr() const { return cancel_render; }
+  bool EngineResourcesHolder::isAxisVInverted() const { return v_invert; }
 
-  [[nodiscard]] bool EngineResourcesHolder::isAxisVInverted() const { return v_invert; }
+  const bool &EngineResourcesHolder::isRendering() const { return is_rendering; }
 
-  [[nodiscard]] const std::string &EngineResourcesHolder::getTag() const { return threadpool_tag; }
+  const std::string &EngineResourcesHolder::getTag() const { return threadpool_tag; }
 
 }  // namespace nova::engine
