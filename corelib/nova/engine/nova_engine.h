@@ -28,7 +28,7 @@ namespace nova {
       int renderer_max_samples{};
       int max_depth{};
       std::atomic_long latency{};
-      bool *cancel_render{};  // hold bool value here , and point elsewhere you donkey .
+      bool is_rendering;
       bool v_invert{false};
       std::string threadpool_tag;
       int integrator_flag{};
@@ -42,10 +42,11 @@ namespace nova {
       void setAliasingSamples(int samples);
       void setMaxSamples(int samples);
       void setMaxDepth(int depth);
-      void setCancelPtr(bool *cancel_ptr);
       void setVAxisInversed(bool invert);
       void setTag(const std::string &tag);
       void setIntegratorType(int type);
+      void stopRender();
+      void startRender();
 
       [[nodiscard]] int getTilesWidth() const;
       [[nodiscard]] int getTilesHeight() const;
@@ -53,7 +54,7 @@ namespace nova {
       [[nodiscard]] int getAliasingSamples() const;
       [[nodiscard]] int getMaxSamples() const;
       [[nodiscard]] int getMaxDepth() const;
-      [[nodiscard]] bool *getCancelPtr() const;
+      [[nodiscard]] const bool &isRendering() const;
       [[nodiscard]] bool isAxisVInverted() const;
       [[nodiscard]] const std::string &getTag() const;
       [[nodiscard]] int getIntegratorType() const;

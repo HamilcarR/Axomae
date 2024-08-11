@@ -52,7 +52,6 @@ class NovaRenderer final : public IRenderer {
   Dim2 resolution{2048, 2048};
   int current_frame{}, next_frame{}, scanline{};
   bool needRedraw{false};
-  bool cancel_render{false};
   float *pbo_map_buffer{};
   NovaInternalMetadata renderer_data{};
   nova::HdrBufferStruct engine_render_buffers;  // TODO : replace by render_scene_data

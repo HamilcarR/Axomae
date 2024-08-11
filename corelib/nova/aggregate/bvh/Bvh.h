@@ -10,7 +10,7 @@ namespace nova::aggregate {
   struct bvh_helper_struct {
     float tmin;
     const primitive::NovaPrimitiveInterface *last_prim;
-    const bool *stop_traversal;
+    const bool *is_rendering;  // We need this in case we stop the rendering mid traversal
   };
   struct base_options_bvh : public hit_options<bvh_helper_struct> {};
 

@@ -39,7 +39,6 @@ namespace controller {
     int height;
   };
   struct engine_misc_options {
-    bool *cancel_ptr;
     int engine_type_flag;
     bool flip_v;
   };
@@ -93,7 +92,6 @@ namespace controller {
     engine_data.num_tiles_w = engine_data.num_tiles_h = engine_options.tiles;
     engine_data.samples_increment = engine_data.samples_max;
     engine_data.engine_type_flag = misc_options.engine_type_flag;
-    engine_data.stop_render_ptr = misc_options.cancel_ptr;
     engine_data.flip_v = misc_options.flip_v;
     engine_data.threadpool_tag = NOVABAKE_POOL_TAG;
   }
@@ -237,8 +235,8 @@ namespace controller {
     int MAX_DEPTH = render_scene_data.nova_resource_manager->getEngineData().getMaxDepth();
     const int N = render_scene_data.nova_resource_manager->getEngineData().getMaxSamples();
     const int smax = math::calculus::compute_serie_term(N);
-    const bool *stop_ptr = render_scene_data.nova_resource_manager->getEngineData().getCancelPtr();
-    while (i < smax && !(*stop_ptr)) {
+    bool is_rendering = render_scene_data.nova_resource_manager->getEngineData().isRendering();
+    while (i < smax && is_rendering) {
       render_scene_data.nova_resource_manager->getEngineData().setSampleIncrement(i);
       render_scene_data.nova_resource_manager->getEngineData().setMaxDepth(
           render_scene_data.nova_resource_manager->getEngineData().getMaxDepth() < MAX_DEPTH ?
@@ -434,9 +432,6 @@ namespace controller {
     render_options.width = inputs.width;
     render_options.height = inputs.height;
 
-    nova_baking_structure.stop = false;
-    bool &b = nova_baking_structure.stop;
-    misc_options.cancel_ptr = &b;
     misc_options.engine_type_flag = inputs.render_type_mode_flag;
     misc_options.flip_v = flip_v;
     do_nova_render(render_options, misc_options);
@@ -444,7 +439,10 @@ namespace controller {
 
   void Controller::novaStopBake() {
     /* Stop the threads. */
-    nova_baking_structure.stop = true;
+    auto &nova_resource_manager = nova_baking_structure.nova_render_scene.nova_resource_manager;
+    if (nova_resource_manager)
+      nova_resource_manager->getEngineData().stopRender();
+
     if (global_application_config && global_application_config->getThreadPool()) {
       /* Empty scheduler list. */
       global_application_config->getThreadPool()->emptyQueue(NOVABAKE_POOL_TAG);

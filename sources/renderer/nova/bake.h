@@ -76,7 +76,6 @@ namespace nova_baker_utils {
     scene_transform_data scene;
     scene_envmap envmap;
     const std::vector<Mesh *> *mesh_list;
-    bool *stop_render_ptr;
     int samples_max, samples_increment, aa_samples;
     int depth_max;
     int num_tiles_w, num_tiles_h;

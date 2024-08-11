@@ -95,7 +95,8 @@ void NovaRenderer::onResize(unsigned int width, unsigned int height) {
     camera_framebuffer->resize();
 }
 void NovaRenderer::onClose() {
-  cancel_render = true;
+  if (nova_resource_manager)
+    nova_resource_manager->getEngineData().stopRender();
   emptyScheduler();
 }
 

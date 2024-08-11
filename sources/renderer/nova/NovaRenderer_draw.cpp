@@ -51,7 +51,6 @@ void NovaRenderer::initializeEngine() {
   engine_opts.num_tiles_h = engine_opts.num_tiles_w = NUM_TILES;
   engine_opts.depth_max = MAX_RECUR_DEPTH;
   engine_opts.samples_max = MAX_SAMPLES;
-  engine_opts.stop_render_ptr = &cancel_render;
   engine_opts.threadpool_tag = NOVA_REALTIME_TAG;
   engine_opts.engine_type_flag = nova::integrator::COMBINED | nova::integrator::PATH;
 
@@ -83,13 +82,13 @@ void NovaRenderer::doProgressiveRender() {
 
 void NovaRenderer::resetToBaseState() {
   current_frame = 1;
-  cancel_render = true;
+  nova_resource_manager->getEngineData().stopRender();
   emptyScheduler();
   emptyAccumBuffer();
   populateNovaSceneResources();
   nova_resource_manager->getEngineData().setSampleIncrement(1);
   nova_resource_manager->getEngineData().setMaxDepth(1);
-  cancel_render = false;
+  nova_resource_manager->getEngineData().startRender();
 }
 
 void NovaRenderer::draw() {
@@ -101,7 +100,6 @@ void NovaRenderer::draw() {
   populateNovaSceneResources();
   if (needRedraw) {
     resetToBaseState();
-
     needRedraw = false;
   }
 
@@ -153,9 +151,9 @@ void NovaRenderer::syncRenderEngineThreads() {
 void NovaRenderer::prepareRedraw() {
   if (global_application_config && global_application_config->getThreadPool())
     global_application_config->getThreadPool()->emptyQueue(NOVA_REALTIME_TAG);
-  cancel_render = true;
+  nova_resource_manager->getEngineData().stopRender();
   syncRenderEngineThreads();
-  cancel_render = false;
+  nova_resource_manager->getEngineData().startRender();
   current_frame = 1;
   emptyBuffers();
 }

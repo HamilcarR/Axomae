@@ -22,7 +22,7 @@ namespace nova::integrator {
           idx = ((tile.image_total_height - 1 - y) * tile.image_total_width + x) * 4;
 
         const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
-        if (*nova_resource_manager->getEngineData().getCancelPtr())
+        if (!nova_resource_manager->getEngineData().isRendering())
           return;
         math::camera::camera_ray r = math::camera::ray_inv_mat(
             ndc.x, ndc.y, nova_resource_manager->getCameraData().getInvProjection(), nova_resource_manager->getCameraData().getInvView());
