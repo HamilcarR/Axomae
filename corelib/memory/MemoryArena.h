@@ -8,8 +8,11 @@
 #include <thread>
 /*
  * Implementation of a simple memory pool.
- * The goal here is to have a system that can allocate a chunk of memory , provide addresses within that chunk to allocate objects with different
+ * The goal here is to have a system that can allocate a chunk of memory , provide addresses within that chunk to allocate objects with same
  * sizes , and deallocate the entire chunk when not needed.
+ * It doesn't support destruction of objects yet. Deallocating blocks will not call the destructor of allocated objects , this is intended as a way to
+ * store small struct like objects.
+ * DO NOT STORE OBJECTS THAT OWN RESOURCE THAT NEEDS TO BE RELEASED BY THEIR DESTRUCTORS.
  */
 namespace core::memory {
 
@@ -27,16 +30,16 @@ namespace core::memory {
     using block_list_t = std::list<block_t>;
 
    private:
-   private:
-    const std::size_t block_size;
+    std::size_t block_size;
     T *current_block_ptr{nullptr};
     std::size_t current_block_offset{}, current_alloc_size{};
     block_list_t used_blocks, free_blocks;
 
    public:
     Arena(const Arena &) = delete;
-    Arena(Arena &&) noexcept = default;
     Arena &operator=(const Arena &) = delete;
+
+    Arena(Arena &&) noexcept = default;
     Arena &operator=(Arena &&) noexcept = default;
 
     Arena(std::size_t block_size_ = DEFAULT_BLOCK_SIZE) : block_size(block_size_) {}
@@ -124,7 +127,7 @@ namespace core::memory {
     template<class U>
     U *allocAlign(std::size_t count) {
       std::size_t total_size = count * sizeof(U);
-      std::align_val_t alignment = static_cast<std::align_val_t>(L1_DEF_ALIGN);
+      auto alignment = static_cast<std::align_val_t>(L1_DEF_ALIGN);
       void *ptr = ::operator new(total_size, alignment);
       return static_cast<U *>(ptr);
     }

@@ -27,8 +27,7 @@ namespace nova {
       int aliasing_samples{};
       int renderer_max_samples{};
       int max_depth{};
-      std::atomic_long latency{};
-      bool is_rendering;
+      bool is_rendering{};
       bool v_invert{false};
       std::string threadpool_tag;
       int integrator_flag{};
