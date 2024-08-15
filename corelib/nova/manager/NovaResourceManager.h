@@ -45,6 +45,7 @@ namespace nova {
     GENERATE_GETTERS(aggregate::Accelerator, AccelerationData, resources.scene_data.acceleration_data)
     GENERATE_GETTERS(scene::SceneTransformations, SceneTransformation, resources.scene_data.scene_transformations)
     GENERATE_GETTERS(core::memory::Arena<>, MemoryPool, resource_mempool)
+    GENERATE_GETTERS(exception::NovaException, ExceptionReference, exception)
 
     void clearResources() {
       resource_mempool.reset();
@@ -54,13 +55,18 @@ namespace nova {
       getMaterialData().clear();
     }
 
-    uint64_t checkErrorStatus() const { return exception.errorCheck(); }
-    void addError(nova::exception::ERROR error_id) const { exception.addErrorType(error_id); }
-    void addError(const nova::exception::NovaException &other_exception) const;
+    AX_DEVICE_CALLABLE uint64_t checkErrorStatus() const { return exception.errorCheck(); }
+    AX_DEVICE_CALLABLE void addError(nova::exception::ERROR error_id) const { exception.addErrorType(error_id); }
+    AX_DEVICE_CALLABLE void addError(const nova::exception::NovaException &other_exception) const;
     std::vector<nova::exception::ERROR> getErrorList() const { return exception.getErrorList(); }
     /* Scene: Textures */
-    void envmapSetData(std::vector<float> *raw_data, int width, int height, int channels);
+    void envmapSetData(float *raw_data, int width, int height, int channels);
   };
+
+  class GPUNovaResourceManager : NovaResourceManager {
+   public:
+  };
+
 }  // namespace nova
 
 #endif  // NOVARESOURCEMANAGER_H

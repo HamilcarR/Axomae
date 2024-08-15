@@ -7,11 +7,12 @@ namespace nova {
     exception.merge(other_flag);
   }
 
-  void NovaResourceManager::envmapSetData(std::vector<float> *raw_data, int width, int height, int channels) {
+  void NovaResourceManager::envmapSetData(float *raw_data, int width, int height, int channels) {
     AX_ASSERT_NOTNULL(raw_data);
-    getEnvmapData().raw_data = raw_data;
-    getEnvmapData().width = width;
-    getEnvmapData().height = height;
-    getEnvmapData().channels = channels;
+    texturing::TextureRawData &envmap_data = getEnvmapData();
+    envmap_data.raw_data = raw_data;
+    envmap_data.width = width;
+    envmap_data.height = height;
+    envmap_data.channels = channels;
   }
 }  // namespace nova
