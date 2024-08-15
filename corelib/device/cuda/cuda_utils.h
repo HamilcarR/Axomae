@@ -3,10 +3,12 @@
 
 #include "Logger.h"
 #include <cuda.h>
+#include <cuda/atomic>
 #include <cuda_device_runtime_api.h>
 #include <cuda_runtime_api.h>
 #include <device_launch_parameters.h>
 #include <texture_fetch_functions.h>
+
 #define AX_DEVICE_CALLABLE __host__ __device__
 #define AX_DEVICE_SHARED __shared__
 #define AX_DEVICE_ONLY __device__
