@@ -16,7 +16,7 @@ namespace nova::aggregate {
   Bvht_data BvhtlBuilder::build(const std::vector<primitive::NovaPrimitiveInterface> &primitives, BUILD_TYPE type, SEGMENTATION segmentation) {
 
     Bvht_data bvh_data;
-    const int32_t prim_size = primitives.size();
+    const std::size_t prim_size = primitives.size();
     if (prim_size == 0)
       throw ::exception::BadSizeException("Primitives list is empty.");
     /* max nodes for a btree is 2N-1*/
@@ -26,7 +26,8 @@ namespace nova::aggregate {
       bvh_data.prim_idx.push_back(i);
     Bvhnl &root = bvh_data.l_tree[0];
     root.left = 0;
-    root.primitive_count = prim_size;
+    AX_ASSERT_LT(prim_size, INT32_MAX);
+    root.primitive_count = (int32_t)prim_size;
     update_aabb(primitives, 0, bvh_data);
     int32_t node_count = 1;
     subdivide(primitives, 0, node_count, type, segmentation, bvh_data);
