@@ -10,6 +10,7 @@ target_link_libraries(ax_core_nova_aggregate PRIVATE
         ax_core_macro
         ax_core_nova_sampler
         ax_core_memory
+        ax_core_device
 )
 
 target_link_libraries(ax_core_nova PUBLIC ax_core_nova_aggregate)
