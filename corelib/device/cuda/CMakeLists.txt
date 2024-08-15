@@ -16,7 +16,7 @@ PUBLIC
         ax_core_debug
         ax_core_common
         ax_core_thread
-        CUDA::cudart
+        CUDA::cudart_static
 )
 
 target_include_directories(ax_core_cuda
