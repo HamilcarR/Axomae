@@ -4,6 +4,7 @@
 #include <atomic>
 #include <class_macros.h>
 #include <cstdint>
+
 #include <vector>
 
 namespace nova::exception {
@@ -30,8 +31,11 @@ namespace nova::exception {
 
   class NovaException {
    private:
+#if defined(__NVCC__)
+    cuda::atomic<uint64_t> err_flag{NOERR};
+#else
     std::atomic<uint64_t> err_flag{NOERR};
-
+#endif
    public:
     AX_DEVICE_CALLABLE NovaException() = default;
     AX_DEVICE_CALLABLE NovaException(NovaException &&move) noexcept;
@@ -41,11 +45,12 @@ namespace nova::exception {
     AX_DEVICE_CALLABLE ~NovaException() = default;
 
     AX_DEVICE_CALLABLE [[nodiscard]] bool errorCheck() const { return err_flag != NOERR; }
-    [[nodiscard]] std::vector<ERROR> getErrorList() const;
     AX_DEVICE_CALLABLE [[nodiscard]] uint64_t getErrorFlag() const { return err_flag; }
     AX_DEVICE_CALLABLE void addErrorType(uint64_t to_add);
     /* merges err_flag and other_error_flag , err_flag will now store it's previous errors + other_error_flag */
     AX_DEVICE_CALLABLE void merge(uint64_t other_error_flag);
+
+    AX_HOST_ONLY [[nodiscard]] std::vector<ERROR> getErrorList() const;
   };
 
 }  // namespace nova::exception

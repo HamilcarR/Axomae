@@ -21,7 +21,7 @@ namespace nova::sampler {
     CLASS_M(RandomSampler)
 
     AX_DEVICE_CALLABLE glm::vec3 sample();
-    nova::exception::NovaException getErrorState() const;
+    AX_DEVICE_CALLABLE nova::exception::NovaException getErrorState() const;
   };
 
   class HammersleySampler {
@@ -34,7 +34,7 @@ namespace nova::sampler {
     explicit HammersleySampler(int N);
     /* Will increment the index*/
     AX_DEVICE_CALLABLE glm::vec3 sample();
-    nova::exception::NovaException getErrorState() const { return exception; }
+    AX_DEVICE_CALLABLE nova::exception::NovaException getErrorState() const { return exception; }
   };
 
   class SobolSampler {
@@ -55,12 +55,12 @@ namespace nova::sampler {
     using tag_ptr::tag_ptr;
 
     AX_DEVICE_CALLABLE [[nodiscard]] nova::exception::NovaException getErrorState() const {
-      auto d = [](auto ptr) { return ptr->getErrorState(); };
+      auto d = [&](auto ptr) { return ptr->getErrorState(); };
       return dispatch(d);
     }
 
     AX_DEVICE_CALLABLE [[nodiscard]] glm::vec3 sample() {
-      auto d = [](auto ptr) { return ptr->sample(); };
+      auto d = [&](auto ptr) { return ptr->sample(); };
       return dispatch(d);
     }
   };
