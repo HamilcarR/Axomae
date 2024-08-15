@@ -1,13 +1,12 @@
 
 
-add_library(ax_core)
+
+add_library(ax_core SHARED)
 
 target_include_directories(ax_core
 PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
-
-
 
 add_subdirectory(thread)
 add_subdirectory(common)
@@ -18,3 +17,5 @@ add_subdirectory(device)
 add_subdirectory(geometry)
 add_subdirectory(debug)
 add_subdirectory(memory)
+
+

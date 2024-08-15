@@ -21,11 +21,8 @@ set(AXOMAE_USE_GOLD "ON" CACHE BOOL "Use GOLD linker")
 set(AXOMAE_USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
 
 # CUDA Compilation
-option(AXOMAE_USE_CUDA "Enable cuda" OFF)
-set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr")
-set(CMAKE_CUDA_ARCHITECTURES "75")
-
-
+option(AXOMAE_USE_CUDA "Enable cuda" ON)
+set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr --verbose ")
 #****************************************************************************************************
 #custom project variables
 set(AXOMAE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
@@ -87,9 +84,10 @@ add_subdirectory(vendor)
 # Project setup
 qt_standard_project_setup()
 qt_add_executable(${PROJECT_NAME} sources/main/main.cpp)
-
 add_subdirectory(corelib)
 add_subdirectory(sources)
+
+
 #****************************************************************************************************
 # Testing
 
@@ -131,5 +129,4 @@ if(AXOMAE_USE_TSAN)
 endif()
 #****************************************************************************************************
 # Global preprocessor variables
-
 
