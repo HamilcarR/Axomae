@@ -2,18 +2,18 @@
 #define TEXTUREGROUP_H
 
 #include "Texture.h"
-#include "TextureDatabase.h"
 
 /**
  * @file TextureGroup.h
  * File defining the TextureGroup structure
  */
 
+class TextureDatabase;
 /**
  * @class TextureGroup
  * @brief A TextureGroup object packs a group of different textures to be bound by the shader
  */
-class TextureGroup final {
+class TextureGroup {
  private:
   TextureDatabase *texture_database{};   /**<Pointer to the database texture*/
   std::vector<int> texture_collection{}; /**<Array of Pointers to textures in the texture database*/

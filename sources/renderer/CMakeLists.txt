@@ -24,9 +24,9 @@ PRIVATE
     ax_database
     ax_material
     ax_editor
-    ax_event
     ax_processing
     ax_core
+    ax_controller
 )
 
 

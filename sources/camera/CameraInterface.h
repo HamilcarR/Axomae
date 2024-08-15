@@ -1,6 +1,6 @@
 #ifndef ICAMERA_H
 #define ICAMERA_H
-#include "EventInterface.h"
+#include "event/EventInterface.h"
 #include "math_utils.h"
 namespace controller::event {
   class Event;

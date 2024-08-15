@@ -3,6 +3,7 @@
 #include "math_importance_sampling.h"
 #include <glm/gtc/matrix_access.hpp>
 
+#include <boost/random/uniform_01.hpp>
 using namespace nova::sampler;
 
 AX_DEVICE_CALLABLE glm::vec3 RandomSampler::sample() {
@@ -40,6 +41,8 @@ SobolSampler::SobolSampler(int seed, int dimension) : N(seed) {
 }
 
 AX_DEVICE_CALLABLE glm::vec3 SobolSampler::sample() {
+
+  boost::random::uniform_01<> dist;
   float x, y, z;
   glm::vec3 p;
   x = dist(*sobol_engine) * 2.f - 1.f;

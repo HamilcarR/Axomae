@@ -3,7 +3,6 @@
 
 #include "DeviceTextureInterface.h"
 #include "GenericTextureProcessing.h"
-#include "constants.h"
 #include "init_3D.h"
 #include "utils_3D.h"
 #include <map>

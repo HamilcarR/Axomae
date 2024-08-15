@@ -10,8 +10,10 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ax_opengl)
 target_link_libraries(ax_opengl 
 
 PRIVATE
+    ax_controller
     ax_mesh
     ax_texture
+    ax_database
     ax_renderer
     ax_camera
     ax_shader

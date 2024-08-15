@@ -1,12 +1,12 @@
 #include "Scene.h"
 #include "Camera.h"
 #include "Drawable.h"
-#include "EventController.h"
 #include "INodeDatabase.h"
 #include "Logger.h"
 #include "Shader.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
+#include "event/EventController.h"
 #include "math_camera.h"
 #include "ray/Ray.h"
 

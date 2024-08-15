@@ -7,8 +7,11 @@ add_library(ax_controller
     GUIWindow_nova_bake.cpp
     WorkspaceTracker.cpp
     ExceptionHandlerUI.cpp
-
-
+    cmd/API.cpp
+    cmd/API_initapp.cpp
+    cmd/ProgramOptionsManager.cpp
+    event/EventController.h
+    event/EventInterface.h
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_controller)
@@ -26,9 +29,8 @@ PRIVATE
     ax_texture
     ax_opengl
     ax_renderer
-    ax_event
     ax_core
-
+    Boost::program_options
 )
 # AUTOUIC weirdly doesn't resolve ui includes
 set(AUTOGEN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/ax_controller_autogen/include")
@@ -39,5 +41,3 @@ INTERFACE
         ${AUTOGEN_INCLUDE_DIR}
 )
 
-add_subdirectory(cmd)
-add_subdirectory(event)

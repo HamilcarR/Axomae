@@ -1,6 +1,7 @@
 #include "TextureGroup.h"
 #include "ResourceDatabaseManager.h"
 #include "Shader.h"
+#include "TextureDatabase.h"
 
 TextureGroup::TextureGroup() : texture_database(ResourceDatabaseManager::getInstance().getTextureDatabase()), initialized(false) {}
 

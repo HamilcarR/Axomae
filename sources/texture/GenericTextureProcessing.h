@@ -1,8 +1,8 @@
 #ifndef GENERICTEXTUREPROCESSING_H
 #define GENERICTEXTUREPROCESSING_H
 
-#include "constants.h"
-
+#include <string>
+#include <vector>
 /**
  * @brief Class for raw binary data of textures
  * !Note : While using HDR envmap , the data format is still uint32_t , as we wont need to use any other texture format

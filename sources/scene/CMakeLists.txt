@@ -16,8 +16,7 @@ PRIVATE
         ax_core
         ax_opengl
         ax_renderer
-        ax_event
-
+        ax_controller
 
 
 
