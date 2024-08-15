@@ -11,7 +11,7 @@ namespace nova::texturing {
   };
 
   struct TextureRawData {
-    std::vector<float> *raw_data;  // TODO : just make it a buffer
+    float *raw_data;  // TODO : const?
     int width;
     int height;
     int channels;

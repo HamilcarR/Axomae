@@ -60,7 +60,7 @@ namespace nova_baker_utils {
   }
 
   void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureRawData &texture_raw_data) {
-    texture_raw_data.raw_data = &envmap.hdr_envmap->data;
+    texture_raw_data.raw_data = envmap.hdr_envmap->data.data();
     texture_raw_data.channels = envmap.hdr_envmap->metadata.channels;
     texture_raw_data.width = envmap.hdr_envmap->metadata.width;
     texture_raw_data.height = envmap.hdr_envmap->metadata.height;
