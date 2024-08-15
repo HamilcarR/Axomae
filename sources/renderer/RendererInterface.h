@@ -1,8 +1,8 @@
 #ifndef RendererInterface_H
 #define RendererInterface_H
-#include "EventInterface.h"
 #include "Image.h"
 #include "RendererCallbacks.h"
+#include "event/EventInterface.h"
 class Scene;
 class SceneTree;
 class RenderPipeline;

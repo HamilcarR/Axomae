@@ -1,7 +1,6 @@
 #ifndef METADATA_H
 #define METADATA_H
-#include "constants.h"
-
+#include <string>
 namespace image {
   struct Metadata {
     std::string name{};

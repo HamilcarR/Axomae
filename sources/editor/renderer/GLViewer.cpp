@@ -1,8 +1,8 @@
 #include "GLViewer.h"
 #include "Config.h"
 #include "DebugGL.h"
-#include "EventController.h"
 #include "Renderer.h"
+#include "event/EventController.h"
 #include <QCursor>
 #include <QMouseEvent>
 #include <QPoint>

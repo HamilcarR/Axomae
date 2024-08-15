@@ -7,7 +7,6 @@
 #include "tag_ptr.h"
 
 #include <boost/random/sobol.hpp>
-#include <boost/random/uniform_01.hpp>
 #include <engine/nova_exception.h>
 #include <memory>
 #include <variant>
@@ -39,12 +38,10 @@ namespace nova::sampler {
 
   class SobolSampler {
     std::unique_ptr<boost::random::sobol> sobol_engine;
-    boost::random::uniform_01<> dist;
     int i{0}, N{0};
     mutable nova::exception::NovaException exception{};
 
    public:
-    CLASS_M(SobolSampler)
     explicit SobolSampler(int seed, int dimension = 1);
     AX_DEVICE_CALLABLE glm::vec3 sample();
     AX_DEVICE_CALLABLE nova::exception::NovaException getErrorState() const { return exception; }

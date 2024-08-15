@@ -34,7 +34,6 @@ PRIVATE
     ax_texture
     ax_opengl
     ax_renderer
-    ax_event
 )
 
 set(AUTOGEN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/ax_editor_autogen/include")

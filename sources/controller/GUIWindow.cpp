@@ -3,7 +3,6 @@
 
 #include "ImageImporter.h"
 
-#include "EventController.h"
 #include "ExceptionHandlerUI.h"
 #include "ImageManager.h"
 #include "MeshListView.h"
@@ -12,6 +11,7 @@
 #include "ShaderFactory.h"
 #include "TextureViewerWidget.h"
 #include "WorkspaceTracker.h"
+#include "event/EventController.h"
 #include "manager/NovaResourceManager.h"
 #include <QTimer>
 #include <QtWidgets/QFileDialog>

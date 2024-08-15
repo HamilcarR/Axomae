@@ -1,7 +1,6 @@
 #ifndef PROGRAMOPTIONSMANAGER_H
 #define PROGRAMOPTIONSMANAGER_H
 
-#include "constants.h"
 /**
  * @brief Command line arguments splitter
  */

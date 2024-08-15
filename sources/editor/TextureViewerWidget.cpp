@@ -1,10 +1,10 @@
 #include "TextureViewerWidget.h"
 
 #include "Config.h"
-#include "EventController.h"
 #include "ExceptionHandlerUI.h"
 #include "GUIWindow.h"
 #include "Logger.h"
+#include "event/EventController.h"
 #include "image_utils.h"
 #include <QTimer>
 static QPoint mapToImage(int image_width, int image_height, const QPoint &pos, int width, int height) {

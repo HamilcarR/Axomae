@@ -3,9 +3,9 @@
 #include "Config.h"
 #include "DebugGL.h"
 #include "EnvmapTextureManager.h"
-#include "EventController.h"
 #include "RenderPipeline.h"
 #include "ShaderDatabase.h"
+#include "event/EventController.h"
 using namespace axomae;
 
 Renderer::Renderer()

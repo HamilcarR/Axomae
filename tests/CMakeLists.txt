@@ -56,7 +56,6 @@ PRIVATE
         ax_renderer
         ax_mesh
         ax_material
-        ax_event
         ax_core
 )
 

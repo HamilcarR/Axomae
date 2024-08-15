@@ -6,7 +6,7 @@ add_library(ax_camera
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_camera)
 target_link_libraries(ax_camera
 PUBLIC
-        ax_event
+        ax_controller
 PRIVATE
         ax_scene
         ax_io

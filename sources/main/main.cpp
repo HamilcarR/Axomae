@@ -1,8 +1,8 @@
-#include "API.h"
 #include "GUIWindow.h"
 #include "GenericException.h"
 #include "ImageImporter.h"
-#include "ProgramOptionsManager.h"
+#include "cmd/API.h"
+#include "cmd/ProgramOptionsManager.h"
 #include <boost/program_options.hpp>
 #include <boost/stacktrace.hpp>
 #include <csignal>
