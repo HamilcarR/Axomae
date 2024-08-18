@@ -6,7 +6,8 @@ add_library(ax_io
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_io)
-target_link_libraries(ax_io 
+gpu_separable_compilation(ax_io)
+target_link_libraries(ax_io
 
 PRIVATE
     ax_controller

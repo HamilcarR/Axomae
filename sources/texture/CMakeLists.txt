@@ -36,7 +36,7 @@ add_library(ax_texture STATIC
         BRDFLookupTexture.cpp
         BRDFLookupTexture.h
 )
-
+gpu_separable_compilation(ax_texture)
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_texture)
 target_link_libraries(ax_texture
 PRIVATE

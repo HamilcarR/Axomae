@@ -2,6 +2,8 @@
 #define MeshInterface_H
 class Object3D;
 class MeshInterface {
+ public:
+  virtual ~MeshInterface() = default;
   virtual void preRenderSetup() = 0;
   virtual void afterRenderSetup() = 0;
   [[nodiscard]] virtual bool isInitialized() const = 0;

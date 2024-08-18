@@ -12,7 +12,8 @@ add_library(ax_database
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_database)
-target_link_libraries(ax_database 
+gpu_separable_compilation(ax_database)
+target_link_libraries(ax_database
 PRIVATE
     ax_scene
     ax_editor

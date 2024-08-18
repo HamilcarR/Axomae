@@ -1,6 +1,5 @@
 #include "ImageManager.h"
 #include "Rgb.h"
-#include "constants.h"
 #include "utils_3D.h"
 
 namespace exception {

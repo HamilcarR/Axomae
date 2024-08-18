@@ -1,11 +1,13 @@
-add_library(ax_scene 
+add_library(ax_scene STATIC
     Node.cpp 
     Scene.cpp 
     SceneHierarchy.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_scene)
-target_link_libraries(ax_scene 
+
+gpu_separable_compilation(ax_scene)
+target_link_libraries(ax_scene
 PRIVATE
         ax_material
         ax_mesh
@@ -13,11 +15,11 @@ PRIVATE
         ax_database
         ax_shader
         ax_texture
-        ax_core
         ax_opengl
         ax_renderer
         ax_controller
-
+PUBLIC
+        ax_core_nova_shape
 
 
 

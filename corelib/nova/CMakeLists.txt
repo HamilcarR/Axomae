@@ -3,7 +3,7 @@ add_library(ax_core_nova
 )
 
 
-target_link_libraries(ax_core PUBLIC ax_core_nova)
+target_link_libraries(ax_core PRIVATE ax_core_nova)
 
 target_link_libraries(ax_core_nova
 PRIVATE
