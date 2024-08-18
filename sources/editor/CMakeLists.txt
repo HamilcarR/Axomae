@@ -15,7 +15,8 @@ add_library(ax_editor
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_editor)
-target_link_libraries(ax_editor 
+gpu_separable_compilation(ax_editor)
+target_link_libraries(ax_editor
 PUBLIC
     Qt6::Widgets
     Qt6::OpenGLWidgets

@@ -12,7 +12,9 @@ add_library(ax_renderer
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_renderer)
-target_link_libraries(ax_renderer 
+
+gpu_separable_compilation(ax_renderer)
+target_link_libraries(ax_renderer
 PRIVATE 
     Qt6::Gui 
     ax_scene
@@ -27,6 +29,7 @@ PRIVATE
     ax_processing
     ax_core
     ax_controller
+    ax_core_nova
 )
 
 

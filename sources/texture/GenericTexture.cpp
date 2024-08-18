@@ -1,5 +1,4 @@
 #include "GenericTexture.h"
-#include "Shader.h"
 
 GenericTexture::GenericTexture() {
   is_dummy = false;

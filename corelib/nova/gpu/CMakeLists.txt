@@ -1,8 +1,10 @@
+
+
 add_library(ax_core_nova_gpu
         gpu.cu
 )
 
-#set_target_properties(ax_core_nova_gpu PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+set_target_properties(ax_core_nova_gpu PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 target_link_libraries(ax_core_nova_gpu
 PRIVATE
         ax_core_nova_engine

@@ -3,7 +3,8 @@ add_library(ax_mesh
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_mesh)
-target_link_libraries(ax_mesh 
+gpu_separable_compilation(ax_mesh)
+target_link_libraries(ax_mesh
 PRIVATE
     ax_scene
     ax_camera
@@ -14,7 +15,6 @@ PRIVATE
     ax_controller
     ax_opengl
     ax_database
-    ax_io
 
 )
 target_include_directories(ax_mesh 

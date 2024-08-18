@@ -5,6 +5,17 @@ endif()
 cmake_minimum_required(VERSION 3.27)
 project(Axomae VERSION 1.0 LANGUAGES C CXX CUDA )
 
+
+set(TARGETS_LIST "" CACHE INTERNAL "")
+function(register_target target)
+    message(STATUS "Registering library :  ${target}")
+    get_property(current_list CACHE TARGETS_LIST PROPERTY VALUE)
+    list(APPEND current_list ${target})
+    set(TARGETS_LIST "${TARGETS_LIST}" CACHE INTERNAL "")
+endfunction()
+
+
+
 # Custom variables
 set(AXOMAE_UI_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/sources/editor/Form")
 #****************************************************************************************************
@@ -22,7 +33,13 @@ set(AXOMAE_USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
 
 # CUDA Compilation
 option(AXOMAE_USE_CUDA "Enable cuda" ON)
-set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr --verbose ")
+function(gpu_separable_compilation target)
+if (AXOMAE_USE_CUDA)
+   message(STATUS "Enabling NVCC Separable Compilation for target :  ${target} ")
+   set_target_properties(${target} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+endif ()
+endfunction()
+set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr --verbose  ")
 #****************************************************************************************************
 #custom project variables
 set(AXOMAE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
@@ -83,9 +100,14 @@ add_subdirectory(vendor)
 #****************************************************************************************************
 # Project setup
 qt_standard_project_setup()
+
+
+
 qt_add_executable(${PROJECT_NAME} sources/main/main.cpp)
-add_subdirectory(corelib)
+
 add_subdirectory(sources)
+add_subdirectory(corelib)
+
 
 
 #****************************************************************************************************

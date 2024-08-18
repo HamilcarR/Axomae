@@ -13,7 +13,7 @@ namespace nova {
     unsigned int x = blockIdx.x * blockDim.x + threadIdx.x;
     unsigned int y = blockIdx.y * blockDim.y + threadIdx.y;
     int idx = y * width + x;
-    //  nova_resource_manager->addError(exception::INVALID_INTEGRATOR);
+    nova_resource_manager->addError(exception::INVALID_INTEGRATOR);
   }
 
   void gpu_draw(HdrBufferStruct *buffers,
@@ -48,5 +48,6 @@ namespace nova {
     perf.print();
 
     AXCUDA_ERROR_CHECK(device.GPUHostUnregister(host_buffer));
+    AXCUDA_ERROR_CHECK(device.GPUFree((void *)nova_resources_manager));
   }
 }  // namespace nova

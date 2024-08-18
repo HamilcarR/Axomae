@@ -15,6 +15,7 @@ add_library(ax_controller
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_controller)
+gpu_separable_compilation(ax_controller)
 target_link_libraries(ax_controller
 PUBLIC
     ax_config
@@ -30,6 +31,7 @@ PRIVATE
     ax_opengl
     ax_renderer
     ax_core
+    ax_core_nova
     Boost::program_options
 )
 # AUTOUIC weirdly doesn't resolve ui includes
