@@ -15,7 +15,6 @@ add_library(ax_controller
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_controller)
-gpu_separable_compilation(ax_controller)
 target_link_libraries(ax_controller
 PUBLIC
     ax_config

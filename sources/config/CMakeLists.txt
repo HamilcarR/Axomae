@@ -3,7 +3,6 @@ add_library(ax_config
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_config)
-gpu_separable_compilation(ax_config)
 target_link_libraries(ax_config
 PUBLIC
     ax_io

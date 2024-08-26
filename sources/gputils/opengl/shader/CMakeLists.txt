@@ -25,7 +25,6 @@ add_library(ax_shader
 add_dependencies(ax_shader axcustom_glsl_generate)
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_shader)
 
-gpu_separable_compilation(ax_shader)
 target_link_libraries(ax_shader
 PRIVATE
     ax_texture
