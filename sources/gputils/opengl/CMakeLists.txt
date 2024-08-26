@@ -7,8 +7,7 @@ add_library(ax_opengl
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_opengl)
-gpu_separable_compilation(ax_opengl)
-target_link_libraries(ax_opengl 
+target_link_libraries(ax_opengl
 
 PRIVATE
     ax_controller

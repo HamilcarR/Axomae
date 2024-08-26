@@ -3,7 +3,6 @@ add_library(ax_mesh
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_mesh)
-gpu_separable_compilation(ax_mesh)
 target_link_libraries(ax_mesh
 PRIVATE
     ax_scene

@@ -6,7 +6,6 @@ add_library(ax_scene STATIC
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_scene)
 
-gpu_separable_compilation(ax_scene)
 target_link_libraries(ax_scene
 PRIVATE
         ax_material

@@ -6,16 +6,6 @@ cmake_minimum_required(VERSION 3.27)
 project(Axomae VERSION 1.0 LANGUAGES C CXX CUDA )
 
 
-set(TARGETS_LIST "" CACHE INTERNAL "")
-function(register_target target)
-    message(STATUS "Registering library :  ${target}")
-    get_property(current_list CACHE TARGETS_LIST PROPERTY VALUE)
-    list(APPEND current_list ${target})
-    set(TARGETS_LIST "${TARGETS_LIST}" CACHE INTERNAL "")
-endfunction()
-
-
-
 # Custom variables
 set(AXOMAE_UI_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/sources/editor/Form")
 #****************************************************************************************************
@@ -32,14 +22,8 @@ set(AXOMAE_USE_GOLD "ON" CACHE BOOL "Use GOLD linker")
 set(AXOMAE_USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
 
 # CUDA Compilation
-option(AXOMAE_USE_CUDA "Enable cuda" ON)
-function(gpu_separable_compilation target)
-if (AXOMAE_USE_CUDA)
-   message(STATUS "Enabling NVCC Separable Compilation for target :  ${target} ")
-   set_target_properties(${target} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-endif ()
-endfunction()
-set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr --verbose  ")
+set(AXOMAE_USE_CUDA "OFF" CACHE BOOL "Use GPU when available")
+set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr ")
 #****************************************************************************************************
 #custom project variables
 set(AXOMAE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
@@ -65,6 +49,10 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 
 
+if (AXOMAE_USE_CUDA AND CUDAToolkit_FOUND)
+    message(STATUS "Enabling NVCC Separable Compilation")
+    set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
+endif ()
 
 
 #****************************************************************************************************
