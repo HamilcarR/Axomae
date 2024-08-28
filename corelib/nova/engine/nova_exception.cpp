@@ -1,7 +1,7 @@
 #include "nova_exception.h"
 namespace nova::exception {
 
-#if defined(__NVCC__)
+#if defined(__CUDA_ARCH__) && defined(AXOMAE_USE_CUDA)
   namespace atomic_nmsp = cuda::std;
 #else
   namespace atomic_nmsp = std;

@@ -23,7 +23,6 @@ class DeviceError {
     return static_cast<cudaError_t>(err);
   }
 };
-
 #define AXCUDA_ERROR_CHECK(ans) \
   { \
     cuAssert((ans), __FILE__, __LINE__); \

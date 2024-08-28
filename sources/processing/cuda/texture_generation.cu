@@ -1,7 +1,9 @@
-#include "Kernel.cuh"
+#include "../kernel_interface.h"
 #include <cmath>
 #include <sstream>
-
+#include "constants.h"
+#include<SDL2/SDL.h>
+#include "Includes.cuh"
 // Old code , tb refactored
 
 namespace axomae {
@@ -311,7 +313,7 @@ namespace axomae {
 
   /* kernels */
   /*********************************************************************************************************************************************/
-  __global__ void GPU_compute_greyscale(void *array, int size_w, int size_h, const int bpp, int pitch, const bool luminance) {
+  AX_KERNEL void GPU_compute_greyscale(void *array, int size_w, int size_h, const int bpp, int pitch, const bool luminance) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     int j = blockIdx.y * blockDim.y + threadIdx.y;
     if (i < size_w && j < size_h) {
@@ -321,7 +323,7 @@ namespace axomae {
       set_pixel_color(pixel_value, rgb, bpp);
     }
   }
-  __global__ void GPU_compute_edges(
+  AX_KERNEL void GPU_compute_edges(
       void *image, void *save, unsigned int width, unsigned int height, int bpp, int pitch, uint8_t convolution, uint8_t border) {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
     int j = blockDim.y * blockIdx.y + threadIdx.y;
@@ -339,7 +341,7 @@ namespace axomae {
     }
   }
 
-  __global__ void GPU_compute_normals(
+  AX_KERNEL void GPU_compute_normals(
       void *image, void *save, unsigned int width, unsigned int height, int bpp, int pitch, double factor, uint8_t border) {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
     int j = blockDim.y * blockIdx.y + threadIdx.y;

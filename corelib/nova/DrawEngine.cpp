@@ -1,8 +1,15 @@
 #include "DrawEngine.h"
 #include "GenericException.h"
-#include "device_utils.h"
 #include "integrator/Integrator.h"
 #include "manager/NovaResourceManager.h"
+#include "Logger.h"
+#include "engine/nova_engine.h"
+
+
+
+
+
+
 
 namespace exception {
   class InvalidThreadpoolStateException final : public GenericException {
@@ -85,7 +92,13 @@ namespace nova {
       const std::string &tag = nova_resources->getEngineData().getTag();
       futs.push_back(thread_pool->addTask(tag, renderer_callback, buffers, elem, nova_resources));
     }
+
     return futs;
   }
+
+
+
+
+
 
 }  // namespace nova

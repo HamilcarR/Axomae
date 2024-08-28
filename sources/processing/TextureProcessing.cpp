@@ -1,8 +1,11 @@
 #include "TextureProcessing.h"
 #include "GenericTextureProcessing.h"
-#include "cuda/CubemapProcessing.cuh"
+#include "Logger.h"
 
-namespace gpu_func = gpgpu_functions::irradiance_mapping;
+#if defined(AXOMAE_USE_CUDA)
+#include "cuda/CubemapProcessing.cuh"
+#endif
+
 template<>
 std::unique_ptr<TextureData> TextureOperations<float>::computeDiffuseIrradiance(unsigned _width, unsigned _height, unsigned delta, bool gpu) const {
   if (!isDimPowerOfTwo(_width) || !isDimPowerOfTwo(_height))
@@ -12,6 +15,8 @@ std::unique_ptr<TextureData> TextureOperations<float>::computeDiffuseIrradiance(
   envmap_tex_data.height = _height;
   envmap_tex_data.mipmaps = 0;
   if (gpu) {
+#if defined(AXOMAE_USE_CUDA)
+    namespace gpu_func = gpgpu_functions::irradiance_mapping;
     envmap_tex_data.f_data.resize(_width * _height * 4);
     envmap_tex_data.nb_components = 4;
     std::vector<float> temp;
@@ -28,6 +33,9 @@ std::unique_ptr<TextureData> TextureOperations<float>::computeDiffuseIrradiance(
         temp.data(), width, height, envmap_tex_data.nb_components, &dest_array, envmap_tex_data.width, envmap_tex_data.height, delta);
     for (unsigned i = 0; i < envmap_tex_data.f_data.size(); i++)
       envmap_tex_data.f_data[i] = dest_array[i];
+#else
+    LOG("CUDA not found. Enable 'AXOMAE_USE_CUDA' in build if this platform has an Nvidia GPU." , LogLevel::ERROR);
+#endif
   } else {
     envmap_tex_data.f_data.resize(_width * _height * channels);
     envmap_tex_data.nb_components = channels;

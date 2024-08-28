@@ -1,6 +1,6 @@
 #ifndef EXCEPTION_H
 #define EXCEPTION_H
-#include "cuda_utils.h"
+#include "device_utils.h"
 #include <atomic>
 #include <class_macros.h>
 #include <cstdint>
@@ -31,7 +31,7 @@ namespace nova::exception {
 
   class NovaException {
    private:
-#if defined(__NVCC__)
+#if defined(__CUDA_ARCH__) && defined(AXOMAE_USE_CUDA)
     cuda::atomic<uint64_t> err_flag{NOERR};
 #else
     std::atomic<uint64_t> err_flag{NOERR};

@@ -27,7 +27,7 @@ namespace axomae {
   constexpr uint8_t AXOMAE_RED = 0X00;
   constexpr uint8_t AXOMAE_GREEN = 0X01;
   constexpr uint8_t AXOMAE_BLUE = 0X02;
-  constexpr uint8_t KERNEL_SIZE = 3;
+
   constexpr int SOBEL = 2;
   constexpr int PREWITT = 1;
 

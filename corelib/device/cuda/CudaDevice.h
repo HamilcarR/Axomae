@@ -1,6 +1,7 @@
 #ifndef CUDADEVICE_H
 #define CUDADEVICE_H
 #include "../DeviceError.h"
+#include "../device_utils.h"
 #include "CudaParams.h"
 #include "cuda_utils.h"
 #include "project_macros.h"

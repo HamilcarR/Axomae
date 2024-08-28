@@ -1,6 +1,6 @@
 #ifndef NOVATEXTUREINTERFACE_H
 #define NOVATEXTUREINTERFACE_H
-#include "cuda_utils.h"
+#include "device_utils.h"
 #include "math_utils.h"
 #include "project_macros.h"
 #include "tag_ptr.h"
