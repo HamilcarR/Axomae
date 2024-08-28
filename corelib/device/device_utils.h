@@ -14,12 +14,9 @@ struct kernel_argpack_t {
   dim3 num_blocks;
   dim3 block_size;
   std::size_t shared_mem_bytes{};
-#if defined(AXOMAE_USE_CUDA)
   cudaStream_t stream{};
-#else
-  uint64_t stream;
-#endif
 };
+
 #else
 #  define AX_DEVICE_CALLABLE
 #  define AX_DEVICE_SHARED
@@ -28,13 +25,4 @@ struct kernel_argpack_t {
 #  define AX_HOST_ONLY
 #  define AX_KERNEL
 #endif
-
-
-
-
-
-
-
-
-
 #endif  // DEVICE_UTILS_H
