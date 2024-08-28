@@ -44,12 +44,12 @@ find_package(Qt6 COMPONENTS Widgets REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 # GPGPU / real time render
-find_package(CUDAToolkit REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
-
+find_package(CUDAToolkit)
 
 if (AXOMAE_USE_CUDA AND CUDAToolkit_FOUND)
+    message(STATUS "Found CUDA toolkit.")
     message(STATUS "Enabling NVCC Separable Compilation")
     set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
     set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr")
