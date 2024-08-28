@@ -12,7 +12,6 @@
 
 namespace nova {
 
-  class NovaResourceManager;
 
   class NovaRenderEngineLR final : public NovaRenderEngineInterface {
    public:

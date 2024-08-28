@@ -1,11 +1,8 @@
 add_library(ax_core_cuda
         cuda_utils.cpp
         CudaDevice.cpp
-        CudaDevice.h
         CudaParams.cpp
-        CudaParams.h
-        kernel/kernel_launcher.cuh
-        kernel/kernel_launcher.cu
+        kernel_launch.cu
 )
 
 target_link_libraries(ax_core_device PUBLIC ax_core_cuda)
@@ -28,4 +25,4 @@ add_subdirectory(optix)
 
 if(AXOMAE_USE_CUDA)
     target_compile_definitions(ax_core_cuda PUBLIC AXOMAE_USE_CUDA)
-endif (AXOMAE_USE_CUDA)
+endif ()

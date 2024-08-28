@@ -23,7 +23,7 @@ set(AXOMAE_USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
 
 # CUDA Compilation
 set(AXOMAE_USE_CUDA "OFF" CACHE BOOL "Use GPU when available")
-set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr ")
+
 #****************************************************************************************************
 #custom project variables
 set(AXOMAE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
@@ -52,13 +52,13 @@ find_package(GLEW REQUIRED)
 if (AXOMAE_USE_CUDA AND CUDAToolkit_FOUND)
     message(STATUS "Enabling NVCC Separable Compilation")
     set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
+    set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr")
+    set(CUDA_GENERATED_OUTPUT_DIR ${CMAKE_BINARY_DIR}/cuda_generated)
 endif ()
-
 
 #****************************************************************************************************
 #Include and paths
-#Cuda
-set(CUDA_GENERATED_OUTPUT_DIR ${CMAKE_BINARY_DIR}/cuda_generated)
+
 # UI files path
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${AXOMAE_UI_LOCATION})
 

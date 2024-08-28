@@ -1,7 +1,8 @@
-add_library(ax_core_nova
-        DrawEngine.cpp
-)
 
+add_library(ax_core_nova STATIC
+        DrawEngine.cpp
+        DrawEngine_GPU.cpp
+)
 
 target_link_libraries(ax_core PRIVATE ax_core_nova)
 
@@ -35,5 +36,9 @@ add_subdirectory(camera)
 add_subdirectory(aggregate)
 add_subdirectory(sampler)
 add_subdirectory(manager)
-add_subdirectory(gpu)
 
+if(AXOMAE_USE_CUDA)
+    add_subdirectory(gpu)
+    set_source_files_properties(DrawEngine_GPU.cpp PROPERTIES LANGUAGE CUDA)
+    target_compile_definitions(ax_core_nova PRIVATE AXOMAE_USE_CUDA)
+endif()

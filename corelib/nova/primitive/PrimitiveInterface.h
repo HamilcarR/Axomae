@@ -2,7 +2,7 @@
 #ifndef PRIMITIVEINTERFACE_H
 #define PRIMITIVEINTERFACE_H
 #include "NovaGeoPrimitive.h"
-#include "cuda_utils.h"
+#include "device_utils.h"
 #include "ray/Hitable.h"
 #include "sampler/Sampler.h"
 #include "tag_ptr.h"

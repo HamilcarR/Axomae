@@ -9,13 +9,7 @@
 #include <device_launch_parameters.h>
 #include <texture_fetch_functions.h>
 
-#if defined(__NVCC__)
-#  define AX_DEVICE_CALLABLE __host__ __device__
-#  define AX_DEVICE_SHARED __shared__
-#  define AX_DEVICE_ONLY __device__
-#  define AX_HOST_ONLY __host__
-#  define AX_KERNEL __global__
-
+#if defined(__CUDA_ARCH__)
 #  define GPU_SYNCTHREAD __syncthreads()
 #  define GPU_SYNCWARP __syncwarp()
 
@@ -28,12 +22,6 @@
 #  define GPU_ATOMICMIN(address, val) atomicMin(address, val)
 #  define GPU_ATOMICMAX(address, val) atomicMax(address, val)
 
-#else
-#  define AX_DEVICE_CALLABLE
-#  define AX_DEVICE_SHARED
-#  define AX_DEVICE_ONLY
-#  define AX_HOST_ONLY
-#  define AX_KERNEL
 #endif
 
 #define CUDA_ERROR_CHECK(ans) \

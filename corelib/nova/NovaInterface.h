@@ -18,4 +18,6 @@ class NovaRenderEngineInterface {
   virtual void engine_render_tile(nova::HdrBufferStruct *out_buffers, nova::Tile &tile, const nova::NovaResourceManager *nova_resources) = 0;
 };
 
+
+
 #endif  // NOVAINTERFACE_H

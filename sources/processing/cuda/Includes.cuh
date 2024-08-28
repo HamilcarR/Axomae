@@ -2,25 +2,15 @@
 #define INCLUDES_CUH
 #include "Logger.h"
 #include "constants.h"
-#include "cuda_utils.h"
+#include "device_utils.h"
 #include "utils_3D.h"
 
 #include <texture_types.h>
 
 constexpr glm::dvec3 UP_VECTOR = glm::dvec3(0.f, 1.f, 0.f);
 
-AX_DEVICE_CALLABLE inline float magnitude(float x, float y) { return sqrtf(x * x + y * y); }
 
-template<typename U, typename T>
-AX_DEVICE_CALLABLE inline T normalize(U maxx, U minn, T pixel) {
-  assert(maxx - minn != 0);
-  return ((pixel - minn) * 255 / (maxx - minn) + 0);
-}
 
-template<typename T, typename D>
-AX_DEVICE_CALLABLE auto lerp(T value1, T value2, D cste) {
-  return (1 - cste) * value1 + cste * value2;
-}
 
 struct gpu_threads {
   dim3 threads;

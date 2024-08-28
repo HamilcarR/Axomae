@@ -1,36 +1,15 @@
 #ifndef CUBEMAPPROCESSING_CUH
 #define CUBEMAPPROCESSING_CUH
-#include "Includes.cuh"
+#include "device/device_utils.h"
+#include "device/cuda/cuda_utils.h"
 
 /**********************************************************************************************************************************************************************************/
 
-namespace gpgpu_functions {
 
-  namespace irradiance_mapping {
 
-    AX_KERNEL void gpgpu_device_compute_diffuse_irradiance(
-        float *D_result_buffer, cudaTextureObject_t texture, unsigned width, unsigned height, unsigned _width, unsigned _height, unsigned samples);
+  namespace gpgpu_functions::irradiance_mapping {
 
-    void gpgpu_kernel_call(void (*device_function)(float *, cudaTextureObject_t, unsigned, unsigned, unsigned, unsigned, unsigned),
-                           float *D_result_buffer,
-                           cudaTextureObject_t,
-                           unsigned width,
-                           unsigned height,
-                           unsigned _width,
-                           unsigned _height,
-                           unsigned samples);
 
-    AX_KERNEL void gpgpu_device_compute_diffuse_irradiance(
-        float *D_result_buffer, float *D_src_buffer, unsigned width, unsigned height, unsigned _width, unsigned _height, unsigned samples);
-
-    void gpgpu_kernel_call(void (*device_function)(float *, float *, unsigned, unsigned, unsigned, unsigned, unsigned),
-                           float *D_result_buffer,
-                           float *D_src_buffer,
-                           unsigned width,
-                           unsigned height,
-                           unsigned _width,
-                           unsigned _height,
-                           unsigned samples);
 
     void GPU_compute_irradiance(float *src_texture,
                                 unsigned src_texture_width,
@@ -41,7 +20,5 @@ namespace gpgpu_functions {
                                 unsigned dest_texture_height,
                                 unsigned samples);
 
-  };  // End namespace irradiance_mapping
-};    // End namespace gpgpu_functions
-
+}
 #endif

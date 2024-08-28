@@ -1,12 +1,24 @@
 #include "ImageManager.h"
-#include "Kernel.cuh"
 #include "Rgb.h"
 #include "constants.h"
 #include "project_macros.h"
 #include <SDL2/SDL.h>
 #include <assert.h>
+#include "Logger.h"
+#include "kernel_interface.h"
+#include "constants.h"
 
-/*Very Old code , to be refactored */
+template<class F , class ...Args>
+constexpr void call_gpu_f(F&& func , Args&& ...args){
+#if defined(AXOMAE_USE_CUDA)
+  func(std::forward<Args>(args)...);
+#else
+  LOG("Built without GPU support . Set AXOMAE_USE_CUDA to ON if platform has compatible GPU." , LogLevel::ERROR);
+#endif
+}
+
+
+/*VERY OLD CODE, NOT GOING TO REFACTOR IT FOR NOW.  */
 
 namespace axomae {
 
@@ -153,7 +165,7 @@ namespace axomae {
     assert(factor > 0);
     assert(image != nullptr);
     if (CHECK_IF_CUDA_AVAILABLE())
-      GPU_compute_greyscale(image, false);
+      call_gpu_f(GPU_compute_greyscale,image, false);
     else
       for (int i = 0; i < image->w; i++)
         for (int j = 0; j < image->h; j++) {
@@ -220,7 +232,7 @@ namespace axomae {
     bool cuda = CHECK_IF_CUDA_AVAILABLE();
     std::clock_t clock;
     if (cuda) {
-      GPU_compute_greyscale(image, true);
+      call_gpu_f(GPU_compute_greyscale , image, true);
     } else {
       assert(image != nullptr);
       for (int i = 0; i < image->w; i++)
@@ -271,7 +283,7 @@ namespace axomae {
   void ImageManager::computeEdge(SDL_Surface *surface, uint8_t flag, uint8_t border) {
     bool cuda = CHECK_IF_CUDA_AVAILABLE();
     if (cuda)
-      GPU_compute_height(surface, flag, border);
+      call_gpu_f(GPU_compute_height,surface, flag, border);
     else {
       // TODO : use multi threading for initialization and greyscale computing
       /*to avoid concurrent access on image*/
@@ -351,8 +363,7 @@ namespace axomae {
   /**************************************************************************************************************/
   max_colors *ImageManager::getColorsMaxVariations(SDL_Surface *image) {
     max_colors *max_min = new max_colors;
-    const int INT_MAXX = 0;
-    int max_red = 0, max_green = 0, max_blue = 0, min_red = INT_MAX, min_blue = INT_MAX, min_green = INT_MAXX;
+    int max_red = 0, max_green = 0, max_blue = 0, min_red = INT8_MAX, min_blue = INT8_MAX, min_green = INT8_MAX;
     for (int i = 0; i < image->w; i++) {
       for (int j = 0; j < image->h; j++) {
         Rgb rgb = getPixelColor(image, i, j);
@@ -424,7 +435,7 @@ namespace axomae {
   void ImageManager::computeNormalMap(SDL_Surface *surface, double fact, float attenuation) {
     bool cuda = CHECK_IF_CUDA_AVAILABLE();
     if (cuda)
-      GPU_compute_normal(surface, fact, AXOMAE_REPEAT);
+      call_gpu_f(GPU_compute_normal,surface, fact, AXOMAE_REPEAT);
     else {
       int height = surface->h;
       int width = surface->w;

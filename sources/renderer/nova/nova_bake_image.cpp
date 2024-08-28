@@ -95,14 +95,14 @@ namespace nova_baker_utils {
                rendering_data.nova_resource_manager.get()
 
     );
-
+  }
+  void bake_scene_gpu(render_scene_data &rendering_data){
     nova::gpu_draw(rendering_data.buffers.get(),
                    rendering_data.width,
                    rendering_data.height,
                    rendering_data.engine_instance.get(),
                    rendering_data.nova_resource_manager.get());
   }
-
   void cancel_render(render_scene_data &rendering_data) { rendering_data.nova_resource_manager->getEngineData().stopRender(); }
   void start_render(render_scene_data &rendering_data) { rendering_data.nova_resource_manager->getEngineData().startRender(); }
 

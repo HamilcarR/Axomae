@@ -1,8 +1,10 @@
 #include "CubemapProcessing.cuh"
-#include "cuda/CudaDevice.h"
-#include "cuda/CudaParams.h"
-#include "device_utils.h"
-#include <cmath>
+#include "device/cuda/CudaDevice.h"
+#include "device/cuda/CudaParams.h"
+#include "device/device_utils.h"
+#include "device/cuda/cuda_utils.h"
+#include "math/math_spherical.h"
+#include "device/kernel_launch_interface.h"
 #ifdef AXOMAE_STATS_TIMER
 #  include "PerformanceLogger.h"
 #endif
@@ -124,7 +126,7 @@ AX_DEVICE_ONLY void gpgpu_device_write_buffer(T *D_result_buffer, const float3 v
   D_result_buffer[(y * _width + x) * 4 + 3] = 1.f;
 }
 
-AX_KERNEL void gpgpu_functions::irradiance_mapping::gpgpu_device_compute_diffuse_irradiance(
+AX_KERNEL static void gpgpu_device_compute_diffuse_irradiance(
     float *D_result_buffer, cudaTextureObject_t texture, unsigned width, unsigned height, unsigned _width, unsigned _height, unsigned total_samples) {
 
   int i = blockDim.x * blockIdx.x + threadIdx.x;
@@ -172,7 +174,7 @@ AX_KERNEL void gpgpu_functions::irradiance_mapping::gpgpu_device_compute_diffuse
   }
 }
 
-void gpgpu_functions::irradiance_mapping::gpgpu_kernel_call(
+static void gpgpu_kernel_call(
     void (*device_function)(float *, cudaTextureObject_t, unsigned, unsigned, unsigned, unsigned, unsigned),
     float *D_result_buffer,
     cudaTextureObject_t texture,

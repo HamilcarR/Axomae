@@ -1,10 +1,9 @@
 
 
-add_library(ax_core_nova_gpu
+add_library(ax_core_nova_gpu STATIC
         gpu.cu
 )
 
-set_target_properties(ax_core_nova_gpu PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 target_link_libraries(ax_core_nova_gpu
 PRIVATE
         ax_core_nova_engine
@@ -17,8 +16,12 @@ PRIVATE
 )
 
 
-target_link_libraries(ax_core_nova PUBLIC ax_core_nova_gpu)
 target_include_directories(ax_core_nova_gpu
 PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/../
 )
+
+target_compile_definitions(ax_core_nova_gpu PUBLIC AXOMAE_USE_CUDA)
+if(AXOMAE_USE_CUDA)
+    target_link_libraries(ax_core_nova PRIVATE ax_core_nova_gpu)
+endif ()

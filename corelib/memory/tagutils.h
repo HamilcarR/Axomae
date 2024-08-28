@@ -1,6 +1,6 @@
 #ifndef TAGUTILS_H
 #define TAGUTILS_H
-#include "cuda_utils.h"
+#include "device_utils.h"
 #include "project_macros.h"
 #include "type_list.h"
 
