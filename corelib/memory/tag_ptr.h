@@ -1,7 +1,7 @@
 #ifndef TPTR_H
 #define TPTR_H
 #include "tagutils.h"
-
+#include <cstdint>
 #include <utility>
 /*
  * This is an implementation of a tag pointer hack. Obviously it is not very portable to other archs than ADM64 , and Aarch64 ,

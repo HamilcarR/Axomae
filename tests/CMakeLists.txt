@@ -1,3 +1,4 @@
+
 #1) add source path variable to test module
 set(PROCESSING_MODULE_SOURCES "" CACHE INTERNAL "")
 set(DATABASE_MODULE_SOURCES "" CACHE INTERNAL "")
@@ -56,6 +57,7 @@ PRIVATE
         ax_renderer
         ax_mesh
         ax_material
+        ax_controller
         ax_core
 )
 
