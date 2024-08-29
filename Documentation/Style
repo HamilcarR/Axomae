@@ -1,0 +1,55 @@
+I) File names:
+File names can use camelCase or snake_case , depending on what utility they implement. 
+- We use camelCase when a file implements a class , an abstract class , or an interface.
+- We use snake_case when a file only implements utility methods , constants or macros.
+- Some file names can use both : 
+ ex "GUIWindow_nova_bake.cpp" . This indicates that a class implementation has been split to multiple files , 
+ and multiple methods of that class focus only on a specific aspect , here "nova_bake" designate the implementation of the GUI aspect of rendering .
+
+II) Variable names :
+- const and constexpr global variables names are always in uppercase.
+- every other variable name is either one word lowercase , or snake_case.
+We do not specify another style for class properties , even if they are private or protected.
+
+III) Class/struct names :
+1) A module main's classes are written using camelCase.
+- Classes that serve a utility purpose , or aggregate data in the same way as a struct can be written in snake_case.
+- Interfaces , and abstract classes are always written in camelCase.
+- An interface class has the word "Interface" appended to it's name . ex "DeviceMutableBufferInterface".
+- An Abstract class has the word "Abstract" prepended to it's name . ex "AbstractTexture".
+Note : Some classes are not abstract in the pedantic sense and can have all their methods implemented... But they should be treated as one.
+Such classes can have a private constructor and cannot be initialized except through specialized functions.
+An example would be the "AbstractNode" in the corelib/datastructure module.
+We design it this way because some usages of a node class don't need a concrete node to be initialized (like a transformation node in the scene tree) .
+
+2) A class is structured as such :
+class MyClass {
+public/private/protected:
+    /* class enums definitions */
+public/private/protected:
+    /* properties */
+public/private/protected:
+    CONSTRUCTOR_CREATION_MACRO(MyClass)
+    /* Class methods */
+public/private/protected:
+    /* Class slots (When QT is used)*/
+public/private/protected:
+    /* Class signals*/
+};
+
+IV) Enum names :
+Enum names are always uppercase.
+
+V) Namespaces :
+Namespaces are always lowercase.
+
+VI) Macros :
+Macros are always uppercase.
+
+VII) Project Structure :
+Axomae's source code is divided into two main folders :
+1) corelib/ : Provides the core library of the application, math library , macros , GPU functions wrappers and nova engine.
+2) sources/ : Provides the implementation of the editor , and it's features.
+In addition to those folders we can list :
+3) vendor/ : 3rd party libs
+4) tests/ : the testing folder.
