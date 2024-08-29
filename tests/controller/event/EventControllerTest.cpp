@@ -1,5 +1,5 @@
 #include "EventControllerTest.h"
-#include "EventController.h"
+#include "event/EventController.h"
 #include "Test.h"
 // Tests in case we extend the event manager
 class EventEmitter {};

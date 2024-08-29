@@ -34,7 +34,7 @@ option(AXOMAE_BUILD_TESTS "Build unit tests." OFF)
 
 
 #****************************************************************************************************
-# Dependencies 
+# Dependencies
 # Command line utilities
 
 # GUI
@@ -96,16 +96,6 @@ qt_add_executable(${PROJECT_NAME} sources/main/main.cpp)
 add_subdirectory(sources)
 add_subdirectory(corelib)
 
-
-
-#****************************************************************************************************
-# Testing
-
-if(AXOMAE_BUILD_TESTS)
-    enable_testing()
-    # Subdirs include
-    add_subdirectory(tests)
-endif()
 #****************************************************************************************************
 # Link
 if(AXOMAE_USE_GOLD)
@@ -137,6 +127,11 @@ if(AXOMAE_USE_TSAN)
             -fsanitize=thread
     )
 endif()
-#****************************************************************************************************
-# Global preprocessor variables
 
+#****************************************************************************************************
+# Testing
+
+if(AXOMAE_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
