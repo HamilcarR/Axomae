@@ -1,4 +1,6 @@
-add_library(ax_material Material.cpp)
+add_library(ax_material STATIC
+
+        Material.cpp)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ax_material)
 target_link_libraries(ax_material

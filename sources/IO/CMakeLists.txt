@@ -1,4 +1,4 @@
-add_library(ax_io  
+add_library(ax_io STATIC
     ImageImporter.cpp 
     Loader_file.cpp 
     Loader_image.cpp

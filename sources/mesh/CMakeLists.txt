@@ -1,4 +1,4 @@
-add_library(ax_mesh
+add_library(ax_mesh STATIC
     Mesh.cpp
 )
 

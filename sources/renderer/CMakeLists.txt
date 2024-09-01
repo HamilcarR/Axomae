@@ -1,4 +1,4 @@
-add_library(ax_renderer
+add_library(ax_renderer STATIC
         Drawable.cpp
         light/LightingSystem.cpp
         Renderer.cpp

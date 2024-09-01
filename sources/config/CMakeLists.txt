@@ -1,4 +1,4 @@
-add_library(ax_config 
+add_library(ax_config STATIC
     Config.cpp
 )
 

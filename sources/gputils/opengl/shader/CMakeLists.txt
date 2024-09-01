@@ -18,7 +18,7 @@ add_custom_target(axcustom_glsl_generate ALL
 
 
 
-add_library(ax_shader
+add_library(ax_shader STATIC
     Shader.cpp
     utils/glsl.cpp
 )
