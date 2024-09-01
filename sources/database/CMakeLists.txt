@@ -1,4 +1,4 @@
-add_library(ax_database 
+add_library(ax_database STATIC
         INodeDatabase.cpp
         LightingDatabase.cpp
         ResourceDatabaseManager.cpp

@@ -1,4 +1,4 @@
-add_library(ax_camera
+add_library(ax_camera STATIC
         Camera.cpp
         ArcballCamera.cpp
         FreePerspectiveCamera.cpp)

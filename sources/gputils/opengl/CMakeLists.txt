@@ -1,4 +1,4 @@
-add_library(ax_opengl
+add_library(ax_opengl STATIC
         CameraFrameBuffer.cpp
         FramebufferHelper.cpp
         PackedGLGeometryBuffer.cpp

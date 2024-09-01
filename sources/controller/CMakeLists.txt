@@ -1,5 +1,4 @@
-
-add_library(ax_controller
+add_library(ax_controller STATIC
     LightControllerUI.cpp
     OperatorProgressStatus.cpp
     GUIWindow.cpp

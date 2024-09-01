@@ -1,4 +1,4 @@
-add_library(ax_editor
+add_library(ax_editor STATIC
         ProgressStatusWidget.cpp
         TextureViewerWidget.cpp
         MessageBoxWidget.cpp

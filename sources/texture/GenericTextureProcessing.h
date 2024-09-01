@@ -1,6 +1,6 @@
 #ifndef GENERICTEXTUREPROCESSING_H
 #define GENERICTEXTUREPROCESSING_H
-
+#include <cstdint>
 #include <string>
 #include <vector>
 /**

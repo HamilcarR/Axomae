@@ -1,4 +1,4 @@
-add_library(ax_processing 
+add_library(ax_processing STATIC
     ImageManager_UV.cpp 
     ImageManager.cpp
     TextureProcessing.cpp
