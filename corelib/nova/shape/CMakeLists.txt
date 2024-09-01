@@ -1,4 +1,4 @@
-add_library(ax_core_nova_shape
+add_library(ax_core_nova_shape STATIC
         Sphere.cpp
         Square.cpp
         Box.cpp

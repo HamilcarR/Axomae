@@ -1,4 +1,4 @@
-add_library(ax_core_nova_scene
+add_library(ax_core_nova_scene STATIC
     nova_scene.cpp
 )
 

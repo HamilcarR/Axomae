@@ -1,4 +1,4 @@
-add_library(ax_core_nova_material
+add_library(ax_core_nova_material STATIC
     NovaMaterials.cpp
 )
 

@@ -1,4 +1,4 @@
-add_library(ax_core_nova_manager
+add_library(ax_core_nova_manager STATIC
     NovaResourceManager.cpp
 )
 

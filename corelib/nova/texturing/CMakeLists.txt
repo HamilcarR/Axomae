@@ -1,4 +1,4 @@
-add_library(ax_core_nova_texturing
+add_library(ax_core_nova_texturing STATIC
         nova_texturing.cpp
         NovaTexture.cpp
 )

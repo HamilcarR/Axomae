@@ -1,4 +1,4 @@
-add_library(ax_core_nova_ray
+add_library(ax_core_nova_ray STATIC
     Ray.cpp
 )
 
