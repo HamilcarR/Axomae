@@ -3,7 +3,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 cmake_minimum_required(VERSION 3.27)
-project(Axomae VERSION 1.0 LANGUAGES C CXX CUDA )
+project(Axomae VERSION 1.0 LANGUAGES C CXX)
 
 
 # Custom variables
@@ -30,39 +30,28 @@ set(AXOMAE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Dis
 option(AXOMAE_LUT_HIGHP "Enable high precision when computing lookup tables." OFF)
 option(AXOMAE_LUT_MEDIUMP "Enable medium precision when computing lookup tables." ON)
 option(AXOMAE_LUT_LOWP "Enable low precision when computing lookup tables." OFF)
-option(AXOMAE_BUILD_TESTS "Build unit tests." OFF)
+option(AXOMAE_BUILD_TESTS "Build unit tests." ON)
 
 
 #****************************************************************************************************
 # Dependencies
-# Command line utilities
+include(cmake/FindDependencies.cmake)
 
-# GUI
-find_package(Qt6 COMPONENTS Gui REQUIRED)
-find_package(Qt6 COMPONENTS OpenGLWidgets REQUIRED)
-find_package(Qt6 COMPONENTS Widgets REQUIRED)
-find_package(SDL2 REQUIRED)
-find_package(SDL2_image REQUIRED)
-# GPGPU / real time render
-find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(CUDAToolkit)
-
+if(NOT CUDAToolkit_FOUND)
+    message(STATUS "Cuda toolkit not found. AXOMAE_USE_CUDA should be set to off.")
+endif()
 if (AXOMAE_USE_CUDA AND CUDAToolkit_FOUND)
     message(STATUS "Found CUDA toolkit.")
     message(STATUS "Enabling NVCC Separable Compilation")
     set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
+    enable_language(CUDA) 
     set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr")
     set(CUDA_GENERATED_OUTPUT_DIR ${CMAKE_BINARY_DIR}/cuda_generated)
 endif ()
 
-#****************************************************************************************************
-#Include and paths
-
 # UI files path
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${AXOMAE_UI_LOCATION})
 
-# Cache
 # Assimp
 set(ASSIMP_INCLUDE_PATH "" CACHE INTERNAL "")
 
