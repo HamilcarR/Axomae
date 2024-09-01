@@ -1,4 +1,4 @@
-add_library(ax_core_nova_primitive
+add_library(ax_core_nova_primitive STATIC
         NovaGeoPrimitive.cpp
         PrimitiveInterface.cpp
 )
@@ -9,6 +9,7 @@ target_link_libraries(ax_core_nova_primitive PRIVATE
         ax_core_math
         ax_core_macro
         ax_core_nova_sampler
+        ax_core_nova_shape
         ax_core_device
         ax_core_memory
 

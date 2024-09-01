@@ -1,4 +1,4 @@
-add_library(ax_core_nova_camera
+add_library(ax_core_nova_camera STATIC
     nova_camera.cpp
 )
 

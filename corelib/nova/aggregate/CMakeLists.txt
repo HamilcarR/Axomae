@@ -1,4 +1,4 @@
-add_library(ax_core_nova_aggregate
+add_library(ax_core_nova_aggregate STATIC
         bvh/Bvh.cpp
         bvh/BvhBuilder.cpp
 )
@@ -9,6 +9,7 @@ target_link_libraries(ax_core_nova_aggregate PRIVATE
         ax_core_math
         ax_core_macro
         ax_core_nova_sampler
+        ax_core_nova_primitive
         ax_core_memory
         ax_core_device
 )
