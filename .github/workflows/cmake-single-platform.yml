@@ -38,7 +38,7 @@ jobs:
 
     - name: Install SDL2 and SDL2_image
       run: |
-        sudo apt-get install -y libsdl2-image-dev libsdl2-dev
+        sudo apt-get install -y libsdl2-image-dev libsdl2-dev libsdl-dev libsdl-image-dev
 
     - name: Install OpenGL and GLEW
       run: |
