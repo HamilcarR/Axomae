@@ -32,19 +32,13 @@ jobs:
         arch: 'gcc_64'
         install-deps : 'true'
 
-    - name: Install SDL2 and SDL2_image
-      steps:
-            - uses: libsdl-org/setup-sdl@main
-              id: sdl
-              with:
-                install-linux-dependencies: true
-                version: 2-latest
-                version-sdl-image: 2-latest
+    - name: Install env
+      run: |
+        sudo apt-get install -y g++ cmake 
 
-            - name: 'Configure and build your project'
-              run: |
-                cmake -S . -B build
-                cmake --build build --verbose
+    - name: Install SDL2 and SDL2_image
+      run: |
+        sudo apt-get install -y libsdl2-image-dev libsdl2-dev
 
     - name: Install OpenGL and GLEW
       run: |
