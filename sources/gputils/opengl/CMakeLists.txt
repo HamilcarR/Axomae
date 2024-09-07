@@ -6,20 +6,19 @@ add_library(ax_opengl STATIC
         RenderQuad.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ax_opengl)
 target_link_libraries(ax_opengl
-
 PRIVATE
-    ax_controller
-    ax_mesh
-    ax_texture
-    ax_database
-    ax_renderer
-    ax_camera
-    ax_shader
-    ax_scene
-    ax_material
-    ax_core
+        ax_texture
+        ax_core
+        ax_controller
+        ax_mesh
+        ax_database
+        ax_renderer
+        ax_camera
+        ax_shader
+        ax_scene
+        ax_material
+
 )
 
 target_include_directories(ax_opengl

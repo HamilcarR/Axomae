@@ -11,7 +11,7 @@ add_library(ax_renderer STATIC
         nova/nova_bake_image.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ax_renderer)
+
 
 target_link_libraries(ax_renderer
 PRIVATE 

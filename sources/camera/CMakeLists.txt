@@ -3,7 +3,6 @@ add_library(ax_camera STATIC
         ArcballCamera.cpp
         FreePerspectiveCamera.cpp)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ax_camera)
 target_link_libraries(ax_camera
 PUBLIC
         ax_controller

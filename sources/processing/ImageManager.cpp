@@ -1,22 +1,20 @@
 #include "ImageManager.h"
+#include "Logger.h"
 #include "Rgb.h"
 #include "constants.h"
+#include "kernel_interface.h"
 #include "project_macros.h"
 #include <SDL2/SDL.h>
 #include <assert.h>
-#include "Logger.h"
-#include "kernel_interface.h"
-#include "constants.h"
 
-template<class F , class ...Args>
-constexpr void call_gpu_f(F&& func , Args&& ...args){
+template<class F, class... Args>
+constexpr void call_gpu_f(F &&func, Args &&...args) {
 #if defined(AXOMAE_USE_CUDA)
   func(std::forward<Args>(args)...);
 #else
-  LOG("Built without GPU support . Set AXOMAE_USE_CUDA to ON if platform has compatible GPU." , LogLevel::ERROR);
+  LOG("Built without GPU support . Set AXOMAE_USE_CUDA to ON if platform has compatible GPU.", LogLevel::ERROR);
 #endif
 }
-
 
 /*VERY OLD CODE, NOT GOING TO REFACTOR IT FOR NOW.  */
 
@@ -25,7 +23,7 @@ namespace axomae {
   using namespace image;
 
   bool ImageManager::gpu = false;
-  static bool CHECK_IF_CUDA_AVAILABLE() {
+  static bool use_gpgpu() {
     if (!ImageManager::isUsingGPU())
       return false;
     else
@@ -164,9 +162,13 @@ namespace axomae {
   void ImageManager::setGrayscaleAverage(SDL_Surface *image, uint8_t factor) {
     assert(factor > 0);
     assert(image != nullptr);
-    if (CHECK_IF_CUDA_AVAILABLE())
-      call_gpu_f(GPU_compute_greyscale,image, false);
-    else
+    if (use_gpgpu()) {
+#if defined(AXOMAE_USE_CUDA)
+      call_gpu_f(GPU_compute_greyscale, image, false);
+#else
+      LOG("Application built without GPGPU. Enable AXOMAE_USE_CUDA in build if GPU is compatible.", LogLevel::ERROR);
+#endif
+    } else
       for (int i = 0; i < image->w; i++)
         for (int j = 0; j < image->h; j++) {
           Rgb rgb = getPixelColor(image, i, j);
@@ -229,10 +231,13 @@ namespace axomae {
 
   /**************************************************************************************************************/
   void ImageManager::setGrayscaleLuminance(SDL_Surface *image) {
-    bool cuda = CHECK_IF_CUDA_AVAILABLE();
     std::clock_t clock;
-    if (cuda) {
-      call_gpu_f(GPU_compute_greyscale , image, true);
+    if (use_gpgpu()) {
+#if defined(AXOMAE_USE_CUDA)
+      call_gpu_f(GPU_compute_greyscale, image, true);
+#else
+      LOG("Application built without GPGPU. Enable AXOMAE_USE_CUDA in build if GPU is compatible.", LogLevel::ERROR);
+#endif
     } else {
       assert(image != nullptr);
       for (int i = 0; i < image->w; i++)
@@ -281,14 +286,15 @@ namespace axomae {
 
   /**************************************************************************************************************/
   void ImageManager::computeEdge(SDL_Surface *surface, uint8_t flag, uint8_t border) {
-    bool cuda = CHECK_IF_CUDA_AVAILABLE();
-    if (cuda)
-      call_gpu_f(GPU_compute_height,surface, flag, border);
-    else {
+    if (use_gpgpu()) {
+#if defined(AXOMAE_USE_CUDA)
+      call_gpu_f(GPU_compute_height, surface, flag, border);
+#else
+      LOG("Application built without GPGPU. Enable AXOMAE_USE_CUDA in build if GPU is compatible.", LogLevel::ERROR);
+#endif
+    } else {
       // TODO : use multi threading for initialization and greyscale computing
       /*to avoid concurrent access on image*/
-
-      std::cout << "CUDA : " << cuda << "\n";
 
       int w = surface->w;
       int h = surface->h;
@@ -433,10 +439,14 @@ namespace axomae {
 
   /**************************************************************************************************************/
   void ImageManager::computeNormalMap(SDL_Surface *surface, double fact, float attenuation) {
-    bool cuda = CHECK_IF_CUDA_AVAILABLE();
-    if (cuda)
-      call_gpu_f(GPU_compute_normal,surface, fact, AXOMAE_REPEAT);
-    else {
+
+    if (use_gpgpu()) {
+#if defined(AXOMAE_USE_CUDA)
+      call_gpu_f(GPU_compute_normal, surface, fact, AXOMAE_REPEAT);
+#else
+      LOG("Application built without GPGPU. Enable AXOMAE_USE_CUDA in build if GPU is compatible.", LogLevel::ERROR);
+#endif
+    } else {
       int height = surface->h;
       int width = surface->w;
       Rgb **data = new Rgb *[width];

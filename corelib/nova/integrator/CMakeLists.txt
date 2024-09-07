@@ -12,6 +12,7 @@ target_link_libraries(ax_core_nova_integrator PRIVATE
         ax_core_debug
         ax_core_thread
         ax_core_nova_sampler
+        ax_core_nova_texturing
         ax_core_memory
         ax_core_device
 )

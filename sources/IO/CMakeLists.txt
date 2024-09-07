@@ -5,9 +5,7 @@ add_library(ax_io STATIC
     Loader_scene.cpp 
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ax_io)
 target_link_libraries(ax_io
-
 PRIVATE
     ax_controller
     ax_editor
@@ -25,9 +23,7 @@ PRIVATE
     assimp
     SDL2::SDL2
     SDL2_image::SDL2_image
-
 )
-
 
 target_include_directories(ax_io
 PUBLIC

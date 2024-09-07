@@ -13,24 +13,23 @@ add_library(ax_controller STATIC
     event/EventInterface.h
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ax_controller)
 target_link_libraries(ax_controller
 PUBLIC
-    ax_config
-PRIVATE
-    ax_editor
-    ax_processing
-    ax_mesh
-    ax_scene
-    ax_camera
-    ax_material
-    ax_shader
-    ax_texture
-    ax_opengl
-    ax_renderer
-    ax_core
-    ax_core_nova
-    Boost::program_options
+        ax_config
+        ax_io
+        ax_database
+        ax_editor
+        ax_processing
+        ax_mesh
+        ax_scene
+        ax_camera
+        ax_material
+        ax_shader
+        ax_texture
+        ax_opengl
+        ax_renderer
+        ax_core
+        Boost::program_options
 )
 # AUTOUIC weirdly doesn't resolve ui includes
 set(AUTOGEN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/ax_controller_autogen/include")
