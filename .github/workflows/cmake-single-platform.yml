@@ -4,13 +4,13 @@ name: Tests
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "Feature-CI_CD" ]
   pull_request:
     branches: [ "master" ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
+  BUILD_TYPE: RelWithDebInfo
   BUILD_TESTS : ON
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
       with:
@@ -36,15 +36,14 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libsdl2-dev libsdl2-image-dev
-
     - name: Install OpenGL and GLEW
       run: |
         sudo apt-get install -y libgl1-mesa-dev libglew-dev
-        
+
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/../build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DAXOMAE_BUILD_TESTS:BOOL=${{env.BUILD_TESTS}} -DAXOMAE_LUT_MEDIUMP:BOOL=ON 
+      run: cmake -B ${{github.workspace}}/../build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DAXOMAE_BUILD_TESTS:BOOL=${{env.BUILD_TESTS}} -DAXOMAE_LUT_MEDIUMP:BOOL=ON
 
     - name: Build
       # Build your program with the given configuration
@@ -55,4 +54,3 @@ jobs:
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
-
