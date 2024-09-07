@@ -4,7 +4,7 @@ add_library(ax_processing STATIC
     TextureProcessing.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ax_processing)
+
 target_link_libraries(ax_processing
 PRIVATE
         ax_texture

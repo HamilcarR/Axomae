@@ -2,7 +2,7 @@ add_library(ax_mesh STATIC
     Mesh.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ax_mesh)
+
 target_link_libraries(ax_mesh
 PRIVATE
     ax_scene

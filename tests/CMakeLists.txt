@@ -59,6 +59,8 @@ PRIVATE
         ax_material
         ax_controller
         ax_core
+PRIVATE
+        compile_opts
 )
 
 target_include_directories(Axomae_test

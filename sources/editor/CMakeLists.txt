@@ -14,7 +14,7 @@ add_library(ax_editor STATIC
 )
 
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ax_editor)
+
 target_link_libraries(ax_editor
 PUBLIC
     Qt6::Widgets

@@ -10,8 +10,6 @@ add_library(ax_database STATIC
         DatabaseStorage.h
         DatabaseInterface.h
 )
-
-target_link_libraries(${PROJECT_NAME} PUBLIC ax_database)
 target_link_libraries(ax_database
 PRIVATE
     ax_scene
@@ -24,9 +22,8 @@ PRIVATE
     ax_controller
     ax_mesh
     ax_material
+PUBLIC
     ax_core
-
-
 )
 
 target_include_directories(ax_database 
