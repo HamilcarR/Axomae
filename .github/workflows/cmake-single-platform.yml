@@ -33,9 +33,19 @@ jobs:
         install-deps : 'true'
 
     - name: Install SDL2 and SDL2_image
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libsdl2-dev libsdl2-image-dev
+      steps:
+            - uses: libsdl-org/setup-sdl@main
+              id: sdl
+              with:
+                install-linux-dependencies: true
+                version: 2-latest
+                version-sdl-image: 2-latest
+
+            - name: 'Configure and build your project'
+              run: |
+                cmake -S . -B build
+                cmake --build build --verbose
+
     - name: Install OpenGL and GLEW
       run: |
         sudo apt-get install -y libgl1-mesa-dev libglew-dev
