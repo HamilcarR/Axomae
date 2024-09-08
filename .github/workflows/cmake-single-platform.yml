@@ -32,6 +32,10 @@ jobs:
         arch: 'gcc_64'
         install-deps : 'true'
 
+    - name: Install dependencies
+      run: |
+        cd ${{github.workspace}} && ./scripts/update_deps.sh
+
     - name: Install OpenGL and GLEW
       run: |
         sudo apt-get install -y libgl1-mesa-dev libglew-dev
@@ -51,6 +55,6 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
 
-    - name: Setup tmate session
-      if: success() || failure()
-      uses: mxschmitt/action-tmate@v3
+   # - name: Setup tmate session
+    #  if: success() || failure()
+    #  uses: mxschmitt/action-tmate@v3
