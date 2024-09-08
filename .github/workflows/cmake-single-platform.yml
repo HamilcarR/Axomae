@@ -38,7 +38,7 @@ jobs:
 
     - name: Install SDL2 and SDL2_image
       run: |
-        sudo apt-get install -y libsdl2-image-dev libsdl2-dev libsdl-dev libsdl-image-dev
+        sudo apt-get install -y libsdl2-image-dev libsdl2-dev 
 
     - name: Install OpenGL and GLEW
       run: |
@@ -58,3 +58,7 @@ jobs:
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: Setup tmate session
+      if: success() || failure()
+    - uses: mxschmitt/action-tmate@v3
