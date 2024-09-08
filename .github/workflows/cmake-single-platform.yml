@@ -28,7 +28,7 @@ jobs:
       with:
         version: '6.2.4'
         host: 'linux'
-        target: 'deskto'
+        target: 'desktop'
         arch: 'gcc_64'
         install-deps : 'true'
 
