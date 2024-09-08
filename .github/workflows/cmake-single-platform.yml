@@ -40,6 +40,11 @@ jobs:
       run: |
         sudo apt-get install -y libsdl2-image-dev libsdl2-dev 
 
+    - name: Copy FindSDL to system
+      run: | 
+        sudo cp cmake/FindSDL.cmake /usr/share/cmake/Modules
+        sudo cp cmake/FindSDL_image.cmake /usr/share/cmake/Modules
+
     - name: Install OpenGL and GLEW
       run: |
         sudo apt-get install -y libgl1-mesa-dev libglew-dev
