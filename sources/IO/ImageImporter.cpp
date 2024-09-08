@@ -1,5 +1,7 @@
 #include "ImageImporter.h"
 #include "Logger.h"
+#include <SDL2/SDL.h>
+#include <SDL_image.h>
 #include <assert.h>
 #include <iostream>
 
@@ -8,9 +10,7 @@ namespace IO {
 
   ImageImporter *ImageImporter::instance = nullptr;
 
-  ImageImporter::ImageImporter()
-
-  {}
+  ImageImporter::ImageImporter() = default;
 
   ImageImporter::~ImageImporter() { SDL_FreeSurface(surf); }
 

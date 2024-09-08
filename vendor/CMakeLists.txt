@@ -34,7 +34,7 @@ set(OPTIX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Optix PARENT_SCOPE)
 set(STB_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/stb PARENT_SCOPE)
 #########################################################################################
 # OpenExr
-message(NOTICE "OpenEXR not found on the system : Initializing OpenEXR build from sources. ")
+message(NOTICE "Initializing OpenEXR build from sources. ")
 set(BUILD_SHARED_LIBS ON)
 set(OpenEXR_BUILD_UTILS OFF)
 set(OpenEXR_BUILD_TESTS OFF)
@@ -59,3 +59,15 @@ if(AXOMAE_BUILD_TESTS)
 endif()
 
 
+#########################################################################################
+
+if(NOT SDL2_FOUND )
+    message(NOTICE "SDL2 not found on the system : Initializing SDL2 from sources.")
+    add_subdirectory(SDL)
+endif()
+
+if(NOT SDL2_image_FOUND)
+    message(NOTICE "SDL2_image not found on the system : Initializing SDL2_image from sources.")
+    add_subdirectory(SDL_image)
+endif()
+#########################################################################################

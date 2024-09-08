@@ -1,15 +1,13 @@
 #ifndef IMAGEIMPORTER_H
 #define IMAGEIMPORTER_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-
+class SDL_Surface;
 // TODO : Old code , move to Loader_image.cpp
 namespace IO {
 
   class ImageImporter {
    private:
-    SDL_Surface *surf;
+    SDL_Surface *surf{};
     static ImageImporter *instance;
 
    public:

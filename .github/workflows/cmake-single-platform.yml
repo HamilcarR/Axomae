@@ -28,23 +28,9 @@ jobs:
       with:
         version: '6.2.4'
         host: 'linux'
-        target: 'desktop'
+        target: 'deskto'
         arch: 'gcc_64'
         install-deps : 'true'
-
-    - name: Install env
-      run: |
-        sudo apt-get install -y g++ cmake 
-
-    - name: Install SDL2 and SDL2_image
-      run: |
-        sudo apt-get install -y libsdl2-image-dev libsdl2-dev 
-
-    - name: Copy FindSDL to system
-      run: |
-        sudo mkdir -p /usr/share/cmake/Modules
-        sudo cp cmake/FindSDL.cmake /usr/share/cmake/Modules/FindSDL2.cmake
-        sudo cp cmake/FindSDL_image.cmake /usr/share/cmake/Modules/FindSDL2_image.cmake
 
     - name: Install OpenGL and GLEW
       run: |
