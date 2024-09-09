@@ -9,7 +9,6 @@
 #include "constants.h"
 #include "ui_main_window.h"
 #include <QtWidgets/qmainwindow.h>
-#include <SDL2/SDL_surface.h>
 
 /**
  * @file GUIWindow.h
@@ -17,6 +16,7 @@
 
 class ApplicationConfig;
 class QTimer;
+class SDL_Surface;
 
 namespace controller::event {
   class Event;
