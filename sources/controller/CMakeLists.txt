@@ -30,6 +30,9 @@ PUBLIC
         ax_renderer
         ax_core
         Boost::program_options
+PRIVATE
+        SDL2_image::SDL2_image
+        SDL2::SDL2
 )
 # AUTOUIC weirdly doesn't resolve ui includes
 set(AUTOGEN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/ax_controller_autogen/include")
