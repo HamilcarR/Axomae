@@ -26,13 +26,13 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.7.2'
+        version: '6.3.*'
         host: 'linux'
         target: 'desktop'
         arch: 'gcc_64'
         install-deps : 'true'
 
-    - name: Install dependencies
+    - name: Install Axomae dependencies
       run: |
         cd ${{github.workspace}} && ./scripts/update_deps.sh
 
