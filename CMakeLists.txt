@@ -34,9 +34,16 @@ option(AXOMAE_LUT_HIGHP "Enable high precision when computing lookup tables." OF
 option(AXOMAE_LUT_MEDIUMP "Enable medium precision when computing lookup tables." ON)
 option(AXOMAE_LUT_LOWP "Enable low precision when computing lookup tables." OFF)
 option(AXOMAE_BUILD_TESTS "Build unit tests." ON)
-
+option(AXOMAE_FROMSOURCE_QT_BUILD "Build QT from source." ON)
 #****************************************************************************************************
 # Dependencies
+if(AXOMAE_FROMSOURCE_QT_BUILD)
+    include(cmake/BuildQt6.cmake)
+else()
+    find_package(Qt6 COMPONENTS Gui REQUIRED)
+    find_package(Qt6 COMPONENTS OpenGLWidgets REQUIRED)
+    find_package(Qt6 COMPONENTS Widgets REQUIRED)
+endif()
 include(cmake/FindDependencies.cmake)
 
 if(NOT CUDAToolkit_FOUND)
