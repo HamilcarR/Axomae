@@ -1,7 +1,6 @@
 # Axomae
-![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
-
-
+![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg) 
+![Build](https://github.com/HamilcarR/Axomae/actions/workflows/cmake-single-platform.yml/badge.svg)
 
 # Table Of Contents:
 * [Introduction](#Introduction)
