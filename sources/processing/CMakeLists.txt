@@ -10,6 +10,9 @@ PRIVATE
         ax_texture
         ax_controller
         ax_core
+
+        SDL2::SDL2
+        SDL2_image::SDL2_image
 )
 
 target_include_directories(ax_processing 

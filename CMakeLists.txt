@@ -34,7 +34,7 @@ option(AXOMAE_LUT_HIGHP "Enable high precision when computing lookup tables." OF
 option(AXOMAE_LUT_MEDIUMP "Enable medium precision when computing lookup tables." ON)
 option(AXOMAE_LUT_LOWP "Enable low precision when computing lookup tables." OFF)
 option(AXOMAE_BUILD_TESTS "Build unit tests." ON)
-option(AXOMAE_UPDATE_DEPENDENCIES "Downloads/Updates the dependencies." OFF)
+
 #****************************************************************************************************
 # Dependencies
 include(cmake/FindDependencies.cmake)

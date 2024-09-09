@@ -1,9 +1,5 @@
 
-if(AXOMAE_UPDATE_DEPENDENCIES)
-    message(STATUS "Downloading dependencies...")
-    execute_process(COMMAND bash "-c" "cd ${PROJECT_SOURCE_DIR} && git submodule update --init --recursive")
-    message(STATUS "Done.")
-endif()
+
 #########################################################################################
 # Assimp
 if(NOT Assimp_FOUND)

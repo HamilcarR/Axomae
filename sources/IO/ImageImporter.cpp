@@ -1,6 +1,6 @@
 #include "ImageImporter.h"
 #include "Logger.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <SDL_image.h>
 #include <assert.h>
 #include <iostream>
