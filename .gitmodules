@@ -60,8 +60,3 @@
 	path = vendor/SDL
 	url = https://github.com/libsdl-org/SDL
 	branch = SDL2
-
-[submodule "vendor/qt/qtbase"]
-	path = vendor/qt/qtbase
-	url = https://github.com/qt/qtbase
-	branch = 6.8
