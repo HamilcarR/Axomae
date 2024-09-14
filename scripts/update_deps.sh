@@ -1,3 +1,3 @@
 #!/bin/bash
 
-git submodule update --init --recursive --force
+git submodule update --init  --force

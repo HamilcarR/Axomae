@@ -1,62 +1,80 @@
 [submodule "vendor/stb"]
 	path = vendor/stb
 	url = https://github.com/nothings/stb
-  ignore = all 
+    ignore = all
+    fetchRecurseSubmodules = true
 
 [submodule "vendor/glm"]
 	path = vendor/glm
 	url = https://github.com/g-truc/glm
     branch = v1.0.1
     ignore = all
+    fetchRecurseSubmodules = true
 
 [submodule "vendor/boost"]
 	path = vendor/boost
 	url = https://github.com/boostorg/boost
     branch = v1.86.0
     ignore = all
+    fetchRecurseSubmodules = true
 
 [submodule "vendor/assimp"]
 	path = vendor/assimp
 	url = https://github.com/assimp/assimp
     branch = v5.4.2
     ignore = all
+    fetchRecurseSubmodules = true
 
 [submodule "vendor/googletest"]
 	path = vendor/googletest
 	url = https://github.com/google/googletest
     branch = v1.15.2
     ignore = all
+    fetchRecurseSubmodules = true
 
 [submodule "vendor/openexr"]
 	path = vendor/openexr
 	url = https://github.com/AcademySoftwareFoundation/openexr
 	branch = v3.2.4
     ignore = all
+    fetchRecurseSubmodules = true
 
 [submodule "vendor/zlib"]
 	path = vendor/zlib
 	url = https://github.com/madler/zlib
 	branch = v1.3.1
     ignore = all
+    fetchRecurseSubmodules = true
 
 [submodule "vendor/imath"]
 	path = vendor/imath
 	url = https://github.com/AcademySoftwareFoundation/Imath
 	branch = v3.1.9
     ignore = all
+    fetchRecurseSubmodules = true
 
 [submodule "vendor/libdeflate"]
 	path = vendor/libdeflate
 	url = https://github.com/ebiggers/libdeflate
 	branch = v1.9
     ignore = all
+    fetchRecurseSubmodules = true
 
 [submodule "vendor/SDL_image"]
 	path = vendor/SDL_image
 	url = https://github.com/libsdl-org/SDL_image
 	branch = SDL2
+    fetchRecurseSubmodules = true
 
 [submodule "vendor/SDL"]
 	path = vendor/SDL
 	url = https://github.com/libsdl-org/SDL
 	branch = SDL2
+    fetchRecurseSubmodules = true
+
+[submodule "vendor/qt"]
+	path = vendor/qt
+	url = https://code.qt.io/qt/qt5.git
+	branch = 6.7.2
+	ignore = all
+	fetchRecurseSubmodules = false
