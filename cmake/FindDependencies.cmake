@@ -1,6 +1,3 @@
-find_package(Qt6 COMPONENTS Gui REQUIRED)
-find_package(Qt6 COMPONENTS OpenGLWidgets REQUIRED)
-find_package(Qt6 COMPONENTS Widgets REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(CUDAToolkit)
