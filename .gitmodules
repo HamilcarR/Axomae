@@ -14,7 +14,7 @@
 [submodule "vendor/boost"]
 	path = vendor/boost
 	url = https://github.com/boostorg/boost
-    branch = v1.86.0
+    branch = v1.85.0
     ignore = all
     fetchRecurseSubmodules = true
 
