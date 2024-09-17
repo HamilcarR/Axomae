@@ -19,22 +19,26 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with :
+        version: "6.3.*"
+        host: 'linux'
+        target: 'desktop'
+        arch: 'gcc_64'
+        install-deps: 'true'
+
+
     - name: Install Axomae dependencies
       run: |
         cd ${{github.workspace}} && ./scripts/update_deps.sh
-
-    - name: Copy FindSDL to system
-      run: |
-        sudo mkdir -p /usr/share/cmake/Modules
-        sudo cp cmake/FindSDL.cmake /usr/share/cmake/Modules/FindSDL2.cmake
-        sudo cp cmake/FindSDL_image.cmake /usr/share/cmake/Modules/FindSDL2_image.cmake
 
     - name: Install OpenGL and GLEW
       run: |
         sudo apt-get install -y libgl1-mesa-dev libglew-dev
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/../build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DAXOMAE_BUILD_TESTS:BOOL=${{env.BUILD_TESTS}} -DAXOMAE_LUT_MEDIUMP:BOOL=ON -DAXOMAE_FROMSOURCE_QT_BUILD=ON
+      run: cmake -B ${{github.workspace}}/../build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DAXOMAE_BUILD_TESTS:BOOL=${{env.BUILD_TESTS}} -DAXOMAE_LUT_MEDIUMP:BOOL=ON -DAXOMAE_FROMSOURCE_QT_BUILD=OFF
 
     - name: Build
       run: cmake --build ${{github.workspace}}/../build --config ${{env.BUILD_TYPE}}
@@ -46,6 +50,6 @@ jobs:
 
     #####################################################
     # For debugging , opens an ssh cli
-   # - name: Setup tmate session
-    #  if: success() || failure()
-    #  uses: mxschmitt/action-tmate@v3
+    - name: Setup tmate session
+      if: success() || failure()
+      uses: mxschmitt/action-tmate@v3
