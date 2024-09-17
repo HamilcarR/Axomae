@@ -2,7 +2,7 @@
 
 ROOT="$(pwd)"
 echo 'Downloading dependencies ...' 
-git submodule update --init --remote
+git submodule update --init --force
 
 if [ -d "$ROOT/vendor/qt" ]; then
 	cd $ROOT/vendor/qt || exit
