@@ -1,7 +1,8 @@
 #ifndef IMAGES_UTILS_H
 #define IMAGES_UTILS_H
 
-#include "internal/macro/project_macros.h"
+#include <internal/common/axstd/span.h>
+#include <internal/macro/project_macros.h>
 namespace hdr_utils {
 
   /* Disable strict aliasing warning on compilation because those functions need type prunning */
@@ -60,7 +61,7 @@ namespace hdr_utils {
    * The output image is always of format RGBA for simplicity.
    * */
   template<class T>
-  std::vector<uint8_t> hdr2image(const std::vector<T> &rgb, int width, int height, int channels, bool needs_color_correct) {
+  std::vector<uint8_t> hdr2image(const axstd::span<const T> &rgb, int width, int height, int channels, bool needs_color_correct) {
     ASSERT_IS_ARITHMETIC(T);
     AX_ASSERT(rgb.size() == static_cast<unsigned>(width * height * channels), "");
 

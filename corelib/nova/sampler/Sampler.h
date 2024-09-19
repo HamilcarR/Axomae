@@ -1,88 +1,103 @@
 #ifndef SAMPLER_H
 #define SAMPLER_H
-#include "internal/common/math/math_random.h"
-#include "internal/common/math/math_utils.h"
-#include "internal/device/gpgpu/device_utils.h"
-#include "internal/macro/project_macros.h"
-#include "internal/memory/tag_ptr.h"
-
-#include <engine/nova_exception.h>
-#include <memory>
+#include "engine/nova_exception.h"
+#include <internal/common/math/math_random.h>
+#include <internal/common/math/math_utils.h>
+#include <internal/device/gpgpu/device_macros.h>
+#include <internal/device/gpgpu/device_utils.h>
+#include <internal/macro/project_macros.h>
+#include <internal/memory/tag_ptr.h>
 
 #if defined(AXOMAE_USE_CUDA)
-#  include "gpu/GPURandomGenerator.h"
+#  include <internal/common/math/gpu/math_random_gpu.h>
 #endif
 
 namespace nova::sampler {
-
-  using PRandomGenerator = math::random::CPUPseudoRandomGenerator;
-  using QRandomGenerator = math::random::CPUQuasiRandomGenerator;
-#if defined AXOMAE_USE_CUDA
-  using DPRandomGenerator = math::random::GPUPseudoRandomGenerator;
-  using DQRandomGenerator = math::random::GPUQuasiRandomGenerator;
-#else
-  using DPRandomGenerator = PRandomGenerator;
-  using DQRandomGenerator = QRandomGenerator;
-#endif
-
-  template<class T>
+  template<class T = math::random::SobolGenerator>
   class SobolSampler {
+   public:
+    using sample_type = typename T::sample_type;
+    using index_type = typename T::index_type;
+
    private:
-    exception::NovaException exception{};
     T generator;
+    index_type index{0};
+    unsigned dimension_counter{0};
 
    public:
-    CLASS_DCM(SobolSampler)
+    ax_device_callable SobolSampler() = default;
 
     ax_device_callable explicit SobolSampler(const T &generator_) : generator(generator_) {}
-    ax_device_callable ax_no_discard glm::vec3 sample() { return generator.nrand3f(-1, 1); }
-    template<class U>
-    ax_device_callable ax_no_discard glm::vec3 sample(U min, U max) {
-      return generator.nrand3f(min, max);
+
+    ax_device_callable sample_type sample1D() { return generator.generate(index, dimension_counter++); }
+
+    ax_device_callable void sample2D(sample_type out_values[2]) {
+      out_values[0] = sample1D();
+      out_values[1] = sample1D();
     }
-    ax_device_callable ax_no_discard exception::NovaException getErrorState() const { return exception; }
+
+    ax_device_callable void sample3D(sample_type out_values[3]) {
+      out_values[0] = sample1D();
+      out_values[1] = sample1D();
+      out_values[2] = sample1D();
+    }
+
+    ax_device_callable void reset(index_type idx) {
+      dimension_counter = 0;
+      index = idx;
+    }
+
+    ax_device_callable unsigned getDimCounter() const { return dimension_counter; }
+
+    ax_device_callable index_type getIndexCounter() const { return index; }
+
+    ax_device_callable void next1D() { dimension_counter++; }
   };
 
-  template<class T>
-  class RandomSampler {
-    exception::NovaException exception{};
-    T generator;
-
-   public:
-    CLASS_DCM(RandomSampler)
-
-    ax_device_callable explicit RandomSampler(const T &generator_) : generator(generator_) {}
-    ax_device_callable ax_no_discard glm::vec3 sample() { return generator.nrand3f(-1, 1); }
-    template<class U>
-    ax_device_callable ax_no_discard glm::vec3 sample(U min, U max) {
-      return generator.nrand3f(min, max);
-    }
-    ax_device_callable ax_no_discard exception::NovaException getErrorState() const { return exception; }
-  };
-
-  class SamplerInterface : public core::tag_ptr<SobolSampler<QRandomGenerator>,
-                                                SobolSampler<DQRandomGenerator>,
-                                                RandomSampler<PRandomGenerator>,
-                                                RandomSampler<DPRandomGenerator>> {
+  class SamplerInterface : public core::tag_ptr<SobolSampler<math::random::SobolGenerator>> {
    public:
     using tag_ptr::tag_ptr;
 
-    ax_device_callable ax_no_discard exception::NovaException getErrorState() const {
-      auto d = [&](auto ptr) { return ptr->getErrorState(); };
+    /* Always return a random number on [0 , 1) interval.*/
+    ax_device_callable decltype(auto) sample1D() {
+      auto d = [&](auto s) { return s->sample1D(); };
       return dispatch(d);
     }
 
-    ax_device_callable ax_no_discard glm::vec3 sample() {
-      auto d = [&](auto ptr) { return ptr->sample(); };
+    ax_device_callable void sample2D(float out_values[2]) {
+      auto d = [&](auto s) { return s->sample2D(out_values); };
       return dispatch(d);
     }
-    template<class T>
-    ax_device_callable ax_no_discard glm::vec3 sample(T min, T max) {
-      auto d = [&](auto ptr) { return ptr->sample(min, max); };
+
+    ax_device_callable void sample3D(float out_values[3]) {
+      auto d = [&](auto s) { return s->sample3D(out_values); };
       return dispatch(d);
+    }
+
+    ax_device_callable void reset(std::size_t index) {
+      auto d = [&](auto s) { return s->reset(index); };
+      return dispatch(d);
+    }
+
+    ax_device_callable unsigned getDimCounter() const {
+      auto d = [&](auto s) { return s->getDimCounter(); };
+      return dispatch(d);
+    }
+
+    ax_device_callable std::size_t getIndexCounter() const {
+      auto d = [&](auto s) { return s->getIndexCounter(); };
+      return dispatch(d);
+    }
+
+    ax_device_callable void next1D() {
+      auto d = [&](auto d) { d->next1D(); };
+      dispatch(d);
     }
   };
 
-  inline exception::NovaException retrieve_sampler_error(const SamplerInterface &sampler) { return sampler.getErrorState(); }
+  ax_device_callable_inlined nova::exception::NovaException retrieve_sampler_error(const SamplerInterface &sampler) {
+    return nova::exception::NovaException();
+  }
+
 }  // namespace nova::sampler
 #endif  // SAMPLER_H

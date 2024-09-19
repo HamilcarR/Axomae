@@ -6,6 +6,7 @@
 #include <QWidget>
 
 class Mesh;
+class Drawable;
 
 /**
  *@brief structures related to the management of offline renderers resources
@@ -19,11 +20,10 @@ namespace nova_baker_utils {
   };
 
   struct texture_buffers_t {
-    axstd::span<nova::texturing::ImageTexture> image_alloc_buffer;
+    axstd::span<nova::texturing::ImageTexture<uint32_t>> image_alloc_buffer;
   };
 
   struct primitive_buffers_t {
-    axstd::span<nova::shape::Triangle> triangle_alloc_buffer;
     axstd::span<nova::primitive::NovaGeoPrimitive> geo_primitive_alloc_buffer;
   };
 
@@ -54,20 +54,29 @@ namespace nova_baker_utils {
     float far, near, fov;
   };
 
+  struct envmap_memory_s {
+    GLuint equirect_glID;
+    float *raw_data;
+    int width;
+    int height;
+    int channels;
+  };
+
+  struct envmap_data_s {
+    std::vector<envmap_memory_s> env_textures;
+    unsigned current_envmap_id;
+  };
+
   struct scene_transform_data {
     glm::mat4 root_transformation;
     glm::mat4 root_translation;
     glm::mat4 root_rotation;
   };
 
-  struct scene_envmap {
-    image::ImageHolder<float> *hdr_envmap;
-  };
-
   struct engine_data {
+    envmap_data_s environment_maps;
     camera_data camera;
     scene_transform_data scene;
-    scene_envmap envmap;
     const std::vector<Mesh *> *mesh_list;
     int samples_max, samples_increment, aa_samples;
     int depth_max;
@@ -79,23 +88,33 @@ namespace nova_baker_utils {
 
   struct bake_temp_buffers {
     image::ThumbnailImageHolder<float> image_holder;
-    std::vector<float> accumulator;
-    std::vector<float> partial;
-    std::vector<float> depth;
+    axstd::managed_vector<float> accumulator;
+    axstd::managed_vector<float> partial;
+    axstd::managed_vector<float> depth;
+  };
+
+  class WorkerRetAction {
+   public:
+    virtual ~WorkerRetAction() = default;
+    virtual void cleanup() = 0;
   };
 
   struct NovaBakingStructure {
     bake_temp_buffers bake_buffers;
     std::unique_ptr<QWidget> spawned_window;
     render_scene_context render_context;
-    std::thread rendering_thread;
+    std::thread worker_baking_thread;
+    std::future<std::unique_ptr<WorkerRetAction>> on_cleanup;
 
     void reinitialize() {
       auto &nova_resource_manager = render_context.nova_resource_manager;
       if (nova_resource_manager)
         nova_resource_manager->getEngineData().is_rendering = false;
-      if (rendering_thread.joinable())
-        rendering_thread.join();
+      if (on_cleanup.valid()) {
+        auto action = on_cleanup.get();
+        if (action)
+          action->cleanup();
+      }
 
       /* Clear the render buffers. */
       bake_buffers.image_holder.clear();
@@ -108,6 +127,19 @@ namespace nova_baker_utils {
     }
   };
 
+  /* We use this because of the sequence of scene initialization through the renderers :
+   * 1) Retrieve original transformation matrices of each mesh.
+   * 2) Drawables are built first by building the scene in each renderer :
+   * this will introduce the camera + skybox nodes on top of the dependency tree , modifying each mesh transformation
+   * 3) Hence we need the original transformations to reconstruct the scene in Nova as we need the unchanged node transformations.
+   *
+   * Access to drawables gives access to the different VBOs used which we can register using cuda-GL interop.
+   * This is required to reduce the memory footprint of a scene by loading only one set of geometry buffers , and just referencing it.
+   */
+  struct drawable_original_transform {
+    Drawable *mesh;
+    glm::mat4 mesh_original_transformation;
+  };
 }  // namespace nova_baker_utils
 
 #endif  // BAKERENDERDATA_H

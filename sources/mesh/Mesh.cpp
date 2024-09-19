@@ -108,7 +108,6 @@ void Mesh::reset() {
   SceneTreeNode::reset();
   shader_program = nullptr;
   material->clean();
-  geometry.clean();
 }
 
 bool Mesh::isInitialized() const { return mesh_initialized; }
@@ -148,36 +147,10 @@ void Mesh::setDepthFunc(DEPTHFUNC func) { ax_glDepthFunc(func); }
 
 /*****************************************************************************************************************/
 CubeMesh::CubeMesh(SceneTreeNode *parent) : Mesh(parent) {
-  std::vector<float> vertices = {-1, -1, -1,  // 0
-                                 1,  -1, -1,  // 1
-                                 -1, 1,  -1,  // 2
-                                 1,  1,  -1,  // 3
-                                 -1, -1, 1,   // 4
-                                 1,  -1, 1,   // 5
-                                 -1, 1,  1,   // 6
-                                 1,  1,  1};  // 7
-
-  std::vector<unsigned int> indices = {0, 1, 2,  // Front face
-                                       1, 3, 2,  //
-                                       5, 4, 6,  // Back face
-                                       6, 7, 5,  //
-                                       0, 2, 6,  // Left face
-                                       0, 6, 4,  //
-                                       1, 5, 7,  // Right face
-                                       7, 3, 1,  //
-                                       3, 7, 6,  // Up face
-                                       2, 3, 6,  //
-                                       0, 4, 5,  // Down face
-                                       0, 5, 1};
-
-  std::vector<float> textures = {0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1};
-
-  std::vector<float> colors = {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0};
-
-  geometry.indices = indices;
-  geometry.vertices = vertices;
-  geometry.uv = textures;
-  geometry.colors = colors;
+  geometry.indices = axstd::span(indices.data(), indices.size());
+  geometry.vertices = axstd::span(vertices.data(), vertices.size());
+  geometry.uv = axstd::span(textures.data(), textures.size());
+  geometry.colors = axstd::span(colors.data(), colors.size());
   local_transformation = glm::mat4(1.f);
   name = "Generic-Cube";
 }
@@ -220,12 +193,9 @@ glm::mat4 CubeMapMesh::computeFinalTransformation() {
 }
 /*****************************************************************************************************************/
 QuadMesh::QuadMesh(SceneTreeNode *parent) : Mesh(parent) {
-  std::vector<float> vertices = {-1.0f, -1.0f, 0.f, -1.0f, 1.0f, 0.f, 1.0f, 1.0f, 0.f, 1.0f, -1.0f, 0.f};
-  std::vector<unsigned int> indices = {2, 1, 0, 3, 2, 0};
-  std::vector<float> textures = {0, 0, 0, 1, 1, 1, 1, 0};
-  geometry.indices = indices;
-  geometry.vertices = vertices;
-  geometry.uv = textures;
+  geometry.indices = axstd::span(indices.data(), indices.size());
+  geometry.vertices = axstd::span(vertices.data(), vertices.size());
+  geometry.uv = axstd::span(textures.data(), textures.size());
   local_transformation = glm::mat4(1.f);
   name = "Quad";
 }
@@ -268,12 +238,14 @@ BoundingBoxMesh::BoundingBoxMesh(SceneTreeNode *parent) : Mesh(parent) {}
 BoundingBoxMesh::BoundingBoxMesh(Mesh *m, Shader *s) : BoundingBoxMesh(m) {
   shader_program = s;
   name = std::string("Boundingbox-") + m->getMeshName();
-  const std::vector<float> &vertices = m->getGeometry().vertices;
-  bounding_box = geometry::BoundingBox(vertices);
+  const axstd::span<float> &vertex_geometry = m->getGeometry().vertices;
+  bounding_box = geometry::BoundingBox(vertex_geometry);
   material->setShaderPointer(s);
   std::pair<std::vector<float>, std::vector<unsigned>> geom = bounding_box.getVertexArray();
-  geometry.vertices = geom.first;
-  geometry.indices = geom.second;
+  vertices = geom.first;
+  indices = geom.second;
+  geometry.vertices = vertices;
+  geometry.indices = indices;
 }
 
 BoundingBoxMesh::BoundingBoxMesh(Mesh *m, const geometry::BoundingBox &bbox, Shader *s) : BoundingBoxMesh(m) {
@@ -282,8 +254,10 @@ BoundingBoxMesh::BoundingBoxMesh(Mesh *m, const geometry::BoundingBox &bbox, Sha
   bounding_box = bbox;
   material->setShaderPointer(s);
   std::pair<std::vector<float>, std::vector<unsigned>> geom = bounding_box.getVertexArray();
-  geometry.vertices = geom.first;
-  geometry.indices = geom.second;
+  vertices = geom.first;
+  indices = geom.second;
+  geometry.vertices = vertices;
+  geometry.indices = indices;
 }
 
 void BoundingBoxMesh::preRenderSetup() {

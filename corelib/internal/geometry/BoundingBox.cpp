@@ -2,7 +2,13 @@
 #include "internal/macro/project_macros.h"
 using namespace geometry;
 
-glm::vec3 calculateCenter(glm::vec3 min_coords, glm::vec3 max_coords);
+ax_device_callable glm::vec3 calculateCenter(glm::vec3 min_coords, glm::vec3 max_coords) {
+  glm::vec3 center{0.f};
+  center.x = (max_coords.x + min_coords.x) * 0.5f;
+  center.y = (max_coords.y + min_coords.y) * 0.5f;
+  center.z = (max_coords.z + min_coords.z) * 0.5f;
+  return center;
+}
 
 glm::vec3 &update_min(glm::vec3 &min_vec, glm::vec3 &compared) {
   if (compared.x <= min_vec.x)
@@ -24,11 +30,6 @@ glm::vec3 &update_max(glm::vec3 &max_vec, glm::vec3 &compared) {
   return max_vec;
 }
 
-BoundingBox::BoundingBox() {
-  center = glm::vec3(0.f);
-  max_coords = glm::vec3(INT_MIN);
-  min_coords = glm::vec3(INT_MAX);
-}
 BoundingBox::BoundingBox(const float min_coords_[3], const float max_coords_[3]) {
   AX_ASSERT_NOTNULL(min_coords_);
   AX_ASSERT_NOTNULL(max_coords_);
@@ -43,34 +44,7 @@ BoundingBox::BoundingBox(const float min_coords_[3], const float max_coords_[3])
   center = calculateCenter(min_coords, max_coords);
 }
 
-BoundingBox::BoundingBox(const BoundingBox &copy) {
-  max_coords = copy.max_coords;
-  min_coords = copy.min_coords;
-  center = copy.center;
-}
-BoundingBox::BoundingBox(BoundingBox &&move) noexcept {
-  max_coords = move.max_coords;
-  min_coords = move.min_coords;
-  center = move.center;
-}
-BoundingBox &BoundingBox::operator=(const BoundingBox &copy) {
-  if (&copy != this) {
-    max_coords = copy.max_coords;
-    min_coords = copy.min_coords;
-    center = copy.center;
-  }
-  return *this;
-}
-BoundingBox &BoundingBox::operator=(BoundingBox &&move) noexcept {
-  if (&move != this) {
-    max_coords = move.max_coords;
-    min_coords = move.min_coords;
-    center = move.center;
-  }
-  return *this;
-}
-
-BoundingBox::BoundingBox(const glm::vec3 &_min_coords, const glm::vec3 &_max_coords) {
+ax_device_callable BoundingBox::BoundingBox(const glm::vec3 &_min_coords, const glm::vec3 &_max_coords) {
   center = calculateCenter(_min_coords, _max_coords);
   min_coords = _min_coords;
   max_coords = _max_coords;
@@ -79,19 +53,8 @@ BoundingBox::BoundingBox(const std::vector<glm::vec3> &vertices) {
   glm::vec3 min{INT_MAX, INT_MAX, INT_MAX};
   glm::vec3 max{INT_MIN, INT_MIN, INT_MIN};
   for (const auto &elem : vertices) {
-    if (elem.x <= min.x)
-      min.x = elem.x;
-    if (elem.y <= min.y)
-      min.x = elem.x;
-    if (elem.y <= min.y)
-      min.x = elem.y;
-
-    if (elem.x >= max.x)
-      max.x = elem.x;
-    if (elem.y >= max.y)
-      max.x = elem.x;
-    if (elem.y >= max.y)
-      max.x = elem.y;
+    min = glm::min(elem, min);
+    max = glm::max(elem, max);
   }
   min_coords = min;
   max_coords = max;
@@ -102,31 +65,20 @@ BoundingBox::BoundingBox(const std::vector<BoundingBox> &bboxes) {
   glm::vec3 min{INT_MAX, INT_MAX, INT_MAX};
   glm::vec3 max{INT_MIN, INT_MIN, INT_MIN};
   for (const auto &elem : bboxes) {
-    if (elem.min_coords.x <= min.x)
-      min.x = elem.min_coords.x;
-    if (elem.min_coords.y <= min.y)
-      min.x = elem.min_coords.y;
-    if (elem.min_coords.z <= min.z)
-      min.x = elem.min_coords.z;
-
-    if (elem.max_coords.x >= max.x)
-      max.x = elem.max_coords.x;
-    if (elem.max_coords.y >= max.y)
-      max.x = elem.max_coords.y;
-    if (elem.max_coords.z >= max.z)
-      max.x = elem.max_coords.z;
+    min = glm::min(min, elem.min_coords);
+    max = glm::max(max, elem.max_coords);
   }
   min_coords = min;
   max_coords = max;
   center = calculateCenter(min_coords, max_coords);
 }
 
-BoundingBox::BoundingBox(const std::vector<float> &vertices) : BoundingBox() {
-  float x_max, y_max, z_max;
-  float x_min, y_min, z_min;
+ax_device_callable static std::pair<glm::vec3, glm::vec3> compute_min_max(const float *vertices, std::size_t size) {
+  float x_max{}, y_max{}, z_max{};
+  float x_min{}, y_min{}, z_min{};
   x_max = y_max = z_max = INT_MIN;
   x_min = y_min = z_min = INT_MAX;
-  for (unsigned i = 0; i < vertices.size(); i += 3) {
+  for (unsigned i = 0; i < size; i += 3) {
     float x_compare = vertices[i], y_compare = vertices[i + 1], z_compare = vertices[i + 2];
     x_max = x_max <= x_compare ? x_compare : x_max;
     y_max = y_max <= y_compare ? y_compare : y_max;
@@ -135,8 +87,29 @@ BoundingBox::BoundingBox(const std::vector<float> &vertices) : BoundingBox() {
     y_min = y_compare <= y_min ? y_compare : y_min;
     z_min = z_compare <= z_min ? z_compare : z_min;
   }
-  min_coords = {x_min, y_min, z_min};
-  max_coords = {x_max, y_max, z_max};
+  glm::vec3 min{x_min, y_min, z_min};
+  glm::vec3 max{x_max, y_max, z_max};
+  return {min, max};
+}
+
+BoundingBox::BoundingBox(const std::vector<float> &vertices) : BoundingBox() {
+  std::pair<glm::vec3, glm::vec3> min_max = compute_min_max(vertices.data(), vertices.size());
+  min_coords = {min_max.first.x, min_max.first.y, min_max.first.z};
+  max_coords = {min_max.second.x, min_max.second.y, min_max.second.z};
+  center = calculateCenter(min_coords, max_coords);
+}
+
+BoundingBox::BoundingBox(const axstd::span<float> &vertices) : BoundingBox() {
+  std::pair<glm::vec3, glm::vec3> min_max = compute_min_max(vertices.data(), vertices.size());
+  min_coords = {min_max.first.x, min_max.first.y, min_max.first.z};
+  max_coords = {min_max.second.x, max_coords.x, max_coords.y};
+  center = calculateCenter(min_coords, max_coords);
+}
+
+ax_device_callable BoundingBox::BoundingBox(const float *vertices, size_t size) : BoundingBox() {
+  std::pair<glm::vec3, glm::vec3> min_max = compute_min_max(vertices, size);
+  min_coords = {min_max.first.x, min_max.first.y, min_max.first.z};
+  max_coords = {min_max.second.x, min_max.second.y, min_max.second.z};
   center = calculateCenter(min_coords, max_coords);
 }
 
@@ -153,14 +126,6 @@ std::pair<std::vector<float>, std::vector<unsigned>> BoundingBox::getVertexArray
   };
   std::vector<unsigned> indices = {0, 1, 2, 0, 2, 3, 1, 4, 5, 1, 5, 2, 7, 6, 5, 7, 5, 4, 3, 6, 7, 3, 7, 0, 2, 5, 6, 2, 6, 3, 7, 4, 1, 7, 1, 0};
   return {vertices, indices};
-}
-
-glm::vec3 calculateCenter(glm::vec3 min_coords, glm::vec3 max_coords) {
-  glm::vec3 center{0.f};
-  center.x = (max_coords.x + min_coords.x) / 2;
-  center.y = (max_coords.y + min_coords.y) / 2;
-  center.z = (max_coords.z + min_coords.z) / 2;
-  return center;
 }
 
 bool BoundingBox::operator==(const BoundingBox &other) const {
@@ -194,7 +159,7 @@ float BoundingBox::intersect(const glm::vec3 &ray_direction, const glm::vec3 &ra
   return MAXFLOAT;
 }
 
-float BoundingBox::area() const {
+float BoundingBox::halfArea() const {
   const glm::vec3 lwh = max_coords - min_coords;
   return lwh.x * lwh.y + lwh.y * lwh.z + lwh.z * lwh.x;
 }

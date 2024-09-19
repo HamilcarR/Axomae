@@ -1,29 +1,23 @@
 #ifndef RAY_H
 #define RAY_H
-#include "internal/common/math/math_utils.h"
+#include <internal/common/math/math_utils.h>
 
 #include <internal/macro/project_macros.h>
 namespace nova {
   class Ray {
    public:
-    glm::vec3 origin;
-    glm::vec3 direction;
+    glm::vec3 origin{};
+    glm::vec3 direction{};
+    float tnear{0.000001f}, tfar{1e30f};
 
    public:
-    Ray() = default;
-    Ray(const glm::vec3 &origin, const glm::vec3 &direction);
-    explicit Ray(const glm::vec3 &direction);
-    ~Ray() = default;
-    Ray(const Ray &) = default;
-    Ray(Ray &&) = default;
-    Ray &operator=(const Ray &) = default;
-    Ray &operator=(Ray &&) = default;
-
-    ax_no_discard glm::vec3 pointAt(float t) const;
+    CLASS_DCM(Ray)
+    ax_device_callable Ray(const glm::vec3 &o, const glm::vec3 &d) : origin(o), direction(d) {}
+    ax_device_callable explicit Ray(const glm::vec3 &d) : origin(0), direction(d) {}
+    ax_device_callable ax_no_discard glm::vec3 pointAt(float t) const { return origin + t * direction; }
   };
 
-  /* Generalized ray*/
-  class GenRay {};
-
+  /* For AA */
+  class RayDifferential : public Ray {};
 }  // namespace nova
 #endif

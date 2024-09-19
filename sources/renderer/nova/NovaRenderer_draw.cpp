@@ -6,8 +6,10 @@
 #include "NovaRenderer.h"
 #include "bake.h"
 #include "integrator/Integrator.h"
-#include "internal/device/rendering/opengl/GLMutablePixelBufferObject.h"
 #include "manager/NovaResourceManager.h"
+#include <cstring>
+#include <internal/device/rendering/opengl/GLMutablePixelBufferObject.h>
+#include <internal/macro/project_macros.h>
 
 static constexpr int MAX_RECUR_DEPTH = 20;
 static constexpr int MAX_SAMPLES = 10000;
@@ -26,25 +28,22 @@ bool NovaRenderer::prep_draw() {
 }
 
 void NovaRenderer::populateNovaSceneResources() {
-  /*Setup envmap */
-  image::ImageHolder<float> *current_envmap = envmap_manager->currentMutableEnvmapMetadata();
-  nova_baker_utils::scene_envmap env{current_envmap};
-  nova_baker_utils::initialize_environment_texture(env, nova_resource_manager->getEnvmapData());
+  if (!envmap_manager || !nova_resource_manager)
+    return;
+  std::size_t id = envmap_manager->getEnvmapID();
+  nova_resource_manager->getTexturesData().setEnvmapId(id);
 }
 
 void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int channels) {
   float max = 0.f;
-  for (int i = 0; i < height; i++)
-    for (int j = 0; j < width * channels; j++) {
-      int inv_idx = (height - 1 - i) * width * channels + j;
-      int idx = i * width * channels + j;
-      const float old = accumulated_render_buffer[inv_idx] / (current_frame + 1);
-      const float new_ = partial_render_buffer[inv_idx];
-      const float pix = old + 0.8f * (new_ - old);
-      final_render_buffer[idx] = pix;
-      pbo_map[idx] = pix;
-      max = std::max(max, pix);
-    }
+  for (std::size_t idx = 0; idx < height * width * channels; idx++) {
+    const float old = accumulated_render_buffer[idx] / (float)(current_frame + 1);
+    const float new_ = partial_render_buffer[idx];
+    const float pix = old + 0.8f * (new_ - old);
+    final_render_buffer[idx] = pix;
+    pbo_map[idx] = pix;
+    max = std::max(max, pix);
+  }
 }
 
 void NovaRenderer::initializeEngine() {
@@ -93,7 +92,7 @@ void NovaRenderer::draw() {
   engine_render_buffers.accumulator_buffer = accumulated_render_buffer.data();
   engine_render_buffers.partial_buffer = partial_render_buffer.data();
   engine_render_buffers.depth_buffer = depth_buffer.data();
-  engine_render_buffers.byte_size_buffers = screen_size.height * screen_size.width * sizeof(float) * 4;
+  engine_render_buffers.byte_size_color_buffers = screen_size.height * screen_size.width * sizeof(float) * 4;
 
   populateNovaSceneResources();
   if (needRedraw) {

@@ -156,7 +156,7 @@ constexpr const char *type2str(GenericTexture::TYPE type) {
   }
 }
 
-constexpr GenericTexture::TYPE str2type(const char *str) {
+inline GenericTexture::TYPE str2type(const char *str) {
   if (std::strcmp(str, "diffuse_map") == 0) {
     return GenericTexture::DIFFUSE;
   } else if (std::strcmp(str, "normal_map") == 0) {

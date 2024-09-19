@@ -2,7 +2,7 @@ autoload_build_utils()
 
 add_library(ax_core_nova_texturing STATIC
         nova_texturing.cpp
-        NovaTexture.cpp
+        texture_interop_storage.cpp
 )
 target_link_libraries(ax_core_nova_texturing PRIVATE
     ax_core_macro
@@ -17,4 +17,7 @@ target_include_directories(ax_core_nova_texturing PUBLIC
     ${AXOMAE_CORELIB_ROOT}
 )
 
-register_device_compilation(NovaTexture.cpp)
+register_device_compilation(
+        NovaTexture.cpp
+        TextureContext.cpp
+)

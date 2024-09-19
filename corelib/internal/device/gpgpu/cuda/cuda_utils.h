@@ -7,6 +7,7 @@
 #include <cuda/atomic>
 #include <cuda_runtime_api.h>
 #include <curand.h>
+#include <device_launch_parameters.h>
 
 struct kernel_argpack_t {
   dim3 num_blocks{1, 1, 1};
@@ -34,7 +35,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort =
 
 inline void gpuAssert(curandStatus_t code, const char *file, int line, bool abort = true) {
   if (code != CURAND_STATUS_SUCCESS) {
-    std::string err = "CURAND GPU assert :" + code;
+    std::string err = std::string("CURAND GPU assert :") + std::to_string(code);
     LOGS(err + "\n File: " + file + "\n Line: " + std::to_string(line));
     if (abort)
       exit(code);

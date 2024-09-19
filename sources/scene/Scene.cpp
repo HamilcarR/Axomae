@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Drawable.h"
 #include "INodeDatabase.h"
+#include "LightingDatabase.h"
 #include "Shader.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
@@ -38,7 +39,7 @@ inline void setUpIblData(TextureDatabase &texture_database, Mesh *mesh) {}
 static void make_drawable(std::vector<std::unique_ptr<Drawable>> &scene_drawables, std::vector<Scene::AABB> &bounding_boxes, Mesh *A) {
   Scene::AABB bbox_mesh;
   auto drawable = std::make_unique<Drawable>(A);
-  bbox_mesh.aabb = nova::shape::Box(A->getGeometry().vertices);
+  bbox_mesh.aabb = nova::shape::Box(A->getGeometry().vertices.data(), A->getGeometry().vertices.size());
   bbox_mesh.drawable = drawable.get();
   bounding_boxes.push_back(bbox_mesh);
   scene_drawables.push_back(std::move(drawable));
@@ -247,7 +248,7 @@ void Scene::focusOnRenderable(int x, int y) {
     const glm::mat4 inv_world_mat = glm::inverse(world_mat);
     const nova::Ray ray(inv_world_mat * glm::vec4(r.near, 1.f), inv_world_mat * glm::vec4(r.far, 0.f));
     nova::hit_data data{};
-    if (elem.aabb.hit(ray, scene_camera->getNear(), scene_camera->getFar(), data, nullptr)) {
+    if (elem.aabb.hit(ray, scene_camera->getNear(), scene_camera->getFar(), data, {})) {
       glm::vec3 pos = elem.aabb.getPosition();
       const glm::vec3 box_center_worldspace = world_mat * glm::vec4(pos, 1.f);
       scene_camera->focus(box_center_worldspace);
@@ -261,4 +262,12 @@ void Scene::processEvent(const controller::event::Event *event) {
   if (event->flag & Event::EVENT_MOUSE_L_DOUBLE) {
     focusOnRenderable(event->mouse_state.pos_x, event->mouse_state.pos_y);
   }
+}
+
+std::vector<Drawable *> Scene::getDrawables() const {
+  std::vector<Drawable *> to_ret;
+  to_ret.reserve(scene.size());
+  for (const auto &elem : drawable_collection)
+    to_ret.push_back(elem.get());
+  return to_ret;
 }

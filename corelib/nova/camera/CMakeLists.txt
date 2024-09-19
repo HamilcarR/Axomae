@@ -1,6 +1,4 @@
-add_library(ax_core_nova_camera STATIC
-    nova_camera.cpp
-)
+add_library(ax_core_nova_camera STATIC)
 
 
 target_link_libraries(ax_core_nova_camera PRIVATE

@@ -124,6 +124,8 @@ class NovaRenderer final : public IRenderer {
   void setViewerWidget(GLViewer *widget) override;
   void setProgressStatus(const std::string &progress_status);
   void onHideEvent() override;
+  void onShowEvent() override;
+  void updateEnvmap() override;
 };
 
 #endif  // NOVARENDERER_H

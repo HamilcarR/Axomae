@@ -44,7 +44,6 @@ class Scene : public EventInterface {
   std::vector<Mesh *> mesh_collection;
 
  public:
-  const std::vector<Mesh *> &getMeshCollection() const { return mesh_collection; }
   explicit Scene(ResourceDatabaseManager &manager);
   void setScene(const SceneTree &scene_tree, const std::vector<Mesh *> &mesh_list);
   virtual std::vector<Drawable *> getOpaqueElements() const;
@@ -78,7 +77,7 @@ class Scene : public EventInterface {
    * @brief This method sorts the scene according to the meshes transparency ... opaque objects are first , and
    * transparent objects are sorted according to distance.
    */
-  std::vector<Drawable *> getSortedSceneByTransparency();
+  ax_no_discard std::vector<Drawable *> getSortedSceneByTransparency();
   void drawForwardTransparencyMode();
   /**
    * @brief This method draws bounding boxes on the scene meshes.
@@ -93,19 +92,21 @@ class Scene : public EventInterface {
    */
   void setCameraPointer(Camera *_scene_camera);
   void updateTree();
-  std::vector<datastructure::NodeInterface *> getNodeByName(const std::string &name);
   void setPolygonFill();
   void setPolygonPoint();
   void setPolygonWireframe();
   void displayBoundingBoxes(bool display) { display_bbox = display; }
-  const CubeMapMesh &getConstSkybox() const { return *scene_skybox; }
-  CubeMapMesh &getSkybox() const { return *scene_skybox; }
-  const SceneTree &getConstSceneTreeRef() const { return scene_tree; }
-  SceneTree &getSceneTreeRef() { return scene_tree; }
+  ax_no_discard std::vector<datastructure::NodeInterface *> getNodeByName(const std::string &name);
+  ax_no_discard const CubeMapMesh &getConstSkybox() const { return *scene_skybox; }
+  ax_no_discard CubeMapMesh &getSkybox() const { return *scene_skybox; }
+  ax_no_discard const SceneTree &getConstSceneTreeRef() const { return scene_tree; }
+  ax_no_discard SceneTree &getSceneTreeRef() { return scene_tree; }
+  ax_no_discard const std::vector<Mesh *> &getMeshCollection() const { return mesh_collection; }
   /**
    * Returns the addresses of all meshes except the skybox
    */
-  std::vector<Mesh *> getMeshCollectionPtr() const;
+  ax_no_discard std::vector<Mesh *> getMeshCollectionPtr() const;
+  ax_no_discard std::vector<Drawable *> getDrawables() const;
   void switchEnvmap(int cubemap_id, int irradiance_id, int prefiltered_id, int lut_id);
   void processEvent(const controller::event::Event *event) override;
   void focusOnRenderable(int viewport_mouse_coord_x, int viewport_mouse_coord_y);

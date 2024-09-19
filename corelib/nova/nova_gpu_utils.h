@@ -1,13 +1,14 @@
 #ifndef NOVA_GPU_UTILS_H
 #define NOVA_GPU_UTILS_H
 
-#include "internal/common/axstd/span.h"
-#include "internal/device/gpgpu/device_utils.h"
 #include <cstdint>
+#include <internal/common/axstd/span.h>
+#include <internal/common/math/math_random.h>
+#include <internal/device/gpgpu/device_utils.h>
 #include <vector>
 
 #ifdef AXOMAE_USE_CUDA
-#  include "gpu/GPURandomGenerator.h"
+#  include <internal/common/math/gpu/math_random_gpu.h>
 #endif
 
 namespace core::memory {
@@ -33,12 +34,8 @@ namespace nova {
      */
     cache_collection_t contiguous_caches;
 
-    void addSharedCacheAddress(axstd::span<uint8_t> buffer) {
-      contiguous_caches.push_back({false,buffer});
-    }
-    void clear() {
-      contiguous_caches.clear();
-    }
+    void addSharedCacheAddress(axstd::span<uint8_t> buffer) { contiguous_caches.push_back({false, buffer}); }
+    void clear() { contiguous_caches.clear(); }
   };
 }  // namespace nova
 
@@ -49,10 +46,9 @@ namespace nova::gputils {
     unsigned y;
   };
 
-#ifdef AXOMAE_USE_CUDA
+#if defined(AXOMAE_USE_CUDA)
   struct gpu_random_generator_t {
-    math::random::GPUPseudoRandomGenerator xorshift;
-    math::random::GPUQuasiRandomGenerator sobol;
+    math::random::SobolGenerator sobol;
   };
   struct gpu_util_structures_t {
     gpu_random_generator_t random_generator;

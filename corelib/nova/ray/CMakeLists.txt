@@ -1,7 +1,6 @@
 autoload_build_utils()
 
 add_library(ax_core_nova_ray STATIC
-    Ray.cpp
 )
 
 target_link_libraries(ax_core_nova_ray PRIVATE

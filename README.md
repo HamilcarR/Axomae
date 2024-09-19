@@ -1,7 +1,7 @@
 # Axomae
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg) 
 ![Build](https://github.com/HamilcarR/Axomae/actions/workflows/cmake-single-platform.yml/badge.svg)
-
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/HamilcarR/Axomae)
 
 ![final](Documentation/Screenshots/final.jpeg)
 
@@ -11,6 +11,8 @@
 * [Requirements](#Requirements)
 * [Installation](#Installation)
 * [Documentation](#Documentation)
+
+## Introduction
 
 ## Introduction
 
@@ -32,7 +34,7 @@ At the same time, the application is intended to be interactive , and customizab
 * Qt6(Axomae can also build Qt from source , see [Installation](#Installation) for details)
 * OpenGL
 * Glew
-* Cuda(Optional)
+* Cuda 12.x + Optix > 8.0.x (Optional)
 * Any Linux distribution
 
 ## Installation
@@ -73,4 +75,16 @@ $ make
 ## Documentation
 ### Architecture and modules : 
 ![Modules](Documentation/Axomae_modules.png)
-![Architecture](Documentation/Axomae_architecture.png)
+
+### Bibliography : 
+- Multiple-Scattering Microfacet Model for Real-Time Image-based Lighting - Carmelo J.Fdez-Aguera
+- Physically Based Rendering: From Theory To Implementation - Matt Pharr, Wenzel Jakob, and Greg Humphreys
+- Fast Minimum Storage Ray/Triangle Intersection - Thomas Müller , Ben Trumbore
+- Unbiased physically based rendering on the GPU - Dietger van Antwerpen
+- Wide BVH Traversal with a Short Stack - K.Vaidyanathan, S.Woop, C.Benthin
+- A Generalized Ray Formulation For Wave-Optics Rendering - Shlomi Steinberg, Ravi Ramamoorthi, Benedikt Bitterli, Eugene D'Eon, Ling-Qi Yan, Matt Pharr
+- Realtime Ray Tracing on current CPU Architectures - Carsten Benthin
+- ALGORITHM 659 Implementing Sobol’s Quasirandom Sequence Generator - Paul Bratley, Bennett L.Fox
+- Stochastic Generation of (t, s) Sample Sequences - Andrew Helmer, Per Christensen, Andrew Kensler
+- Megakernels Considered Harmful: Wavefront Path Tracing on GPUs - Samuli Laine, Tero Karras, Timo Aila
+- Practical Hash-Based Owen Scrambling - Brent Burley

@@ -9,10 +9,10 @@
 #include "Scene.h"
 #include "TextureProcessing.h"
 #include "event/EventController.h"
-#include "internal/device/rendering/opengl/GLMutablePixelBufferObject.h"
 #include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
 #include "primitive/NovaGeoPrimitive.h"
+#include <internal/device/rendering/opengl/GLMutablePixelBufferObject.h>
 #include <unistd.h>
 
 static std::mutex mutex;
@@ -71,6 +71,17 @@ void NovaRenderer::setProgressStatus(const std::string &status) {
   gl_widget->notifyProgress();
 }
 void NovaRenderer::onHideEvent() { onClose(); }
+
+void NovaRenderer::onShowEvent() {}
+
+void NovaRenderer::updateEnvmap() {
+  if (!envmap_manager || !nova_resource_manager)
+    return;
+  resetToBaseState();
+  nova_baker_utils::envmap_data_s envmap_data;
+  nova_baker_utils::setup_envmaps(*envmap_manager, envmap_data);
+  nova_baker_utils::initialize_environment_maps(envmap_data, nova_resource_manager->getTexturesData());
+}
 
 void NovaRenderer::displayProgress(float current, float target) {
   if (current > target)
@@ -131,7 +142,7 @@ void NovaRenderer::getScreenPixelColor(int x, int y, float r_screen_pixel_color[
 
 ax_no_discard image::ImageHolder<float> NovaRenderer::getSnapshotFloat(int width, int height) const {
   image::ImageHolder<float> img;
-  img.data.resize(width * height * 4);
+  img.data().resize(width * height * 4);
   img.metadata.channels = 4;
   img.metadata.color_corrected = true;
   img.metadata.format = "hdr";
@@ -140,7 +151,7 @@ ax_no_discard image::ImageHolder<float> NovaRenderer::getSnapshotFloat(int width
   img.metadata.is_hdr = true;
   TextureOperations<float> op(final_render_buffer, screen_size.width, screen_size.height, 4);
   auto apply_color_correct = [](const float &channel_component) { return channel_component; };
-  op.processTexture(img.data.data(), width, height, apply_color_correct);
+  op.processTexture(img.data().data(), width, height, apply_color_correct);
   return img;
 }
 ax_no_discard image::ImageHolder<uint8_t> NovaRenderer::getSnapshotUint8(int width, int height) const { AX_UNREACHABLE; }

@@ -37,6 +37,7 @@ class RendererInterface : public EventInterface {
   virtual void draw() = 0;
   virtual void onResize(unsigned int width, unsigned int height) = 0;
   virtual void onHideEvent() = 0;
+  virtual void onShowEvent() = 0;
   virtual void setDefaultFrameBufferId(unsigned id) = 0;
   virtual void onClose() = 0;
   /**
@@ -47,6 +48,7 @@ class RendererInterface : public EventInterface {
   virtual void getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) = 0;
   virtual void prepSceneChange() = 0;
   virtual void setNewScene(const SceneChangeData &new_scene) = 0;
+  virtual void updateEnvmap() = 0;
   ax_no_discard virtual RenderPipeline &getRenderPipeline() const = 0;
   ax_no_discard virtual Scene &getScene() const = 0;
   ax_no_discard virtual const EnvmapTextureManager &getCurrentEnvmapId() const = 0;

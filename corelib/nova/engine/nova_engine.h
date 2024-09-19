@@ -1,21 +1,12 @@
 #ifndef NOVA_ENGINE_H
 #define NOVA_ENGINE_H
-#include "internal/macro/project_macros.h"
+#include "datastructures.h"
+#include "gpu/nova_gpu.h"
 #include "utils/nova_utils.h"
 #include <atomic>
+#include <internal/macro/project_macros.h>
 #include <string>
-
 namespace nova {
-
-  template<class T>
-  struct RenderBuffers {
-    T *accumulator_buffer;
-    T *partial_buffer;
-    size_t byte_size_buffers{};
-    int channels{};
-    T *depth_buffer;
-  };
-  using HdrBufferStruct = RenderBuffers<float>;
 
   namespace engine {
     class EngineResourcesHolder {
@@ -31,7 +22,6 @@ namespace nova {
       std::string threadpool_tag;
       int integrator_flag{};
 
-     public:
       CLASS_CM(EngineResourcesHolder)
     };
   }  // namespace engine

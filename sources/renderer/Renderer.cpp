@@ -132,6 +132,9 @@ void Renderer::draw() {
 }
 
 void Renderer::prepSceneChange() { scene->clear(); }
+
+void Renderer::onShowEvent() { EMPTY_FUNCBODY; }
+
 void Renderer::onHideEvent() { EMPTY_FUNCBODY; }
 
 void Renderer::setNewScene(const SceneChangeData &new_scene) {
@@ -150,6 +153,7 @@ void Renderer::setNewScene(const SceneChangeData &new_scene) {
   start_draw = true;
   shader_database->initializeShaders();
   camera_framebuffer->updateFrameBufferShader();
+  scene->prepare_draw(scene_camera);
 }
 
 ax_no_discard image::ImageHolder<float> Renderer::getSnapshotFloat(int width, int height) const { AX_UNREACHABLE; }
@@ -168,6 +172,9 @@ void Renderer::onResize(unsigned int width, unsigned int height) {
   }
 }
 void Renderer::onClose() {}
+
+/* Not really anything to do here because of how the envmap manager is designed.*/
+void Renderer::updateEnvmap() {}
 
 void Renderer::setGammaValue(float value) {
   if (camera_framebuffer) {

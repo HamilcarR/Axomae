@@ -1,13 +1,13 @@
 #ifndef NOVABAKE_H
 #define NOVABAKE_H
 #include "NovaInterface.h"
-#include "Texture.h"
 #include "bake_render_data.h"
 #include "engine/nova_exception.h"
-#include "internal/common/axstd/span.h"
-
+#include <internal/common/axstd/span.h>
 class Camera;
 class TextureGroup;
+class Drawable;
+class EnvmapTextureManager;
 
 namespace nova {
   class NovaResourceManager;
@@ -15,9 +15,7 @@ namespace nova {
   namespace material {
     class NovaMaterialInterface;
   }
-  namespace texturing {
-    class ImageTexture;
-  }
+
 }  // namespace nova
 
 namespace geometry {
@@ -32,27 +30,10 @@ namespace image {
 }
 namespace nova_baker_utils {
 
-  void setup_geometry_data(primitive_buffers_t &geometry_buffers,
-                           Mesh *mesh,
-                           std::size_t &alloc_offset_primitives,
-                           nova::material::NovaMaterialInterface &material,
-                           nova::NovaResourceManager &manager);
-  nova::material::NovaMaterialInterface setup_material_data(material_buffers_t &material_buffers,
-                                                            texture_buffers_t &texture_buffers,
-                                                            const Mesh *mesh,
-                                                            nova::NovaResourceManager &manager,
-                                                            std::size_t &alloc_offset_textures,
-                                                            std::size_t &alloc_offset_materials);
-  bake_buffers_storage_t build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager);
-  nova::aggregate::Accelerator build_performance_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives);
-  nova::aggregate::Accelerator build_quality_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives);
-  void transform_vertices(const geometry::face_data_tri &tri_primitive, const glm::mat4 &final_transfo, glm::vec3 vertices[3]);
-  void transform_normals(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 normals[3]);
-  void transform_tangents(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 tangents[3]);
-  void transform_bitangents(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 bitangents[3]);
-  void extract_uvs(const geometry::face_data_tri &tri_primitive, glm::vec2 textures[3]);
-  primitive_buffers_t allocate_primitive_triangle_buffers(core::memory::ByteArena &memory_pool, std::size_t number_elements);
-  material_buffers_t allocate_materials_buffers(core::memory::ByteArena &memory_pool, std::size_t number_elements);
+  void build_scene(const std::vector<drawable_original_transform> &drawables, nova::NovaResourceManager &manager);
+  nova::aggregate::DefaultAccelerator build_api_managed_acceleration_structure(nova::aggregate::primitive_aggregate_data_s primitive_geometry);
+  std::unique_ptr<nova::aggregate::DeviceAcceleratorInterface> build_device_managed_acceleration_structure(
+      nova::aggregate::primitive_aggregate_data_s primitive_geometry);
 
   /* Takes an initialized NovaResourceManager.*/
   void bake_scene(render_scene_context &rendering_data);
@@ -63,7 +44,9 @@ namespace nova_baker_utils {
                              nova::scene::SceneTransformations &scene_transform,
                              nova::camera::CameraResourcesHolder &camera_resources_holder);
   void initialize_engine_opts(const engine_data &engine_opts, nova::engine::EngineResourcesHolder &engine_resources_holder);
-  void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureRawData &texture_raw_data);
+  void initialize_environment_maps(const envmap_data_s &envmaps, nova::texturing::TextureResourcesHolder &texture_resources_holder);
+  /* Retrieve all envmaps registered.*/
+  void setup_envmaps(const EnvmapTextureManager &envmap_manager, nova_baker_utils::envmap_data_s &envmap_data);
   void cancel_render(engine_data &data);
   std::unique_ptr<NovaRenderEngineInterface> create_engine(const engine_data &engine_type);
   void synchronize_render_threads(render_scene_context &scene_data, const std::string &tag);

@@ -1,37 +1,90 @@
 #include "nova_texturing.h"
+#include "NovaTextureInterface.h"
 namespace nova::texturing {
 
-  /* returns uv in [0 , 1] interval*/
-  float normalize_uv(float uv) {
-    if (uv < 0) {
-      float float_part = std::ceil(uv) - uv;
-      return 1.f - float_part;
+  void TextureStorage::allocConstant(std::size_t total_cste_tex) {
+    constant_textures.clear();
+    constant_textures.reserve(total_cste_tex);
+  }
+
+  void TextureStorage::allocImage(std::size_t total_img_tex) {
+    image_textures.clear();
+    image_textures.reserve(total_img_tex);
+  }
+
+  void TextureStorage::allocEnvmap(std::size_t total_env_tex) {
+    envmap_textures.clear();
+    envmap_textures.reserve(total_env_tex);
+  }
+
+  EnvMapCollection TextureStorage::envmaps() const { return envmap_textures; }
+  CstTexCollection TextureStorage::constants() const { return constant_textures; }
+  ImgTexCollection TextureStorage::images() const { return image_textures; }
+  IntfTexCollection TextureStorage::pointers() const { return textures; }
+
+  template<class T>
+  static void erase_shared_elements(const axstd::managed_vector<T> &type_collection, axstd::managed_vector<NovaTextureInterface> &interface_vector) {
+    for (const auto &elem : type_collection) {
+      auto iterator = std::find_if(
+          interface_vector.begin(), interface_vector.end(), [&elem](const NovaTextureInterface &interface) { return interface.get() == &elem; });
+      if (iterator != interface_vector.end())
+        interface_vector.erase(iterator);
     }
-    return uv;
   }
 
-  glm::vec3 sample_cubemap(const glm::vec3 &sample_vector, const TextureRawData *res_holder) {
-    AX_ASSERT_NOTNULL(res_holder);
-    AX_ASSERT_NOTNULL(res_holder->raw_data);
-    glm::vec3 normalized = glm::normalize(sample_vector);
-    std::swap(normalized.y, normalized.z);
-    normalized.z = -normalized.z;
-    const glm::vec2 sph = math::spherical::cartesianToSpherical(normalized);
-    const glm::vec2 uv = math::spherical::sphericalToUv(sph);
-    const float u = normalize_uv(uv.x);
-    const float v = normalize_uv(uv.y);
-
-    const int x = (int)math::texture::uvToPixel(u, res_holder->width - 1);
-    const int y = (int)math::texture::uvToPixel(1 - v, res_holder->height - 1);
-
-    int index = (y * res_holder->width + x) * res_holder->channels;
-    AX_ASSERT_LT(index + 2, res_holder->width * res_holder->height * res_holder->channels);
-    const float *data = res_holder->raw_data;
-    return {data[index], data[index + 1], data[index + 2]};
+  void TextureStorage::clearEnvmap() {
+    erase_shared_elements(envmap_textures, textures);
+    envmap_textures.clear();
   }
 
-  glm::vec3 sample_cubemap_plane(const glm::vec3 &sample_vector, const glm::vec3 &up_vector, const TextureRawData *res_holder) {
-    const glm::vec3 same_plane_vector = glm::dot(sample_vector, up_vector) * sample_vector;
-    return sample_cubemap(same_plane_vector, res_holder);
+  void TextureStorage::clearConstant() {
+    erase_shared_elements(constant_textures, textures);
+    constant_textures.clear();
   }
+
+  void TextureStorage::clearImage() {
+    erase_shared_elements(image_textures, textures);
+    image_textures.clear();
+  }
+
+  void TextureStorage::clear() {
+    textures.clear();
+    constant_textures.clear();
+    image_textures.clear();
+    envmap_textures.clear();
+  }
+
+  void TextureResourcesHolder::allocateMeshTextures(const texture_init_record_s &init_data) {
+    texture_storage.allocConstant(init_data.total_constant_textures);
+    texture_storage.allocImage(init_data.total_image_textures);
+  }
+
+  void TextureResourcesHolder::allocateEnvironmentMaps(std::size_t num_envmaps) {
+    EnvMapCollection envmaps = texture_storage.envmaps();
+    for (const EnvmapTexture &elem : envmaps) {
+      std::size_t texture_index = elem.getTextureIndex();
+      texture_raw_data_storage.removeF32(texture_index);
+    }
+    texture_storage.clearEnvmap();
+    texture_storage.allocEnvmap(num_envmaps);
+  }
+
+  NovaTextureInterface TextureResourcesHolder::getEnvmap(unsigned index) const {
+    EnvMapCollection envmaps = texture_storage.envmaps();
+    AX_ASSERT_LT(index, envmaps.size());
+    return &envmaps[index];
+  }
+
+  NovaTextureInterface TextureResourcesHolder::getCurrentEnvmap() const { return getEnvmap(current_environmentmap_index); }
+
+  void TextureResourcesHolder::lockResources() { texture_raw_data_storage.mapResources(); }
+
+  void TextureResourcesHolder::releaseResources() { texture_raw_data_storage.release(); }
+
+  void TextureResourcesHolder::mapBuffers() { texture_raw_data_storage.mapBuffers(); }
+
+  TextureBundleViews TextureResourcesHolder::getTextureBundleViews() const {
+    return TextureBundleViews(texture_raw_data_storage.getU32TexturesViews(), texture_raw_data_storage.getF32TexturesViews());
+  }
+
 }  // namespace nova::texturing

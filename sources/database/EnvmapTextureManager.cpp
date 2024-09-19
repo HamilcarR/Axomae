@@ -63,7 +63,7 @@ static void createBlack(HdrImageDatabase &database) {
   metadata.name = "Black.hdr";
   metadata.width = 256;
   metadata.height = 256;
-  metadata.channels = 3;
+  metadata.channels = 4;
   metadata.color_corrected = true;
   metadata.is_hdr = true;
   std::vector<float> image_data(metadata.width * metadata.height * metadata.channels, 0.f);
@@ -142,7 +142,7 @@ static F32TexData texture_metadata(image::ThumbnailImageHolder<float> *raw_image
   envmap.internal_format = GenericTexture::RGBA32F;
   envmap.data_format = GenericTexture::RGBA;
   envmap.nb_components = raw_image_data->metadata.channels;
-  envmap.data = raw_image_data->data.data();
+  envmap.data = raw_image_data->data().data();
   return envmap;
 }
 
@@ -152,16 +152,22 @@ void EnvmapTextureManager::addToCollection(int index) {
   texture::envmap::EnvmapTextureGroup texgroup{};
   image::ThumbnailImageHolder<float> *raw_image_data = image_database->get(index);
   AX_ASSERT(raw_image_data, "Index returns invalid pointer.");
-  texgroup.equirect_id = index;
+
   texgroup.metadata = raw_image_data;
   TextureData envmap = texture_metadata(raw_image_data);
-  auto result = database::texture::store<EnvironmentMap2DTexture>(*texture_database, false, &envmap);
-  AX_ASSERT_NOTNULL(result.object);
+
+  auto query_equirect = database::texture::store<EnvironmentMap2DTexture>(*texture_database, true, &envmap);
+  AX_ASSERT_NOTNULL(query_equirect.object);
+
   if (!cuda_process) {
     texgroup.cubemap_id = render_pipeline->bakeEnvmapToCubemap(
-        result.object, *skybox_mesh, config.skybox_dim.width, config.skybox_dim.height, screen_dim);
+        query_equirect.object, *skybox_mesh, config.skybox_dim.width, config.skybox_dim.height, screen_dim);
+    texgroup.cubemap_gl_id = texture_database->get(texgroup.cubemap_id)->getSamplerID();
+
     texgroup.irradiance_id = render_pipeline->bakeIrradianceCubemap(
         texgroup.cubemap_id, config.irradiance_dim.width, config.irradiance_dim.height, screen_dim);
+    texgroup.irradiance_gl_id = texture_database->get(texgroup.irradiance_id)->getSamplerID();
+
     texgroup.prefiltered_id = render_pipeline->preFilterEnvmap(texgroup.cubemap_id,
                                                                config.base_env_dim_upscale,
                                                                config.prefilter_dim.width,
@@ -170,10 +176,30 @@ void EnvmapTextureManager::addToCollection(int index) {
                                                                config.base_samples,
                                                                config.sampling_factor_per_mips,
                                                                screen_dim);
+    texgroup.prefiltered_gl_id = texture_database->get(texgroup.prefiltered_id)->getSamplerID();
+
     texture_database->setPersistence(texgroup.cubemap_id);
     texture_database->setPersistence(texgroup.irradiance_id);
     texture_database->setPersistence(texgroup.prefiltered_id);
   }
-  texgroup.lut_id = texture_database->getTexturesByType(GenericTexture::BRDFLUT)[0].id;
+
+  auto query_lut = texture_database->getTexturesByType(GenericTexture::BRDFLUT)[0];
+  AX_ASSERT_NOTNULL(query_lut.object);
+  texgroup.lut_id = query_lut.id;
+  texgroup.lut_gl_id = query_lut.object->getSamplerID();
+
+  texgroup.equirect_id = index;
+  texgroup.equirect_gl_id = query_equirect.object->getSamplerID();
+  texture_database->setPersistence(texgroup.equirect_id);
   bakes_id.push_back(texgroup);
+}
+
+std::size_t EnvmapTextureManager::getEnvmapID() const {
+  std::size_t index = 0;
+  for (const auto &elem : bakes_id) {
+    if (elem.equirect_gl_id == current.equirect_gl_id)
+      return index;
+    index++;
+  }
+  return -1;
 }

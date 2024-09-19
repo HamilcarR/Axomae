@@ -1,14 +1,10 @@
 #ifndef NOVA_CAMERA_H
 #define NOVA_CAMERA_H
-#include "internal/common/math/math_utils.h"
-#include "internal/macro/project_macros.h"
+#include <internal/common/math/math_utils.h>
+#include <internal/macro/project_macros.h>
 namespace nova::camera {
-  class CameraResourcesHolder {
-   public:
-    unsigned int screen_width;
-    unsigned int screen_height;
-    float far, near;
-    float fov;  // In radians
+  struct CameraResourcesHolder {
+
     /*Projection*/
     glm::mat4 P;
     glm::mat4 inv_P;
@@ -18,12 +14,18 @@ namespace nova::camera {
     /* Projection * View*/
     glm::mat4 PV;
     glm::mat4 inv_PV;
+
     glm::vec3 position;
     glm::vec3 up_vector;
     glm::vec3 direction;
 
-   public:
-    CLASS_CM(CameraResourcesHolder)
+    unsigned int screen_width;
+    unsigned int screen_height;
+
+    float far;
+    float near;
+    float fov;  // In radians
   };
+
 }  // namespace nova::camera
 #endif  // NOVA_CAMERA_H

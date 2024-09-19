@@ -1,22 +1,23 @@
 #include "NormalIntegrator.h"
+#include <internal/common/math/math_random.h>
 
 namespace nova::integrator {
 
   void NormalIntegrator::render(RenderBuffers<float> *buffers, Tile &tile, nova_eng_internals &nova_internals) const {
     const NovaResourceManager *nova_resource_manager = nova_internals.resource_manager;
     NovaExceptionManager *nova_exception_manager = nova_internals.exception_manager;
-    auto pseudo_generator = math::random::CPUPseudoRandomGenerator(0xDEADBEEF);
-    sampler::RandomSampler random_sampler = sampler::RandomSampler(pseudo_generator);
-    sampler::SamplerInterface sampler = &random_sampler;
+    math::random::SobolGenerator generator;
+    sampler::SobolSampler sobol_sampler(generator);
+    sampler::SamplerInterface sampler = &sobol_sampler;
     for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
       for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
+        unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().vertical_invert, x, y);
+        sampler.reset(idx);
         validate(sampler, nova_internals);
         if (nova_exception_manager->checkErrorStatus() != exception::NOERR) {
           prepareAbortRender();
           return;
         }
-
-        unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().vertical_invert, x, y);
 
         const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
         if (!nova_resource_manager->getEngineData().is_rendering)
@@ -31,11 +32,15 @@ namespace nova::integrator {
   }
 
   glm::vec4 NormalIntegrator::Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const {
-
     bvh_hit_data hit = bvh_hit(ray, nova_internals);
     if (hit.is_hit) {
       Ray out{};
-      if (!hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, sampler) || depth < 0)
+      material::shading_data_s shading{};
+      texturing::TextureCtx texture_context = nova_internals.resource_manager->getTexturesData().getTextureBundleViews();
+      texturing::texture_data_aggregate_s texture_data;
+      texture_data.texture_ctx = &texture_context;
+      shading.texture_aggregate = &texture_data;
+      if (!hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, sampler, shading) || depth < 0)
         return glm::vec4(0.f);
       glm::vec4 normal = {hit.hit_d.normal, 1.f};
       return normal;

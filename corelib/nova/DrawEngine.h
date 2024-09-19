@@ -24,11 +24,10 @@ namespace nova {
                                       threading::ThreadPool *thread_pool,
                                       nova::nova_eng_internals &nova_internals);
 
-  void gpu_draw(HdrBufferStruct *buffers,
-                unsigned width_resolution,
-                unsigned height_resolution,
-                nova::nova_eng_internals &nova_internals,
-                gputils::gpu_util_structures_t &gpu_structures);
+  struct device_traversal_param_s;
+  struct nova_eng_internals;
+
+  void gpu_draw(const device_traversal_param_s &traversal_params, nova_eng_internals &internals);
 
 }  // namespace nova
 #endif

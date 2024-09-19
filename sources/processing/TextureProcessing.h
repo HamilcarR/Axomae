@@ -2,10 +2,12 @@
 #define OFFLINECUBEMAPPROCESSING_H
 #include "GenericTextureProcessing.h"
 #include "Image.h"
-#include "internal/common/exception/GenericException.h"
-#include "internal/common/math/math_utils.h"
-#include "internal/macro/project_macros.h"
-#include "internal/thread/worker/ThreadPool.h"
+#include <internal/common/axstd/span.h>
+#include <internal/common/exception/GenericException.h>
+#include <internal/common/math/math_utils.h>
+#include <internal/macro/project_macros.h>
+#include <internal/thread/worker/ThreadPool.h>
+#include <type_traits>
 inline bool isDimPowerOfTwo(int dimension) { return (dimension & (dimension - 1)) == 0; }
 inline bool isValidDim(int dimension) { return dimension > 0; }
 
@@ -27,11 +29,14 @@ class TextureNonPowerOfTwoDimensionsException : public exception::GenericExcepti
   TextureNonPowerOfTwoDimensionsException() : GenericException() { saveErrorString("Provided texture has dimensions that are not a power of two."); }
 };
 
+template<class T, class U>
+using is_convertible_u = std::enable_if_t<std::is_convertible_v<T, U>>;
+
 template<class T>
 class TextureOperations {
 
  private:
-  const std::vector<T> *data{};
+  axstd::span<const T> data{};
   unsigned width{};
   unsigned height{};
   unsigned channels{};
@@ -41,7 +46,14 @@ class TextureOperations {
 
  public:
   TextureOperations() = default;
-  TextureOperations(const std::vector<T> &_data, unsigned _width, unsigned _height, unsigned int num_channels = 3);
+  template<class U, typename = is_convertible_u<typename U::value_type, T>>
+  TextureOperations(const U &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels = 3) : data(_data) {
+    if (!isValidDim(_width) || !isValidDim(_height))
+      throw TextureInvalidDimensionsException();
+    width = _width;
+    height = _height;
+    channels = num_channels;
+  }
   ~TextureOperations();
   TextureOperations(const TextureOperations &copy);
   TextureOperations(TextureOperations &&move) noexcept;
@@ -100,16 +112,6 @@ class TextureOperations {
 using HdrEnvmapProcessing = TextureOperations<float>;
 
 template<class T>
-TextureOperations<T>::TextureOperations(const std::vector<T> &_data, const unsigned _width, const unsigned _height, const unsigned int num_channels)
-    : data(&_data) {
-  if (!isValidDim(_width) || !isValidDim(_height))
-    throw TextureInvalidDimensionsException();
-  width = _width;
-  height = _height;
-  channels = num_channels;
-}
-
-template<class T>
 TextureOperations<T>::TextureOperations(const TextureOperations &copy) {
   if (this != &copy) {
     data = copy.data;
@@ -121,7 +123,7 @@ TextureOperations<T>::TextureOperations(const TextureOperations &copy) {
 template<class T>
 TextureOperations<T>::TextureOperations(TextureOperations &&move) noexcept {
   if (this != &move) {
-    data = move.data;
+    data = std::move(move.data);
     width = move.width;
     height = move.height;
     channels = move.channels;
@@ -142,7 +144,7 @@ TextureOperations<T> &TextureOperations<T>::operator=(const TextureOperations &c
 template<class T>
 TextureOperations<T> &TextureOperations<T>::operator=(TextureOperations &&move) noexcept {
   if (this != &move) {
-    data = move.data;
+    data = std::move(move.data);
     width = move.width;
     height = move.height;
     channels = move.channels;
@@ -172,9 +174,9 @@ template<class T>
 glm::vec3 TextureOperations<T>::discreteSample(int x, int y) const {
   const glm::vec2 normalized = wrapAroundPixelCoords(x, y);
   int index = (static_cast<int>(normalized.y) * width + static_cast<int>(normalized.x)) * channels;
-  const float r = (*data)[index];
-  const float g = (*data)[index + 1];
-  const float b = (*data)[index + 2];
+  const float r = data[index];
+  const float g = data[index + 1];
+  const float b = data[index + 2];
   return {r, g, b};
 }
 

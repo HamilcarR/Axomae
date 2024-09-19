@@ -1,9 +1,38 @@
 #ifndef OBJECT3D_H
 #define OBJECT3D_H
-#include "internal/macro/project_macros.h"
-#include <vector>
+#include "glm/gtc/type_ptr.hpp"
+#include <internal/common/axstd/span.h>
+#include <internal/common/math/math_utils.h>
+#include <internal/common/math/utils_3D.h>
+#include <internal/device/gpgpu/device_macros.h>
+#include <internal/device/gpgpu/device_utils.h>
+#include <internal/macro/project_macros.h>
+
+/* Triangle based mesh parameters. Would probably need a renaming.*/
+
+struct vertices_attrb3d_t {
+  glm::vec3 v0;
+  glm::vec3 v1;
+  glm::vec3 v2;
+};
+
+struct vertices_attrb2d_t {
+  glm::vec2 v0;
+  glm::vec2 v1;
+  glm::vec2 v2;
+};
+
+struct edges_t {
+  glm::vec3 e1;
+  glm::vec3 e2;
+};
 
 namespace geometry {
+
+  struct interpolates_s {
+    float v[3], n[3], c[3], uv[2], tan[3], bit[3];
+  };
+
   struct face_data_tri {
     float v0[3], v1[3], v2[3];        // vertices
     float n0[3], n1[3], n2[3];        // normals
@@ -11,9 +40,233 @@ namespace geometry {
     float uv0[2], uv1[2], uv2[2];     // texture coordinates
     float tan0[3], tan1[3], tan2[3];  // tangent
     float bit0[3], bit1[3], bit2[3];  // bitangents
+
+    template<class T>
+    ax_device_callable_inlined static void copy3(T dest[3], const T src[3]) {
+      for (int i = 0; i < 3; i++)
+        dest[i] = src[i];
+    }
+
+    template<class T>
+    ax_device_callable_inlined static void copy2(T dest[2], const T src[2]) {
+      for (int i = 0; i < 2; i++)
+        dest[i] = src[i];
+    }
+
+    // Deep copy of the structure
+    ax_device_callable_inlined void copy(face_data_tri &other) const {
+      copy3(other.v0, v0);
+      copy3(other.v1, v1);
+      copy3(other.v2, v2);
+
+      copy3(other.n0, n0);
+      copy3(other.n1, n1);
+      copy3(other.n2, n2);
+
+      copy3(other.c0, c0);
+      copy3(other.c1, c1);
+      copy3(other.c2, c2);
+
+      copy2(other.uv0, uv0);
+      copy2(other.uv1, uv1);
+      copy2(other.uv2, uv2);
+
+      copy3(other.tan0, tan0);
+      copy3(other.tan1, tan1);
+      copy3(other.tan2, tan2);
+
+      copy3(other.bit0, bit0);
+      copy3(other.bit1, bit1);
+      copy3(other.bit2, bit2);
+    }
+
+    ax_device_callable_inlined interpolates_s lerp(float u, float v) {
+      float w = 1 - u - v;
+      interpolates_s i;
+      for (int k = 0; k < 3; k++)
+        i.v[k] = math::geometry::barycentric_lerp(v0[k], v1[k], v2[k], w, u, v);
+
+      for (int k = 0; k < 3; k++)
+        i.n[k] = math::geometry::barycentric_lerp(n0[k], n1[k], n2[k], w, u, v);
+
+      for (int k = 0; k < 3; k++)
+        i.c[k] = math::geometry::barycentric_lerp(c0[k], c1[k], c2[k], w, u, v);
+
+      for (int k = 0; k < 2; k++)
+        i.uv[k] = math::geometry::barycentric_lerp(uv0[k], uv1[k], uv2[k], w, u, v);
+
+      for (int k = 0; k < 3; k++)
+        i.tan[k] = math::geometry::barycentric_lerp(tan0[k], tan1[k], tan2[k], w, u, v);
+
+      for (int k = 0; k < 3; k++)
+        i.bit[k] = math::geometry::barycentric_lerp(bit0[k], bit1[k], bit2[k], w, u, v);
+
+      return i;
+    }
+
+    ax_device_callable static void transform(const glm::mat4 &transform, float v[3]) {
+      glm::vec3 vect{v[0], v[1], v[2]};
+      vect = transform * glm::vec4(vect, 1.f);
+      v[0] = vect.x;
+      v[1] = vect.y;
+      v[2] = vect.z;
+    }
+
+    ax_device_callable static void transform(const glm::mat3 &transform, float v[3]) {
+      glm::vec3 vect{v[0], v[1], v[2]};
+      vect = transform * vect;
+      v[0] = vect.x;
+      v[1] = vect.y;
+      v[2] = vect.z;
+    }
+
+    /* n_transform is transpose(inverse(transform)) */
+    ax_device_callable_inlined void transform(const glm::mat4 &t, const glm::mat3 &n) {
+
+      // Transform vertices.
+      transform(t, v0);
+      transform(t, v1);
+      transform(t, v2);
+
+      // Transform normals.
+      transform(n, n0);
+      transform(n, n1);
+      transform(n, n2);
+
+      // Transform tangents.
+      transform(n, tan0);
+      transform(n, tan1);
+      transform(n, tan2);
+
+      // Transform bitangents.
+      transform(n, bit0);
+      transform(n, bit1);
+      transform(n, bit2);
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t vertices() const {
+      return vertices_attrb3d_t{glm::vec3(v0[0], v0[1], v0[2]), glm::vec3(v1[0], v1[1], v1[2]), glm::vec3(v2[0], v2[1], v2[2])};
+    }
+
+    ax_device_callable_inlined vertices_attrb2d_t uvs() const {
+      return vertices_attrb2d_t{glm::vec2(uv0[0], uv0[1]), glm::vec2(uv1[0], uv1[1]), glm::vec2(uv2[0], uv2[1])};
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t normals() const {
+      return vertices_attrb3d_t{glm::vec3(n0[0], n0[1], n0[2]), glm::vec3(n1[0], n1[1], n1[2]), glm::vec3(n2[0], n2[1], n2[2])};
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t colors() const {
+      return vertices_attrb3d_t{glm::vec3(c0[0], c0[1], c0[2]), glm::vec3(c1[0], c1[1], c1[2]), glm::vec3(c2[0], c2[1], c2[2])};
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t tangents() const {
+      return vertices_attrb3d_t{glm::vec3(tan0[0], tan0[1], tan0[2]), glm::vec3(tan1[0], tan1[1], tan1[2]), glm::vec3(tan2[0], tan2[1], tan2[2])};
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t bitangents() const {
+      return vertices_attrb3d_t{glm::vec3(bit0[0], bit0[1], bit0[2]), glm::vec3(bit1[0], bit1[1], bit1[2]), glm::vec3(bit2[0], bit2[1], bit2[2])};
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t vertices(const glm::mat4 &transform) const {
+      return vertices_attrb3d_t{transform * glm::vec4(v0[0], v0[1], v0[2], 1.f),
+                                transform * glm::vec4(v1[0], v1[1], v1[2], 1.f),
+                                transform * glm::vec4(v2[0], v2[1], v2[2], 1.f)};
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t normals(const glm::mat3 &transform) const {
+      return vertices_attrb3d_t{
+          transform * glm::vec3(n0[0], n0[1], n0[2]), transform * glm::vec3(n1[0], n1[1], n1[2]), transform * glm::vec3(n2[0], n2[1], n2[2])};
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t tangents(const glm::mat3 &transform) const {
+      return vertices_attrb3d_t{transform * glm::vec3(tan0[0], tan0[1], tan0[2]),
+                                transform * glm::vec3(tan1[0], tan1[1], tan1[2]),
+                                transform * glm::vec3(tan2[0], tan2[1], tan2[2])};
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t bitangents(const glm::mat3 &transform) const {
+      return vertices_attrb3d_t{transform * glm::vec3(bit0[0], bit0[1], bit0[2]),
+                                transform * glm::vec3(bit1[0], bit1[1], bit1[2]),
+                                transform * glm::vec3(bit2[0], bit2[1], bit2[2])};
+    }
+
+    ax_device_callable_inlined glm::vec3 compute_center() {
+      float x = (v0[0] + v1[0] + v2[0]) * 0.333333f;
+      float y = (v0[1] + v1[1] + v2[1]) * 0.333333f;
+      float z = (v0[2] + v1[2] + v2[2]) * 0.333333f;
+      return {x, y, z};
+    }
+
+    ax_device_callable_inlined edges_t compute_edges() {
+      edges_t edges{};
+      edges.e1 = glm::vec3(v1[0], v1[1], v1[2]) - glm::vec3(v0[0], v0[1], v0[2]);
+      edges.e2 = glm::vec3(v2[0], v2[1], v2[2]) - glm::vec3(v0[0], v0[1], v0[2]);
+      return edges;
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t compute_bitangents() {
+      vertices_attrb3d_t bitans{};
+      glm::vec3 n_0 = {n0[0], n0[1], n0[2]};
+      glm::vec3 n_1 = {n1[0], n1[1], n1[2]};
+      glm::vec3 n_2 = {n2[0], n2[1], n2[2]};
+      glm::vec3 tan_0 = {tan0[0], tan0[1], tan0[2]};
+      glm::vec3 tan_1 = {tan1[0], tan1[1], tan1[2]};
+      glm::vec3 tan_2 = {tan2[0], tan2[1], tan2[2]};
+
+      bitans.v0 = glm::normalize(glm::cross(n_0, tan_0));
+      bitans.v1 = glm::normalize(glm::cross(n_1, tan_1));
+      bitans.v2 = glm::normalize(glm::cross(n_2, tan_2));
+
+      return bitans;
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t compute_tangents() {
+      vertices_attrb3d_t tans{};
+      glm::vec3 n_0 = {n0[0], n0[1], n0[2]};
+      glm::vec3 n_1 = {n1[0], n1[1], n1[2]};
+      glm::vec3 n_2 = {n2[0], n2[1], n2[2]};
+      glm::vec3 bitan0 = {bit0[0], bit0[1], bit0[2]};
+      glm::vec3 bitan1 = {bit1[0], bit1[1], bit1[2]};
+      glm::vec3 bitan2 = {bit2[0], bit2[1], bit2[2]};
+
+      tans.v0 = glm::normalize(glm::cross(n_0, bitan0));
+      tans.v1 = glm::normalize(glm::cross(n_1, bitan1));
+      tans.v2 = glm::normalize(glm::cross(n_2, bitan2));
+
+      return tans;
+    }
+
+    ax_device_callable_inlined bool hasValidUvs() const {
+      bool tex0 = uv0[0] != 0 || uv0[1] != 0;
+      bool tex1 = uv1[0] != 0 || uv1[1] != 0;
+      bool tex2 = uv2[0] != 0 || uv2[1] != 0;
+      return tex0 || tex1 || tex2;
+    }
+
+    ax_device_callable_inlined bool hasValidNormals() const {
+      bool nml0 = n0[0] != 0 || n0[1] != 0 || n0[2] != 0;
+      bool nml1 = n1[0] != 0 || n1[1] != 0 || n1[2] != 0;
+      bool nml2 = n2[0] != 0 || n2[1] != 0 || n2[2] != 0;
+      return nml0 || nml1 || nml2;
+    }
+
+    ax_device_callable_inlined bool hasValidTangents() const {
+      bool t0 = tan0[0] != 0 || tan0[1] != 0 || tan0[2] != 0;
+      bool t1 = tan1[0] != 0 || tan1[1] != 0 || tan1[2] != 0;
+      bool t2 = tan2[0] != 0 || tan2[1] != 0 || tan2[2] != 0;
+      return t0 || t1 || t2;
+    }
+
+    ax_device_callable_inlined bool hasValidBitangents() const {
+      bool t0 = bit0[0] != 0 || bit0[1] != 0 || bit0[2] != 0;
+      bool t1 = bit1[0] != 0 || bit1[1] != 0 || bit1[2] != 0;
+      bool t2 = bit2[0] != 0 || bit2[1] != 0 || bit2[2] != 0;
+      return t0 || t1 || t2;
+    }
   };
   template<class T>
-  static void load_vertex_attribute3f(T c0[3], T c1[3], T c2[3], const unsigned idx[3], const std::vector<T> &attribute) {
+  ax_device_callable void load_vertex_attribute3f(T c0[3], T c1[3], T c2[3], const unsigned idx[3], const axstd::span<T> &attribute) {
     if (attribute.empty())
       return;
     for (int i = 0; i < 3; i++) {
@@ -24,7 +277,7 @@ namespace geometry {
   }
 
   template<class T>
-  static void load_vertex_attribute2f(T c0[2], T c1[2], T c2[2], const unsigned idx[3], const std::vector<T> &attribute) {
+  ax_device_callable void load_vertex_attribute2f(T c0[2], T c1[2], T c2[2], const unsigned idx[3], const axstd::span<T> &attribute) {
     if (attribute.empty())
       return;
     for (int i = 0; i < 2; i++) {
@@ -33,32 +286,161 @@ namespace geometry {
       c2[i] = attribute[idx[2] * 2 + i];
     }
   }
+
+  ax_device_callable_inlined void transform_vertices(const face_data_tri &tri_primitive, const glm::mat4 &final_transfo, glm::vec3 vertices[3]) {
+    glm::vec3 v1{tri_primitive.v0[0], tri_primitive.v0[1], tri_primitive.v0[2]};
+    glm::vec3 v2{tri_primitive.v1[0], tri_primitive.v1[1], tri_primitive.v1[2]};
+    glm::vec3 v3{tri_primitive.v2[0], tri_primitive.v2[1], tri_primitive.v2[2]};
+
+    vertices[0] = final_transfo * glm::vec4(v1, 1.f);
+    vertices[1] = final_transfo * glm::vec4(v2, 1.f);
+    vertices[2] = final_transfo * glm::vec4(v3, 1.f);
+  }
+
+  ax_device_callable_inlined void transform_normals(const face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 normals[3]) {
+
+    glm::vec3 n1{tri_primitive.n0[0], tri_primitive.n0[1], tri_primitive.n0[2]};
+    glm::vec3 n2{tri_primitive.n1[0], tri_primitive.n1[1], tri_primitive.n1[2]};
+    glm::vec3 n3{tri_primitive.n2[0], tri_primitive.n2[1], tri_primitive.n2[2]};
+
+    normals[0] = normal_matrix * n1;
+    normals[1] = normal_matrix * n2;
+    normals[2] = normal_matrix * n3;
+  }
+
+  ax_device_callable_inlined void transform_tangents(const face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 tangents[3]) {
+    glm::vec3 t0{tri_primitive.tan0[0], tri_primitive.tan0[1], tri_primitive.tan0[2]};
+    glm::vec3 t1{tri_primitive.tan1[0], tri_primitive.tan1[1], tri_primitive.tan1[2]};
+    glm::vec3 t2{tri_primitive.tan2[0], tri_primitive.tan2[1], tri_primitive.tan2[2]};
+
+    tangents[0] = normal_matrix * t0;
+    tangents[1] = normal_matrix * t1;
+    tangents[2] = normal_matrix * t2;
+  }
+  ax_device_callable_inlined void transform_bitangents(const face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 bitangents[3]) {
+    glm::vec3 b0{tri_primitive.bit0[0], tri_primitive.bit0[1], tri_primitive.bit0[2]};
+    glm::vec3 b1{tri_primitive.bit1[0], tri_primitive.bit1[1], tri_primitive.bit1[2]};
+    glm::vec3 b2{tri_primitive.bit2[0], tri_primitive.bit2[1], tri_primitive.bit2[2]};
+
+    bitangents[0] = normal_matrix * b0;
+    bitangents[1] = normal_matrix * b1;
+    bitangents[2] = normal_matrix * b2;
+  }
+
+  ax_device_callable_inlined void normalize_uv(glm::vec2 &textures) {
+    if (textures.s > 1 || textures.s < 0)
+      textures.s = textures.s - std::floor(textures.s);
+    if (textures.t > 1 || textures.t < 0)
+      textures.t = textures.t - std::floor(textures.t);
+  }
+
+  ax_device_callable_inlined void extract_uvs(const face_data_tri &tri_primitive, glm::vec2 textures[3]) {
+    textures[0] = {tri_primitive.uv0[0], tri_primitive.uv0[1]};
+    textures[1] = {tri_primitive.uv1[0], tri_primitive.uv1[1]};
+    textures[2] = {tri_primitive.uv2[0], tri_primitive.uv2[1]};
+    normalize_uv(textures[0]);
+    normalize_uv(textures[1]);
+    normalize_uv(textures[2]);
+  }
+
+  ax_device_callable_inlined void transform_attr(vertices_attrb3d_t &attr, const glm::mat4 &matrix) {
+    attr.v0 = matrix * glm::vec4(attr.v0, 1.f);
+    attr.v1 = matrix * glm::vec4(attr.v1, 1.f);
+    attr.v2 = matrix * glm::vec4(attr.v2, 1.f);
+  }
+
+  ax_device_callable_inlined void transform_attr(vertices_attrb3d_t &attr, const glm::mat3 &matrix) {
+    attr.v0 = matrix * attr.v0;
+    attr.v1 = matrix * attr.v1;
+    attr.v2 = matrix * attr.v2;
+  }
+
+  ax_device_callable_inlined edges_t compute_edges(const vertices_attrb3d_t &vertices) {
+    edges_t edges{};
+    edges.e1 = vertices.v1 - vertices.v0;
+    edges.e2 = vertices.v2 - vertices.v0;
+    return edges;
+  }
 }  // namespace geometry
 
-/* Contains vertices data (a lot) */
+// TODO: Triangle mesh , replace name
 class Object3D {
- public:
-  std::vector<float> vertices;       /*<Vertices array*/
-  std::vector<float> uv;             /*<UV arrays of dimension 2*/
-  std::vector<float> colors;         /*<Colors array , Format is RGB*/
-  std::vector<float> normals;        /*<Normals of the geometry*/
-  std::vector<float> bitangents;     /*<Bitangent of each vertex*/
-  std::vector<float> tangents;       /*<Tangent of each vertex*/
-  std::vector<unsigned int> indices; /*<Indices of the vertices buffer*/
+  // Requires geom argument to be filled with needed normal vectors to compute resulting tangents and bitangents.
+  ax_device_callable_inlined void compute_missing_vectors(geometry::face_data_tri &geom) const {
+    if (bitangents.empty()) {
+      vertices_attrb3d_t bit = geom.compute_bitangents();
+      for (int i = 0; i < 3; i++) {
+        geom.bit0[i] = glm::value_ptr(bit.v0)[i];
+        geom.bit1[i] = glm::value_ptr(bit.v1)[i];
+        geom.bit2[i] = glm::value_ptr(bit.v2)[i];
+      }
+    } else if (tangents.empty()) {
+      vertices_attrb3d_t tan = geom.compute_tangents();
+      for (int i = 0; i < 3; i++) {
+        geom.tan0[i] = glm::value_ptr(tan.v0)[i];
+        geom.tan1[i] = glm::value_ptr(tan.v1)[i];
+        geom.tan2[i] = glm::value_ptr(tan.v2)[i];
+      }
+    }
+  }
 
  public:
-  CLASS_CM(Object3D)
+  axstd::span<float> vertices{};
+  axstd::span<float> uv{};
+  axstd::span<float> colors{};
+  axstd::span<float> normals{};
+  axstd::span<float> bitangents{};
+  axstd::span<float> tangents{};
+  axstd::span<unsigned> indices{};
 
-  void get_tri(geometry::face_data_tri &geom, const unsigned int indices[3]) const;
+  constexpr static int face_stride = 3;
 
-  void clean() {
-    vertices.clear();
-    uv.clear();
-    colors.clear();
-    normals.clear();
-    bitangents.clear();
-    tangents.clear();
-    indices.clear();
+  ax_device_callable_inlined void getTri(geometry::face_data_tri &geom, const unsigned int idx[3], bool compute_missing_attr = true) const {
+    for (int i = 0; i < 3; i++) {
+      if (!vertices.empty()) {
+        geom.v0[i] = vertices[idx[0] * face_stride + i];
+        geom.v1[i] = vertices[idx[1] * face_stride + i];
+        geom.v2[i] = vertices[idx[2] * face_stride + i];
+      }
+      if (!normals.empty()) {
+        geom.n0[i] = normals[idx[0] * face_stride + i];
+        geom.n1[i] = normals[idx[1] * face_stride + i];
+        geom.n2[i] = normals[idx[2] * face_stride + i];
+      }
+      if (!colors.empty()) {
+        geom.c0[i] = colors[idx[0] * face_stride + i];
+        geom.c1[i] = colors[idx[1] * face_stride + i];
+        geom.c2[i] = colors[idx[2] * face_stride + i];
+      }
+      if (!tangents.empty()) {
+        geom.tan0[i] = tangents[idx[0] * face_stride + i];
+        geom.tan1[i] = tangents[idx[1] * face_stride + i];
+        geom.tan2[i] = tangents[idx[2] * face_stride + i];
+      }
+      if (!bitangents.empty()) {
+        geom.bit0[i] = bitangents[idx[0] * face_stride + i];
+        geom.bit1[i] = bitangents[idx[1] * face_stride + i];
+        geom.bit2[i] = bitangents[idx[2] * face_stride + i];
+      }
+    }
+    if (!uv.empty()) {
+      for (int i = 0; i < 2; i++) {
+        geom.uv0[i] = uv[idx[0] * 2 + i];
+        geom.uv1[i] = uv[idx[1] * 2 + i];
+        geom.uv2[i] = uv[idx[2] * 2 + i];
+      }
+    }
+
+    if (compute_missing_attr)
+      compute_missing_vectors(geom);
+  }
+
+  ax_device_callable geometry::face_data_tri getFace(std::size_t triangle_id) const {
+    geometry::face_data_tri tri_primitive{};
+    AX_ASSERT_FALSE(indices.empty());
+    unsigned idx[3] = {indices[triangle_id], indices[triangle_id + 1], indices[triangle_id + 2]};
+    getTri(tri_primitive, idx);
+    return tri_primitive;
   }
 };
 

@@ -3,10 +3,10 @@ name: Build and Tests
 on:
   push:
     branches:
-    - "Feature-CI_CD"
+    - "Build_Test_Deployment"
     - "master"
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master" , "Build_Test_Deployment"]
 
 env:
   BUILD_TYPE: RelWithDebInfo
@@ -19,16 +19,20 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Axomae dependencies
-      run: |
-        cd ${{github.workspace}} && ./scripts/update_deps.sh
-
     - name: Install OpenGL and GLEW
       run: |
         sudo apt-get install -y libgl1-mesa-dev libglew-dev
 
+    - name: Install libxext-dev
+      run: |
+        sudo apt-get install -y libxext-dev
+
+    - name: Install Axomae dependencies
+      run: |
+        cd ${{github.workspace}} && ./scripts/update_deps.sh
+
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/../build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DAXOMAE_BUILD_TESTS:BOOL=${{env.BUILD_TESTS}} -DAXOMAE_LUT_MEDIUMP:BOOL=ON -DAXOMAE_FROMSOURCE_QT_BUILD=ON
+      run: cmake -B ${{github.workspace}}/../build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DAXOMAE_BUILD_TESTS:BOOL=${{env.BUILD_TESTS}} -DAXOMAE_LUT_MEDIUMP:BOOL=ON -DAXOMAE_FROMSOURCE_QT_BUILD=ON -DAXOMAE_USE_EMBREE=OFF
 
     - name: Build
       run: cmake --build ${{github.workspace}}/../build --config ${{env.BUILD_TYPE}}

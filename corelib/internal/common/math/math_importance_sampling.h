@@ -1,7 +1,7 @@
 #ifndef MATH_IMPORTANCE_SAMPLING_H
 #define MATH_IMPORTANCE_SAMPLING_H
-#include <glm/common.hpp>
-#include <glm/glm.hpp>
+#include "math_includes.h"
+
 
 namespace math::importance_sampling {
   inline glm::vec3 pgc3d(unsigned x, unsigned y, unsigned z) {

@@ -11,6 +11,11 @@ target_link_libraries(ax_core_nova_engine PRIVATE
         ax_core_macro
         ax_core_device
         ax_core_memory
+PUBLIC
+        ax_core_nova_primitive
+        ax_core_nova_texturing
+        ax_core_nova_shape
+
 )
 target_link_libraries(ax_core_nova PUBLIC ax_core_nova_engine)
 

@@ -1,6 +1,8 @@
 Ninja (only for building QT6 from source)
 QT6
-GCC (version depends on desired cuda version if gpgpu used)
+GCC (Check the maximum supported version on cuda specifications doc) / Clang
 Opengl
 Glew
-Cuda (if AXOMAE_USE_CUDA set to ON)
+Cuda 12.x + Optix > 8.0.0 (if AXOMAE_USE_CUDA set to ON) 
+binutils
+TBB (if using embree)

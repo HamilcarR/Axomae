@@ -1,7 +1,8 @@
 #ifndef RGBDISPLAYERLABEL_H
 #define RGBDISPLAYERLABEL_H
-#include "internal/common/image/Rgb.h"
 #include <QLabel>
+#include <internal/common/image/Rgb.h>
+#include <internal/common/math/vector/Vector.h>
 
 namespace editor {
   class RgbDisplayerLabel : public QLabel {
@@ -9,6 +10,8 @@ namespace editor {
     struct DisplayInfo {
       image::Rgb texture_color_value;
       std::string rgb_display_text;
+      Vec2ui pixel_position;
+      Vec2f pixel_uv;
     };
 
    private:
@@ -17,8 +20,8 @@ namespace editor {
 
    public:
     explicit RgbDisplayerLabel(QWidget *parent = nullptr);
-    void updateLabel(const float rgb[4], bool normalize = false);
-    void updateLabel(const uint8_t rgb[4]);
+    void updateLabel(const float rgb[4], uint32_t pixel_x, uint32_t pixel_y, unsigned image_width, unsigned image_height, bool normalize = false);
+    void updateLabel(const uint8_t rgb[4], uint32_t pixel_x, uint32_t pixel_y, unsigned image_width, unsigned image_height);
 
    protected:
     void paintEvent(QPaintEvent *event) override;

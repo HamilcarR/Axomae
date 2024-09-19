@@ -1,4 +1,5 @@
 #include "DepthIntegrator.h"
+#include <internal/common/math/math_random.h>
 
 namespace nova::integrator {
 
@@ -13,21 +14,20 @@ namespace nova::integrator {
     float near = camera.near;
     float far = camera.far;
 
-    auto pseudo_generator = math::random::CPUPseudoRandomGenerator(0xDEADBEEF);
-    sampler::RandomSampler random_sampler = sampler::RandomSampler(pseudo_generator);
+    math::random::SobolGenerator generator;
+    sampler::SobolSampler random_sampler(generator);
     sampler::SamplerInterface sampler = &random_sampler;
     const scene::SceneTransformations &scene_transformations = nova_resource_manager->getSceneTransformation();
 
     for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
       for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
-
+        unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().vertical_invert, x, y);
+        sampler.reset(idx);
         validate(sampler, nova_internals);
         if (nova_exception_manager->checkErrorStatus() != exception::NOERR) {
           prepareAbortRender();
           return;
         }
-
-        unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().vertical_invert, x, y);
 
         const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
         if (!nova_resource_manager->getEngineData().is_rendering)

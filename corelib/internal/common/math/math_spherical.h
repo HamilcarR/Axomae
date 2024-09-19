@@ -1,9 +1,9 @@
 #ifndef MATH_SPHERICAL_H
 #define MATH_SPHERICAL_H
-#include "math_random.h"
+
+#include "math_random_interface.h"
 #include "math_utils_approx.h"
-#include <glm/common.hpp>
-#include <glm/glm.hpp>
+#include <internal/device/gpgpu/device_utils.h>
 
 constexpr double PI = M_PI;
 constexpr double INV_PI = 1.f / PI;
@@ -13,41 +13,45 @@ namespace math::spherical {
   float acos_lt(float a);
 
   template<class T>
-  inline glm::dvec2 uvToSpherical(const T &u, const T &v) {
+  ax_device_callable_inlined glm::vec2 uvToSpherical(const T &u, const T &v) {
     const T phi = 2 * PI * u;
     const T theta = PI * v;
-    return glm::dvec2(phi, theta);
+    return glm::vec2(phi, theta);
   }
 
-  inline glm::dvec2 uvToSpherical(const glm::dvec2 &uv) { return uvToSpherical(uv.x, uv.y); }
+  ax_device_callable_inlined glm::vec2 uvToSpherical(const glm::vec2 &uv) { return uvToSpherical(uv.x, uv.y); }
 
   template<class T>
-  inline glm::dvec2 sphericalToUv(const T &phi, const T &theta) {
-    const T u = phi / (2 * PI);
-    const T v = theta / PI;
+  ax_device_callable glm::vec2 sphericalToUv(const T &phi, const T &theta) {
+    const T u = phi * INV_2PI;
+    const T v = theta * INV_PI;
     return {u, v};
   }
 
-  inline glm::dvec2 sphericalToUv(const glm::dvec2 &sph) { return sphericalToUv(sph.x, sph.y); }
+  ax_device_callable_inlined glm::vec2 sphericalToUv(const glm::vec2 &sph) { return sphericalToUv(sph.x, sph.y); }
 
   template<class T>
-  inline glm::dvec3 sphericalToCartesian(const T &phi, const T &theta) {
+  ax_device_callable_inlined glm::vec3 sphericalToCartesian(const T &phi, const T &theta) {
     const T z = cos(theta);
     const T x = sin(theta) * cos(phi);
     const T y = sin(theta) * sin(phi);
-    return glm::dvec3(x, y, z);
+    return glm::vec3(x, y, z);
   }
 
-  inline glm::dvec3 sphericalToCartesian(const glm::dvec2 &sph) { return sphericalToCartesian(sph.x, sph.y); }
+  ax_device_callable_inlined glm::vec3 sphericalToCartesian(const glm::vec2 &sph) { return sphericalToCartesian(sph.x, sph.y); }
 
   template<class T>
-  inline glm::dvec2 cartesianToSpherical(const T &x, const T &y, const T &z, bool fast_approx = true) {
-    const T theta = fast_approx ? acos_lt(z) : std::acos(z);
+  ax_device_callable_inlined glm::vec2 cartesianToSpherical(const T &x, const T &y, const T &z, bool fast_approx = true) {
     const T phi = fast_approx ? atan2_approx(y, x) : atan2f(y, x);
+#ifdef __CUDA_ARCH__
+    const T theta = acos_as_approx((float)z);
+#else
+    const T theta = fast_approx ? acos_lt(z) : std::acos(z);
+#endif
     return {phi, theta};
   }
 
-  inline glm::dvec2 cartesianToSpherical(const glm::dvec3 &xyz, bool fast_approx = true) {
+  ax_device_callable_inlined glm::vec2 cartesianToSpherical(const glm::vec3 &xyz, bool fast_approx = true) {
     return cartesianToSpherical(xyz.x, xyz.y, xyz.z, fast_approx);
   }
 
@@ -57,19 +61,19 @@ namespace math::spherical {
     float roll;
   };
 
-  inline SphAxis cartesianToSphericalAxis(const glm::dvec3 &xyz) {
+  ax_device_callable_inlined SphAxis cartesianToSphericalAxis(const glm::vec3 &xyz) {
     return {atan2_approx(-xyz.x, -xyz.z), (float)std::asin(xyz.y / glm::length(xyz)), 0.f};
   }
 
   template<class T>
-  glm::vec3 rand_p_hemisphere(random::AbstractRandomGenerator<T> &generator) {
+  ax_device_callable_inlined glm::vec3 rand_p_hemisphere(random::AbstractRandomGenerator<T> &generator) {
     float phi = generator.nrandf(0.f, 2 * PI);
     float theta = generator.nrandf(0.f, PI * 0.5f);
-    return glm::normalize(math::spherical::sphericalToCartesian(phi, theta));
+    return normalize(sphericalToCartesian(phi, theta));
   }
 
   template<class T>
-  glm::vec3 rand_p_sphere(random::AbstractRandomGenerator<T> &generator) {
+  ax_device_callable_inlined glm::vec3 rand_p_sphere(random::AbstractRandomGenerator<T> &generator) {
     glm::vec3 p;
     do {
       float x = generator.nrandf(0, 1);

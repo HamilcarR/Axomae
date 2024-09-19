@@ -1,11 +1,15 @@
-#include "MaterialInterface.h"
+#include "Drawable.h"
+#include "EnvmapTextureManager.h"
 #include "Mesh.h"
-#include "TextureGroup.h"
+#include "aggregate/acceleration_interface.h"
 #include "bake.h"
-#include "internal/common/axstd/span.h"
-#include "internal/macro/project_macros.h"
+#include "extract_scene_internal.h"
 #include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
+#include "nova/bake_render_data.h"
+#include "shape/nova_shape.h"
+#include <internal/common/axstd/span.h>
+
 namespace nova_baker_utils {
 
   static std::size_t compute_primitive_number(const std::vector<Mesh *> &meshes, int indices_padding = 3) {
@@ -19,11 +23,9 @@ namespace nova_baker_utils {
   }
 
   primitive_buffers_t allocate_primitive_triangle_buffers(core::memory::ByteArena &memory_pool, std::size_t primitive_number) {
-    auto *triangle_buffer = memory_pool.construct<nova::shape::Triangle>(primitive_number, false, "Triangle buffer");
     auto *primitive_buffer = memory_pool.construct<nova::primitive::NovaGeoPrimitive>(primitive_number, false, "Primitive buffer");
     primitive_buffers_t geometry_buffers{};
     geometry_buffers.geo_primitive_alloc_buffer = axstd::span<nova::primitive::NovaGeoPrimitive>(primitive_buffer, primitive_number);
-    geometry_buffers.triangle_alloc_buffer = axstd::span<nova::shape::Triangle>(triangle_buffer, primitive_number);
     return geometry_buffers;
   }
 
@@ -37,43 +39,112 @@ namespace nova_baker_utils {
     return memory_arena.allocate(sizeof(T) * num_textures, "", alignment);
   }
 
-  bake_buffers_storage_t build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager) {
-    core::memory::ByteArena &memory_pool = manager.getMemoryPool();
+  static std::vector<Mesh *> retrieve_meshes_from_drawables(const std::vector<drawable_original_transform> &drawables) {
+    std::vector<Mesh *> meshes;
+    meshes.reserve(drawables.size());
+    for (const auto &elem : drawables)
+      meshes.push_back(elem.mesh->getMeshPointer());
+    return meshes;
+  }
 
+  struct resource_holders_inits_s {
+    std::size_t triangle_mesh_number;
+    std::size_t triangle_number;
+
+    std::size_t dielectrics_number;
+    std::size_t diffuse_number;
+    std::size_t conductors_number;
+
+    std::size_t image_texture_number;
+    std::size_t constant_texture_number;
+    std::size_t hdr_texture_number;
+  };
+
+  static void initialize_resources_holders(nova::NovaResourceManager &manager, const resource_holders_inits_s &resrc) {
+    nova::shape::shape_init_record_s shape_init_data{};
+    shape_init_data.total_triangle_meshes = resrc.triangle_mesh_number;
+    shape_init_data.total_triangles = resrc.triangle_number;
+    auto &shape_reshdr = manager.getShapeData();
+    shape_reshdr.init(shape_init_data);
+
+    nova::primitive::primitive_init_record_s primitive_init_data{};
+    primitive_init_data.geometric_primitive_count = resrc.triangle_number;
+    primitive_init_data.total_primitive_count = primitive_init_data.geometric_primitive_count;
+    auto &primitive_reshdr = manager.getPrimitiveData();
+    primitive_reshdr.init(primitive_init_data);
+
+    nova::material::material_init_record_s material_init_data{};
+    material_init_data.conductors_size = resrc.conductors_number;
+    material_init_data.dielectrics_size = resrc.dielectrics_number;
+    material_init_data.diffuse_size = resrc.diffuse_number;
+    auto &material_resrc = manager.getMaterialData();
+    material_resrc.init(material_init_data);
+
+    nova::texturing::texture_init_record_s texture_init_data{};
+    texture_init_data.total_constant_textures = resrc.constant_texture_number;
+    texture_init_data.total_image_textures = resrc.image_texture_number;
+    auto &texture_resrc = manager.getTexturesData();
+    texture_resrc.allocateMeshTextures(texture_init_data);
+  }
+
+  void setup_envmaps(const EnvmapTextureManager &envmap_manager, nova_baker_utils::envmap_data_s &envmap_data) {
+    axstd::span<const texture::envmap::EnvmapTextureGroup> baked_envmaps = envmap_manager.getBakesViews();
+    nova_baker_utils::envmap_data_s envmap_infos;
+    std::vector<nova_baker_utils::envmap_memory_s> &envmap_data_collection = envmap_infos.env_textures;
+    unsigned current_envmap_id = 0;
+    auto gl_equi2D_id = envmap_manager.getCurrentEnvmapGroup().equirect_gl_id;
+    for (const auto &envmap : baked_envmaps) {
+      nova_baker_utils::envmap_memory_s data{};
+      data.equirect_glID = envmap.equirect_gl_id;
+      if (data.equirect_glID == gl_equi2D_id)
+        envmap_infos.current_envmap_id = current_envmap_id;
+      AX_ASSERT_NOTNULL(envmap.metadata);
+      data.width = envmap.metadata->metadata.width;
+      data.height = envmap.metadata->metadata.height;
+      data.raw_data = envmap.metadata->data().data();
+      data.channels = envmap.metadata->metadata.channels;
+      envmap_data_collection.push_back(data);
+      current_envmap_id++;
+    }
+    envmap_data = envmap_infos;
+  }
+
+  void build_scene(const std::vector<drawable_original_transform> &drawables_orig_transfo, nova::NovaResourceManager &manager) {
+    core::memory::ByteArena &memory_pool = manager.getMemoryPool();
+    std::vector<Mesh *> meshes = retrieve_meshes_from_drawables(drawables_orig_transfo);
     /* Allocate for triangles */
     std::size_t primitive_number = compute_primitive_number(meshes);
     primitive_buffers_t primitive_buffers = allocate_primitive_triangle_buffers(memory_pool, primitive_number);
 
-    /* Allocate one singular contiguous buffer of ImageTexture objects*/
-    auto *image_texture_buffer = reinterpret_cast<nova::texturing::ImageTexture *>(
-        memory_pool.allocate(PBR_PIPELINE_TEX_NUM * meshes.size() * sizeof(nova::texturing::ImageTexture), "ImageTexture buffer"));
-    texture_buffers_t texture_buffers{};
-    texture_buffers.image_alloc_buffer = axstd::span<nova::texturing::ImageTexture>(image_texture_buffer, PBR_PIPELINE_TEX_NUM * meshes.size());
-    material_buffers_t material_buffers = allocate_materials_buffers(manager.getMemoryPool(), meshes.size());
-    std::size_t alloc_offset_primitives = 0, alloc_offset_materials = 0, alloc_offset_textures = 0;
+    resource_holders_inits_s resrc{};
+    resrc.triangle_mesh_number = meshes.size();
+    resrc.triangle_number = primitive_number;
+    resrc.conductors_number = meshes.size();
+    resrc.diffuse_number = meshes.size();
+    resrc.dielectrics_number = meshes.size();
+    resrc.image_texture_number = meshes.size() * PBR_PIPELINE_TEX_NUM;
+    resrc.hdr_texture_number = 1;  // At least 1 for Environment map.
+    initialize_resources_holders(manager, resrc);
 
-    for (const auto &elem : meshes) {
-      nova::material::NovaMaterialInterface material = setup_material_data(
-          material_buffers, texture_buffers, elem, manager, alloc_offset_textures, alloc_offset_materials);
-      setup_geometry_data(primitive_buffers, elem, alloc_offset_primitives, material, manager);
+    std::size_t mesh_index = 0;
+    for (const drawable_original_transform &dtf : drawables_orig_transfo) {
+      nova::material::NovaMaterialInterface material = setup_material_data(*dtf.mesh, manager);
+      setup_geometry_data(dtf, material, manager, mesh_index);
+      mesh_index++;
     }
-    bake_buffers_storage_t bake_buffers_storage{};
-    bake_buffers_storage.material_buffers = material_buffers;
-    bake_buffers_storage.primitive_buffers = primitive_buffers;
-    bake_buffers_storage.texture_buffers = texture_buffers;
-    return bake_buffers_storage;
   }
 
-  nova::aggregate::Accelerator build_performance_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives) {
-    nova::aggregate::Accelerator accelerator{};
-    accelerator.buildBVH(primitives);
-    return accelerator;
+  nova::aggregate::DefaultAccelerator build_api_managed_acceleration_structure(nova::aggregate::primitive_aggregate_data_s primitive_geometry) {
+    nova::aggregate::DefaultAccelerator acceleration;
+    acceleration.build(primitive_geometry);
+    return acceleration;
   }
 
-  nova::aggregate::Accelerator build_quality_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives) {
-    nova::aggregate::Accelerator accelerator{};
-    accelerator.buildBVH(primitives);
-    return accelerator;
-  }
+  std::unique_ptr<nova::aggregate::DeviceAcceleratorInterface> build_device_managed_acceleration_structure(
+      nova::aggregate::primitive_aggregate_data_s primitive_geometry) {
+    auto device_builder = nova::aggregate::DeviceAcceleratorInterface::make();
+    device_builder->build(primitive_geometry);
+    return device_builder;
+  };
 
 }  // namespace nova_baker_utils

@@ -44,3 +44,9 @@ Ressources/Skybox_Textures/HDR/Sky/Sky.hdr
 Ressources/Skybox_Textures/HDR/Snow/Snow.hdr
 Ressources/Skybox_Textures/HDR/Street/Street.hdr
 moc/*
+.cache/*
+.idea/*
+.vscode/*
+.venv/*
+.sessions/*
+compile_commands.json

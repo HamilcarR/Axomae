@@ -20,6 +20,7 @@ class GLIndexBufferObject : public DeviceBaseBufferInterface {
   void unbind() override;
   void clean() override;
   void fill(const unsigned *buffer, size_t number_elements, DRAW_MODE mode);
+  GLuint getID() const { return id; }
 };
 
 #endif  // GLINDEXBUFFEROBJECT_H

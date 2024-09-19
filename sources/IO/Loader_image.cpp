@@ -55,7 +55,7 @@ namespace IO {
                            static_cast<int>(image.metadata.width),
                            static_cast<int>(image.metadata.height),
                            static_cast<int>(image.metadata.channels),
-                           image.data.data());
+                           image.data().data());
     if (n == 0) {
       throw exception::LoadImagePathException(path);
     }
@@ -96,52 +96,45 @@ namespace IO {
     std::string filename = utils::string::tokenize(str_path, '/').back();
 
     try {
-      image::ImageHolder<float> img;
+      image::Metadata metadata;
+      std::vector<float> raw_image;
       Imf::InputFile input_file(path);
       Imath::Box2i win = input_file.header().dataWindow();
       bool alpha = input_file.header().channels().findChannel("A");
-      img.metadata.width = win.max.x - win.min.x + 1;
-      img.metadata.height = win.max.y - win.min.y + 1;
-      img.metadata.name = filename;
-      img.metadata.color_corrected = false;
-      img.metadata.is_hdr = true;
-      img.metadata.channels = alpha ? 4 : 3;
-      img.data.resize(img.metadata.width * img.metadata.height * img.metadata.channels);
+      metadata.width = win.max.x - win.min.x + 1;
+      metadata.height = win.max.y - win.min.y + 1;
+      metadata.name = filename;
+      metadata.color_corrected = false;
+      metadata.is_hdr = true;
+      metadata.channels = alpha ? 4 : 3;
+      raw_image.resize(metadata.width * metadata.height * metadata.channels);
       Imf::FrameBuffer framebuffer;
       std::vector<float> pixels;
 
-      pixels.resize(img.metadata.width * img.metadata.height * img.metadata.channels);
-      framebuffer.insert("R",
-                         Imf::Slice(Imf::FLOAT,
-                                    (char *)(pixels.data()),
-                                    sizeof(float) * img.metadata.channels,
-                                    sizeof(float) * img.metadata.channels * img.metadata.width));
-      framebuffer.insert("G",
-                         Imf::Slice(Imf::FLOAT,
-                                    (char *)(pixels.data() + 1),
-                                    sizeof(float) * img.metadata.channels,
-                                    sizeof(float) * img.metadata.channels * img.metadata.width));
-      framebuffer.insert("B",
-                         Imf::Slice(Imf::FLOAT,
-                                    (char *)(pixels.data() + 2),
-                                    sizeof(float) * img.metadata.channels,
-                                    sizeof(float) * img.metadata.channels * img.metadata.width));
+      pixels.resize(metadata.width * metadata.height * metadata.channels);
+      framebuffer.insert(
+          "R",
+          Imf::Slice(Imf::FLOAT, (char *)(pixels.data()), sizeof(float) * metadata.channels, sizeof(float) * metadata.channels * metadata.width));
+      framebuffer.insert(
+          "G",
+          Imf::Slice(Imf::FLOAT, (char *)(pixels.data() + 1), sizeof(float) * metadata.channels, sizeof(float) * metadata.channels * metadata.width));
+      framebuffer.insert(
+          "B",
+          Imf::Slice(Imf::FLOAT, (char *)(pixels.data() + 2), sizeof(float) * metadata.channels, sizeof(float) * metadata.channels * metadata.width));
       if (alpha) {
-        framebuffer.insert("A",
-                           Imf::Slice(Imf::FLOAT,
-                                      (char *)pixels.data() + 3,
-                                      sizeof(float) * img.metadata.channels,
-                                      sizeof(float) * img.metadata.channels * img.metadata.width));
+        framebuffer.insert(
+            "A",
+            Imf::Slice(Imf::FLOAT, (char *)pixels.data() + 3, sizeof(float) * metadata.channels, sizeof(float) * metadata.channels * metadata.width));
       }
       input_file.setFrameBuffer(framebuffer);
       input_file.readPixels(win.min.y, win.max.y);
-      std::memcpy(img.data.data(), pixels.data(), img.metadata.channels * img.metadata.width * img.metadata.height * sizeof(float));
+      std::memcpy(raw_image.data(), pixels.data(), metadata.channels * metadata.width * metadata.height * sizeof(float));
 
       if (store) {
         HdrImageDatabase *hdr_database = resource_database->getHdrDatabase();
-        database::image::store<float>(*hdr_database, false, img.data, img.metadata);
+        database::image::store<float>(*hdr_database, false, raw_image, metadata);
       }
-      return img;
+      return image::ImageHolder<float>(raw_image, metadata);
     } catch (Iex::BaseExc &e) {
       throw exception::InvalidImageFormat(e.what());
     }

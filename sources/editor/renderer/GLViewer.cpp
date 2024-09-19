@@ -23,6 +23,22 @@ static QSurfaceFormat setupFormat() {
   return format;
 }
 
+void GLViewer::currentCtx() { makeCurrent(); }
+
+void GLViewer::doneCtx() { doneCurrent(); }
+
+void GLViewer::syncRenderer() {
+  makeCurrent();
+  glFinish();
+  doneCurrent();
+}
+
+void GLViewer::signalEnvmapChange() { renderer->updateEnvmap(); }
+
+void GLViewer::haltRender() { is_rendering = false; }
+
+void GLViewer::resumeRender() { is_rendering = true; }
+
 GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent), glew_initialized(false) {
   setFormat(setupFormat());
   renderer = std::make_unique<Renderer>(width(), height(), this);
@@ -93,9 +109,12 @@ void GLViewer::initializeGL() {
 }
 
 void GLViewer::paintGL() {
-  if (renderer->prep_draw()) {
+  if (renderer->prep_draw() && is_rendering) {
     renderer->setDefaultFrameBufferId(defaultFramebufferObject());
     renderer->draw();
+  } else {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0f);
   }
 }
 
@@ -153,7 +172,11 @@ void GLViewer::wheelEvent(QWheelEvent *event) {
   widget_input_events->flag &= ~EventManager::EVENT_MOUSE_WHEEL;
   update();
 }
-void GLViewer::showEvent(QShowEvent *event) { QOpenGLWidget::showEvent(event); }
+void GLViewer::showEvent(QShowEvent *event) {
+  QOpenGLWidget::showEvent(event);
+  renderer->onShowEvent();
+}
+
 void GLViewer::hideEvent(QHideEvent *event) {
   QOpenGLWidget::hideEvent(event);
   renderer->onHideEvent();

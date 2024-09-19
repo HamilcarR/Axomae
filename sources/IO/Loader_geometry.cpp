@@ -72,15 +72,7 @@ namespace IO {
     return nullptr;
   }
 
-  /**
-   * The function generates a scene tree from a model scene and a lookup of mesh nodes.
-   * @param modelScene The modelScene parameter is a pointer to an aiScene object, which represents a 3D
-   * model scene loaded from a file using the Assimp library. It contains information about the model's
-   * hierarchy, meshes, materials, textures, animations, etc.
-   * @param node_lookup The `node_lookup` parameter is a vector of pointers to `Mesh` objects. It is used
-   * to map the `aiNode` objects in the `modelScene` to their corresponding `Mesh` objects.
-   * @return a SceneTree object.
-   */
+
   SceneTree generateSceneTree(const aiScene *modelScene, const std::vector<Mesh *> &node_lookup) {
     aiNode *ai_root = modelScene->mRootNode;
     SceneTree scene_tree;
@@ -92,19 +84,9 @@ namespace IO {
     return scene_tree;
   }
 
-  /**
-   * The function "load_geometry_buffer" takes an array of aiVector3D objects, converts them to a
-   * specified dimension, and stores the result in a destination vector.
-   * @param dest The `dest` parameter is a reference to a `std::vector<T>` object, where `T` is the type
-   * of the elements in the vector. This vector will be used to store the loaded geometry data.
-   * @param from The "from" parameter is a pointer to an array of aiVector3D objects.
-   * @param size The size parameter represents the number of elements in the from array.
-   * @param dimension The "dimension" parameter determines the number of components in each vector. If
-   * dimension is set to 3, each vector will have three components (x, y, and z). If dimension is set to
-   * 2, each vector will have two components (x and y).
-   */
+
   template<class T>
-  static void load_geometry_buffer(std::vector<T> &dest, const aiVector3D *from, int size, int dimension) {
+  static void load_geometry_buffer(axstd::span<T> &dest, const aiVector3D *from, int size, int dimension) {
     for (int f = 0, i = 0; f < size; f++) {
       const aiVector3D &vect = from[f];
       if (dimension == 3) {
@@ -120,15 +102,7 @@ namespace IO {
     }
   }
 
-  /**
-   * The function `load_indices_buffer` loads the indices of a mesh's faces into a destination vector.
-   * @param dest A reference to a vector of unsigned integers where the indices will be loaded into.
-   * @param faces The `faces` parameter is a pointer to an array of `aiFace` objects. Each `aiFace`
-   * object represents a face in a 3D model and contains an array of indices that define the vertices of
-   * the face.
-   * @param num_faces The parameter "num_faces" represents the number of faces in the mesh.
-   */
-  static void load_indices_buffer(std::vector<unsigned> &dest, const aiFace *faces, int num_faces) {
+  static void load_indices_buffer(axstd::span<unsigned> &dest, const aiFace *faces, int num_faces) {
     for (int i = 0, f = 0; i < num_faces; i++, f += 3) {
       assert(faces[i].mNumIndices == 3);
       dest[f] = faces[i].mIndices[0];
@@ -166,45 +140,54 @@ namespace IO {
     return total_size;
   }
 
+  template<class T>
+  static axstd::span<T> retrieve_buffer_and_update_offset(const INodeDatabase& mesh_database, std::size_t &offset , unsigned attrib_count) {
+    uint8_t* vertex_attributes_cache = mesh_database.getCurrentCache();
+    AX_ASSERT_NEQ(vertex_attributes_cache, nullptr);
+    axstd::span<T> buffer = axstd::span<T>(reinterpret_cast<T*>(vertex_attributes_cache + offset), attrib_count);
+    offset += attrib_count * sizeof(T);
+    return buffer;
+  }
+
   /**
    * This function loads vertex attributes in an async manner.
+   * element_count in bytes.
    */
   std::pair<unsigned, std::unique_ptr<Object3D>> load_geometry(const aiScene *modelScene,
                                                                unsigned mesh_index,
                                                                INodeDatabase &mesh_database,
-                                                               std::size_t &element_count) {
+                                                               std::size_t &offset) {
     const aiMesh *mesh = modelScene->mMeshes[mesh_index];
     AX_ASSERT_NOTNULL(mesh->mVertices);
-
     std::unique_ptr<Object3D> mesh_geometry_buffers = std::make_unique<Object3D>();
-    auto size_dim3 = mesh->mNumVertices * 3;
-    auto size_dim2 = mesh->mNumVertices * 2;
-    auto size_dim3_indices = mesh->mNumFaces * 3;
+    auto dim3_attrib_count = mesh->mNumVertices * 3;
+    auto dim2_attrib_count = mesh->mNumVertices * 2;
+    auto dim3_faces_count = mesh->mNumFaces * 3;
 
     std::vector<std::shared_future<void>> shared_futures;
     std::future<void> f_vertices, f_normals, f_bitangents, f_tangents, f_uv;
-    mesh_geometry_buffers->vertices.resize(size_dim3);
+    mesh_geometry_buffers->vertices = retrieve_buffer_and_update_offset<float>(mesh_database , offset, dim3_attrib_count);
     f_vertices = std::async(std::launch::async,
                             [&]() { load_geometry_buffer(mesh_geometry_buffers->vertices, mesh->mVertices, mesh->mNumVertices, 3); });
     shared_futures.push_back(f_vertices.share());
 
     if (mesh->HasNormals()) {
-      mesh_geometry_buffers->normals.resize(size_dim3);
+      mesh_geometry_buffers->normals = retrieve_buffer_and_update_offset<float>(mesh_database , offset, dim3_attrib_count);
       f_normals = std::async(std::launch::async,
                              [&]() { load_geometry_buffer(mesh_geometry_buffers->normals, mesh->mNormals, mesh->mNumVertices, 3); });
       shared_futures.push_back(f_normals.share());
     }
 
     if (mesh->HasTextureCoords(0)) {
-      mesh_geometry_buffers->uv.resize(size_dim2);
+      mesh_geometry_buffers->uv = retrieve_buffer_and_update_offset<float>(mesh_database , offset, dim2_attrib_count);
       f_uv = std::async(std::launch::async,
                         [&]() { load_geometry_buffer(mesh_geometry_buffers->uv, mesh->mTextureCoords[0], mesh->mNumVertices, 2); });
       shared_futures.push_back(f_uv.share());
     }
 
     if (mesh->HasTangentsAndBitangents()) {
-      mesh_geometry_buffers->tangents.resize(size_dim3);
-      mesh_geometry_buffers->bitangents.resize(size_dim3);
+      mesh_geometry_buffers->tangents = retrieve_buffer_and_update_offset<float>(mesh_database , offset, dim3_attrib_count);
+      mesh_geometry_buffers->bitangents = retrieve_buffer_and_update_offset<float>(mesh_database , offset, dim3_attrib_count);
       f_tangents = std::async(std::launch::async,
                               [&]() { load_geometry_buffer(mesh_geometry_buffers->tangents, mesh->mTangents, mesh->mNumVertices, 3); });
       f_bitangents = std::async(std::launch::async,
@@ -212,8 +195,7 @@ namespace IO {
       shared_futures.push_back(f_tangents.share());
       shared_futures.push_back(f_bitangents.share());
     }
-
-    mesh_geometry_buffers->indices.resize(size_dim3_indices);
+    mesh_geometry_buffers->indices = retrieve_buffer_and_update_offset<unsigned>(mesh_database , offset, dim3_faces_count);
     load_indices_buffer(mesh_geometry_buffers->indices, mesh->mFaces, mesh->mNumFaces);
     std::for_each(shared_futures.begin(), shared_futures.end(), [](std::shared_future<void> &it) -> void { it.wait(); });
     return {mesh_index, std::move(mesh_geometry_buffers)};

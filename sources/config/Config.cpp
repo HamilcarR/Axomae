@@ -1,12 +1,20 @@
 #include "Config.h"
+#include <internal/device/gpgpu/device_transfer_interface.h>
 #include <iostream>
 #include <memory>
 
-ApplicationConfig::ApplicationConfig() {
+ApplicationConfig::ApplicationConfig() { logger_conf = generateLoggerConfigDataStruct(); }
+
+ApplicationConfig::ApplicationConfig(std::thread::id id) : main_thread_id(id) {
   flag = 0;
   logger_conf = generateLoggerConfigDataStruct();
+
+#ifdef AXOMAE_USE_CUDA
+  AX_ASSERT_EQ(std::this_thread::get_id(), main_thread_id);
+  device::gpgpu::init_driver_API();
+  device::gpgpu::create_context(gpu_context);
+#endif
 }
-ApplicationConfig::~ApplicationConfig() = default;
 
 std::string ApplicationConfig::getLogFile() const {
   time_t now = time(0);

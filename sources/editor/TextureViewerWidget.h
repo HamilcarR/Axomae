@@ -2,9 +2,9 @@
 #define TEXTUREVIEWERWIDGET_H
 #include "ContextMenuWidget.h"
 #include "Image.h"
-#include "internal/common/image/Rgb.h"
 #include "metadata/RgbDisplayerLabel.h"
 #include "ui_texture_viewer.h"
+#include <internal/common/image/Rgb.h>
 
 #include <QImage>
 #include <QMainWindow>
@@ -73,7 +73,11 @@ class HdrRenderViewerWidget : public QWidget {
   std::unique_ptr<ContextMenuWidget> context_menu;
 
  public:
-  HdrRenderViewerWidget(const image::ImageHolder<float> *tex, controller::Controller *app_controller, QWidget *parent = nullptr);
+  /* If use_timer = true , update of the canvas is done through a timer. Else , we use a signal. */
+  HdrRenderViewerWidget(const image::ImageHolder<float> *tex,
+                        controller::Controller *app_controller,
+                        bool use_timer = true,
+                        QWidget *parent = nullptr);
   ~HdrRenderViewerWidget() override;
   HdrRenderViewerWidget(const HdrRenderViewerWidget &other) = delete;
   HdrRenderViewerWidget(HdrRenderViewerWidget &&other) noexcept = delete;
@@ -83,11 +87,13 @@ class HdrRenderViewerWidget : public QWidget {
   void mouseReleaseEvent(QMouseEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
   void closeEvent(QCloseEvent *event) override;
+  void notifyUpdate();
 
  signals:
   void viewerClosed(QWidget *widget_address);
   void onSaveRenderQuery(const image::ImageHolder<float> &target_buffer);
   void onStopRenderQuery();
+  void onNotifyUpdate();
  public slots:
   void updateImage();
 };

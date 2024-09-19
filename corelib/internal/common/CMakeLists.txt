@@ -7,16 +7,23 @@ PRIVATE
         ax_core_math
         ax_core_image
         ax_core_exception
-        ax_core_macro
+
 PUBLIC
         Boost::core
-
+        ax_core_macro
 )
 
 target_include_directories(ax_core_common
 PUBLIC
     ${AXOMAE_CORELIB_ROOT}
 )
+if(AXOMAE_USE_CUDA)
+  target_compile_definitions(ax_core_common PUBLIC AXOMAE_USE_CUDA)
+endif()
+if(AXOMAE_USE_EMBREE)
+  target_compile_definitions(ax_core_common PUBLIC AXOMAE_USE_EMBREE)
+endif()
+
 
 add_subdirectory(math)
 add_subdirectory(exception)

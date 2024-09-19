@@ -1,12 +1,12 @@
 #ifndef DRAWABLE_H
 #define DRAWABLE_H
-
-#include "Camera.h"
-#include "LightingDatabase.h"
-#include "Mesh.h"
 #include "PackedGLGeometryBuffer.h"
-#include "TextureGroup.h"
+#include <internal/macro/project_macros.h>
 
+class Camera;
+class Mesh;
+class GLMaterial;
+class Shader;
 /**
  * @file Drawable.h
  * Implements a wrapper containing a mesh structure , a reference to a camera , and opengl buffers
@@ -18,8 +18,8 @@
  */
 class Drawable {
  protected:
-  Mesh *mesh_object;           /**<Pointer to the mesh */
-  Camera *camera_pointer;      /**<Pointer to the camera*/
+  Mesh *mesh_object;                 /**<Pointer to the mesh */
+  Camera *camera_pointer;            /**<Pointer to the camera*/
   PackedGLGeometryBuffer gl_buffers; /**<OpenGL buffers*/
 
  public:
@@ -37,9 +37,10 @@ class Drawable {
   void unbind();
   bool ready();
   void setSceneCameraPointer(Camera *camera);
-  Mesh *getMeshPointer() { return mesh_object; }
+  Mesh *getMeshPointer() const { return mesh_object; }
   ax_no_discard Shader *getMeshShaderPointer() const;
   ax_no_discard GLMaterial *getMaterialPointer() const;
+  ax_no_discard const PackedGLGeometryBuffer &getMeshGLBuffers() const { return gl_buffers; }
 };
 
 #endif

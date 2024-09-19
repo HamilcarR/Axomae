@@ -4,6 +4,8 @@
 #include "Vec3.h"
 
 using Vec2f = math::geometry::Vec2<float>;
+using Vec2i = math::geometry::Vec2<int>;
+using Vec2ui = math::geometry::Vec2<unsigned>;
 using Vec3f = math::geometry::Vec3<float>;
 using Vec3i = math::geometry::Vec3<int>;
 using Vec3d = math::geometry::Vec3<double>;

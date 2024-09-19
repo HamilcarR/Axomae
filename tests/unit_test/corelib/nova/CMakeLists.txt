@@ -1,0 +1,24 @@
+add_subdirectory(shape)
+add_subdirectory(aggregate)
+add_subdirectory(sampler)
+add_subdirectory(material)
+add_subdirectory(engine)
+add_subdirectory(texturing)
+
+
+set(NOVA_MODULE_SHAPE_SOURCES "" CACHE INTERNAL "" )
+set(NOVA_MODULE_AGGREGATE_SOURCES "" CACHE INTERNAL "")
+set(NOVA_MODULE_SAMPLER_SOURCES "" CACHE INTERNAL "")
+set(NOVA_MODULE_MATERIAL_SOURCES "" CACHE INTERNAL "")
+set(NOVA_MODULE_ENGINE_SOURCES "" CACHE INTERNAL "" )
+set(NOVA_MODULE_TEXTURING_SOURCES "" CACHE INTERNAL "")
+set(NOVA_MODULE_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/nova_utilsTest.cpp
+        ${NOVA_MODULE_SHAPE_SOURCES}
+        ${NOVA_MODULE_AGGREGATE_SOURCES}
+        ${NOVA_MODULE_SAMPLER_SOURCES}
+        ${NOVA_MODULE_MATERIAL_SOURCES}
+        ${NOVA_MODULE_ENGINE_SOURCES}
+        ${NOVA_MODULE_TEXTURING_SOURCES}
+        PARENT_SCOPE)
+

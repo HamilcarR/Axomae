@@ -20,9 +20,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_PREFIX_PATH "" CACHE FILEPATH "")
 set(CMAKE_INCLUDE_PATH "" CACHE FILEPATH "")
 set(CMAKE_LIBRARY_PATH "" CACHE FILEPATH "")
-set(AXOMAE_USE_GOLD "ON" CACHE BOOL "Use GOLD linker")
-set(AXOMAE_USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
-set(AXOMAE_USE_LLD "OFF" CACHE BOOL "USE LLVM linker")
 option(AXOMAE_USE_SCCACHE "Use sccache for build optimization" OFF)
 if(AXOMAE_USE_SCCACHE)
     find_program(SCCACHE sccache)
@@ -33,20 +30,16 @@ if(AXOMAE_USE_SCCACHE)
     endif ()
 endif ()
 
-# CUDA Compilation
-option(AXOMAE_USE_CUDA "Use GPU when available" OFF)
-
 #****************************************************************************************************
 #custom project variables
 set(AXOMAE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
 option(AXOMAE_LUT_HIGHP "Enable high precision when computing lookup tables." OFF)
 option(AXOMAE_LUT_MEDIUMP "Enable medium precision when computing lookup tables." ON)
 option(AXOMAE_LUT_LOWP "Enable low precision when computing lookup tables." OFF)
-option(AXOMAE_BUILD_TESTS "Build unit tests." ON)
-option(AXOMAE_FROMSOURCE_QT_BUILD "Build QT from source." ON)
-
 #****************************************************************************************************
 # Dependencies
+option(AXOMAE_USE_EMBREE "Replace native BVH with Embree's partition" ON)
+option(AXOMAE_FROMSOURCE_QT_BUILD "Build QT from source." ON)
 if(AXOMAE_FROMSOURCE_QT_BUILD)
     include(cmake/BuildQt6.cmake)
 else()
@@ -56,22 +49,45 @@ else()
 endif()
 include(cmake/FindDependencies.cmake)
 
+
+# CUDA Compilation
+option(AXOMAE_USE_CUDA "Use GPU when available" OFF)
+option(AXOMAE_USE_OPTIX "Use Optix acceleration structures (Needs AXOMAE_USE_CUDA)" ON)
 if(NOT CUDAToolkit_FOUND)
     message(STATUS "Cuda toolkit not found. Setting AXOMAE_USE_CUDA to off.")
     set(AXOMAE_USE_CUDA "OFF" CACHE BOOL "Use GPU when available")
 endif()
 if (AXOMAE_USE_CUDA AND CUDAToolkit_FOUND)
     message(STATUS "Found CUDA toolkit.")
-    message(STATUS "Enabling NVCC Separable Compilation")
+    find_program(BIN2C 
+          NAMES bin2c 
+          PATHS ${CMAKE_CUDA_COMPILER}
+    )
+    if(NOT BIN2C)
+      message(FATAL_ERROR "bin2c not found on the system.")
+    endif()
+    message(STATUS "bin2c found.")
+
     option(AXOMAE_CUDA_ALLOW_UNSUPPORTED_HOST_CC "Allow the compilation with a non supported host compiler" OFF)
     if(AXOMAE_CUDA_ALLOW_UNSUPPORTED_HOST_CC)
         set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --allow-unsupported-compiler")
     endif()
+    message(STATUS "Enabling NVCC Separable Compilation")
     set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
-    enable_language(CUDA) 
-    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr -std=c++17 -G")
+    enable_language(CUDA)
+    if (CMAKE_BUILD_TYPE MATCHES "Debug")
+      set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr -std=c++17 -G -g")
+    else() 
+      set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr -std=c++17")
+    endif()
     set(CUDA_GENERATED_OUTPUT_DIR ${CMAKE_BINARY_DIR}/cuda_generated)
+    # Optix
+    set(OPTIX_INCLUDE_PATH "" CACHE INTERNAL "")
 endif ()
+
+
+
+
 
 # UI files path
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${AXOMAE_UI_LOCATION})
@@ -85,9 +101,6 @@ set(STB_INCLUDE_PATH "" CACHE INTERNAL "")
 # GLM
 set(GLM_INCLUDE_PATH "" CACHE INTERNAL "")
 
-# Optix
-set(OPTIX_INCLUDE_PATH "" CACHE INTERNAL "")
-
 # Boost
 set(BOOST_INCLUDE_PATH "" CACHE INTERNAL "")
 
@@ -96,6 +109,9 @@ set(OPENEXR_INCLUDE_PATH "" CACHE INTERNAL "")
 
 # GTest
 set(GTEST_INCLUDE_PATH "" CACHE INTERNAL "")
+
+# For libraries without build system
+set(VENDOR_PATH "" CACHE INTERNAL "")
 
 add_subdirectory(vendor)
 #****************************************************************************************************
@@ -114,6 +130,9 @@ target_link_libraries(${PROJECT_NAME} PUBLIC compile_opts)
 #****************************************************************************************************
 # Link
 
+set(AXOMAE_USE_GOLD "ON" CACHE BOOL "Use GOLD linker")
+set(AXOMAE_USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
+set(AXOMAE_USE_LLD "OFF" CACHE BOOL "USE LLVM linker")
 
 if(AXOMAE_USE_GOLD)
     target_link_options(compile_opts INTERFACE -fuse-ld=gold)
@@ -149,7 +168,8 @@ endif()
 
 #****************************************************************************************************
 # Testing
+option(AXOMAE_BUILD_TESTS "Build unit tests." ON)
 if(AXOMAE_BUILD_TESTS)
     enable_testing()
-    add_subdirectory(tests)
+    add_subdirectory(tests/unit_test)
 endif()

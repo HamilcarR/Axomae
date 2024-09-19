@@ -32,7 +32,7 @@
 
 #define AX_ASSERT_NOTNULL(expr) assert(expr)
 
-#define AX_ASSERT_FALSE(expr) assert(!expr)
+#define AX_ASSERT_FALSE(expr) assert(!(expr))
 
 #define AX_ASSERT_TRUE(expr) assert(expr)
 
@@ -52,4 +52,9 @@
 
 #define ax_maybe_unused [[maybe_unused]]
 
+#define LIKELY(x) __builtin_expect(!!(x), 1)
+
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+
+#define AX_PACK(align) __attribute__((packed, aligned(align)))
 #endif

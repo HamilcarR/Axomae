@@ -1,5 +1,5 @@
-Checks: >
-  cppcoreguidelines-*,
+Checks: 'cppcoreguidelines-* , -cppcoreguidelines-avoid-c-arrays , -cppcoreguidelines-avoid-magic-numbers, -cppcoreguidelines-pro-type-union-access'
+  
 
 
 CheckOptions:
