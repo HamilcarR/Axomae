@@ -2,8 +2,8 @@
 
 namespace nova::integrator {
 
-  void NormalIntegrator::render(RenderBuffers<float> *buffers, Tile &tile, const NovaResourceManager *nova_resource_manager) const {
-
+  void NormalIntegrator::render(RenderBuffers<float> *buffers, Tile &tile, nova_eng_internals &nova_internals) const {
+    const NovaResourceManager *nova_resource_manager = nova_internals.resource_manager;
     sampler::RandomSampler random_sampler = sampler::RandomSampler();
     sampler::SamplerInterface sampler = &random_sampler;
     for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
@@ -21,7 +21,7 @@ namespace nova::integrator {
             ndc.x, ndc.y, nova_resource_manager->getCameraData().getInvProjection(), nova_resource_manager->getCameraData().getInvView());
         Ray ray(r.near, r.far);
 
-        glm::vec4 rgb = Li(ray, nova_resource_manager, nova_resource_manager->getEngineData().getMaxDepth(), sampler);
+        glm::vec4 rgb = Li(ray, nova_internals, nova_resource_manager->getEngineData().getMaxDepth(), sampler);
         for (int k = 0; k < 3; k++) {
           buffers->accumulator_buffer[idx + k] += buffers->partial_buffer[idx + k];
           buffers->partial_buffer[idx] = rgb.r;
@@ -33,9 +33,9 @@ namespace nova::integrator {
     tile.finished_render = true;
   }
 
-  glm::vec4 NormalIntegrator::Li(const Ray &ray, const NovaResourceManager *nova_resources, int depth, sampler::SamplerInterface &sampler) const {
+  glm::vec4 NormalIntegrator::Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const {
 
-    bvh_hit_data hit = bvh_hit(ray, nova_resources);
+    bvh_hit_data hit = bvh_hit(ray, nova_internals);
     if (hit.is_hit) {
       Ray out{};
       if (!hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, sampler) || depth < 0)

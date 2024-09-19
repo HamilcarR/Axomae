@@ -4,8 +4,9 @@
 namespace nova::integrator {
   class NormalIntegrator : public AbstractIntegrator<NormalIntegrator> {
    public:
-    void render(RenderBuffers<float> *buffers, Tile &tile, const NovaResourceManager *nova_resource_manager) const;
-    [[nodiscard]] glm::vec4 Li(const Ray &ray, const NovaResourceManager *nova_resources_manager, int depth, sampler::SamplerInterface &sampler) const;
+    void render(RenderBuffers<float> *buffers, Tile &tile, nova_eng_internals &nova_internals) const;
+
+    [[nodiscard]] glm::vec4 Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const;
   };
 }  // namespace nova::integrator
 #endif  // NORMALINTEGRATOR_H

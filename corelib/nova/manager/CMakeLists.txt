@@ -1,5 +1,7 @@
 add_library(ax_core_nova_manager STATIC
-    NovaResourceManager.cpp
+        NovaResourceManager.cpp
+        NovaExceptionManager.cpp
+
 )
 
 target_link_libraries(ax_core_nova_manager PRIVATE

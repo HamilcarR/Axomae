@@ -6,8 +6,9 @@ namespace nova::integrator {
   static float normalize_depth(float z, float near, float far) { return (2.0f * near * far) / (far + near - z * (far - near)); }
 
   /* same as regular integrators , but sample pixels without random deviation and sample loop*/
-  void DepthIntegrator::render(RenderBuffers<float> *buffers, Tile &tile, const NovaResourceManager *nova_resource_manager) const {
+  void DepthIntegrator::render(RenderBuffers<float> *buffers, Tile &tile, nova_eng_internals &nova_internals) const {
     static std::mutex mutex;
+    const NovaResourceManager *nova_resource_manager = nova_internals.resource_manager;
     const camera::CameraResourcesHolder &camera = nova_resource_manager->getCameraData();
     float near = camera.getNear();
     float far = camera.getFar();
@@ -29,8 +30,7 @@ namespace nova::integrator {
         Ray ray(r.near, r.far);
         sampler::RandomSampler random_sampler = sampler::RandomSampler();
         sampler::SamplerInterface sampler = &random_sampler;
-        glm::vec4 distance = Li(ray, nova_resource_manager, 0, sampler);
-
+        glm::vec4 distance = Li(ray, nova_internals, 0, sampler);
         float depth = 1 - (distance.x - near) / (far - near);
         depth = normalize_depth(depth, near, far) * 2.f - 1.f;
         glm::vec3 rgb{depth / far};
@@ -49,11 +49,8 @@ namespace nova::integrator {
   }
 
   /* returns closest primitive distance (intersection) , and farthest primitive distance*/
-  glm::vec4 DepthIntegrator::Li(const Ray &ray,
-                                const NovaResourceManager *nova_resources,
-                                int /*depth*/,
-                                sampler::SamplerInterface & /*sampler*/) const {
-    bvh_hit_data hit = bvh_hit(ray, nova_resources);
+  glm::vec4 DepthIntegrator::Li(const Ray &ray, nova_eng_internals &nova_internals, int /*depth*/, sampler::SamplerInterface & /*sampler*/) const {
+    bvh_hit_data hit = bvh_hit(ray, nova_internals);
     if (hit.is_hit) {
       glm::vec3 min_max_intersect{hit.hit_d.t, hit.prim_max_t, MAXFLOAT};
       return {min_max_intersect, 1.f};
