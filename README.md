@@ -12,21 +12,24 @@
 * [Installation](#Installation)
 * [Troubleshooting](#Troubleshooting)
 
-## Introduction :
+## Introduction
+
 Axomae is a 3D rendering engine and raytracer, designed as a foundation to explore advanced rendering techniques .    
 The goal of the software is to facilitate the implementation of rendering algorithms and display of photorealistic images. 
 At the same time, the application is intended to be interactive , and customizable. 
 
-## Features :
+## Features
+
 * Nova: A multi-thread path-tracer , currently implemented to be scalable and distributed on GPU. Nova can be used as an offline renderer, or a pseudo-realtime , more interactive viewer. 
 * UV-editor
 * (Old feature) A normal map generation tool : Will probably be scrapped for an entirely new material generation pipeline. 
 * .hdr texture viewer.
 * PBR rasterizer 3D viewer. 
 
-## Requirements :
+## Requirements
+
 * GCC 
-* Qt6(Axomae can also build from QT source if needs be , see [Installation](#Installation) for details)
+* Qt6(Axomae can also build Qt from source , see [Installation](#Installation) for details)
 * OpenGL
 * Glew
 * Cuda(Optional)
@@ -56,9 +59,11 @@ $ ./scripts/update_deps.sh
 Axomae doesn't support in-source builds, so I suggest building in the parent folder: 
 Note that: 
 
-1) Unit tests building is enabled by default , set ```-DAXOMAE_BUILD_TESTS=OFF``` if not needed. 
-2) QT's repository layout is downloaded by default, and can be enabled in case we want to build QT from source . Use ```-DAXOMAE_FROMSOURCE_QT_BUILD=ON```.
-3) For CUDA , use ```-DAXOMAE_USE_CUDA=ON```.
+- Building Unit tests is enabled by default , set ```-DAXOMAE_BUILD_TESTS=OFF``` if they are not needed. 
+- Building QT from source is enabled by default. It is more reliable to build Axomae and it's dependencies through a unique toolchain, but it will take longer(~15 min on an 8 cores ... Build time optimizations are on the backlog. )
+- If nonetheless you can use your own QT system library , use ```-DAXOMAE_FROMSOURCE_QT_BUILD=OFF``` .
+- For CUDA , use ```-DAXOMAE_USE_CUDA=ON```.
+- 
 ```
 $ cd Axomae
 $ cmake -S . -B ../build -DAXOMAE_BUILD_TESTS=OFF -DAXOMAE_FROMSOURCE_QT_BUILD=OFF
