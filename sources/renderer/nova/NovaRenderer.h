@@ -43,6 +43,7 @@ class NovaRenderer final : public IRenderer {
   std::unique_ptr<NovaRenderEngineInterface> nova_engine;
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
   std::unique_ptr<nova::NovaResourceManager> nova_resource_manager;
+  std::unique_ptr<nova::NovaExceptionManager> nova_exception_manager;
   ApplicationConfig *global_application_config{};
   std::vector<std::future<void>> nova_result_futures;
   std::vector<float> partial_render_buffer;

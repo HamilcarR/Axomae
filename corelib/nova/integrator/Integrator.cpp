@@ -3,44 +3,43 @@
 #include "DepthIntegrator.h"
 #include "Logger.h"
 #include "NormalIntegrator.h"
-#include "manager/NovaResourceManager.h"
+#include "engine/nova_engine.h"
+#include "manager/ManagerInternalStructs.h"
 #include "ray/Hitable.h"
 #include "ray/Ray.h"
 #include "sampler/Sampler.h"
 
-#include <engine/nova_engine.h>
-
 namespace nova::integrator {
 
-  void integrator_dispatch(RenderBuffers<float> *buffers, Tile &tile, const NovaResourceManager *nova_resource_manager) {
-    static std::mutex mutex;
-    const engine::EngineResourcesHolder &engine = nova_resource_manager->getEngineData();
+  void integrator_dispatch(RenderBuffers<float> *buffers, Tile &tile, nova::nova_eng_internals &nova_internals) {
+    const engine::EngineResourcesHolder &engine = nova_internals.resource_manager->getEngineData();
     int integrator_type = engine.getIntegratorType();
     if (integrator_type & PATH) {
       bool processed = false;
       if (integrator_type & COMBINED) {
         processed = true;
         const PathIntegrator path_integrator;
-        path_integrator.render(buffers, tile, nova_resource_manager);
+        path_integrator.render(buffers, tile, nova_internals);
       }
       if (integrator_type & NORMAL) {
         processed = true;
         const NormalIntegrator normal_integrator;
-        normal_integrator.render(buffers, tile, nova_resource_manager);
+        normal_integrator.render(buffers, tile, nova_internals);
       }
       if (integrator_type & DEPTH) {
         processed = true;
         const DepthIntegrator depth_integrator;
-        depth_integrator.render(buffers, tile, nova_resource_manager);
+        depth_integrator.render(buffers, tile, nova_internals);
       }
       if (!processed)
-        nova_resource_manager->addError(nova::exception::INVALID_RENDER_MODE);
+        nova_internals.exception_manager->addError(nova::exception::INVALID_RENDER_MODE);
     } else {
-      nova_resource_manager->addError(nova::exception::INVALID_INTEGRATOR);
+      nova_internals.exception_manager->addError(nova::exception::INVALID_INTEGRATOR);
     }
   }
 
-  bvh_hit_data bvh_hit(const Ray &ray, const NovaResourceManager *nova_resources) {
+  bvh_hit_data bvh_hit(const Ray &ray, nova_eng_internals &nova_internals) {
+    const NovaResourceManager *nova_resources = nova_internals.resource_manager;
     bvh_hit_data hit_ret;
     const primitive::NovaPrimitiveInterface *last_primit = nullptr;
     const aggregate::Bvhtl &bvh = nova_resources->getAccelerationData().accelerator;
@@ -53,16 +52,16 @@ namespace nova::integrator {
     return hit_ret;
   }
 
-  glm::vec4 PathIntegrator::Li(const Ray &ray, const NovaResourceManager *nova_resources, int depth, sampler::SamplerInterface &sampler) const {
-    bvh_hit_data hit = bvh_hit(ray, nova_resources);
-
+  glm::vec4 PathIntegrator::Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const {
+    const NovaResourceManager *nova_resources = nova_internals.resource_manager;
+    bvh_hit_data hit = bvh_hit(ray, nova_internals);
     if (hit.is_hit) {
       Ray out{};
       if (!hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, sampler) || depth < 0)
         return glm::vec4(0.f);
       glm::vec4 color = hit.hit_d.attenuation;
       glm::vec4 emit = hit.hit_d.emissive;
-      return 10.f * emit + color * Li(out, nova_resources, depth - 1, sampler);
+      return 10.f * emit + color * Li(out, nova_internals, depth - 1, sampler);
     }
     glm::vec3 sample_vector = ray.direction;
     return {texturing::sample_cubemap(sample_vector, &nova_resources->getEnvmapData()), 1.f};

@@ -1,15 +1,9 @@
 #include "DrawEngine.h"
 #include "GenericException.h"
-#include "integrator/Integrator.h"
-#include "manager/NovaResourceManager.h"
 #include "Logger.h"
 #include "engine/nova_engine.h"
-
-
-
-
-
-
+#include "integrator/Integrator.h"
+#include "manager/NovaResourceManager.h"
 
 namespace exception {
   class InvalidThreadpoolStateException final : public GenericException {
@@ -33,8 +27,8 @@ namespace nova {
    * 3) Final state : render at full depth , full sample size , full resolution.
    * Allows proper synchronization.
    */
-  void NovaRenderEngineLR::engine_render_tile(HdrBufferStruct *buffers, Tile &tile, const NovaResourceManager *nova_resources) {
-    integrator::integrator_dispatch(buffers, tile, nova_resources);
+  void NovaRenderEngineLR::engine_render_tile(HdrBufferStruct *buffers, Tile &tile, nova::nova_eng_internals &nova_internals) {
+    integrator::integrator_dispatch(buffers, tile, nova_internals);
   }
 
   static bool validate(HdrBufferStruct *buffers,
@@ -42,21 +36,25 @@ namespace nova {
                        const unsigned height_resolution,
                        NovaRenderEngineInterface *engine_instance,
                        threading::ThreadPool *thread_pool,
-                       const NovaResourceManager *nova_resources) {
+                       nova::nova_eng_internals &nova_internals) {
 
     bool keep_rendering = true;
+    const NovaResourceManager *nova_resources = nova_internals.resource_manager;
+    NovaExceptionManager *nova_exception = nova_internals.exception_manager;
     if (!nova_resources)
       throw ::exception::InvalidResourceManagerStateException("Resource manager reference is invalid (nullptr).");
+    if (!nova_exception)
+      throw ::exception::InvalidResourceManagerStateException("Exception manager reference is invalid (nullptr).");
     if (!engine_instance) {
-      nova_resources->addError(nova::exception::INVALID_ENGINE_INSTANCE);
+      nova_exception->addError(nova::exception::INVALID_ENGINE_INSTANCE);
       keep_rendering = false;
     }
     if (width_resolution == 0 || height_resolution == 0 || width_resolution > 65536 || height_resolution > 65536) {
-      nova_resources->addError(nova::exception::INVALID_RENDERBUFFER_DIM);
+      nova_exception->addError(nova::exception::INVALID_RENDERBUFFER_DIM);
       keep_rendering = false;
     }
     if (!buffers) {
-      nova_resources->addError(nova::exception::INVALID_RENDERBUFFER_STATE);
+      nova_exception->addError(nova::exception::INVALID_RENDERBUFFER_STATE);
       keep_rendering = false;
     }
     if (!thread_pool)
@@ -69,36 +67,33 @@ namespace nova {
                                       const unsigned height_resolution,
                                       NovaRenderEngineInterface *engine_instance,
                                       threading::ThreadPool *thread_pool,
-                                      const NovaResourceManager *nova_resources) {
+                                      nova::nova_eng_internals &nova_internals) {
 
     AX_ASSERT(nova_resources != nullptr, "Scene descriptor is not initialized.");
     try {
-      if (!validate(buffers, width_resolution, height_resolution, engine_instance, thread_pool, nova_resources))
+      if (!validate(buffers, width_resolution, height_resolution, engine_instance, thread_pool, nova_internals))
         return {};
     } catch (const ::exception::GenericException &e) {
       throw;
     }
 
     std::vector<std::future<void>> futs;
-    std::vector<Tile> tiles = divideByTiles(
-        width_resolution, height_resolution, nova_resources->getEngineData().getTilesWidth(), nova_resources->getEngineData().getTilesHeight());
+    std::vector<Tile> tiles = divideByTiles(width_resolution,
+                                            height_resolution,
+                                            nova_internals.resource_manager->getEngineData().getTilesWidth(),
+                                            nova_internals.resource_manager->getEngineData().getTilesHeight());
     for (auto &elem : tiles) {
-      auto renderer_callback = [engine_instance](HdrBufferStruct *buffers, Tile &tile, const NovaResourceManager *resrc) {
-        engine_instance->engine_render_tile(buffers, tile, resrc);
+      auto renderer_callback = [engine_instance](HdrBufferStruct *buffers, Tile &tile, nova::nova_eng_internals &nova_internals) {
+        engine_instance->engine_render_tile(buffers, tile, nova_internals);
       };
-      elem.sample_per_tile = nova_resources->getEngineData().getSampleIncrement();
+      elem.sample_per_tile = nova_internals.resource_manager->getEngineData().getSampleIncrement();
       elem.image_total_height = height_resolution;
       elem.image_total_width = width_resolution;
-      const std::string &tag = nova_resources->getEngineData().getTag();
-      futs.push_back(thread_pool->addTask(tag, renderer_callback, buffers, elem, nova_resources));
+      const std::string &tag = nova_internals.resource_manager->getEngineData().getTag();
+      futs.push_back(thread_pool->addTask(tag, renderer_callback, buffers, elem, nova_internals));
     }
 
     return futs;
   }
-
-
-
-
-
 
 }  // namespace nova

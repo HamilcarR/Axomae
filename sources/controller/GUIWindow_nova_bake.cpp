@@ -4,6 +4,7 @@
 #include "GUIWindow.h"
 #include "GenericException.h"
 #include "Logger.h"
+#include "TextureViewerWidget.h"
 #include "WorkspaceTracker.h"
 #include "engine/nova_exception.h"
 #include "exception_macros.h"
@@ -143,8 +144,9 @@ namespace controller {
   }
 
   void setup_render_scene_data(const ui_render_options &render_options,
-                               std::unique_ptr<nova::NovaResourceManager> &&manager,
-                               std::unique_ptr<NovaRenderEngineInterface> &&engine_instance,
+                               std::unique_ptr<nova::NovaResourceManager> manager,
+                               std::unique_ptr<nova::NovaExceptionManager> exception_manager,
+                               std::unique_ptr<NovaRenderEngineInterface> engine_instance,
                                NovaBakingStructure &nova_baking_structure,
                                threading::ThreadPool *thread_pool) {
     /* Engine type */
@@ -155,6 +157,7 @@ namespace controller {
     render_scene_data.height = render_options.height;
     render_scene_data.engine_instance = std::move(engine_instance);
     render_scene_data.nova_resource_manager = std::move(manager);
+    render_scene_data.nova_exception_manager = std::move(exception_manager);
     render_scene_data.thread_pool = thread_pool;
   }
 
@@ -165,10 +168,10 @@ namespace controller {
   }
 
   /* returns true if exception needs to shutdown renderer  */
-  static bool on_exception_shutdown(const nova::NovaResourceManager &nova_resource_manager) {
+  static bool on_exception_shutdown(const nova::NovaExceptionManager &exception_manager) {
     using namespace nova::exception;
-    if (nova_baker_utils::get_error_status(nova_resource_manager) != 0) {
-      auto exception_list = nova_baker_utils::get_error_list(nova_resource_manager);
+    if (nova_baker_utils::get_error_status(exception_manager) != 0) {
+      auto exception_list = nova_baker_utils::get_error_list(exception_manager);
       bool must_shutdown = false;
       for (const auto &elem : exception_list) {
         switch (elem) {
@@ -251,7 +254,7 @@ namespace controller {
       }
       nova_baker_utils::synchronize_render_threads(render_scene_data, NOVABAKE_POOL_TAG);
 
-      if (on_exception_shutdown(*render_scene_data.nova_resource_manager))
+      if (on_exception_shutdown(*render_scene_data.nova_exception_manager))
         return;
       color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)i);
       i++;
@@ -323,11 +326,13 @@ namespace controller {
     try {
       nova_baking_structure.reinitialize();
       nova_baker_utils::engine_data engine_data = generate_engine_data(mesh_collection, render_options, misc_options, *renderer_camera, renderer);
-      std::unique_ptr<nova::NovaResourceManager> manager = std::make_unique<nova::NovaResourceManager>();
-      nova_baker_utils::initialize_manager(engine_data, *manager);
+      std::unique_ptr<nova::NovaResourceManager> resource_manager = std::make_unique<nova::NovaResourceManager>();
+      std::unique_ptr<nova::NovaExceptionManager> exception_manager = std::make_unique<nova::NovaExceptionManager>();
+      nova_baker_utils::initialize_manager(engine_data, *resource_manager);
       std::unique_ptr<NovaRenderEngineInterface> engine_instance = create_engine(engine_data);
       threading::ThreadPool *thread_pool = global_application_config->getThreadPool();
-      setup_render_scene_data(render_options, std::move(manager), std::move(engine_instance), nova_baking_structure, thread_pool);
+      setup_render_scene_data(
+          render_options, std::move(resource_manager), std::move(exception_manager), std::move(engine_instance), nova_baking_structure, thread_pool);
       start_baking(nova_baking_structure.nova_render_scene, this, nova_baking_structure.bake_buffers.image_holder);
       ignore_skybox(renderer, false);
     } catch (const exception::CatastrophicFailureException &e) {

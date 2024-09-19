@@ -12,12 +12,11 @@
 
 namespace nova {
 
-
   class NovaRenderEngineLR final : public NovaRenderEngineInterface {
    public:
     CLASS_OCM(NovaRenderEngineLR)
 
-    void engine_render_tile(HdrBufferStruct *dest_buffer, Tile &tile, const NovaResourceManager *nova_resources) override;
+    void engine_render_tile(HdrBufferStruct *dest_buffer, Tile &tile, nova::nova_eng_internals &nova_internals) override;
   };
 
   std::vector<std::future<void>> draw(HdrBufferStruct *buffers,
@@ -25,13 +24,13 @@ namespace nova {
                                       unsigned height_resolution,
                                       NovaRenderEngineInterface *engine_instance,
                                       threading::ThreadPool *thread_pool,
-                                      const NovaResourceManager *nova_resources);
+                                      nova::nova_eng_internals &nova_internals);
 
   void gpu_draw(HdrBufferStruct *buffers,
                 unsigned width_resolution,
                 unsigned height_resolution,
                 NovaRenderEngineInterface *engine_interface,
-                const NovaResourceManager *nova_resources_manager);
+                nova::nova_eng_internals &nova_internals);
 
 }  // namespace nova
 #endif

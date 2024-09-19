@@ -1,9 +1,10 @@
 #ifndef INTEGRATOR_H
 #define INTEGRATOR_H
+#include "manager/ManagerInternalStructs.h"
 #include "math_camera.h"
 #include "math_utils.h"
 #include "project_macros.h"
-#include <manager/NovaResourceManager.h>
+
 namespace nova {
   class Ray;
   struct Tile;
@@ -40,9 +41,9 @@ namespace nova::integrator {
     float prim_max_t;
   };
 
-  bvh_hit_data bvh_hit(const Ray &ray, const NovaResourceManager *nova_resources);
+  bvh_hit_data bvh_hit(const Ray &ray, nova_eng_internals &nova_internals);
 
-  void integrator_dispatch(RenderBuffers<float> *buffers, Tile &tile, const NovaResourceManager *nova_resource_manager);
+  void integrator_dispatch(RenderBuffers<float> *buffers, Tile &tile, nova::nova_eng_internals &nova_internals);
 
   template<class T>
   class AbstractIntegrator {
@@ -50,20 +51,22 @@ namespace nova::integrator {
     /* leave this here in case there's some memory pools to free */
     void prepareAbortRender() const {}
 
-    void validate(const sampler::SamplerInterface &sampler, const NovaResourceManager *nova_resource_manager) const {
+    void validate(const sampler::SamplerInterface &sampler, nova::nova_eng_internals &nova_internals) const {
       nova::exception::NovaException exception = nova::sampler::retrieve_sampler_error(sampler);
-      nova_resource_manager->addError(exception);
+      nova_internals.exception_manager->addError(exception);
     }
 
-    void render(RenderBuffers<float> *buffers, Tile &tile, const NovaResourceManager *nova_resource_manager) const {
+    void render(RenderBuffers<float> *buffers, Tile &tile, nova::nova_eng_internals &nova_internals) const {
       constexpr float RAND_DX = 0.0005;
       constexpr float RAND_DY = 0.0005;
+      const NovaResourceManager *nova_resource_manager = nova_internals.resource_manager;
+      NovaExceptionManager *nova_exception_manager = nova_internals.exception_manager;
       sampler::SobolSampler sobol = sampler::SobolSampler(nova_resource_manager->getEngineData().getMaxSamples(), 20);
       sampler::SamplerInterface sampler = &sobol;
       for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
         for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
-          validate(sampler, nova_resource_manager);
-          if (nova_resource_manager->checkErrorStatus() != 0) {
+          validate(sampler, nova_internals);
+          if (nova_exception_manager->checkErrorStatus() != 0) {
             prepareAbortRender();
             return;
           }
@@ -86,7 +89,7 @@ namespace nova::integrator {
                                                                    nova_resource_manager->getCameraData().getInvProjection(),
                                                                    nova_resource_manager->getCameraData().getInvView());
             Ray ray(r.near, r.far);
-            rgb += Li(ray, nova_resource_manager, nova_resource_manager->getEngineData().getMaxDepth(), sampler);
+            rgb += Li(ray, nova_internals, nova_resource_manager->getEngineData().getMaxDepth(), sampler);
           }
           rgb /= (float)(tile.sample_per_tile);
           for (int k = 0; k < 3; k++)
@@ -98,20 +101,14 @@ namespace nova::integrator {
         }
       tile.finished_render = true;
     }
-    [[nodiscard]] glm::vec4 Li(const Ray &ray,
-                               const NovaResourceManager *nova_resources_manager,
-                               int depth,
-                               sampler::SamplerInterface &sampler) const {
-      return static_cast<const T *>(this)->Li(ray, nova_resources_manager, depth, sampler);
+    [[nodiscard]] glm::vec4 Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const {
+      return static_cast<const T *>(this)->Li(ray, nova_internals, depth, sampler);
     }
   };
 
   class PathIntegrator : public AbstractIntegrator<PathIntegrator> {
    public:
-    [[nodiscard]] glm::vec4 Li(const Ray &ray,
-                               const NovaResourceManager *nova_resources_manager,
-                               int depth,
-                               sampler::SamplerInterface &sampler) const;
+    [[nodiscard]] glm::vec4 Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const;
   };
 
 }  // namespace nova::integrator

@@ -58,12 +58,9 @@ void NovaRenderer::initializeEngine() {
 }
 
 void NovaRenderer::drawBatch() {
-  nova_result_futures = nova::draw(&engine_render_buffers,
-                                   screen_size.width,
-                                   screen_size.height,
-                                   nova_engine.get(),
-                                   global_application_config->getThreadPool(),
-                                   nova_resource_manager.get());
+  nova::nova_eng_internals interns{nova_resource_manager.get(), nova_exception_manager.get()};
+  nova_result_futures = nova::draw(
+      &engine_render_buffers, screen_size.width, screen_size.height, nova_engine.get(), global_application_config->getThreadPool(), interns);
 }
 
 void NovaRenderer::doProgressiveRender() {

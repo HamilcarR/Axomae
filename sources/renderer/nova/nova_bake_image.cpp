@@ -87,21 +87,19 @@ namespace nova_baker_utils {
   }
 
   void bake_scene(render_scene_data &rendering_data) {
+    nova::nova_eng_internals interns{rendering_data.nova_resource_manager.get(), rendering_data.nova_exception_manager.get()};
     nova::draw(rendering_data.buffers.get(),
                rendering_data.width,
                rendering_data.height,
                rendering_data.engine_instance.get(),
                rendering_data.thread_pool,
-               rendering_data.nova_resource_manager.get()
+               interns
 
     );
   }
-  void bake_scene_gpu(render_scene_data &rendering_data){
-    nova::gpu_draw(rendering_data.buffers.get(),
-                   rendering_data.width,
-                   rendering_data.height,
-                   rendering_data.engine_instance.get(),
-                   rendering_data.nova_resource_manager.get());
+  void bake_scene_gpu(render_scene_data &rendering_data) {
+    nova::nova_eng_internals interns{rendering_data.nova_resource_manager.get(), rendering_data.nova_exception_manager.get()};
+    nova::gpu_draw(rendering_data.buffers.get(), rendering_data.width, rendering_data.height, rendering_data.engine_instance.get(), interns);
   }
   void cancel_render(render_scene_data &rendering_data) { rendering_data.nova_resource_manager->getEngineData().stopRender(); }
   void start_render(render_scene_data &rendering_data) { rendering_data.nova_resource_manager->getEngineData().startRender(); }
@@ -113,8 +111,6 @@ namespace nova_baker_utils {
       scene_data.thread_pool->fence(tag);
     }
   }
-  uint64_t get_error_status(const nova::NovaResourceManager &nova_resource_manager) { return nova_resource_manager.checkErrorStatus(); }
-  std::vector<nova::exception::ERROR> get_error_list(const nova::NovaResourceManager &nova_resource_manager) {
-    return nova_resource_manager.getErrorList();
-  }
+  uint64_t get_error_status(const nova::NovaExceptionManager &exception_manager) { return exception_manager.checkErrorStatus(); }
+  std::vector<nova::exception::ERROR> get_error_list(const nova::NovaExceptionManager &exception_manager) { return exception_manager.getErrorList(); }
 }  // namespace nova_baker_utils
