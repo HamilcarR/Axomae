@@ -1,10 +1,10 @@
 #include "CubemapProcessing.cuh"
-#include "device/cuda/CudaDevice.h"
-#include "device/cuda/CudaParams.h"
-#include "device/device_utils.h"
-#include "device/cuda/cuda_utils.h"
-#include "math/math_spherical.h"
-#include "device/kernel_launch_interface.h"
+#include "internal/common/math/math_spherical.h"
+#include "internal/device/cuda/CudaDevice.h"
+#include "internal/device/cuda/CudaParams.h"
+#include "internal/device/cuda/cuda_utils.h"
+#include "internal/device/device_utils.h"
+#include "internal/device/kernel_launch_interface.h"
 #ifdef AXOMAE_STATS_TIMER
 #  include "PerformanceLogger.h"
 #endif
@@ -174,15 +174,14 @@ AX_KERNEL static void gpgpu_device_compute_diffuse_irradiance(
   }
 }
 
-static void gpgpu_kernel_call(
-    void (*device_function)(float *, cudaTextureObject_t, unsigned, unsigned, unsigned, unsigned, unsigned),
-    float *D_result_buffer,
-    cudaTextureObject_t texture,
-    const unsigned width,
-    const unsigned height,
-    const unsigned _width,
-    const unsigned _height,
-    const unsigned samples) {
+static void gpgpu_kernel_call(void (*device_function)(float *, cudaTextureObject_t, unsigned, unsigned, unsigned, unsigned, unsigned),
+                              float *D_result_buffer,
+                              cudaTextureObject_t texture,
+                              const unsigned width,
+                              const unsigned height,
+                              const unsigned _width,
+                              const unsigned _height,
+                              const unsigned samples) {
 
 #ifdef USE_STATS_TIMER
   cudaEvent_t start, stop;
