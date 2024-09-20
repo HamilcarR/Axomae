@@ -1,15 +1,15 @@
 #ifndef KERNEL_INTERFACE_CUH
 #define KERNEL_INTERFACE_CUH
-#include <device/device_utils.h>
+#include "constants.h"
+#include "internal/device/device_utils.h"
 #include <assert.h>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
-#include "constants.h"
 
 // Old code , tb refactored.
-struct SDL_Surface ;
+struct SDL_Surface;
 
 AX_DEVICE_CALLABLE inline float magnitude(float x, float y) { return sqrtf(x * x + y * y); }
 
