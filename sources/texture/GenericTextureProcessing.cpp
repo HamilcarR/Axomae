@@ -1,5 +1,5 @@
 #include "GenericTextureProcessing.h"
-#include "device/opengl/init_3D.h"
+#include "internal/device/opengl/init_3D.h"
 
 TextureData::TextureData()
     : width(0), height(0), nb_components(1), mipmaps(5), internal_format(GL_RGBA), data_format(GL_BGRA), data_type(GL_UNSIGNED_BYTE) {}
