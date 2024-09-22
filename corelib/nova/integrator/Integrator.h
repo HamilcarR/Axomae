@@ -47,6 +47,22 @@ namespace nova::integrator {
 
   template<class T>
   class AbstractIntegrator {
+   protected:
+    void accumulateRgbRenderbuffer(RenderBuffers<float> *buffers, unsigned pixel_offset, glm::vec4 color) const {
+      for (int k = 0; k < 3; k++)
+        buffers->accumulator_buffer[pixel_offset + k] += buffers->partial_buffer[pixel_offset + k];
+      buffers->partial_buffer[pixel_offset] = color.r;
+      buffers->partial_buffer[pixel_offset + 1] = color.g;
+      buffers->partial_buffer[pixel_offset + 2] = color.b;
+      buffers->partial_buffer[pixel_offset + 3] = color.a;
+    }
+
+    [[nodiscard]] unsigned generateImageOffset(const Tile &tile, bool axis_inverted, int x, int y) const {
+      if (axis_inverted)
+        return (y * tile.image_total_width + x) * 4;
+      return ((tile.image_total_height - 1 - y) * tile.image_total_width + x) * 4;
+    }
+
    public:
     /* leave this here in case there's some memory pools to free */
     void prepareAbortRender() const {}
@@ -59,26 +75,27 @@ namespace nova::integrator {
     void render(RenderBuffers<float> *buffers, Tile &tile, nova::nova_eng_internals &nova_internals) const {
       constexpr float RAND_DX = 0.0005;
       constexpr float RAND_DY = 0.0005;
+
       const NovaResourceManager *nova_resource_manager = nova_internals.resource_manager;
       NovaExceptionManager *nova_exception_manager = nova_internals.exception_manager;
+
       sampler::SobolSampler sobol = sampler::SobolSampler(nova_resource_manager->getEngineData().getMaxSamples(), 20);
       sampler::SamplerInterface sampler = &sobol;
+
       for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
         for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
+
           validate(sampler, nova_internals);
-          if (nova_exception_manager->checkErrorStatus() != 0) {
+          if (nova_exception_manager->checkErrorStatus() != exception::NOERR) {
             prepareAbortRender();
             return;
           }
-          unsigned int idx = 0;
-          if (!nova_resource_manager->getEngineData().isAxisVInverted())
-            idx = (y * tile.image_total_width + x) * 4;
-          else
-            idx = ((tile.image_total_height - 1 - y) * tile.image_total_width + x) * 4;
+
+          unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().isAxisVInverted(), x, y);
+
           glm::vec4 rgb{};
           const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
           for (int i = 0; i < tile.sample_per_tile; i++) {
-
             if (!nova_resource_manager->getEngineData().isRendering())
               return;
             /* Samples random direction around the pixel for AA. */
@@ -92,15 +109,11 @@ namespace nova::integrator {
             rgb += Li(ray, nova_internals, nova_resource_manager->getEngineData().getMaxDepth(), sampler);
           }
           rgb /= (float)(tile.sample_per_tile);
-          for (int k = 0; k < 3; k++)
-            buffers->accumulator_buffer[idx + k] += buffers->partial_buffer[idx + k];
-          buffers->partial_buffer[idx] = rgb.r;
-          buffers->partial_buffer[idx + 1] = rgb.g;
-          buffers->partial_buffer[idx + 2] = rgb.b;
-          buffers->partial_buffer[idx + 3] = rgb.a;
+          accumulateRgbRenderbuffer(buffers, idx, rgb);
         }
       tile.finished_render = true;
     }
+
     [[nodiscard]] glm::vec4 Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const {
       return static_cast<const T *>(this)->Li(ray, nova_internals, depth, sampler);
     }

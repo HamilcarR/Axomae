@@ -2,6 +2,8 @@ add_library(ax_core_nova_integrator STATIC
         Integrator.cpp
         DepthIntegrator.cpp
         NormalIntegrator.cpp
+        EmissiveIntegrator.cpp
+        EmissiveIntegrator.h
 )
 
 

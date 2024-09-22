@@ -52,6 +52,7 @@ void NovaRenderer::initializeEngine() {
   engine_opts.depth_max = MAX_RECUR_DEPTH;
   engine_opts.samples_max = MAX_SAMPLES;
   engine_opts.threadpool_tag = NOVA_REALTIME_TAG;
+  engine_opts.flip_v = true;
   engine_opts.engine_type_flag = nova::integrator::COMBINED | nova::integrator::PATH;
 
   initialize_engine_opts(engine_opts, nova_resource_manager->getEngineData());
