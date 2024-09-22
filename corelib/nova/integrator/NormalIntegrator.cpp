@@ -4,15 +4,18 @@ namespace nova::integrator {
 
   void NormalIntegrator::render(RenderBuffers<float> *buffers, Tile &tile, nova_eng_internals &nova_internals) const {
     const NovaResourceManager *nova_resource_manager = nova_internals.resource_manager;
+    NovaExceptionManager *nova_exception_manager = nova_internals.exception_manager;
     sampler::RandomSampler random_sampler = sampler::RandomSampler();
     sampler::SamplerInterface sampler = &random_sampler;
     for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
       for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
-        unsigned int idx = 0;
-        if (!nova_resource_manager->getEngineData().isAxisVInverted())
-          idx = (y * tile.image_total_width + x) * 4;
-        else
-          idx = ((tile.image_total_height - 1 - y) * tile.image_total_width + x) * 4;
+        validate(sampler, nova_internals);
+        if (nova_exception_manager->checkErrorStatus() != exception::NOERR) {
+          prepareAbortRender();
+          return;
+        }
+
+        unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().isAxisVInverted(), x, y);
 
         const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
         if (!nova_resource_manager->getEngineData().isRendering())
@@ -20,15 +23,8 @@ namespace nova::integrator {
         math::camera::camera_ray r = math::camera::ray_inv_mat(
             ndc.x, ndc.y, nova_resource_manager->getCameraData().getInvProjection(), nova_resource_manager->getCameraData().getInvView());
         Ray ray(r.near, r.far);
-
         glm::vec4 rgb = Li(ray, nova_internals, nova_resource_manager->getEngineData().getMaxDepth(), sampler);
-        for (int k = 0; k < 3; k++) {
-          buffers->accumulator_buffer[idx + k] += buffers->partial_buffer[idx + k];
-          buffers->partial_buffer[idx] = rgb.r;
-          buffers->partial_buffer[idx + 1] = rgb.g;
-          buffers->partial_buffer[idx + 2] = rgb.b;
-        }
-        buffers->partial_buffer[idx + 3] = 1.f;
+        accumulateRgbRenderbuffer(buffers, idx, rgb);
       }
     tile.finished_render = true;
   }
