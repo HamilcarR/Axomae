@@ -11,12 +11,14 @@ namespace nova::exception {
     if (this != &move) {
       auto target_val = move.err_flag.exchange(0, atomic_nmsp::memory_order_relaxed);
       err_flag.store(target_val, atomic_nmsp::memory_order_relaxed);
+      synchronizeErrFlag();
     }
   }
   NovaException &NovaException::operator=(NovaException &&move) noexcept {
     if (this != &move) {
       auto target_val = move.err_flag.exchange(0, atomic_nmsp::memory_order_relaxed);
       err_flag.store(target_val, atomic_nmsp::memory_order_relaxed);
+      synchronizeErrFlag();
     }
     return *this;
   }
@@ -24,6 +26,7 @@ namespace nova::exception {
     if (this != &copy) {
       auto target_val = copy.err_flag.load(atomic_nmsp::memory_order_relaxed);
       err_flag.store(target_val, atomic_nmsp::memory_order_relaxed);
+      synchronizeErrFlag();
     }
   }
 
@@ -31,21 +34,29 @@ namespace nova::exception {
     if (this != &copy) {
       auto target_val = copy.err_flag.load(atomic_nmsp::memory_order_relaxed);
       err_flag.store(target_val, atomic_nmsp::memory_order_relaxed);
+      synchronizeErrFlag();
     }
     return *this;
   }
 
-  void NovaException::addErrorType(uint64_t to_add) { err_flag.fetch_or(to_add, atomic_nmsp::memory_order_relaxed); }
+  void NovaException::addErrorType(uint64_t to_add) {
+    err_flag.fetch_or(to_add, atomic_nmsp::memory_order_relaxed);
+    synchronizeErrFlag();
+  }
 
-  void NovaException::merge(uint64_t other_error_flag) { err_flag.fetch_or(other_error_flag, atomic_nmsp::memory_order_relaxed); }
+  void NovaException::synchronizeErrFlag() { synchronized_err_flag = err_flag.load(atomic_nmsp::memory_order_relaxed); }
+  void NovaException::merge(uint64_t other_error_flag) {
+    err_flag.fetch_or(other_error_flag, atomic_nmsp::memory_order_relaxed);
+    synchronizeErrFlag();
+  }
 
   std::vector<ERROR> NovaException::getErrorList() const {
-    if (err_flag == NOERR)
+    if (synchronized_err_flag == NOERR)
       return {NOERR};
     std::vector<ERROR> error_vector;
     error_vector.reserve(64);
     uint64_t padding = 0;
-    uint64_t err_type_int = err_flag;
+    uint64_t err_type_int = synchronized_err_flag;
     while (padding < 63) {
       uint64_t test_var = err_type_int & (1ULL << padding);
       if (test_var != 0) {

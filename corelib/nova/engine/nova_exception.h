@@ -31,11 +31,18 @@ namespace nova::exception {
 
   class NovaException {
    private:
+    uint64_t synchronized_err_flag{NOERR};  // Synchronized on device , to be read by host. Otherwise we can't read err_flag if cuda is used, since it
+                                            // depends on architecture context.
+
 #if defined(__CUDA_ARCH__) && defined(AXOMAE_USE_CUDA)
     cuda::atomic<uint64_t> err_flag{NOERR};
 #else
     std::atomic<uint64_t> err_flag{NOERR};
 #endif
+
+   private:
+    AX_DEVICE_CALLABLE void synchronizeErrFlag();
+
    public:
     AX_DEVICE_CALLABLE NovaException() = default;
     AX_DEVICE_CALLABLE NovaException(NovaException &&move) noexcept;
@@ -44,8 +51,8 @@ namespace nova::exception {
     AX_DEVICE_CALLABLE NovaException &operator=(const NovaException &copy) noexcept;
     AX_DEVICE_CALLABLE ~NovaException() = default;
 
-    AX_DEVICE_CALLABLE [[nodiscard]] bool errorCheck() const { return err_flag != NOERR; }
-    AX_DEVICE_CALLABLE [[nodiscard]] uint64_t getErrorFlag() const { return err_flag; }
+    AX_DEVICE_CALLABLE [[nodiscard]] bool errorCheck() const { return synchronized_err_flag != NOERR; }
+    AX_DEVICE_CALLABLE [[nodiscard]] uint64_t getErrorFlag() const { return synchronized_err_flag; }
     AX_DEVICE_CALLABLE void addErrorType(uint64_t to_add);
     /* merges err_flag and other_error_flag , err_flag will now store it's previous errors + other_error_flag */
     AX_DEVICE_CALLABLE void merge(uint64_t other_error_flag);
