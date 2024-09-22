@@ -25,7 +25,6 @@ namespace exception {
 
 }  // namespace exception
 
-static std::mutex mutex;
 const char *const NOVABAKE_POOL_TAG = "_NOVABAKE_POOL_TAG_";
 
 /**************************************************************************************************************/

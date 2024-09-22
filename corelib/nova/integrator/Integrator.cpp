@@ -1,6 +1,7 @@
 
 #include "Integrator.h"
 #include "DepthIntegrator.h"
+#include "EmissiveIntegrator.h"
 #include "Logger.h"
 #include "NormalIntegrator.h"
 #include "engine/nova_engine.h"
@@ -30,6 +31,11 @@ namespace nova::integrator {
         processed = true;
         const DepthIntegrator depth_integrator;
         depth_integrator.render(buffers, tile, nova_internals);
+      }
+      if (integrator_type & EMISSIVE) {
+        processed = true;
+        const EmissiveIntegrator emissive_integrator;
+        emissive_integrator.render(buffers, tile, nova_internals);
       }
       if (!processed)
         nova_internals.exception_manager->addError(nova::exception::INVALID_RENDER_MODE);
