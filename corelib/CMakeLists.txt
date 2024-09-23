@@ -1,6 +1,3 @@
-
-
-
 add_library(ax_core STATIC)
 
 target_include_directories(ax_core

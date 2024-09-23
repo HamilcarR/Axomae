@@ -2,7 +2,6 @@
 #include "Integrator.h"
 #include "DepthIntegrator.h"
 #include "EmissiveIntegrator.h"
-#include "Logger.h"
 #include "NormalIntegrator.h"
 #include "engine/nova_engine.h"
 #include "manager/ManagerInternalStructs.h"

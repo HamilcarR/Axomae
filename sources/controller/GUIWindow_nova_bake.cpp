@@ -41,6 +41,7 @@ namespace controller {
   struct engine_misc_options {
     int engine_type_flag;
     bool flip_v;
+    bool use_gpu;
   };
 
   static void setup_camera(nova_baker_utils::engine_data &engine_data, const Camera &renderer_camera, float render_width, float render_height) {
@@ -232,18 +233,53 @@ namespace controller {
     }
   }
 
-  static void do_progressive_render(nova_baker_utils::render_scene_data &render_scene_data, image::ImageHolder<float> &image_holder) {
-    int i = 1;
-    int MAX_DEPTH = render_scene_data.nova_resource_manager->getEngineData().getMaxDepth();
-    const int N = render_scene_data.nova_resource_manager->getEngineData().getMaxSamples();
-    const int smax = math::calculus::compute_serie_term(N);
+  struct progressive_render_metadata {
+    int max_depth;
+    int max_samples;
+    int serie_max;
+    bool is_rendering;
+  };
+
+  static progressive_render_metadata create_render_metadata(const nova_baker_utils::render_scene_data &render_scene_data) {
+    int max_depth = render_scene_data.nova_resource_manager->getEngineData().getMaxDepth();
+    int max_samples = render_scene_data.nova_resource_manager->getEngineData().getMaxDepth();
+    int smax = math::calculus::compute_serie_term(max_samples);
     bool is_rendering = render_scene_data.nova_resource_manager->getEngineData().isRendering();
-    while (i < smax && is_rendering) {
-      render_scene_data.nova_resource_manager->getEngineData().setSampleIncrement(i);
+    return {max_depth, max_samples, smax, is_rendering};
+  }
+
+  static void do_progressive_render_gpu(nova_baker_utils::render_scene_data &render_scene_data, image::ImageHolder<float> &image_holder) {
+    int sample_increment = 1;
+    progressive_render_metadata metadata = create_render_metadata(render_scene_data);
+    while (sample_increment < metadata.max_samples && metadata.is_rendering) {
+      render_scene_data.nova_resource_manager->getEngineData().setSampleIncrement(sample_increment);
       render_scene_data.nova_resource_manager->getEngineData().setMaxDepth(
-          render_scene_data.nova_resource_manager->getEngineData().getMaxDepth() < MAX_DEPTH ?
+          render_scene_data.nova_resource_manager->getEngineData().getMaxDepth() < metadata.max_depth ?
               render_scene_data.nova_resource_manager->getEngineData().getMaxDepth() + 1 :
-              MAX_DEPTH);
+              metadata.max_depth);
+      try {
+        nova_baker_utils::bake_scene_gpu(render_scene_data);
+      } catch (const exception::GenericException &e) {
+        ExceptionInfoBoxHandler::handle(e);
+        return;
+      }
+
+      if (on_exception_shutdown(*render_scene_data.nova_exception_manager))
+        return;
+      color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)sample_increment);
+      sample_increment++;
+    }
+  }
+
+  static void do_progressive_render(nova_baker_utils::render_scene_data &render_scene_data, image::ImageHolder<float> &image_holder) {
+    int sample_increment = 1;
+    progressive_render_metadata metadata = create_render_metadata(render_scene_data);
+    while (sample_increment < metadata.max_samples && metadata.is_rendering) {
+      render_scene_data.nova_resource_manager->getEngineData().setSampleIncrement(sample_increment);
+      render_scene_data.nova_resource_manager->getEngineData().setMaxDepth(
+          render_scene_data.nova_resource_manager->getEngineData().getMaxDepth() < metadata.max_depth ?
+              render_scene_data.nova_resource_manager->getEngineData().getMaxDepth() + 1 :
+              metadata.max_depth);
       try {
         nova_baker_utils::bake_scene(render_scene_data);
       } catch (const exception::GenericException &e) {
@@ -255,8 +291,8 @@ namespace controller {
 
       if (on_exception_shutdown(*render_scene_data.nova_exception_manager))
         return;
-      color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)i);
-      i++;
+      color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)sample_increment);
+      sample_increment++;
     }
   }
 
@@ -273,11 +309,19 @@ namespace controller {
 
   static void start_baking(nova_baker_utils::render_scene_data &render_scene_data,
                            Controller *app_controller,
-                           image::ThumbnailImageHolder<float> &image_holder) {
+                           image::ThumbnailImageHolder<float> &image_holder,
+                           bool use_gpu) {
+    std::function<void(nova_baker_utils::render_scene_data &, image::ImageHolder<float> &)> callback;
 
-    auto callback = [](nova_baker_utils::render_scene_data &render_scene_data, image::ImageHolder<float> &image_holder) {
-      do_progressive_render(render_scene_data, image_holder);
-    };
+    if (use_gpu) {
+      callback = [](nova_baker_utils::render_scene_data &render_scene_data, image::ImageHolder<float> &image_holder) {
+        do_progressive_render_gpu(render_scene_data, image_holder);
+      };
+    } else {
+      callback = [](nova_baker_utils::render_scene_data &render_scene_data, image::ImageHolder<float> &image_holder) {
+        do_progressive_render(render_scene_data, image_holder);
+      };
+    }
 
     /* Creates a rendering thread . Will be moved to the baking structure ,
      * which will take care of managing it's lifetime */
@@ -332,7 +376,7 @@ namespace controller {
       threading::ThreadPool *thread_pool = global_application_config->getThreadPool();
       setup_render_scene_data(
           render_options, std::move(resource_manager), std::move(exception_manager), std::move(engine_instance), nova_baking_structure, thread_pool);
-      start_baking(nova_baking_structure.nova_render_scene, this, nova_baking_structure.bake_buffers.image_holder);
+      start_baking(nova_baking_structure.nova_render_scene, this, nova_baking_structure.bake_buffers.image_holder, misc_options.use_gpu);
       ignore_skybox(renderer, false);
     } catch (const exception::CatastrophicFailureException &e) {
       ignore_skybox(renderer, false);
@@ -350,6 +394,7 @@ namespace controller {
   struct ui_inputs {
     int width, height, tiles_number, depth, samples_per_pixel;
     int render_type_mode_flag;
+    bool use_gpu;
   };
 
   bool input_check(const ui_inputs &inputs) {
@@ -373,46 +418,52 @@ namespace controller {
       ExceptionInfoBoxHandler::handle("Invalid sample number.", exception::WARNING);
       return false;
     }
-
+    if (inputs.use_gpu) {
+#ifndef AXOMAE_USE_CUDA
+      ExceptionInfoBoxHandler::handle("GPGPU not available. \nSee logs.(execute with --editor --verbose).", exception::WARNING);
+      LOG("CUDA not found. Enable 'AXOMAE_USE_CUDA' in build if this platform has an Nvidia GPU.", LogLevel::ERROR);
+      return false;
+#endif
+    }
     return true;
   }
 
   static int get_render_type_mode(const Ui::MainWindow &main_window_ui) {
-    int flag = 0;
+    int render_type_flag = 0;
 
     /* color modes */
     if (main_window_ui.checkbox_rendermode_combined->isChecked())
-      flag |= nova::integrator::COMBINED;
+      render_type_flag |= nova::integrator::COMBINED;
     if (main_window_ui.checkbox_rendermode_depth->isChecked())
-      flag |= nova::integrator::DEPTH;
+      render_type_flag |= nova::integrator::DEPTH;
     if (main_window_ui.checkbox_rendermode_normal->isChecked())
-      flag |= nova::integrator::NORMAL;
+      render_type_flag |= nova::integrator::NORMAL;
     if (main_window_ui.checkbox_rendermode_diffuse->isChecked())
-      flag |= nova::integrator::DIFFUSE;
+      render_type_flag |= nova::integrator::DIFFUSE;
     if (main_window_ui.checkbox_rendermode_emissive->isChecked())
-      flag |= nova::integrator::EMISSIVE;
+      render_type_flag |= nova::integrator::EMISSIVE;
     if (main_window_ui.checkbox_rendermode_specular->isChecked())
-      flag |= nova::integrator::SPECULAR;
+      render_type_flag |= nova::integrator::SPECULAR;
 
     /* renderer type */
     std::string render_type = main_window_ui.combobox_enginetype_selector->currentText().toStdString();
     if (render_type == "Path")
-      flag |= nova::integrator::PATH;
+      render_type_flag |= nova::integrator::PATH;
     else if (render_type == "Bidirectional Path")
-      flag |= nova::integrator::BIPATH;
+      render_type_flag |= nova::integrator::BIPATH;
     else if (render_type == "Spectral")
-      flag |= nova::integrator::SPECTRAL;
+      render_type_flag |= nova::integrator::SPECTRAL;
     else if (render_type == "Metropolis")
-      flag |= nova::integrator::METROPOLIS;
+      render_type_flag |= nova::integrator::METROPOLIS;
     else if (render_type == "Photon Mapping")
-      flag |= nova::integrator::PHOTON;
+      render_type_flag |= nova::integrator::PHOTON;
     else if (render_type == "Marching")
-      flag |= nova::integrator::MARCHING;
+      render_type_flag |= nova::integrator::MARCHING;
     else if (render_type == "Hybrid")
-      flag |= nova::integrator::HYBRID;
+      render_type_flag |= nova::integrator::HYBRID;
     else if (render_type == "Voxel")
-      flag |= nova::integrator::VOXEL;
-    return flag;
+      render_type_flag |= nova::integrator::VOXEL;
+    return render_type_flag;
   }
 
   void Controller::slot_nova_start_bake() {
@@ -424,6 +475,7 @@ namespace controller {
     inputs.tiles_number = main_window_ui.spinbox_tile_number->value();
     inputs.render_type_mode_flag = get_render_type_mode(main_window_ui);
     bool flip_v = main_window_ui.checkbox_flip_y_axis->isChecked();
+    inputs.use_gpu = main_window_ui.use_gpu->isChecked();
     if (!input_check(inputs))
       return;
 
@@ -436,6 +488,7 @@ namespace controller {
     render_options.width = inputs.width;
     render_options.height = inputs.height;
 
+    misc_options.use_gpu = inputs.use_gpu;
     misc_options.engine_type_flag = inputs.render_type_mode_flag;
     misc_options.flip_v = flip_v;
     do_nova_render(render_options, misc_options);
