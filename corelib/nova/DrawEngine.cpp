@@ -18,7 +18,7 @@ namespace exception {
 }  // namespace exception
 
 namespace nova {
-   void NovaRenderEngineLR::engine_render_tile(HdrBufferStruct *buffers, Tile &tile, nova::nova_eng_internals &nova_internals) {
+  void NovaRenderEngineLR::engine_render_tile(HdrBufferStruct *buffers, Tile &tile, nova::nova_eng_internals &nova_internals) {
     integrator::integrator_dispatch(buffers, tile, nova_internals);
   }
 
@@ -59,8 +59,8 @@ namespace nova {
                                       NovaRenderEngineInterface *engine_instance,
                                       threading::ThreadPool *thread_pool,
                                       nova::nova_eng_internals &nova_internals) {
-
-    AX_ASSERT(nova_resources != nullptr, "Scene descriptor is not initialized.");
+    AX_ASSERT(nova_internals.resource_manager != nullptr, "Scene descriptor is not initialized.");
+    AX_ASSERT(nova_internals.exception_manager != nullptr, "Exception manager is not initialized");
     try {
       if (!validate(buffers, width_resolution, height_resolution, engine_instance, thread_pool, nova_internals))
         return {};

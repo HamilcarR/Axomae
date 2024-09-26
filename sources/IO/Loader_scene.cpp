@@ -365,40 +365,53 @@ namespace IO {
   }
 
   /**
-   * The function "geometry_fill_buffers" fills the buffers of a 3D object with vertex, normal, tangent,
-   * bitangent, and UV data from an imported model.
-   *
-   * @param modelScene modelScene is a pointer to an aiScene object, which represents a 3D model scene.
-   * It contains information about the model's meshes, materials, textures, and other properties.
-   * @param i The parameter "i" is the index of the mesh in the model scene that you want to fill the
-   * buffers for.
-   *
-   * @return a std::pair<unsigned, Object3D*>.
+   * This function loads vertex attributes in an async manner.
    */
-  std::pair<unsigned, std::unique_ptr<Object3D>> geometry_fill_buffers(const aiScene *modelScene, unsigned i) {
+  static std::pair<unsigned, std::unique_ptr<Object3D>> retrieve_geometry(const aiScene *modelScene, unsigned i) {
     const aiMesh *mesh = modelScene->mMeshes[i];
-    auto object = std::make_unique<Object3D>();
+    AX_ASSERT_NOTNULL(mesh->mVertices);
+
+    std::unique_ptr<Object3D> mesh_geometry_buffers = std::make_unique<Object3D>();
     auto size_dim3 = mesh->mNumVertices * 3;
     auto size_dim2 = mesh->mNumVertices * 2;
     auto size_dim3_indices = mesh->mNumFaces * 3;
-    object->vertices.resize(size_dim3);
-    object->normals.resize(size_dim3);
-    object->tangents.resize(size_dim3);
-    object->bitangents.resize(size_dim3);
-    object->indices.resize(size_dim3_indices);
-    object->uv.resize(size_dim2);
-    assert(mesh->HasTextureCoords(0));
+
+    std::vector<std::shared_future<void>> shared_futures;
     std::future<void> f_vertices, f_normals, f_bitangents, f_tangents, f_uv;
-    f_vertices = std::async(std::launch::async, [&]() { load_geometry_buffer(object->vertices, mesh->mVertices, mesh->mNumVertices, 3); });
-    f_normals = std::async(std::launch::async, [&]() { load_geometry_buffer(object->normals, mesh->mNormals, mesh->mNumVertices, 3); });
-    f_bitangents = std::async(std::launch::async, [&]() { load_geometry_buffer(object->bitangents, mesh->mBitangents, mesh->mNumVertices, 3); });
-    f_tangents = std::async(std::launch::async, [&]() { load_geometry_buffer(object->tangents, mesh->mTangents, mesh->mNumVertices, 3); });
-    f_uv = std::async(std::launch::async, [&]() { load_geometry_buffer(object->uv, mesh->mTextureCoords[0], mesh->mNumVertices, 2); });
-    load_indices_buffer(object->indices, mesh->mFaces, mesh->mNumFaces);
-    std::vector<std::shared_future<void>> shared_futures = {
-        f_vertices.share(), f_normals.share(), f_bitangents.share(), f_tangents.share(), f_uv.share()};
+    mesh_geometry_buffers->vertices.resize(size_dim3);
+    f_vertices = std::async(std::launch::async,
+                            [&]() { load_geometry_buffer(mesh_geometry_buffers->vertices, mesh->mVertices, mesh->mNumVertices, 3); });
+    shared_futures.push_back(f_vertices.share());
+
+    if (mesh->HasNormals()) {
+      mesh_geometry_buffers->normals.resize(size_dim3);
+      f_normals = std::async(std::launch::async,
+                             [&]() { load_geometry_buffer(mesh_geometry_buffers->normals, mesh->mNormals, mesh->mNumVertices, 3); });
+      shared_futures.push_back(f_normals.share());
+    }
+
+    if (mesh->HasTextureCoords(0)) {
+      mesh_geometry_buffers->uv.resize(size_dim2);
+      f_uv = std::async(std::launch::async,
+                        [&]() { load_geometry_buffer(mesh_geometry_buffers->uv, mesh->mTextureCoords[0], mesh->mNumVertices, 2); });
+      shared_futures.push_back(f_uv.share());
+    }
+
+    if (mesh->HasTangentsAndBitangents()) {
+      mesh_geometry_buffers->tangents.resize(size_dim3);
+      mesh_geometry_buffers->bitangents.resize(size_dim3);
+      f_tangents = std::async(std::launch::async,
+                              [&]() { load_geometry_buffer(mesh_geometry_buffers->tangents, mesh->mTangents, mesh->mNumVertices, 3); });
+      f_bitangents = std::async(std::launch::async,
+                                [&]() { load_geometry_buffer(mesh_geometry_buffers->bitangents, mesh->mBitangents, mesh->mNumVertices, 3); });
+      shared_futures.push_back(f_tangents.share());
+      shared_futures.push_back(f_bitangents.share());
+    }
+
+    mesh_geometry_buffers->indices.resize(size_dim3_indices);
+    load_indices_buffer(mesh_geometry_buffers->indices, mesh->mFaces, mesh->mNumFaces);
     std::for_each(shared_futures.begin(), shared_futures.end(), [](std::shared_future<void> &it) -> void { it.wait(); });
-    return {i, std::move(object)};
+    return {i, std::move(mesh_geometry_buffers)};
   };
 
   /**
@@ -419,7 +432,7 @@ namespace IO {
     Assimp::Importer importer;
     const aiScene *modelScene = importer.ReadFile(
         file, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs);
-    if (modelScene != nullptr) {
+    if (modelScene) {
       std::vector<std::future<std::pair<unsigned, std::unique_ptr<Object3D>>>> loaded_meshes_futures;
       std::vector<GLMaterial> material_array;
       std::vector<Mesh *> node_lookup_table;
@@ -428,7 +441,7 @@ namespace IO {
       material_array.resize(modelScene->mNumMeshes);
       for (unsigned int i = 0; i < modelScene->mNumMeshes; i++) {
         loaded_meshes_futures.push_back(std::async(std::launch::async,
-                                                   geometry_fill_buffers,
+                                                   retrieve_geometry,
                                                    modelScene,
                                                    i)  //*We launch multiple threads loading the geometry , and the main thread loads the materials
         );
@@ -451,7 +464,7 @@ namespace IO {
       objects.second = scene_tree;
       return objects;
     } else {
-      LOG("Problem loading scene", LogLevel::ERROR);
+      LOG("Cannot read file.", LogLevel::ERROR);
       return std::pair<std::vector<Mesh *>, SceneTree>();
     }
   }
