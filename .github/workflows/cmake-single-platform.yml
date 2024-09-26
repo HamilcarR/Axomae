@@ -23,6 +23,12 @@ jobs:
       run: |
         cd ${{github.workspace}} && ./scripts/update_deps.sh
 
+    - name: Copy FindSDL to system
+      run: |
+        sudo mkdir -p /usr/share/cmake/Modules
+        sudo cp cmake/FindSDL.cmake /usr/share/cmake/Modules/FindSDL2.cmake
+        sudo cp cmake/FindSDL_image.cmake /usr/share/cmake/Modules/FindSDL2_image.cmake
+
     - name: Install OpenGL and GLEW
       run: |
         sudo apt-get install -y libgl1-mesa-dev libglew-dev
