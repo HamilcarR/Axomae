@@ -65,7 +65,7 @@ namespace nova::integrator {
 
    public:
     /* leave this here in case there's some memory pools to free */
-    void prepareAbortRender() const {}
+    void prepareAbortRender() const { EMPTY_FUNCBODY }
 
     void validate(const sampler::SamplerInterface &sampler, nova::nova_eng_internals &nova_internals) const {
       nova::exception::NovaException exception = nova::sampler::retrieve_sampler_error(sampler);
