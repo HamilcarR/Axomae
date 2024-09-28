@@ -21,6 +21,15 @@ target_link_libraries(ax_core_nova_integrator PRIVATE
 
 target_link_libraries(ax_core_nova PUBLIC ax_core_nova_integrator)
 
-target_include_directories(ax_core_nova_integrator PUBLIC
+target_include_directories(ax_core_nova_integrator
+PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/../
+PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../
 )
+
+
+if(AXOMAE_USE_CUDA)
+    target_compile_definitions(ax_core_nova_integrator PUBLIC AXOMAE_USE_CUDA)
+    target_sources(ax_core_nova_integrator PRIVATE megakernel.cu)
+endif ()

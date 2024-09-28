@@ -22,8 +22,8 @@ namespace ax_cuda {
     AX_HOST_ONLY DeviceError GPUSetDevice(const CudaParams &params);
 
     /* Memory */
-    AX_HOST_ONLY DeviceError GPUMalloc(void **ptr, std::size_t size);
-    AX_HOST_ONLY DeviceError GPUFree(void *ptr);
+    AX_DEVICE_CALLABLE DeviceError GPUMalloc(void **ptr, std::size_t size);
+    AX_DEVICE_CALLABLE DeviceError GPUFree(void *ptr);
     AX_HOST_ONLY DeviceError GPUMallocManaged(void **ptr, std::size_t, const CudaParams &params);
     AX_HOST_ONLY DeviceError GPUMemcpy(const void *ptr_source, void *ptr_dest, std::size_t byte_count, const CudaParams &params);
     AX_HOST_ONLY DeviceError GPUMallocArray(cudaArray_t *array, const CudaParams &params, unsigned width, unsigned height, unsigned flags = 0);

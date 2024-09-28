@@ -31,7 +31,7 @@ inline void cuAssert(const DeviceError &err, const char *file, int line, bool ab
   cudaError_t code = err.cast_error(DeviceError::CUDA);
   if (code != cudaSuccess) {
     const char *err_str = cudaGetErrorString(code);
-    std::string err = "CUDA GPU assert :" + std::string(err_str);
+    std::string err = "CUDA GPU assert , error : " + std::to_string(code) + " " + std::string(err_str);
     LOGS(err + "\n File: " + file + "\n Line: " + std::to_string(line));
     if (abort)
       exit(code);

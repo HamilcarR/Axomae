@@ -5,8 +5,9 @@
 #include "engine/nova_exception.h"
 #include "integrator/Integrator.h"
 #include "manager/NovaResourceManager.h"
+
 #if defined(AXOMAE_USE_CUDA)
-#  include "gpu/gpu.cuh"
+#  include "integrator/GPUIntegrator.cuh"
 #endif
 
 namespace nova {
