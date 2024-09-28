@@ -5,7 +5,9 @@ target_link_libraries(ax_core_common PUBLIC ax_core_math)
 target_link_libraries(ax_core_math
 PRIVATE
         ax_core_macro
+
 PUBLIC
+        ax_core_device
         Boost::random
 )
 
@@ -55,4 +57,8 @@ elseif (AXOMAE_LUT_MEDIUMP)
 else()
     target_compile_definitions(ax_core_math PUBLIC AXOMAE_LUT_LOWP)
     precision_compile_flag(LOW)
+endif()
+
+if(AXOMAE_USE_CUDA)
+    target_compile_definitions(ax_core_math PUBLIC AXOMAE_USE_CUDA)
 endif()
