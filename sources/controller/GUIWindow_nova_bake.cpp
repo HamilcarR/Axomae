@@ -104,8 +104,10 @@ namespace controller {
     std::vector<float> &partial = nova_baking_structure.bake_buffers.partial;
     std::vector<float> &accumulator = nova_baking_structure.bake_buffers.accumulator;
     std::vector<float> &depth = nova_baking_structure.bake_buffers.depth;
-    size_t color_buffer_size = render_options.width * render_options.height * 4;
-    size_t depth_buffer_size = render_options.width * render_options.height * 2;
+    const int COLOR_CHANS = 4;
+    const int DEPTH_CHANS = 2;
+    size_t color_buffer_size = render_options.width * render_options.height * COLOR_CHANS;
+    size_t depth_buffer_size = render_options.width * render_options.height * DEPTH_CHANS;
     image_holder.data.resize(color_buffer_size);
     partial.resize(color_buffer_size);
     accumulator.resize(color_buffer_size);
@@ -115,7 +117,7 @@ namespace controller {
       depth.push_back(-1e30f);
     }
 
-    image_holder.metadata.channels = 4;
+    image_holder.metadata.channels = COLOR_CHANS;
     image_holder.metadata.color_corrected = false;
     image_holder.metadata.format = "hdr";
     image_holder.metadata.height = render_options.height;
@@ -126,6 +128,7 @@ namespace controller {
     buffers->partial_buffer = partial.data();
     buffers->accumulator_buffer = accumulator.data();
     buffers->depth_buffer = depth.data();
+    buffers->channels = COLOR_CHANS;
     return buffers;
   }
 

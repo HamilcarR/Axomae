@@ -8,8 +8,6 @@ target_link_libraries(ax_core_device
 PRIVATE
         ax_core_macro
         ax_core_debug
-        ax_core_common
-        ax_core_thread
 )
 
 target_include_directories(ax_core_device

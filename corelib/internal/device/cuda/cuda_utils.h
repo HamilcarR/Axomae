@@ -9,7 +9,7 @@
 #include <device_launch_parameters.h>
 #include <texture_fetch_functions.h>
 
-#if defined(__CUDA_ARCH__)
+#if defined(__CUDA_ARCH__) && defined(AXOMAE_USE_CUDA)
 #  define GPU_SYNCTHREAD __syncthreads()
 #  define GPU_SYNCWARP __syncwarp()
 
