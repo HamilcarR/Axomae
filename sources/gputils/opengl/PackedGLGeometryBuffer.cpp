@@ -63,7 +63,7 @@ void PackedGLGeometryBuffer::bindIndexBuffer() { index_buffer.bind(); }
 void PackedGLGeometryBuffer::bindTangentBuffer() { tangent_buffer.bind(); }
 
 // TODO: [AX-20] Provide methods to fill individual buffer , or to modify them
-void __attribute((optimize("O0"))) PackedGLGeometryBuffer::fill() {
+void PackedGLGeometryBuffer::fill() {
   if (!buffers_filled) {
     bindVao();
     bindVertexBuffer();

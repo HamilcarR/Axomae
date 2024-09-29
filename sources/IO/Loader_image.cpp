@@ -151,7 +151,7 @@ namespace IO {
 
   /***************************************************************************************/
   /* Radiance file format*/
-  image::ImageHolder<float> __attribute((optimize("O0"))) Loader::loadRadianceFile(const char *path, bool store) {
+  image::ImageHolder<float> Loader::loadRadianceFile(const char *path, bool store) {
     controller::ProgressManagerHelper helper(this);
     int width = -1, height = -1, channels = -1;
     float *data = stbi_loadf(path, &width, &height, &channels, 0);
