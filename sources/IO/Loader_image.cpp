@@ -165,9 +165,21 @@ namespace IO {
     AX_ASSERT(channels == 1 || channels == 2 || channels == 3 || channels == 4, "Channel number invalid for imported HDR image.");
 
     std::vector<float> image_data{};
-    image_data.reserve(width * height * channels);
-    for (int i = 0; i < width * height * channels; i++)
-      image_data.push_back(data[i]);
+    if (channels == 3) {
+      channels++;
+      image_data.resize(width * height * channels);
+      for (int i = 0; i < width * height; i++) {
+        for (int k = 0; k < 3; k++) {
+          image_data[i * channels + k] = data[i * 3 + k];
+        }
+        image_data[i * channels + 3] = 1.f;
+      }
+
+    } else {
+      image_data.reserve(width * height * channels);
+      for (int i = 0; i < width * height * channels; i++)
+        image_data.push_back(data[i]);
+    }
 
     std::string path_str(path);
     std::string name = utils::string::tokenize(path_str, '/').back();

@@ -47,19 +47,18 @@ EnvmapTextureManager::EnvmapTextureManager(ResourceDatabaseManager &resource_dat
 }
 
 static void createFurnace(HdrImageDatabase &database) {
-  std::vector<float> image_data(256 * 256 * 3, 0.1f);
   image::Metadata metadata;
   metadata.name = "Furnace.hdr";
   metadata.width = 256;
   metadata.height = 256;
-  metadata.channels = 3;
+  metadata.channels = 4;
   metadata.color_corrected = true;
   metadata.is_hdr = true;
+  std::vector<float> image_data(metadata.width * metadata.height * metadata.channels, 0.1f);
   database::image::store<float>(database, true, image_data, metadata);
 }
 
 static void createBlack(HdrImageDatabase &database) {
-  std::vector<float> image_data(256 * 256 * 3, 0.f);
   image::Metadata metadata;
   metadata.name = "Black.hdr";
   metadata.width = 256;
@@ -67,6 +66,7 @@ static void createBlack(HdrImageDatabase &database) {
   metadata.channels = 3;
   metadata.color_corrected = true;
   metadata.is_hdr = true;
+  std::vector<float> image_data(metadata.width * metadata.height * metadata.channels, 0.f);
   database::image::store<float>(database, true, image_data, metadata);
 }
 
@@ -92,7 +92,7 @@ void EnvmapTextureManager::initializeDefaultEnvmap(ApplicationConfig *conf) {
   current = bakes_id.back();
 }
 
-void EnvmapTextureManager::notified(observer::Data<EnvmapTextureManager::Message *> &message) {
+void EnvmapTextureManager::notified(observer::Data<Message *> &message) {
   switch (message.data->getOperation()) {
     case Message::ADD:
       if (update_policy_flag & ADD) {
@@ -139,8 +139,8 @@ static TextureData texture_metadata(image::ThumbnailImageHolder<float> *raw_imag
   envmap.height = raw_image_data->metadata.height;
   envmap.name = raw_image_data->metadata.name;
   envmap.data_type = GenericTexture::FLOAT;
-  envmap.internal_format = GenericTexture::RGB32F;
-  envmap.data_format = GenericTexture::RGB;
+  envmap.internal_format = GenericTexture::RGBA32F;
+  envmap.data_format = GenericTexture::RGBA;
   envmap.nb_components = raw_image_data->metadata.channels;
   envmap.f_data = raw_image_data->data;
   return envmap;
@@ -156,7 +156,7 @@ void EnvmapTextureManager::addToCollection(int index) {
   texgroup.metadata = raw_image_data;
   TextureData envmap = texture_metadata(raw_image_data);
   auto result = database::texture::store<EnvironmentMap2DTexture>(*texture_database, false, &envmap);
-  assert(result.object);
+  AX_ASSERT_NOTNULL(result.object);
   if (!cuda_process) {
     texgroup.cubemap_id = render_pipeline->bakeEnvmapToCubemap(
         result.object, *skybox_mesh, config.skybox_dim.width, config.skybox_dim.height, screen_dim);
