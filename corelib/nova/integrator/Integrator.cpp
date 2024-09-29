@@ -69,7 +69,7 @@ namespace nova::integrator {
       return 10.f * emit + color * Li(out, nova_internals, depth - 1, sampler);
     }
     glm::vec3 sample_vector = ray.direction;
-    return {texturing::sample_cubemap(sample_vector, &nova_resources->getEnvmapData()), 1.f};
+    return {sample_cubemap(sample_vector, &nova_resources->getEnvmapData()), 1.f};
   }
 
 }  // namespace nova::integrator
