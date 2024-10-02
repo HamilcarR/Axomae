@@ -3,6 +3,7 @@ add_library(ax_core_cuda
         CudaDevice.cpp
         CudaParams.cpp
         kernel_launch.cu
+        cuda_resource_loader.cpp
 )
 
 target_link_libraries(ax_core_device PUBLIC ax_core_cuda)
