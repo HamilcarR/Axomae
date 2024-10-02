@@ -26,4 +26,12 @@ class PerformanceLogger : protected AbstractLogger {
   long getDuration() { return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count(); }
 };
 
+#define AXOMAE_START_TIMER(var_name) \
+  PerformanceLogger var_name; \
+  var_name.startTimer();
+
+#define AXOMAE_END_TIMER(var_name) \
+  var_name.endTimer(); \
+  var_name.print();
+
 #endif
