@@ -1,5 +1,6 @@
 
-add_library(ax_core_device STATIC)
+add_library(ax_core_device STATIC
+        device_resource_interface.h)
 
 
 target_link_libraries(ax_core PUBLIC ax_core_device)
