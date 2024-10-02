@@ -59,7 +59,7 @@ if (AXOMAE_USE_CUDA AND CUDAToolkit_FOUND)
     endif()
     set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
     enable_language(CUDA) 
-    set(CMAKE_CUDA_FLAGS "--compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr -std=c++17")
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr -std=c++17 -G")
     set(CUDA_GENERATED_OUTPUT_DIR ${CMAKE_BINARY_DIR}/cuda_generated)
 endif ()
 
