@@ -1,10 +1,10 @@
-#include "CubemapProcessing.cuh"
+#include "CubemapProcessing.h"
 #include "internal/common/math/math_spherical.h"
-#include "internal/device/cuda/CudaDevice.h"
-#include "internal/device/cuda/CudaParams.h"
-#include "internal/device/cuda/cuda_utils.h"
-#include "internal/device/device_utils.h"
-#include "internal/device/kernel_launch_interface.h"
+#include "internal/device/gpgpu/cuda/CudaDevice.h"
+#include "internal/device/gpgpu/cuda/CudaParams.h"
+#include "internal/device/gpgpu/cuda/cuda_utils.h"
+#include "internal/device/gpgpu/device_utils.h"
+#include "internal/device/gpgpu/kernel_launch_interface.h"
 #ifdef AXOMAE_STATS_TIMER
 #  include "PerformanceLogger.h"
 #endif

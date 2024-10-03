@@ -23,8 +23,3 @@ PUBLIC
         OpenGL::GLU
         GLEW::GLEW
 )
-
-
-target_include_directories(ax_core_opengl PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)

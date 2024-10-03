@@ -3,7 +3,7 @@
 #include "Logger.h"
 
 #if defined(AXOMAE_USE_CUDA)
-#include "cuda/CubemapProcessing.cuh"
+#  include "cuda/CubemapProcessing.h"
 #endif
 
 template<>

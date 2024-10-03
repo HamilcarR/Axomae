@@ -2,7 +2,7 @@ add_library(ax_core_cuda
         cuda_utils.cpp
         CudaDevice.cpp
         CudaParams.cpp
-        kernel_launch.cu
+        CudaDeviceError.cpp
         cuda_resource_loader.cpp
 )
 
@@ -17,11 +17,10 @@ PUBLIC
         CUDA::cudart_static
 )
 
-target_include_directories(ax_core_cuda
-PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}
-)
+target_include_directories(ax_core_cuda PRIVATE
+    ${AXOMAE_CORELIB_ROOT}
 
+)
 add_subdirectory(optix)
 
 if(AXOMAE_USE_CUDA)

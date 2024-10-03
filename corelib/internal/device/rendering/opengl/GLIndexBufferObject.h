@@ -9,7 +9,7 @@ class GLIndexBufferObject : public DeviceBaseBufferInterface {
   enum DRAW_MODE : int { STATIC = GL_STATIC_DRAW, DYNAMIC = GL_DYNAMIC_DRAW, STREAM = GL_STREAM_DRAW };
 
  private:
-  GLuint id;
+  GLuint id{};
 
  public:
   CLASS_OCM(GLIndexBufferObject)

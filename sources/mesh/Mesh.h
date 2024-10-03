@@ -33,9 +33,9 @@ class Mesh : public SceneTreeNode, public MeshInterface {
   Object3D geometry;
   std::unique_ptr<GLMaterial> material;
   bool mesh_initialized;
-  Mesh *cubemap_reference;
-  Camera *camera;
-  glm::mat4 modelview_matrix;
+  Mesh *cubemap_reference{};
+  Camera *camera{};
+  glm::mat4 modelview_matrix{};
   bool face_culling_enabled;
   bool depth_mask_enabled;
   bool is_drawn;

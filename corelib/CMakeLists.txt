@@ -5,8 +5,7 @@ PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-
+set(AXOMAE_CORELIB_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(internal)
 add_subdirectory(nova)
-
 

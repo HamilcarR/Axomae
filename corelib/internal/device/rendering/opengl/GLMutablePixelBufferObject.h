@@ -16,9 +16,9 @@ class GLMutablePixelBufferObject final : public DeviceMutableBufferInterface {
   ACCESS access_type{R};
 
  public:
-  GLMutablePixelBufferObject() = default;
+  CLASS_OCM(GLMutablePixelBufferObject)
+
   GLMutablePixelBufferObject(TRANSFER type, size_t size);
-  ~GLMutablePixelBufferObject() override = default;
 
   void initialize() override;
   [[nodiscard]] bool isReady() const override;

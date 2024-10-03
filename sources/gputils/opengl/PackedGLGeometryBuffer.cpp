@@ -1,5 +1,5 @@
 #include "PackedGLGeometryBuffer.h"
-#include "DebugGL.h"
+#include "internal/device/rendering/opengl/DebugGL.h"
 
 PackedGLGeometryBuffer::PackedGLGeometryBuffer() {
   geometry = nullptr;

@@ -1,6 +1,6 @@
 #ifndef SAMPLER_H
 #define SAMPLER_H
-#include "device_utils.h"
+#include "internal/device/gpgpu/device_utils.h"
 #include "math_random.h"
 #include "math_utils.h"
 #include "project_macros.h"
