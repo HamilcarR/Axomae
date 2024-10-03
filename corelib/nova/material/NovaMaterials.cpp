@@ -1,6 +1,6 @@
 #include "NovaMaterials.h"
+#include "internal/common/math/utils_3D.h"
 #include "ray/Ray.h"
-#include "utils_3D.h"
 #include <sampler/Sampler.h>
 
 namespace nova::material {

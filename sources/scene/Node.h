@@ -1,9 +1,9 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "AbstractNode.h"
 #include "SceneNodeInterface.h"
-#include "utils_3D.h"
+#include "internal/common/math/utils_3D.h"
+#include "internal/datastructure/AbstractNode.h"
 
 /**
  * @file Node.h

@@ -1,9 +1,7 @@
 #ifndef NOVA_MATERIAL_H
 #define NOVA_MATERIAL_H
-#include "MemoryArena.h"
 #include "NovaMaterials.h"
-#include "project_macros.h"
-#include "utils/macros.h"
+#include "internal/memory/MemoryArena.h"
 #include <memory>
 namespace nova::material {
 

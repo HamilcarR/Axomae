@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
-#include "Logger.h"
-#include "ThreadPool.h"
+#include "internal/debug/Logger.h"
+#include "internal/thread/worker/ThreadPool.h"
 /**
  * @brief File implementing a utility returning configurations states for the application , either from the configuration file or the CLI tool.
  * @file Config.h

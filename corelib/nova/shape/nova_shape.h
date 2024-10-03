@@ -1,11 +1,7 @@
 #ifndef NOVA_SHAPE_H
 #define NOVA_SHAPE_H
-#include "Box.h"
-#include "MemoryArena.h"
-#include "Sphere.h"
-#include "Square.h"
 #include "Triangle.h"
-#include "utils/macros.h"
+#include "internal/memory/MemoryArena.h"
 #include <memory>
 
 namespace nova {

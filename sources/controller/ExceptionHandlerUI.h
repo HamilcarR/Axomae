@@ -1,8 +1,6 @@
-
 #ifndef EXCEPTIONHANDLERUI_H
 #define EXCEPTIONHANDLERUI_H
-#include "GenericException.h"
-#include <cstdlib>
+#include "internal/common/exception/GenericException.h"
 #include <string>
 
 namespace controller {

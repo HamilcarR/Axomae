@@ -1,7 +1,6 @@
 #include "ProgramOptionsManager.h"
-#include "../Operator.h"
 #include "API.h"
-#include "GenericException.h"
+#include "internal/common/exception/GenericException.h"
 #include <boost/program_options.hpp>
 #include <iostream>
 #include <regex>

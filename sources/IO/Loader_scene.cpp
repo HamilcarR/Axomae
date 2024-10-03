@@ -3,10 +3,8 @@
 #include "Loader.h"
 #include "ResourceDatabaseManager.h"
 #include "ShaderDatabase.h"
-#include "ShaderFactory.h"
 #include "TextureDatabase.h"
-#include "TextureFactory.h"
-#include "string/axomae_str_utils.h"
+#include "internal/common/string/axomae_str_utils.h"
 #include <QImage>
 
 #include <assimp/Importer.hpp>

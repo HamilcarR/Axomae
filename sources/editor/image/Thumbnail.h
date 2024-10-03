@@ -3,8 +3,6 @@
 #include "Metadata.h"
 #include "OperatorProgressStatus.h"
 #include "constants.h"
-#include "image_utils.h"
-#include "project_macros.h"
 #include <QPixmap>
 /**
  * @file ThumbnailList.h

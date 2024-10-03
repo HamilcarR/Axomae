@@ -3,6 +3,8 @@
 #include "../DeviceBufferInterface.h"
 #include "DebugGL.h"
 #include "init_3D.h"
+#include "internal/macro/project_macros.h"
+
 class GLMutablePixelBufferObject final : public DeviceMutableBufferInterface {
  public:
   enum TRANSFER : unsigned { DOWN = GL_PIXEL_PACK_BUFFER, UP = GL_PIXEL_UNPACK_BUFFER };

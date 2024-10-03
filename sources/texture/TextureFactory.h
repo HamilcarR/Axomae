@@ -1,9 +1,8 @@
 #ifndef TEXTUREFACTORY_H
 #define TEXTUREFACTORY_H
-#include "Factory.h"
-#include "RenderingDatabaseInterface.h"
 #include "Texture.h"
-#include "project_macros.h"
+#include "internal/common/Factory.h"
+#include "internal/macro/project_macros.h"
 /**
  * @file TextureFactory.h
  * Class definition of the factory system for the textures

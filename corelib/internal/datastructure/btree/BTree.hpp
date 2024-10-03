@@ -1,7 +1,7 @@
 #ifndef BTREE_H
 #define BTREE_H
-#include "AbstractHierarchy.h"
 #include "BNode.hpp"
+#include "internal/datastructure/AbstractHierarchy.h"
 namespace datastructure::btree {
   template<class T>
   class BTree : public AbstractHierarchy {

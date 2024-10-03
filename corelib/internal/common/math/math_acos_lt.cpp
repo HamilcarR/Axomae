@@ -1,5 +1,5 @@
+#include "internal/macro/project_macros.h"
 #include "math_spherical.h"
-#include "project_macros.h"
 
 #include <bits/stl_algo.h>
 

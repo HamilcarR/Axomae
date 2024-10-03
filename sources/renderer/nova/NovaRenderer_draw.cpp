@@ -8,7 +8,6 @@
 #include "integrator/Integrator.h"
 #include "internal/device/rendering/opengl/GLMutablePixelBufferObject.h"
 #include "manager/NovaResourceManager.h"
-#include <sys/param.h>
 
 static constexpr int MAX_RECUR_DEPTH = 20;
 static constexpr int MAX_SAMPLES = 10000;

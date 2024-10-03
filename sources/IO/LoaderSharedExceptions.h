@@ -1,6 +1,6 @@
 #ifndef LOADERSHAREDEXCEPTIONS_H
 #define LOADERSHAREDEXCEPTIONS_H
-#include "GenericException.h"
+#include "internal/common/exception/GenericException.h"
 
 namespace exception {
   class LoadFilePathException : public exception::GenericException {

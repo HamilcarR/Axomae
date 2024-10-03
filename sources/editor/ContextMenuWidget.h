@@ -1,6 +1,6 @@
 #ifndef CONTEXTMENUWIDGET_H
 #define CONTEXTMENUWIDGET_H
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 #include <QMenu>
 
 class ContextMenuWidget : public QMenu {

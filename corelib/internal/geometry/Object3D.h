@@ -1,7 +1,6 @@
 #ifndef OBJECT3D_H
 #define OBJECT3D_H
-#include "project_macros.h"
-#include <cstring>
+#include "internal/macro/project_macros.h"
 #include <vector>
 
 namespace geometry {

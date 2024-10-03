@@ -1,7 +1,7 @@
 #ifndef DEBUGGL_H
 #define DEBUGGL_H
-#include "Logger.h"
 #include "gl_headers.h"
+#include "internal/debug/Logger.h"
 #include <iostream>
 #define GL_ERROR_CHECK(function) \
   do { \

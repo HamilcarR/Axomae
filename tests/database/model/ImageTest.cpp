@@ -1,6 +1,6 @@
 #include "Image.h"
 #include "Test.h"
-#include "math_utils.h"
+#include "internal/common/math/math_utils.h"
 
 constexpr int MAX_W = 1919;
 constexpr int MAX_H = 1080;

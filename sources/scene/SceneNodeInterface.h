@@ -1,6 +1,6 @@
 #ifndef SceneNodeInterface_H
 #define SceneNodeInterface_H
-#include "math_utils.h"
+#include "internal/common/math/math_utils.h"
 /**
  * @class SceneNodeInterface
  * @brief Provides an interface for a scene node

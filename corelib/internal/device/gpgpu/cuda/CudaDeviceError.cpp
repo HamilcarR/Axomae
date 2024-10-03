@@ -1,6 +1,7 @@
 #include "../DeviceError.h"
-
+#include <cuda_runtime_api.h>
 #include <internal/common/exception/GenericException.h>
+#include <internal/debug/Logger.h>
 
 namespace exception {
   class WrongDeviceTypeException : public GenericException {

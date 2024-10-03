@@ -2,14 +2,13 @@
 #include "GPUIntegrator.cuh"
 #include "Integrator.h"
 #include "engine/nova_exception.h"
+#include "internal/common/math/math_texturing.h"
 #include "internal/debug/Logger.h"
-#include "internal/debug/PerformanceLogger.h"
 #include "internal/device/gpgpu/cuda/CudaDevice.h"
 #include "internal/device/gpgpu/device_resource_interface.h"
 #include "internal/device/gpgpu/device_utils.h"
 #include "internal/device/gpgpu/kernel_launch_interface.h"
 #include "manager/NovaResourceManager.h"
-#include "math/math_texturing.h"
 
 /* Serves only as a baseline for performance to compare against */
 namespace nova {

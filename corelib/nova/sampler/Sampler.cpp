@@ -1,8 +1,6 @@
 #include "Sampler.h"
 #include "engine/nova_exception.h"
-#include "math_importance_sampling.h"
-#include <glm/gtc/matrix_access.hpp>
-
+#include "internal/common/math/math_importance_sampling.h"
 #include <boost/random/uniform_01.hpp>
 using namespace nova::sampler;
 

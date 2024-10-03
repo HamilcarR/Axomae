@@ -1,8 +1,7 @@
 
 #ifndef OPERATOR_H
 #define OPERATOR_H
-#include "ILockable.h"
-#include "constants.h"
+#include "internal/thread/ILockable.h"
 
 /**
  * @file Operator.h

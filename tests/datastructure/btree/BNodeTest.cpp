@@ -1,4 +1,4 @@
-#include "btree/BNode.hpp"
+#include "internal/datastructure/btree/BNode.hpp"
 #include "Test.h"
 
 using namespace datastructure::btree;

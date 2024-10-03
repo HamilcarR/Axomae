@@ -1,6 +1,6 @@
 #include "TextureProcessing.h"
 #include "Test.h"
-#include "math_random.h"
+#include "internal/common/math/math_random.h"
 
 constexpr unsigned int NUM_CHANNELS = 3;
 constexpr unsigned int SAMPLES = 500;

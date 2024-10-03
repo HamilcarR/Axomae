@@ -1,9 +1,9 @@
 #ifndef NOVATEXTUREINTERFACE_H
 #define NOVATEXTUREINTERFACE_H
+#include "internal/common/math/math_utils.h"
 #include "internal/device/gpgpu/device_utils.h"
-#include "math_utils.h"
-#include "project_macros.h"
-#include "tag_ptr.h"
+#include "internal/macro/project_macros.h"
+#include "internal/memory/tag_ptr.h"
 
 namespace nova::texturing {
   struct texture_sample_data {

@@ -1,8 +1,8 @@
 #ifndef CUDAPARAMS_H
 #define CUDAPARAMS_H
 #include "cuda_utils.h"
+#include "internal/macro/project_macros.h"
 #include "params_structs.h"
-#include "project_macros.h"
 
 namespace ax_cuda {
 

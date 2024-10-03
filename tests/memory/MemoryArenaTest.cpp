@@ -1,6 +1,6 @@
-#include "MemoryArena.h"
+#include "internal/memory/MemoryArena.h"
 #include "Test.h"
-#include "math_random.h"
+#include "internal/common/math/math_random.h"
 #include <cstdint>
 #include <gtest/gtest.h>
 

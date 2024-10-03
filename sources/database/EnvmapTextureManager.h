@@ -1,11 +1,9 @@
 #ifndef ENVMAPTEXTUREMANAGER_H
 #define ENVMAPTEXTUREMANAGER_H
 #include "ImageDatabase.h"
-#include "Observer.h"
 #include "RenderPipeline.h"
 #include "ResourceDatabaseManager.h"
-#include "TextureDatabase.h"
-#include "constants.h"
+#include "internal/common/Observer.h"
 
 namespace texture::envmap {
   /*This structure packs all 3 cubemaps IDs used in IBL*/

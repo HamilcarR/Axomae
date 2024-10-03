@@ -1,12 +1,11 @@
 #ifndef IMAGEDATABASE_H
 #define IMAGEDATABASE_H
-#include "Factory.h"
 #include "Image.h"
-#include "Observer.h"
 #include "RenderingDatabaseInterface.h"
 #include "Thumbnail.h"
 #include "database_utils.h"
-#include "project_macros.h"
+#include "internal/common/Observer.h"
+#include "internal/macro/project_macros.h"
 #include <utility>
 
 template<class DATATYPE>
