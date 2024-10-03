@@ -2,14 +2,12 @@
 #define NOVA_DRAW_ENGINE_H
 #include "NovaInterface.h"
 
-#include "ThreadPool.h"
-#include "manager/NovaResourceManager.h"
-#include "math_camera.h"
-#include "ray/Ray.h"
-#include "texturing/nova_texturing.h"
-#include "utils/nova_utils.h"
+#include <future>
 #include <vector>
 
+namespace threading {
+  class ThreadPool;
+}
 namespace nova {
 
   class NovaRenderEngineLR final : public NovaRenderEngineInterface {

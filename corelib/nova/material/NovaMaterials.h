@@ -1,6 +1,6 @@
 #ifndef NOVAMATERIALS_H
 #define NOVAMATERIALS_H
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 #include "ray/Hitable.h"
 #include "sampler/Sampler.h"
 #include "texturing/nova_texturing.h"

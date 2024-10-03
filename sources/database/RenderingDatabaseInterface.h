@@ -2,9 +2,9 @@
 #define RENDERINGDATABASEINTERFACE_H
 
 #include "DatabaseInterface.h"
-#include "Mutex.h"
 #include "OperatorProgressStatus.h"
 #include "constants.h"
+#include "internal/thread/Mutex.h"
 #include <map>
 
 /**

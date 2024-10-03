@@ -1,8 +1,8 @@
 #include "ArcballCamera.h"
-#include "Logger.h"
 #include "event/EventController.h"
-#include "math_utils.h"
-#include "project_macros.h"
+#include "internal/common/math/math_utils.h"
+#include "internal/debug/Logger.h"
+#include "internal/macro/project_macros.h"
 
 constexpr float DELTA_ZOOM = 1.f;
 constexpr float ANGLE_EPSILON = 0.0001f;   // we use these to avoid nan values when angles or vector lengths become too small

@@ -1,15 +1,10 @@
 #include "ExceptionHandlerUI.h"
-#include "Logger.h"
-#include "Mesh.h"
 #include "NovaRenderer.h"
-#include "Object3D.h"
 #include "bake.h"
+#include "internal/common/exception/GenericException.h"
+#include "internal/debug/Logger.h"
+#include "internal/geometry/Object3D.h"
 #include "manager/NovaResourceManager.h"
-#include "material/nova_material.h"
-#include "primitive/NovaGeoPrimitive.h"
-#include "shape/nova_shape.h"
-
-#include <GenericException.h>
 
 void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
   try {

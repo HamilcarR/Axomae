@@ -1,11 +1,11 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "BoundingBox.h"
 #include "Camera.h"
 #include "Material.h"
 #include "MeshInterface.h"
-#include "Object3D.h"
+#include "internal/geometry/BoundingBox.h"
+#include "internal/geometry/Object3D.h"
 
 /**
  * @brief Mesh.h
@@ -33,9 +33,9 @@ class Mesh : public SceneTreeNode, public MeshInterface {
   Object3D geometry;
   std::unique_ptr<GLMaterial> material;
   bool mesh_initialized;
-  Mesh *cubemap_reference;
-  Camera *camera;
-  glm::mat4 modelview_matrix;
+  Mesh *cubemap_reference{};
+  Camera *camera{};
+  glm::mat4 modelview_matrix{};
   bool face_culling_enabled;
   bool depth_mask_enabled;
   bool is_drawn;

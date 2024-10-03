@@ -1,5 +1,5 @@
 #include "ImageImporter.h"
-#include "Logger.h"
+#include "internal/debug/Logger.h"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <assert.h>

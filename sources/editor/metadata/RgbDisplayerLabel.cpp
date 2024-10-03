@@ -1,6 +1,6 @@
 #include "RgbDisplayerLabel.h"
 
-#include "image_utils.h"
+#include "internal/common/image/image_utils.h"
 
 #include <QPainter>
 namespace editor {

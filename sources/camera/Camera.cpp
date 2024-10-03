@@ -1,7 +1,5 @@
 #include "Camera.h"
-#include "event/EventController.h"
-#include "math_utils.h"
-#include "project_macros.h"
+#include "internal/common/math/math_utils.h"
 
 /**********************************************************************************************************************************************/
 Camera::Camera() : world_up(glm::vec3(0, 1, 0)) {

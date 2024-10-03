@@ -1,8 +1,9 @@
 #include "DrawEngine.h"
-#include "GenericException.h"
-#include "Logger.h"
 #include "engine/nova_engine.h"
 #include "integrator/Integrator.h"
+#include "internal/common/exception/GenericException.h"
+#include "internal/debug/Logger.h"
+#include "internal/thread/worker/ThreadPool.h"
 #include "manager/NovaResourceManager.h"
 
 namespace exception {

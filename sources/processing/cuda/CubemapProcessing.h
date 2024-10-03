@@ -1,7 +1,5 @@
-#ifndef CUBEMAPPROCESSING_CUH
-#define CUBEMAPPROCESSING_CUH
-#include "internal/device/cuda/cuda_utils.h"
-#include "internal/device/device_utils.h"
+#ifndef CUBEMAPPROCESSING_H
+#define CUBEMAPPROCESSING_H
 
 /**********************************************************************************************************************************************************************************/
 

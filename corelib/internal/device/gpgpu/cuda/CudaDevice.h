@@ -4,7 +4,7 @@
 #include "../device_utils.h"
 #include "CudaParams.h"
 #include "cuda_utils.h"
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 
 namespace ax_cuda {
 

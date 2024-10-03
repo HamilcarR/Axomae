@@ -1,8 +1,8 @@
 #ifndef BNODE_H
 #define BNODE_H
-#include "AbstractNode.h"
 #include "BNodeInterface.h"
-#include "project_macros.h"
+#include "internal/datastructure/AbstractNode.h"
+#include "internal/macro/project_macros.h"
 namespace datastructure::btree {
   template<class T>
   class BNode : public AbstractNode, public BNodeInterface<T> {

@@ -1,7 +1,7 @@
 #ifndef UTILS_3D_H
 #define UTILS_3D_H
-#include "Vector.h"
 #include "math_utils.h"
+#include "vector/Vector.h"
 
 namespace math::geometry {
   /* Get barycentric coordinates of I in triangle P1P2P3 */

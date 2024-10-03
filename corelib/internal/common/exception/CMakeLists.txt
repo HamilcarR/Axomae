@@ -9,7 +9,6 @@ target_link_libraries(ax_core_exception
 )
 
 target_include_directories(ax_core_exception
-PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR}
-
+PUBLIC
+        ${AXOMAE_CORELIB_ROOT}
 )

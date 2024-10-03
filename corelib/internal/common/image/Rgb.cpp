@@ -1,5 +1,5 @@
 #include "Rgb.h"
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 #include <cmath>
 #include <sstream>
 namespace image {

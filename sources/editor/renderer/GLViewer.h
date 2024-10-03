@@ -5,9 +5,9 @@
 #include "Mesh.h"
 #include "RendererCallbacks.h"
 #include "RendererInterface.h"
-#include "Rgb.h"
 #include "SceneHierarchy.h"
 #include "constants.h"
+#include "internal/common/image/Rgb.h"
 
 #include <QOpenGLWidget>
 /**

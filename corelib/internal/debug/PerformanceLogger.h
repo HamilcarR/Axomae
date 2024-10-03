@@ -1,7 +1,7 @@
 #ifndef PERFORMANCELOGGER_H
 #define PERFORMANCELOGGER_H
 #include "Logger.h"
-
+#include <iostream>
 /**
  * @file PerformanceLogger.h
  * This file implements a class that can measure time differences

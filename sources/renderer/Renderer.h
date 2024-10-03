@@ -1,23 +1,14 @@
 #ifndef RENDERER_H
 #define RENDERER_H
-
-#include <any>
-#include <queue>
-
 #include "Camera.h"
 #include "CameraFrameBuffer.h"
-#include "Drawable.h"
 #include "EnvmapTextureManager.h"
 #include "GLViewer.h"
 #include "LightingDatabase.h"
-#include "Loader.h"
-#include "Mesh.h"
-#include "RendererCallbacks.h"
 #include "RendererInterface.h"
 #include "ResourceDatabaseManager.h"
 #include "Scene.h"
 #include "constants.h"
-#include "utils_3D.h"
 /**
  * @file Renderer.h
  * Implementation of the renderer system

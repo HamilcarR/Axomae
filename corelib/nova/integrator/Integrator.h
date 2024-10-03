@@ -1,9 +1,9 @@
 #ifndef INTEGRATOR_H
 #define INTEGRATOR_H
+#include "internal/common/math/math_camera.h"
+#include "internal/common/math/math_utils.h"
+#include "internal/macro/project_macros.h"
 #include "manager/ManagerInternalStructs.h"
-#include "math_camera.h"
-#include "math_utils.h"
-#include "project_macros.h"
 
 namespace nova {
   class Ray;

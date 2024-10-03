@@ -1,11 +1,9 @@
 #include "ImageManager.h"
-#include "Logger.h"
-#include "Rgb.h"
 #include "constants.h"
+#include "internal/common/image/Rgb.h"
+#include "internal/debug/Logger.h"
 #include "kernel_interface.h"
-#include "project_macros.h"
 #include <SDL2/SDL.h>
-#include <assert.h>
 
 template<class F, class... Args>
 constexpr void call_gpu_f(F &&func, Args &&...args) {

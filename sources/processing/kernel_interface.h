@@ -1,7 +1,7 @@
 #ifndef KERNEL_INTERFACE_CUH
 #define KERNEL_INTERFACE_CUH
 #include "constants.h"
-#include "internal/device/device_utils.h"
+#include "internal/device/gpgpu/device_utils.h"
 #include <assert.h>
 #include <cstdint>
 #include <fstream>

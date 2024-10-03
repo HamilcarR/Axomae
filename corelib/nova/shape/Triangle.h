@@ -1,8 +1,8 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
-#include "BoundingBox.h"
-#include "math_utils.h"
-#include "project_macros.h"
+#include "internal/common/math/math_utils.h"
+#include "internal/geometry/BoundingBox.h"
+#include "internal/macro/project_macros.h"
 #include "ray/Hitable.h"
 
 namespace nova::shape {

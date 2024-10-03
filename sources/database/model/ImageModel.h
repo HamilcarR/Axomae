@@ -1,8 +1,8 @@
 #ifndef IMAGEMODEL_H
 #define IMAGEMODEL_H
 #include "ImageDatabase.h"
-#include "Observer.h"
 #include "constants.h"
+#include "internal/common/Observer.h"
 #include <QAbstractListModel>
 
 class HdrImageModel : public QAbstractListModel, public ISubscriber<database::event::ImageUpdateMessage *> {

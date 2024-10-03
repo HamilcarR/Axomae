@@ -2,7 +2,7 @@
 
 #include "primitive/nova_primitive.h"
 
-#include <GenericException.h>
+#include "internal/common/exception/GenericException.h"
 
 namespace exception {
   class BadSizeException : public GenericException {

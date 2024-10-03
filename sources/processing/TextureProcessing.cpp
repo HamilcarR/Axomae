@@ -1,9 +1,9 @@
 #include "TextureProcessing.h"
 #include "GenericTextureProcessing.h"
-#include "Logger.h"
+#include "internal/debug/Logger.h"
 
 #if defined(AXOMAE_USE_CUDA)
-#include "cuda/CubemapProcessing.cuh"
+#  include "cuda/CubemapProcessing.h"
 #endif
 
 template<>
@@ -34,7 +34,7 @@ std::unique_ptr<TextureData> TextureOperations<float>::computeDiffuseIrradiance(
     for (unsigned i = 0; i < envmap_tex_data.f_data.size(); i++)
       envmap_tex_data.f_data[i] = dest_array[i];
 #else
-    LOG("CUDA not found. Enable 'AXOMAE_USE_CUDA' in build if this platform has an Nvidia GPU." , LogLevel::ERROR);
+    LOG("CUDA not found. Enable 'AXOMAE_USE_CUDA' in build if this platform has an Nvidia GPU.", LogLevel::ERROR);
 #endif
   } else {
     envmap_tex_data.f_data.resize(_width * _height * channels);

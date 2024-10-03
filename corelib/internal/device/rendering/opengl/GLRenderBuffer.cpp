@@ -1,5 +1,5 @@
 #include "GLRenderBuffer.h"
-#include "DebugGL.h"
+#include "internal/macro/project_macros.h"
 
 GLRenderBuffer::GLRenderBuffer() {
   width = 0;

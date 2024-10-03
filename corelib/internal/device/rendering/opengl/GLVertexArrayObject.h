@@ -1,7 +1,7 @@
 #ifndef GLVERTEXARRAYOBJECT_H
 #define GLVERTEXARRAYOBJECT_H
 #include "../DeviceBufferInterface.h"
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 #include <GL/glew.h>
 
 class GLVertexArrayObject : public DeviceBaseBufferInterface {

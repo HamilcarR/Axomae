@@ -1,11 +1,11 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "DeviceShaderInterface.h"
 #include "Texture.h"
-#include "init_3D.h"
-#include "project_macros.h"
-#include <DebugGL.h>
+#include "internal/common/math/utils_3D.h"
+#include "internal/device/rendering/DeviceShaderInterface.h"
+#include "internal/device/rendering/opengl/DebugGL.h"
+#include "internal/device/rendering/opengl/init_3D.h"
 #include <string>
 
 // TODO : implement uniform buffer objects

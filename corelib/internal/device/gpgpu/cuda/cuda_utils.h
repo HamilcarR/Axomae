@@ -1,13 +1,10 @@
 #ifndef CU_MACRO_H
 #define CU_MACRO_H
 
-#include "Logger.h"
+#include "internal/debug/Logger.h"
 #include <cuda.h>
 #include <cuda/atomic>
-#include <cuda_device_runtime_api.h>
 #include <cuda_runtime_api.h>
-#include <device_launch_parameters.h>
-#include <texture_fetch_functions.h>
 
 #if defined(__CUDA_ARCH__) && defined(AXOMAE_USE_CUDA)
 #  define GPU_SYNCTHREAD __syncthreads()

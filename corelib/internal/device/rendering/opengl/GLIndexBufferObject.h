@@ -3,13 +3,13 @@
 #define GLINDEXBUFFEROBJECT_H
 #include "../DeviceBufferInterface.h"
 #include "init_3D.h"
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 class GLIndexBufferObject : public DeviceBaseBufferInterface {
  public:
   enum DRAW_MODE : int { STATIC = GL_STATIC_DRAW, DYNAMIC = GL_DYNAMIC_DRAW, STREAM = GL_STREAM_DRAW };
 
  private:
-  GLuint id;
+  GLuint id{};
 
  public:
   CLASS_OCM(GLIndexBufferObject)

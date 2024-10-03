@@ -2,7 +2,7 @@
 #define NOVARESOURCEMANAGER_H
 #include "camera/nova_camera.h"
 #include "engine/nova_engine.h"
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 #include "ray/Ray.h"
 #include "scene/nova_scene.h"
 #include "texturing/nova_texturing.h"

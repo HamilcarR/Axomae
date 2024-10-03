@@ -1,8 +1,8 @@
 #ifndef SHADERDATABASE_H
 #define SHADERDATABASE_H
-#include "Factory.h"
 #include "RenderingDatabaseInterface.h"
 #include "Shader.h"
+#include "internal/common/Factory.h"
 /**
  * @file ShaderDatabase.h
  * A database containing Shader pointers to avoid duplicating and copying Shaders with the same informations

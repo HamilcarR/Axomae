@@ -1,14 +1,13 @@
-#include "Logger.h"
 #include "MaterialInterface.h"
 #include "Mesh.h"
 #include "TextureGroup.h"
 #include "bake.h"
+#include "internal/common/exception/GenericException.h"
+#include "internal/debug/Logger.h"
+#include "internal/macro/project_macros.h"
 #include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
-#include "project_macros.h"
 #include "texturing/nova_texturing.h"
-
-#include <GenericException.h>
 
 namespace exception {
   class InvalidTexTypeConversionException : public CatastrophicFailureException {
