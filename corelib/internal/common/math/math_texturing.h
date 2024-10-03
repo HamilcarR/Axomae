@@ -1,6 +1,6 @@
 #ifndef MATH_TEXTURING_H
 #define MATH_TEXTURING_H
-#include "device_utils.h"
+#include "internal/device/gpgpu/device_utils.h"
 namespace math::texture {
   constexpr float ONE_255 = 1.f / 255.f;
 

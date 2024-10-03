@@ -1,14 +1,13 @@
-
 #include "Config.h"
 #include "ExceptionHandlerUI.h"
 #include "GUIWindow.h"
-#include "GenericException.h"
-#include "Logger.h"
 #include "TextureViewerWidget.h"
 #include "WorkspaceTracker.h"
 #include "engine/nova_exception.h"
-#include "exception_macros.h"
 #include "integrator/Integrator.h"
+#include "internal/common/exception/GenericException.h"
+#include "internal/debug/Logger.h"
+#include "internal/macro/exception_macros.h"
 #include "manager/NovaResourceManager.h"
 #include "nova/bake.h"
 #include <QFileDialog>

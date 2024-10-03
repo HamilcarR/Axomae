@@ -1,6 +1,6 @@
 #ifndef VEC2_H
 #define VEC2_H
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 #include <cmath>
 #include <cstdlib>
 #include <ostream>

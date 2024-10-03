@@ -1,12 +1,6 @@
 #ifndef LOADER_H
 #define LOADER_H
 
-#include <cassert>
-#include <cstdlib>
-#include <iostream>
-#include <memory>
-
-#include "GenericException.h"
 #include "Image.h"
 #include "Mesh.h"
 #include "ResourceDatabaseManager.h"

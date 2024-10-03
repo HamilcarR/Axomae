@@ -1,6 +1,6 @@
 #include "Thumbnail.h"
+#include "internal/common/image/image_utils.h"
 #include <QImageWriter>
-
 Thumbnail::Thumbnail(std::vector<uint8_t> &rgb, const image::Metadata &metadata, controller::ProgressStatus *status) {
   initProgress(status, "Generating image thumbnail", static_cast<float>(metadata.width * metadata.height * metadata.channels));
   controller::ProgressManagerHelper helper(this);

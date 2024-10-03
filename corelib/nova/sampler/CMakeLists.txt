@@ -15,4 +15,5 @@ target_link_libraries(ax_core_nova PUBLIC ax_core_nova_sampler)
 
 target_include_directories(ax_core_nova_sampler PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/../
+        ${AXOMAE_CORELIB_ROOT}
 )

@@ -1,9 +1,8 @@
 #ifndef BOX_H
 #define BOX_H
-#include "BoundingBox.h"
+#include "internal/geometry/BoundingBox.h"
 #include "ray/Hitable.h"
 #include "ray/Ray.h"
-#include <glm/vec3.hpp>
 
 namespace nova::shape {
   class Box {

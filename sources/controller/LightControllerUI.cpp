@@ -1,7 +1,7 @@
 #include "LightControllerUI.h"
-#include "Logger.h"
 #include "Renderer.h"
 #include "constants.h"
+#include "internal/debug/Logger.h"
 #include "light/LightingSystem.h"
 
 // TODO : refactor for cleaner controller system : Implement light control system after free camera

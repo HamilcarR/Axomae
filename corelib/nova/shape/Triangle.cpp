@@ -1,7 +1,7 @@
 #include "Triangle.h"
-#include "math_utils.h"
+#include "internal/common/math/math_utils.h"
+#include "internal/common/math/utils_3D.h"
 #include "ray/Ray.h"
-#include "utils_3D.h"
 
 namespace nova::shape {
 

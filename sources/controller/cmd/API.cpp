@@ -1,10 +1,9 @@
 #include "API.h"
-#include "GenericException.h"
 #include "Loader.h"
 #include "TextureProcessing.h"
 #include "TextureViewerWidget.h"
-#include "ThreadPool.h"
 #include "constants.h"
+#include "internal/common/exception/GenericException.h"
 
 namespace controller::cmd {
 

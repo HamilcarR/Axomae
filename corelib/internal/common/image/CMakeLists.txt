@@ -10,5 +10,5 @@ PRIVATE
 
 target_include_directories(ax_core_image
 PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR}
+        ${AXOMAE_CORELIB_ROOT}
 )

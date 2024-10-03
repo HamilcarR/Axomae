@@ -1,5 +1,5 @@
 #include "Config.h"
-
+#include <iostream>
 #include <memory>
 
 ApplicationConfig::ApplicationConfig() {

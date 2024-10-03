@@ -1,7 +1,7 @@
 #include "Texture.h"
 #include "Test.h"
 
-#include <Factory.h>
+#include "internal/common/Factory.h"
 
 #define TYPE_LIST \
   DiffuseTexture, NormalTexture, MetallicTexture, RoughnessTexture, AmbiantOcclusionTexture, SpecularTexture, EmissiveTexture, OpacityTexture, \

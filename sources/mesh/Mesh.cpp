@@ -1,8 +1,7 @@
 #include "Mesh.h"
-#include "DebugGL.h"
-#include "PerformanceLogger.h"
-#include "init_3D.h"
-#include "project_macros.h"
+#include "internal/debug/PerformanceLogger.h"
+#include "internal/device/rendering/opengl/init_3D.h"
+#include "internal/macro/project_macros.h"
 
 Mesh::Mesh(SceneTreeNode *parent) : SceneTreeNode(parent) {
   mesh_initialized = false;

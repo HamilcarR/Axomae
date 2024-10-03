@@ -1,4 +1,4 @@
-#include "btree/BTree.hpp"
+#include "internal/datastructure/btree/BTree.hpp"
 #include "Test.h"
 
 using namespace datastructure::btree;

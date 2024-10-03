@@ -1,9 +1,9 @@
 #ifndef OFFLINECUBEMAPPROCESSING_H
 #define OFFLINECUBEMAPPROCESSING_H
-#include "GenericException.h"
-#include "ThreadPool.h"
-#include "math_utils.h"
-#include "project_macros.h"
+#include "internal/common/exception/GenericException.h"
+#include "internal/common/math/math_utils.h"
+#include "internal/macro/project_macros.h"
+#include "internal/thread/worker/ThreadPool.h"
 
 inline bool isDimPowerOfTwo(int dimension) { return (dimension & (dimension - 1)) == 0; }
 inline bool isValidDim(int dimension) { return dimension > 0; }

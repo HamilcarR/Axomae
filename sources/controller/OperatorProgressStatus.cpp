@@ -1,6 +1,6 @@
-#include "Logger.h"
 #include "OperatorProgressStatus.h"
 #include "ProgressStatusWidget.h"
+#include "internal/debug/Logger.h"
 
 namespace controller {
 

@@ -1,6 +1,7 @@
 #ifndef LightInterface_H
 #define LightInterface_H
-#include "math_utils.h"
+#include "internal/common/math/math_utils.h"
+
 class LightInterface {
  public:
   virtual void setPosition(const glm::vec3 &pos) = 0;

@@ -1,7 +1,7 @@
 #ifndef AABB_UTILS_TEST_H
 #define AABB_UTILS_TEST_H
 #include "geometry_shapes.h"
-#include "math_utils.h"
+#include "internal/common/math/math_utils.h"
 #define f_rand math::random::nrandf(-2000.f, 2000.f)
 
 constexpr float EPSILON = 0.001f;

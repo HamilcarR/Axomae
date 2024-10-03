@@ -1,6 +1,5 @@
 #ifndef BVH_H
 #define BVH_H
-#include "BoundingBox.h"
 #include "BvhBuilder.h"
 #include "primitive/nova_primitive.h"
 namespace nova::aggregate {

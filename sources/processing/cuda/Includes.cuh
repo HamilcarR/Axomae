@@ -1,16 +1,10 @@
 #ifndef INCLUDES_CUH
 #define INCLUDES_CUH
-#include "Logger.h"
 #include "constants.h"
-#include "device_utils.h"
-#include "utils_3D.h"
-
-#include <texture_types.h>
+#include "internal/common/math/utils_3D.h"
+#include "internal/debug/Logger.h"
 
 constexpr glm::dvec3 UP_VECTOR = glm::dvec3(0.f, 1.f, 0.f);
-
-
-
 
 struct gpu_threads {
   dim3 threads;

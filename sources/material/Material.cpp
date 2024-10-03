@@ -1,7 +1,7 @@
 #include "Material.h"
-#include "DebugGL.h"
 #include "UniformNames.h"
-
+#include "internal/common/math/utils_3D.h"
+#include "internal/device/rendering/opengl/DebugGL.h"
 GLMaterial::GLMaterial() {
   dielectric_factor = 0.f;
   shininess = 100.f;

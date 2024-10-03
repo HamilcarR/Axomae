@@ -1,10 +1,10 @@
 #ifndef SAMPLER_H
 #define SAMPLER_H
-#include "device_utils.h"
-#include "math_random.h"
-#include "math_utils.h"
-#include "project_macros.h"
-#include "tag_ptr.h"
+#include "internal/common/math/math_random.h"
+#include "internal/common/math/math_utils.h"
+#include "internal/device/gpgpu/device_utils.h"
+#include "internal/macro/project_macros.h"
+#include "internal/memory/tag_ptr.h"
 
 #include <boost/random/sobol.hpp>
 #include <engine/nova_exception.h>

@@ -1,5 +1,4 @@
 #include "RenderCubeMap.h"
-#include "Logger.h"
 
 RenderCubeMap::RenderCubeMap(TextureDatabase *database, Dim2 *screen, unsigned int *default_fbo) : FramebufferHelper(database, screen, default_fbo) {}
 

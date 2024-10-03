@@ -1,4 +1,4 @@
-#include "BoundingBox.h"
+#include "internal/geometry/BoundingBox.h"
 #include "Test.h"
 #include "aabb_utils_test.h"
 using namespace geometry;

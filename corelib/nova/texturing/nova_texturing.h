@@ -1,10 +1,10 @@
 #ifndef NOVA_TEXTURING_H
 #define NOVA_TEXTURING_H
-#include "MemoryArena.h"
 #include "NovaTextureInterface.h"
-#include "math_utils.h"
-#include "project_macros.h"
-#include "utils/macros.h"
+#include "internal/common/math/math_utils.h"
+#include "internal/common/type_list.h"
+#include "internal/macro/project_macros.h"
+#include "internal/memory/MemoryArena.h"
 #include <memory>
 namespace nova::texturing {
 

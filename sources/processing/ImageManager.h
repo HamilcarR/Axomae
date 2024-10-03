@@ -1,8 +1,7 @@
 #ifndef IMAGEMANAGER_H
 #define IMAGEMANAGER_H
-#include "GenericException.h"
-#include "Object3D.h"
-#include "Rgb.h"
+#include "internal/common/image/Rgb.h"
+#include "internal/geometry/Object3D.h"
 
 // TODO : Old code , Refactor
 

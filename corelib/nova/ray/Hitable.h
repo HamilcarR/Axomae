@@ -1,6 +1,6 @@
 #ifndef HITABLE_H
 #define HITABLE_H
-#include "math_utils.h"
+#include "internal/common/math/math_utils.h"
 namespace nova {
 
   /**

@@ -1,7 +1,7 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
 
-#include "math_utils.h"
+#include "internal/common/math/math_utils.h"
 #include <vector>
 
 /**

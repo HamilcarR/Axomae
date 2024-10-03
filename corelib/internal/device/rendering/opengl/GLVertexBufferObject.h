@@ -3,7 +3,7 @@
 #include "../DeviceBufferInterface.h"
 #include "DebugGL.h"
 #include "init_3D.h"
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 
 template<class T>
 class GLVertexBufferObject final : public DeviceBaseBufferInterface {

@@ -1,5 +1,4 @@
 #include "Object3D.h"
-#include "project_macros.h"
 void Object3D::get_tri(geometry::face_data_tri &geom, const unsigned int idx[3]) const {
   geometry::load_vertex_attribute3f(geom.v0, geom.v1, geom.v2, idx, vertices);
   geometry::load_vertex_attribute3f(geom.n0, geom.n1, geom.n2, idx, normals);

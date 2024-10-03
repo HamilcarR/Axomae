@@ -1,7 +1,7 @@
 #ifndef MESH_GEOMETRY_UTILS_H
 #define MESH_GEOMETRY_UTILS_H
-#include "Object3D.h"
 #include "geometry_shapes.h"
+#include "internal/geometry/Object3D.h"
 
 class Object3DBuilder {
  public:

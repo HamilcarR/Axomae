@@ -1,5 +1,5 @@
 #include "BoundingBox.h"
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 using namespace geometry;
 
 glm::vec3 calculateCenter(glm::vec3 min_coords, glm::vec3 max_coords);

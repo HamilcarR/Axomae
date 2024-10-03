@@ -13,8 +13,8 @@ PRIVATE
 )
 
 target_include_directories(ax_core_common
-PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR}
+PUBLIC
+    ${AXOMAE_CORELIB_ROOT}
 )
 
 add_subdirectory(math)

@@ -5,6 +5,7 @@
 #include "ResourceDatabaseManager.h"
 #include "SceneHierarchy.h"
 #include "shape/Box.h"
+#include <map>
 /**
  * @file Scene.h
  * @brief File implementing classes and functions relative to how the scene is represented and how to manage it

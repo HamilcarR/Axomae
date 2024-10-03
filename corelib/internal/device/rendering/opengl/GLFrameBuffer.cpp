@@ -1,6 +1,7 @@
 #include "GLFrameBuffer.h"
 #include "DebugGL.h"
-#include "Logger.h"
+#include "internal/debug/Logger.h"
+#include "internal/macro/project_macros.h"
 
 GLFrameBuffer::GLFrameBuffer() {
   renderbuffer_object = nullptr;

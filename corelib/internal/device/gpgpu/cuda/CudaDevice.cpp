@@ -1,8 +1,4 @@
-
-
 #include "CudaDevice.h"
-
-#include <GenericException.h>
 
 namespace ax_cuda {
 

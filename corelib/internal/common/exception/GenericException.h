@@ -1,6 +1,6 @@
 #ifndef GENERICEXCEPTION_H
 #define GENERICEXCEPTION_H
-#include "class_macros.h"
+#include "internal/macro/class_macros.h"
 #include <stdexcept>
 namespace exception {
   enum SEVERITY : int { QUERY, INFO, WARNING, CRITICAL };

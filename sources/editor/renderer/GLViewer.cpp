@@ -1,6 +1,5 @@
 #include "GLViewer.h"
 #include "Config.h"
-#include "DebugGL.h"
 #include "Renderer.h"
 #include "event/EventController.h"
 #include <QCursor>

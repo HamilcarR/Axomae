@@ -1,7 +1,7 @@
 #ifndef IMAGES_UTILS_H
 #define IMAGES_UTILS_H
 
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 namespace hdr_utils {
 
   /* Disable strict aliasing warning on compilation because those functions need type prunning */

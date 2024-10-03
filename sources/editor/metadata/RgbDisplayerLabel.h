@@ -1,8 +1,8 @@
 #ifndef RGBDISPLAYERLABEL_H
 #define RGBDISPLAYERLABEL_H
-#include "Rgb.h"
-
+#include "internal/common/image/Rgb.h"
 #include <QLabel>
+
 namespace editor {
   class RgbDisplayerLabel : public QLabel {
    public:
