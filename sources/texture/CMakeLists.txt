@@ -1,5 +1,4 @@
 add_library(ax_texture STATIC
-        Texture.cpp
         TextureGroup.cpp
         texture_utils.cpp
         GenericTextureProcessing.cpp

@@ -1,9 +1,8 @@
 #include "Shader.h"
 #include "Camera.h"
-#include "DebugGL.h"
 #include "UniformNames.h"
 #include "glsl.h"
-#include "init_3D.h"
+#include "internal/device/rendering/opengl/init_3D.h"
 #include <cstring>
 #include <stdexcept>
 

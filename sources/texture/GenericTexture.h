@@ -1,13 +1,10 @@
 #ifndef GENERICTEXTURE_H
 #define GENERICTEXTURE_H
 
-#include "DeviceTextureInterface.h"
 #include "GenericTextureProcessing.h"
-#include "init_3D.h"
-#include "utils_3D.h"
-#include <map>
-#include <unordered_map>
-
+#include "internal/device/rendering/DeviceTextureInterface.h"
+#include "internal/device/rendering/opengl/init_3D.h"
+#include <cstring>
 class Shader;
 /**
  * @brief Texture class

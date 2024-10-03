@@ -1,11 +1,11 @@
 #ifndef GLGEOMETRYBUFFER_H
 #define GLGEOMETRYBUFFER_H
-#include "../DeviceBufferInterface.h"
 #include "Object3D.h"
+#include "internal/device/rendering/DeviceBufferInterface.h"
 
-#include "GLIndexBufferObject.h"
-#include "GLVertexArrayObject.h"
-#include "GLVertexBufferObject.h"
+#include "internal/device/rendering/opengl/GLIndexBufferObject.h"
+#include "internal/device/rendering/opengl/GLVertexArrayObject.h"
+#include "internal/device/rendering/opengl/GLVertexBufferObject.h"
 
 /**
  * Wrapper for opengl buffers functions , related to geometry and vertices attributes

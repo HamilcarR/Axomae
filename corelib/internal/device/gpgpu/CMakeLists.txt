@@ -1,0 +1,5 @@
+if(AXOMAE_USE_CUDA)
+    target_compile_definitions(ax_core_device PUBLIC AXOMAE_USE_CUDA)
+    set_source_files_properties(device_utils.h PROPERTIES LANGUAGE CUDA)
+    add_subdirectory(cuda)
+endif()

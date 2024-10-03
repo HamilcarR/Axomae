@@ -1,5 +1,5 @@
 #include "Drawable.h"
-#include "DebugGL.h"
+#include "internal/device/rendering/opengl/DebugGL.h"
 using namespace axomae;
 
 Drawable::Drawable() : mesh_object(nullptr), camera_pointer(nullptr) {}

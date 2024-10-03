@@ -1,5 +1,4 @@
 #include "RenderPipeline.h"
-#include "DebugGL.h"
 #include "FramebufferHelper.h"
 #include "FreePerspectiveCamera.h"
 #include "INodeFactory.h"
@@ -7,6 +6,7 @@
 #include "RenderQuad.h"
 #include "Renderer.h"
 #include "ShaderDatabase.h"
+#include "internal/device/rendering/opengl/DebugGL.h"
 
 const float FOV = FOV;
 const float NEAR = NEAR;

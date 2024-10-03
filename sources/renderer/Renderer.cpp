@@ -1,11 +1,11 @@
 #include "Renderer.h"
 #include "ArcballCamera.h"
 #include "Config.h"
-#include "DebugGL.h"
 #include "EnvmapTextureManager.h"
 #include "RenderPipeline.h"
 #include "ShaderDatabase.h"
 #include "event/EventController.h"
+#include "internal/device/rendering/opengl/DebugGL.h"
 using namespace axomae;
 
 Renderer::Renderer()

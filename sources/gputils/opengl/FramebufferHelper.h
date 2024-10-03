@@ -2,8 +2,8 @@
 #define FRAMEBUFFERHELPER_H
 
 #include "FramebufferHelperInterface.h"
-#include "GLFrameBuffer.h"
 #include "TextureDatabase.h"
+#include "internal/device/rendering/opengl/GLFrameBuffer.h"
 
 class TextureDatabase;
 

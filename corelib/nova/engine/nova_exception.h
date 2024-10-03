@@ -1,6 +1,6 @@
 #ifndef EXCEPTION_H
 #define EXCEPTION_H
-#include "device_utils.h"
+#include "internal/device/gpgpu/device_utils.h"
 #include <atomic>
 #include <class_macros.h>
 #include <cstdint>

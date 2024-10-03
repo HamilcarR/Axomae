@@ -1,5 +1,3 @@
-
-
 target_link_libraries(${PROJECT_NAME} PUBLIC
         ax_core
         ax_controller

@@ -13,4 +13,5 @@ PUBLIC
 target_include_directories(ax_core_memory
 PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${AXOMAE_CORELIB_ROOT}
 )

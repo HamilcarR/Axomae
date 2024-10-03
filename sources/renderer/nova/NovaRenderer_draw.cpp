@@ -3,10 +3,10 @@
 #include "DrawEngine.h"
 #include "Drawable.h"
 #include "EnvmapTextureManager.h"
-#include "GLMutablePixelBufferObject.h"
 #include "NovaRenderer.h"
 #include "bake.h"
 #include "integrator/Integrator.h"
+#include "internal/device/rendering/opengl/GLMutablePixelBufferObject.h"
 #include "manager/NovaResourceManager.h"
 #include <sys/param.h>
 
