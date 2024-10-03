@@ -1,5 +1,6 @@
 #include "DrawEngine.h"
 #include "integrator/Integrator.h"
+#include "internal/debug/Logger.h"
 #include "manager/NovaResourceManager.h"
 
 #if defined(AXOMAE_USE_CUDA)
