@@ -1,7 +1,4 @@
 #include "DrawEngine.h"
-#include "Logger.h"
-#include "PerformanceLogger.h"
-#include "engine/nova_exception.h"
 #include "integrator/Integrator.h"
 #include "manager/NovaResourceManager.h"
 

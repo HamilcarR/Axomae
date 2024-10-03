@@ -2,7 +2,6 @@
 #define DEVICE_RESOURCE_DATA_H
 
 #include "DeviceError.h"
-#include "project_macros.h"
 #include <any>
 
 namespace device::gpgpu::resource {
@@ -29,5 +28,5 @@ namespace device::gpgpu::resource {
     texture_channel_descriptor descriptor;
   };
 
-}
+}  // namespace device::gpgpu::resource
 #endif

@@ -1,5 +1,5 @@
 #include "TextureDatabase.h"
-#include "Mutex.h"
+#include "internal/thread/Mutex.h"
 #include <utility>
 
 TextureDatabase::TextureDatabase(controller::ProgressStatus *progress_manager_) { progress_manager = progress_manager_; }

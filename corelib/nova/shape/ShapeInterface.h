@@ -1,8 +1,8 @@
 #ifndef SHAPEINTERFACE_H
 #define SHAPEINTERFACE_H
-#include "BoundingBox.h"
+#include "internal/geometry/BoundingBox.h"
+#include "internal/memory/tag_ptr.h"
 #include "ray/Hitable.h"
-#include <tag_ptr.h>
 
 namespace nova::shape {
   class Sphere;

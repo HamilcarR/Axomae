@@ -2,7 +2,6 @@
 #define LIGHTINGDATABASE_H
 #include "INodeDatabase.h"
 #include "LightingSystem.h"
-#include "utils_3D.h"
 
 class LightingDatabase {
   using AbstractLightMap = std::map<AbstractLight::TYPE, std::vector<AbstractLight *>>;

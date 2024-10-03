@@ -1,5 +1,4 @@
 #include "DepthIntegrator.h"
-#include "Mutex.h"
 
 namespace nova::integrator {
 

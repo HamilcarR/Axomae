@@ -1,5 +1,5 @@
 #include "ShaderDatabase.h"
-#include "Mutex.h"
+#include "internal/thread/Mutex.h"
 
 ShaderDatabase::ShaderDatabase(controller::ProgressStatus *progress_manager_) { progress_manager = progress_manager_; }
 

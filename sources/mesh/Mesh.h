@@ -1,11 +1,11 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "BoundingBox.h"
 #include "Camera.h"
 #include "Material.h"
 #include "MeshInterface.h"
-#include "Object3D.h"
+#include "internal/geometry/BoundingBox.h"
+#include "internal/geometry/Object3D.h"
 
 /**
  * @brief Mesh.h

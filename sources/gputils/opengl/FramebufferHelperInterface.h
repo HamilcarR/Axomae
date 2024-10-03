@@ -1,7 +1,7 @@
 #ifndef FramebufferInterface_H
 #define FramebufferInterface_H
+#include "internal/common/math/math_utils.h"
 #include "internal/device/rendering/DeviceBufferInterface.h"
-#include "math_utils.h"
 
 class FramebufferHelperInterface : public DeviceBaseBufferInterface {
  public:

@@ -1,8 +1,8 @@
 #ifndef TAGUTILS_H
 #define TAGUTILS_H
+#include "internal/common/type_list.h"
 #include "internal/device/gpgpu/device_utils.h"
-#include "project_macros.h"
-#include "type_list.h"
+#include "internal/macro/project_macros.h"
 
 namespace core::tagutils {
 

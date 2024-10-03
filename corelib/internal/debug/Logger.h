@@ -1,15 +1,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
-#include "ILockable.h"
-#include "Mutex.h"
-#include "project_macros.h"
-#include <chrono>
-#include <cstdlib>
+#include "internal/thread/ILockable.h"
 #include <fstream>
-#include <iostream>
 #include <memory>
-#include <sstream>
-#include <vector>
 
 #define LOG(message, level) log_functions::log_message(message, level, __FILE__, __func__, __LINE__)
 #define LOGFL(message, level, file, function, line) log_functions::log_message(message, level, file, function, line)

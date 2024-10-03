@@ -1,10 +1,10 @@
 #ifndef INODEDATABASE_H
 #define INODEDATABASE_H
 
-#include "Factory.h"
 #include "Node.h"
 #include "RenderingDatabaseInterface.h"
-#include "project_macros.h"
+#include "internal/common/Factory.h"
+#include "internal/macro/project_macros.h"
 
 class INodeDatabase final : public IntegerResourceDB<datastructure::NodeInterface> {
   using NodeIdMap [[maybe_unused]] = std::map<int, std::unique_ptr<datastructure::NodeInterface>>;

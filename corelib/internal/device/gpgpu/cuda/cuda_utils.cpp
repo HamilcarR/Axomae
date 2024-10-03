@@ -1,6 +1,5 @@
 #include "cuda_utils.h"
-#include "GenericException.h"
-
+#include <sstream>
 namespace ax_cuda::utils {
 
   /* Get device info . Throws GenericException*/

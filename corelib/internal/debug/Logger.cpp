@@ -1,8 +1,8 @@
 #include "Logger.h"
-#include "GenericException.h"
-#include "Mutex.h"
-#include <map>
+#include "internal/common/exception/GenericException.h"
+#include "internal/thread/Mutex.h"
 #include <unordered_map>
+#include <vector>
 #define LOG2STR(level) level_str[level]
 #define STR2LOG(str) level_str.find(str)
 

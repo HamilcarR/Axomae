@@ -1,11 +1,11 @@
 #include "Camera.h"
-#include "CameraInterface.h"
 #include "DrawEngine.h"
-#include "GenericException.h"
 #include "Image.h"
-#include "ThreadPool.h"
 #include "bake.h"
+#include "internal/common/exception/GenericException.h"
+#include "internal/thread/worker/ThreadPool.h"
 #include "manager/NovaResourceManager.h"
+
 namespace exception {
   class NullMeshListException : public GenericException {
    public:

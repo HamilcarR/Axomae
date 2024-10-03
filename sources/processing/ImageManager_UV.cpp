@@ -1,7 +1,7 @@
 #include "ImageManager.h"
-#include "Rgb.h"
-#include "utils_3D.h"
-
+#include "internal/common/exception/GenericException.h"
+#include "internal/common/image/Rgb.h"
+#include "internal/common/math/utils_3D.h"
 namespace exception {
   class NoNormalsException : public GenericException {
    public:

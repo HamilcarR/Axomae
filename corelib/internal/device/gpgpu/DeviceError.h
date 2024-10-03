@@ -1,8 +1,8 @@
 #ifndef DEVICEERROR_H
 #define DEVICEERROR_H
-#include "cuda/cuda_utils.h"
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 #include <cstdint>
+#include <driver_types.h>
 
 class DeviceError {
  public:

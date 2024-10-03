@@ -4,7 +4,7 @@
 #include "LightInterface.h"
 #include "Node.h"
 #include "Shader.h"
-#include "utils_3D.h"
+
 /**
  * @file LightingSystem.h
  * Defines polymorphic lighting system.

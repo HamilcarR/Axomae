@@ -1,8 +1,8 @@
 #ifndef NOVAGEOPRIMITIVE_H
 #define NOVAGEOPRIMITIVE_H
-#include "BoundingBox.h"
+#include "internal/geometry/BoundingBox.h"
+#include "internal/macro/project_macros.h"
 #include "material/NovaMaterials.h"
-#include "project_macros.h"
 #include "ray/Hitable.h"
 #include "ray/Ray.h"
 #include "shape/ShapeInterface.h"

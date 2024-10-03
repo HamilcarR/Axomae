@@ -1,5 +1,5 @@
 #include "Bvh.h"
-#include "BoundingBox.h"
+#include "internal/geometry/BoundingBox.h"
 #include "primitive/PrimitiveInterface.h"
 #include "ray/Ray.h"
 #include "shape/Box.h"

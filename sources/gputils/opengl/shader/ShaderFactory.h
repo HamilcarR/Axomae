@@ -1,8 +1,7 @@
 #ifndef SHADERFACTORY_H
 #define SHADERFACTORY_H
-#include "Factory.h"
-#include "ResourceDatabaseManager.h"
 #include "Shader.h"
+#include "internal/common/Factory.h"
 /**
  * @file ShaderFactory.h
  * File defining the creation system for shaders

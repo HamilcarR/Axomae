@@ -1,5 +1,6 @@
 #include "API.h"
-#include "Logger.h"
+#include "internal/debug/Logger.h"
+#include <iostream>
 namespace controller::cmd {
   const int DEFAULT_UV_RES_X = 700;
   const int DEFAULT_UV_RES_Y = 700;

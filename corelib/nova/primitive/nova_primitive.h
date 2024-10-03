@@ -1,12 +1,8 @@
 #ifndef NOVA_PRIMITIVE_H
 #define NOVA_PRIMITIVE_H
-#include "BoundingBox.h"
-#include "MemoryArena.h"
 #include "PrimitiveInterface.h"
-#include "project_macros.h"
-#include "ray/Hitable.h"
-#include "utils/macros.h"
-#include <memory>
+#include "internal/geometry/BoundingBox.h"
+#include "internal/memory/MemoryArena.h"
 
 namespace nova::primitive {
   struct PrimitivesResourcesHolder {

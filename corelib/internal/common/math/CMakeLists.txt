@@ -14,8 +14,6 @@ PUBLIC
 
 target_include_directories(ax_core_math
 PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/vector
     ${GLM_INCLUDE_PATH}
     ${AXOMAE_CORELIB_ROOT}
 )

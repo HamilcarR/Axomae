@@ -1,11 +1,9 @@
 #ifndef MEMORYARENA_H
 #define MEMORYARENA_H
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 #include <cstdlib>
 #include <list>
 #include <new>
-#include <stdexcept>
-#include <thread>
 /*
  * Implementation of a simple memory pool.
  * The goal here is to have a system that can allocate a chunk of memory , provide addresses within that chunk to allocate objects with same
