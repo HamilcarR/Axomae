@@ -7,7 +7,6 @@ namespace device::gpgpu {
 
   struct GPU_query_result {
     void *device_ptr{};
-    DeviceError error_status;
   };
 
 }  // namespace device::gpgpu

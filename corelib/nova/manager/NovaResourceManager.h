@@ -58,9 +58,7 @@ namespace nova {
     void envmapSetData(float *raw_data, int width, int height, int channels);
   };
 
-  class GPUNovaResourceManager : NovaResourceManager {
-   public:
-  };
+
 
 }  // namespace nova
 
