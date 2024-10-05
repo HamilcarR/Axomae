@@ -3,7 +3,8 @@ add_library(ax_core_cuda
         CudaDevice.cpp
         CudaParams.cpp
         CudaDeviceError.cpp
-        cuda_resource_loader.cpp
+        cuda_buffer_loader.cpp
+        cuda_texture_loader.cpp
 )
 
 target_link_libraries(ax_core_device PUBLIC ax_core_cuda)
