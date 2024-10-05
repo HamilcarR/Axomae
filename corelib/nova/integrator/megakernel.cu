@@ -72,7 +72,6 @@ namespace nova {
     resrc::GPU_texture texture_resrc = resrc::create_texture(
         (const void *)image_texture.raw_data, image_texture.width, image_texture.height, tex_desc, res_desc);
     resrc::GPU_query_result draw_buffer = resrc::allocate_buffer(screen_size);
-    AXCUDA_ERROR_CHECK(draw_buffer.error_status);
 
     kernel_argpack_t argpack;
     argpack.num_blocks = {screen_width / 32, screen_height, 1};
@@ -85,8 +84,8 @@ namespace nova {
                 screen_height,
                 image_texture.width,
                 image_texture.height);
-    AXCUDA_ERROR_CHECK(resrc::copy_buffer(draw_buffer.device_ptr, buffers->partial_buffer, screen_size, 1).error_status);
-    AXCUDA_ERROR_CHECK(resrc::deallocate_buffer(draw_buffer.device_ptr).error_status);
+    resrc::copy_buffer(draw_buffer.device_ptr, buffers->partial_buffer, screen_size, 1);
+    resrc::deallocate_buffer(draw_buffer.device_ptr);
     resrc::destroy_texture(texture_resrc);
   }
 }  // namespace nova
