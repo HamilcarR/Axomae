@@ -13,7 +13,6 @@ namespace nova {
     T *partial_buffer;
     size_t byte_size_buffers{};
     int channels{};
-    std::vector<Tile> tiles;
     T *depth_buffer;
   };
   using HdrBufferStruct = RenderBuffers<float>;
