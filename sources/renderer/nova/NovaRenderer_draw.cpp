@@ -66,26 +66,26 @@ void NovaRenderer::drawBatch() {
 void NovaRenderer::doProgressiveRender() {
   nova_result_futures.clear();
   /* Solves the sum :  MAX_SAMPLES = 1 + 2 + 3 + 4 + ...+ smax .*/
-  const float s1 = (-1 - std::sqrt(1.f + 8 * nova_resource_manager->getEngineData().getMaxSamples())) * 0.5f;
-  const float s2 = (-1 + std::sqrt(1.f + 8 * nova_resource_manager->getEngineData().getMaxSamples())) * 0.5f;
+  const float s1 = (-1 - std::sqrt(1.f + 8 * nova_resource_manager->getEngineData().renderer_max_samples)) * 0.5f;
+  const float s2 = (-1 + std::sqrt(1.f + 8 * nova_resource_manager->getEngineData().renderer_max_samples)) * 0.5f;
   const float smax = std::max(s1, s2);
-  nova_resource_manager->getEngineData().setMaxDepth(nova_resource_manager->getEngineData().getMaxDepth() < MAX_RECUR_DEPTH ?
-                                                         nova_resource_manager->getEngineData().getMaxDepth() + 1 :
-                                                         MAX_RECUR_DEPTH);
-  nova_resource_manager->getEngineData().setSampleIncrement(current_frame);
+  nova_resource_manager->getEngineData().max_depth = nova_resource_manager->getEngineData().max_depth < MAX_RECUR_DEPTH ?
+                                                         nova_resource_manager->getEngineData().max_depth + 1 :
+                                                         MAX_RECUR_DEPTH;
+  nova_resource_manager->getEngineData().sample_increment = current_frame;
   if (current_frame < smax)
     drawBatch();
 }
 
 void NovaRenderer::resetToBaseState() {
   current_frame = 1;
-  nova_resource_manager->getEngineData().stopRender();
+  nova_resource_manager->getEngineData().is_rendering = false;
   emptyScheduler();
   emptyAccumBuffer();
   populateNovaSceneResources();
-  nova_resource_manager->getEngineData().setSampleIncrement(1);
-  nova_resource_manager->getEngineData().setMaxDepth(1);
-  nova_resource_manager->getEngineData().startRender();
+  nova_resource_manager->getEngineData().sample_increment = 1;
+  nova_resource_manager->getEngineData().max_depth = 1;
+  nova_resource_manager->getEngineData().is_rendering = true;
 }
 
 void NovaRenderer::draw() {
@@ -122,7 +122,7 @@ void NovaRenderer::draw() {
   pbo_read->unbind();
   framebuffer_texture->unbind();
   camera_framebuffer->renderFrameBufferMesh();
-  displayProgress(current_frame, nova_resource_manager->getEngineData().getMaxSamples());
+  displayProgress(current_frame, nova_resource_manager->getEngineData().renderer_max_samples);
   current_frame++;
   scanline++;
 }
@@ -148,9 +148,9 @@ void NovaRenderer::syncRenderEngineThreads() {
 void NovaRenderer::prepareRedraw() {
   if (global_application_config && global_application_config->getThreadPool())
     global_application_config->getThreadPool()->emptyQueue(NOVA_REALTIME_TAG);
-  nova_resource_manager->getEngineData().stopRender();
+  nova_resource_manager->getEngineData().is_rendering = false;
   syncRenderEngineThreads();
-  nova_resource_manager->getEngineData().startRender();
+  nova_resource_manager->getEngineData().is_rendering = true;
   current_frame = 1;
   emptyBuffers();
 }
@@ -173,6 +173,6 @@ void NovaRenderer::updateNovaCameraFields() {
   st_data.root_translation = scene_camera->getSceneTranslationMatrix();
 
   initialize_scene_data(c_data, st_data, nova_scene_transformations, nova_camera_structure);
-  nova_camera_structure.setScreenWidth((int)screen_size.width);
-  nova_camera_structure.setScreenHeight((int)screen_size.height);
+  nova_camera_structure.screen_width = (int)screen_size.width;
+  nova_camera_structure.screen_height = (int)screen_size.height;
 }

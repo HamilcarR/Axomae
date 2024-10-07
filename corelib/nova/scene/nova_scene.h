@@ -9,7 +9,7 @@
 #include <memory>
 namespace nova::scene {
   class SceneTransformations {
-   private:
+   public:
     /* View x Scene Transfo */
     glm::mat4 VM;
     glm::mat4 inv_VM;
@@ -30,29 +30,6 @@ namespace nova::scene {
 
    public:
     CLASS_CM(SceneTransformations)
-
-    void setTranslation(const glm::mat4 &translation);
-    void setRotation(const glm::mat4 &rotation);
-    void setInvTranslation(const glm::mat4 &inv_translation);
-    void setInvRotation(const glm::mat4 &inv_rotation);
-    void setModel(const glm::mat4 &model);
-    void setInvModel(const glm::mat4 &inv_model);
-    void setPvm(const glm::mat4 &pvm);
-    void setInvPvm(const glm::mat4 &inv_pvm);
-    void setVm(const glm::mat4 &vm);
-    void setInvVm(const glm::mat4 &inv_vm);
-    void setNormalMatrix(const glm::mat3 &normal_mat);
-    [[nodiscard]] const glm::mat4 &getTranslation() const;
-    [[nodiscard]] const glm::mat4 &getRotation() const;
-    [[nodiscard]] const glm::mat4 &getInvTranslation() const;
-    [[nodiscard]] const glm::mat4 &getInvRotation() const;
-    [[nodiscard]] const glm::mat4 &getModel() const;
-    [[nodiscard]] const glm::mat4 &getInvModel() const;
-    [[nodiscard]] const glm::mat4 &getPvm() const;
-    [[nodiscard]] const glm::mat4 &getInvPvm() const;
-    [[nodiscard]] const glm::mat4 &getVm() const;
-    [[nodiscard]] const glm::mat4 &getInvVm() const;
-    [[nodiscard]] const glm::mat3 &getNormalMatrix() const;
   };
 
   // TODO : use memory pool

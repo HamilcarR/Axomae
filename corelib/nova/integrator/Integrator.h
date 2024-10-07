@@ -79,7 +79,7 @@ namespace nova::integrator {
       const NovaResourceManager *nova_resource_manager = nova_internals.resource_manager;
       NovaExceptionManager *nova_exception_manager = nova_internals.exception_manager;
 
-      sampler::SobolSampler sobol = sampler::SobolSampler(nova_resource_manager->getEngineData().getMaxSamples(), 20);
+      sampler::SobolSampler sobol = sampler::SobolSampler(nova_resource_manager->getEngineData().renderer_max_samples, 20);
       sampler::SamplerInterface sampler = &sobol;
 
       for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
@@ -91,22 +91,20 @@ namespace nova::integrator {
             return;
           }
 
-          unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().isAxisVInverted(), x, y);
+          unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().vertical_invert, x, y);
 
           glm::vec4 rgb{};
           const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
           for (int i = 0; i < tile.sample_per_tile; i++) {
-            if (!nova_resource_manager->getEngineData().isRendering())
+            if (!nova_resource_manager->getEngineData().is_rendering)
               return;
             /* Samples random direction around the pixel for AA. */
             const float dx = math::random::nrandf(-RAND_DX, RAND_DX);
             const float dy = math::random::nrandf(-RAND_DY, RAND_DY);
-            math::camera::camera_ray r = math::camera::ray_inv_mat(ndc.x + dx,
-                                                                   ndc.y + dy,
-                                                                   nova_resource_manager->getCameraData().getInvProjection(),
-                                                                   nova_resource_manager->getCameraData().getInvView());
+            math::camera::camera_ray r = math::camera::ray_inv_mat(
+                ndc.x + dx, ndc.y + dy, nova_resource_manager->getCameraData().inv_P, nova_resource_manager->getCameraData().inv_V);
             Ray ray(r.near, r.far);
-            rgb += Li(ray, nova_internals, nova_resource_manager->getEngineData().getMaxDepth(), sampler);
+            rgb += Li(ray, nova_internals, nova_resource_manager->getEngineData().max_depth, sampler);
           }
           rgb /= (float)(tile.sample_per_tile);
           accumulateRgbRenderbuffer(buffers, idx, rgb);
