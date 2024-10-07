@@ -25,7 +25,7 @@ namespace controller {
     void reinitialize() {
       auto &nova_resource_manager = nova_render_scene.nova_resource_manager;
       if (nova_resource_manager)
-        nova_resource_manager->getEngineData().stopRender();
+        nova_resource_manager->getEngineData().is_rendering = false;
       if (rendering_thread.joinable())
         rendering_thread.join();
       /* Clear the render buffers. */
