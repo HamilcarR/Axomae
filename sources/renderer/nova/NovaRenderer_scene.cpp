@@ -15,7 +15,7 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
     /* Build acceleration. */
     setProgressStatus("Building BVH structure...");
     nova_baker_utils::build_acceleration_structure(*nova_resource_manager);
-    nova_resource_manager->getEngineData().startRender();
+    nova_resource_manager->getEngineData().is_rendering = true;
   } catch (const exception::CatastrophicFailureException &e) {
     LOG(e.what(), LogLevel::CRITICAL);
     controller::ExceptionInfoBoxHandler::handle(e);
@@ -25,7 +25,7 @@ void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
 }
 
 void NovaRenderer::prepSceneChange() {
-  nova_resource_manager->getEngineData().stopRender();
+  nova_resource_manager->getEngineData().is_rendering = false;
   emptyScheduler();
   nova_resource_manager->clearResources();
 }

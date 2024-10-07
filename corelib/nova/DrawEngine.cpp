@@ -72,16 +72,16 @@ namespace nova {
     std::vector<std::future<void>> futs;
     std::vector<Tile> tiles = divideByTiles(width_resolution,
                                             height_resolution,
-                                            nova_internals.resource_manager->getEngineData().getTilesWidth(),
-                                            nova_internals.resource_manager->getEngineData().getTilesHeight());
+                                            nova_internals.resource_manager->getEngineData().tiles_width,
+                                            nova_internals.resource_manager->getEngineData().tiles_height);
     for (auto &elem : tiles) {
       auto renderer_callback = [engine_instance](HdrBufferStruct *buffers, Tile &tile, nova::nova_eng_internals &nova_internals) {
         engine_instance->engine_render_tile(buffers, tile, nova_internals);
       };
-      elem.sample_per_tile = nova_internals.resource_manager->getEngineData().getSampleIncrement();
+      elem.sample_per_tile = nova_internals.resource_manager->getEngineData().sample_increment;
       elem.image_total_height = height_resolution;
       elem.image_total_width = width_resolution;
-      const std::string &tag = nova_internals.resource_manager->getEngineData().getTag();
+      const std::string &tag = nova_internals.resource_manager->getEngineData().threadpool_tag;
       futs.push_back(thread_pool->addTask(tag, renderer_callback, buffers, elem, nova_internals));
     }
 
