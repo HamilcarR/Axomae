@@ -19,44 +19,44 @@ namespace nova_baker_utils {
                              nova::camera::CameraResourcesHolder &nova_camera_structure) {
 
     /* Camera data*/
-    nova_camera_structure.setUpVector(scene_camera.up_vector);
-    nova_camera_structure.setProjection(scene_camera.projection);
-    nova_camera_structure.setInvProjection(glm::inverse(scene_camera.projection));
-    nova_camera_structure.setView(scene_camera.view);
-    nova_camera_structure.setInvView(glm::inverse(nova_camera_structure.getView()));
-    nova_camera_structure.setPosition(scene_camera.position);
-    nova_camera_structure.setDirection(scene_camera.direction);
-    nova_camera_structure.setFar(scene_camera.far);
-    nova_camera_structure.setNear(scene_camera.near);
-    nova_camera_structure.setScreenWidth(scene_camera.width);
-    nova_camera_structure.setScreenHeight(scene_camera.height);
-    nova_camera_structure.setFov(scene_camera.fov);
+    nova_camera_structure.up_vector = scene_camera.up_vector;
+    nova_camera_structure.P = scene_camera.projection;
+    nova_camera_structure.inv_P = glm::inverse(scene_camera.projection);
+    nova_camera_structure.V = scene_camera.view;
+    nova_camera_structure.inv_V = glm::inverse(nova_camera_structure.V);
+    nova_camera_structure.position = scene_camera.position;
+    nova_camera_structure.direction = scene_camera.direction;
+    nova_camera_structure.far = scene_camera.far;
+    nova_camera_structure.near = scene_camera.near;
+    nova_camera_structure.screen_width = scene_camera.width;
+    nova_camera_structure.screen_height = scene_camera.height;
+    nova_camera_structure.fov = scene_camera.fov;
 
     /* Scene root transformations */
-    nova_scene_transformations.setTranslation(scene_data.root_translation);
-    nova_scene_transformations.setInvTranslation(glm::inverse(scene_data.root_translation));
-    nova_scene_transformations.setRotation(scene_data.root_rotation);
-    nova_scene_transformations.setInvRotation(glm::inverse(scene_data.root_rotation));
-    nova_scene_transformations.setModel(scene_data.root_transformation);
-    nova_scene_transformations.setInvModel(glm::inverse(scene_data.root_transformation));
-    nova_scene_transformations.setPvm(scene_camera.projection * scene_camera.view * scene_data.root_transformation);
-    nova_scene_transformations.setInvPvm(glm::inverse(nova_scene_transformations.getPvm()));
-    nova_scene_transformations.setVm(nova_camera_structure.getView() * nova_scene_transformations.getModel());
-    nova_scene_transformations.setInvVm(glm::inverse(nova_scene_transformations.getVm()));
-    nova_scene_transformations.setNormalMatrix(glm::mat3(glm::transpose(nova_scene_transformations.getInvModel())));
+    nova_scene_transformations.T = scene_data.root_translation;
+    nova_scene_transformations.inv_T = glm::inverse(scene_data.root_translation);
+    nova_scene_transformations.R = scene_data.root_rotation;
+    nova_scene_transformations.inv_R = glm::inverse(scene_data.root_rotation);
+    nova_scene_transformations.M = scene_data.root_transformation;
+    nova_scene_transformations.inv_M = glm::inverse(scene_data.root_transformation);
+    nova_scene_transformations.PVM = scene_camera.projection * scene_camera.view * scene_data.root_transformation;
+    nova_scene_transformations.inv_PVM = glm::inverse(nova_scene_transformations.PVM);
+    nova_scene_transformations.VM = nova_camera_structure.V * nova_scene_transformations.M;
+    nova_scene_transformations.inv_VM = glm::inverse(nova_scene_transformations.VM);
+    nova_scene_transformations.N = glm::mat3(glm::transpose(nova_scene_transformations.inv_M));
   }
 
   void initialize_engine_opts(const engine_data &engine_opts, nova::engine::EngineResourcesHolder &engine_resources_holder) {
-    engine_resources_holder.setAliasingSamples(engine_opts.aa_samples);
-    engine_resources_holder.startRender();
-    engine_resources_holder.setMaxDepth(engine_opts.depth_max);
-    engine_resources_holder.setMaxSamples(engine_opts.samples_max);
-    engine_resources_holder.setSampleIncrement(engine_opts.samples_increment);
-    engine_resources_holder.setTilesHeight(engine_opts.num_tiles_w);
-    engine_resources_holder.setTilesWidth(engine_opts.num_tiles_h);
-    engine_resources_holder.setVAxisInversed(engine_opts.flip_v);
-    engine_resources_holder.setTag(engine_opts.threadpool_tag);
-    engine_resources_holder.setIntegratorType(engine_opts.engine_type_flag);
+    engine_resources_holder.aliasing_samples = engine_opts.aa_samples;
+    engine_resources_holder.is_rendering = true;
+    engine_resources_holder.max_depth = engine_opts.depth_max;
+    engine_resources_holder.renderer_max_samples = engine_opts.samples_max;
+    engine_resources_holder.sample_increment = engine_opts.samples_increment;
+    engine_resources_holder.tiles_width = engine_opts.num_tiles_w;
+    engine_resources_holder.tiles_height = engine_opts.num_tiles_h;
+    engine_resources_holder.vertical_invert = engine_opts.flip_v;
+    engine_resources_holder.threadpool_tag = engine_opts.threadpool_tag;
+    engine_resources_holder.integrator_flag = engine_opts.engine_type_flag;
   }
 
   void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureRawData &texture_raw_data) {
@@ -101,8 +101,8 @@ namespace nova_baker_utils {
     nova::nova_eng_internals interns{rendering_data.nova_resource_manager.get(), rendering_data.nova_exception_manager.get()};
     nova::gpu_draw(rendering_data.buffers.get(), rendering_data.width, rendering_data.height, rendering_data.engine_instance.get(), interns);
   }
-  void cancel_render(render_scene_data &rendering_data) { rendering_data.nova_resource_manager->getEngineData().stopRender(); }
-  void start_render(render_scene_data &rendering_data) { rendering_data.nova_resource_manager->getEngineData().startRender(); }
+  void cancel_render(render_scene_data &rendering_data) { rendering_data.nova_resource_manager->getEngineData().is_rendering = false; }
+  void start_render(render_scene_data &rendering_data) { rendering_data.nova_resource_manager->getEngineData().is_rendering = true; }
 
   std::unique_ptr<NovaRenderEngineInterface> create_engine(const engine_data &engine_type) { return std::make_unique<nova::NovaRenderEngineLR>(); }
 

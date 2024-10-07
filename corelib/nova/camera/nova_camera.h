@@ -4,7 +4,7 @@
 #include "internal/macro/project_macros.h"
 namespace nova::camera {
   class CameraResourcesHolder {
-   private:
+   public:
     unsigned int screen_width;
     unsigned int screen_height;
     float far, near;
@@ -24,31 +24,6 @@ namespace nova::camera {
 
    public:
     CLASS_CM(CameraResourcesHolder)
-
-    void setPosition(const glm::vec3 &position);
-    void setUpVector(const glm::vec3 &up);
-    void setProjection(const glm::mat4 &projection);
-    void setInvProjection(const glm::mat4 &inv_projection);
-    void setView(const glm::mat4 &view);
-    void setInvView(const glm::mat4 &view);
-    void setDirection(const glm::vec3 &direction);
-    void setScreenWidth(int width);
-    void setScreenHeight(int height);
-    void setFar(float far);
-    void setNear(float near);
-    void setFov(float fov);
-    [[nodiscard]] const glm::vec3 &getUpVector() const;
-    [[nodiscard]] const glm::mat4 &getProjection() const;
-    [[nodiscard]] const glm::mat4 &getInvProjection() const;
-    [[nodiscard]] const glm::mat4 &getView() const;
-    [[nodiscard]] const glm::mat4 &getInvView() const;
-    [[nodiscard]] const glm::vec3 &getPosition() const;
-    [[nodiscard]] const glm::vec3 &getDirection() const;
-    [[nodiscard]] int getScreenWidth() const;
-    [[nodiscard]] int getScreenHeight() const;
-    [[nodiscard]] float getFar() const;
-    [[nodiscard]] float getNear() const;
-    [[nodiscard]] float getFov() const;
   };
 }  // namespace nova::camera
 #endif  // NOVA_CAMERA_H

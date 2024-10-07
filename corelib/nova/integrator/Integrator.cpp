@@ -13,7 +13,7 @@ namespace nova::integrator {
 
   void integrator_dispatch(RenderBuffers<float> *buffers, Tile &tile, nova::nova_eng_internals &nova_internals) {
     const engine::EngineResourcesHolder &engine = nova_internals.resource_manager->getEngineData();
-    int integrator_type = engine.getIntegratorType();
+    int integrator_type = engine.integrator_flag;
     if (integrator_type & PATH) {
       bool processed = false;
       if (integrator_type & COMBINED) {
@@ -48,7 +48,7 @@ namespace nova::integrator {
     bvh_hit_data hit_ret;
     const primitive::NovaPrimitiveInterface *last_primit = nullptr;
     const aggregate::Bvhtl &bvh = nova_resources->getAccelerationData().accelerator;
-    aggregate::bvh_helper_struct bvh_hit{MAXFLOAT, nullptr, &nova_resources->getEngineData().isRendering()};
+    aggregate::bvh_helper_struct bvh_hit{MAXFLOAT, nullptr, &nova_resources->getEngineData().is_rendering};
     aggregate::base_options_bvh opts;
     opts.data = bvh_hit;
     hit_ret.is_hit = bvh.hit(ray, 0.0001f, MAXFLOAT, hit_ret.hit_d, &opts);

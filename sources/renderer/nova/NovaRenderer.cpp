@@ -62,7 +62,7 @@ void NovaRenderer::initialize(ApplicationConfig *app_conf) {
 
 void NovaRenderer::emptyScheduler() {
   if (global_application_config && global_application_config->getThreadPool()) {
-    global_application_config->getThreadPool()->emptyQueue(nova_resource_manager->getEngineData().getTag());
+    global_application_config->getThreadPool()->emptyQueue(nova_resource_manager->getEngineData().threadpool_tag);
     syncRenderEngineThreads();
   }
 }
@@ -96,7 +96,7 @@ void NovaRenderer::onResize(unsigned int width, unsigned int height) {
 }
 void NovaRenderer::onClose() {
   if (nova_resource_manager)
-    nova_resource_manager->getEngineData().stopRender();
+    nova_resource_manager->getEngineData().is_rendering = false;
   emptyScheduler();
 }
 

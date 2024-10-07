@@ -10,8 +10,8 @@ namespace nova::integrator {
     NovaExceptionManager *nova_exception_manager = nova_internals.exception_manager;
 
     const camera::CameraResourcesHolder &camera = nova_resource_manager->getCameraData();
-    float near = camera.getNear();
-    float far = camera.getFar();
+    float near = camera.near;
+    float far = camera.far;
 
     sampler::RandomSampler random_sampler = sampler::RandomSampler();
     sampler::SamplerInterface sampler = &random_sampler;
@@ -26,13 +26,13 @@ namespace nova::integrator {
           return;
         }
 
-        unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().isAxisVInverted(), x, y);
+        unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().vertical_invert, x, y);
 
         const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
-        if (!nova_resource_manager->getEngineData().isRendering())
+        if (!nova_resource_manager->getEngineData().is_rendering)
           return;
         math::camera::camera_ray r = math::camera::ray_inv_mat(
-            ndc.x, ndc.y, nova_resource_manager->getCameraData().getInvProjection(), nova_resource_manager->getCameraData().getInvView());
+            ndc.x, ndc.y, nova_resource_manager->getCameraData().inv_P, nova_resource_manager->getCameraData().inv_V);
         Ray ray(r.near, r.far);
 
         glm::vec4 distance = Li(ray, nova_internals, 0, sampler);
