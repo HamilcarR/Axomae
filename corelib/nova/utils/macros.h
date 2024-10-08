@@ -1,6 +1,6 @@
 #ifndef UTILSMACROS_H
 #define UTILSMACROS_H
-#include "project_macros.h"
+#include "internal/macro/project_macros.h"
 /* Macro defining the create procedure of a resource */
 #define RESOURCES_DEFINE_CREATE(object_interface) \
   template<class SUBTYPE, class... Args> \
