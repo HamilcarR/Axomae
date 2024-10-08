@@ -84,7 +84,7 @@ namespace nova {
                 screen_height,
                 image_texture.width,
                 image_texture.height);
-    resrc::copy_buffer(draw_buffer.device_ptr, buffers->partial_buffer, screen_size, 1);
+    resrc::copy_buffer(draw_buffer.device_ptr, buffers->partial_buffer, screen_size, resrc::DEVICE_HOST);
     resrc::deallocate_buffer(draw_buffer.device_ptr);
     resrc::destroy_texture(texture_resrc);
   }
