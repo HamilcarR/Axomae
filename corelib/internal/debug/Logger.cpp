@@ -61,6 +61,15 @@ class LogLine {
 };
 /***************************************************************************************************************************************************************/
 class Logger : protected AbstractLogger {
+
+ protected:
+  std::vector<LogLine> log_buffer{};
+  bool stdout_logging{};
+  bool enabled{};
+  LogLevel::LOGENUMTYPE priority;
+  std::shared_ptr<std::ostream> out;
+  std::string filters{};
+
  public:
   Logger() {
     priority = LogLevel::INFO;
@@ -117,14 +126,6 @@ class Logger : protected AbstractLogger {
   std::ostream &outstm() { return *out; }
 
   void loggerState(bool enabled_) { enabled = enabled_; }
-
- protected:
-  std::vector<LogLine> log_buffer{};
-  bool stdout_logging{};
-  bool enabled{};
-  LogLevel::LOGENUMTYPE priority;
-  std::shared_ptr<std::ostream> out;
-  std::string filters{};
 };
 /***************************************************************************************************************************************************************/
 

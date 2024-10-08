@@ -1,6 +1,6 @@
 #include "shape/Box.h"
 #include "Test.h"
-#include "geometry/aabb_utils_test.h"
+#include "corelib/internal/geometry/aabb_utils_test.h"
 #include "internal/geometry/BoundingBox.h"
 #include "ray/Ray.h"
 
