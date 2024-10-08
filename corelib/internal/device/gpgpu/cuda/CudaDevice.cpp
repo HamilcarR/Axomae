@@ -1,52 +1,56 @@
 #include "CudaDevice.h"
-#include "../DeviceError.h"
+
 namespace ax_cuda {
 
   CudaDevice::CudaDevice(int device) : device_id(device) {}
 
-  void CudaDevice::GPUInitDevice(const CudaParams &params) {
-    DEVICE_ERROR_CHECK(cudaInitDevice(device_id, params.getDeviceFlags(), params.getFlags()));
+  DeviceError CudaDevice::GPUInitDevice(const CudaParams &params) {
+    return DeviceError(cudaInitDevice(device_id, params.getDeviceFlags(), params.getFlags()));
   }
 
-  void CudaDevice::GPUSetDevice(const CudaParams &params) { DEVICE_ERROR_CHECK(cudaSetDevice(params.getDeviceID())); }
+  DeviceError CudaDevice::GPUSetDevice(const CudaParams &params) { return DeviceError(cudaSetDevice(params.getDeviceID())); }
 
-  void CudaDevice::GPUMalloc(void **ptr, std::size_t size) { DEVICE_ERROR_CHECK(cudaMalloc(ptr, size)); }
+  DeviceError CudaDevice::GPUMalloc(void **ptr, std::size_t size) { return DeviceError(cudaMalloc(ptr, size)); }
 
-  void CudaDevice::GPUFree(void *ptr) { DEVICE_ERROR_CHECK(cudaFree(ptr)); }
+  DeviceError CudaDevice::GPUFree(void *ptr) { return DeviceError(cudaFree(ptr)); }
 
-  void CudaDevice::GPUMallocManaged(void **ptr, std::size_t size, const CudaParams &params) { void(cudaMallocManaged(ptr, size, params.getFlags())); }
-
-  void CudaDevice::GPUDeviceSynchronize() { DEVICE_ERROR_CHECK(cudaDeviceSynchronize()); }
-
-  void CudaDevice::GPUMemcpy(const void *ptr_source, void *ptr_dest, std::size_t byte_count, const CudaParams &params) {
-    cudaMemcpyKind copy_type = params.getMemcpyKind();
-    DEVICE_ERROR_CHECK(cudaMemcpy(ptr_dest, ptr_source, byte_count, copy_type));
+  DeviceError CudaDevice::GPUMallocManaged(void **ptr, std::size_t size, const CudaParams &params) {
+    return DeviceError(cudaMallocManaged(ptr, size, params.getFlags()));
   }
 
-  void CudaDevice::GPUMallocArray(cudaArray_t *array, const CudaParams &params, unsigned width, unsigned height, unsigned flags) {
+  DeviceError CudaDevice::GPUDeviceSynchronize() { return DeviceError(cudaDeviceSynchronize()); }
+
+  DeviceError CudaDevice::GPUMemcpy(const void *ptr_source, void *ptr_dest, std::size_t byte_count, const CudaParams &params) {
+    cudaMemcpyKind copy_type = static_cast<cudaMemcpyKind>(params.getMemcpyKind());
+    return DeviceError(cudaMemcpy(ptr_dest, ptr_source, byte_count, copy_type));
+  }
+
+  DeviceError CudaDevice::GPUMallocArray(cudaArray_t *array, const CudaParams &params, unsigned width, unsigned height, unsigned flags) {
     cudaChannelFormatDesc chan_desc = params.getChanDescriptors();
-    DEVICE_ERROR_CHECK(cudaMallocArray(array, &chan_desc, width, height, flags));
+    return DeviceError(cudaMallocArray(array, &chan_desc, width, height, flags));
   }
-  void CudaDevice::GPUFreeArray(cudaArray_t array) { DEVICE_ERROR_CHECK(cudaFreeArray(array)); }
+  DeviceError CudaDevice::GPUFreeArray(cudaArray_t array) { return DeviceError(cudaFreeArray(array)); }
 
-  void CudaDevice::GPUMemcpy2DToArray(
+  DeviceError CudaDevice::GPUMemcpy2DToArray(
       cudaArray_t array, size_t wOffset, size_t hOffset, const void *src, size_t spitch, size_t width, size_t height, const CudaParams &params) {
-    DEVICE_ERROR_CHECK(cudaMemcpy2DToArray(array, wOffset, hOffset, src, spitch, width, height, static_cast<cudaMemcpyKind>(params.getMemcpyKind())));
+    return DeviceError(cudaMemcpy2DToArray(array, wOffset, hOffset, src, spitch, width, height, static_cast<cudaMemcpyKind>(params.getMemcpyKind())));
   }
 
-  void CudaDevice::GPUCreateTextureObject(cudaTextureObject_t *tex, const CudaParams &params, bool use_resc_view) {
+  DeviceError CudaDevice::GPUCreateTextureObject(cudaTextureObject_t *tex, const CudaParams &params, bool use_resc_view) {
     if (use_resc_view)
-      DEVICE_ERROR_CHECK(cudaCreateTextureObject(tex, &params.getResourceDesc(), &params.getTextureDesc(), &params.getResourceViewDesc()));
-    DEVICE_ERROR_CHECK(cudaCreateTextureObject(tex, &params.getResourceDesc(), &params.getTextureDesc(), nullptr));
+      return DeviceError(cudaCreateTextureObject(tex, &params.getResourceDesc(), &params.getTextureDesc(), &params.getResourceViewDesc()));
+    return DeviceError(cudaCreateTextureObject(tex, &params.getResourceDesc(), &params.getTextureDesc(), nullptr));
   }
-  void CudaDevice::GPUDestroyTextureObject(cudaTextureObject_t texture_object) { DEVICE_ERROR_CHECK(cudaDestroyTextureObject(texture_object)); }
+  DeviceError CudaDevice::GPUDestroyTextureObject(cudaTextureObject_t texture_object) {
+    return DeviceError(cudaDestroyTextureObject(texture_object));
+  }
 
-  void CudaDevice::GPUHostRegister(void *ptr, std::size_t size_bytes, unsigned flags) {
-    DEVICE_ERROR_CHECK(cudaHostRegister(ptr, size_bytes, flags));
+  DeviceError CudaDevice::GPUHostRegister(void *ptr, std::size_t size_bytes, unsigned flags) {
+    return DeviceError(cudaHostRegister(ptr, size_bytes, flags));
   }
-  void CudaDevice::GPUHostGetDevicePointer(void **ptr_device, void *ptr_host, unsigned flags) {
-    DEVICE_ERROR_CHECK(cudaHostGetDevicePointer(ptr_device, ptr_host, flags));
+  DeviceError CudaDevice::GPUHostGetDevicePointer(void **ptr_device, void *ptr_host, unsigned flags) {
+    return DeviceError(cudaHostGetDevicePointer(ptr_device, ptr_host, flags));
   }
-  void CudaDevice::GPUHostUnregister(void *ptr_host) { DEVICE_ERROR_CHECK(cudaHostUnregister(ptr_host)); }
+  DeviceError CudaDevice::GPUHostUnregister(void *ptr_host) { return DeviceError(cudaHostUnregister(ptr_host)); }
 
 }  // namespace ax_cuda
