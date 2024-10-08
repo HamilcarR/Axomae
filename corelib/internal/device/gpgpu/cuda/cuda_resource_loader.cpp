@@ -4,6 +4,58 @@
 #include "CudaDevice.h"
 
 namespace device::gpgpu {
+
+  bool validate_gpu_state() { return !ax_cuda::utils::cuda_info_device().empty(); }
+  GPU_query_result ret_error() {
+    GPU_query_result gpu_resource;
+    gpu_resource.device_ptr = nullptr;
+    gpu_resource.error_status = DeviceError(cudaErrorInvalidDevice);
+    return gpu_resource;
+  }
+
+  GPU_query_result allocate_buffer(size_t size) {
+    if (!validate_gpu_state())
+      return ret_error();
+    ax_cuda::CudaDevice device;
+    GPU_query_result gpu_resource;
+    gpu_resource.error_status = device.GPUMalloc(&gpu_resource.device_ptr, size);
+    return gpu_resource;
+  }
+
+  GPU_query_result copy_buffer(const void *src, void *dest, std::size_t buffer_size, int copy_type) {
+    if (!validate_gpu_state())
+      return ret_error();
+    ax_cuda::CudaDevice device;
+    GPU_query_result gpu_resource;
+    ax_cuda::CudaParams params;
+    switch (copy_type) {
+      case 0:
+        params.setMemcpyKind(cudaMemcpyHostToDevice);
+        break;
+      case 1:
+        params.setMemcpyKind(cudaMemcpyDeviceToHost);
+        break;
+      case 2:
+        params.setMemcpyKind(cudaMemcpyDeviceToDevice);
+        break;
+      default:
+        params.setMemcpyKind(cudaMemcpyHostToDevice);
+        break;
+    }
+    gpu_resource.error_status = device.GPUMemcpy(src, dest, buffer_size, params);
+    gpu_resource.device_ptr = dest;
+    return gpu_resource;
+  }
+
+  GPU_query_result deallocate_buffer(void *device_ptr) {
+    if (!validate_gpu_state())
+      return ret_error();
+    ax_cuda::CudaDevice device;
+    GPU_query_result gpu_resource;
+    gpu_resource.error_status = device.GPUFree(device_ptr);
+    return gpu_resource;
+  }
+
   static int get_channels_num(const channel_format &desc) {
     int i = 0;
     i += desc.bits_size_x ? 1 : 0;
@@ -124,7 +176,7 @@ namespace device::gpgpu {
     ax_cuda::CudaParams params;
     params.setChanDescriptors(
         chan_format.bits_size_x, chan_format.bits_size_y, chan_format.bits_size_z, chan_format.bits_size_a, convert_type(chan_format.format_type));
-    device.GPUMallocArray(&array, params, width, height, flag);
+    DEVICE_ERROR_CHECK(device.GPUMallocArray(&array, params, width, height, flag));
     GPU_resource resource{};
     resource.res.array.array = array;
     return resource;
@@ -132,7 +184,7 @@ namespace device::gpgpu {
 
   void destroy_array(GPU_resource &resource) {
     ax_cuda::CudaDevice device;
-    device.GPUFreeArray(static_cast<cudaArray_t>(resource.res.array.array));
+    DEVICE_ERROR_CHECK(device.GPUFreeArray(static_cast<cudaArray_t>(resource.res.array.array)));
   }
 
   GPU_texture create_texture(const void *src, int width, int height, const texture_descriptor &tex_desc, resource_descriptor &resc_desc) {
@@ -153,10 +205,10 @@ namespace device::gpgpu {
 
     params.setMemcpyKind(cudaMemcpyHostToDevice);
     std::size_t pitch = width * get_channels_num(channel_format) * texture_type_size(channel_format);
-    device.GPUMemcpy2DToArray(cuda_array, 0, 0, src, pitch, pitch, height, params);
+    DEVICE_ERROR_CHECK(device.GPUMemcpy2DToArray(cuda_array, 0, 0, src, pitch, pitch, height, params));
     init_descriptors(params, tex_desc, resc_desc);
     cudaTextureObject_t texture_object = 0;
-    device.GPUCreateTextureObject(&texture_object, params);
+    DEVICE_ERROR_CHECK(device.GPUCreateTextureObject(&texture_object, params));
     gpu_texture.texture_object = texture_object;
     gpu_texture.array_object = cuda_array;
     return gpu_texture;
@@ -164,7 +216,8 @@ namespace device::gpgpu {
 
   void destroy_texture(GPU_texture &texture) {
     ax_cuda::CudaDevice device;
-    device.GPUDestroyTextureObject(std::any_cast<cudaTextureObject_t>(texture.texture_object));
-    device.GPUFreeArray(std::any_cast<cudaArray_t>(texture.array_object));
+    DEVICE_ERROR_CHECK(device.GPUDestroyTextureObject(std::any_cast<cudaTextureObject_t>(texture.texture_object)));
+    DEVICE_ERROR_CHECK(device.GPUFreeArray(std::any_cast<cudaArray_t>(texture.array_object)));
   }
+
 }  // namespace device::gpgpu
