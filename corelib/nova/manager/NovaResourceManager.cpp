@@ -1,4 +1,5 @@
 #include "NovaResourceManager.h"
+#include "internal/device/gpgpu/device_transfer_interface.h"
 
 namespace nova {
 
@@ -10,4 +11,8 @@ namespace nova {
     envmap_data.height = height;
     envmap_data.channels = channels;
   }
+
+  void NovaResourceManager::uploadToDevice() { /* Upload envmap */
+  }
+
 }  // namespace nova

@@ -56,9 +56,11 @@ namespace nova {
 
     /* Scene: Textures */
     void envmapSetData(float *raw_data, int width, int height, int channels);
+
+    void uploadToDevice();
   };
 
-
+  class GPUNovaResourceManager : public NovaResourceManager {};
 
 }  // namespace nova
 
