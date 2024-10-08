@@ -21,20 +21,20 @@ namespace device::gpgpu {
     return gpu_resource;
   }
 
-  GPU_query_result copy_buffer(const void *src, void *dest, std::size_t buffer_size, int copy_type) {
+  GPU_query_result copy_buffer(const void *src, void *dest, std::size_t buffer_size, COPY_TYPE copy_type) {
     if (!validate_gpu_state())
       return ret_error();
     ax_cuda::CudaDevice device;
     GPU_query_result gpu_resource;
     ax_cuda::CudaParams params;
     switch (copy_type) {
-      case 0:
+      case HOST_DEVICE:
         params.setMemcpyKind(cudaMemcpyHostToDevice);
         break;
-      case 1:
+      case DEVICE_HOST:
         params.setMemcpyKind(cudaMemcpyDeviceToHost);
         break;
-      case 2:
+      case DEVICE_DEVICE:
         params.setMemcpyKind(cudaMemcpyDeviceToDevice);
         break;
       default:
