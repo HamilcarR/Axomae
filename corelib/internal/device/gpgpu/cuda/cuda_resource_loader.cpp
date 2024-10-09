@@ -4,12 +4,11 @@
 #include "CudaDevice.h"
 
 namespace device::gpgpu {
-
   bool validate_gpu_state() { return !ax_cuda::utils::cuda_info_device().empty(); }
   GPU_query_result ret_error() {
     GPU_query_result gpu_resource;
     gpu_resource.device_ptr = nullptr;
-    gpu_resource.error_status = DeviceError(cudaErrorInvalidDevice);
+    gpu_resource.error_status = DeviceError(cudaErrorDeviceUninitialized);
     return gpu_resource;
   }
 
@@ -22,24 +21,26 @@ namespace device::gpgpu {
     return gpu_resource;
   }
 
-  GPU_query_result copy_buffer(const void *src, void *dest, std::size_t buffer_size, int copy_type) {
+  GPU_query_result copy_buffer(const void *src, void *dest, std::size_t buffer_size, COPY_MODE copy_type) {
     if (!validate_gpu_state())
       return ret_error();
     ax_cuda::CudaDevice device;
     GPU_query_result gpu_resource;
     ax_cuda::CudaParams params;
     switch (copy_type) {
-      case 0:
+      case HOST_HOST:
+        params.setMemcpyKind(cudaMemcpyHostToHost);
+      case HOST_DEVICE:
         params.setMemcpyKind(cudaMemcpyHostToDevice);
         break;
-      case 1:
+      case DEVICE_HOST:
         params.setMemcpyKind(cudaMemcpyDeviceToHost);
         break;
-      case 2:
+      case DEVICE_DEVICE:
         params.setMemcpyKind(cudaMemcpyDeviceToDevice);
         break;
       default:
-        params.setMemcpyKind(cudaMemcpyHostToDevice);
+        params.setMemcpyKind(cudaMemcpyDefault);
         break;
     }
     gpu_resource.error_status = device.GPUMemcpy(src, dest, buffer_size, params);
@@ -182,9 +183,11 @@ namespace device::gpgpu {
     return resource;
   }
 
-  void destroy_array(GPU_resource &resource) {
+  GPU_query_result destroy_array(GPU_resource &resource) {
     ax_cuda::CudaDevice device;
-    DEVICE_ERROR_CHECK(device.GPUFreeArray(static_cast<cudaArray_t>(resource.res.array.array)));
+    GPU_query_result result;
+    result.error_status = device.GPUFreeArray(static_cast<cudaArray_t>(resource.res.array.array));
+    return result;
   }
 
   GPU_texture create_texture(const void *src, int width, int height, const texture_descriptor &tex_desc, resource_descriptor &resc_desc) {
@@ -220,4 +223,43 @@ namespace device::gpgpu {
     DEVICE_ERROR_CHECK(device.GPUFreeArray(std::any_cast<cudaArray_t>(texture.array_object)));
   }
 
+  unsigned int get_cuda_host_register_flag(PIN_MODE mode) {
+    switch (mode) {
+      case PIN_MODE_DEFAULT:
+        return cudaHostRegisterDefault;
+      case PIN_MODE_PORTABLE:
+        return cudaHostRegisterPortable;
+      case PIN_MODE_MAPPED:
+        return cudaHostRegisterMapped;
+      case PIN_MODE_IO:
+        return cudaHostRegisterIoMemory;
+      case PIN_MODE_RO:
+        return cudaHostRegisterReadOnly;
+      default:
+        return cudaHostRegisterDefault;
+    }
+  }
+
+  GPU_query_result pin_host_memory(void *buffer, std::size_t size_bytes, PIN_MODE mode) {
+    GPU_query_result result;
+    ax_cuda::CudaDevice device;
+    result.error_status = device.GPUHostRegister(buffer, size_bytes, get_cuda_host_register_flag(mode));
+    result.device_ptr = buffer;
+    return result;
+  }
+
+  GPU_query_result unpin_host_memory(void *buffer) {
+    GPU_query_result result;
+    ax_cuda::CudaDevice device;
+    result.error_status = device.GPUHostUnregister(buffer);
+    result.device_ptr = nullptr;
+    return result;
+  }
+
+  GPU_query_result get_pinned_memory_dptr(void *host, PIN_EXT mode) {
+    GPU_query_result result;
+    ax_cuda::CudaDevice device;
+    result.error_status = device.GPUHostGetDevicePointer(&result.device_ptr, host, 0); /* Keep flag to 0 */
+    return result;
+  }
 }  // namespace device::gpgpu
