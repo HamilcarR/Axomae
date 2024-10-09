@@ -14,25 +14,26 @@ namespace device::gpgpu {
   /* Allocate a buffer of size_bytes bytes on device*/
   GPU_query_result allocate_buffer(std::size_t buffer_size_bytes);
 
-  enum COPY_TYPE { HOST_DEVICE = 0, DEVICE_HOST = 1, DEVICE_DEVICE = 2 };
-  /** copy_type :
-   * 0 = host to device
-   * 1 = device to host
-   * 2 = device to device
-   */
-  GPU_query_result copy_buffer(const void *src, void *dest, std::size_t buffer_size_bytes, COPY_TYPE copy_type);
+  enum COPY_MODE { HOST_HOST = 0, HOST_DEVICE = 1, DEVICE_HOST = 2, DEVICE_DEVICE = 3 };
+  GPU_query_result copy_buffer(const void *src, void *dest, std::size_t buffer_size_bytes, COPY_MODE copy_type);
   GPU_query_result deallocate_buffer(void *device_ptr);
 
   /**
    * if resc_desc has a null resource (for ex , null array but with RESOURCE_ARRAY type), this function will create the array and assign it to the
-   * required resource_buffer_descriptor field.
+   * required resource_buffer_descriptor field :
+   * cudaArray for array , cudaMipmappedArray for mipmap etc.
    */
   GPU_texture create_texture(const void *src, int width, int height, const texture_descriptor &tex_desc, resource_descriptor &resc_desc);
   void destroy_texture(GPU_texture &texture);
 
   GPU_resource create_array(int width, int height, const channel_format &format, int flag);
-  void destroy_array(GPU_resource &resource);
+  GPU_query_result destroy_array(GPU_resource &resource);
 
+  enum PIN_MODE { PIN_MODE_DEFAULT = 0, PIN_MODE_PORTABLE = 1, PIN_MODE_MAPPED = 2, PIN_MODE_IO = 3, PIN_MODE_RO = 4 };
+  GPU_query_result pin_host_memory(void *buffer, std::size_t host_buffer_in_bytes, PIN_MODE mode);
+  GPU_query_result unpin_host_memory(void *buffer);
+  enum PIN_EXT { PIN_EXT_NOOP };
+  GPU_query_result get_pinned_memory_dptr(void *host_ptr, PIN_EXT flag = PIN_EXT_NOOP);
 }  // namespace device::gpgpu
 
 #endif  // DEVICE_TRANSFER_INTERFACE_H
