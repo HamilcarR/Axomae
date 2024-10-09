@@ -11,7 +11,7 @@ add_subdirectory(internal/datastructure)
 add_subdirectory(internal/geometry)
 add_subdirectory(internal/memory)
 if(AXOMAE_USE_CUDA)
-    add_subdirectory(internal/device/gpgpu/cuda)
+    add_subdirectory(internal/device/gpgpu)
 endif()
 
 target_sources(Axomae_test PUBLIC
