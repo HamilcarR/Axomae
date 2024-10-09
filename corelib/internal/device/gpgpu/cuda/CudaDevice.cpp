@@ -21,7 +21,7 @@ namespace ax_cuda {
   DeviceError CudaDevice::GPUDeviceSynchronize() { return DeviceError(cudaDeviceSynchronize()); }
 
   DeviceError CudaDevice::GPUMemcpy(const void *ptr_source, void *ptr_dest, std::size_t byte_count, const CudaParams &params) {
-    cudaMemcpyKind copy_type = static_cast<cudaMemcpyKind>(params.getMemcpyKind());
+    cudaMemcpyKind copy_type = params.getMemcpyKind();
     return DeviceError(cudaMemcpy(ptr_dest, ptr_source, byte_count, copy_type));
   }
 
