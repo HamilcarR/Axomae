@@ -10,19 +10,12 @@ namespace exception {
   };
 }  // namespace exception
 
-DeviceError::DeviceError(cudaError_t error) : err(error) {}
+DeviceError::DeviceError(cudaError_t error) : id(error) {}
 
-bool DeviceError::check(DEVICETYPE type) const {
-  switch (type) {
-    case CUDA:
-      return err == 0;
-    default:
-      throw exception::WrongDeviceTypeException("Unknown Device error type used.");
-  }
-}
+bool DeviceError::isOk() const { return id == cudaSuccess; }
 
-void cuAssert(const DeviceError &err, const char *file, int line, bool abort) {
-  cudaError_t code = err.cast_error(DeviceError::CUDA);
+void gpgpu_err_log(const DeviceError &err, const char *file, int line, bool abort) {
+  cudaError_t code = err.getId();
   if (code != cudaSuccess) {
     const char *err_str = cudaGetErrorString(code);
     std::string err = "CUDA GPU assert , error : " + std::to_string(code) + " " + std::string(err_str);
