@@ -24,7 +24,7 @@ namespace nova {
     NovaResources resources;
 
     /* Holds the actual objects refered to by the resource structures.*/
-    core::memory::Arena<std::byte> resource_mempool;
+    core::memory::MemoryArena<std::byte> resource_mempool;
 
    public:
     NovaResourceManager() = default;
@@ -44,7 +44,7 @@ namespace nova {
     GENERATE_GETTERS(shape::ShapeResourcesHolder, ShapeData, resources.scene_data.shape_data)
     GENERATE_GETTERS(aggregate::Accelerator, AccelerationData, resources.scene_data.acceleration_data)
     GENERATE_GETTERS(scene::SceneTransformations, SceneTransformation, resources.scene_data.scene_transformations)
-    GENERATE_GETTERS(core::memory::Arena<>, MemoryPool, resource_mempool)
+    GENERATE_GETTERS(core::memory::MemoryArena<>, MemoryPool, resource_mempool)
 
     void clearResources() {
       resource_mempool.reset();
