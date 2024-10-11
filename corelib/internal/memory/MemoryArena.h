@@ -17,7 +17,7 @@ namespace core::memory {
   static constexpr std::size_t L1_DEF_ALIGN = 64;
   static constexpr std::size_t DEFAULT_BLOCK_SIZE = 262144;
   template<class T = std::byte>
-  class Arena {
+  class MemoryArena {
    private:
     struct block_t {
       T *current_block_ptr{nullptr};
@@ -34,15 +34,15 @@ namespace core::memory {
     block_list_t used_blocks, free_blocks;
 
    public:
-    Arena(const Arena &) = delete;
-    Arena &operator=(const Arena &) = delete;
+    MemoryArena(const MemoryArena &) = delete;
+    MemoryArena &operator=(const MemoryArena &) = delete;
 
-    Arena(Arena &&) noexcept = default;
-    Arena &operator=(Arena &&) noexcept = default;
+    MemoryArena(MemoryArena &&) noexcept = default;
+    MemoryArena &operator=(MemoryArena &&) noexcept = default;
 
-    Arena(std::size_t block_size_ = DEFAULT_BLOCK_SIZE) : block_size(block_size_) {}
+    MemoryArena(std::size_t block_size_ = DEFAULT_BLOCK_SIZE) : block_size(block_size_) {}
 
-    ~Arena() {
+    ~MemoryArena() {
       freeAlign(current_block_ptr);
       for (auto &block : used_blocks)
         freeAlign(block.current_block_ptr);

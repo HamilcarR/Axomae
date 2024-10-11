@@ -45,7 +45,7 @@ namespace nova_baker_utils {
   };
 
   /* Will be removed when BSDFs will be implemented */
-  static material_buffers_t allocate_materials_buffers(core::memory::Arena<> &memory_pool, std::size_t number_elements) {
+  static material_buffers_t allocate_materials_buffers(core::memory::MemoryArena<> &memory_pool, std::size_t number_elements) {
 
     material_buffers_t buffers{};
     buffers.conductor_alloc_buffer = memory_pool.construct<nova::material::NovaConductorMaterial>(number_elements, false);
@@ -185,7 +185,7 @@ namespace nova_baker_utils {
   }
 
   void build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager) {
-    core::memory::Arena<> &memory_pool = manager.getMemoryPool();
+    core::memory::MemoryArena<> &memory_pool = manager.getMemoryPool();
     /* Allocate for triangles */
     std::size_t primitive_number = compute_primitive_number(meshes);
     auto *triangle_buffer = memory_pool.construct<nova::shape::Triangle>(primitive_number, false);
