@@ -16,7 +16,7 @@ namespace nova::shape {
     template<class T, class... Args>
     NovaShapeInterface add_shape(T *allocation_buffer, std::size_t offset, Args &&...args) {
       static_assert(core::has<T, TYPELIST>::has_type, "Provided type is not a Shape type.");
-      T *allocated_ptr = core::memory::Arena<>::construct<T>(&allocation_buffer[offset], std::forward<Args>(args)...);
+      T *allocated_ptr = core::memory::MemoryArena<>::construct<T>(&allocation_buffer[offset], std::forward<Args>(args)...);
       shapes.push_back(allocated_ptr);
       AX_ASSERT_NOTNULL(shapes.back().get());
       return shapes.back();
