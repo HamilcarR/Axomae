@@ -100,33 +100,37 @@ namespace IO {
   template<class TEXTYPE>
   static void loadTexture(const aiScene *scene,
                           GLMaterial *material,
-                          TextureData *texture,
+                          TextureData &texture,
                           const aiString &texture_string,
                           ResourceDatabaseManager &resource_manager,
                           controller::IProgressManager *progress_manager) {
     std::string texture_index_string = texture_string.C_Str();
-    std::string texture_type = texture->name;
+    std::string texture_type = texture.name;
     TextureDatabase &texture_database = *resource_manager.getTextureDatabase();
-    RawImageDatabase &image_database = *resource_manager.getRawImgdatabase();
     if (!texture_index_string.empty()) {
-      texture_index_string = texture_index_string.substr(1);  // get rid of the '*' character at the beginning of the string id
-      texture->name = texture_index_string;
-      auto result = texture_database.getUniqueTexture(texture->name);  // Check if the name (the assimp texture id number) is present in the database.
+      /*Get rid of the '*' character at the beginning of the string id*/
+      texture_index_string = texture_index_string.substr(1);
+      texture.name = texture_index_string;
+      /*Check if the name (the assimp texture id number) is present in the database.*/
+      auto result = texture_database.getUniqueTexture(texture.name);
       if (result.object != nullptr) {
         material->addTexture(result.id);
       } else {
-        int texture_index_int = stoi(texture_index_string);                                        // convert id to integer
-        copyTexels(texture, scene->mTextures[texture_index_int], texture_type, progress_manager);  // read the image pixels and copy them to "texture"
-        auto result_add = database::texture::store<TEXTYPE>(texture_database, false, texture);     // add new ID
+        /*Convert id to integer*/
+        int texture_index_int = stoi(texture_index_string);
+        /*Read the image pixels and copy them to "texture"*/
+        copyTexels(&texture, scene->mTextures[texture_index_int], texture_type, progress_manager);
+        /*Add new texture*/
+        auto result_add = database::texture::store<TEXTYPE>(texture_database, false, &texture);
         image::Metadata metadata;
-        metadata.width = texture->width;
-        metadata.height = texture->height;
+        metadata.width = texture.width;
+        metadata.height = texture.height;
         metadata.channels = 4;
         metadata.is_hdr = false;
-        metadata.name = texture->name;
+        metadata.name = texture.name;
 
         std::vector<uint8_t> bytearray(metadata.width * metadata.height * metadata.channels);
-        std::memcpy(bytearray.data(), texture->data.data(), metadata.width * metadata.height * metadata.channels);
+        std::memcpy(bytearray.data(), texture.data.data(), metadata.width * metadata.height * metadata.channels);
         material->addTexture(result_add.id);
       }
     } else
@@ -135,11 +139,9 @@ namespace IO {
 
   /**
    * The function loads textures for a given material in a 3D model scene.
-   *
    * @param scene a pointer to the aiScene object which contains the loaded 3D model data.
    * @param material The aiMaterial object that contains information about the material properties of a
    * 3D model.
-   *
    * @return a Material object.
    */
   static GLMaterial loadAllTextures(const aiScene *scene,
@@ -157,55 +159,54 @@ namespace IO {
     ambiantocclusion.name = "occlusion";
     specular.name = "specular";
     emissive.name = "emissive";
-    unsigned int color_index = 0, metallic_index = 0, roughness_index = 0;
     aiString color_texture, opacity_texture, normal_texture, metallic_texture, roughness_texture, emissive_texture, specular_texture,
-        occlusion_texture;  // we get indexes of embedded textures , since we will use GLB format
+        occlusion_texture;
     if (material->GetTextureCount(aiTextureType_BASE_COLOR) > 0) {
       material->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE, &color_texture);
-      loadTexture<DiffuseTexture>(scene, &mesh_material, &diffuse, color_texture, resource_manager, progress_manager);
+      loadTexture<DiffuseTexture>(scene, &mesh_material, diffuse, color_texture, resource_manager, progress_manager);
     } else
       loadTextureDummy<DiffuseTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_OPACITY) > 0) {
       mesh_material.setAlphaFactor(true);
       material->GetTexture(aiTextureType_OPACITY, 0, &opacity_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture<OpacityTexture>(scene, &mesh_material, &opacity, opacity_texture, resource_manager, progress_manager);
+      loadTexture<OpacityTexture>(scene, &mesh_material, opacity, opacity_texture, resource_manager, progress_manager);
     } else
       loadTextureDummy<OpacityTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_METALNESS) > 0) {
       material->GetTexture(AI_MATKEY_METALLIC_TEXTURE, &metallic_texture);
-      loadTexture<MetallicTexture>(scene, &mesh_material, &metallic, metallic_texture, resource_manager, progress_manager);
+      loadTexture<MetallicTexture>(scene, &mesh_material, metallic, metallic_texture, resource_manager, progress_manager);
     } else
       loadTextureDummy<MetallicTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS) > 0) {
       material->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE, &roughness_texture);
-      loadTexture<RoughnessTexture>(scene, &mesh_material, &roughness, roughness_texture, resource_manager, progress_manager);
+      loadTexture<RoughnessTexture>(scene, &mesh_material, roughness, roughness_texture, resource_manager, progress_manager);
     } else
       loadTextureDummy<RoughnessTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_NORMALS) > 0) {
       material->GetTexture(aiTextureType_NORMALS, 0, &normal_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture<NormalTexture>(scene, &mesh_material, &normal, normal_texture, resource_manager, progress_manager);
+      loadTexture<NormalTexture>(scene, &mesh_material, normal, normal_texture, resource_manager, progress_manager);
     } else
       loadTextureDummy<NormalTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_LIGHTMAP) > 0) {
       material->GetTexture(aiTextureType_LIGHTMAP, 0, &occlusion_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture<AmbiantOcclusionTexture>(scene, &mesh_material, &ambiantocclusion, occlusion_texture, resource_manager, progress_manager);
+      loadTexture<AmbiantOcclusionTexture>(scene, &mesh_material, ambiantocclusion, occlusion_texture, resource_manager, progress_manager);
     } else
       loadTextureDummy<AmbiantOcclusionTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_SHEEN) > 0) {
       material->GetTexture(aiTextureType_SHEEN, 0, &specular_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture<SpecularTexture>(scene, &mesh_material, &specular, specular_texture, resource_manager, progress_manager);
+      loadTexture<SpecularTexture>(scene, &mesh_material, specular, specular_texture, resource_manager, progress_manager);
     } else
       loadTextureDummy<SpecularTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
     if (material->GetTextureCount(aiTextureType_EMISSIVE) > 0) {
       material->GetTexture(aiTextureType_EMISSIVE, 0, &emissive_texture, nullptr, nullptr, nullptr, nullptr, nullptr);
-      loadTexture<EmissiveTexture>(scene, &mesh_material, &emissive, emissive_texture, resource_manager, progress_manager);
+      loadTexture<EmissiveTexture>(scene, &mesh_material, emissive, emissive_texture, resource_manager, progress_manager);
     } else
       loadTextureDummy<EmissiveTexture>(&mesh_material, resource_manager.getTextureDatabase());
 
