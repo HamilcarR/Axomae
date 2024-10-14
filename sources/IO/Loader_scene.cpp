@@ -447,8 +447,8 @@ namespace IO {
         aiMaterial *ai_mat = modelScene->mMaterials[modelScene->mMeshes[i]->mMaterialIndex];
         material_array[i] = loadMaterials(modelScene, ai_mat, *resource_database, i, this).second;
       }
-      for (auto it = loaded_meshes_futures.begin(); it != loaded_meshes_futures.end(); it++) {
-        std::pair<unsigned, std::unique_ptr<Object3D>> geometry_loaded = it->get();
+      for (auto &loaded_meshes_future : loaded_meshes_futures) {
+        std::pair<unsigned, std::unique_ptr<Object3D>> geometry_loaded = loaded_meshes_future.get();
         unsigned mesh_index = geometry_loaded.first;
         const aiMesh *mesh = modelScene->mMeshes[mesh_index];
         const char *mesh_name = mesh->mName.C_Str();
