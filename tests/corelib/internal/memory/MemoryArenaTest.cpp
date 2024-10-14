@@ -20,8 +20,8 @@ TEST(MemoryArenaTest, alloc) {
   core::memory::MemoryArena<> allocator;
   /* check 16 bytes alignment addresses*/
   for (int i = 0; i < 1024; i++) {
-    auto ptr = reinterpret_cast<uintptr_t>(allocator.alloc(math::random::nrandi(1, 10000)));
-    ASSERT_EQ(ptr % 0x10, 0);
+    void *ptr = allocator.allocate(math::random::nrandi(1, 10000));
+    ASSERT_EQ(reinterpret_cast<uintptr_t>(ptr) % 0x10, 0);
   }
 }
 
@@ -29,25 +29,36 @@ TEST(MemoryArenaTest, getTotalSize) {
   std::size_t default_block_size = core::memory::DEFAULT_BLOCK_SIZE;
   core::memory::MemoryArena<> allocator(default_block_size);
   ASSERT_EQ(allocator.getTotalSize(), 0);
-  allocator.alloc(default_block_size);
+  allocator.allocate(default_block_size);
   ASSERT_EQ(allocator.getTotalSize(), default_block_size);
   std::size_t align_size;
   /* check size alignment on 16 bytes*/
   for (int i = 0; i < 200; i++) {
     align_size = math::random::nrandi(1, core::memory::DEFAULT_BLOCK_SIZE);
-    allocator.alloc(default_block_size + align_size);
+    allocator.allocate(default_block_size + align_size);
     ASSERT_EQ(allocator.getTotalSize() % 0x10, 0);
   }
 }
 
 TEST(MemoryArenaTest, reset) {
   core::memory::MemoryArena<> allocator;
-  allocator.alloc(100000);
-  allocator.alloc(20303030);
-  allocator.alloc(404040239);
+  allocator.allocate(100000);
+  allocator.allocate(20303030);
+  allocator.allocate(404040239);
   ASSERT_EQ(allocator.getUsedBlocksNum(), 2);
   ASSERT_EQ(allocator.getFreeBlocksNum(), 0);
   allocator.reset();
   ASSERT_EQ(allocator.getUsedBlocksNum(), 0);
   ASSERT_EQ(allocator.getFreeBlocksNum(), 2);
+}
+
+TEST(MemoryArenaTest, deallocate) {
+  core::memory::MemoryArena<> allocator;
+  void *ptr = allocator.allocate(1000000);
+  allocator.deallocate(ptr);
+  ASSERT_EQ(allocator.getUsedBlocksNum(), 0);
+  ASSERT_EQ(allocator.getFreeBlocksNum(), 1);
+  ptr = allocator.allocate(999);
+  ASSERT_EQ(allocator.getFreeBlocksNum(), 0);
+  allocator.deallocate(ptr);
 }

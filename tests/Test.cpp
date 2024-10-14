@@ -1,8 +1,8 @@
 #include "Test.h"
 
 #include "internal/common/math/math_utils.h"
+#include "internal/debug/Logger.h"
 #include <gtest/gtest.h>
-
 int main(int argv, char **argc) {
   math::random::init_rand();
   LoggerConfigDataStruct config;
