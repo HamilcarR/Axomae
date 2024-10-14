@@ -2,8 +2,9 @@
 #define DEVICEERROR_H
 #include "internal/macro/project_macros.h"
 #include <cstdint>
-#include <driver_types.h>
-
+#if defined(AXOMAE_USE_CUDA)
+#  include <driver_types.h>
+#endif
 class DeviceError {
 
 #if defined(AXOMAE_USE_CUDA)
