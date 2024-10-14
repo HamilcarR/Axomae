@@ -10,7 +10,7 @@
  * sizes , and deallocate the entire chunk when not needed.
  * It doesn't support destruction of objects yet. Deallocating blocks will not call the destructor of allocated objects , this is intended as a way to
  * store small struct like objects.
- * DO NOT STORE OBJECTS THAT OWN RESOURCE THAT NEEDS TO BE RELEASED BY THEIR DESTRUCTORS.
+ * Deallocation of individual resource should be made by the caller.This structures doesn't execute destructors.
  */
 namespace core::memory {
 
@@ -29,6 +29,8 @@ namespace core::memory {
 
    private:
     std::size_t block_size;
+    /* This is implicit block, used block list can be empty , but current_block_ptr can be used , so there's in fact 1 used block even though
+     * used_blocks is empty*/
     T *current_block_ptr{nullptr};
     std::size_t current_block_offset{}, current_alloc_size{};
     block_list_t used_blocks, free_blocks;
@@ -64,7 +66,6 @@ namespace core::memory {
         acc += elem.current_alloc_size;
       for (const auto &elem : free_blocks)
         acc += elem.current_alloc_size;
-
       return acc;
     }
 
@@ -75,7 +76,7 @@ namespace core::memory {
 
     template<class U>
     U *construct(std::size_t num_instances, bool constructor = true) {
-      U *memory_alloc = static_cast<U *>(alloc(num_instances * sizeof(U)));
+      U *memory_alloc = static_cast<U *>(allocate(num_instances * sizeof(U)));
       if (constructor) {
         for (std::size_t i = 0; i < num_instances; i++)
           ::new (&memory_alloc[i]) U();
@@ -91,15 +92,12 @@ namespace core::memory {
       return ptr;
     }
 
-    void *alloc(std::size_t size_bytes) {
+    void *allocate(std::size_t size_bytes) {
       /* Needs 16 bytes alignment */
       size_bytes = (size_bytes + 0xF) & ~0xF;
       if (current_block_offset + size_bytes > current_alloc_size) {
         /* Adds current block to used list*/
-        if (current_block_ptr) {
-          used_blocks.push_back({current_block_ptr, current_alloc_size});
-          current_block_ptr = nullptr;
-        }
+        addCurrentBlockToUsed();
         /* Looks for a free block in the free_block list with enough memory*/
         for (typename block_list_t::const_iterator block = free_blocks.begin(); block != free_blocks.end(); block++) {
           if (block->current_alloc_size >= size_bytes) {
@@ -121,6 +119,20 @@ namespace core::memory {
       return ret_ptr;
     }
 
+    /*
+     * deallocate will move the used block to the free list, it will not call delete , only the destructor will properly release memory to the OS.
+     */
+    void deallocate(void *ptr) {
+      if (!ptr)
+        return;
+      if (current_block_ptr == ptr)
+        addCurrentBlockToFree();
+      auto to_dealloc = getUsedBlockItr(ptr);
+      if (to_dealloc == used_blocks.end())
+        return;
+      moveUsedToFree(to_dealloc);
+    }
+
    private:
     template<class U>
     U *allocAlign(std::size_t count) {
@@ -131,11 +143,45 @@ namespace core::memory {
     }
 
     void freeAlign(void *ptr) {
-      std::align_val_t alignment = static_cast<std::align_val_t>(L1_DEF_ALIGN);
+      auto alignment = static_cast<std::align_val_t>(L1_DEF_ALIGN);
       ::operator delete(ptr, alignment);
     }
-  };
 
+    typename block_list_t::const_iterator getUsedBlockItr(void *ptr) const {
+      T *block_ptr = static_cast<T *>(ptr);
+      for (typename block_list_t::const_iterator block = used_blocks.begin(); block != used_blocks.end(); block++) {
+        if (block->current_block_ptr == block_ptr)
+          return block;
+      }
+      return used_blocks.end();
+    }
+
+    void addCurrentBlockToUsed() {
+      if (current_block_ptr) {
+        used_blocks.push_back({current_block_ptr, current_alloc_size});
+        current_block_ptr = nullptr;
+        current_alloc_size = 0;
+        current_block_offset = 0;
+      }
+    }
+
+    void addCurrentBlockToFree() {
+      if (current_block_ptr) {
+        free_blocks.push_back({current_block_ptr, current_alloc_size});
+        current_block_ptr = nullptr;
+        current_alloc_size = 0;
+        current_block_offset = 0;
+      }
+    }
+
+    void moveUsedToFree(typename block_list_t::const_iterator &to_move) {
+      if (!to_move->current_block_ptr)
+        return;
+      free_blocks.push_back({to_move->current_block_ptr, to_move->current_alloc_size});
+      used_blocks.erase(to_move);
+    }
+  };
+  using ByteArena = MemoryArena<std::byte>;
 }  // namespace core::memory
 
 #endif  // MEMORYARENA_H
