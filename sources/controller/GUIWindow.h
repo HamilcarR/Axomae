@@ -65,6 +65,7 @@ namespace controller {
     /* Raytracing engine display*/
     GLViewer *nova_viewer;
     NovaBakingStructure nova_baking_structure;
+    core::memory::ByteArena memory_pool;
 
    public:
     static HeapManagement *_MemManagement;  // TODO : Refactor
@@ -72,6 +73,11 @@ namespace controller {
    public:
     explicit Controller(QWidget *parent = nullptr);
     ~Controller() override;
+    Controller(const Controller &) = delete;
+    Controller(Controller &&) = delete;
+    Controller &operator=(const Controller &) = delete;
+    Controller &operator=(Controller &&) = delete;
+
     void setApplicationConfig(ApplicationConfig &&configuration);
     [[nodiscard]] ApplicationConfig *getApplicationConfig() const { return global_application_config.get(); }
     Ui::MainWindow &getUi() { return main_window_ui; }

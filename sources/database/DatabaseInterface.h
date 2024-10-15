@@ -43,7 +43,7 @@ class DatabaseInterface {
   virtual T *get(U id) const = 0;
 
   /**
-   * @brief Removes the element from a database , using it's ID
+   * @brief Removes the element from a database , using its ID
    *
    * @param id ID to remove
    * @return true If the element has been found and removed
@@ -52,7 +52,7 @@ class DatabaseInterface {
   virtual bool remove(U id) = 0;
 
   /**
-   * @brief Removes an element from the database using it's address
+   * @brief Removes an element from the database using its address
    *
    * @param element Address of the element to be removed
    * @return true If the element has been removed
