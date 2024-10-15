@@ -1,8 +1,11 @@
 #include "TextureDatabase.h"
+#include "internal/memory/MemoryArena.h"
 #include "internal/thread/Mutex.h"
 #include <utility>
-
-TextureDatabase::TextureDatabase(controller::ProgressStatus *progress_manager_) { progress_manager = progress_manager_; }
+TextureDatabase::TextureDatabase(core::memory::ByteArena *arena, controller::ProgressStatus *progress_manager_) {
+  progress_manager = progress_manager_;
+  setUpCacheMemory(arena);
+}
 
 void TextureDatabase::purge() {
   Mutex::Lock lock(mutex);

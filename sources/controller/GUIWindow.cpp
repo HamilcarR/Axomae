@@ -226,7 +226,7 @@ namespace controller {
     timer = std::make_unique<QTimer>();
 
     /*Initialize databases*/
-    resource_database.initializeDatabases();
+    resource_database.initializeDatabases(memory_pool);
 
     /* UI elements initialization*/
     main_window_ui.setupUi(this);
