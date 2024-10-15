@@ -13,21 +13,30 @@
 class TextureDatabase;
 class ShaderDatabase;
 class INodeDatabase;
+
 template<class T>
 class ImageDatabase;
+
 using RawImageDatabase = ImageDatabase<uint8_t>;
+
 using HdrImageDatabase = ImageDatabase<float>;
+
 namespace controller {
   class OperatorProgressStatus;
   using ProgressStatus = OperatorProgressStatus;
 }  // namespace controller
+
+namespace core::memory {
+  template<class T>
+  class MemoryArena;
+}
 
 /**
  * @brief This class contains all databases relative to resources used by the renderer.
  * Every resource loaded using IO is managed from this class.
  *
  */
-class ResourceDatabaseManager final {
+class ResourceDatabaseManager {
  private:
   std::unique_ptr<TextureDatabase> texture_database; /*<Pointer on the texture database*/
   std::unique_ptr<ShaderDatabase> shader_database;   /*<Pointer on the shader database*/
@@ -67,7 +76,8 @@ class ResourceDatabaseManager final {
   [[nodiscard]] HdrImageDatabase *getHdrDatabase() const { return hdr_database.get(); }
   [[nodiscard]] RawImageDatabase *getRawImgdatabase() const { return image_database.get(); }
   void setProgressManagerAllDb(controller::ProgressStatus *progress_manager);
-  void initializeDatabases(controller::ProgressStatus *progress_manager = nullptr);
+
+  void initializeDatabases(core::memory::MemoryArena<std::byte> &arena, controller::ProgressStatus *progress_manager = nullptr);
 };
 
 #endif
