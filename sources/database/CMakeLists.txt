@@ -22,7 +22,6 @@ PRIVATE
     ax_controller
     ax_mesh
     ax_material
-PUBLIC
     ax_core
 )
 

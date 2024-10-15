@@ -1,10 +1,10 @@
-
 #include "ResourceDatabaseManager.h"
 #include "INodeDatabase.h"
 #include "ImageDatabase.h"
 #include "OperatorProgressStatus.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
+#include "internal/memory/MemoryArena.h"
 
 ResourceDatabaseManager &ResourceDatabaseManager::getInstance() {
   static ResourceDatabaseManager instance;
@@ -26,12 +26,12 @@ void ResourceDatabaseManager::clean() {
   image_database->clean();
 }
 
-void ResourceDatabaseManager::initializeDatabases(controller::ProgressStatus *progress_manager) {
-  texture_database = std::make_unique<TextureDatabase>(progress_manager);
+void ResourceDatabaseManager::initializeDatabases(core::memory::ByteArena &arena, controller::ProgressStatus *progress_manager) {
+  texture_database = std::make_unique<TextureDatabase>(&arena, progress_manager);
   shader_database = std::make_unique<ShaderDatabase>(progress_manager);
   node_database = std::make_unique<INodeDatabase>(progress_manager);
-  hdr_database = std::make_unique<ImageDatabase<float>>(progress_manager);
-  image_database = std::make_unique<ImageDatabase<uint8_t>>(progress_manager);
+  hdr_database = std::make_unique<ImageDatabase<float>>(&arena, progress_manager);
+  image_database = std::make_unique<ImageDatabase<uint8_t>>(&arena, progress_manager);
 }
 
 void ResourceDatabaseManager::setProgressManagerAllDb(controller::ProgressStatus *progress_manager) {

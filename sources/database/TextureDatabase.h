@@ -10,6 +10,11 @@
  *
  */
 
+namespace core::memory {
+  template<class T>
+  class MemoryArena;
+}
+
 /**
  * @brief TextureDatabase class definition
  * GL texture database with no duplicates.
@@ -20,7 +25,7 @@ class TextureDatabase final : public IntegerResourceDB<GenericTexture> {
   std::map<std::string, int> unique_textures;
 
  public:
-  explicit TextureDatabase(controller::ProgressStatus *progress_manager = nullptr);
+  explicit TextureDatabase(core::memory::MemoryArena<std::byte> *memory_arena = nullptr, controller::ProgressStatus *progress_manager = nullptr);
   ~TextureDatabase() override = default;
   void clean() override;
   void purge() override;
