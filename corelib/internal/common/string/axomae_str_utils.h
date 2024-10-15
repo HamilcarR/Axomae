@@ -15,6 +15,13 @@ namespace utils {
       }
       return ret;
     }
+    /* Prints address in format 0x...*/
+    inline std::string to_hex(std::uintptr_t value) {
+      std::stringstream ss;
+      ss << std::hex << value;
+      return ss.str();
+    }
+
   };  // namespace string
 };    // namespace utils
 
