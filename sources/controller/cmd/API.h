@@ -4,6 +4,8 @@
 
 #include "api_namespaces.h"
 
+#include <internal/macro/project_macros.h>
+
 /**
  * @file API.h
  * @brief This class is responsible for booting either the default state of the program , or setting the program to
@@ -24,7 +26,7 @@ namespace controller::cmd {
      * Use this method after completing the ApplicationConfig structure states.
      * Will move the final config property , and invalidate the current instance.
      */
-    [[nodiscard]] ApplicationConfig &&getConfig() {
+    ax_no_discard ApplicationConfig &&getConfig() {
       argv = nullptr;
       argc = nullptr;
       return std::move(config);

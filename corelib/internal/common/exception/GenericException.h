@@ -1,6 +1,7 @@
 #ifndef GENERICEXCEPTION_H
 #define GENERICEXCEPTION_H
 #include "internal/macro/class_macros.h"
+#include <internal/macro/project_macros.h>
 #include <stdexcept>
 namespace exception {
   enum SEVERITY : int { QUERY, INFO, WARNING, CRITICAL };
@@ -22,15 +23,15 @@ namespace exception {
       saveErrorString(str);
     }
     void setSeverity(SEVERITY n) { severity = n; }
-    [[nodiscard]] SEVERITY getSeverity() const { return severity; }
-    [[nodiscard]] const std::string &getErrorMessage() const { return this_error_string; }
+    ax_no_discard SEVERITY getSeverity() const { return severity; }
+    ax_no_discard const std::string &getErrorMessage() const { return this_error_string; }
   };
 
   class GenericException : public std::exception, public ExceptionData {
    public:
     GenericException() : std::exception(), ExceptionData(std::string("The program has encountered an exception : \n")) {}
     GenericException(const std::string &message, SEVERITY severity) : std::exception(), ExceptionData(message, severity) {}
-    [[nodiscard]] const char *what() const noexcept override { return this_error_string.c_str(); }
+    ax_no_discard const char *what() const noexcept override { return this_error_string.c_str(); }
   };
 
   class InvalidArgumentException : public std::invalid_argument, public ExceptionData {
@@ -39,14 +40,14 @@ namespace exception {
         : std::invalid_argument(error_string), ExceptionData(std::string("The program has encoutered an exception : \n ")) {}
     InvalidArgumentException(const std::string &error_string, SEVERITY severity)
         : std::invalid_argument(error_string), ExceptionData(error_string, severity) {}
-    [[nodiscard]] const char *what() const noexcept override { return this_error_string.c_str(); }
+    ax_no_discard const char *what() const noexcept override { return this_error_string.c_str(); }
   };
 
   class CatastrophicFailureException : public std::exception, public ExceptionData {
    public:
     CatastrophicFailureException()
         : std::exception(), ExceptionData(std::string("The program has encoutered a critical exception and will now shut down: \n"), CRITICAL) {}
-    [[nodiscard]] const char *what() const noexcept override { return this_error_string.c_str(); }
+    ax_no_discard const char *what() const noexcept override { return this_error_string.c_str(); }
   };
 
 }  // namespace exception

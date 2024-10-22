@@ -15,7 +15,7 @@ class GLIndexBufferObject : public DeviceBaseBufferInterface {
   CLASS_OCM(GLIndexBufferObject)
 
   void initialize() override;
-  [[nodiscard]] bool isReady() const override;
+  ax_no_discard bool isReady() const override;
   void bind() override;
   void unbind() override;
   void clean() override;

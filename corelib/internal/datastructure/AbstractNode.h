@@ -2,6 +2,8 @@
 #define ABSTRACTNODE_H
 #include "NodeInterface.h"
 
+#include <internal/macro/project_macros.h>
+
 namespace datastructure {
   class AbstractNode : public NodeInterface {
 
@@ -13,14 +15,14 @@ namespace datastructure {
     std::vector<NodeInterface *> children{}; /*<List of children*/
     AbstractHierarchy *owner{};              /*<Structure owning this hierarchy*/
    public:
-    [[nodiscard]] const std::vector<NodeInterface *> &getChildren() const override { return children; };
-    [[nodiscard]] const std::vector<NodeInterface *> &getParents() const override { return parents; }
-    [[nodiscard]] bool isLeaf() const override;
-    [[nodiscard]] bool isMarked() const override { return mark; };
-    [[nodiscard]] const std::string &getName() const override { return name; };
-    [[nodiscard]] AbstractHierarchy *getHierarchyOwner() const override { return owner; };
-    [[nodiscard]] bool isRoot() const override;
-    [[nodiscard]] bool isUpdated() const override { return updated; }
+    ax_no_discard const std::vector<NodeInterface *> &getChildren() const override { return children; };
+    ax_no_discard const std::vector<NodeInterface *> &getParents() const override { return parents; }
+    ax_no_discard bool isLeaf() const override;
+    ax_no_discard bool isMarked() const override { return mark; };
+    ax_no_discard const std::string &getName() const override { return name; };
+    ax_no_discard AbstractHierarchy *getHierarchyOwner() const override { return owner; };
+    ax_no_discard bool isRoot() const override;
+    ax_no_discard bool isUpdated() const override { return updated; }
 
     NodeInterface *returnRoot() override;
     void setMark(bool marked) override { mark = marked; };

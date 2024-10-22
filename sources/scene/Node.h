@@ -40,14 +40,14 @@ class SceneTreeNode : public SceneNodeInterface, public datastructure::AbstractN
    */
   glm::mat4 computeFinalTransformation() override;
   virtual void setParent(NodeInterface *node);
-  [[nodiscard]] virtual SceneTreeNode *getParent() const;
-  [[nodiscard]] const glm::mat4 &getLocalModelMatrix() const override { return local_transformation; }
+  ax_no_discard virtual SceneTreeNode *getParent() const;
+  ax_no_discard const glm::mat4 &getLocalModelMatrix() const override { return local_transformation; }
   void setLocalModelMatrix(const glm::mat4 &local_mat) override { local_transformation = local_mat; }
   void resetLocalModelMatrix() override;
   void resetAccumulatedMatrix() override;
   void setAccumulatedModelMatrix(const glm::mat4 &matrix) override { accumulated_transformation = matrix; };
-  [[nodiscard]] const glm::mat4 &getAccumulatedModelMatrix() const override { return accumulated_transformation; };
-  [[nodiscard]] bool isTransformIgnored() const override { return ignore_transformation; }
+  ax_no_discard const glm::mat4 &getAccumulatedModelMatrix() const override { return accumulated_transformation; };
+  ax_no_discard bool isTransformIgnored() const override { return ignore_transformation; }
   void ignoreTransformation(bool ignore_) override { ignore_transformation = ignore_; }
   void reset() override;
 };

@@ -24,10 +24,10 @@ namespace nova::shape {
      * @brief tmin must be initialized to a small value (0.f) while tmax should be set at a highest value.
      * Use camera near and far .
      */
-    [[nodiscard]] bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const;
-    [[nodiscard]] glm::vec3 centroid() const { return aabb.getPosition(); }
-    [[nodiscard]] const glm::vec3 &getPosition() const { return aabb.getPosition(); }
-    [[nodiscard]] geometry::BoundingBox computeAABB() const { return aabb; }
+    ax_no_discard bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const;
+    ax_no_discard glm::vec3 centroid() const { return aabb.getPosition(); }
+    ax_no_discard const glm::vec3 &getPosition() const { return aabb.getPosition(); }
+    ax_no_discard geometry::BoundingBox computeAABB() const { return aabb; }
   };
 }  // namespace nova::shape
 

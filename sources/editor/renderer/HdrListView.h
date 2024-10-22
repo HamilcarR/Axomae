@@ -17,7 +17,7 @@ class ThumbnailDelegate : public QStyledItemDelegate {
     QStyledItemDelegate::paint(painter, option, index);
   }
 
-  [[nodiscard]] QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override { return QSize(100, 50); }
+  ax_no_discard QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override { return QSize(100, 50); }
 };
 
 class EnvmapListDisplay : public QListView {

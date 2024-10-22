@@ -17,15 +17,15 @@ namespace math::geometry {
     Vec2(T a, T b);
 
     inline void normalize();
-    [[nodiscard]] inline float angle(const Vec2 &arg) const;
-    [[nodiscard]] inline float dot(const Vec2 &arg) const;
-    [[nodiscard]] inline float magnitude() const;
-    [[nodiscard]] inline Vec2 operator-(const Vec2 &arg) const;
-    [[nodiscard]] inline Vec2 operator+(const Vec2 &arg) const;
+    ax_no_discard inline float angle(const Vec2 &arg) const;
+    ax_no_discard inline float dot(const Vec2 &arg) const;
+    ax_no_discard inline float magnitude() const;
+    ax_no_discard inline Vec2 operator-(const Vec2 &arg) const;
+    ax_no_discard inline Vec2 operator+(const Vec2 &arg) const;
     template<class Y>
-    [[nodiscard]] inline Vec2 operator*(const Y &arg) const;
-    [[nodiscard]] inline Vec2 operator/(const Vec2 &arg) const;
-    [[nodiscard]] inline bool operator==(const Vec2 &arg) const;
+    ax_no_discard inline Vec2 operator*(const Y &arg) const;
+    ax_no_discard inline Vec2 operator/(const Vec2 &arg) const;
+    ax_no_discard inline bool operator==(const Vec2 &arg) const;
 
     friend std::ostream &operator<<(std::ostream &os, const Vec2 &p) {
       os << "(" << p.x << "," << p.y << ")";

@@ -18,21 +18,21 @@ namespace ax_cuda {
    public:
     CLASS_CM(CudaParams)
 
-    [[nodiscard]] int getDeviceID() const { return device_params.device_id; }
+    ax_no_discard int getDeviceID() const { return device_params.device_id; }
     void setDeviceID(int device_id) { this->device_params.device_id = device_id; }
-    [[nodiscard]] unsigned getDeviceFlags() const { return device_params.deviceFlags; }
+    ax_no_discard unsigned getDeviceFlags() const { return device_params.deviceFlags; }
     void setDeviceFlags(unsigned device_flags) { device_params.deviceFlags = device_flags; }
-    [[nodiscard]] unsigned getFlags() const { return device_params.flags; }
+    ax_no_discard unsigned getFlags() const { return device_params.flags; }
     void setFlags(unsigned flags) { this->device_params.flags = flags; }
     void setMemcpyKind(cudaMemcpyKind copy_kind);
-    [[nodiscard]] const cudaMemcpyKind &getMemcpyKind() const { return memory_params.memcpy_kind; }
+    ax_no_discard const cudaMemcpyKind &getMemcpyKind() const { return memory_params.memcpy_kind; }
     void setChanDescriptors(int x, int y, int z, int a, cudaChannelFormatKind kind);
-    [[nodiscard]] cudaChannelFormatDesc getChanDescriptors() const;
+    ax_no_discard cudaChannelFormatDesc getChanDescriptors() const;
     void setResourceDesc(const cudaResourceDesc &resc) { resource_descriptor_params.resource_desc = resc; }
-    [[nodiscard]] const cudaResourceDesc &getResourceDesc() const { return resource_descriptor_params.resource_desc; }
+    ax_no_discard const cudaResourceDesc &getResourceDesc() const { return resource_descriptor_params.resource_desc; }
     void setTextureDesc(const cudaTextureDesc &desc) { texture_descriptor_params.texture_desc = desc; }
-    [[nodiscard]] const cudaTextureDesc &getTextureDesc() const { return texture_descriptor_params.texture_desc; }
-    [[nodiscard]] const cudaResourceViewDesc &getResourceViewDesc() const { return resource_descriptor_params.resource_view_desc; }
+    ax_no_discard const cudaTextureDesc &getTextureDesc() const { return texture_descriptor_params.texture_desc; }
+    ax_no_discard const cudaResourceViewDesc &getResourceViewDesc() const { return resource_descriptor_params.resource_view_desc; }
     void setResourceViewDesc(const cudaResourceViewDesc &view_desc) { resource_descriptor_params.resource_view_desc = view_desc; }
   };
 }  // namespace ax_cuda

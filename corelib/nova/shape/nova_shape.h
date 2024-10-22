@@ -23,7 +23,7 @@ namespace nova::shape {
     }
 
     std::vector<NovaShapeInterface> &get_shapes() { return shapes; }
-    [[nodiscard]] const std::vector<NovaShapeInterface> &get_shapes() const { return shapes; }
+    ax_no_discard const std::vector<NovaShapeInterface> &get_shapes() const { return shapes; }
 
     void clear() { shapes.clear(); }
   };

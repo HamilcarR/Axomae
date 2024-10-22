@@ -25,14 +25,14 @@ namespace database::event {
     ImageUpdateMessage(ImageUpdateMessage &&) = default;
     ImageUpdateMessage(const ImageUpdateMessage &) = default;
     void setIndex(int id) { index = id; }
-    [[nodiscard]] virtual OPERATION getOperation() const = 0;
-    [[nodiscard]] int getIndex() const { return index; }
+    ax_no_discard virtual OPERATION getOperation() const = 0;
+    ax_no_discard int getIndex() const { return index; }
   };
   /*image event when an image has been deleted to the DB*/
   class ImageDeleteMessage : public ImageUpdateMessage {
    public:
     ImageDeleteMessage() : ImageUpdateMessage() { index = 0; }
-    [[nodiscard]] OPERATION getOperation() const override { return OPERATION::DELETE; }
+    ax_no_discard OPERATION getOperation() const override { return OPERATION::DELETE; }
   };
 
   /*******************************************************************************************************************************************/
@@ -46,17 +46,17 @@ namespace database::event {
 
    public:
     ImageAddMessage() : ImageUpdateMessage() { index = 0; }
-    [[nodiscard]] OPERATION getOperation() const override { return OPERATION::ADD; }
-    [[nodiscard]] const QPixmap *getThumbnail() { return value; }
+    ax_no_discard OPERATION getOperation() const override { return OPERATION::ADD; }
+    ax_no_discard const QPixmap *getThumbnail() { return value; }
     void setThumbnail(const QPixmap *thumbnail) { value = thumbnail; }
-    [[nodiscard]] image::Metadata getMetadata() { return metadata; }
+    ax_no_discard image::Metadata getMetadata() { return metadata; }
     void setMetadata(const image::Metadata &metad) { metadata = metad; }
   };
 
   class ImageSelectedMessage : public ImageUpdateMessage {
    public:
     ImageSelectedMessage() : ImageUpdateMessage() { index = 0; }
-    [[nodiscard]] OPERATION getOperation() const override { return OPERATION::SELECTED; }
+    ax_no_discard OPERATION getOperation() const override { return OPERATION::SELECTED; }
   };
 
 }  // namespace database::event

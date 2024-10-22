@@ -18,16 +18,16 @@ namespace math::geometry {
     Vec3(T a, T b, T c);
 
     inline void normalize();
-    [[nodiscard]] inline float magnitude() const;
-    [[nodiscard]] inline float angle(const Vec3 &arg) const;
-    [[nodiscard]] inline float dot(const Vec3 &arg) const;
-    [[nodiscard]] inline Vec3 cross(const Vec3 &arg) const;
-    [[nodiscard]] inline Vec3 operator-(const Vec3 &arg) const;
-    [[nodiscard]] inline Vec3 operator+(const Vec3 &arg) const;
+    ax_no_discard inline float magnitude() const;
+    ax_no_discard inline float angle(const Vec3 &arg) const;
+    ax_no_discard inline float dot(const Vec3 &arg) const;
+    ax_no_discard inline Vec3 cross(const Vec3 &arg) const;
+    ax_no_discard inline Vec3 operator-(const Vec3 &arg) const;
+    ax_no_discard inline Vec3 operator+(const Vec3 &arg) const;
     template<class Y>
-    [[nodiscard]] inline Vec3 operator*(const Y &arg) const;
-    [[nodiscard]] inline Vec3 operator/(const Vec3 &arg) const;
-    [[nodiscard]] inline bool operator==(const Vec3 &arg) const;
+    ax_no_discard inline Vec3 operator*(const Y &arg) const;
+    ax_no_discard inline Vec3 operator/(const Vec3 &arg) const;
+    ax_no_discard inline bool operator==(const Vec3 &arg) const;
 
     friend std::ostream &operator<<(std::ostream &os, const Vec3 &v) {
       os << "(" << v.x << "," << v.y << "," << v.z << ")";

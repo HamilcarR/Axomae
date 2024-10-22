@@ -60,7 +60,7 @@ class DispatchTest : public core::tag_ptr<TestClass1, TestClass2, TestClass3> {
  public:
   using tag_ptr::tag_ptr;
 
-  [[nodiscard]] std::string toString() {
+  ax_no_discard std::string toString() {
     auto d = [](auto ptr) { return ptr->toString(); };
     return host_dispatch(d);
   }

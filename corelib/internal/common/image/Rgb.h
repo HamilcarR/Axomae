@@ -1,6 +1,7 @@
 #ifndef RGB_H
 #define RGB_H
 #include <cinttypes>
+#include <internal/macro/project_macros.h>
 #include <string>
 
 namespace image {
@@ -34,8 +35,8 @@ namespace image {
     Rgb operator-(Rgb arg) const;
     void clamp();
     uint32_t rgb_to_int();
-    [[nodiscard]] std::string to_string() const;
-    [[nodiscard]] std::string to_stringi() const;
+    ax_no_discard std::string to_string() const;
+    ax_no_discard std::string to_stringi() const;
   };
 }  // namespace image
 #endif  // RGB_H

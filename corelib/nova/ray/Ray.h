@@ -1,6 +1,8 @@
 #ifndef RAY_H
 #define RAY_H
 #include "internal/common/math/math_utils.h"
+
+#include <internal/macro/project_macros.h>
 namespace nova {
   class Ray {
    public:
@@ -17,7 +19,7 @@ namespace nova {
     Ray &operator=(const Ray &) = default;
     Ray &operator=(Ray &&) = default;
 
-    [[nodiscard]] glm::vec3 pointAt(float t) const;
+    ax_no_discard glm::vec3 pointAt(float t) const;
   };
 
   /* Generalized ray*/
