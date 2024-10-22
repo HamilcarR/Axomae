@@ -3,6 +3,8 @@
 
 #include "ui_nova_viewer.h"
 
+#include <internal/macro/project_macros.h>
+
 class QGridLayout;
 class GLViewer;
 namespace editor {
@@ -23,7 +25,7 @@ class NovaViewerWidget : public QWidget {
   NovaViewerWidget &operator=(const NovaViewerWidget &copy) = delete;
   NovaViewerWidget &operator=(NovaViewerWidget &&move) noexcept = delete;
   NovaViewerWidget(NovaViewerWidget &&move) noexcept = delete;
-  [[nodiscard]] GLViewer *getViewer() const;
+  ax_no_discard GLViewer *getViewer() const;
   void mouseMoveEvent(QMouseEvent *event) override;
 };
 

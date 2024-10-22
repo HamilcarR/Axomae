@@ -22,9 +22,9 @@ class GenericCubemapTexture : public CubemapTexture {
   const char *getTextureTypeCStr();
   void setTextureUnit(unsigned int tex_unit) { texture_unit = tex_unit; }
   void setLocationName(const std::string &loc_name) { location_name = loc_name; }
-  [[nodiscard]] unsigned int getTextureUnit() const { return texture_unit; }
+  ax_no_discard unsigned int getTextureUnit() const { return texture_unit; }
   std::string getLocationName() { return location_name; }
-  [[nodiscard]] TYPE getTextureType() const override { return GENERIC_CUBE; }
+  ax_no_discard TYPE getTextureType() const override { return GENERIC_CUBE; }
 };
 
 #endif  // GENERICCUBEMAPTEXTURE_H

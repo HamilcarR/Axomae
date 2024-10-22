@@ -13,9 +13,9 @@ namespace datastructure {
    public:
     virtual ~HierarchyInterface() = default;
     virtual void setRoot(NodeInterface *_root) = 0;
-    [[nodiscard]] virtual NodeInterface *getIterator() const = 0;
+    ax_no_discard virtual NodeInterface *getIterator() const = 0;
     virtual void setIterator(NodeInterface *iter) = 0;
-    [[nodiscard]] virtual NodeInterface *getRootNode() const = 0;
+    ax_no_discard virtual NodeInterface *getRootNode() const = 0;
     virtual void setAsRootChild(NodeInterface *node) = 0;
     /**
      * @brief Update owner of each node to this structure

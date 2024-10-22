@@ -2,6 +2,8 @@
 #define CONFIG_H
 #include "internal/debug/Logger.h"
 #include "internal/thread/worker/ThreadPool.h"
+
+#include <internal/macro/project_macros.h>
 /**
  * @brief File implementing a utility returning configurations states for the application , either from the configuration file or the CLI tool.
  * @file Config.h
@@ -48,14 +50,14 @@ class ApplicationConfig {
 
   void setUvEditorResolutionWidth(unsigned int resolution) { uv_editor_resolution_width = resolution; }
   void setUvEditorResolutionHeight(unsigned int resolution) { uv_editor_resolution_height = resolution; }
-  [[nodiscard]] int getUvEditorResolutionWidth() const { return static_cast<int>(uv_editor_resolution_width); }
-  [[nodiscard]] int getUvEditorResolutionHeight() const { return static_cast<int>(uv_editor_resolution_height); }
-  [[nodiscard]] int getThreadPoolSize() const;
+  ax_no_discard int getUvEditorResolutionWidth() const { return static_cast<int>(uv_editor_resolution_width); }
+  ax_no_discard int getUvEditorResolutionHeight() const { return static_cast<int>(uv_editor_resolution_height); }
+  ax_no_discard int getThreadPoolSize() const;
   void initializeThreadPool(int size = 0);
-  [[nodiscard]] threading::ThreadPool *getThreadPool() const { return thread_pool.get(); }
-  [[nodiscard]] std::string getLogFile() const;
-  [[nodiscard]] LoggerConfigDataStruct generateDefaultLoggerConfigDataStruct() const;
-  [[nodiscard]] LoggerConfigDataStruct generateLoggerConfigDataStruct() const;
+  ax_no_discard threading::ThreadPool *getThreadPool() const { return thread_pool.get(); }
+  ax_no_discard std::string getLogFile() const;
+  ax_no_discard LoggerConfigDataStruct generateDefaultLoggerConfigDataStruct() const;
+  ax_no_discard LoggerConfigDataStruct generateLoggerConfigDataStruct() const;
 };
 
 #endif

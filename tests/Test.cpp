@@ -10,6 +10,7 @@ int main(int argv, char **argc) {
   config.write_destination = out;
   config.enable_logging = true;
   LOGCONFIG(config);
+  LOGDISABLE();
   ::testing::InitGoogleTest(&argv, argc);
   auto a = RUN_ALL_TESTS();
   return a;

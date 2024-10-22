@@ -46,11 +46,11 @@ class LogLine {
 
   const std::string &getFunctionName() { return function; }
 
-  [[nodiscard]] unsigned getLine() const { return line; }
+  ax_no_discard unsigned getLine() const { return line; }
 
   LogLevel::LOGENUMTYPE &getLogLevel() { return level; }
 
-  [[nodiscard]] std::string getFormattedLog() const { return getFormatedLog(message, file, function, line, level); }
+  ax_no_discard std::string getFormattedLog() const { return getFormatedLog(message, file, function, line, level); }
 
  private:
   std::string message;

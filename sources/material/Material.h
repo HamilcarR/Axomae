@@ -61,17 +61,17 @@ class GLMaterial : public MaterialInterface {
   void setEmissiveFactor(float factor) override { emissive_factor = factor; }
   void setAlphaFactor(float transparency_value) override { alpha_factor = 1.f - transparency_value; }
   virtual void setShaderPointer(Shader *shader) { shader_program = shader; }
-  [[nodiscard]] bool isTransparent() const override;
-  [[nodiscard]] const TextureGroup &getTextureGroup() const override { return textures_group; }
-  [[nodiscard]] TextureGroup &getTextureGroupRef() { return textures_group; }
-  [[nodiscard]] float getDielectricFactor() const override { return dielectric_factor; }
-  [[nodiscard]] float getRoughnessFactor() const override { return roughness_factor; }
-  [[nodiscard]] float getTransmissionFactor() const override { return transmission_factor; }
-  [[nodiscard]] float getEmissiveFactor() const override { return emissive_factor; }
-  [[nodiscard]] float getAlphaFactor() const override { return alpha_factor; }
-  [[nodiscard]] Vec2f getRefractiveIndex() const override;
-  [[nodiscard]] Shader *getShaderProgram() const { return shader_program; }
-  [[nodiscard]] bool hasTextures() const override { return !textures_group.isEmpty(); }
+  ax_no_discard bool isTransparent() const override;
+  ax_no_discard const TextureGroup &getTextureGroup() const override { return textures_group; }
+  ax_no_discard TextureGroup &getTextureGroupRef() { return textures_group; }
+  ax_no_discard float getDielectricFactor() const override { return dielectric_factor; }
+  ax_no_discard float getRoughnessFactor() const override { return roughness_factor; }
+  ax_no_discard float getTransmissionFactor() const override { return transmission_factor; }
+  ax_no_discard float getEmissiveFactor() const override { return emissive_factor; }
+  ax_no_discard float getAlphaFactor() const override { return alpha_factor; }
+  ax_no_discard Vec2f getRefractiveIndex() const override;
+  ax_no_discard Shader *getShaderProgram() const { return shader_program; }
+  ax_no_discard bool hasTextures() const override { return !textures_group.isEmpty(); }
 
  private:
   void do_copy_constr(const GLMaterial &copy);

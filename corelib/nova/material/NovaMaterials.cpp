@@ -13,7 +13,7 @@ namespace nova::material {
     CLASS_CM(TexturePackSampler)
     explicit TexturePackSampler(const texture_pack &texture_p) : tpack(texture_p) {}
 
-    [[nodiscard]] glm::vec4 emissive(float u, float v, const texturing::texture_sample_data &sample_data) const {
+    ax_no_discard glm::vec4 emissive(float u, float v, const texturing::texture_sample_data &sample_data) const {
       using namespace math::texture;
       if (tpack.emissive) {
         glm::vec4 value = tpack.emissive->sample(u, v, sample_data);
@@ -22,7 +22,7 @@ namespace nova::material {
       return glm::vec4(0.f);
     }
 
-    [[nodiscard]] glm::vec4 albedo(float u, float v, const texturing::texture_sample_data &sample_data) const {
+    ax_no_discard glm::vec4 albedo(float u, float v, const texturing::texture_sample_data &sample_data) const {
       using namespace math::texture;
       if (tpack.albedo) {
         glm::vec4 value = tpack.albedo->sample(u, v, sample_data);
@@ -31,7 +31,7 @@ namespace nova::material {
       return glm::vec4(1.f);
     }
 
-    [[nodiscard]] glm::vec4 metallic(float u, float v, const texturing::texture_sample_data &sample_data) const {
+    ax_no_discard glm::vec4 metallic(float u, float v, const texturing::texture_sample_data &sample_data) const {
       using namespace math::texture;
       if (tpack.metallic) {
         glm::vec4 value = tpack.metallic->sample(u, v, sample_data);
@@ -40,7 +40,7 @@ namespace nova::material {
       return glm::vec4(0.f);
     }
 
-    [[nodiscard]] glm::vec4 roughness(float u, float v, const texturing::texture_sample_data &sample_data) const {
+    ax_no_discard glm::vec4 roughness(float u, float v, const texturing::texture_sample_data &sample_data) const {
       using namespace math::texture;
       if (tpack.roughness) {
         glm::vec4 value = tpack.roughness->sample(u, v, sample_data);
@@ -49,7 +49,7 @@ namespace nova::material {
       return glm::vec4(0.f);
     }
 
-    [[nodiscard]] glm::vec4 normal(float u, float v, const texturing::texture_sample_data &sample_data) const {
+    ax_no_discard glm::vec4 normal(float u, float v, const texturing::texture_sample_data &sample_data) const {
       using namespace math::texture;
       if (tpack.normalmap) {
         glm::vec4 value = tpack.normalmap->sample(u, v, sample_data);
@@ -58,7 +58,7 @@ namespace nova::material {
       return glm::vec4(0.f, 0.f, 1.f, 0.f);
     }
 
-    [[nodiscard]] glm::vec4 ao(float u, float v, const texturing::texture_sample_data &sample_data) const {
+    ax_no_discard glm::vec4 ao(float u, float v, const texturing::texture_sample_data &sample_data) const {
       using namespace math::texture;
       if (tpack.ao) {
         glm::vec4 value = tpack.ao->sample(u, v, sample_data);

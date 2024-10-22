@@ -23,7 +23,7 @@ namespace nova::texturing {
   class NovaTextureInterface : public core::tag_ptr<ConstantTexture, ImageTexture> {
    public:
     using tag_ptr::tag_ptr;
-    AX_DEVICE_CALLABLE [[nodiscard]] glm::vec4 sample(float u, float v, const texture_sample_data &sample_data) const;
+    AX_DEVICE_CALLABLE ax_no_discard glm::vec4 sample(float u, float v, const texture_sample_data &sample_data) const;
   };
 
   class ConstantTexture {
@@ -33,7 +33,7 @@ namespace nova::texturing {
    public:
     AX_DEVICE_CALLABLE ConstantTexture() = default;
     AX_DEVICE_CALLABLE explicit ConstantTexture(const glm::vec4 &albedo);
-    AX_DEVICE_CALLABLE [[nodiscard]] glm::vec4 sample(float u, float v, const texture_sample_data &sample_data) const;
+    AX_DEVICE_CALLABLE ax_no_discard glm::vec4 sample(float u, float v, const texture_sample_data &sample_data) const;
   };
 
   class ImageTexture {
@@ -44,7 +44,7 @@ namespace nova::texturing {
    public:
     AX_DEVICE_CALLABLE ImageTexture() = default;
     AX_DEVICE_CALLABLE ImageTexture(const uint32_t *raw_image, int w, int h, int chans, bool isrgba = false);
-    AX_DEVICE_CALLABLE [[nodiscard]] glm::vec4 sample(float u, float v, const texture_sample_data &sample_data) const;
+    AX_DEVICE_CALLABLE ax_no_discard glm::vec4 sample(float u, float v, const texture_sample_data &sample_data) const;
   };
 
   using TYPELIST = core::type_list<ConstantTexture, ImageTexture>;

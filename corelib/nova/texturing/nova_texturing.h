@@ -20,7 +20,7 @@ namespace nova::texturing {
     }
 
     std::vector<NovaTextureInterface> &get_textures() { return textures; }
-    [[nodiscard]] const std::vector<NovaTextureInterface> &get_textures() const { return textures; }
+    ax_no_discard const std::vector<NovaTextureInterface> &get_textures() const { return textures; }
     void clear() { textures.clear(); }
   };
 

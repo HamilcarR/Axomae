@@ -57,7 +57,7 @@ namespace nova::integrator {
       buffers->partial_buffer[pixel_offset + 3] = color.a;
     }
 
-    [[nodiscard]] unsigned generateImageOffset(const Tile &tile, bool axis_inverted, int x, int y) const {
+    ax_no_discard unsigned generateImageOffset(const Tile &tile, bool axis_inverted, int x, int y) const {
       if (axis_inverted)
         return (y * tile.image_total_width + x) * 4;
       return ((tile.image_total_height - 1 - y) * tile.image_total_width + x) * 4;
@@ -112,14 +112,14 @@ namespace nova::integrator {
       tile.finished_render = true;
     }
 
-    [[nodiscard]] glm::vec4 Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const {
+    ax_no_discard glm::vec4 Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const {
       return static_cast<const T *>(this)->Li(ray, nova_internals, depth, sampler);
     }
   };
 
   class PathIntegrator : public AbstractIntegrator<PathIntegrator> {
    public:
-    [[nodiscard]] glm::vec4 Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const;
+    ax_no_discard glm::vec4 Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const;
   };
 
 }  // namespace nova::integrator

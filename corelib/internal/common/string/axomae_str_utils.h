@@ -18,7 +18,7 @@ namespace utils {
     /* Prints address in format 0x...*/
     inline std::string to_hex(std::uintptr_t value) {
       std::stringstream ss;
-      ss << std::hex << value;
+      ss << "0x" << std::hex << value;
       return ss.str();
     }
 

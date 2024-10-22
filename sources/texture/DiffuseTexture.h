@@ -2,6 +2,8 @@
 #define DIFFUSETEXTURE_H
 #include "GenericTexture.h"
 
+#include <internal/macro/project_macros.h>
+
 class DiffuseTexture : public GenericTexture {
  protected:
   bool has_transparency{};
@@ -25,7 +27,7 @@ class DiffuseTexture : public GenericTexture {
   void set(TextureData *texture) override;
   virtual bool hasTransparency() { return has_transparency; }
   static const char *getTextureTypeCStr();
-  [[nodiscard]] TYPE getTextureType() const override { return DIFFUSE; }
+  ax_no_discard TYPE getTextureType() const override { return DIFFUSE; }
 };
 
 #endif  // DIFFUSETEXTURE_H

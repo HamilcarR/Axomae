@@ -60,10 +60,10 @@ class Mesh : public SceneTreeNode, public MeshInterface {
   virtual void bindShaders();
   virtual void releaseShaders();
   void reset() override;
-  [[nodiscard]] bool isInitialized() const override;
+  ax_no_discard bool isInitialized() const override;
   virtual void initializeGlData();
   virtual void setSceneCameraPointer(Camera *camera);
-  [[nodiscard]] virtual const glm::mat4 &getModelViewMatrix() const { return modelview_matrix; }
+  ax_no_discard virtual const glm::mat4 &getModelViewMatrix() const { return modelview_matrix; }
   void setPolygonDrawMode(RASTERMODE mode);
   void cullBackFace();
   void cullFrontFace();
@@ -73,14 +73,14 @@ class Mesh : public SceneTreeNode, public MeshInterface {
   void setDepthFunc(DEPTHFUNC func);
   Shader *getShader() { return shader_program; }
   void setShader(Shader *shader);
-  [[nodiscard]] MaterialInterface *getMaterial() const override { return material.get(); }
-  [[nodiscard]] const std::string &getMeshName() const override { return name; }
+  ax_no_discard MaterialInterface *getMaterial() const override { return material.get(); }
+  ax_no_discard const std::string &getMeshName() const override { return name; }
   void setMeshName(const std::string &new_name) override { name = new_name; }
-  [[nodiscard]] const Object3D &getGeometry() const override { return geometry; }
+  ax_no_discard const Object3D &getGeometry() const override { return geometry; }
   void setGeometry(const Object3D &_geometry) override { geometry = _geometry; }
   void setCubemapPointer(Mesh *cubemap_pointer) { cubemap_reference = cubemap_pointer; }
   void setDrawState(bool draw) override { is_drawn = draw; }
-  [[nodiscard]] bool isDrawn() const override { return is_drawn; }
+  ax_no_discard bool isDrawn() const override { return is_drawn; }
 };
 
 /*****************************************************************************************************************/

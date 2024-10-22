@@ -89,7 +89,7 @@ class NovaRenderer final : public IRenderer {
   NovaRenderer(NovaRenderer &&move) noexcept = default;
   NovaRenderer &operator=(NovaRenderer &&move) noexcept = default;
 
-  [[nodiscard]] const EnvmapTextureManager &getCurrentEnvmapId() const override { return *envmap_manager; }
+  ax_no_discard const EnvmapTextureManager &getCurrentEnvmapId() const override { return *envmap_manager; }
   void prepSceneChange() override;
   void syncRenderEngineThreads();
   void getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) override;
@@ -102,13 +102,13 @@ class NovaRenderer final : public IRenderer {
   void onClose() override;
   void setDefaultFrameBufferId(unsigned id) override;
   void setNewScene(const SceneChangeData &new_scene) override;
-  [[nodiscard]] unsigned int *getDefaultFrameBufferIdPointer() override;
-  [[nodiscard]] RenderPipeline &getRenderPipeline() const override;
-  [[nodiscard]] Scene &getScene() const override;
-  [[nodiscard]] image::ImageHolder<float> getSnapshotFloat(int width, int height) const override;
-  [[nodiscard]] image::ImageHolder<uint8_t> getSnapshotUint8(int width, int height) const override;
-  [[nodiscard]] const Camera *getCamera() const override { return scene_camera; }
-  [[nodiscard]] Camera *getCamera() override { return scene_camera; }
+  ax_no_discard unsigned int *getDefaultFrameBufferIdPointer() override;
+  ax_no_discard RenderPipeline &getRenderPipeline() const override;
+  ax_no_discard Scene &getScene() const override;
+  ax_no_discard image::ImageHolder<float> getSnapshotFloat(int width, int height) const override;
+  ax_no_discard image::ImageHolder<uint8_t> getSnapshotUint8(int width, int height) const override;
+  ax_no_discard const Camera *getCamera() const override { return scene_camera; }
+  ax_no_discard Camera *getCamera() override { return scene_camera; }
   void setGammaValue(float gamma) override;
   void setExposureValue(float exposure) override;
   void setNoPostProcess() override;

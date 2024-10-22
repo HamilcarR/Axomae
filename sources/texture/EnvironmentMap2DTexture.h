@@ -3,6 +3,8 @@
 
 #include "GenericTexture.h"
 
+#include <internal/macro/project_macros.h>
+
 /**
  * @brief Environment map texture class definition
  */
@@ -18,7 +20,7 @@ class EnvironmentMap2DTexture : public GenericTexture {
   void unbind() override;
   void initialize(Shader *shader) override;
   static const char *getTextureTypeCStr();
-  [[nodiscard]] TYPE getTextureType() const override { return ENVMAP2D; }
+  ax_no_discard TYPE getTextureType() const override { return ENVMAP2D; }
 };
 
 #endif  // ENVIRONMENTMAP2DTEXTURE_H

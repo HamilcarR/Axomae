@@ -13,7 +13,7 @@ class MetallicTexture : public GenericTexture {
   void initialize(Shader *shader) override;
   static const char *getTextureTypeCStr();
 
-  [[nodiscard]] TYPE getTextureType() const override { return METALLIC; }
+  ax_no_discard TYPE getTextureType() const override { return METALLIC; }
 };
 
 #endif  // METALLICTEXTURE_H

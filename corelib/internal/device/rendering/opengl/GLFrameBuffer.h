@@ -47,7 +47,7 @@ class GLFrameBuffer : public DeviceMutableBufferInterface {
                 TEXTURE_TARGET target_texture_type = TEXTURE2D);
 
   void initialize() override;
-  [[nodiscard]] bool isReady() const override;
+  ax_no_discard bool isReady() const override;
   void attachTexture2D(INTERNAL_FORMAT color_attachment, TEXTURE_TARGET target, unsigned int texture_id, unsigned int mipmap_level = 0);
   void bind() override;
   void unbind() override;

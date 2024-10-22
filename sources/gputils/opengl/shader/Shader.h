@@ -75,7 +75,7 @@ class Shader : public DeviceShaderInterface {
   void setUniform(const char *name, const T &value);
   template<typename T>
   void setUniform(const std::string &name, const T &value);
-  [[nodiscard]] bool isInitialized() const override { return shader_program != 0; }
+  ax_no_discard bool isInitialized() const override { return shader_program != 0; }
   virtual void setTextureUniforms(const std::string &texture_name, GenericTexture::TYPE texture_type);
   virtual void setTextureUniforms(const std::string &texture_name, int location);
 

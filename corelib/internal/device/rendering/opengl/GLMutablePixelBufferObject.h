@@ -23,7 +23,7 @@ class GLMutablePixelBufferObject final : public DeviceMutableBufferInterface {
   GLMutablePixelBufferObject(TRANSFER type, size_t size);
 
   void initialize() override;
-  [[nodiscard]] bool isReady() const override;
+  ax_no_discard bool isReady() const override;
   void fill() override;
   void fillBuffersAddress(void *address);
   void fillSubBuffers(void *buffer, size_t offset, size_t length);
@@ -40,7 +40,7 @@ class GLMutablePixelBufferObject final : public DeviceMutableBufferInterface {
   void setNewSize(size_t new_size);
   void setTransferType(TRANSFER new_type) { buffer_type = new_type; }
   void setAccessType(ACCESS new_access_type) { access_type = new_access_type; }
-  [[nodiscard]] TRANSFER getTransferType() const { return buffer_type; }
+  ax_no_discard TRANSFER getTransferType() const { return buffer_type; }
 };
 template<class T>
 T *GLMutablePixelBufferObject::mapBuffer(ACCESS access) {

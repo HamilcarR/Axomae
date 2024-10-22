@@ -37,7 +37,7 @@ class LightData {
   /*Helper functions */
   void enableUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag) { update_flags |= flag; }
   void disableUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag) { update_flags &= ~flag; }
-  [[nodiscard]] bool checkUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag) const { return update_flags & flag; }
+  bool checkUpdateFlag(LIGHTDATA_UPDATE_FLAGS flag) const { return update_flags & flag; }
 
   void asPbrColor(uint8_t red, uint8_t green, uint8_t blue) {
     diffuse_col = glm::vec3(red, green, blue);
@@ -76,15 +76,15 @@ class AbstractLight : public SceneTreeNode, public LightInterface {
   void setSpecularColor(const glm::vec3 &col) override { specularColor = col; }
   void setAmbiantColor(const glm::vec3 &col) override { ambientColor = col; }
   void setDiffuseColor(const glm::vec3 &col) override { diffuseColor = col; }
-  [[nodiscard]] const glm::vec3 &getPosition() const override { return position; }
-  [[nodiscard]] const glm::vec3 &getDiffuseColor() const override { return diffuseColor; }
-  [[nodiscard]] const glm::vec3 &getAmbiantColor() const override { return ambientColor; }
-  [[nodiscard]] const glm::vec3 &getSpecularColor() const override { return specularColor; }
+  ax_no_discard const glm::vec3 &getPosition() const override { return position; }
+  ax_no_discard const glm::vec3 &getDiffuseColor() const override { return diffuseColor; }
+  ax_no_discard const glm::vec3 &getAmbiantColor() const override { return ambientColor; }
+  ax_no_discard const glm::vec3 &getSpecularColor() const override { return specularColor; }
   void setIntensity(float s) override { intensity = s; }
-  [[nodiscard]] float getIntensity() const override { return intensity; }
+  ax_no_discard float getIntensity() const override { return intensity; }
   virtual void updateShaderData(Shader *shader, glm::mat4 &view, unsigned int index);
   virtual TYPE getType() { return type; }
-  [[nodiscard]] unsigned int getID() const override { return id; }
+  ax_no_discard unsigned int getID() const override { return id; }
   virtual void updateLightData(const LightData &data);
   void setID(unsigned light_id) override { id = light_id; }
 };
@@ -127,7 +127,7 @@ class PointLight : public AbstractLight {
   PointLight &operator=(PointLight &&move) noexcept = default;
   PointLight &operator=(const PointLight &copy) = default;
   void updateShaderData(Shader *shader, glm::mat4 &view, unsigned int index) override;
-  [[nodiscard]] const glm::vec3 &getAttenuation() const { return attenuation; }
+  ax_no_discard const glm::vec3 &getAttenuation() const { return attenuation; }
   void setAttenuation(const glm::vec3 &atten) { attenuation = atten; }
   void updateLightData(const LightData &data) override;
 

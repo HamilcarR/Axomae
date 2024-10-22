@@ -1,5 +1,6 @@
 #ifndef DATABASESTORAGE_H
 #define DATABASESTORAGE_H
+#include <internal/macro/project_macros.h>
 #include <memory>
 
 namespace database {
@@ -28,8 +29,8 @@ namespace database {
     T *get() const;
     void setId(U id_);
     U getId() const;
-    [[nodiscard]] bool isPersistent() const;
-    [[nodiscard]] bool isValid() const;
+    ax_no_discard bool isPersistent() const;
+    ax_no_discard bool isValid() const;
     void setPersistence(bool pers);
     void setValidity(bool validity);
   };
@@ -85,12 +86,12 @@ namespace database {
   }
 
   template<class U, class T>
-  [[nodiscard]] bool Storage<U, T>::isPersistent() const {
+  ax_no_discard bool Storage<U, T>::isPersistent() const {
     return persistent;
   }
 
   template<class U, class T>
-  [[nodiscard]] bool Storage<U, T>::isValid() const {
+  ax_no_discard bool Storage<U, T>::isValid() const {
     return valid;
   }
 
