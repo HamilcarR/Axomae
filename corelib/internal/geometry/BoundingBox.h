@@ -2,6 +2,7 @@
 #define BOUNDINGBOX_H
 
 #include "internal/common/math/math_utils.h"
+#include <internal/macro/project_macros.h>
 #include <vector>
 
 /**
@@ -36,33 +37,33 @@ namespace geometry {
     BoundingBox(BoundingBox &&move) noexcept;
     BoundingBox &operator=(const BoundingBox &copy);
     BoundingBox &operator=(BoundingBox &&move) noexcept;
-    [[nodiscard]] const glm::vec3 &getPosition() const { return center; }
+    ax_no_discard const glm::vec3 &getPosition() const { return center; }
     /**
      * @brief Returns the index + vertices array representatives of the bounding box
      * @return std::pair<std::vector<float> , std::vector<unsigned>>
      */
-    [[nodiscard]] std::pair<std::vector<float>, std::vector<unsigned>> getVertexArray() const;
-    [[nodiscard]] const glm::vec3 &getMaxCoords() const { return max_coords; }
-    [[nodiscard]] const glm::vec3 &getMinCoords() const { return min_coords; }
+    ax_no_discard std::pair<std::vector<float>, std::vector<unsigned>> getVertexArray() const;
+    ax_no_discard const glm::vec3 &getMaxCoords() const { return max_coords; }
+    ax_no_discard const glm::vec3 &getMinCoords() const { return min_coords; }
     void setMaxCoords(glm::vec3 max) { max_coords = max; }
     void setMinCoords(glm::vec3 min) { min_coords = min; }
 
-    [[nodiscard]] bool operator==(const BoundingBox &other) const;
-    [[nodiscard]] BoundingBox operator+(const BoundingBox &addbox) const;
+    ax_no_discard bool operator==(const BoundingBox &other) const;
+    ax_no_discard BoundingBox operator+(const BoundingBox &addbox) const;
     /**
      * @brief Takes normalized ray direction , in object space
      */
-    [[nodiscard]] bool intersect(const glm::vec3 &ray_dir, const glm::vec3 &origin) const;
+    ax_no_discard bool intersect(const glm::vec3 &ray_dir, const glm::vec3 &origin) const;
 
-    [[nodiscard]] float intersect(const glm::vec3 &ray_dir, const glm::vec3 &origin, float dist_min) const;
+    ax_no_discard float intersect(const glm::vec3 &ray_dir, const glm::vec3 &origin, float dist_min) const;
 
-    [[nodiscard]] float area() const;
+    ax_no_discard float area() const;
   };
 
   class AABBInterface {
    public:
     virtual ~AABBInterface() = default;
-    [[nodiscard]] virtual BoundingBox computeAABB() const = 0;
+    ax_no_discard virtual BoundingBox computeAABB() const = 0;
   };
 
 }  // namespace geometry

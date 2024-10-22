@@ -13,11 +13,11 @@ class DeviceError {
 
  public:
   explicit DeviceError(cudaError_t error);
-  [[nodiscard]] cudaError_t getId() const { return id; }
+  ax_no_discard cudaError_t getId() const { return id; }
 #endif
  public:
   CLASS_CM(DeviceError)
-  [[nodiscard]] bool isOk() const;
+  ax_no_discard bool isOk() const;
 };
 
 #if defined(AXOMAE_USE_CUDA)

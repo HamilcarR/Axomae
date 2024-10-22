@@ -28,8 +28,8 @@ class ImageDatabase : public IntegerResourceDB<image::ThumbnailImageHolder<DATAT
   void isSelected(int index);
   void clean() override;
   HolderResult add(HolderPointer element, bool keep) override;
-  [[nodiscard]] image::Metadata getMetadata(int index) const;
-  [[nodiscard]] const QPixmap &getThumbnail(int index) const;
+  ax_no_discard image::Metadata getMetadata(int index) const;
+  ax_no_discard const QPixmap &getThumbnail(int index) const;
   void notify(observer::Data<Message> &data) const override;
   void attach(Subscriber &subscriber) override;
   void detach(Subscriber &subscriber) override;

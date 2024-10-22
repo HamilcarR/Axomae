@@ -23,8 +23,8 @@ namespace nova::primitive {
     AX_DEVICE_CALLABLE NovaGeoPrimitive(const shape::NovaShapeInterface &shape, const material::NovaMaterialInterface &material);
     AX_DEVICE_CALLABLE bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const;
     AX_DEVICE_CALLABLE bool scatter(const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler) const;
-    AX_DEVICE_CALLABLE [[nodiscard]] glm::vec3 centroid() const;
-    AX_DEVICE_CALLABLE [[nodiscard]] geometry::BoundingBox computeAABB() const;
+    AX_DEVICE_CALLABLE ax_no_discard glm::vec3 centroid() const;
+    AX_DEVICE_CALLABLE ax_no_discard geometry::BoundingBox computeAABB() const;
   };
 }  // namespace nova::primitive
 #endif  // NOVAGEOPRIMITIVE_H

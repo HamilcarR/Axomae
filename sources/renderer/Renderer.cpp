@@ -152,8 +152,8 @@ void Renderer::setNewScene(const SceneChangeData &new_scene) {
   camera_framebuffer->updateFrameBufferShader();
 }
 
-[[nodiscard]] image::ImageHolder<float> Renderer::getSnapshotFloat(int width, int height) const { AX_UNREACHABLE; }
-[[nodiscard]] image::ImageHolder<uint8_t> Renderer::getSnapshotUint8(int width, int height) const { AX_UNREACHABLE; }
+ax_no_discard image::ImageHolder<float> Renderer::getSnapshotFloat(int width, int height) const { AX_UNREACHABLE; }
+ax_no_discard image::ImageHolder<uint8_t> Renderer::getSnapshotUint8(int width, int height) const { AX_UNREACHABLE; }
 
 void Renderer::processEvent(const controller::event::Event *event) {
   scene->processEvent(event);

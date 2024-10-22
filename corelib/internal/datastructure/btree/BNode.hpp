@@ -21,8 +21,8 @@ namespace datastructure::btree {
     void setLeft(BNode *node) override;
     void setRight(BNode *node) override;
     void setParent(BNode *node) override;
-    [[nodiscard]] BNode *right() const override;
-    [[nodiscard]] BNode *left() const override;
+    ax_no_discard BNode *right() const override;
+    ax_no_discard BNode *left() const override;
     const T &data() const override;
     void setData(T &data) override;
 

@@ -16,7 +16,7 @@ namespace nova::material {
       return materials.back();
     }
     std::vector<NovaMaterialInterface> &get_materials() { return materials; }
-    [[nodiscard]] const std::vector<NovaMaterialInterface> &get_materials() const { return materials; }
+    ax_no_discard const std::vector<NovaMaterialInterface> &get_materials() const { return materials; }
 
     void clear() { materials.clear(); }
   };

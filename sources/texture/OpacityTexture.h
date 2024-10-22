@@ -10,7 +10,7 @@ class OpacityTexture : public GenericTexture {
   void unbind() override;
   void initialize(Shader *shader) override;
   static const char *getTextureTypeCStr();
-  [[nodiscard]] TYPE getTextureType() const override { return OPACITY; }
+  ax_no_discard TYPE getTextureType() const override { return OPACITY; }
 };
 
 #endif  // OPACITYTEXTURE_H

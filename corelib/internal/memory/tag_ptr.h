@@ -66,19 +66,19 @@ namespace core {
     }
 
     template<class T>
-    AX_DEVICE_CALLABLE [[nodiscard]] bool isType() const {
+    AX_DEVICE_CALLABLE ax_no_discard bool isType() const {
       return tag() == index<T>();
     }
 
     template<class T>
-    AX_DEVICE_CALLABLE [[nodiscard]] T *get() {
+    AX_DEVICE_CALLABLE ax_no_discard T *get() {
       if (isType<T>())
         return reinterpret_cast<T *>((bits & ptrmask));
       return nullptr;
     }
 
     template<class T>
-    AX_DEVICE_CALLABLE [[nodiscard]] const T *get() const {
+    AX_DEVICE_CALLABLE ax_no_discard const T *get() const {
       if (isType<T>())
         return reinterpret_cast<const T *>((bits & ptrmask));
       return nullptr;
@@ -112,11 +112,11 @@ namespace core {
       return tagutils::host_dispatch<F, R, Ts...>(std::forward<F>(func), get(), tag() - 1);
     }
 
-    AX_DEVICE_CALLABLE [[nodiscard]] unsigned int tag() const { return bits >> shift; }
+    AX_DEVICE_CALLABLE ax_no_discard unsigned int tag() const { return bits >> shift; }
 
     AX_DEVICE_CALLABLE void *get() { return reinterpret_cast<void *>(bits & ptrmask); }
 
-    AX_DEVICE_CALLABLE [[nodiscard]] const void *get() const { return reinterpret_cast<const void *>(bits & ptrmask); }
+    AX_DEVICE_CALLABLE ax_no_discard const void *get() const { return reinterpret_cast<const void *>(bits & ptrmask); }
 
     AX_DEVICE_CALLABLE static constexpr int tagSize() { return sizeof...(Ts); }
 

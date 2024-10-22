@@ -79,16 +79,16 @@ namespace controller {
     Controller &operator=(Controller &&) = delete;
 
     void setApplicationConfig(ApplicationConfig &&configuration);
-    [[nodiscard]] ApplicationConfig *getApplicationConfig() const { return global_application_config.get(); }
+    ax_no_discard ApplicationConfig *getApplicationConfig() const { return global_application_config.get(); }
     Ui::MainWindow &getUi() { return main_window_ui; }
     static SDL_Surface *copy_surface(SDL_Surface *surface);
     void closeEvent(QCloseEvent *event) override;
     ProgressStatus *getProgress() const { return progress_manager.get(); }
-    [[nodiscard]] std::string spawnSaveFileDialogueWidget();
+    ax_no_discard std::string spawnSaveFileDialogueWidget();
     void cleanupWindowProcess(QWidget *window);
     void cleanupNova();
-    [[nodiscard]] const NovaBakingStructure &getBakingStructure() const { return nova_baking_structure; }
-    [[nodiscard]] NovaBakingStructure &getBakingStructure() { return nova_baking_structure; }
+    ax_no_discard const NovaBakingStructure &getBakingStructure() const { return nova_baking_structure; }
+    ax_no_discard NovaBakingStructure &getBakingStructure() { return nova_baking_structure; }
     void novaStopBake();
 
    private:

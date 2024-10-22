@@ -1,5 +1,6 @@
 #ifndef BNODEINTERFACE_H
 #define BNODEINTERFACE_H
+#include <internal/macro/project_macros.h>
 
 namespace datastructure::btree {
   template<class T>
@@ -14,8 +15,8 @@ namespace datastructure::btree {
     virtual void setLeft(BNode<T> *node) = 0;
     virtual void setRight(BNode<T> *node) = 0;
     virtual void setParent(BNode<T> *node) = 0;
-    [[nodiscard]] virtual BNode<T> *right() const = 0;
-    [[nodiscard]] virtual BNode<T> *left() const = 0;
+    ax_no_discard virtual BNode<T> *right() const = 0;
+    ax_no_discard virtual BNode<T> *left() const = 0;
   };
 }  // namespace datastructure::btree
 

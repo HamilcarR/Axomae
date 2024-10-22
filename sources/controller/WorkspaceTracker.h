@@ -31,7 +31,7 @@ namespace controller {
    public:
     explicit WorkspaceTracker(const Ui::MainWindow *ui_main_win) : main_window(ui_main_win) {}
 
-    [[nodiscard]] uint64_t getContext() const;
+    ax_no_discard uint64_t getContext() const;
   };
 }  // namespace controller
 #endif  // WORKSPACETRACKER_H

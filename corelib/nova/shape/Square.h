@@ -30,8 +30,8 @@ namespace nova::shape {
     Square &operator=(Square &&other) noexcept = default;
 
     bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const;
-    [[nodiscard]] glm::vec3 centroid() const { return center; }
-    [[nodiscard]] geometry::BoundingBox computeAABB() const;
+    ax_no_discard glm::vec3 centroid() const { return center; }
+    ax_no_discard geometry::BoundingBox computeAABB() const;
   };
 }  // namespace nova::shape
 

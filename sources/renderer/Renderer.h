@@ -53,7 +53,7 @@ class Renderer final : public IRenderer {
    * @brief Method setting up the meshes , and the scene camera
    */
   bool prep_draw() override;
-  [[nodiscard]] const EnvmapTextureManager &getCurrentEnvmapId() const override { return *envmap_manager; }
+  ax_no_discard const EnvmapTextureManager &getCurrentEnvmapId() const override { return *envmap_manager; }
   void setNewScene(const SceneChangeData &new_scene) override;
   /**
    * @brief Checks if all Drawable objects in the scene have been initialized
@@ -66,14 +66,14 @@ class Renderer final : public IRenderer {
   void onClose() override;
   void setDefaultFrameBufferId(unsigned id) override { default_framebuffer_id = id; }
   void getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) override;
-  [[nodiscard]] unsigned int *getDefaultFrameBufferIdPointer() override { return &default_framebuffer_id; }
-  [[nodiscard]] const Scene &getConstScene() const { return *scene; }
-  [[nodiscard]] Scene &getScene() const override { return *scene; }
-  [[nodiscard]] RenderPipeline &getRenderPipeline() const override { return *render_pipeline; }
-  [[nodiscard]] image::ImageHolder<float> getSnapshotFloat(int width, int height) const override;
-  [[nodiscard]] image::ImageHolder<uint8_t> getSnapshotUint8(int width, int height) const override;
-  [[nodiscard]] const Camera *getCamera() const override { return scene_camera; }
-  [[nodiscard]] Camera *getCamera() override { return scene_camera; }
+  ax_no_discard unsigned int *getDefaultFrameBufferIdPointer() override { return &default_framebuffer_id; }
+  ax_no_discard const Scene &getConstScene() const { return *scene; }
+  ax_no_discard Scene &getScene() const override { return *scene; }
+  ax_no_discard RenderPipeline &getRenderPipeline() const override { return *render_pipeline; }
+  ax_no_discard image::ImageHolder<float> getSnapshotFloat(int width, int height) const override;
+  ax_no_discard image::ImageHolder<uint8_t> getSnapshotUint8(int width, int height) const override;
+  ax_no_discard const Camera *getCamera() const override { return scene_camera; }
+  ax_no_discard Camera *getCamera() override { return scene_camera; }
   void setGammaValue(float gamma) override;
   void setExposureValue(float exposure) override;
   void setNoPostProcess() override;

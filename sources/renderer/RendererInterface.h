@@ -36,18 +36,18 @@ class RendererInterface : public EventInterface {
   /**
    * @brief Cleans up the former scene and replaces it with a new one.
    */
-  [[nodiscard]] virtual unsigned int *getDefaultFrameBufferIdPointer() = 0;
+  ax_no_discard virtual unsigned int *getDefaultFrameBufferIdPointer() = 0;
   virtual void setViewerWidget(GLViewer *widget) = 0;
   virtual void getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) = 0;
   virtual void prepSceneChange() = 0;
   virtual void setNewScene(const SceneChangeData &new_scene) = 0;
-  [[nodiscard]] virtual RenderPipeline &getRenderPipeline() const = 0;
-  [[nodiscard]] virtual Scene &getScene() const = 0;
-  [[nodiscard]] virtual const EnvmapTextureManager &getCurrentEnvmapId() const = 0;
-  [[nodiscard]] virtual image::ImageHolder<float> getSnapshotFloat(int width, int height) const = 0;
-  [[nodiscard]] virtual image::ImageHolder<uint8_t> getSnapshotUint8(int width, int height) const = 0;
-  [[nodiscard]] virtual const Camera *getCamera() const = 0;
-  [[nodiscard]] virtual Camera *getCamera() = 0;
+  ax_no_discard virtual RenderPipeline &getRenderPipeline() const = 0;
+  ax_no_discard virtual Scene &getScene() const = 0;
+  ax_no_discard virtual const EnvmapTextureManager &getCurrentEnvmapId() const = 0;
+  ax_no_discard virtual image::ImageHolder<float> getSnapshotFloat(int width, int height) const = 0;
+  ax_no_discard virtual image::ImageHolder<uint8_t> getSnapshotUint8(int width, int height) const = 0;
+  ax_no_discard virtual const Camera *getCamera() const = 0;
+  ax_no_discard virtual Camera *getCamera() = 0;
 };
 
 class IRenderer : public RendererInterface {

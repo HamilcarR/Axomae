@@ -52,14 +52,14 @@ class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
   GLViewer(GLViewer &&move) noexcept;
 
   virtual void setNewScene(const SceneChangeData &new_scene);
-  [[nodiscard]] RendererInterface &getRenderer() const;
+  ax_no_discard RendererInterface &getRenderer() const;
   void setApplicationConfig(ApplicationConfig *app_conf);
   void setRenderer(std::unique_ptr<IRenderer> &renderer);
   void renderOnTimer(int interval);
   void renderOnUpdate();
-  [[nodiscard]] image::ImageHolder<uint8_t> getRenderScreenshotUint8(int width, int height) const;
-  [[nodiscard]] image::ImageHolder<float> getRenderScreenshotFloat(int width, int height) const;
-  [[nodiscard]] image::Rgb getFramebufferColor(int x, int y) const;
+  ax_no_discard image::ImageHolder<uint8_t> getRenderScreenshotUint8(int width, int height) const;
+  ax_no_discard image::ImageHolder<float> getRenderScreenshotFloat(int width, int height) const;
+  ax_no_discard image::Rgb getFramebufferColor(int x, int y) const;
   void closeEvent(QCloseEvent *event) override;
   void prepareRendererSceneChange();
   template<RENDERER_CALLBACK_ENUM callback_id, class... Args>
@@ -69,7 +69,7 @@ class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
   void initializeGL() override;
   void paintGL() override;
   void resizeGL(int width, int height) override;
-  [[nodiscard]] const controller::event::Event *getInputEventsStructure() const;
+  ax_no_discard const controller::event::Event *getInputEventsStructure() const;
 
  private:
   void mouseMoveEvent(QMouseEvent *event) override;

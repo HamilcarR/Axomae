@@ -82,12 +82,12 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
   EnvmapTextureManager &operator=(EnvmapTextureManager &&move) = delete;
   void initializeDefaultEnvmap(ApplicationConfig *app_conf);
   void notified(observer::Data<Message *> &message) override;
-  [[nodiscard]] int currentCubemapId() const { return current.cubemap_id; }
-  [[nodiscard]] int currentPrefilterId() const { return current.prefiltered_id; }
-  [[nodiscard]] int currentIrradianceId() const { return current.irradiance_id; }
-  [[nodiscard]] int currentLutId() const { return current.lut_id; }
-  [[nodiscard]] const image::ImageHolder<float> *currentEnvmapMetadata() const { return current.metadata; }
-  [[nodiscard]] image::ImageHolder<float> *currentMutableEnvmapMetadata() const { return current.metadata; }
+  ax_no_discard int currentCubemapId() const { return current.cubemap_id; }
+  ax_no_discard int currentPrefilterId() const { return current.prefiltered_id; }
+  ax_no_discard int currentIrradianceId() const { return current.irradiance_id; }
+  ax_no_discard int currentLutId() const { return current.lut_id; }
+  ax_no_discard const image::ImageHolder<float> *currentEnvmapMetadata() const { return current.metadata; }
+  ax_no_discard image::ImageHolder<float> *currentMutableEnvmapMetadata() const { return current.metadata; }
   void next();
   void previous();
   void updateCurrent(int index);

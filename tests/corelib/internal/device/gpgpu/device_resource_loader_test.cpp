@@ -1,10 +1,12 @@
+#include "Test.h"
 #include "internal/common/math/math_random.h"
 #include "internal/device/gpgpu/device_transfer_interface.h"
-#include <gtest/gtest.h>
+#include <internal/debug/Logger.h>
 
 #define DEVICE_GTEST_ASSERT(ans) \
   { \
     if (!ans.error_status.isOk()) { \
+      LOGENABLE(); \
       DEVICE_ERROR_CHECK(ans.error_status); \
       ASSERT_TRUE(false); \
     } \
@@ -53,6 +55,7 @@ TEST(device_resource_loader_test, copy_buffer) {
  */
 
 TEST(device_resource_loader_test, pin_host_memory) {
+
   std::array<int, BUFFER_SIZE> array_test = {0};
   generate_random_arrayi(array_test);
   gpu::GPU_query_result pin_result = gpu::pin_host_memory(array_test.data(), BUFFER_SIZE * sizeof(int), gpu::PIN_MODE_DEFAULT);

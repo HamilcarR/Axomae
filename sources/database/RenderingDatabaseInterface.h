@@ -24,7 +24,7 @@ namespace exception {
   };
 }  // namespace exception
 /**
- * @brief This class provides a (pseudo) interface of pure abstract methods to manage rendering objects databases .
+ * @brief This class provides a non instanciable abstract class , to group common database methods.
  * @class IResourceDB
  * @tparam U Index of the stored object . Must be enum/numeric
  * @tparam T Class type of the object stored in the database
@@ -52,16 +52,18 @@ class IResourceDB : public DatabaseInterface<U, T>, public ILockable, public con
  public:
   void clean() override;
   void purge() override;
-  T *get(U id) const override;
+
   bool remove(U id) override;
   bool remove(const T *element) override;
-  [[nodiscard]] U firstFreeId() const override = 0;
-  database::Result<U, T> add(std::unique_ptr<T> element, bool keep) override;
+  ax_no_discard T *get(U id) const override;
+  ax_no_discard U firstFreeId() const override = 0;
+  ax_no_discard database::Result<U, T> add(std::unique_ptr<T> element, bool keep) override;
+  ax_no_discard database::Result<U, T> contains(const T *element_address) const override;
+  ax_no_discard int size() const override;
   bool contains(U id) const override;
-  database::Result<U, T> contains(const T *element_address) const override;
   bool empty() const override;
-  int size() const override;
-  const DATABASE &getConstData() const;
+
+  ax_no_discard const DATABASE &getConstData() const;
   bool setPersistence(U id, bool persistence = true);
   void setUpCacheMemory(CACHE *memory_cache);
   /**
@@ -71,10 +73,10 @@ class IResourceDB : public DatabaseInterface<U, T>, public ILockable, public con
   /**
    * Deallocates caches from the arena for later use.
    */
-  void invalidateCaches();
-  std::size_t getCacheSize(uint8_t *ptr);
-  std::size_t getCurrentCacheSize();
-  uint8_t *getCurrentCache();
+  void invalidateCaches() override;
+  ax_no_discard std::size_t getCacheSize(uint8_t *ptr) const override;
+  ax_no_discard std::size_t getCurrentCacheSize() const override;
+  ax_no_discard uint8_t *getCurrentCache() const override;
 };
 
 /* Some methods may have an ambiguous behavior depending on the type of the ID . this class provides a specialization of the
@@ -91,7 +93,7 @@ class IntegerResourceDB : public IResourceDB<int, T> {
    * 3) allocated new storage in the map , at the end of the structure.\n
    * @return U id
    */
-  [[nodiscard]] int firstFreeId() const override {
+  ax_no_discard int firstFreeId() const override {
     using BASETYPE = IResourceDB<int, T>;
     int diff = 0;
     if (BASETYPE::database_map.begin()->first > 0)  // In case 0 is available.
@@ -121,9 +123,9 @@ void IResourceDB<U, T>::clean() {
 
 template<class U, class T>
 void IResourceDB<U, T>::purge() {
+  invalidateCaches();
   Mutex::Lock lock(mutex);
   database_map.clear();
-  invalidateCaches();
 }
 
 template<class U, class T>
@@ -228,7 +230,7 @@ uint8_t *IResourceDB<U, T>::reserveCache(std::size_t size_bytes) {
 }
 
 template<class U, class T>
-std::size_t IResourceDB<U, T>::getCacheSize(uint8_t *ptr) {
+std::size_t IResourceDB<U, T>::getCacheSize(uint8_t *ptr) const {
   try {
     return reserved_memory_map.at(ptr);
   } catch (const std::out_of_range &e) {
@@ -238,12 +240,12 @@ std::size_t IResourceDB<U, T>::getCacheSize(uint8_t *ptr) {
 }
 
 template<class U, class T>
-std::size_t IResourceDB<U, T>::getCurrentCacheSize() {
+std::size_t IResourceDB<U, T>::getCurrentCacheSize() const {
   return current_cache_block.cache_size_bytes;
 }
 
 template<class U, class T>
-uint8_t *IResourceDB<U, T>::getCurrentCache() {
+uint8_t *IResourceDB<U, T>::getCurrentCache() const {
   return current_cache_block.cache_address;
 }
 
