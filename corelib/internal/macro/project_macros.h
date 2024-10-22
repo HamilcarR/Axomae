@@ -48,4 +48,6 @@
 
 #define AX_ASSERT_LT(expr1, expr2) assert(expr1 < expr2)
 
+#define ax_no_discard [[nodiscard]]
+
 #endif

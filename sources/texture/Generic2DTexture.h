@@ -3,6 +3,8 @@
 
 #include "GenericTexture.h"
 
+#include <internal/macro/project_macros.h>
+
 class Generic2DTexture : public GenericTexture {
  protected:
   unsigned int texture_unit{};
@@ -18,7 +20,7 @@ class Generic2DTexture : public GenericTexture {
   virtual void setTextureUnit(unsigned int texture_unit);
   void setLocationName(const std::string &name);
   const char *getTextureTypeCStr();
-  [[nodiscard]] TYPE getTextureType() const override { return GENERIC; }
+  ax_no_discard TYPE getTextureType() const override { return GENERIC; }
 };
 
 #endif  // GENERIC2DTEXTURE_H

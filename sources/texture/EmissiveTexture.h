@@ -2,6 +2,8 @@
 #define EMISSIVETEXTURE_H
 #include "GenericTexture.h"
 
+#include <internal/macro/project_macros.h>
+
 class EmissiveTexture : public GenericTexture {
  protected:
   explicit EmissiveTexture(TextureData *data);
@@ -12,7 +14,7 @@ class EmissiveTexture : public GenericTexture {
   void unbind() override;
   void initialize(Shader *shader) override;
   static const char *getTextureTypeCStr();
-  [[nodiscard]] TYPE getTextureType() const override { return EMISSIVE; }
+  ax_no_discard TYPE getTextureType() const override { return EMISSIVE; }
 };
 
 #endif  // EMISSIVETEXTURE_H

@@ -38,8 +38,8 @@ class Drawable {
   bool ready();
   void setSceneCameraPointer(Camera *camera);
   Mesh *getMeshPointer() { return mesh_object; }
-  [[nodiscard]] Shader *getMeshShaderPointer() const;
-  [[nodiscard]] GLMaterial *getMaterialPointer() const;
+  ax_no_discard Shader *getMeshShaderPointer() const;
+  ax_no_discard GLMaterial *getMaterialPointer() const;
 };
 
 #endif

@@ -13,9 +13,9 @@ namespace nova::shape {
   class NovaShapeInterface : public core::tag_ptr<Triangle, Sphere, Square, Box> {
    public:
     using tag_ptr::tag_ptr;
-    AX_DEVICE_CALLABLE [[nodiscard]] glm::vec3 centroid() const;
-    AX_DEVICE_CALLABLE [[nodiscard]] geometry::BoundingBox computeAABB() const;
-    AX_DEVICE_CALLABLE [[nodiscard]] bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const;
+    AX_DEVICE_CALLABLE ax_no_discard glm::vec3 centroid() const;
+    AX_DEVICE_CALLABLE ax_no_discard geometry::BoundingBox computeAABB() const;
+    AX_DEVICE_CALLABLE ax_no_discard bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const;
   };
 
   using TYPELIST = NovaShapeInterface::type_pack;

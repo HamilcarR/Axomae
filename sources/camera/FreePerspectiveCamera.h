@@ -9,8 +9,8 @@ class FreePerspectiveCamera : public Camera {
   void zoomIn() override;
   void zoomOut() override;
   void focus(const glm::vec3 &position) override;
-  [[nodiscard]] const glm::mat4 &getSceneTranslationMatrix() const override;
-  [[nodiscard]] const glm::mat4 &getSceneRotationMatrix() const override;
+  ax_no_discard const glm::mat4 &getSceneTranslationMatrix() const override;
+  ax_no_discard const glm::mat4 &getSceneRotationMatrix() const override;
 };
 
 #endif  // FreePerspectiveCamera_H

@@ -14,7 +14,7 @@ class NormalTexture : public GenericTexture {
   void unbind() override;
   void initialize(Shader *shader) override;
   static const char *getTextureTypeCStr();
-  [[nodiscard]] TYPE getTextureType() const override { return NORMAL; }
+  ax_no_discard TYPE getTextureType() const override { return NORMAL; }
 };
 
 #endif  // NORMALTEXTURE_H

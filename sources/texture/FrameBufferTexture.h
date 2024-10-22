@@ -2,6 +2,8 @@
 #define FRAMEBUFFERTEXTURE_H
 #include "GenericTexture.h"
 
+#include <internal/macro/project_macros.h>
+
 class FrameBufferTexture : public GenericTexture {
  protected:
   FrameBufferTexture();
@@ -21,7 +23,7 @@ class FrameBufferTexture : public GenericTexture {
   void initialize(Shader *shader) override;
   void initializeTexture2D() override;
   static const char *getTextureTypeCStr();
-  [[nodiscard]] TYPE getTextureType() const override { return FRAMEBUFFER; }
+  ax_no_discard TYPE getTextureType() const override { return FRAMEBUFFER; }
 };
 
 #endif  // FRAMEBUFFERTEXTURE_H

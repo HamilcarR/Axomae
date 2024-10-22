@@ -13,7 +13,7 @@ class IrradianceTexture : public CubemapTexture {
 
  public:
   const char *getTextureTypeCStr();
-  [[nodiscard]] TYPE getTextureType() const override { return IRRADIANCE; }
+  ax_no_discard TYPE getTextureType() const override { return IRRADIANCE; }
 };
 
 #endif  // IRRADIANCETEXTURE_H

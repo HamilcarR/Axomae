@@ -19,8 +19,8 @@ namespace nova::shape {
     Sphere &operator=(const Sphere &copy) = delete;
     Sphere &operator=(Sphere &&move) noexcept = default;
     bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const;
-    [[nodiscard]] glm::vec3 centroid() const { return origin; }
-    [[nodiscard]] geometry::BoundingBox computeAABB() const;
+    ax_no_discard glm::vec3 centroid() const { return origin; }
+    ax_no_discard geometry::BoundingBox computeAABB() const;
   };
 }  // namespace nova::shape
 #endif  // SPHERE_H

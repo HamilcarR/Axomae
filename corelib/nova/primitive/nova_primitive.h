@@ -17,7 +17,7 @@ namespace nova::primitive {
     }
 
     std::vector<NovaPrimitiveInterface> &get_primitives() { return primitives; }
-    [[nodiscard]] const std::vector<NovaPrimitiveInterface> &get_primitives() const { return primitives; }
+    ax_no_discard const std::vector<NovaPrimitiveInterface> &get_primitives() const { return primitives; }
 
     void clear() { primitives.clear(); }
   };

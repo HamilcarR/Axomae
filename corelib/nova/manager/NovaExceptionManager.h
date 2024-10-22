@@ -17,10 +17,10 @@ namespace nova {
 
     GENERATE_GETTERS(exception::NovaException, ExceptionReference, exception)
 
-    AX_DEVICE_CALLABLE [[nodiscard]] uint64_t checkErrorStatus() const { return exception.getErrorFlag(); }
+    AX_DEVICE_CALLABLE ax_no_discard uint64_t checkErrorStatus() const { return exception.getErrorFlag(); }
     AX_DEVICE_CALLABLE void addError(uint64_t error_id) { exception.addErrorType(error_id); }
     AX_DEVICE_CALLABLE void addError(const nova::exception::NovaException &other_exception);
-    [[nodiscard]] std::vector<nova::exception::ERROR> getErrorList() const { return exception.getErrorList(); }
+    ax_no_discard std::vector<nova::exception::ERROR> getErrorList() const { return exception.getErrorList(); }
   };
 }  // namespace nova
 

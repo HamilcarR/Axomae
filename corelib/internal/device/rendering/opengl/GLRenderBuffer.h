@@ -37,12 +37,12 @@ class GLRenderBuffer : public DeviceMutableBufferInterface {
    *
    */
   void initialize() override;
-  [[nodiscard]] bool isReady() const override;
+  ax_no_discard bool isReady() const override;
   void bind() override;
   void unbind() override;
   void clean() override;
 
-  [[nodiscard]] unsigned int getID() const { return renderbuffer_id; }
+  ax_no_discard unsigned int getID() const { return renderbuffer_id; }
   INTERNAL_FORMAT getFormat() { return format; }
   virtual void resize(unsigned width, unsigned height);
   void fill() override;

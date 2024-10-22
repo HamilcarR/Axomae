@@ -65,12 +65,12 @@ class TextureOperations {
   /**
    * @brief Normalizes a set of pixel coordinates into texture bounds.
    */
-  [[nodiscard]] glm::vec2 wrapAroundPixelCoords(int x, int y) const;
+  ax_no_discard glm::vec2 wrapAroundPixelCoords(int x, int y) const;
 
   /**
    * @brief Computes the linear interpolation of a point based on 4 of it's neighbours.
    */
-  [[nodiscard]] glm::vec3 bilinearInterpolate(const glm::vec2 &top_left,
+  ax_no_discard glm::vec3 bilinearInterpolate(const glm::vec2 &top_left,
                                               const glm::vec2 &top_right,
                                               const glm::vec2 &bottom_left,
                                               const glm::vec2 &bottom_right,
@@ -79,7 +79,7 @@ class TextureOperations {
   /**
    * @brief Sample the original texture using pixel coordinates.
    */
-  [[nodiscard]] glm::vec3 discreteSample(int x, int y) const;
+  ax_no_discard glm::vec3 discreteSample(int x, int y) const;
 
   /**
    * @brief In case the coordinates go beyond the bounds of the texture , we wrap around .
@@ -90,9 +90,9 @@ class TextureOperations {
   glm::vec3 uvSample(D u, D v) const;
   template<typename D>
   void launchAsyncDiffuseIrradianceCompute(D delta, float *f_data, unsigned width_begin, unsigned width_end, unsigned _width, unsigned _height) const;
-  [[nodiscard]] std::unique_ptr<TextureData> computeDiffuseIrradiance(unsigned _width, unsigned _height, unsigned delta, bool gpu) const;
+  ax_no_discard std::unique_ptr<TextureData> computeDiffuseIrradiance(unsigned _width, unsigned _height, unsigned delta, bool gpu) const;
 
-  [[nodiscard]] glm::vec3 computeIrradianceSingleTexel(
+  ax_no_discard glm::vec3 computeIrradianceSingleTexel(
       unsigned x, unsigned y, unsigned samples, const glm::vec3 &tangent, const glm::vec3 &bitangent, const glm::vec3 &normal) const;
 
   template<class D>

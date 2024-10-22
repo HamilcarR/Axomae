@@ -31,13 +31,13 @@ namespace nova::shape {
                       const glm::vec3 tangents[3] = nullptr,
                       const glm::vec3 bitangents[3] = nullptr);
     bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const;
-    [[nodiscard]] glm::vec3 centroid() const { return center; }
-    [[nodiscard]] geometry::BoundingBox computeAABB() const;
+    ax_no_discard glm::vec3 centroid() const { return center; }
+    ax_no_discard geometry::BoundingBox computeAABB() const;
 
-    [[nodiscard]] bool hasValidTangents() const { return t0 != glm::vec3(0.f) || t1 != glm::vec3(0.f) || t2 != glm::vec3(0.f); }
-    [[nodiscard]] bool hasValidBitangents() const { return b0 != glm::vec3(0.f) || b1 != glm::vec3(0.f) || b2 != glm::vec3(0.f); }
-    [[nodiscard]] bool hasValidNormals() const { return n0 != glm::vec3(0.f) || n1 != glm::vec3(0.f) || n2 != glm::vec3(0.f); }
-    [[nodiscard]] bool hasValidUvs() const { return uv_valid; }
+    ax_no_discard bool hasValidTangents() const { return t0 != glm::vec3(0.f) || t1 != glm::vec3(0.f) || t2 != glm::vec3(0.f); }
+    ax_no_discard bool hasValidBitangents() const { return b0 != glm::vec3(0.f) || b1 != glm::vec3(0.f) || b2 != glm::vec3(0.f); }
+    ax_no_discard bool hasValidNormals() const { return n0 != glm::vec3(0.f) || n1 != glm::vec3(0.f) || n2 != glm::vec3(0.f); }
+    ax_no_discard bool hasValidUvs() const { return uv_valid; }
   };
 }  // namespace nova::shape
 

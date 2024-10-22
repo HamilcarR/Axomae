@@ -2,6 +2,8 @@
 #define ICAMERA_H
 #include "event/EventInterface.h"
 #include "internal/common/math/math_utils.h"
+
+#include <internal/macro/project_macros.h>
 namespace controller::event {
   class Event;
 }
@@ -19,19 +21,19 @@ class CameraInterface : public EventInterface {
    * @param focus_point Point in worldspace
    */
   virtual void focus(const glm::vec3 &focus_point) = 0;
-  [[nodiscard]] virtual const glm::vec3 &getUpVector() const = 0;
-  [[nodiscard]] virtual const glm::vec3 &getDirection() const = 0;
-  [[nodiscard]] virtual const glm::vec3 &getPosition() const = 0;
-  [[nodiscard]] virtual const glm::mat4 &getSceneRotationMatrix() const = 0;
-  [[nodiscard]] virtual const glm::mat4 &getSceneTranslationMatrix() const = 0;
-  [[nodiscard]] virtual const glm::mat4 &getViewProjection() const = 0;
-  [[nodiscard]] virtual const glm::mat4 &getProjection() const = 0;
-  [[nodiscard]] virtual const glm::mat4 &getView() const = 0;
-  [[nodiscard]] virtual const Dim2 *getScreenDimensions() const = 0;
-  [[nodiscard]] virtual float getFar() const = 0;
-  [[nodiscard]] virtual float getNear() const = 0;
-  [[nodiscard]] virtual float getFov() const = 0;
-  [[nodiscard]] virtual float getRatio() const = 0;
+  ax_no_discard virtual const glm::vec3 &getUpVector() const = 0;
+  ax_no_discard virtual const glm::vec3 &getDirection() const = 0;
+  ax_no_discard virtual const glm::vec3 &getPosition() const = 0;
+  ax_no_discard virtual const glm::mat4 &getSceneRotationMatrix() const = 0;
+  ax_no_discard virtual const glm::mat4 &getSceneTranslationMatrix() const = 0;
+  ax_no_discard virtual const glm::mat4 &getViewProjection() const = 0;
+  ax_no_discard virtual const glm::mat4 &getProjection() const = 0;
+  ax_no_discard virtual const glm::mat4 &getView() const = 0;
+  ax_no_discard virtual const Dim2 *getScreenDimensions() const = 0;
+  ax_no_discard virtual float getFar() const = 0;
+  ax_no_discard virtual float getNear() const = 0;
+  ax_no_discard virtual float getFov() const = 0;
+  ax_no_discard virtual float getRatio() const = 0;
 };
 
 #endif  // ICAMERA_H

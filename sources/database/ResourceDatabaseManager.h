@@ -2,6 +2,7 @@
 #define RESOURCEDATABASEMANAGER_H
 
 #include <cstdint>
+#include <internal/macro/project_macros.h>
 #include <memory>
 
 /**
@@ -70,11 +71,11 @@ class ResourceDatabaseManager {
   void purgeNodeDatabase();
   void cleanRawImgDatabase();
   void purgeRawImgDatabase();
-  [[nodiscard]] TextureDatabase *getTextureDatabase() const { return texture_database.get(); }
-  [[nodiscard]] ShaderDatabase *getShaderDatabase() const { return shader_database.get(); }
-  [[nodiscard]] INodeDatabase *getNodeDatabase() const { return node_database.get(); }
-  [[nodiscard]] HdrImageDatabase *getHdrDatabase() const { return hdr_database.get(); }
-  [[nodiscard]] RawImageDatabase *getRawImgdatabase() const { return image_database.get(); }
+  ax_no_discard TextureDatabase *getTextureDatabase() const { return texture_database.get(); }
+  ax_no_discard ShaderDatabase *getShaderDatabase() const { return shader_database.get(); }
+  ax_no_discard INodeDatabase *getNodeDatabase() const { return node_database.get(); }
+  ax_no_discard HdrImageDatabase *getHdrDatabase() const { return hdr_database.get(); }
+  ax_no_discard RawImageDatabase *getRawImgdatabase() const { return image_database.get(); }
   void setProgressManagerAllDb(controller::ProgressStatus *progress_manager);
 
   void initializeDatabases(core::memory::MemoryArena<std::byte> &arena, controller::ProgressStatus *progress_manager = nullptr);

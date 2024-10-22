@@ -114,7 +114,7 @@ TEST(TextureDatabaseTest, get) {
   /* Checks that the database isn't modified */
   int original_size = database.size();
   for (int i = 0; i < database.size(); i++) {
-    database.get(i);
+    GenericTexture *tex = database.get(i);
     EXPECT_EQ(database.size(), original_size);
   }
   EXPECT_EQ(ptr_list.size(), database.size());

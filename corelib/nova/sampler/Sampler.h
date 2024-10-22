@@ -51,12 +51,12 @@ namespace nova::sampler {
    public:
     using tag_ptr::tag_ptr;
 
-    AX_DEVICE_CALLABLE [[nodiscard]] nova::exception::NovaException getErrorState() const {
+    AX_DEVICE_CALLABLE ax_no_discard nova::exception::NovaException getErrorState() const {
       auto d = [&](auto ptr) { return ptr->getErrorState(); };
       return dispatch(d);
     }
 
-    AX_DEVICE_CALLABLE [[nodiscard]] glm::vec3 sample() {
+    AX_DEVICE_CALLABLE ax_no_discard glm::vec3 sample() {
       auto d = [&](auto ptr) { return ptr->sample(); };
       return dispatch(d);
     }

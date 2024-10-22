@@ -24,10 +24,10 @@ class FramebufferHelper : public FramebufferHelperInterface {
   void unbind() override;
   void initialize() override;
   void clean() override;
-  [[nodiscard]] bool isReady() const override;
+  ax_no_discard bool isReady() const override;
   void setDefaultFrameBufferIdPointer(unsigned *id) override;
   GenericTexture *getFrameBufferTexturePointer(GLFrameBuffer::INTERNAL_FORMAT color_attachment);
-  [[nodiscard]] GLFrameBuffer *getFramebufferObject() const { return gl_framebuffer_object.get(); }
+  ax_no_discard GLFrameBuffer *getFramebufferObject() const { return gl_framebuffer_object.get(); }
   /**
    * @brief Initialize an empty target texture to be rendered to , saves it in the database , and returns it's database
    * ID

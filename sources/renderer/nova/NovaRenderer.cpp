@@ -130,7 +130,7 @@ void NovaRenderer::getScreenPixelColor(int x, int y, float r_screen_pixel_color[
   r_screen_pixel_color[3] = 1.f;
 }
 
-[[nodiscard]] image::ImageHolder<float> NovaRenderer::getSnapshotFloat(int width, int height) const {
+ax_no_discard image::ImageHolder<float> NovaRenderer::getSnapshotFloat(int width, int height) const {
   image::ImageHolder<float> img;
   img.data.resize(width * height * 4);
   img.metadata.channels = 4;
@@ -144,7 +144,7 @@ void NovaRenderer::getScreenPixelColor(int x, int y, float r_screen_pixel_color[
   op.processTexture(img.data.data(), width, height, apply_color_correct);
   return img;
 }
-[[nodiscard]] image::ImageHolder<uint8_t> NovaRenderer::getSnapshotUint8(int width, int height) const { AX_UNREACHABLE; }
+ax_no_discard image::ImageHolder<uint8_t> NovaRenderer::getSnapshotUint8(int width, int height) const { AX_UNREACHABLE; }
 
 void NovaRenderer::setDefaultFrameBufferId(unsigned int id) {}
 

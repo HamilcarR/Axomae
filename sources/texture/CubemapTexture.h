@@ -2,6 +2,8 @@
 #define CUBEMAPTEXTURE_H
 #include "GenericTexture.h"
 
+#include <internal/macro/project_macros.h>
+
 class CubemapTexture : public GenericTexture {
  protected:
   explicit CubemapTexture(
@@ -34,7 +36,7 @@ class CubemapTexture : public GenericTexture {
   void initialize(Shader *shader) override;
   void generateMipmap() override;
   static const char *getTextureTypeCStr();
-  [[nodiscard]] TYPE getTextureType() const override { return CUBEMAP; }
+  ax_no_discard TYPE getTextureType() const override { return CUBEMAP; }
 
  protected:
   virtual void setCubeMapTextureData(TextureData *texture);

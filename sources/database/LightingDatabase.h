@@ -19,7 +19,7 @@ class LightingDatabase {
   virtual bool removeLight(AbstractLight *light);
   virtual bool removeLight(unsigned id);
   virtual bool updateLight(unsigned id, const LightData &data);
-  [[nodiscard]] const std::vector<AbstractLight *> &getLightsArrayByType(AbstractLight::TYPE type) const;
+  ax_no_discard const std::vector<AbstractLight *> &getLightsArrayByType(AbstractLight::TYPE type) const;
   virtual bool contains(AbstractLight *light) const;
   void eraseLightsArray(AbstractLight::TYPE type);
   void clearDatabase();

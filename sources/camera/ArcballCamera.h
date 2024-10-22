@@ -32,9 +32,9 @@ class ArcballCamera : public Camera {
   void zoomIn() override;
   void zoomOut() override;
   void reset() override;
-  [[nodiscard]] const glm::mat4 &getSceneTranslationMatrix() const override;
-  [[nodiscard]] const glm::mat4 &getSceneRotationMatrix() const override;
-  [[nodiscard]] glm::mat4 getTransformedView() const override;
+  ax_no_discard const glm::mat4 &getSceneTranslationMatrix() const override;
+  ax_no_discard const glm::mat4 &getSceneRotationMatrix() const override;
+  ax_no_discard glm::mat4 getTransformedView() const override;
   void computeViewSpace() override;
   void focus(const glm::vec3 &position) override;
 

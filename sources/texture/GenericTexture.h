@@ -5,6 +5,7 @@
 #include "internal/device/rendering/DeviceTextureInterface.h"
 #include "internal/device/rendering/opengl/init_3D.h"
 #include <cstring>
+#include <internal/macro/project_macros.h>
 class Shader;
 /**
  * @brief Texture class
@@ -71,7 +72,7 @@ class GenericTexture : public DeviceTextureInterface {
   GenericTexture &operator=(const GenericTexture &copy) = default;
   GenericTexture &operator=(GenericTexture &&move) noexcept = default;
   virtual void set(TextureData *texture);
-  [[nodiscard]] unsigned int getSamplerID() const { return sampler2D; }
+  ax_no_discard unsigned int getSamplerID() const { return sampler2D; }
   /**
    * @brief Set the texture's sampler ID .
    * This method will not check if sampler2D has already a valid value.
@@ -79,16 +80,16 @@ class GenericTexture : public DeviceTextureInterface {
    * This method will also not free or tamper with the previous sampler2D value.
    */
   void setSamplerID(unsigned int id) { sampler2D = id; }
-  [[nodiscard]] virtual TYPE getTextureType() const { return EMPTY; };
-  [[nodiscard]] const uint32_t *getData() const { return data.data(); }
-  [[nodiscard]] const float *getFData() const { return f_data.data(); }
-  [[nodiscard]] unsigned getWidth() const { return width; }
-  [[nodiscard]] unsigned getHeight() const { return height; }
-  [[nodiscard]] bool isDummyTexture() const { return is_dummy; }
+  ax_no_discard virtual TYPE getTextureType() const { return EMPTY; };
+  ax_no_discard const uint32_t *getData() const { return data.data(); }
+  ax_no_discard const float *getFData() const { return f_data.data(); }
+  ax_no_discard unsigned getWidth() const { return width; }
+  ax_no_discard unsigned getHeight() const { return height; }
+  ax_no_discard bool isDummyTexture() const { return is_dummy; }
   void setDummy(bool d) { is_dummy = d; }
-  [[nodiscard]] const std::string &getName() const { return name; }
+  ax_no_discard const std::string &getName() const { return name; }
   virtual bool empty() { return data.empty() && f_data.empty(); }
-  [[nodiscard]] bool isInitialized() const override { return sampler2D != 0; }
+  ax_no_discard bool isInitialized() const override { return sampler2D != 0; }
   virtual void setMipmapsLevel(unsigned level) { mipmaps = level; }
   virtual unsigned int getMipmapsLevel() { return mipmaps; }
   virtual void generateMipmap();

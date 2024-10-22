@@ -11,7 +11,7 @@ class DeviceShaderInterface {
   virtual void release() = 0;
   virtual void clean() = 0;
   virtual void setShadersRawText(const std::string &vs, const std::string &fs) = 0;
-  [[nodiscard]] virtual bool isInitialized() const = 0;
+  ax_no_discard virtual bool isInitialized() const = 0;
 };
 
 #endif
