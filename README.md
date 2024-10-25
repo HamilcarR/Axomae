@@ -10,7 +10,7 @@
 * [Features](#Features)
 * [Requirements](#Requirements)
 * [Installation](#Installation)
-* [Troubleshooting](#Troubleshooting)
+* [Documentation](#Documentation)
 
 ## Introduction
 
@@ -70,4 +70,7 @@ $ cd ../build
 $ make
 ```
 
-## Troubleshooting
+## Documentation
+### Architecture and modules : 
+![Modules](Documentation/Axomae_modules.png)
+
