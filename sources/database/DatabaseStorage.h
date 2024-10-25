@@ -4,6 +4,33 @@
 #include <memory>
 
 namespace database {
+
+  template<class T>
+  struct storage_deleter_interface {
+    virtual ~storage_deleter_interface() = default;
+    virtual void operator()(T *ptr) const = 0;
+  };
+
+  template<class T>
+  struct cached_storage_deleter : public storage_deleter_interface<T> {
+    void operator()(T *ptr) const override { ptr->~T(); }
+  };
+  template<class T>
+  struct default_storage_deleter : public storage_deleter_interface<T> {
+    void operator()(T *ptr) const override { delete ptr; }
+  };
+
+  template<class T>
+  struct VirtualDeleter {
+    std::unique_ptr<storage_deleter_interface<T>> deleter;
+    VirtualDeleter() = default;
+    explicit VirtualDeleter(std::unique_ptr<storage_deleter_interface<T>> deleter_) : deleter(std::move(deleter_)) {}
+    void operator()(T *ptr) const {
+      if (deleter)
+        (*deleter)(ptr);
+    }
+  };
+
   /**
    * @brief Stores objects inside the database
    * @tparam U ID type
@@ -11,15 +38,26 @@ namespace database {
    */
   template<class U, class T>
   class Storage {
+    using storage_ptr = std::unique_ptr<T, VirtualDeleter<T>>;
+
    private:
-    std::unique_ptr<T> object;
+    storage_ptr object{};
     U id;
-    bool persistent;
-    bool valid;
+    bool persistent{false};
+    bool valid{false};
 
    public:
-    Storage();
-    Storage(std::unique_ptr<T> object_, U id_, bool persistent_);
+    Storage() = default;
+    /*
+     * Creates a storage with a unique pointer that owns completely the resource and is totally responsible for its lifecycle,
+     * and calls delete on the resource at Storage end-life.
+     */
+    Storage(std::unique_ptr<T> object, U id, bool persistent);
+    /*
+     * Creates a storage with a unique pointer that owns the resource but doesn't destroy it.
+     * This is useful for when the resource is present on an allocated buffer or a cache, that is destroyed by the caller.
+     */
+    Storage(T *object, U id, bool persistent);
     Storage(const Storage &) = delete;
     Storage &operator=(const Storage &) = delete;
     Storage(Storage &&assign) noexcept;
@@ -29,18 +67,25 @@ namespace database {
     T *get() const;
     void setId(U id_);
     U getId() const;
-    ax_no_discard bool isPersistent() const;
-    ax_no_discard bool isValid() const;
+    bool isPersistent() const;
+    bool isValid() const;
     void setPersistence(bool pers);
     void setValidity(bool validity);
   };
 
   template<class U, class T>
-  Storage<U, T>::Storage() : object(nullptr), persistent(false), valid(false) {}
+  Storage<U, T>::Storage(std::unique_ptr<T> object_, U id_, bool persistent_) : id(id_), persistent(persistent_), valid(true) {
+    std::unique_ptr<storage_deleter_interface<T>> deleter;
+    deleter = std::make_unique<default_storage_deleter<T>>();
+    object = storage_ptr(object_.release(), VirtualDeleter<T>(std::move(deleter)));
+  }
 
   template<class U, class T>
-  Storage<U, T>::Storage(std::unique_ptr<T> object_, U id_, bool persistent_)
-      : object(std::move(object_)), id(id_), persistent(persistent_), valid(true) {}
+  Storage<U, T>::Storage(T *object_, U id_, bool persistent_) : id(id_), persistent(persistent_), valid(true) {
+    std::unique_ptr<storage_deleter_interface<T>> deleter;
+    deleter = std::make_unique<cached_storage_deleter<T>>();
+    object = storage_ptr(object_, VirtualDeleter<T>(std::move(deleter)));
+  }
 
   template<class U, class T>
   Storage<U, T>::Storage(Storage &&assign) noexcept {
