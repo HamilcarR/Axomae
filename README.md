@@ -73,4 +73,4 @@ $ make
 ## Documentation
 ### Architecture and modules : 
 ![Modules](Documentation/Axomae_modules.png)
-
+![Architecture](Documentation/Axomae_architecture.png)

@@ -280,7 +280,7 @@ void IResourceDB<U, T>::setUpCacheMemory(CACHE *memory_cache) {
 
 template<class U, class T>
 template<class SUBTYPE, class... Args>
-database::Result<U, T> __attribute((optimize("O0"))) IResourceDB<U, T>::addCached(bool keep, uint8_t *cache_address, Args &&...args) {
+database::Result<U, T> IResourceDB<U, T>::addCached(bool keep, uint8_t *cache_address, Args &&...args) {
   ASSERT_SUBTYPE(SUBTYPE, T);
   if (!memory_arena) {
     LOG("Cache is not initialized.", LogLevel::ERROR);
