@@ -23,6 +23,9 @@ namespace exception {
     DatabaseCacheAllocationException() : GenericException() { saveErrorString("Error allocating memory for database arena."); }
   };
 }  // namespace exception
+
+constexpr std::size_t DATABASE_CACHE_INVALID_SIZE = -1;
+
 /**
  * @brief This class provides a non instanciable abstract class , to group common database methods.
  * @class IResourceDB
@@ -37,13 +40,13 @@ class IResourceDB : public DatabaseInterface<U, T>, public ILockable, public con
 
   struct cache_block_t {
     uint8_t *cache_address{nullptr};
+    std::size_t cache_element_position{0};
     std::size_t cache_size_bytes{0};
   };
   /* A map of all allocated arena memory for this instance of database , in bytes */
-  using CACHELIST = std::unordered_map<uint8_t *, std::size_t>;
+  using CACHELIST = std::unordered_map<uint8_t *, cache_block_t>;
   CACHELIST reserved_memory_map;
-  cache_block_t current_cache_block{nullptr, 0};
-  std::size_t cache_increment{0};
+  cache_block_t *current_working_cache{nullptr};
 
  protected:
   using DATABASE = std::map<U, database::Storage<U, T>>;
@@ -57,7 +60,12 @@ class IResourceDB : public DatabaseInterface<U, T>, public ILockable, public con
   bool remove(const T *element) override;
   ax_no_discard T *get(U id) const override;
   ax_no_discard U firstFreeId() const override = 0;
-  ax_no_discard database::Result<U, T> add(std::unique_ptr<T> element, bool keep) override;
+  database::Result<U, T> add(std::unique_ptr<T> element, bool keep) override;
+  /* Uses placement to create elements in the arena.
+   * It is up to the caller to allocate first enough memory, provide the cache address and call this method the number of time needed.
+   */
+  template<class SUBTYPE, class... Args>
+  database::Result<U, T> addCached(bool keep, uint8_t *cache_address, Args &&...args);
   ax_no_discard database::Result<U, T> contains(const T *element_address) const override;
   ax_no_discard int size() const override;
   bool contains(U id) const override;
@@ -162,8 +170,8 @@ bool IResourceDB<U, T>::remove(const T *element) {
 
 template<class U, class T>
 database::Result<U, T> IResourceDB<U, T>::add(std::unique_ptr<T> element, bool keep) {
-  T *ptr = element.get();
   U ffid = firstFreeId();
+  T *ptr = element.get();
   database::Storage<U, T> storage(std::move(element), ffid, keep);
   Mutex::Lock lock(mutex);
   database_map[ffid] = std::move(storage);
@@ -222,31 +230,35 @@ uint8_t *IResourceDB<U, T>::reserveCache(std::size_t size_bytes) {
   allocated = static_cast<uint8_t *>(memory_arena->allocate(size_bytes));
   if (!allocated) {
     LOG("Error allocating cache database.", LogLevel::CRITICAL);
-    throw exception::DatabaseCacheAllocationException();
+    return nullptr;
   }
-  reserved_memory_map[allocated] = size_bytes;
-  current_cache_block = {allocated, size_bytes};
+  reserved_memory_map[allocated] = {allocated, 0, size_bytes};
+  current_working_cache = &reserved_memory_map.at(allocated);
   return allocated;
 }
 
 template<class U, class T>
 std::size_t IResourceDB<U, T>::getCacheSize(uint8_t *ptr) const {
   try {
-    return reserved_memory_map.at(ptr);
+    return reserved_memory_map.at(ptr).cache_size_bytes;
   } catch (const std::out_of_range &e) {
     LOG("Cannot retrieve cache size for cache address: " + utils::string::to_hex(reinterpret_cast<std::uintptr_t>(ptr)), LogLevel::WARNING);
-    return 0;
+    return DATABASE_CACHE_INVALID_SIZE;
   }
 }
 
 template<class U, class T>
 std::size_t IResourceDB<U, T>::getCurrentCacheSize() const {
-  return current_cache_block.cache_size_bytes;
+  if (!current_working_cache)
+    return DATABASE_CACHE_INVALID_SIZE;
+  return current_working_cache->cache_size_bytes;
 }
 
 template<class U, class T>
 uint8_t *IResourceDB<U, T>::getCurrentCache() const {
-  return current_cache_block.cache_address;
+  if (!current_working_cache)
+    return nullptr;
+  return current_working_cache->cache_address;
 }
 
 template<class U, class T>
@@ -265,4 +277,39 @@ template<class U, class T>
 void IResourceDB<U, T>::setUpCacheMemory(CACHE *memory_cache) {
   memory_arena = memory_cache;
 }
+
+template<class U, class T>
+template<class SUBTYPE, class... Args>
+database::Result<U, T> __attribute((optimize("O0"))) IResourceDB<U, T>::addCached(bool keep, uint8_t *cache_address, Args &&...args) {
+  ASSERT_SUBTYPE(SUBTYPE, T);
+  if (!memory_arena) {
+    LOG("Cache is not initialized.", LogLevel::ERROR);
+    return database::Result<U, T>();
+  }
+  if (getCacheSize(cache_address) == DATABASE_CACHE_INVALID_SIZE)
+    return database::Result<U, T>();
+  cache_block_t *cache_block = &reserved_memory_map[cache_address];
+  std::size_t offset = cache_block->cache_element_position * sizeof(SUBTYPE);
+  if (offset >= cache_block->cache_size_bytes) {
+    LOG("Block offset reached max block size.", LogLevel::ERROR);
+    return database::Result<U, T>();
+  }
+  Mutex::Lock lock(mutex);
+  SUBTYPE *created_resource = memory_arena->construct<SUBTYPE>(
+      reinterpret_cast<SUBTYPE *>(cache_address), cache_block->cache_element_position, std::forward<Args>(args)...);
+  if (!created_resource) {
+    LOG("Error creating resource at cache address: " + utils::string::to_hex(reinterpret_cast<uintptr_t>(cache_address + offset)), LogLevel::ERROR);
+    return database::Result<U, T>();
+  }
+  cache_block->cache_element_position += 1;
+
+  /* Since we're allocating on a buffer we own , we need a custom deleter that doesn't call  delete on memory and cause undefined behavior. */
+
+  U ffid = firstFreeId();
+  T *ptr = created_resource;
+  database::Storage<U, T> storage(created_resource, ffid, keep);
+  database_map[ffid] = std::move(storage);
+  return {ffid, ptr};
+}
+
 #endif
