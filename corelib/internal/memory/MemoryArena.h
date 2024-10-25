@@ -1,6 +1,7 @@
 #ifndef MEMORYARENA_H
 #define MEMORYARENA_H
 #include "internal/macro/project_macros.h"
+#include <cstdint>
 #include <cstdlib>
 #include <list>
 #include <new>
@@ -23,7 +24,10 @@ namespace core::memory {
       T *current_block_ptr{nullptr};
       std::size_t current_alloc_size{};
     };
-
+    struct const_block_t {
+      const T *current_block_ptr{nullptr};
+      std::size_t current_alloc_size{};
+    };
     using value_type = T;
     using block_list_t = std::list<block_t>;
 
@@ -60,6 +64,13 @@ namespace core::memory {
 
     const block_list_t &getUsedBlocks() const { return used_blocks; }
 
+    const const_block_t *getCurrentBlock() const {
+      const const_block_t current;
+      current.current_block_ptr = current_block_ptr;
+      current.current_alloc_size = current_alloc_size;
+      return current;
+    }
+
     std::size_t getTotalSize() {
       std::size_t acc = current_alloc_size;
       for (const auto &elem : used_blocks)
@@ -87,9 +98,16 @@ namespace core::memory {
     template<class U, class... Args>
     static U *construct(U *ptr, Args &&...args) {
       if (!ptr)
-        throw std::bad_alloc();
+        return nullptr;
       ::new (ptr) U(std::forward<Args>(args)...);
       return ptr;
+    }
+
+    template<class U, class... Args>
+    static U *construct(U *ptr, uint64_t cache_element_position, Args &&...args) {
+      std::size_t offset = cache_element_position * sizeof(U);
+      uintptr_t new_address = reinterpret_cast<uintptr_t>(ptr) + offset;
+      return construct(reinterpret_cast<U *>(new_address), std::forward<Args>(args)...);
     }
 
     void *allocate(std::size_t size_bytes) {
