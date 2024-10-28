@@ -21,7 +21,7 @@ TEST(MemoryArenaTest, alloc) {
   /* check 16 bytes alignment addresses*/
   for (int i = 0; i < 1024; i++) {
     void *ptr = allocator.allocate(math::random::nrandi(1, 10000));
-    ASSERT_EQ(reinterpret_cast<uintptr_t>(ptr) % 0x10, 0);
+    ASSERT_EQ(reinterpret_cast<uintptr_t>(ptr) % allocator.getCurrentAlignment(), 0);
   }
 }
 
@@ -31,12 +31,52 @@ TEST(MemoryArenaTest, getTotalSize) {
   ASSERT_EQ(allocator.getTotalSize(), 0);
   allocator.allocate(default_block_size);
   ASSERT_EQ(allocator.getTotalSize(), default_block_size);
-  std::size_t align_size;
-  /* check size alignment on 16 bytes*/
+  std::size_t align_size{};
+  /* check platform alignment. */
   for (int i = 0; i < 200; i++) {
     align_size = math::random::nrandi(1, core::memory::DEFAULT_BLOCK_SIZE);
-    allocator.allocate(default_block_size + align_size);
-    ASSERT_EQ(allocator.getTotalSize() % 0x10, 0);
+    auto aligned_ptr = reinterpret_cast<uintptr_t>(allocator.allocate(default_block_size + align_size), core::memory::PLATFORM_ALIGN);
+    ASSERT_EQ(aligned_ptr % core::memory::PLATFORM_ALIGN, 0);
+    ASSERT_EQ(allocator.getTotalSize() % allocator.getCurrentAlignment(), 0);
+  }
+
+  /* 128 bytes alignment.*/
+  for (int i = 0; i < 200; i++) {
+    align_size = math::random::nrandi(1, core::memory::DEFAULT_BLOCK_SIZE);
+    auto aligned_ptr = reinterpret_cast<uintptr_t>(allocator.allocate(default_block_size + align_size), core::memory::B128_ALIGN);
+    ASSERT_EQ(aligned_ptr % core::memory::B128_ALIGN, 0);
+    ASSERT_EQ(allocator.getTotalSize() % allocator.getCurrentAlignment(), 0);
+  }
+
+  /* 64 bytes alignment. */
+  for (int i = 0; i < 200; i++) {
+    align_size = math::random::nrandi(1, core::memory::DEFAULT_BLOCK_SIZE);
+    auto aligned_ptr = reinterpret_cast<uintptr_t>(allocator.allocate(default_block_size + align_size), core::memory::B64_ALIGN);
+    ASSERT_EQ(aligned_ptr % core::memory::B64_ALIGN, 0);
+    ASSERT_EQ(allocator.getTotalSize() % allocator.getCurrentAlignment(), 0);
+  }
+  /* 32 bytes alignment.*/
+  for (int i = 0; i < 200; i++) {
+    align_size = math::random::nrandi(1, core::memory::DEFAULT_BLOCK_SIZE);
+    auto aligned_ptr = reinterpret_cast<uintptr_t>(allocator.allocate(default_block_size + align_size), core::memory::B32_ALIGN);
+    ASSERT_EQ(aligned_ptr % core::memory::B32_ALIGN, 0);
+    ASSERT_EQ(allocator.getTotalSize() % allocator.getCurrentAlignment(), 0);
+  }
+
+  /* 16 bytes alignment.*/
+  for (int i = 0; i < 200; i++) {
+    align_size = math::random::nrandi(1, core::memory::DEFAULT_BLOCK_SIZE);
+    auto aligned_ptr = reinterpret_cast<uintptr_t>(allocator.allocate(default_block_size + align_size), core::memory::B16_ALIGN);
+    ASSERT_EQ(aligned_ptr % core::memory::B16_ALIGN, 0);
+    ASSERT_EQ(allocator.getTotalSize() % allocator.getCurrentAlignment(), 0);
+  }
+
+  /* 8 bytes alignment.*/
+  for (int i = 0; i < 200; i++) {
+    align_size = math::random::nrandi(1, core::memory::DEFAULT_BLOCK_SIZE);
+    auto aligned_ptr = reinterpret_cast<uintptr_t>(allocator.allocate(default_block_size + align_size), core::memory::B8_ALIGN);
+    ASSERT_EQ(aligned_ptr % core::memory::B8_ALIGN, 0);
+    ASSERT_EQ(allocator.getTotalSize() % allocator.getCurrentAlignment(), 0);
   }
 }
 
