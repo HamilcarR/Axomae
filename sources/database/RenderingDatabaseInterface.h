@@ -35,7 +35,7 @@ constexpr std::size_t DATABASE_CACHE_INVALID_SIZE = -1;
 template<class U, class T>
 class IResourceDB : public DatabaseInterface<U, T>, public ILockable, public controller::IProgressManager {
  private:
-  using CACHE = core::memory::MemoryArena<std::byte>;
+  using CACHE = core::memory::ByteArena;
   CACHE *memory_arena{nullptr};
 
   struct cache_block_t {
@@ -51,6 +51,10 @@ class IResourceDB : public DatabaseInterface<U, T>, public ILockable, public con
  protected:
   using DATABASE = std::map<U, database::Storage<U, T>>;
   DATABASE database_map;
+
+ private:
+  ax_no_discard const cache_block_t *getCacheBlock(uint8_t *ptr) const;
+  ax_no_discard cache_block_t *getCacheBlock(uint8_t *ptr);
 
  public:
   void clean() override;
@@ -279,6 +283,20 @@ void IResourceDB<U, T>::setUpCacheMemory(CACHE *memory_cache) {
 }
 
 template<class U, class T>
+const typename IResourceDB<U, T>::cache_block_t *IResourceDB<U, T>::getCacheBlock(uint8_t *ptr) const {
+  if (getCacheSize(ptr) == DATABASE_CACHE_INVALID_SIZE)
+    return nullptr;
+  return &reserved_memory_map.at(ptr);
+}
+
+template<class U, class T>
+typename IResourceDB<U, T>::cache_block_t *IResourceDB<U, T>::getCacheBlock(uint8_t *ptr) {
+  if (getCacheSize(ptr) == DATABASE_CACHE_INVALID_SIZE)
+    return nullptr;
+  return &reserved_memory_map.at(ptr);
+}
+
+template<class U, class T>
 template<class SUBTYPE, class... Args>
 database::Result<U, T> IResourceDB<U, T>::addCached(bool keep, uint8_t *cache_address, Args &&...args) {
   ASSERT_SUBTYPE(SUBTYPE, T);
@@ -286,9 +304,9 @@ database::Result<U, T> IResourceDB<U, T>::addCached(bool keep, uint8_t *cache_ad
     LOG("Cache is not initialized.", LogLevel::ERROR);
     return database::Result<U, T>();
   }
-  if (getCacheSize(cache_address) == DATABASE_CACHE_INVALID_SIZE)
+  cache_block_t *cache_block = getCacheBlock(cache_address);
+  if (!cache_block)
     return database::Result<U, T>();
-  cache_block_t *cache_block = &reserved_memory_map[cache_address];
   std::size_t offset = cache_block->cache_element_position * sizeof(SUBTYPE);
   if (offset >= cache_block->cache_size_bytes) {
     LOG("Block offset reached max block size.", LogLevel::ERROR);
