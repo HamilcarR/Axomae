@@ -1,8 +1,6 @@
 #include "Generic2DTexture.h"
 #include "Shader.h"
 
-Generic2DTexture::Generic2DTexture(TextureData *data) : GenericTexture(data) {}
-
 void Generic2DTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + texture_unit);

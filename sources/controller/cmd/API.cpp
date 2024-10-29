@@ -45,7 +45,7 @@ namespace controller::cmd {
     try {
       image::ImageHolder<float> data = loader.loadHdrEnvmap(envmap.path_input.c_str(), false);
       TextureOperations<float> process_texture(data.data, data.metadata.width, data.metadata.height, data.metadata.channels);
-      std::unique_ptr<TextureData> texture;
+      std::unique_ptr<F32TexData> texture;
       if (envmap.baketype == "irradiance") {
         texture = process_texture.computeDiffuseIrradiance(envmap.width_output, envmap.height_output, envmap.samples, (config.flag & CONF_USE_CUDA));
       }
@@ -53,7 +53,7 @@ namespace controller::cmd {
       metadata.width = texture->width;
       metadata.height = texture->height;
       metadata.channels = texture->nb_components;
-      image::ImageHolder<float> hdr(texture->f_data, metadata);
+      image::ImageHolder<float> hdr(texture->data, metadata);
       loader.writeHdr(envmap.path_output.c_str(), hdr);
       QApplication qapp(*argv, argc);
       HdrTextureViewerWidget tex(hdr);

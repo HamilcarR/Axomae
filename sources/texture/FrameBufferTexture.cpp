@@ -7,17 +7,6 @@ FrameBufferTexture::FrameBufferTexture() : GenericTexture() {
   data_type = UBYTE;
 }
 
-FrameBufferTexture::FrameBufferTexture(TextureData *_data) : FrameBufferTexture() {
-  if (_data != nullptr) {
-    width = _data->width;
-    height = _data->height;
-    internal_format = static_cast<GenericTexture::FORMAT>(_data->internal_format);
-    data_format = static_cast<GenericTexture::FORMAT>(_data->data_format);
-    data_type = static_cast<GenericTexture::FORMAT>(_data->data_type);
-    this->data.clear();
-  }
-}
-
 FrameBufferTexture::FrameBufferTexture(unsigned _width, unsigned _height) : FrameBufferTexture() {
   width = _width;
   height = _height;

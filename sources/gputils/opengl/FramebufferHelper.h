@@ -76,7 +76,7 @@ int FramebufferHelper::setUpEmptyTexture(unsigned width,
                                          GenericTexture::FORMAT data_format,
                                          GenericTexture::FORMAT data_type,
                                          unsigned int mipmaps) {
-  TextureData temp_empty_data_texture;
+  F32TexData temp_empty_data_texture;
   temp_empty_data_texture.width = width;
   temp_empty_data_texture.height = height;
   temp_empty_data_texture.internal_format = internal_format;

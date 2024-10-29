@@ -2,7 +2,8 @@
 #define DEVICE_UTILS_H
 
 #if defined(AXOMAE_USE_CUDA)
-#include "cuda/cuda_utils.h"
+#  include "cuda/cuda_utils.h"
+/* TODO: AX_* to lowercase conforming to macros guideline*/
 #  define AX_DEVICE_CALLABLE __host__ __device__
 #  define AX_DEVICE_SHARED __shared__
 #  define AX_DEVICE_ONLY __device__

@@ -4,8 +4,6 @@
 GenericCubemapTexture::GenericCubemapTexture(FORMAT internal_format, FORMAT data_format, FORMAT data_type, unsigned width, unsigned height)
     : CubemapTexture(internal_format, data_format, data_type, width, height) {}
 
-GenericCubemapTexture::GenericCubemapTexture(TextureData *data) : CubemapTexture(data) {}
-
 void GenericCubemapTexture::bind() {
   ax_glActiveTexture(GL_TEXTURE0 + texture_unit);
   ax_glBindTexture(GL_TEXTURE_CUBE_MAP, sampler2D);

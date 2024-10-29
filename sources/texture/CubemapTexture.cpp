@@ -11,7 +11,27 @@ CubemapTexture::CubemapTexture(FORMAT _internal_format, FORMAT _data_format, FOR
   mipmaps = 0;
 }
 
-void CubemapTexture::setCubeMapTextureData(TextureData *texture) {
+void CubemapTexture::setCubeMapTextureData(const F32TexData *texture) {
+  if (!texture)
+    return;
+  clean();
+  width = texture->width;
+  height = texture->height;
+  internal_format = static_cast<GenericTexture::FORMAT>(texture->internal_format);
+  data_format = static_cast<GenericTexture::FORMAT>(texture->data_format);
+  data_type = static_cast<GenericTexture::FORMAT>(texture->data_type);
+  mipmaps = texture->mipmaps;
+  /* In case raw data is 4 bytes float / channel */
+  if (!texture->data.empty()) {
+    f_data.resize(width * height * 6 * texture->nb_components);
+    for (unsigned i = 0; i < width * height * 6 * texture->nb_components; i++)
+      f_data[i] = texture->data[i];
+  }
+}
+
+void CubemapTexture::setCubeMapTextureData(const U32TexData *texture) {
+  if (!texture)
+    return;
   clean();
   width = texture->width;
   height = texture->height;
@@ -25,17 +45,6 @@ void CubemapTexture::setCubeMapTextureData(TextureData *texture) {
     for (unsigned int i = 0; i < width * height * 6; i++)
       data[i] = texture->data[i];
   }
-  /* In case raw data is 4 bytes float / channel */
-  if (!texture->f_data.empty()) {
-    f_data.resize(width * height * 6 * texture->nb_components);
-    for (unsigned i = 0; i < width * height * 6 * texture->nb_components; i++)
-      f_data[i] = texture->f_data[i];
-  }
-}
-
-CubemapTexture::CubemapTexture(TextureData *data) : CubemapTexture() {
-  if (data)
-    CubemapTexture::setCubeMapTextureData(data);
 }
 
 void CubemapTexture::initializeTexture2D() {

@@ -3,7 +3,9 @@
 #include "GenericTexture.h"
 class OpacityTexture : public GenericTexture {
  protected:
-  explicit OpacityTexture(TextureData *data);
+  explicit OpacityTexture(std::nullptr_t) : GenericTexture() { set_dummy_TextureData(this); }
+  explicit OpacityTexture(const U32TexData *data) : GenericTexture(data) {}
+  explicit OpacityTexture(const F32TexData *data) : GenericTexture(data) {}
 
  public:
   void bind() override;

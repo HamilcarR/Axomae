@@ -26,7 +26,7 @@ namespace IO {
    * @param totexture A pointer to a TextureData struct that will hold the copied texture data.
    * @param fromtexture The aiTexture object containing the texture data to be copied.
    */
-  static void copyTexels(TextureData *totexture,
+  static void copyTexels(U32TexData *totexture,
                          aiTexture *fromtexture,
                          const std::string &texture_type,
                          controller::IProgressManager *progress_manager) {
@@ -100,7 +100,7 @@ namespace IO {
   template<class TEXTYPE>
   static void loadTexture(const aiScene *scene,
                           GLMaterial *material,
-                          TextureData &texture,
+                          U32TexData &texture,
                           const aiString &texture_string,
                           ResourceDatabaseManager &resource_manager,
                           controller::IProgressManager *progress_manager) {
@@ -150,7 +150,7 @@ namespace IO {
                                     controller::IProgressManager *progress_manager) {
     GLMaterial mesh_material;
     std::vector<GenericTexture::TYPE> dummy_textures_type;
-    TextureData diffuse, metallic, roughness, normal, ambiantocclusion, emissive, specular, opacity;
+    U32TexData diffuse, metallic, roughness, normal, ambiantocclusion, emissive, specular, opacity;
     diffuse.name = "diffuse";
     metallic.name = "metallic";
     roughness.name = "roughness";
