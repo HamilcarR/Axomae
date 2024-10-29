@@ -1,11 +1,6 @@
 #include "SpecularTexture.h"
 #include "Shader.h"
 
-SpecularTexture::SpecularTexture(TextureData *data) : GenericTexture(data) {
-  if (!data)
-    set_dummy_TextureData(this);
-}
-
 void SpecularTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + SPECULAR);

@@ -6,7 +6,9 @@
 
 class RoughnessTexture : public GenericTexture {
  protected:
-  explicit RoughnessTexture(TextureData *data);
+  explicit RoughnessTexture(std::nullptr_t) : GenericTexture() { set_dummy_TextureData(this); }
+  explicit RoughnessTexture(U32TexData *data) : GenericTexture(data) {}
+  explicit RoughnessTexture(F32TexData *data) : GenericTexture(data) {}
 
  public:
   void bind() override;

@@ -6,7 +6,7 @@ const int COUNT = 16;
 namespace texture_database_test {
 
   template<class HEAD, class... TAIL>
-  constexpr void addTexture(IResourceDB<int, GenericTexture> &database, TextureData *data) {
+  constexpr void addTexture(IResourceDB<int, GenericTexture> &database, U32TexData *data) {
     bool persistence = math::random::randb();
     database::texture::store<HEAD>(database, persistence, data);
     if constexpr (sizeof...(TAIL) > 0)
@@ -48,7 +48,7 @@ class TextureDatabaseTest final : public DatabaseBuilderTest<int, GenericTexture
 
  private:
   void buildDatabase() {
-    TextureData data;
+    U32TexData data;
     texture_database_test::addTexture<TYPE_LIST>(database, &data);
     total_size = database.size();
     number_persistent = getPersistentSize();
@@ -67,13 +67,13 @@ TEST(TextureDatabaseTest, add) {
   int incremented = test.total_size;
   EXPECT_EQ(sizeDB, incremented);
   /* Textures with a non-empty name should be unique*/
-  TextureData data1, data2;
+  U32TexData data1, data2;
   data1.name = std::string("texture1");
   data2.name = std::string("texture2");
   auto result1 = test.add<DiffuseTexture>(false, &data1);
   auto result2 = test.add<DiffuseTexture>(false, &data2);
   EXPECT_NE(result1, result2);
-  TextureData data3;
+  U32TexData data3;
   data3.name = std::string("texture1");
   auto result3 = test.add<DiffuseTexture>(false, &data3);
   EXPECT_EQ(result1, result3);

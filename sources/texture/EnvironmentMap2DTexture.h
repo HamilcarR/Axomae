@@ -12,7 +12,10 @@ class EnvironmentMap2DTexture : public GenericTexture {
  protected:
   explicit EnvironmentMap2DTexture(
       FORMAT internal_format = RGB32F, FORMAT data_format = RGB, FORMAT data_type = FLOAT, unsigned width = 0, unsigned height = 0);
-  explicit EnvironmentMap2DTexture(TextureData *data);
+
+  explicit EnvironmentMap2DTexture(const U32TexData *data) : GenericTexture(data) {}
+  explicit EnvironmentMap2DTexture(const F32TexData *data) : GenericTexture(data) {}
+  explicit EnvironmentMap2DTexture(std::nullptr_t) : GenericTexture() {}
 
  public:
   void initializeTexture2D() override;

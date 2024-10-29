@@ -44,12 +44,15 @@ V) Namespaces :
 Namespaces are always lowercase.
 
 VI) Macros :
-Macros are always uppercase.
+Macros are divided into two categories:
+1) Aliases : like ax_no_discard, an alias is a clean renaming for attributes and keywords that are too cluttered : ([[no_discard]] __attribute__ etc)
+It is always lowercase.
+2) Functions macros: Macros that behave like a function, and taking arguments... They are always uppercase.
 
 VII) Project Structure :
 Axomae's source code is divided into two main folders :
 1) corelib/ : Provides the core library of the application, math library , macros , GPU functions wrappers and nova engine.
-2) sources/ : Provides the implementation of the editor , and it's features.
+2) sources/ : Provides the implementation of the application , like the editor, the renderer, widgets etc.
 In addition to those folders we can list :
 3) vendor/ : 3rd party libs
 4) tests/ : the testing folder.
