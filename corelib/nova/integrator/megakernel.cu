@@ -15,7 +15,7 @@ namespace resrc = device::gpgpu;
 /* Serves only as a baseline for performance to compare against */
 namespace nova {
   namespace gpu {
-    AX_KERNEL void test_func(float *ptr, cudaTextureObject_t host_texture, unsigned width, unsigned height, int i_width, int i_height) {
+    ax_kernel void test_func(float *ptr, cudaTextureObject_t host_texture, unsigned width, unsigned height, int i_width, int i_height) {
       unsigned int x = blockDim.x * blockIdx.x + threadIdx.x;
       unsigned int y = blockDim.y * blockIdx.y + threadIdx.y;
       unsigned int offset = (y * width + x) * 4;
