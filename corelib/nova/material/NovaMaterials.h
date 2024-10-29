@@ -27,7 +27,7 @@ namespace nova::material {
    public:
     using tag_ptr::tag_ptr;
     /*replace by eval() , check metallic , roughness , emissive value and use correct function*/
-    AX_DEVICE_CALLABLE bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const;
+    ax_device_callable bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const;
   };
 
   class NovaDiffuseMaterial {
@@ -38,7 +38,7 @@ namespace nova::material {
     CLASS_CM(NovaDiffuseMaterial)
 
     explicit NovaDiffuseMaterial(const texture_pack &textures);
-    AX_DEVICE_CALLABLE bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const;
+    ax_device_callable bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const;
   };
 
   class NovaConductorMaterial {
@@ -51,7 +51,7 @@ namespace nova::material {
 
     explicit NovaConductorMaterial(const texture_pack &textures);
     NovaConductorMaterial(const texture_pack &textures, float fuzz_);
-    AX_DEVICE_CALLABLE bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const;
+    ax_device_callable bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const;
   };
 
   class NovaDielectricMaterial {
@@ -64,7 +64,7 @@ namespace nova::material {
 
     explicit NovaDielectricMaterial(const texture_pack &textures);
     NovaDielectricMaterial(const texture_pack &textures, float ior);
-    AX_DEVICE_CALLABLE bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const;
+    ax_device_callable bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const;
   };
 
   using TYPELIST = NovaMaterialInterface::type_pack;

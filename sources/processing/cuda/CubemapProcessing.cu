@@ -11,17 +11,17 @@
 
 namespace spherical_math {
 
-  AX_DEVICE_ONLY inline float3 sphericalToCartesian(const float phi, const float theta);
+  ax_device_only inline float3 sphericalToCartesian(const float phi, const float theta);
 
-  AX_DEVICE_ONLY inline float2 cartesianToSpherical(const float x, const float y, const float z);
+  ax_device_only inline float2 cartesianToSpherical(const float x, const float y, const float z);
 
-  AX_DEVICE_ONLY inline float2 uvToSpherical(const float u, const float v);
+  ax_device_only inline float2 uvToSpherical(const float u, const float v);
 
-  AX_DEVICE_ONLY inline float2 sphericalToUv(const float u, const float v);
+  ax_device_only inline float2 sphericalToUv(const float u, const float v);
 
-  AX_DEVICE_ONLY inline float3 gpu_pgc3d(unsigned x, unsigned y, unsigned z);
+  ax_device_only inline float3 gpu_pgc3d(unsigned x, unsigned y, unsigned z);
 
-  AX_DEVICE_ONLY float3 sphericalToCartesian(const float phi, const float theta) {
+  ax_device_only float3 sphericalToCartesian(const float phi, const float theta) {
     float z = cos(theta);
     float x = sin(theta) * cos(phi);
     float y = sin(theta) * sin(phi);
@@ -32,7 +32,7 @@ namespace spherical_math {
     return xyz;
   }
 
-  AX_DEVICE_ONLY inline float2 cartesianToSpherical(const float x, const float y, const float z) {
+  ax_device_only inline float2 cartesianToSpherical(const float x, const float y, const float z) {
     const float theta = acos(z);
     const float phi = atan2f(y, x);
     float2 sph;
@@ -41,7 +41,7 @@ namespace spherical_math {
     return sph;
   }
 
-  AX_DEVICE_ONLY inline float2 uvToSpherical(const float u, const float v) {
+  ax_device_only inline float2 uvToSpherical(const float u, const float v) {
     float phi = 2 * PI * u;
     float theta = PI * v;
     float2 spherical;
@@ -50,7 +50,7 @@ namespace spherical_math {
     return spherical;
   }
 
-  AX_DEVICE_ONLY inline float2 sphericalToUv(const float phi, const float theta) {
+  ax_device_only inline float2 sphericalToUv(const float phi, const float theta) {
     const float u = phi / (2 * PI);
     const float v = theta / PI;
     float2 uv;
@@ -59,7 +59,7 @@ namespace spherical_math {
     return uv;
   }
 
-  AX_DEVICE_ONLY inline float3 gpu_pgc3d(unsigned x, unsigned y, unsigned z) {
+  ax_device_only inline float3 gpu_pgc3d(unsigned x, unsigned y, unsigned z) {
     x = x * 1664525u + 1013904223u;
     y = y * 1664525u + 1013904223u;
     z = z * 1664525u + 1013904223u;
@@ -83,11 +83,11 @@ namespace spherical_math {
   }
 };  // End namespace spherical_math
 
-AX_DEVICE_ONLY inline float dot(const float2 &vec1, const float2 &vec2) { return vec1.x * vec2.x + vec1.y * vec2.y; }
+ax_device_only inline float dot(const float2 &vec1, const float2 &vec2) { return vec1.x * vec2.x + vec1.y * vec2.y; }
 
-AX_DEVICE_ONLY inline float dot(const float3 &vec1, const float3 &vec2) { return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z; }
+ax_device_only inline float dot(const float3 &vec1, const float3 &vec2) { return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z; }
 
-AX_DEVICE_ONLY inline float3 cross(const float3 &A, const float3 &B) {
+ax_device_only inline float3 cross(const float3 &A, const float3 &B) {
   float3 C;
   C.x = A.y * B.z - A.z * B.y;
   C.y = A.z * B.x - A.x * B.z;
@@ -95,7 +95,7 @@ AX_DEVICE_ONLY inline float3 cross(const float3 &A, const float3 &B) {
   return C;
 }
 
-AX_DEVICE_ONLY inline float3 normalize(const float3 &A) {
+ax_device_only inline float3 normalize(const float3 &A) {
   float d = sqrt(A.x * A.x + A.y * A.y + A.z * A.z);
   float3 A1;
   A1.x = A.x / d;
@@ -103,14 +103,14 @@ AX_DEVICE_ONLY inline float3 normalize(const float3 &A) {
   A1.z = A.z / d;
   return A1;
 }
-AX_DEVICE_ONLY inline float3 operator*(float k, float3 vec) {
+ax_device_only inline float3 operator*(float k, float3 vec) {
   float3 res;
   res.x = vec.x * k;
   res.y = vec.y * k;
   res.z = vec.z * k;
   return res;
 }
-AX_DEVICE_ONLY inline float3 operator+(float3 vec1, float3 vec2) {
+ax_device_only inline float3 operator+(float3 vec1, float3 vec2) {
   float3 res;
   res.x = vec1.x + vec2.x;
   res.y = vec1.y + vec2.y;
@@ -119,14 +119,14 @@ AX_DEVICE_ONLY inline float3 operator+(float3 vec1, float3 vec2) {
 }
 
 template<class T>
-AX_DEVICE_ONLY void gpgpu_device_write_buffer(T *D_result_buffer, const float3 val, const int x, const int y, const unsigned _width) {
+ax_device_only void gpgpu_device_write_buffer(T *D_result_buffer, const float3 val, const int x, const int y, const unsigned _width) {
   D_result_buffer[(y * _width + x) * 4] = val.x;
   D_result_buffer[(y * _width + x) * 4 + 1] = val.y;
   D_result_buffer[(y * _width + x) * 4 + 2] = val.z;
   D_result_buffer[(y * _width + x) * 4 + 3] = 1.f;
 }
 
-AX_KERNEL static void gpgpu_device_compute_diffuse_irradiance(
+ax_kernel static void gpgpu_device_compute_diffuse_irradiance(
     float *D_result_buffer, cudaTextureObject_t texture, unsigned width, unsigned height, unsigned _width, unsigned _height, unsigned total_samples) {
 
   int i = blockDim.x * blockIdx.x + threadIdx.x;

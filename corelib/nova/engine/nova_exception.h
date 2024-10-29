@@ -42,23 +42,23 @@ namespace nova::exception {
 #endif
 
    private:
-    AX_DEVICE_CALLABLE void synchronizeErrFlag();
+    ax_device_callable void synchronizeErrFlag();
 
    public:
-    AX_DEVICE_CALLABLE NovaException() = default;
-    AX_DEVICE_CALLABLE NovaException(NovaException &&move) noexcept;
-    AX_DEVICE_CALLABLE NovaException &operator=(NovaException &&move) noexcept;
-    AX_DEVICE_CALLABLE NovaException(const NovaException &copy) noexcept;
-    AX_DEVICE_CALLABLE NovaException &operator=(const NovaException &copy) noexcept;
-    AX_DEVICE_CALLABLE ~NovaException() = default;
+    ax_device_callable NovaException() = default;
+    ax_device_callable NovaException(NovaException &&move) noexcept;
+    ax_device_callable NovaException &operator=(NovaException &&move) noexcept;
+    ax_device_callable NovaException(const NovaException &copy) noexcept;
+    ax_device_callable NovaException &operator=(const NovaException &copy) noexcept;
+    ax_device_callable ~NovaException() = default;
 
-    AX_DEVICE_CALLABLE ax_no_discard bool errorCheck() const { return synchronized_err_flag != NOERR; }
-    AX_DEVICE_CALLABLE ax_no_discard uint64_t getErrorFlag() const { return synchronized_err_flag; }
-    AX_DEVICE_CALLABLE void addErrorType(uint64_t to_add);
+    ax_device_callable ax_no_discard bool errorCheck() const { return synchronized_err_flag != NOERR; }
+    ax_device_callable ax_no_discard uint64_t getErrorFlag() const { return synchronized_err_flag; }
+    ax_device_callable void addErrorType(uint64_t to_add);
     /* merges err_flag and other_error_flag , err_flag will now store it's previous errors + other_error_flag */
-    AX_DEVICE_CALLABLE void merge(uint64_t other_error_flag);
+    ax_device_callable void merge(uint64_t other_error_flag);
 
-    AX_HOST_ONLY ax_no_discard std::vector<ERROR> getErrorList() const;
+    ax_host_only ax_no_discard std::vector<ERROR> getErrorList() const;
   };
 
 }  // namespace nova::exception
