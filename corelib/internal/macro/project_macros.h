@@ -50,4 +50,6 @@
 
 #define ax_no_discard [[nodiscard]]
 
+#define ax_maybe_unused [[maybe_unused]]
+
 #endif

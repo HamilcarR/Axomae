@@ -21,7 +21,7 @@ class TextureGroup {
 
  public:
   TextureGroup();
-  ~TextureGroup() = default;
+  virtual ~TextureGroup() = default;
   TextureGroup(TextureGroup &&move) noexcept;
   TextureGroup(const TextureGroup &copy);
   TextureGroup &operator=(TextureGroup &&move) noexcept;

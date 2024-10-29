@@ -1,11 +1,6 @@
 #include "RoughnessTexture.h"
 #include "Shader.h"
 
-RoughnessTexture::RoughnessTexture(TextureData *data) : GenericTexture(data) {
-  if (!data)
-    set_dummy_TextureData(this);
-}
-
 void RoughnessTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + ROUGHNESS);

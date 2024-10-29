@@ -2,8 +2,6 @@
 #include "BRDFLookupTexture.h"
 #include "Shader.h"
 
-BRDFLookupTexture::BRDFLookupTexture(TextureData *data) : GenericTexture(data) {}
-
 void BRDFLookupTexture::bind() {
   ax_glActiveTexture(GL_TEXTURE0 + BRDFLUT);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);

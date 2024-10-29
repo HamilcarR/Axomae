@@ -133,8 +133,8 @@ void EnvmapTextureManager::deleteFromCollection(int index) {
       bakes_id.erase(it);
 }
 
-static TextureData texture_metadata(image::ThumbnailImageHolder<float> *raw_image_data) {
-  TextureData envmap;
+static F32TexData texture_metadata(image::ThumbnailImageHolder<float> *raw_image_data) {
+  F32TexData envmap;
   envmap.width = raw_image_data->metadata.width;
   envmap.height = raw_image_data->metadata.height;
   envmap.name = raw_image_data->metadata.name;
@@ -142,7 +142,7 @@ static TextureData texture_metadata(image::ThumbnailImageHolder<float> *raw_imag
   envmap.internal_format = GenericTexture::RGBA32F;
   envmap.data_format = GenericTexture::RGBA;
   envmap.nb_components = raw_image_data->metadata.channels;
-  envmap.f_data = raw_image_data->data;
+  envmap.data = raw_image_data->data;
   return envmap;
 }
 

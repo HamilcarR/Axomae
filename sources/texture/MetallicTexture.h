@@ -2,10 +2,12 @@
 #define METALLICTEXTURE_H
 
 #include "GenericTexture.h"
-class TextureData;
+
 class MetallicTexture : public GenericTexture {
  protected:
-  explicit MetallicTexture(TextureData *data);
+  explicit MetallicTexture(std::nullptr_t) : GenericTexture() { set_dummy_TextureData(this); }
+  explicit MetallicTexture(const U32TexData *data) : GenericTexture(data) {}
+  explicit MetallicTexture(const F32TexData *data) : GenericTexture(data) {}
 
  public:
   void bind() override;

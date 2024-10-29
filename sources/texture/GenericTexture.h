@@ -63,7 +63,9 @@ class GenericTexture : public DeviceTextureInterface {
 
  protected:
   GenericTexture();
-  explicit GenericTexture(TextureData *tex);
+  explicit GenericTexture(const U32TexData *tex) { GenericTexture::set(tex); }
+  explicit GenericTexture(const F32TexData *tex) { GenericTexture::set(tex); }
+  explicit GenericTexture(std::nullptr_t) : GenericTexture() {}
 
  public:
   ~GenericTexture() override = default;
@@ -71,7 +73,8 @@ class GenericTexture : public DeviceTextureInterface {
   GenericTexture(GenericTexture &&move) noexcept = default;
   GenericTexture &operator=(const GenericTexture &copy) = default;
   GenericTexture &operator=(GenericTexture &&move) noexcept = default;
-  virtual void set(TextureData *texture);
+  virtual void set(const F32TexData *texture);
+  virtual void set(const U32TexData *texture);
   ax_no_discard unsigned int getSamplerID() const { return sampler2D; }
   /**
    * @brief Set the texture's sampler ID .
@@ -109,6 +112,7 @@ class GenericTexture : public DeviceTextureInterface {
   virtual void initializeTexture2D();
   virtual void setTextureParametersOptions();
 };
+
 template<class T>
 void GenericTexture::setNewData(const std::vector<T> &new_buffer, FORMAT format, FORMAT type) {
   ax_glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (int)width, (int)height, format, type, new_buffer.data());
@@ -194,7 +198,7 @@ constexpr GenericTexture::TYPE str2type(const char *str) {
  * texture with a solid black color.
  */
 inline void set_dummy_TextureData(GenericTexture *set_texture) {
-  TextureData dummy;
+  U32TexData dummy;
   dummy.width = DUMMY_TEXTURE_DIM;
   dummy.height = DUMMY_TEXTURE_DIM;
   dummy.data.resize(dummy.width * dummy.height);
@@ -213,7 +217,7 @@ inline void set_dummy_TextureData(GenericTexture *set_texture) {
  */
 
 inline void set_dummy_TextureData_normals(GenericTexture *set_texture) {
-  TextureData dummy;
+  U32TexData dummy;
   dummy.width = DUMMY_TEXTURE_DIM;
   dummy.height = DUMMY_TEXTURE_DIM;
   dummy.data.resize(dummy.width * dummy.height);

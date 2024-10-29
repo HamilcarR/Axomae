@@ -7,7 +7,7 @@
 #include "internal/macro/project_macros.h"
 
 class INodeDatabase final : public IntegerResourceDB<datastructure::NodeInterface> {
-  using NodeIdMap [[maybe_unused]] = std::map<int, std::unique_ptr<datastructure::NodeInterface>>;
+  using NodeIdMap ax_maybe_unused = std::map<int, std::unique_ptr<datastructure::NodeInterface>>;
 
  public:
   explicit INodeDatabase(controller::ProgressStatus *progress_manager = nullptr);

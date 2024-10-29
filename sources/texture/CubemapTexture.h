@@ -8,7 +8,9 @@ class CubemapTexture : public GenericTexture {
  protected:
   explicit CubemapTexture(
       FORMAT internal_format = RGBA, FORMAT data_format = RGBA, FORMAT data_type = UBYTE, unsigned width = 0, unsigned height = 0);
-  explicit CubemapTexture(TextureData *data);
+  explicit CubemapTexture(const F32TexData *data) : CubemapTexture() { CubemapTexture::setCubeMapTextureData(data); }
+  explicit CubemapTexture(const U32TexData *data) : CubemapTexture() { CubemapTexture::setCubeMapTextureData(data); }
+  explicit CubemapTexture(std::nullptr_t) : CubemapTexture() {}
 
  public:
   /*
@@ -39,7 +41,8 @@ class CubemapTexture : public GenericTexture {
   ax_no_discard TYPE getTextureType() const override { return CUBEMAP; }
 
  protected:
-  virtual void setCubeMapTextureData(TextureData *texture);
+  void setCubeMapTextureData(const U32TexData *texture);
+  void setCubeMapTextureData(const F32TexData *texture);
 };
 
 #endif  // CUBEMAPTEXTURE_H

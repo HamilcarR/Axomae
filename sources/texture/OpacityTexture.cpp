@@ -2,11 +2,6 @@
 
 #include "Shader.h"
 
-OpacityTexture::OpacityTexture(TextureData *data) : GenericTexture(data) {
-  if (!data)
-    set_dummy_TextureData(this);
-}
-
 void OpacityTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + OPACITY);
