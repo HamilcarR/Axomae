@@ -15,7 +15,9 @@
  */
 class BRDFLookupTexture : public GenericTexture {
  protected:
-  explicit BRDFLookupTexture(TextureData *data);
+  explicit BRDFLookupTexture(std::nullptr_t) {}
+  explicit BRDFLookupTexture(const U32TexData *data) : GenericTexture(data) {}
+  explicit BRDFLookupTexture(const F32TexData *data) : GenericTexture(data) {}
 
  public:
   void bind() override;

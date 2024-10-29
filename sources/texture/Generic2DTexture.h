@@ -11,7 +11,9 @@ class Generic2DTexture : public GenericTexture {
   std::string location_name;
 
  protected:
-  explicit Generic2DTexture(TextureData *data);
+  explicit Generic2DTexture(const U32TexData *data) : GenericTexture(data) {}
+  explicit Generic2DTexture(const F32TexData *data) : GenericTexture(data) {}
+  explicit Generic2DTexture(std::nullptr_t) : GenericTexture() {}
 
  public:
   void bind() override;

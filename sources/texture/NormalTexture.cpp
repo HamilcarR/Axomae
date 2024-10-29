@@ -2,11 +2,6 @@
 
 #include "Shader.h"
 
-NormalTexture::NormalTexture(TextureData *texture) : GenericTexture(texture) {
-  if (data.empty())
-    set_dummy_TextureData_normals(this);
-}
-
 void NormalTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + NORMAL);

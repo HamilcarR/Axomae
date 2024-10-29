@@ -2,11 +2,6 @@
 #include "AmbiantOcclusionTexture.h"
 #include "Shader.h"
 
-AmbiantOcclusionTexture::AmbiantOcclusionTexture(TextureData *data) : GenericTexture(data) {
-  if (!data)
-    set_dummy_TextureData(this);
-}
-
 void AmbiantOcclusionTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + AMBIANTOCCLUSION);

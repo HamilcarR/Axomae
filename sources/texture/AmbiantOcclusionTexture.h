@@ -8,7 +8,9 @@
 class Shader;
 class AmbiantOcclusionTexture : public GenericTexture {
  protected:
-  explicit AmbiantOcclusionTexture(TextureData *data);
+  explicit AmbiantOcclusionTexture(std::nullptr_t) { set_dummy_TextureData(this); }
+  explicit AmbiantOcclusionTexture(const U32TexData *data) : GenericTexture(data) {}
+  explicit AmbiantOcclusionTexture(const F32TexData *data) : GenericTexture(data) {}
 
  public:
   void bind() override;

@@ -1,11 +1,6 @@
 #include "DiffuseTexture.h"
 #include "Shader.h"
 
-DiffuseTexture::DiffuseTexture(TextureData *data) : GenericTexture(data) {
-  if (!data)
-    set_dummy_TextureData(this);
-}
-
 void DiffuseTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + DIFFUSE);
@@ -25,7 +20,7 @@ void DiffuseTexture::unbind() {
   ax_glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void DiffuseTexture::set(TextureData *texture) {
+void DiffuseTexture::set(const U32TexData *texture) {
   clean();
   width = texture->width;
   height = texture->height;

@@ -14,8 +14,6 @@ EnvironmentMap2DTexture::EnvironmentMap2DTexture(FORMAT _internal_format, FORMAT
   height = _height;
 }
 
-EnvironmentMap2DTexture::EnvironmentMap2DTexture(TextureData *data) : GenericTexture(data) {}
-
 void EnvironmentMap2DTexture::initializeTexture2D() {
   ax_glTexImage2D(GL_TEXTURE_2D, 0, internal_format, (int)width, (int)height, 0, data_format, data_type, f_data.data());
   ax_glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

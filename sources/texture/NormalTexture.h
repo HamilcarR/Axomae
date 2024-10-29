@@ -7,7 +7,9 @@
 class NormalTexture : public GenericTexture {
  protected:
   NormalTexture() = default;
-  explicit NormalTexture(TextureData *data);
+  explicit NormalTexture(std::nullptr_t) : GenericTexture() { set_dummy_TextureData_normals(this); }
+  explicit NormalTexture(const U32TexData *texture) : GenericTexture(texture) {}
+  explicit NormalTexture(const F32TexData *texture) : GenericTexture(texture) {}
 
  public:
   void bind() override;

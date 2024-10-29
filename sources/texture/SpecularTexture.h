@@ -7,7 +7,9 @@
 
 class SpecularTexture : public GenericTexture {
  protected:
-  explicit SpecularTexture(TextureData *data);
+  explicit SpecularTexture(std::nullptr_t) { set_dummy_TextureData(this); }
+  explicit SpecularTexture(const U32TexData *data) : GenericTexture(data) {}
+  explicit SpecularTexture(const F32TexData *data) : GenericTexture(data) {}
 
  public:
   void bind() override;

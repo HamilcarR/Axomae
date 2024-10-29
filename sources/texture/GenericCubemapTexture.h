@@ -7,13 +7,16 @@
 
 class GenericCubemapTexture : public CubemapTexture {
  protected:
-  unsigned int texture_unit;
-  std::string location_name;
+  unsigned int texture_unit{};
+  std::string location_name{};
 
  protected:
   explicit GenericCubemapTexture(
       FORMAT internal_format = RGBA, FORMAT data_format = RGBA, FORMAT data_type = UBYTE, unsigned width = 0, unsigned height = 0);
-  explicit GenericCubemapTexture(TextureData *data);
+
+  explicit GenericCubemapTexture(const U32TexData *data) : CubemapTexture(data) {}
+  explicit GenericCubemapTexture(const F32TexData *data) : CubemapTexture(data) {}
+  explicit GenericCubemapTexture(std::nullptr_t) : CubemapTexture(nullptr) {}
 
  public:
   void bind() override;

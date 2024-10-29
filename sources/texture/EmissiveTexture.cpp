@@ -2,11 +2,6 @@
 #include "EmissiveTexture.h"
 #include "Shader.h"
 
-EmissiveTexture::EmissiveTexture(TextureData *data) : GenericTexture(data) {
-  if (!data)
-    set_dummy_TextureData(this);
-}
-
 void EmissiveTexture::initializeTexture2D() {
   ax_glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, data.data());
   ax_glGenerateMipmap(GL_TEXTURE_2D);

@@ -9,7 +9,9 @@ class DiffuseTexture : public GenericTexture {
   bool has_transparency{};
 
  protected:
-  explicit DiffuseTexture(TextureData *data);
+  explicit DiffuseTexture(std::nullptr_t null_val) { set_dummy_TextureData(this); }
+  explicit DiffuseTexture(const U32TexData *data) : GenericTexture(data) {}
+  explicit DiffuseTexture(const F32TexData *data) : GenericTexture(data) {}
 
  public:
   void bind() override;
@@ -24,7 +26,7 @@ class DiffuseTexture : public GenericTexture {
    * having transparency values.
    * @param texture Texture data to copy.
    */
-  void set(TextureData *texture) override;
+  void set(const U32TexData *texture) override;
   virtual bool hasTransparency() { return has_transparency; }
   static const char *getTextureTypeCStr();
   ax_no_discard TYPE getTextureType() const override { return DIFFUSE; }

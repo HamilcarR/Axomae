@@ -2,11 +2,6 @@
 
 #include "Shader.h"
 
-MetallicTexture::MetallicTexture(TextureData *data) : GenericTexture(data) {
-  if (!data)
-    set_dummy_TextureData(this);
-}
-
 void MetallicTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + METALLIC);

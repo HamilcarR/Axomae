@@ -8,13 +8,9 @@ GenericTexture::GenericTexture() {
   internal_format = RGBA;
   data_format = BGRA;
 }
-
-GenericTexture::GenericTexture(TextureData *tex) : GenericTexture() {
-  if (tex != nullptr)
-    GenericTexture::set(tex);
-}
-
-void GenericTexture::set(TextureData *texture) {
+void GenericTexture::set(const U32TexData *texture) {
+  if (!texture)
+    return;
   clean();
   name = texture->name;
   width = texture->width;
@@ -22,8 +18,21 @@ void GenericTexture::set(TextureData *texture) {
   if (!texture->data.empty()) {
     data = texture->data;
   }
-  if (!texture->f_data.empty()) {
-    f_data = texture->f_data;
+  data_format = static_cast<GenericTexture::FORMAT>(texture->data_format);
+  internal_format = static_cast<GenericTexture::FORMAT>(texture->internal_format);
+  data_type = static_cast<GenericTexture::FORMAT>(texture->data_type);
+  mipmaps = texture->mipmaps;
+}
+
+void GenericTexture::set(const F32TexData *texture) {
+  if (!texture)
+    return;
+  clean();
+  name = texture->name;
+  width = texture->width;
+  height = texture->height;
+  if (!texture->data.empty()) {
+    f_data = texture->data;
   }
   data_format = static_cast<GenericTexture::FORMAT>(texture->data_format);
   internal_format = static_cast<GenericTexture::FORMAT>(texture->internal_format);

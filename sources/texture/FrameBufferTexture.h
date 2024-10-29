@@ -14,7 +14,19 @@ class FrameBufferTexture : public GenericTexture {
    * @param data TextureData parameter
    *
    */
-  explicit FrameBufferTexture(TextureData *data);
+  explicit FrameBufferTexture(const F32TexData *_data) : FrameBufferTexture() {
+    if (_data != nullptr) {
+      width = _data->width;
+      height = _data->height;
+      internal_format = static_cast<GenericTexture::FORMAT>(_data->internal_format);
+      data_format = static_cast<GenericTexture::FORMAT>(_data->data_format);
+      data_type = static_cast<GenericTexture::FORMAT>(_data->data_type);
+      this->data.clear();
+    }
+  }
+  explicit FrameBufferTexture(const U32TexData *_data) : FrameBufferTexture() {}
+  explicit FrameBufferTexture(std::nullptr_t) : FrameBufferTexture() {}
+
   FrameBufferTexture(unsigned width, unsigned height);
 
  public:
