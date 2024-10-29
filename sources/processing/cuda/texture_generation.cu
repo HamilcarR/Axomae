@@ -8,9 +8,9 @@
 
 namespace axomae {
 
-  AX_DEVICE_ONLY const static bool isbigEndian = SDL_BIG_ENDIAN == SDL_BYTEORDER;
-  AX_DEVICE_ONLY static uint32_t max_int_rgb = 0;
-  AX_DEVICE_ONLY static uint32_t min_int_rgb = UINT32_MAX;
+  ax_device_only const static bool isbigEndian = SDL_BIG_ENDIAN == SDL_BYTEORDER;
+  ax_device_only static uint32_t max_int_rgb = 0;
+  ax_device_only static uint32_t min_int_rgb = UINT32_MAX;
 
   struct Triplet {
     int x;
@@ -25,31 +25,31 @@ namespace axomae {
     uint8_t b;
     uint8_t a;
 
-    AX_DEVICE_ONLY void operator=(DEVICE_RGB rgb) {
+    ax_device_only void operator=(DEVICE_RGB rgb) {
       this->r = rgb.r;
       this->g = rgb.g;
       this->b = rgb.b;
       this->a = rgb.a;
     }
     std::string string() { return std::to_string(r) + "   " + std::to_string(g) + "  " + std::to_string(b) + "\n"; }
-    AX_DEVICE_ONLY DEVICE_RGB operator+(DEVICE_RGB rgb) { return {uint8_t(r + rgb.r), uint8_t(g + rgb.g), uint8_t(b + rgb.b), uint8_t(a + rgb.a)}; }
+    ax_device_only DEVICE_RGB operator+(DEVICE_RGB rgb) { return {uint8_t(r + rgb.r), uint8_t(g + rgb.g), uint8_t(b + rgb.b), uint8_t(a + rgb.a)}; }
     template<typename T>
-    AX_DEVICE_ONLY DEVICE_RGB operator+(T rgb) {
+    ax_device_only DEVICE_RGB operator+(T rgb) {
       return {r + rgb, g + rgb, b + rgb, a + rgb};
     }
-    AX_DEVICE_ONLY DEVICE_RGB operator*(DEVICE_RGB rgb) { return {uint8_t(r * rgb.r), uint8_t(g * rgb.g), uint8_t(b * rgb.b), uint8_t(a * rgb.a)}; }
+    ax_device_only DEVICE_RGB operator*(DEVICE_RGB rgb) { return {uint8_t(r * rgb.r), uint8_t(g * rgb.g), uint8_t(b * rgb.b), uint8_t(a * rgb.a)}; }
     template<typename T>
-    AX_DEVICE_ONLY DEVICE_RGB operator*(T value) {
+    ax_device_only DEVICE_RGB operator*(T value) {
       return {uint8_t(r * value), uint8_t(g * value), uint8_t(b * value), uint8_t(a * value)};
     }
-    AX_DEVICE_ONLY DEVICE_RGB normalize_rgb(DEVICE_RGB max, DEVICE_RGB min) {
+    ax_device_only DEVICE_RGB normalize_rgb(DEVICE_RGB max, DEVICE_RGB min) {
       uint8_t n_red = normalize(max.r, min.r, r);
       uint8_t n_green = normalize(max.g, min.g, g);
       uint8_t n_blue = normalize(max.b, min.b, b);
       return {n_red, n_green, n_blue, 0};
     }
     /*compute the magnitude between to rgb values*/
-    AX_DEVICE_ONLY DEVICE_RGB magnitude_rgb(DEVICE_RGB horizontal, DEVICE_RGB vertical) {
+    ax_device_only DEVICE_RGB magnitude_rgb(DEVICE_RGB horizontal, DEVICE_RGB vertical) {
       DEVICE_RGB rgb;
       rgb.r = (uint8_t)magnitude(vertical.r, horizontal.r);
       rgb.g = (uint8_t)magnitude(vertical.g, horizontal.g);
@@ -57,7 +57,7 @@ namespace axomae {
       rgb.a = (uint8_t)magnitude(vertical.a, horizontal.a);
       return rgb;
     }
-    AX_DEVICE_ONLY void print() { printf("%i %i %i\n", r, g, b); }
+    ax_device_only void print() { printf("%i %i %i\n", r, g, b); }
   };
 
   class SDLSurfParam {
@@ -86,16 +86,16 @@ namespace axomae {
 
   /*device*/
   /*********************************************************************************************************************************************/
-  AX_DEVICE_CALLABLE uint32_t rgb_to_int(DEVICE_RGB val) {
+  ax_device_callable uint32_t rgb_to_int(DEVICE_RGB val) {
     uint32_t value = (isbigEndian) ? val.a | (val.b << 8) | (val.g << 16) | (val.r << 24) : val.r | (val.g << 8) | (val.b << 16) | (val.a << 24);
     return value;
   }
-  AX_DEVICE_ONLY void initialize_2D_array(uint32_t *array, int size_w, int size_h) {
+  ax_device_only void initialize_2D_array(uint32_t *array, int size_w, int size_h) {
     int i = blockIdx.x;
     int j = threadIdx.x;
     array[i * size_w + j] = 0;
   }
-  AX_DEVICE_ONLY DEVICE_RGB compute_greyscale(DEVICE_RGB rgb, const bool luminance) {
+  ax_device_only DEVICE_RGB compute_greyscale(DEVICE_RGB rgb, const bool luminance) {
     DEVICE_RGB ret;
     if (luminance) {
       ret.r = rgb.r * 0.3 + rgb.g * 0.59 + rgb.b * 0.11;
@@ -108,7 +108,7 @@ namespace axomae {
     }
     return ret;
   }
-  AX_DEVICE_ONLY DEVICE_RGB int_to_rgb(uint8_t *pixel_value, const int bpp) {
+  ax_device_only DEVICE_RGB int_to_rgb(uint8_t *pixel_value, const int bpp) {
     DEVICE_RGB rgb = {0, 0, 0, 0};
     if (bpp == 4) {
       if (isbigEndian) {
@@ -163,7 +163,7 @@ namespace axomae {
     }
     return rgb;
   }
-  AX_DEVICE_ONLY void set_pixel_color(uint8_t *pixel_value, DEVICE_RGB rgb, const int bpp) {
+  ax_device_only void set_pixel_color(uint8_t *pixel_value, DEVICE_RGB rgb, const int bpp) {
     uint32_t toInt = rgb_to_int(rgb);
     if (bpp == 4)
       *(uint32_t *)(pixel_value) = toInt;
@@ -182,7 +182,7 @@ namespace axomae {
     else
       *pixel_value = toInt;
   }
-  AX_DEVICE_ONLY DEVICE_RGB get_pixel_value_at(uint8_t *pixel, int i, int j, const int bpp, int pitch) {
+  ax_device_only DEVICE_RGB get_pixel_value_at(uint8_t *pixel, int i, int j, const int bpp, int pitch) {
     uint8_t *p = (uint8_t *)(pixel) + i * bpp + j * pitch;
     DEVICE_RGB A = int_to_rgb(p, bpp);
     return A;
@@ -193,7 +193,7 @@ namespace axomae {
   };
 
   // TODO : case kernel < 0
-  AX_DEVICE_ONLY convolution_directions compute_convolution(uint8_t *pixel,
+  ax_device_only convolution_directions compute_convolution(uint8_t *pixel,
                                                       const int bpp,
                                                       int pitch,
                                                       const int h_kernel[KERNEL_SIZE][KERNEL_SIZE],
@@ -245,7 +245,7 @@ namespace axomae {
   /* pos 0 = vertical convolution kernel
      pos 1 = horizontal convolution kernel */
 
-  AX_DEVICE_ONLY DEVICE_RGB get_convolution_values(uint8_t *pixel, const int bpp, int pitch, uint8_t convolution, uint8_t border) {
+  ax_device_only DEVICE_RGB get_convolution_values(uint8_t *pixel, const int bpp, int pitch, uint8_t convolution, uint8_t border) {
     int custom_kernel = 0;
     convolution_directions convoluted;
     if (custom_kernel == 0) {
@@ -263,7 +263,7 @@ namespace axomae {
     }
   }
 
-  AX_DEVICE_ONLY DEVICE_RGB compute_normal(uint8_t *pixel, int bpp, int pitch, double factor) {
+  ax_device_only DEVICE_RGB compute_normal(uint8_t *pixel, int bpp, int pitch, double factor) {
     DEVICE_RGB center = get_pixel_value_at(pixel, 0, 0, bpp, pitch);
     DEVICE_RGB west = get_pixel_value_at(pixel, 0, -1, bpp, pitch);
     DEVICE_RGB north_west = get_pixel_value_at(pixel, -1, -1, bpp, pitch);
@@ -291,7 +291,7 @@ namespace axomae {
     return {(uint8_t)std::floor(Nx), (uint8_t)std::floor(Ny), Nz, 0};
   }
 
-  AX_DEVICE_ONLY static void replace_min(DEVICE_RGB rgb) {
+  ax_device_only static void replace_min(DEVICE_RGB rgb) {
     uint32_t *max = &max_int_rgb;
     uint8_t *pixel = (uint8_t *)max;
     DEVICE_RGB maxx = int_to_rgb(pixel, 4);
@@ -301,7 +301,7 @@ namespace axomae {
     *max = rgb_to_int(maxx);
   }
 
-  AX_DEVICE_ONLY static void replace_max(DEVICE_RGB rgb) {
+  ax_device_only static void replace_max(DEVICE_RGB rgb) {
     uint32_t *min = &min_int_rgb;
     uint8_t *pixel = (uint8_t *)min;
     DEVICE_RGB minn = int_to_rgb(pixel, 4);
@@ -313,7 +313,7 @@ namespace axomae {
 
   /* kernels */
   /*********************************************************************************************************************************************/
-  AX_KERNEL void GPU_compute_greyscale(void *array, int size_w, int size_h, const int bpp, int pitch, const bool luminance) {
+  ax_kernel void GPU_compute_greyscale(void *array, int size_w, int size_h, const int bpp, int pitch, const bool luminance) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     int j = blockIdx.y * blockDim.y + threadIdx.y;
     if (i < size_w && j < size_h) {
@@ -323,7 +323,7 @@ namespace axomae {
       set_pixel_color(pixel_value, rgb, bpp);
     }
   }
-  AX_KERNEL void GPU_compute_edges(
+  ax_kernel void GPU_compute_edges(
       void *image, void *save, unsigned int width, unsigned int height, int bpp, int pitch, uint8_t convolution, uint8_t border) {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
     int j = blockDim.y * blockIdx.y + threadIdx.y;
@@ -341,7 +341,7 @@ namespace axomae {
     }
   }
 
-  AX_KERNEL void GPU_compute_normals(
+  ax_kernel void GPU_compute_normals(
       void *image, void *save, unsigned int width, unsigned int height, int bpp, int pitch, double factor, uint8_t border) {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
     int j = blockDim.y * blockIdx.y + threadIdx.y;

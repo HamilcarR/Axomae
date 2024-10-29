@@ -11,16 +11,16 @@
 // Old code , tb refactored.
 struct SDL_Surface;
 
-AX_DEVICE_CALLABLE inline float magnitude(float x, float y) { return sqrtf(x * x + y * y); }
+ax_device_callable inline float magnitude(float x, float y) { return sqrtf(x * x + y * y); }
 
 template<typename U, typename T>
-AX_DEVICE_CALLABLE inline T normalize(U maxx, U minn, T pixel) {
+ax_device_callable inline T normalize(U maxx, U minn, T pixel) {
   assert(maxx - minn != 0);
   return ((pixel - minn) * 255 / (maxx - minn) + 0);
 }
 
 template<typename T, typename D>
-AX_DEVICE_CALLABLE auto lerp(T value1, T value2, D cste) {
+ax_device_callable auto lerp(T value1, T value2, D cste) {
   return (1 - cste) * value1 + cste * value2;
 }
 namespace axomae {
@@ -29,21 +29,21 @@ namespace axomae {
 
   constexpr uint8_t KERNEL_SIZE = 3;
   // clang-format off
-AX_DEVICE_CONST
+ax_device_const
 const float mean_smoothing_3_3[KERNEL_SIZE][KERNEL_SIZE] = {
 	{1 , 1 , 1},
 	{1 , 1 , 1},
 	{1 , 1 , 1}
 };
 
-AX_DEVICE_CONST
+ax_device_const
 const float sharpen_kernel[KERNEL_SIZE][KERNEL_SIZE] = {
 	{0. , -1. , 0.} ,
 	{-1. , 5. , -1.} ,
 	{0. , -1. , 0.}
 };
 
-AX_DEVICE_CONST
+ax_device_const
 const float gaussian_blur_5_5[5][5] = {
 	{1./256 , 4./256 , 6./256 , 4./256 , 1./256},
 	{4./256 , 16./256 , 24./256 , 16./256 , 4./256},
@@ -53,7 +53,7 @@ const float gaussian_blur_5_5[5][5] = {
 };
 
 
-AX_DEVICE_CONST
+ax_device_const
 const float unsharp_masking[5][5] = {
 	{-1./256 ,-4./256 , -6./256 , -4./256 , -1./256},
 	{-4./256 , -16./256 , -24./256 , -16./256 , -4./256},
@@ -62,55 +62,55 @@ const float unsharp_masking[5][5] = {
 	{-1./256 , -4./256 , 6./256 , -4./256 , -1./256}
 };
 
-AX_DEVICE_CONST
+ax_device_const
 const float box_blur[KERNEL_SIZE][KERNEL_SIZE] = {
 		{1./9 , 1./9 , 1./9},
 		{1./9 , 1./9 , 1./9},
 		{1./9 , 1./9 , 1./9}
 };
-AX_DEVICE_CONST
+ax_device_const
 const float gaussian_blur_3_3[KERNEL_SIZE][KERNEL_SIZE] = {
 		{1./16 , 2./16 , 1./16},
 		{2./16 , 4./16 , 2./16},
 		{1./16 , 2./16 , 1./16}
 };
 
-AX_DEVICE_CONST
+ax_device_const
 const int scharr_mask_vertical[KERNEL_SIZE][KERNEL_SIZE] = {
 			{ 3 , 10 , 3 },
 			{ 0 , 0  , 0 },
 			{ -3, -10 ,-3 }
 };
 
- AX_DEVICE_CONST
+ ax_device_const
 const int scharr_mask_horizontal[KERNEL_SIZE][KERNEL_SIZE] = {
 			{ 3 , 0 , -3 },
 			{ 10 , 0 , -10 },
 			{ 3 , 0 , -3 }
 };
 
- AX_DEVICE_CONST
+ ax_device_const
 const int sobel_mask_vertical[KERNEL_SIZE][KERNEL_SIZE] = {
 			{ -1,-SOBEL,-1 },
 			{ 0,  0  ,0 },
 			{ 1, SOBEL , 1 }
 };
 
- AX_DEVICE_CONST
+ ax_device_const
 const int sobel_mask_horizontal[KERNEL_SIZE][KERNEL_SIZE] = {
 			{ 1,0,-1 },
 			{ SOBEL,0,-SOBEL },
 			{ 1,0,-1 }
 };
 
- AX_DEVICE_CONST
+ ax_device_const
 const int prewitt_mask_vertical[KERNEL_SIZE][KERNEL_SIZE] = {
 			{ 1,PREWITT,1 },
 			{ 0,  0  ,0 },
 			{ -1, -PREWITT , -1 }
 };
 
- AX_DEVICE_CONST
+ ax_device_const
 const int prewitt_mask_horizontal[KERNEL_SIZE][KERNEL_SIZE] = {
 			{ -1,0,1 },
 			{ -PREWITT,0,PREWITT },
@@ -123,18 +123,18 @@ const int prewitt_mask_horizontal[KERNEL_SIZE][KERNEL_SIZE] = {
     uint8_t max_rgb[3];
     uint8_t min_rgb[3];
 
-    AX_DEVICE_CALLABLE void init() {
+    ax_device_callable void init() {
       for (int i = 0; i < 3; i++) {
         max_rgb[i] = 0;
         min_rgb[i] = 255;
       }
     }
-    AX_DEVICE_CALLABLE void compare_max(uint8_t r, uint8_t g, uint8_t b) {
+    ax_device_callable void compare_max(uint8_t r, uint8_t g, uint8_t b) {
       max_rgb[0] = max_rgb[0] >= r ? max_rgb[0] : r;
       max_rgb[1] = max_rgb[1] >= g ? max_rgb[1] : g;
       max_rgb[2] = max_rgb[2] >= b ? max_rgb[2] : b;
     }
-    AX_DEVICE_CALLABLE void compare_min(uint8_t r, uint8_t g, uint8_t b) {
+    ax_device_callable void compare_min(uint8_t r, uint8_t g, uint8_t b) {
       min_rgb[0] = min_rgb[0] < r ? min_rgb[0] : r;
       min_rgb[1] = min_rgb[1] < g ? min_rgb[1] : g;
       min_rgb[2] = min_rgb[2] < b ? min_rgb[2] : b;

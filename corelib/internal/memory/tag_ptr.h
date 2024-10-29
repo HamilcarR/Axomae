@@ -37,28 +37,28 @@ namespace core {
 
    public:
     template<class T>
-    AX_DEVICE_CALLABLE tag_ptr(T *ptr) {
+    ax_device_callable tag_ptr(T *ptr) {
       auto conv = reinterpret_cast<uintptr_t>(ptr);
       constexpr uintptr_t type_index = index<T>();
       bits = (type_index << shift) | conv;
     }
 
-    AX_DEVICE_CALLABLE tag_ptr(std::nullptr_t) {}
+    ax_device_callable tag_ptr(std::nullptr_t) {}
 
-    AX_DEVICE_CALLABLE tag_ptr() = default;
+    ax_device_callable tag_ptr() = default;
 
-    AX_DEVICE_CALLABLE ~tag_ptr() = default;
+    ax_device_callable ~tag_ptr() = default;
 
-    AX_DEVICE_CALLABLE tag_ptr(const tag_ptr &tptr) = default;
+    ax_device_callable tag_ptr(const tag_ptr &tptr) = default;
 
-    AX_DEVICE_CALLABLE tag_ptr(tag_ptr &&tptr) noexcept = default;
+    ax_device_callable tag_ptr(tag_ptr &&tptr) noexcept = default;
 
-    AX_DEVICE_CALLABLE tag_ptr &operator=(const tag_ptr &tptr) = default;
+    ax_device_callable tag_ptr &operator=(const tag_ptr &tptr) = default;
 
-    AX_DEVICE_CALLABLE tag_ptr &operator=(tag_ptr &&tptr) noexcept = default;
+    ax_device_callable tag_ptr &operator=(tag_ptr &&tptr) noexcept = default;
 
     template<class T>
-    AX_DEVICE_CALLABLE static constexpr unsigned int index() {
+    ax_device_callable static constexpr unsigned int index() {
       using FT = typename std::remove_cv_t<T>;
       if constexpr (ISTYPE(FT, std::nullptr_t))
         return 0;
@@ -66,63 +66,63 @@ namespace core {
     }
 
     template<class T>
-    AX_DEVICE_CALLABLE ax_no_discard bool isType() const {
+    ax_device_callable ax_no_discard bool isType() const {
       return tag() == index<T>();
     }
 
     template<class T>
-    AX_DEVICE_CALLABLE ax_no_discard T *get() {
+    ax_device_callable ax_no_discard T *get() {
       if (isType<T>())
         return reinterpret_cast<T *>((bits & ptrmask));
       return nullptr;
     }
 
     template<class T>
-    AX_DEVICE_CALLABLE ax_no_discard const T *get() const {
+    ax_device_callable ax_no_discard const T *get() const {
       if (isType<T>())
         return reinterpret_cast<const T *>((bits & ptrmask));
       return nullptr;
     }
 
     template<class F>
-    AX_DEVICE_CALLABLE decltype(auto) dispatch(F &&func) {
+    ax_device_callable decltype(auto) dispatch(F &&func) {
       AX_ASSERT_NOTNULL(get());
       using R = typename return_type<F, Ts...>::RETURN_TYPE;
       return tagutils::dispatch<F, R, Ts...>(std::forward<F>(func), get(), tag() - 1);
     }
 
     template<class F>
-    AX_DEVICE_CALLABLE decltype(auto) dispatch(F &&func) const {
+    ax_device_callable decltype(auto) dispatch(F &&func) const {
       AX_ASSERT_NOTNULL(get());
       using R = typename return_type<F, Ts...>::RETURN_TYPE;
       return tagutils::dispatch<F, R, Ts...>(std::forward<F>(func), get(), tag() - 1);
     }
 
     template<class F>
-    AX_HOST_ONLY decltype(auto) host_dispatch(F &&func) {
+    ax_host_only decltype(auto) host_dispatch(F &&func) {
       AX_ASSERT_NOTNULL(get());
       using R = typename return_type<F, Ts...>::RETURN_TYPE;
       return tagutils::host_dispatch<F, R, Ts...>(std::forward<F>(func), get(), tag() - 1);
     }
 
     template<class F>
-    AX_HOST_ONLY decltype(auto) host_dispatch(F &&func) const {
+    ax_host_only decltype(auto) host_dispatch(F &&func) const {
       AX_ASSERT_NOTNULL(get());
       using R = typename return_const_type<F, Ts...>::RETURN_TYPE;
       return tagutils::host_dispatch<F, R, Ts...>(std::forward<F>(func), get(), tag() - 1);
     }
 
-    AX_DEVICE_CALLABLE ax_no_discard unsigned int tag() const { return bits >> shift; }
+    ax_device_callable ax_no_discard unsigned int tag() const { return bits >> shift; }
 
-    AX_DEVICE_CALLABLE void *get() { return reinterpret_cast<void *>(bits & ptrmask); }
+    ax_device_callable void *get() { return reinterpret_cast<void *>(bits & ptrmask); }
 
-    AX_DEVICE_CALLABLE ax_no_discard const void *get() const { return reinterpret_cast<const void *>(bits & ptrmask); }
+    ax_device_callable ax_no_discard const void *get() const { return reinterpret_cast<const void *>(bits & ptrmask); }
 
-    AX_DEVICE_CALLABLE static constexpr int tagSize() { return sizeof...(Ts); }
+    ax_device_callable static constexpr int tagSize() { return sizeof...(Ts); }
 
-    AX_DEVICE_CALLABLE static constexpr uintptr_t ptrMask() { return ptrmask; }
+    ax_device_callable static constexpr uintptr_t ptrMask() { return ptrmask; }
 
-    AX_DEVICE_CALLABLE static constexpr uintptr_t tagMask() { return tagmask; }
+    ax_device_callable static constexpr uintptr_t tagMask() { return tagmask; }
   };
 }  // namespace core
 #endif  // TPTR_H

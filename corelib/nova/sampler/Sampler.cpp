@@ -4,14 +4,14 @@
 #include <boost/random/uniform_01.hpp>
 using namespace nova::sampler;
 
-AX_DEVICE_CALLABLE glm::vec3 RandomSampler::sample() {
+ax_device_callable glm::vec3 RandomSampler::sample() {
   return {math::random::nrandi(-1, 1), math::random::nrandi(-1, 1), math::random::nrandi(-1, 1)};
 }
 nova::exception::NovaException RandomSampler::getErrorState() const { return exception; }
 
 HammersleySampler::HammersleySampler(int N_) : N(N_) {}
 
-AX_DEVICE_CALLABLE glm::vec3 HammersleySampler::sample() {
+ax_device_callable glm::vec3 HammersleySampler::sample() {
   if (N <= 0) {
     exception.addErrorType(nova::exception::INVALID_SAMPLER_DIM);
     return glm::vec3(0.f);
@@ -38,7 +38,7 @@ SobolSampler::SobolSampler(int seed, int dimension) : N(seed) {
   }
 }
 
-AX_DEVICE_CALLABLE glm::vec3 SobolSampler::sample() {
+ax_device_callable glm::vec3 SobolSampler::sample() {
 
   boost::random::uniform_01<> dist;
   float x, y, z;
