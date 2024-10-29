@@ -3,13 +3,12 @@
 
 #if defined(AXOMAE_USE_CUDA)
 #  include "cuda/cuda_utils.h"
-/* TODO: AX_* to lowercase conforming to macros guideline*/
-#  define AX_DEVICE_CALLABLE __host__ __device__
-#  define AX_DEVICE_SHARED __shared__
-#  define AX_DEVICE_ONLY __device__
-#  define AX_DEVICE_CONST __device__ __constant__
-#  define AX_HOST_ONLY __host__
-#  define AX_KERNEL __global__
+#  define ax_device_callable __host__ __device__
+#  define ax_device_shared __shared__
+#  define ax_device_only __device__
+#  define ax_device_const __device__ __constant__
+#  define ax_host_only __host__
+#  define ax_kernel __global__
 
 struct kernel_argpack_t {
   dim3 num_blocks;
@@ -19,11 +18,11 @@ struct kernel_argpack_t {
 };
 
 #else
-#  define AX_DEVICE_CALLABLE
-#  define AX_DEVICE_SHARED
-#  define AX_DEVICE_ONLY
-#  define AX_DEVICE_CONST
-#  define AX_HOST_ONLY
-#  define AX_KERNEL
+#  define ax_device_callable
+#  define ax_device_shared
+#  define ax_device_only
+#  define ax_device_const
+#  define ax_host_only
+#  define ax_kernel
 #endif
 #endif  // DEVICE_UTILS_H

@@ -19,8 +19,8 @@ namespace nova::sampler {
    public:
     CLASS_M(RandomSampler)
 
-    AX_DEVICE_CALLABLE glm::vec3 sample();
-    AX_DEVICE_CALLABLE nova::exception::NovaException getErrorState() const;
+    ax_device_callable glm::vec3 sample();
+    ax_device_callable nova::exception::NovaException getErrorState() const;
   };
 
   class HammersleySampler {
@@ -32,8 +32,8 @@ namespace nova::sampler {
 
     explicit HammersleySampler(int N);
     /* Will increment the index*/
-    AX_DEVICE_CALLABLE glm::vec3 sample();
-    AX_DEVICE_CALLABLE nova::exception::NovaException getErrorState() const { return exception; }
+    ax_device_callable glm::vec3 sample();
+    ax_device_callable nova::exception::NovaException getErrorState() const { return exception; }
   };
 
   class SobolSampler {
@@ -43,20 +43,20 @@ namespace nova::sampler {
 
    public:
     explicit SobolSampler(int seed, int dimension = 1);
-    AX_DEVICE_CALLABLE glm::vec3 sample();
-    AX_DEVICE_CALLABLE nova::exception::NovaException getErrorState() const { return exception; }
+    ax_device_callable glm::vec3 sample();
+    ax_device_callable nova::exception::NovaException getErrorState() const { return exception; }
   };
 
   class SamplerInterface : public core::tag_ptr<HammersleySampler, SobolSampler, RandomSampler> {
    public:
     using tag_ptr::tag_ptr;
 
-    AX_DEVICE_CALLABLE ax_no_discard nova::exception::NovaException getErrorState() const {
+    ax_device_callable ax_no_discard nova::exception::NovaException getErrorState() const {
       auto d = [&](auto ptr) { return ptr->getErrorState(); };
       return dispatch(d);
     }
 
-    AX_DEVICE_CALLABLE ax_no_discard glm::vec3 sample() {
+    ax_device_callable ax_no_discard glm::vec3 sample() {
       auto d = [&](auto ptr) { return ptr->sample(); };
       return dispatch(d);
     }
