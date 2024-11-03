@@ -7,7 +7,7 @@
 #include "internal/memory/MemoryArena.h"
 #include "internal/thread/Mutex.h"
 #include <internal/common/exception/GenericException.h>
-#include <internal/common/string/axomae_str_utils.h>
+#include <internal/common/string/string_utils.h>
 #include <internal/debug/Logger.h>
 #include <map>
 #include <unordered_map>
@@ -42,6 +42,7 @@ class IResourceDB : public DatabaseInterface<U, T>, public ILockable, public con
     uint8_t *cache_address{nullptr};
     std::size_t cache_element_position{0};
     std::size_t cache_size_bytes{0};
+    std::string cache_label{""};
   };
   /* A map of all allocated arena memory for this instance of database , in bytes */
   using CACHELIST = std::unordered_map<uint8_t *, cache_block_t>;
@@ -55,6 +56,7 @@ class IResourceDB : public DatabaseInterface<U, T>, public ILockable, public con
  private:
   ax_no_discard const cache_block_t *getCacheBlock(uint8_t *ptr) const;
   ax_no_discard cache_block_t *getCacheBlock(uint8_t *ptr);
+  ax_no_discard cache_block_t *getCurrentCacheBlock() const;
 
  public:
   void clean() override;
@@ -65,11 +67,17 @@ class IResourceDB : public DatabaseInterface<U, T>, public ILockable, public con
   ax_no_discard T *get(U id) const override;
   ax_no_discard U firstFreeId() const override = 0;
   database::Result<U, T> add(std::unique_ptr<T> element, bool keep) override;
-  /* Uses placement to create elements in the arena.
-   * It is up to the caller to allocate first enough memory, provide the cache address and call this method the number of time needed.
+  /**
+   * Uses placement to create elements in the arena through the cache_address.
+   * It is up to the caller to allocate first enough memory.
    */
   template<class SUBTYPE, class... Args>
-  database::Result<U, T> addCached(bool keep, uint8_t *cache_address, Args &&...args);
+  database::Result<U, T> addCachedElement(bool keep, uint8_t *cache_address, Args &&...args);
+  /**
+   * Copy array or buffer `to_copy` inside the specified cache, and returns it's in-buffer address.
+   */
+  template<class TYPE>
+  TYPE *copyRangeToCache(TYPE *to_copy, uint8_t *cache_address, std::size_t count, std::size_t offset);
   ax_no_discard database::Result<U, T> contains(const T *element_address) const override;
   ax_no_discard int size() const override;
   bool contains(U id) const override;
@@ -79,9 +87,10 @@ class IResourceDB : public DatabaseInterface<U, T>, public ILockable, public con
   bool setPersistence(U id, bool persistence = true);
   void setUpCacheMemory(CACHE *memory_cache);
   /**
-   * Reserves an amount of contiguous memory in the arena
+   * Reserves an amount of contiguous memory in the arena,
+   * and sets the current cache address with the newly created address.
    */
-  uint8_t *reserveCache(std::size_t size_bytes);
+  uint8_t *reserveCache(std::size_t size_bytes, std::size_t alignment, const char *label = nullptr);
   /**
    * Deallocates caches from the arena for later use.
    */
@@ -226,17 +235,25 @@ bool IResourceDB<U, T>::setPersistence(const U id, bool persistence) {
 }
 
 template<class U, class T>
-uint8_t *IResourceDB<U, T>::reserveCache(std::size_t size_bytes) {
+uint8_t *IResourceDB<U, T>::reserveCache(std::size_t size_bytes, std::size_t alignment, const char *label) {
   if (!memory_arena)
     return nullptr;
   uint8_t *allocated = nullptr;
   Mutex::Lock lock(mutex);
-  allocated = static_cast<uint8_t *>(memory_arena->allocate(size_bytes));
+  allocated = static_cast<uint8_t *>(memory_arena->allocate(size_bytes, alignment));
   if (!allocated) {
     LOG("Error allocating cache database.", LogLevel::CRITICAL);
     return nullptr;
   }
-  reserved_memory_map[allocated] = {allocated, 0, size_bytes};
+  cache_block_t block;
+  block.cache_size_bytes = size_bytes;
+  block.cache_address = allocated;
+  block.cache_element_position = 0;
+  if (label)
+    block.cache_label = label;
+  else
+    block.cache_label = "";
+  reserved_memory_map[allocated] = block;
   current_working_cache = &reserved_memory_map.at(allocated);
   return allocated;
 }
@@ -263,6 +280,11 @@ uint8_t *IResourceDB<U, T>::getCurrentCache() const {
   if (!current_working_cache)
     return nullptr;
   return current_working_cache->cache_address;
+}
+
+template<class U, class T>
+typename IResourceDB<U, T>::cache_block_t *IResourceDB<U, T>::getCurrentCacheBlock() const {
+  return current_working_cache;
 }
 
 template<class U, class T>
@@ -298,7 +320,7 @@ typename IResourceDB<U, T>::cache_block_t *IResourceDB<U, T>::getCacheBlock(uint
 
 template<class U, class T>
 template<class SUBTYPE, class... Args>
-database::Result<U, T> IResourceDB<U, T>::addCached(bool keep, uint8_t *cache_address, Args &&...args) {
+database::Result<U, T> IResourceDB<U, T>::addCachedElement(bool keep, uint8_t *cache_address, Args &&...args) {
   ASSERT_SUBTYPE(SUBTYPE, T);
   if (!memory_arena) {
     LOG("Cache is not initialized.", LogLevel::ERROR);
@@ -313,7 +335,7 @@ database::Result<U, T> IResourceDB<U, T>::addCached(bool keep, uint8_t *cache_ad
     return database::Result<U, T>();
   }
   Mutex::Lock lock(mutex);
-  SUBTYPE *created_resource = memory_arena->construct<SUBTYPE>(
+  SUBTYPE *created_resource = memory_arena->constructAtMemPosition<SUBTYPE>(
       reinterpret_cast<SUBTYPE *>(cache_address), cache_block->cache_element_position, std::forward<Args>(args)...);
   if (!created_resource) {
     LOG("Error creating resource at cache address: " + utils::string::to_hex(reinterpret_cast<uintptr_t>(cache_address + offset)), LogLevel::ERROR);
@@ -321,13 +343,31 @@ database::Result<U, T> IResourceDB<U, T>::addCached(bool keep, uint8_t *cache_ad
   }
   cache_block->cache_element_position += 1;
 
-  /* Since we're allocating on a buffer we own , we need a custom deleter that doesn't call  delete on memory and cause undefined behavior. */
+  /* Since we're allocating on a buffer we own , we need a custom deleter that doesn't call delete on arena memory . */
 
   U ffid = firstFreeId();
   T *ptr = created_resource;
   database::Storage<U, T> storage(created_resource, ffid, keep);
   database_map[ffid] = std::move(storage);
   return {ffid, ptr};
+}
+
+template<class U, class T>
+template<class TYPE>
+TYPE *IResourceDB<U, T>::copyRangeToCache(TYPE *to_copy, uint8_t *cache_address, std::size_t count, std::size_t offset) {
+  if (!getCacheBlock(cache_address)) {
+    LOG("Cache address :" + utils::string::to_hex(reinterpret_cast<uintptr_t>(cache_address)) + " not initialized", LogLevel::ERROR);
+    return nullptr;
+  }
+  if (!memory_arena) {
+    LOG("Cache is not initialized", LogLevel::ERROR);
+    return nullptr;
+  }
+  if (!to_copy) {
+    LOG("Invalid buffer address", LogLevel::ERROR);
+    return nullptr;
+  }
+  return memory_arena->copyRange(to_copy, cache_address, count, offset);
 }
 
 #endif

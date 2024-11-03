@@ -5,7 +5,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "ImfChannelList.h"
 #include "internal/common/exception/GenericException.h"
-#include "internal/common/string/axomae_str_utils.h"
+#include "internal/common/string/string_utils.h"
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include <ImfInputFile.h>
