@@ -1,6 +1,6 @@
-#ifndef AXOMAE_UTILS_H
-#define AXOMAE_UTILS_H
-#include <cstdlib>
+#ifndef STRING_UTILS_H
+#define STRING_UTILS_H
+#include <cstdint>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -25,4 +25,4 @@ namespace utils {
   };  // namespace string
 };    // namespace utils
 
-#endif  // AXOMAE_UTILS_H
+#endif  // STRING_UTILS_H

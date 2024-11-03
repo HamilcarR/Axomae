@@ -4,7 +4,7 @@
 #include "ResourceDatabaseManager.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
-#include "internal/common/string/axomae_str_utils.h"
+#include "internal/common/string/string_utils.h"
 #include <QImage>
 
 #include <assimp/Importer.hpp>
@@ -62,14 +62,14 @@ namespace IO {
         controller::ProgressManagerHelper progress_helper(progress_manager);
         progress_helper.notifyProgress(controller::ProgressManagerHelper::ONE_FOURTH);
 
-        image.loadFromData((const unsigned char *)fromtexture->pcData, static_cast<int>(fromtexture->mWidth));
+        image.loadFromData(reinterpret_cast<const uint8_t *>(fromtexture->pcData), static_cast<int>(fromtexture->mWidth));
         image = image.convertToFormat(QImage::Format_ARGB32);
         progress_helper.notifyProgress(controller::ProgressManagerHelper::THREE_FOURTH);
 
         unsigned image_width = image.width();
         unsigned image_height = image.height();
         totexture->data.resize(image_width * image_height);
-        uint8_t *dest_buffer = reinterpret_cast<uint8_t *>(&totexture->data[0]);
+        auto *dest_buffer = reinterpret_cast<uint8_t *>(&totexture->data[0]);
         uint8_t *from_buffer = image.bits();
         std::memcpy(dest_buffer, from_buffer, image_height * image_width * sizeof(uint32_t));
         progress_helper.notifyProgress(controller::ProgressManagerHelper::COMPLETE);
@@ -107,34 +107,26 @@ namespace IO {
     std::string texture_index_string = texture_string.C_Str();
     std::string texture_type = texture.name;
     TextureDatabase &texture_database = *resource_manager.getTextureDatabase();
-    if (!texture_index_string.empty()) {
-      /*Get rid of the '*' character at the beginning of the string id*/
-      texture_index_string = texture_index_string.substr(1);
-      texture.name = texture_index_string;
-      /*Check if the name (the assimp texture id number) is present in the database.*/
-      auto result = texture_database.getUniqueTexture(texture.name);
-      if (result.object != nullptr) {
-        material->addTexture(result.id);
-      } else {
-        /*Convert id to integer*/
-        int texture_index_int = stoi(texture_index_string);
-        /*Read the image pixels and copy them to "texture"*/
-        copyTexels(&texture, scene->mTextures[texture_index_int], texture_type, progress_manager);
-        /*Add new texture*/
-        auto result_add = database::texture::store<TEXTYPE>(texture_database, false, &texture);
-        image::Metadata metadata;
-        metadata.width = texture.width;
-        metadata.height = texture.height;
-        metadata.channels = 4;
-        metadata.is_hdr = false;
-        metadata.name = texture.name;
-
-        std::vector<uint8_t> bytearray(metadata.width * metadata.height * metadata.channels);
-        std::memcpy(bytearray.data(), texture.data.data(), metadata.width * metadata.height * metadata.channels);
-        material->addTexture(result_add.id);
-      }
-    } else
-      LOG("Loader can't load texture\n", LogLevel::WARNING);
+    if (texture_index_string.empty()) {
+      LOG("Loader failed loading texture of type: " + texture_type, LogLevel::ERROR);
+      return;
+    }
+    /*Get rid of the '*' character at the beginning of the string id*/
+    texture_index_string = texture_index_string.substr(1);
+    texture.name = texture_index_string;
+    /*Check if the name (the assimp texture id number) is present in the database.*/
+    auto result = texture_database.getUniqueTexture(texture.name);
+    if (!result.object) {
+      /*Convert id to integer*/
+      int texture_index_int = stoi(texture_index_string);
+      /*Read the image pixels and copy them to "texture"*/
+      copyTexels(&texture, scene->mTextures[texture_index_int], texture_type, progress_manager);
+      /*Add new texture*/
+      auto result_add = database::texture::store<TEXTYPE>(texture_database, false, &texture);
+      material->addTexture(result_add.id);
+    } else {
+      material->addTexture(result.id);
+    }
   }
 
   /**
@@ -311,7 +303,7 @@ namespace IO {
     aiNode *ai_root = modelScene->mRootNode;
     SceneTree scene_tree;
     SceneTreeNode *node = fillTreeData(ai_root, node_lookup, nullptr);
-    assert(node != nullptr);
+    AX_ASSERT_NEQ(node, nullptr);
     node = dynamic_cast<SceneTreeNode *>(node->returnRoot());
     scene_tree.setRoot(node);
     scene_tree.updateAccumulatedTransformations();
@@ -413,20 +405,26 @@ namespace IO {
     return {i, std::move(mesh_geometry_buffers)};
   };
 
-  /**
-   * The function "loadObjects" loads objects from a file using the Assimp library and returns a pair
-   * containing a vector of meshes and a scene tree.
-   *
-   * @param file The "file" parameter is a const char pointer that represents the file path of the scene
-   * file that needs to be loaded.
-   *
-   * @return a pair containing a vector of Mesh pointers and a SceneTree object.
-   */
+  static std::size_t total_textures_size(const aiScene *scene) {
+    std::size_t totalSize = 0;
+    for (unsigned int i = 0; i < scene->mNumTextures; ++i) {
+      aiTexture *texture = scene->mTextures[i];
+      if (texture->mHeight == 0) {
+        QImage image;
+        image.loadFromData(reinterpret_cast<uint8_t *>(texture->pcData), static_cast<int>(texture->mWidth));
+        image = image.convertToFormat(QImage::Format_ARGB32);
+        totalSize += image.width() * image.height() * sizeof(uint32_t);
+      } else {
+        totalSize += texture->mWidth * texture->mHeight * sizeof(uint32_t);
+      }
+    }
 
+    return totalSize;
+  }
   std::pair<std::vector<Mesh *>, SceneTree> Loader::loadObjects(const char *file) {
-    ShaderDatabase &shader_database = *resource_database->getShaderDatabase();
-    INodeDatabase &node_database = *resource_database->getNodeDatabase();
-
+    ShaderDatabase *shader_database = resource_database->getShaderDatabase();
+    INodeDatabase *node_database = resource_database->getNodeDatabase();
+    TextureDatabase *texture_database = resource_database->getTextureDatabase();
     std::pair<std::vector<Mesh *>, SceneTree> objects;
     Assimp::Importer importer;
     const aiScene *modelScene = importer.ReadFile(
@@ -435,9 +433,11 @@ namespace IO {
       std::vector<std::future<std::pair<unsigned, std::unique_ptr<Object3D>>>> loaded_meshes_futures;
       std::vector<GLMaterial> material_array;
       std::vector<Mesh *> node_lookup_table;
-      Shader *shader_program = shader_database.get(Shader::BRDF);
+      Shader *shader_program = shader_database->get(Shader::BRDF);
       node_lookup_table.resize(modelScene->mNumMeshes);
       material_array.resize(modelScene->mNumMeshes);
+      std::size_t texture_cache_size = total_textures_size(modelScene);
+      texture_database->reserveCache(texture_cache_size, core::memory::PLATFORM_ALIGN);
       for (unsigned int i = 0; i < modelScene->mNumMeshes; i++) {
         loaded_meshes_futures.push_back(std::async(std::launch::async,
                                                    retrieve_geometry,
@@ -454,7 +454,7 @@ namespace IO {
         const char *mesh_name = mesh->mName.C_Str();
         std::string name(mesh_name);
         auto mesh_result = database::node::store<Mesh>(
-            node_database, false, name, std::move(*geometry_loaded.second), material_array[mesh_index], shader_program, nullptr);
+            *node_database, false, name, std::move(*geometry_loaded.second), material_array[mesh_index], shader_program, nullptr);
         LOG("object loaded : " + name, LogLevel::INFO);
         node_lookup_table[mesh_index] = mesh_result.object;
         objects.first.push_back(mesh_result.object);
@@ -470,14 +470,10 @@ namespace IO {
 
   /**
    * The function loads a file and generates a vector of meshes, including a cube map if applicable.
-   *
    * @param file A pointer to a character array representing the file path of the 3D model to be loaded.
-   *
    * @return A vector of Mesh pointers.
    */
   std::pair<std::vector<Mesh *>, SceneTree> Loader::load(const char *file) {
-    TextureDatabase *texture_database = resource_database->getTextureDatabase();
-    texture_database->clean();
     std::pair<std::vector<Mesh *>, SceneTree> scene = loadObjects(file);
     return scene;
   }
