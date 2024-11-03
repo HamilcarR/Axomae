@@ -4,8 +4,10 @@
 #include "internal/macro/project_macros.h"
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <list>
 #include <new>
+
 /*
  * Implementation of a simple memory pool.
  * The goal here is to have a system that can allocate a chunk of memory , provide addresses within that chunk to allocate objects with same
@@ -96,7 +98,7 @@ namespace core::memory {
     }
 
     template<class U>
-    U *construct(std::size_t num_instances, bool constructor = true) {
+    U *construct(std::size_t num_instances, bool constructor = true) noexcept {
       U *memory_alloc = static_cast<U *>(allocate(num_instances * sizeof(U)));
       if (constructor) {
         for (std::size_t i = 0; i < num_instances; i++)
@@ -106,7 +108,7 @@ namespace core::memory {
     }
 
     template<class U, class... Args>
-    static U *construct(U *ptr, Args &&...args) {
+    static U *construct(U *ptr, Args &&...args) noexcept {
       if (!ptr)
         return nullptr;
       ::new (ptr) U(std::forward<Args>(args)...);
@@ -114,16 +116,34 @@ namespace core::memory {
     }
 
     template<class U, class... Args>
-    U *construct(U *start_buffer_address, uint64_t cache_element_position, Args &&...args) {
+    U *constructAtMemPosition(U *start_buffer_address, std::size_t cache_element_position, Args &&...args) {
       std::size_t offset = cache_element_position * sizeof(U);
       uintptr_t new_address = reinterpret_cast<uintptr_t>(start_buffer_address) + offset;
       if (new_address % current_alignment != 0) {
-        new_address += compute_alignment(new_address, current_alignment);
+        new_address = compute_alignment(new_address, current_alignment);
       }
       return construct(reinterpret_cast<U *>(new_address), std::forward<Args>(args)...);
     }
 
-    /* Returns an aligned pointer on platform_align value. */
+    /* Copy data to current block and returns an aligned pointer to it.  */
+    template<class U>
+    U *copyRange(U *to_copy, void *dest_address, std::size_t elements, std::size_t offset) {
+      if (!to_copy || !dest_address)
+        return nullptr;
+      if (dest_address != current_block_ptr)
+        return nullptr;
+      if (elements * sizeof(U) > current_alloc_size)
+        return nullptr;
+
+      uintptr_t new_address = reinterpret_cast<uintptr_t>(dest_address) + offset;
+      if (new_address % current_alignment != 0) {
+        new_address = compute_alignment(new_address, current_alignment);
+      }
+      std::memcpy(reinterpret_cast<void *>(new_address), to_copy, elements * sizeof(U));
+      return reinterpret_cast<U *>(new_address);
+    }
+
+    /* Allocates a buffer of size_bytes size and returns it's desired aligned address. */
     void *allocate(std::size_t size_bytes, std::size_t alignment = PLATFORM_ALIGN) {
       size_bytes = compute_alignment(size_bytes, alignment);
       if (current_block_offset + size_bytes > current_alloc_size) {

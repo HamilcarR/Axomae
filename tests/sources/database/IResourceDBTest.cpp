@@ -32,7 +32,7 @@ TEST(IResourceDB, reserveCache) {
     std::size_t block_size_arena = math::random::nrandi(2048, 65556);
     core::memory::MemoryArena arena(block_size_arena);
     TestDatabase test_database(&arena);
-    auto ptr = test_database.reserveCache(ALLOC_SIZE);
+    auto ptr = test_database.reserveCache(ALLOC_SIZE, core::memory::PLATFORM_ALIGN);
     EXPECT_NE(ptr, nullptr);
     EXPECT_EQ(arena.getTotalSize(), test_database.getCacheSize(ptr));
   }
@@ -50,7 +50,7 @@ TEST(IResourceDB, getCacheSize) {
   for (uint32_t i = 0; i < NUM_TESTS; i++) {
     std::size_t block_size_arena = math::random::nrandi(2048, 65556);
     uint8_t *ptr = nullptr;
-    ASSERT_NE(ptr = test_database.reserveCache(block_size_arena), nullptr);
+    ASSERT_NE(ptr = test_database.reserveCache(block_size_arena, core::memory::PLATFORM_ALIGN), nullptr);
     EXPECT_EQ(block_size_arena, test_database.getCacheSize(ptr));
   }
 }
@@ -60,7 +60,7 @@ TEST(IResourceDB, invalidateCaches) {
   TestDatabase test_database(&arena);
   for (uint32_t i = 0; i < NUM_TESTS; i++) {
     std::size_t block_size_arena = math::random::nrandi(2048, 65556);
-    ASSERT_NE(test_database.reserveCache(block_size_arena), nullptr);
+    ASSERT_NE(test_database.reserveCache(block_size_arena, core::memory::PLATFORM_ALIGN), nullptr);
   }
   ASSERT_NE(arena.getUsedBlocksNum(), 0);
   test_database.invalidateCaches();
@@ -70,7 +70,7 @@ TEST(IResourceDB, invalidateCaches) {
 
 static void test_no_cache() {
   TestDatabase test_database;
-  database::Result result = test_database.addCached<TestString>(false, nullptr);
+  database::Result result = test_database.addCachedElement<TestString>(false, nullptr);
   ASSERT_EQ(result.object, nullptr);
 }
 
@@ -85,13 +85,13 @@ static void verify_objects_memory(uint8_t *cache, uint32_t total_size, const std
 static void verify_out_of_bounds() {
   core::memory::MemoryArena arena;
   TestDatabase test_database(&arena);
-  uint8_t *cache = test_database.reserveCache(sizeof(TestString));
+  uint8_t *cache = test_database.reserveCache(sizeof(TestString), core::memory::PLATFORM_ALIGN);
   const std::string valid = "Not out-of-bounds";
-  database::Result result = test_database.addCached<TestString>(false, cache, valid);
+  database::Result result = test_database.addCachedElement<TestString>(false, cache, valid);
   ASSERT_NE(result.object, nullptr);
   EXPECT_EQ(*result.object, valid);
   const std::string invalid = "Out-of-bounds";
-  result = test_database.addCached<TestString>(false, cache, invalid);
+  result = test_database.addCachedElement<TestString>(false, cache, invalid);
   database::Result<int, TestString> empty{};
   EXPECT_EQ(result, empty);
 }
@@ -99,12 +99,12 @@ static void verify_out_of_bounds() {
 void add_string() {
   core::memory::MemoryArena arena;
   TestDatabase test_database(&arena);
-  uint8_t *cache = test_database.reserveCache(ALLOC_SIZE);
+  uint8_t *cache = test_database.reserveCache(ALLOC_SIZE, core::memory::PLATFORM_ALIGN);
   std::vector<database::Result<int, TestString>> results;
   const std::string base_str_test = "Test addCached";
   for (uint32_t i = 0; i < NUM_TESTS; i++) {
     const std::string test = base_str_test + std::to_string(i);
-    database::Result result = test_database.addCached<TestString>(false, cache, test);
+    database::Result result = test_database.addCachedElement<TestString>(false, cache, test);
     ASSERT_NE(result.object, nullptr);
     EXPECT_EQ(*result.object, test);
   }
