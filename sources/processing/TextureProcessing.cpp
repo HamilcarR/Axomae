@@ -7,18 +7,16 @@
 #endif
 
 template<>
-std::unique_ptr<F32TexData> TextureOperations<float>::computeDiffuseIrradiance(unsigned _width, unsigned _height, unsigned delta, bool gpu) const {
+image::ImageHolder<float> TextureOperations<float>::computeDiffuseIrradiance(unsigned _width, unsigned _height, unsigned delta, bool gpu) const {
   if (!isDimPowerOfTwo(_width) || !isDimPowerOfTwo(_height))
     throw TextureNonPowerOfTwoDimensionsException();
-  F32TexData envmap_tex_data;
-  envmap_tex_data.width = _width;
-  envmap_tex_data.height = _height;
-  envmap_tex_data.mipmaps = 0;
+  image::ImageHolder<float> envmap_tex_data;
+  envmap_tex_data.metadata.width = _width;
+  envmap_tex_data.metadata.height = _height;
   if (gpu) {
 #if defined(AXOMAE_USE_CUDA)
     namespace gpu_func = gpgpu_functions::irradiance_mapping;
     envmap_tex_data.data.resize(_width * _height * 4);
-    envmap_tex_data.nb_components = 4;
     std::vector<float> temp;
     temp.reserve(data->size());
     for (int i = 0; i < data->size(); i += 3) {
@@ -28,9 +26,15 @@ std::unique_ptr<F32TexData> TextureOperations<float>::computeDiffuseIrradiance(u
       temp.push_back(0);  // Alpha channel because cuda channel descriptors don't have RGB only
     }
     float *dest_array{};
-    envmap_tex_data.nb_components = 4;
-    gpu_func::GPU_compute_irradiance(
-        temp.data(), width, height, envmap_tex_data.nb_components, &dest_array, envmap_tex_data.width, envmap_tex_data.height, delta);
+    envmap_tex_data.metadata.channels = 4;
+    gpu_func::GPU_compute_irradiance(temp.data(),
+                                     width,
+                                     height,
+                                     envmap_tex_data.metadata.channels,
+                                     &dest_array,
+                                     envmap_tex_data.metadata.width,
+                                     envmap_tex_data.metadata.height,
+                                     delta);
     for (unsigned i = 0; i < envmap_tex_data.data.size(); i++)
       envmap_tex_data.data[i] = dest_array[i];
 #else
@@ -38,7 +42,7 @@ std::unique_ptr<F32TexData> TextureOperations<float>::computeDiffuseIrradiance(u
 #endif
   } else {
     envmap_tex_data.data.resize(_width * _height * channels);
-    envmap_tex_data.nb_components = channels;
+    envmap_tex_data.metadata.channels = channels;
     std::vector<std::shared_future<void>> futures;
     for (unsigned i = 1; i <= MAX_THREADS; i++) {
       unsigned int width_max = (_width / MAX_THREADS) * i, width_min = width_max - (_width / MAX_THREADS);
@@ -46,7 +50,7 @@ std::unique_ptr<F32TexData> TextureOperations<float>::computeDiffuseIrradiance(u
         width_max += _width % MAX_THREADS - 1;
       auto lambda = [this, &envmap_tex_data](unsigned delta, const unsigned width_min, const unsigned width_max) {
         this->launchAsyncDiffuseIrradianceCompute(
-            delta, envmap_tex_data.data.data(), width_min, width_max, envmap_tex_data.width, envmap_tex_data.height);
+            delta, envmap_tex_data.data.data(), width_min, width_max, envmap_tex_data.metadata.width, envmap_tex_data.metadata.height);
       };
       futures.push_back(std::async(std::launch::async, lambda, delta, width_min, width_max));
     }
@@ -54,5 +58,5 @@ std::unique_ptr<F32TexData> TextureOperations<float>::computeDiffuseIrradiance(u
       it.get();
     }
   }
-  return std::make_unique<F32TexData>(envmap_tex_data);
+  return envmap_tex_data;
 }

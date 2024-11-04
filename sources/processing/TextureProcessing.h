@@ -1,6 +1,7 @@
 #ifndef OFFLINECUBEMAPPROCESSING_H
 #define OFFLINECUBEMAPPROCESSING_H
 #include "GenericTextureProcessing.h"
+#include "Image.h"
 #include "internal/common/exception/GenericException.h"
 #include "internal/common/math/math_utils.h"
 #include "internal/macro/project_macros.h"
@@ -88,7 +89,7 @@ class TextureOperations {
   glm::vec3 uvSample(D u, D v) const;
   template<typename D>
   void launchAsyncDiffuseIrradianceCompute(D delta, float *f_data, unsigned width_begin, unsigned width_end, unsigned _width, unsigned _height) const;
-  ax_no_discard std::unique_ptr<F32TexData> computeDiffuseIrradiance(unsigned _width, unsigned _height, unsigned delta, bool gpu) const;
+  ax_no_discard image::ImageHolder<float> computeDiffuseIrradiance(unsigned _width, unsigned _height, unsigned delta, bool gpu) const;
 
   ax_no_discard glm::vec3 computeIrradianceSingleTexel(
       unsigned x, unsigned y, unsigned samples, const glm::vec3 &tangent, const glm::vec3 &bitangent, const glm::vec3 &normal) const;
