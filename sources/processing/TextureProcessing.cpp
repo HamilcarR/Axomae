@@ -13,20 +13,24 @@ image::ImageHolder<float> TextureOperations<float>::computeDiffuseIrradiance(uns
   image::ImageHolder<float> envmap_tex_data;
   envmap_tex_data.metadata.width = _width;
   envmap_tex_data.metadata.height = _height;
+  envmap_tex_data.data.resize(_width * _height * channels);
+  envmap_tex_data.metadata.channels = 4;
+
   if (gpu) {
 #if defined(AXOMAE_USE_CUDA)
     namespace gpu_func = gpgpu_functions::irradiance_mapping;
-    envmap_tex_data.data.resize(_width * _height * 4);
     std::vector<float> temp;
-    temp.reserve(data->size());
-    for (int i = 0; i < data->size(); i += 3) {
-      temp.push_back((*data)[i]);
-      temp.push_back((*data)[i + 1]);
-      temp.push_back((*data)[i + 2]);
-      temp.push_back(0);  // Alpha channel because cuda channel descriptors don't have RGB only
+    temp.resize(width * height * 4);
+    for (int i = 0; i < width * height; i++) {
+      int idx = i * channels;
+      int t_idx = i * 4;
+      temp[t_idx] = ((*data)[idx]);
+      temp[t_idx + 1] = ((*data)[idx + 1]);
+      temp[t_idx + 2] = ((*data)[idx + 2]);
+      temp[t_idx + 3] = 1.f;
     }
     float *dest_array{};
-    envmap_tex_data.metadata.channels = 4;
+
     gpu_func::GPU_compute_irradiance(temp.data(),
                                      width,
                                      height,
@@ -41,8 +45,6 @@ image::ImageHolder<float> TextureOperations<float>::computeDiffuseIrradiance(uns
     LOG("CUDA not found. Enable 'AXOMAE_USE_CUDA' in build if this platform has an Nvidia GPU.", LogLevel::ERROR);
 #endif
   } else {
-    envmap_tex_data.data.resize(_width * _height * channels);
-    envmap_tex_data.metadata.channels = channels;
     std::vector<std::shared_future<void>> futures;
     for (unsigned i = 1; i <= MAX_THREADS; i++) {
       unsigned int width_max = (_width / MAX_THREADS) * i, width_min = width_max - (_width / MAX_THREADS);
