@@ -45,18 +45,13 @@ namespace controller::cmd {
     try {
       image::ImageHolder<float> data = loader.loadHdrEnvmap(envmap.path_input.c_str(), false);
       TextureOperations<float> process_texture(data.data, data.metadata.width, data.metadata.height, data.metadata.channels);
-      std::unique_ptr<F32TexData> texture;
+      image::ImageHolder<float> texture;
       if (envmap.baketype == "irradiance") {
         texture = process_texture.computeDiffuseIrradiance(envmap.width_output, envmap.height_output, envmap.samples, (config.flag & CONF_USE_CUDA));
       }
-      image::Metadata metadata;
-      metadata.width = texture->width;
-      metadata.height = texture->height;
-      metadata.channels = texture->nb_components;
-      image::ImageHolder<float> hdr(texture->data, metadata);
-      loader.writeHdr(envmap.path_output.c_str(), hdr);
+      loader.writeHdr(envmap.path_output.c_str(), texture);
       QApplication qapp(*argv, argc);
-      HdrTextureViewerWidget tex(hdr);
+      HdrTextureViewerWidget tex(texture);
       tex.show();
       qapp.exec();
     } catch (const exception::GenericException &e) {
