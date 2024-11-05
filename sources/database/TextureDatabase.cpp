@@ -21,6 +21,7 @@ struct DestroyList {
   std::string name;
 };
 void TextureDatabase::clean() {
+  invalidateCaches();
   std::vector<DestroyList> to_destroy;
   Mutex::Lock lock(mutex);
   for (auto &it : database_map)

@@ -7,6 +7,7 @@
 #include <cstring>
 #include <internal/macro/project_macros.h>
 class Shader;
+
 /**
  * @brief Texture class
  */
@@ -54,8 +55,8 @@ class GenericTexture : public DeviceTextureInterface {
   FORMAT data_type{};
   unsigned int width{};
   unsigned int height{};
-  std::vector<uint32_t> data{};
-  std::vector<float> f_data{};
+  const uint32_t *data{};
+  const float *f_data{};
   unsigned int sampler2D{};
   unsigned int mipmaps{};
   bool is_dummy{};
@@ -84,14 +85,16 @@ class GenericTexture : public DeviceTextureInterface {
    */
   void setSamplerID(unsigned int id) { sampler2D = id; }
   ax_no_discard virtual TYPE getTextureType() const { return EMPTY; };
-  ax_no_discard const uint32_t *getData() const { return data.data(); }
-  ax_no_discard const float *getFData() const { return f_data.data(); }
+  ax_no_discard const uint32_t *getData() const { return data; }
+  ax_no_discard const float *getFData() const { return f_data; }
   ax_no_discard unsigned getWidth() const { return width; }
   ax_no_discard unsigned getHeight() const { return height; }
   ax_no_discard bool isDummyTexture() const { return is_dummy; }
   void setDummy(bool d) { is_dummy = d; }
+  void setNormalmapDummy();
+  void setGenericDummy();
   ax_no_discard const std::string &getName() const { return name; }
-  virtual bool empty() { return data.empty() && f_data.empty(); }
+  virtual bool empty() { return !data && !f_data; }
   ax_no_discard bool isInitialized() const override { return sampler2D != 0; }
   virtual void setMipmapsLevel(unsigned level) { mipmaps = level; }
   virtual unsigned int getMipmapsLevel() { return mipmaps; }
@@ -117,10 +120,6 @@ template<class T>
 void GenericTexture::setNewData(const std::vector<T> &new_buffer, FORMAT format, FORMAT type) {
   ax_glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (int)width, (int)height, format, type, new_buffer.data());
 }
-
-constexpr unsigned int DUMMY_TEXTURE_DIM = 1;
-constexpr uint32_t DEFAULT_NORMAL_DUMMY_PIXEL_RGBA = 0x007F7FFF;   // Default pixel color for a normal map
-constexpr uint32_t DEFAULT_OPACITY_DUMMY_PIXEL_RGBA = 0xFF000000;  // Default pixel color for other textures
 
 constexpr const char *type2str(GenericTexture::TYPE type) {
   switch (type) {
@@ -197,17 +196,7 @@ constexpr GenericTexture::TYPE str2type(const char *str) {
  * the width, height, and data of the TextureData struct pointed to by "dummy" to create a dummy
  * texture with a solid black color.
  */
-inline void set_dummy_TextureData(GenericTexture *set_texture) {
-  U32TexData dummy;
-  dummy.width = DUMMY_TEXTURE_DIM;
-  dummy.height = DUMMY_TEXTURE_DIM;
-  dummy.data.resize(dummy.width * dummy.height);
-  for (unsigned i = 0; i < dummy.width * dummy.height; i++) {
-    dummy.data[i] = DEFAULT_OPACITY_DUMMY_PIXEL_RGBA;
-  }
-  set_texture->set(&dummy);
-  set_texture->setDummy(true);
-}
+inline void set_dummy_TextureData(GenericTexture *set_texture) { set_texture->setGenericDummy(); }
 
 /**
  * The function sets the width, height, and data of a dummy texture with a constant blue color ,
@@ -216,15 +205,6 @@ inline void set_dummy_TextureData(GenericTexture *set_texture) {
  * 255).
  */
 
-inline void set_dummy_TextureData_normals(GenericTexture *set_texture) {
-  U32TexData dummy;
-  dummy.width = DUMMY_TEXTURE_DIM;
-  dummy.height = DUMMY_TEXTURE_DIM;
-  dummy.data.resize(dummy.width * dummy.height);
-  for (unsigned i = 0; i < DUMMY_TEXTURE_DIM * DUMMY_TEXTURE_DIM; i++)
-    dummy.data[i] = DEFAULT_NORMAL_DUMMY_PIXEL_RGBA;
-  set_texture->set(&dummy);
-  set_texture->setDummy(true);
-}
+inline void set_dummy_TextureData_normals(GenericTexture *set_texture) { set_texture->setNormalmapDummy(); }
 
 #endif  // GENERICTEXTURE_H

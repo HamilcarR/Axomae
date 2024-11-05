@@ -122,12 +122,12 @@ TEST(MemoryArenaTest, copyRange) {
     else
       array2[i - 128] = i;
   }
-  uint8_t *ptr_array1 = arena.copyRange(array1.data(), pool, 128, 0);
+  uint8_t *ptr_array1 = static_cast<uint8_t *>(arena.copyRange(array1.data(), pool, 128, 0));
   ASSERT_EQ(reinterpret_cast<std::uintptr_t>(ptr_array1) % core::memory::PLATFORM_ALIGN, 0);
   for (uint32_t i = 0; i < array1.size(); i++) {
     EXPECT_EQ(array1[i], ptr_array1[i]);
   }
-  uint8_t *ptr_array2 = arena.copyRange(array2.data(), pool, 128, 1);
+  uint8_t *ptr_array2 = static_cast<uint8_t *>(arena.copyRange(array2.data(), pool, 128, 1));
   ASSERT_EQ(reinterpret_cast<std::uintptr_t>(ptr_array2) % core::memory::PLATFORM_ALIGN, 0);
   for (uint32_t i = 0; i < array2.size(); i++) {
     EXPECT_EQ(array2[i], ptr_array2[i]);

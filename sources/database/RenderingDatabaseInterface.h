@@ -75,6 +75,7 @@ class IResourceDB : public DatabaseInterface<U, T>, public ILockable, public con
   database::Result<U, T> addCachedElement(bool keep, uint8_t *cache_address, Args &&...args);
   /**
    * Copy array or buffer `to_copy` inside the specified cache, and returns it's in-buffer address.
+   * if `cache_address` is null , will copy inside the current cache.
    */
   template<class TYPE>
   TYPE *copyRangeToCache(TYPE *to_copy, uint8_t *cache_address, std::size_t count, std::size_t offset);
@@ -355,6 +356,8 @@ database::Result<U, T> IResourceDB<U, T>::addCachedElement(bool keep, uint8_t *c
 template<class U, class T>
 template<class TYPE>
 TYPE *IResourceDB<U, T>::copyRangeToCache(TYPE *to_copy, uint8_t *cache_address, std::size_t count, std::size_t offset) {
+  if (!cache_address)
+    cache_address = getCurrentCache();
   if (!getCacheBlock(cache_address)) {
     LOG("Cache address :" + utils::string::to_hex(reinterpret_cast<uintptr_t>(cache_address)) + " not initialized", LogLevel::ERROR);
     return nullptr;
@@ -367,7 +370,7 @@ TYPE *IResourceDB<U, T>::copyRangeToCache(TYPE *to_copy, uint8_t *cache_address,
     LOG("Invalid buffer address", LogLevel::ERROR);
     return nullptr;
   }
-  return memory_arena->copyRange(to_copy, cache_address, count, offset);
+  return static_cast<TYPE *>(memory_arena->copyRange(to_copy, cache_address, count * sizeof(TYPE), offset * count * sizeof(TYPE)));
 }
 
 #endif

@@ -1,5 +1,27 @@
 #include "GenericTexture.h"
 
+static constexpr unsigned int DUMMY_TEXTURE_DIM = 1;
+static constexpr uint32_t DEFAULT_NORMAL_DUMMY_PIXEL_RGBA[] = {0x007F7FFF};   // Default pixel color for a normal map
+static constexpr uint32_t DEFAULT_OPACITY_DUMMY_PIXEL_RGBA[] = {0xFF000000};  // Default pixel color for other textures
+
+void GenericTexture::setGenericDummy() {
+  U32TexData texdata;
+  texdata.width = DUMMY_TEXTURE_DIM;
+  texdata.height = DUMMY_TEXTURE_DIM;
+  texdata.data = reinterpret_cast<const uint32_t *>(DEFAULT_OPACITY_DUMMY_PIXEL_RGBA);
+  set(&texdata);
+  setDummy(true);
+}
+
+void GenericTexture::setNormalmapDummy() {
+  U32TexData texdata;
+  texdata.width = DUMMY_TEXTURE_DIM;
+  texdata.height = DUMMY_TEXTURE_DIM;
+  texdata.data = reinterpret_cast<const uint32_t *>(DEFAULT_NORMAL_DUMMY_PIXEL_RGBA);
+  set(&texdata);
+  setDummy(true);
+}
+
 GenericTexture::GenericTexture() {
   is_dummy = false;
   width = 0;
@@ -15,9 +37,8 @@ void GenericTexture::set(const U32TexData *texture) {
   name = texture->name;
   width = texture->width;
   height = texture->height;
-  if (!texture->data.empty()) {
+  if (texture->data)
     data = texture->data;
-  }
   data_format = static_cast<GenericTexture::FORMAT>(texture->data_format);
   internal_format = static_cast<GenericTexture::FORMAT>(texture->internal_format);
   data_type = static_cast<GenericTexture::FORMAT>(texture->data_type);
@@ -31,16 +52,19 @@ void GenericTexture::set(const F32TexData *texture) {
   name = texture->name;
   width = texture->width;
   height = texture->height;
-  if (!texture->data.empty()) {
+  if (texture->data)
     f_data = texture->data;
-  }
   data_format = static_cast<GenericTexture::FORMAT>(texture->data_format);
   internal_format = static_cast<GenericTexture::FORMAT>(texture->internal_format);
   data_type = static_cast<GenericTexture::FORMAT>(texture->data_type);
   mipmaps = texture->mipmaps;
 }
 
-void GenericTexture::clean() { cleanGlData(); }
+void GenericTexture::clean() {
+  cleanGlData();
+  data = nullptr;
+  f_data = nullptr;
+}
 
 void GenericTexture::setTextureParametersOptions() {
   ax_glGenerateMipmap(GL_TEXTURE_2D);
@@ -51,7 +75,7 @@ void GenericTexture::setTextureParametersOptions() {
 }
 
 void GenericTexture::initializeTexture2D() {
-  ax_glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, data.data());
+  ax_glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, data_format, data_type, data);
   setTextureParametersOptions();
 }
 
