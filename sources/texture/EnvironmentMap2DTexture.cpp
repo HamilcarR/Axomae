@@ -15,7 +15,7 @@ EnvironmentMap2DTexture::EnvironmentMap2DTexture(FORMAT _internal_format, FORMAT
 }
 
 void EnvironmentMap2DTexture::initializeTexture2D() {
-  ax_glTexImage2D(GL_TEXTURE_2D, 0, internal_format, (int)width, (int)height, 0, data_format, data_type, f_data.data());
+  ax_glTexImage2D(GL_TEXTURE_2D, 0, internal_format, (int)width, (int)height, 0, data_format, data_type, f_data);
   ax_glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   ax_glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   ax_glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -27,7 +27,7 @@ void EnvironmentMap2DTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + ENVMAP2D);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
-  if (!f_data.empty())
+  if (f_data)
     EnvironmentMap2DTexture::initializeTexture2D();
   shader->setTextureUniforms(type2str(ENVMAP2D), ENVMAP2D);
 }

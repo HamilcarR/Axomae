@@ -22,10 +22,8 @@ void CubemapTexture::setCubeMapTextureData(const F32TexData *texture) {
   data_type = static_cast<GenericTexture::FORMAT>(texture->data_type);
   mipmaps = texture->mipmaps;
   /* In case raw data is 4 bytes float / channel */
-  if (!texture->data.empty()) {
-    f_data.resize(width * height * 6 * texture->nb_components);
-    for (unsigned i = 0; i < width * height * 6 * texture->nb_components; i++)
-      f_data[i] = texture->data[i];
+  if (texture->data) {
+    f_data = texture->data;
   }
 }
 
@@ -40,17 +38,15 @@ void CubemapTexture::setCubeMapTextureData(const U32TexData *texture) {
   data_type = static_cast<GenericTexture::FORMAT>(texture->data_type);
   mipmaps = texture->mipmaps;
   /* In case the raw data is in RGB-RGBA with 8 bits/channel*/
-  if (!texture->data.empty()) {
-    data.resize(width * height * 6);
-    for (unsigned int i = 0; i < width * height * 6; i++)
-      data[i] = texture->data[i];
+  if (texture->data) {
+    data = texture->data;
   }
 }
 
 void CubemapTexture::initializeTexture2D() {
-  if (!data.empty())
+  if (data)
     for (unsigned int i = 1; i <= 6; i++) {
-      uint32_t *pointer_to_data = data.data() + (i - 1) * width * height;
+      const uint32_t *pointer_to_data = data + (i - 1) * width * height;
       ax_glTexImage2D(
           GL_TEXTURE_CUBE_MAP_POSITIVE_X + (i - 1), 0, internal_format, (int)width, (int)height, 0, data_format, data_type, pointer_to_data);
     }
