@@ -142,7 +142,7 @@ static F32TexData texture_metadata(image::ThumbnailImageHolder<float> *raw_image
   envmap.internal_format = GenericTexture::RGBA32F;
   envmap.data_format = GenericTexture::RGBA;
   envmap.nb_components = raw_image_data->metadata.channels;
-  envmap.data = raw_image_data->data;
+  envmap.data = raw_image_data->data.data();
   return envmap;
 }
 

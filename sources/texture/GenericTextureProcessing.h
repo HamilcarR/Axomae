@@ -26,7 +26,7 @@ class TextureData : public core::memory::Serializable {
   uint32_t data_format{};
   uint32_t data_type{};
   std::string name;
-  std::vector<T> data;
+  const T *data{};
 
  public:
   TextureData();
@@ -47,7 +47,6 @@ TextureData<T>::TextureData() : nb_components(1), mipmaps(5), internal_format(GL
 
 template<class T>
 void TextureData<T>::clean() {
-  data.clear();
   width = 0;
   height = 0;
   name = "";
