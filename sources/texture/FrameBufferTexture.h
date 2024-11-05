@@ -21,7 +21,7 @@ class FrameBufferTexture : public GenericTexture {
       internal_format = static_cast<GenericTexture::FORMAT>(_data->internal_format);
       data_format = static_cast<GenericTexture::FORMAT>(_data->data_format);
       data_type = static_cast<GenericTexture::FORMAT>(_data->data_type);
-      this->data.clear();
+      data = nullptr;
     }
   }
   explicit FrameBufferTexture(const U32TexData *_data) : FrameBufferTexture() {}

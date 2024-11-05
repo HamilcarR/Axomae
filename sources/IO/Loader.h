@@ -18,10 +18,11 @@ namespace IO {
   /**
    * @brief 3D Loader class
    */
-  class Loader : public controller::IProgressManager {
+  class Loader {
 
    private:
     ResourceDatabaseManager *resource_database;
+    controller::IProgressManager progress_manager;
 
    public:
     explicit Loader(controller::ProgressStatus *progress_status);

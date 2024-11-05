@@ -150,10 +150,10 @@ namespace IO {
   /***************************************************************************************/
   /* Radiance file format*/
   image::ImageHolder<float> Loader::loadRadianceFile(const char *path, bool store) {
-    controller::ProgressManagerHelper helper(this);
+    controller::ProgressManagerHelper helper(&progress_manager);
     int width = -1, height = -1, channels = -1;
     float *data = stbi_loadf(path, &width, &height, &channels, 0);
-    initProgress("Importing environment map", (float)(width * height * channels));
+    progress_manager.initProgress("Importing environment map", (float)(width * height * channels));
     helper.notifyProgress(controller::ProgressManagerHelper::ONE_FOURTH);
     if (!data) {
       helper.reset();

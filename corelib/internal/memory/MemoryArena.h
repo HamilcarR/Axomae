@@ -125,22 +125,26 @@ namespace core::memory {
       return construct(reinterpret_cast<U *>(new_address), std::forward<Args>(args)...);
     }
 
-    /* Copy data to current block and returns an aligned pointer to it.  */
-    template<class U>
-    U *copyRange(U *to_copy, void *dest_address, std::size_t elements, std::size_t offset) {
-      if (!to_copy || !dest_address)
+    /**
+     * Copy data to current block and returns an aligned pointer to it.
+     * @param size : size in bytes
+     * @param offset : copy offset from the beginning address of dest , in bytes
+     *
+     */
+    void *copyRange(const void *src, void *dest, std::size_t size, std::size_t offset) noexcept {
+      if (!src || !dest)
         return nullptr;
-      if (dest_address != current_block_ptr)
+      if (dest != current_block_ptr)
         return nullptr;
-      if (elements * sizeof(U) > current_alloc_size)
+      if (size > current_alloc_size)
         return nullptr;
 
-      uintptr_t new_address = reinterpret_cast<uintptr_t>(dest_address) + offset;
+      uintptr_t new_address = reinterpret_cast<uintptr_t>(dest) + offset;
       if (new_address % current_alignment != 0) {
         new_address = compute_alignment(new_address, current_alignment);
       }
-      std::memcpy(reinterpret_cast<void *>(new_address), to_copy, elements * sizeof(U));
-      return reinterpret_cast<U *>(new_address);
+      std::memcpy(reinterpret_cast<void *>(new_address), src, size);
+      return reinterpret_cast<void *>(new_address);
     }
 
     /* Allocates a buffer of size_bytes size and returns it's desired aligned address. */

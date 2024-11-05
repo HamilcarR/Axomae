@@ -5,7 +5,7 @@ void RoughnessTexture::initialize(Shader *shader) {
   ax_glGenTextures(1, &sampler2D);
   ax_glActiveTexture(GL_TEXTURE0 + ROUGHNESS);
   ax_glBindTexture(GL_TEXTURE_2D, sampler2D);
-  if (!data.empty())
+  if (data)
     GenericTexture::initializeTexture2D();
   shader->setTextureUniforms(type2str(ROUGHNESS), ROUGHNESS);
 }

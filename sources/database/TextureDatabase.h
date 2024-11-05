@@ -25,8 +25,13 @@ class TextureDatabase final : public IntegerResourceDB<GenericTexture> {
   std::map<std::string, int> unique_textures;
 
  public:
-  explicit TextureDatabase(core::memory::MemoryArena<std::byte> *memory_arena = nullptr, controller::ProgressStatus *progress_manager = nullptr);
+  explicit TextureDatabase(core::memory::ByteArena *memory_arena = nullptr, controller::ProgressStatus *progress_manager = nullptr);
   ~TextureDatabase() override = default;
+  TextureDatabase(const TextureDatabase &other) = delete;
+  TextureDatabase(TextureDatabase &&other) noexcept = delete;
+  TextureDatabase &operator=(const TextureDatabase &other) = delete;
+  TextureDatabase &operator=(TextureDatabase &&other) noexcept = delete;
+
   void clean() override;
   void purge() override;
   bool remove(int index) override;
