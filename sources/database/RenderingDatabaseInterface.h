@@ -370,7 +370,7 @@ TYPE *IResourceDB<U, T>::copyRangeToCache(TYPE *to_copy, uint8_t *cache_address,
     LOG("Invalid buffer address", LogLevel::ERROR);
     return nullptr;
   }
-  return static_cast<TYPE *>(memory_arena->copyRange(to_copy, cache_address, count * sizeof(TYPE), offset * count * sizeof(TYPE)));
+  return static_cast<TYPE *>(memory_arena->copyRange(to_copy, cache_address, count * sizeof(TYPE), offset * sizeof(TYPE)));
 }
 
 #endif
