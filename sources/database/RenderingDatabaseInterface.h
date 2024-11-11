@@ -343,11 +343,9 @@ database::Result<U, T> IResourceDB<U, T>::addCachedElement(bool keep, uint8_t *c
     return database::Result<U, T>();
   }
   cache_block->cache_element_position += 1;
-
-  /* Since we're allocating on a buffer we own , we need a custom deleter that doesn't call delete on arena memory . */
-
   U ffid = firstFreeId();
   T *ptr = created_resource;
+  /* Since we're allocating on a buffer we own , we need a custom deleter that doesn't call delete on arena memory . */
   database::Storage<U, T> storage(created_resource, ffid, keep);
   database_map[ffid] = std::move(storage);
   return {ffid, ptr};
