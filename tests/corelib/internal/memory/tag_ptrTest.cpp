@@ -85,3 +85,12 @@ TEST(tag_ptr_test, host_dispatch) {
   ASSERT_FALSE(dt.toString() == "TestClass2");
   ASSERT_TRUE(dt.toString() == "TestClass3");
 }
+
+/* Test if tagged pointers are read from the device side when pinning memory */
+
+#if defined(AXOMAE_USE_CUDA)
+#  include "cuda/tag_device_test.cuh"
+
+TEST(tag_ptr_test, device_share) { tag_ptr_kernel_test(); }
+
+#endif

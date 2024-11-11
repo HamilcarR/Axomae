@@ -98,5 +98,37 @@
   classname& operator=(const classname& copy) = delete;\
   classname& operator=(classname&& move) noexcept = delete;
 
+#define CLASS_DCM(classname) \
+  ax_device_callable classname() = default; \
+  ax_device_callable ~classname() = default; \
+  ax_device_callable classname(const classname& copy) = default; \
+  ax_device_callable classname(classname&& move) noexcept = default; \
+  ax_device_callable classname& operator=(const classname& copy) = default; \
+  ax_device_callable classname& operator=(classname&& move) noexcept = default;
+
+#define CLASS_DM(classname) \
+  ax_device_callable classname() = default; \
+  ax_device_callable ~classname() = default; \
+  ax_device_callable classname(const classname& copy) = delete; \
+  ax_device_callable classname(classname&& move) noexcept = default; \
+  ax_device_callable classname& operator=(const classname& copy) = delete; \
+  ax_device_callable classname& operator=(classname&& move) noexcept = default;
+
+#define CLASS_DC(classname) \
+  ax_device_callable classname() = default; \
+  ax_device_callable ~classname() = default; \
+  ax_device_callable classname(const classname& copy) = default; \
+  ax_device_callable classname(classname&& move) noexcept = delete; \
+  ax_device_callable classname& operator=(const classname& copy) = default; \
+  ax_device_callable classname& operator=(classname&& move) noexcept = delete;
+
+#define CLASS_D(classname) \
+  ax_device_callable classname() = default; \
+  ax_device_callable ~classname() = default; \
+  ax_device_callable classname(const classname& copy) = delete; \
+  ax_device_callable classname(classname&& move) noexcept = delete; \
+  ax_device_callable classname& operator=(const classname& copy) = delete; \
+  ax_device_callable classname& operator=(classname&& move) noexcept = delete;
+
 // clang-format on
 #endif  // CLASS_MACROS_H
