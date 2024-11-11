@@ -42,10 +42,11 @@ namespace core::memory {
 
    private:
     std::size_t block_size;
-    /* This is implicit block, used block list can be empty , but current_block_ptr can be used , so there's in fact 1 used block even though
-     * used_blocks is empty*/
-    T *current_block_ptr{nullptr};
-    std::size_t current_block_offset{}, current_alloc_size{}, current_alignment{};
+    /* This is implicit block, used block list can be empty ,
+     * but current_block_ptr can be used , so there's in fact 1 used block even though used_blocks is empty*/
+
+    block_t current_block;
+    std::size_t current_block_offset{};
     block_list_t used_blocks, free_blocks;
 
    public:
@@ -58,7 +59,7 @@ namespace core::memory {
     MemoryArena(std::size_t block_size_ = DEFAULT_BLOCK_SIZE) : block_size(block_size_) {}
 
     ~MemoryArena() {
-      freeAlign(current_block_ptr, current_alignment);
+      freeAlign(current_block.current_block_ptr, current_block.current_alignment);
       for (auto &block : used_blocks)
         freeAlign(block.current_block_ptr, block.current_alignment);
       for (auto &block : free_blocks)
@@ -69,22 +70,14 @@ namespace core::memory {
 
     ax_no_discard std::size_t getUsedBlocksNum() const { return used_blocks.size(); }
 
-    ax_no_discard std::size_t getCurrentAlignment() const { return current_alignment; }
+    ax_no_discard std::size_t getCurrentAlignment() const { return current_block.current_alignment; }
 
     const block_list_t &getFreeBlocks() const { return free_blocks; }
 
     const block_list_t &getUsedBlocks() const { return used_blocks; }
 
-    const_block_t getCurrentBlock() const {
-      const_block_t current;
-      current.current_block_ptr = current_block_ptr;
-      current.current_alloc_size = current_alloc_size;
-      current.current_alignment = current_alignment;
-      return current;
-    }
-
     std::size_t getTotalSize() {
-      std::size_t acc = current_alloc_size;
+      std::size_t acc = current_block.current_alloc_size;
       for (const auto &elem : used_blocks)
         acc += elem.current_alloc_size;
       for (const auto &elem : free_blocks)
@@ -119,8 +112,8 @@ namespace core::memory {
     U *constructAtMemPosition(U *start_buffer_address, std::size_t cache_element_position, Args &&...args) {
       std::size_t offset = cache_element_position * sizeof(U);
       uintptr_t new_address = reinterpret_cast<uintptr_t>(start_buffer_address) + offset;
-      if (new_address % current_alignment != 0) {
-        new_address = compute_alignment(new_address, current_alignment);
+      if (new_address % current_block.current_alignment != 0) {
+        new_address = compute_alignment(new_address, current_block.current_alignment);
       }
       return construct(reinterpret_cast<U *>(new_address), std::forward<Args>(args)...);
     }
@@ -134,14 +127,14 @@ namespace core::memory {
     void *copyRange(const void *src, void *dest, std::size_t size, std::size_t offset) noexcept {
       if (!src || !dest)
         return nullptr;
-      if (dest != current_block_ptr)
+      if (dest != current_block.current_block_ptr)
         return nullptr;
-      if (size > current_alloc_size)
+      if (size > current_block.current_alloc_size)
         return nullptr;
 
       uintptr_t new_address = reinterpret_cast<uintptr_t>(dest) + offset;
-      if (new_address % current_alignment != 0) {
-        new_address = compute_alignment(new_address, current_alignment);
+      if (new_address % current_block.current_alignment != 0) {
+        new_address = compute_alignment(new_address, current_block.current_alignment);
       }
       std::memcpy(reinterpret_cast<void *>(new_address), src, size);
       return reinterpret_cast<void *>(new_address);
@@ -150,28 +143,28 @@ namespace core::memory {
     /* Allocates a buffer of size_bytes size and returns it's desired aligned address. */
     void *allocate(std::size_t size_bytes, std::size_t alignment = PLATFORM_ALIGN) {
       size_bytes = compute_alignment(size_bytes, alignment);
-      if (current_block_offset + size_bytes > current_alloc_size) {
+      if (current_block_offset + size_bytes > current_block.current_alloc_size) {
         /* Adds current block to used list*/
         addCurrentBlockToUsed();
         /* Looks for a free block in the free_block list with enough memory.*/  // TODO : Replace with best fit rather than first fit.
         for (typename block_list_t::const_iterator block = free_blocks.begin(); block != free_blocks.end(); block++) {
           if (block->current_alloc_size >= size_bytes) {
-            current_block_ptr = block->current_block_ptr;
-            current_alloc_size = block->current_alloc_size;
-            current_alignment = block->current_alignment;
+            current_block.current_block_ptr = block->current_block_ptr;
+            current_block.current_alloc_size = block->current_alloc_size;
+            current_block.current_alignment = block->current_alignment;
             free_blocks.erase(block);
             break;
           }
         }
 
-        if (!current_block_ptr) {
-          current_alloc_size = std::max(size_bytes, block_size);
-          current_block_ptr = allocAlign<T>(current_alloc_size, alignment);
-          current_alignment = alignment;
+        if (!current_block.current_block_ptr) {
+          current_block.current_alloc_size = std::max(size_bytes, block_size);
+          current_block.current_block_ptr = allocAlign<T>(current_block.current_alloc_size, alignment);
+          current_block.current_alignment = alignment;
         }
         current_block_offset = 0;
       }
-      T *ret_ptr = current_block_ptr + current_block_offset;
+      T *ret_ptr = current_block.current_block_ptr + current_block_offset;
       current_block_offset += size_bytes;
       return ret_ptr;
     }
@@ -182,7 +175,7 @@ namespace core::memory {
     void deallocate(void *ptr) {
       if (!ptr)
         return;
-      if (current_block_ptr == ptr)
+      if (current_block.current_block_ptr == ptr)
         addCurrentBlockToFree();
       auto to_dealloc = getUsedBlockItr(ptr);
       if (to_dealloc == used_blocks.end())
@@ -192,6 +185,14 @@ namespace core::memory {
 
    private:
     std::size_t compute_alignment(std::size_t value, std::size_t align = PLATFORM_ALIGN) { return (value + align - 1) & ~(align - 1); }
+
+    const_block_t getCurrentBlock() const {
+      const_block_t current;
+      current.current_block_ptr = current_block.current_block_ptr;
+      current.current_alloc_size = current_block.current_alloc_size;
+      current.current_alignment = current_block.current_alignment;
+      return current;
+    }
 
     template<class U>
     U *allocAlign(std::size_t count, std::size_t align = PLATFORM_ALIGN) {
@@ -216,19 +217,19 @@ namespace core::memory {
     }
 
     void addCurrentBlockToUsed() {
-      if (current_block_ptr) {
-        used_blocks.push_back({current_block_ptr, current_alignment, current_alloc_size});
-        current_block_ptr = nullptr;
-        current_alloc_size = 0;
+      if (current_block.current_block_ptr) {
+        used_blocks.push_back({current_block.current_block_ptr, current_block.current_alignment, current_block.current_alloc_size});
+        current_block.current_block_ptr = nullptr;
+        current_block.current_alloc_size = 0;
         current_block_offset = 0;
       }
     }
 
     void addCurrentBlockToFree() {
-      if (current_block_ptr) {
-        free_blocks.push_back({current_block_ptr, current_alignment, current_alloc_size});
-        current_block_ptr = nullptr;
-        current_alloc_size = 0;
+      if (current_block.current_block_ptr) {
+        free_blocks.push_back({current_block.current_block_ptr, current_block.current_alignment, current_block.current_alloc_size});
+        current_block.current_block_ptr = nullptr;
+        current_block.current_alloc_size = 0;
         current_block_offset = 0;
       }
     }
