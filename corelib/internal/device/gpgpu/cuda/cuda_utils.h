@@ -1,25 +1,11 @@
 #ifndef CU_MACRO_H
 #define CU_MACRO_H
 
+#include "cuda_macros.h"
 #include "internal/debug/Logger.h"
 #include <cuda.h>
 #include <cuda/atomic>
 #include <cuda_runtime_api.h>
-
-#if defined(__CUDA_ARCH__) && defined(AXOMAE_USE_CUDA)
-#  define GPU_SYNCTHREAD __syncthreads()
-#  define GPU_SYNCWARP __syncwarp()
-
-#  define GPU_FASTCOS(value) __cosf(value)
-#  define GPU_FASTSIN(value) __sinf(value)
-#  define GPU_FASTEXP(value) __expf(value)
-
-#  define GPU_ATOMICADD(address, val) atomicAdd(address, val)
-#  define GPU_ATOMICSUB(address, val) atomicSub(address, val)
-#  define GPU_ATOMICMIN(address, val) atomicMin(address, val)
-#  define GPU_ATOMICMAX(address, val) atomicMax(address, val)
-
-#endif
 
 #define CUDA_ERROR_CHECK(ans) \
   { \
