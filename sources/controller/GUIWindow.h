@@ -5,9 +5,11 @@
 #include "Renderer.h"
 #include "SceneListView.h"
 #include "SceneSelector.h"
-#include "bake_render_data.h"
 #include "constants.h"
+#include "nova/bake.h"
+#include "nova/bake_render_data.h"
 #include "ui_main_window.h"
+
 #include <QtWidgets/qmainwindow.h>
 
 /**
@@ -64,11 +66,13 @@ namespace controller {
     std::unique_ptr<QTimer> timer;
     /* Raytracing engine display*/
     GLViewer *nova_viewer;
-    NovaBakingStructure nova_baking_structure;
+
     core::memory::ByteArena memory_pool;
+    nova_baker_utils::NovaBakingStructure nova_baking_structure;
+    nova::device_shared_caches_t shared_caches;
 
    public:
-    static HeapManagement *_MemManagement;  // TODO : Refactor
+    static HeapManagement *_MemManagement;  // TODO : Useless , Refactor
 
    public:
     explicit Controller(QWidget *parent = nullptr);
@@ -87,9 +91,11 @@ namespace controller {
     ax_no_discard std::string spawnSaveFileDialogueWidget();
     void cleanupWindowProcess(QWidget *window);
     void cleanupNova();
-    ax_no_discard const NovaBakingStructure &getBakingStructure() const { return nova_baking_structure; }
-    ax_no_discard NovaBakingStructure &getBakingStructure() { return nova_baking_structure; }
+    ax_no_discard const nova_baker_utils::NovaBakingStructure &getBakingStructure() const { return nova_baking_structure; }
+    ax_no_discard nova_baker_utils::NovaBakingStructure &getBakingStructure() { return nova_baking_structure; }
     void novaStopBake();
+    void emptySceneCaches();
+    nova::device_shared_caches_t &getSharedCaches() { return shared_caches; }
 
    private:
     void connect_all_slots();

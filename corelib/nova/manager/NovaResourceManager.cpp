@@ -12,7 +12,4 @@ namespace nova {
     envmap_data.channels = channels;
   }
 
-  void NovaResourceManager::uploadToDevice() { /* Upload envmap */
-  }
-
 }  // namespace nova

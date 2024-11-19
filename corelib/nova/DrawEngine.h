@@ -1,9 +1,9 @@
 #ifndef NOVA_DRAW_ENGINE_H
 #define NOVA_DRAW_ENGINE_H
 #include "NovaInterface.h"
+#include "nova_gpu_utils.h"
 
 #include <future>
-#include <vector>
 
 namespace threading {
   class ThreadPool;
@@ -28,7 +28,8 @@ namespace nova {
                 unsigned width_resolution,
                 unsigned height_resolution,
                 NovaRenderEngineInterface *engine_interface,
-                nova::nova_eng_internals &nova_internals);
+                nova::nova_eng_internals &nova_internals,
+                const device_shared_caches_t &shared_buffer_collection);
 
 }  // namespace nova
 #endif
