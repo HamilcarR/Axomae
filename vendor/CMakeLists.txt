@@ -13,7 +13,7 @@ endif()
 
 if(NOT Boost_FOUND)
     message(NOTICE "Boost not found on the system : Initializing Boost build from sources. ")
-    set(BOOST_INCLUDE_LIBRARIES program_options stacktrace random)
+    set(BOOST_INCLUDE_LIBRARIES program_options stacktrace core random)
     set(BUILD_SHARED_LIBS ON)
     add_subdirectory(boost)
 

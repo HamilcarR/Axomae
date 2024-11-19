@@ -9,6 +9,8 @@ add_library(ax_renderer STATIC
         nova/NovaRenderer_draw.cpp
         nova/extract_scene.cpp
         nova/nova_bake_image.cpp
+        nova/extract_material.cpp
+        nova/extract_geometry.cpp
 )
 
 
@@ -29,6 +31,7 @@ PRIVATE
     ax_core
     ax_controller
     ax_core_nova
+
 )
 
 

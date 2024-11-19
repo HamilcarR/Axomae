@@ -209,12 +209,12 @@ namespace IO {
    * @param totexture A pointer to a TextureData struct that will hold the copied texture data.
    * @param fromtexture The aiTexture object containing the texture data to be copied.
    */
-  static void ax_dbg_optimize0 copyTexels(U32TexData *totexture,
-                                          aiTexture *fromtexture,
-                                          const std::string &texture_type,
-                                          TextureDatabase &texture_database,
-                                          std::size_t &texcache_element_count,
-                                          controller::IProgressManager &progress_manager) {
+  static void copyTexels(U32TexData *totexture,
+                         aiTexture *fromtexture,
+                         const std::string &texture_type,
+                         TextureDatabase &texture_database,
+                         std::size_t &texcache_element_count,
+                         controller::IProgressManager &progress_manager) {
 
     if (fromtexture != nullptr) {
       /* If mHeight != 0 , the texture is uncompressed , and we read it as is */
@@ -414,20 +414,21 @@ namespace IO {
     return totalSize;
   }
 
-  static std::pair<std::vector<Mesh *>, SceneTree> loadSceneElements(const aiScene *modelScene,
-                                                                     ShaderDatabase *shader_database,
-                                                                     TextureDatabase *texture_database,
-                                                                     INodeDatabase *node_database,
-                                                                     controller::IProgressManager &progress_manager) {
+  static loader_data_t loadSceneElements(const aiScene *modelScene,
+                                         ShaderDatabase *shader_database,
+                                         TextureDatabase *texture_database,
+                                         INodeDatabase *node_database,
+                                         controller::IProgressManager &progress_manager) {
     std::vector<std::future<std::pair<unsigned, std::unique_ptr<Object3D>>>> loaded_meshes_futures;
     std::vector<GLMaterial> material_array;
     std::vector<Mesh *> node_lookup_table;
     Shader *shader_program = shader_database->get(Shader::BRDF);
     node_lookup_table.resize(modelScene->mNumMeshes);
     material_array.resize(modelScene->mNumMeshes);
-    std::pair<std::vector<Mesh *>, SceneTree> objects;
+    loader_data_t scene_data;
     std::size_t texture_cache_size = total_textures_size(modelScene);
-    texture_database->reserveCache(texture_cache_size, core::memory::PLATFORM_ALIGN);
+    uint8_t *cache_address = texture_database->reserveCache(texture_cache_size, core::memory::PLATFORM_ALIGN);
+    scene_data.texture_cache = boost::span(cache_address, texture_cache_size);
     std::size_t texcache_element_count = 0;
     for (unsigned int i = 0; i < modelScene->mNumMeshes; i++) {
       loaded_meshes_futures.push_back(std::async(std::launch::async,
@@ -448,29 +449,29 @@ namespace IO {
           *node_database, false, name, std::move(*geometry_loaded.second), material_array[mesh_index], shader_program, nullptr);
       LOG("object loaded : " + name, LogLevel::INFO);
       node_lookup_table[mesh_index] = mesh_result.object;
-      objects.first.push_back(mesh_result.object);
+      scene_data.mesh_list.push_back(mesh_result.object);
     }
     SceneTree scene_tree = generateSceneTree(modelScene, node_lookup_table);
-    objects.second = scene_tree;
-    return objects;
+    scene_data.scene_tree = scene_tree;
+    return scene_data;
   }
 
-  std::pair<std::vector<Mesh *>, SceneTree> Loader::loadObjects(const char *file) {
+  loader_data_t Loader::loadObjects(const char *file) {
     ShaderDatabase *shader_database = resource_database->getShaderDatabase();
     INodeDatabase *node_database = resource_database->getNodeDatabase();
     TextureDatabase *texture_database = resource_database->getTextureDatabase();
-
+    loader_data_t loader_data;
     if (!texture_database) {
       LOG("Texture database is not initialized.", LogLevel::CRITICAL);
-      return std::pair<std::vector<Mesh *>, SceneTree>();
+      return loader_data;
     }
     if (!node_database) {
       LOG("Node database is not initialized.", LogLevel::CRITICAL);
-      return std::pair<std::vector<Mesh *>, SceneTree>();
+      return loader_data;
     }
     if (!shader_database) {
       LOG("Shader database is not initialized.", LogLevel::CRITICAL);
-      return std::pair<std::vector<Mesh *>, SceneTree>();
+      return loader_data;
     }
 
     Assimp::Importer importer;
@@ -480,7 +481,7 @@ namespace IO {
       return loadSceneElements(modelScene, shader_database, texture_database, node_database, progress_manager);
     } else {
       LOG("Cannot read file.", LogLevel::ERROR);
-      return std::pair<std::vector<Mesh *>, SceneTree>();
+      return loader_data;
     }
   }
 
@@ -489,8 +490,8 @@ namespace IO {
    * @param file A pointer to a character array representing the file path of the 3D model to be loaded.
    * @return A vector of Mesh pointers.
    */
-  std::pair<std::vector<Mesh *>, SceneTree> Loader::load(const char *file) {
-    std::pair<std::vector<Mesh *>, SceneTree> scene = loadObjects(file);
+  loader_data_t Loader::load(const char *file) {
+    loader_data_t scene = loadObjects(file);
     return scene;
   }
 

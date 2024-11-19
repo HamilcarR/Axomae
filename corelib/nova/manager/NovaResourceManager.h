@@ -24,7 +24,7 @@ namespace nova {
     NovaResources resources;
 
     /* Holds the actual objects refered to by the resource structures.*/
-    core::memory::MemoryArena<std::byte> resource_mempool;
+    core::memory::ByteArena resource_mempool;
 
    public:
     NovaResourceManager() = default;
@@ -56,12 +56,7 @@ namespace nova {
 
     /* Scene: Textures */
     void envmapSetData(float *raw_data, int width, int height, int channels);
-
-    void uploadToDevice();
   };
-
-  class GPUNovaResourceManager : public NovaResourceManager {};
-
 }  // namespace nova
 
 #endif  // NOVARESOURCEMANAGER_H

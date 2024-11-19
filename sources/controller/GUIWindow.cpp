@@ -652,10 +652,13 @@ namespace controller {
   }
   /**************************************************************************************************************/
 
+  void Controller::emptySceneCaches() { shared_caches.clear(); }
+
   bool Controller::slot_import_3DOBJ() {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
     if (!filename.isEmpty()) {
       cleanupNova();
+      emptySceneCaches();
       realtime_viewer->prepareRendererSceneChange();
       nova_viewer->prepareRendererSceneChange();
 
@@ -664,9 +667,11 @@ namespace controller {
       resource_database.getRawImgdatabase()->clean();
 
       IO::Loader loader(progress_manager.get());
-      auto struct_holder = loader.load(filename.toStdString().c_str());
-      std::vector<Mesh *> scene = struct_holder.first;
-      SceneChangeData scene_data = {&struct_holder.second, struct_holder.first};
+      IO::loader_data_t loader_data = loader.load(filename.toStdString().c_str());
+      shared_caches.addSharedCacheAddress(loader_data.texture_cache);
+
+      std::vector<Mesh *> scene = loader_data.mesh_list;
+      SceneChangeData scene_data = {&loader_data.scene_tree, loader_data.mesh_list};
       realtime_viewer->setNewScene(scene_data);
       nova_viewer->setNewScene(scene_data);
       uv_mesh_selector.setScene(scene);
@@ -854,7 +859,6 @@ namespace controller {
   /**************************************************************************************************************/
 
   void Controller::cleanupWindowProcess(QWidget *widget) { cleanupNova(); }
-
   void Controller::slot_on_closed_spawn_window(QWidget *address) { cleanupWindowProcess(address); }
 
   /**************************************************************************************************************/

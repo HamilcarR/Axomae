@@ -7,7 +7,7 @@ namespace nova::material {
 
   class TexturePackSampler {
    private:
-    texture_pack tpack;
+    texture_pack tpack{};
 
    public:
     CLASS_CM(TexturePackSampler)

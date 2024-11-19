@@ -4,7 +4,7 @@
 #include <any>
 
 namespace device::gpgpu {
-  enum FORMAT_TYPE { FLOAT = 0 };
+  enum FORMAT_TYPE { FLOAT, UINT8X4N };
 
   struct channel_format {
     int bits_size_x, bits_size_y, bits_size_z, bits_size_a;
