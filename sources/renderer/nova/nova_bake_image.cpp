@@ -66,7 +66,7 @@ namespace nova_baker_utils {
     texture_raw_data.height = envmap.hdr_envmap->metadata.height;
   }
 
-  void initialize_manager(const engine_data &engine_opts, nova::NovaResourceManager &manager) {
+  void initialize_manager(const engine_data &engine_opts, nova::NovaResourceManager &manager, nova::device_shared_caches_t &shared_caches) {
     /* Initialize every matrix of the scene , and camera structures*/
     nova::camera::CameraResourcesHolder &camera_resources_holder = manager.getCameraData();
     nova::scene::SceneTransformations &scene_transformations = manager.getSceneTransformation();
@@ -82,11 +82,12 @@ namespace nova_baker_utils {
     /* Build Scene */
     if (!engine_opts.mesh_list)
       throw exception::NullMeshListException();
-    build_scene(*engine_opts.mesh_list, manager);
+    nova_baker_utils::bake_buffers_storage_t buffers = build_scene(*engine_opts.mesh_list, manager);
+    shared_caches.addSharedCacheAddress(buffers.texture_buffers.image_alloc_buffer);
     build_acceleration_structure(manager);
   }
 
-  void bake_scene(render_scene_data &rendering_data) {
+  void bake_scene(render_scene_context &rendering_data) {
     nova::nova_eng_internals interns{rendering_data.nova_resource_manager.get(), rendering_data.nova_exception_manager.get()};
     nova::draw(rendering_data.buffers.get(),
                rendering_data.width,
@@ -97,16 +98,24 @@ namespace nova_baker_utils {
 
     );
   }
-  void bake_scene_gpu(render_scene_data &rendering_data) {
+  void bake_scene_gpu(render_scene_context &rendering_data) {
+#if defined(AXOMAE_USE_CUDA)
     nova::nova_eng_internals interns{rendering_data.nova_resource_manager.get(), rendering_data.nova_exception_manager.get()};
-    nova::gpu_draw(rendering_data.buffers.get(), rendering_data.width, rendering_data.height, rendering_data.engine_instance.get(), interns);
+    const nova::device_shared_caches_t &buffer_collection = rendering_data.shared_caches;
+    nova::gputils::lock_host_memory_default(buffer_collection);
+    nova::gpu_draw(
+        rendering_data.buffers.get(), rendering_data.width, rendering_data.height, rendering_data.engine_instance.get(), interns, buffer_collection);
+    nova::gputils::unlock_host_memory(buffer_collection);
+#else
+    LOG("Application built without CUDA. Enable AXOMAE_USE_CUDA in build if GPU is compatible.", LogLevel::ERROR);
+#endif
   }
-  void cancel_render(render_scene_data &rendering_data) { rendering_data.nova_resource_manager->getEngineData().is_rendering = false; }
-  void start_render(render_scene_data &rendering_data) { rendering_data.nova_resource_manager->getEngineData().is_rendering = true; }
+  void cancel_render(render_scene_context &rendering_data) { rendering_data.nova_resource_manager->getEngineData().is_rendering = false; }
+  void start_render(render_scene_context &rendering_data) { rendering_data.nova_resource_manager->getEngineData().is_rendering = true; }
 
   std::unique_ptr<NovaRenderEngineInterface> create_engine(const engine_data &engine_type) { return std::make_unique<nova::NovaRenderEngineLR>(); }
 
-  void synchronize_render_threads(render_scene_data &scene_data, const std::string &tag) {
+  void synchronize_render_threads(render_scene_context &scene_data, const std::string &tag) {
     if (scene_data.thread_pool) {
       scene_data.thread_pool->fence(tag);
     }

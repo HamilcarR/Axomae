@@ -7,6 +7,8 @@
 #include "SceneHierarchy.h"
 #include "constants.h"
 
+#include <boost/core/span.hpp>
+
 /**
  * @file Loader.h
  * Implements a Loader class that will read mesh data and textures from disk
@@ -14,6 +16,11 @@
  */
 
 namespace IO {
+  struct loader_data_t {
+    boost::span<uint8_t> texture_cache;
+    std::vector<Mesh *> mesh_list;
+    SceneTree scene_tree;
+  };
 
   /**
    * @brief 3D Loader class
@@ -32,7 +39,7 @@ namespace IO {
      * @param file Path of the 3D glb model
      * @return std::vector<Mesh*>
      */
-    std::pair<std::vector<Mesh *>, SceneTree> load(const char *file);
+    loader_data_t load(const char *file);
 
     /**
      * @brief Loads a text file , with new lines
@@ -44,7 +51,7 @@ namespace IO {
     /**
      * @brief Loads all meshes from the GLB file.
      */
-    std::pair<std::vector<Mesh *>, SceneTree> loadObjects(const char *filename);
+    loader_data_t loadObjects(const char *filename);
 
     /**
      * @brief Loads an HDR equirectangular envmap . Alpha channel is clipped .

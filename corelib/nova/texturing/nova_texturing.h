@@ -12,9 +12,9 @@ namespace nova::texturing {
     std::vector<NovaTextureInterface> textures;
 
     template<class T, class... Args>
-    NovaTextureInterface add_texture(T *allocation_buffer, std::size_t offset, Args &&...args) {
+    NovaTextureInterface add_texture(core::memory::ByteArena &memory_arena, T *allocation_buffer, std::size_t offset, Args &&...args) {
       static_assert(core::has<T, TYPELIST>::has_type, "Provided type is not a Texture type.");
-      T *allocated_ptr = core::memory::MemoryArena<>::construct<T>(&allocation_buffer[offset], std::forward<Args>(args)...);
+      T *allocated_ptr = memory_arena.constructAtMemPosition(allocation_buffer, offset, std::forward<Args>(args)...);
       textures.push_back(allocated_ptr);
       return textures.back();
     }

@@ -2,7 +2,8 @@
 
 namespace nova::texturing {
 
-  ax_no_discard glm::vec4 NovaTextureInterface::sample(float u, float v, const texture_sample_data &sample_data) const {
+
+  glm::vec4 NovaTextureInterface::sample(float u, float v, const texture_sample_data &sample_data) const {
     auto disp = [&](auto texture) { return texture->sample(u, v, sample_data); };
     return dispatch(disp);
   }
@@ -17,7 +18,7 @@ namespace nova::texturing {
     is_rgba = isrgba;
   }
 
-  ax_no_discard glm::vec4 ImageTexture::sample(float u, float v, const texture_sample_data & /*sample_data*/) const {
+  glm::vec4 ImageTexture::sample(float u, float v, const texture_sample_data & /*sample_data*/) const {
     unsigned i = math::texture::uvToPixel(u, width - 1);
     unsigned j = math::texture::uvToPixel(v, height - 1);
     unsigned idx = (i * height + j);

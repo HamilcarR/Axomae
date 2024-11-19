@@ -16,4 +16,8 @@
 #include "OpacityTexture.h"
 #include "RoughnessTexture.h"
 #include "SpecularTexture.h"
+
+/* Number of minimal textures needed for a render pass : albedo, normal map, metallic ,roughness, AO , and emissive */
+constexpr unsigned PBR_PIPELINE_TEX_NUM = 6 ;
+
 #endif
