@@ -166,6 +166,7 @@ namespace device::gpgpu {
     switch (type) {
       case FLOAT:
         return cudaChannelFormatKindFloat;
+      case UINT8X4N:
       default:
         return cudaChannelFormatKindUnsignedNormalized8X4;
     }

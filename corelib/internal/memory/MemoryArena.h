@@ -56,7 +56,7 @@ namespace core::memory {
     MemoryArena(MemoryArena &&) noexcept = default;
     MemoryArena &operator=(MemoryArena &&) noexcept = default;
 
-    MemoryArena(std::size_t block_size_ = DEFAULT_BLOCK_SIZE) : block_size(block_size_) {}
+    explicit MemoryArena(std::size_t block_size_ = DEFAULT_BLOCK_SIZE) : block_size(block_size_) {}
 
     ~MemoryArena() {
       freeAlign(current_block.current_block_ptr, current_block.current_alignment);
@@ -91,8 +91,8 @@ namespace core::memory {
     }
 
     template<class U>
-    U *construct(std::size_t num_instances, bool constructor = true) noexcept {
-      U *memory_alloc = static_cast<U *>(allocate(num_instances * sizeof(U)));
+    U *construct(std::size_t num_instances, bool constructor = true, std::size_t alignment = PLATFORM_ALIGN) noexcept {
+      U *memory_alloc = static_cast<U *>(allocate(num_instances * sizeof(U), alignment));
       if (constructor) {
         for (std::size_t i = 0; i < num_instances; i++)
           ::new (&memory_alloc[i]) U();
@@ -110,7 +110,8 @@ namespace core::memory {
 
     template<class U, class... Args>
     U *constructAtMemPosition(U *start_buffer_address, std::size_t cache_element_position, Args &&...args) {
-      std::size_t offset = cache_element_position * sizeof(U);
+      AX_ASSERT_EQ(reinterpret_cast<uintptr_t>(start_buffer_address) % current_block.current_alignment, 0);
+      std::size_t offset = cache_element_position * compute_alignment(sizeof(U), current_block.current_alignment);
       uintptr_t new_address = reinterpret_cast<uintptr_t>(start_buffer_address) + offset;
       if (new_address % current_block.current_alignment != 0) {
         new_address = compute_alignment(new_address, current_block.current_alignment);
@@ -149,9 +150,7 @@ namespace core::memory {
         /* Looks for a free block in the free_block list with enough memory.*/  // TODO : Replace with best fit rather than first fit.
         for (typename block_list_t::const_iterator block = free_blocks.begin(); block != free_blocks.end(); block++) {
           if (block->current_alloc_size >= size_bytes) {
-            current_block.current_block_ptr = block->current_block_ptr;
-            current_block.current_alloc_size = block->current_alloc_size;
-            current_block.current_alignment = block->current_alignment;
+            current_block = *block;
             free_blocks.erase(block);
             break;
           }

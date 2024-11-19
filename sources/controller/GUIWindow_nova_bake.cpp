@@ -64,7 +64,7 @@ namespace controller {
     engine_data.camera = camera_data;
   }
 
-  static void setup_scene_transfo(nova_baker_utils::engine_data &engine_data, const Camera &renderer_camera) {
+  static void setup_scene_transformation(nova_baker_utils::engine_data &engine_data, const Camera &renderer_camera) {
     /* Scene transformations */
     nova_baker_utils::scene_transform_data scene_transfo{};
     scene_transfo.root_rotation = renderer_camera.getSceneRotationMatrix();
@@ -96,7 +96,8 @@ namespace controller {
     engine_data.threadpool_tag = NOVABAKE_POOL_TAG;
   }
 
-  std::unique_ptr<nova::HdrBufferStruct> allocate_buffers(NovaBakingStructure &nova_baking_structure, const ui_render_options &render_options) {
+  std::unique_ptr<nova::HdrBufferStruct> allocate_buffers(nova_baker_utils::NovaBakingStructure &nova_baking_structure,
+                                                          const ui_render_options &render_options) {
 
     /* buffers*/
     image::ThumbnailImageHolder<float> &image_holder = nova_baking_structure.bake_buffers.image_holder;
@@ -140,20 +141,21 @@ namespace controller {
     engine_data.mesh_list = &mesh_collection;
     setup_engine(engine_data, render_options, misc_options);
     setup_camera(engine_data, renderer_camera, render_options.width, render_options.height);
-    setup_scene_transfo(engine_data, renderer_camera);
+    setup_scene_transformation(engine_data, renderer_camera);
     setup_environment_map(engine_data, renderer);
     return engine_data;
   }
 
-  void setup_render_scene_data(const ui_render_options &render_options,
-                               std::unique_ptr<nova::NovaResourceManager> manager,
-                               std::unique_ptr<nova::NovaExceptionManager> exception_manager,
-                               std::unique_ptr<NovaRenderEngineInterface> engine_instance,
-                               NovaBakingStructure &nova_baking_structure,
-                               threading::ThreadPool *thread_pool) {
+  static void setup_render_scene_data(const ui_render_options &render_options,
+                                      std::unique_ptr<nova::NovaResourceManager> manager,
+                                      std::unique_ptr<nova::NovaExceptionManager> exception_manager,
+                                      std::unique_ptr<NovaRenderEngineInterface> engine_instance,
+                                      const nova::device_shared_caches_t &shared_caches,
+                                      nova_baker_utils::NovaBakingStructure &nova_baking_structure,
+                                      threading::ThreadPool *thread_pool) {
     /* Engine type */
-    nova_baking_structure.nova_render_scene = nova_baker_utils::render_scene_data{};
-    nova_baker_utils::render_scene_data &render_scene_data = nova_baking_structure.nova_render_scene;
+    nova_baking_structure.nova_render_scene = nova_baker_utils::render_scene_context{};
+    nova_baker_utils::render_scene_context &render_scene_data = nova_baking_structure.nova_render_scene;
     render_scene_data.buffers = allocate_buffers(nova_baking_structure, render_options);
     render_scene_data.width = render_options.width;
     render_scene_data.height = render_options.height;
@@ -161,6 +163,7 @@ namespace controller {
     render_scene_data.nova_resource_manager = std::move(manager);
     render_scene_data.nova_exception_manager = std::move(exception_manager);
     render_scene_data.thread_pool = thread_pool;
+    render_scene_data.shared_caches = shared_caches;
   }
 
   /**************************************************************************************************************/
@@ -242,7 +245,7 @@ namespace controller {
     bool is_rendering;
   };
 
-  static progressive_render_metadata create_render_metadata(const nova_baker_utils::render_scene_data &render_scene_data) {
+  static progressive_render_metadata create_render_metadata(const nova_baker_utils::render_scene_context &render_scene_data) {
     int max_depth = render_scene_data.nova_resource_manager->getEngineData().max_depth;
     int max_samples = render_scene_data.nova_resource_manager->getEngineData().max_depth;
     int smax = math::calculus::compute_serie_term(max_samples);
@@ -250,7 +253,7 @@ namespace controller {
     return {max_depth, max_samples, smax, is_rendering};
   }
 
-  static void do_progressive_render_gpu(nova_baker_utils::render_scene_data &render_scene_data, image::ImageHolder<float> &image_holder) {
+  static void do_progressive_render_gpu(nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder) {
     int sample_increment = 1;
     progressive_render_metadata metadata = create_render_metadata(render_scene_data);
     while (sample_increment < metadata.max_samples && metadata.is_rendering) {
@@ -273,7 +276,7 @@ namespace controller {
     }
   }
 
-  static void do_progressive_render(nova_baker_utils::render_scene_data &render_scene_data, image::ImageHolder<float> &image_holder) {
+  static void do_progressive_render(nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder) {
     int sample_increment = 1;
     progressive_render_metadata metadata = create_render_metadata(render_scene_data);
     while (sample_increment < metadata.max_samples && metadata.is_rendering) {
@@ -300,7 +303,7 @@ namespace controller {
 
   static void display_render(controller::Controller *app_controller, image::ThumbnailImageHolder<float> &image_holder) {
     /* Creates a texture widget that will display the rendered image */
-    NovaBakingStructure &nova_baking_structure = app_controller->getBakingStructure();
+    nova_baker_utils::NovaBakingStructure &nova_baking_structure = app_controller->getBakingStructure();
     auto &texture_widget = nova_baking_structure.spawned_window;
     texture_widget = texture_display_render(app_controller, image_holder);
     if (!texture_widget)
@@ -309,18 +312,18 @@ namespace controller {
     img_ptr->show();
   }
 
-  static void start_baking(nova_baker_utils::render_scene_data &render_scene_data,
+  static void start_baking(nova_baker_utils::render_scene_context &render_scene_data,
                            Controller *app_controller,
                            image::ThumbnailImageHolder<float> &image_holder,
                            bool use_gpu) {
-    std::function<void(nova_baker_utils::render_scene_data &, image::ImageHolder<float> &)> callback;
+    std::function<void(nova_baker_utils::render_scene_context &, image::ImageHolder<float> &)> callback;
 
     if (use_gpu) {
-      callback = [](nova_baker_utils::render_scene_data &render_scene_data, image::ImageHolder<float> &image_holder) {
+      callback = [](nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder) {
         do_progressive_render_gpu(render_scene_data, image_holder);
       };
     } else {
-      callback = [](nova_baker_utils::render_scene_data &render_scene_data, image::ImageHolder<float> &image_holder) {
+      callback = [](nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder) {
         do_progressive_render(render_scene_data, image_holder);
       };
     }
@@ -328,7 +331,7 @@ namespace controller {
     /* Creates a rendering thread . Will be moved to the baking structure ,
      * which will take care of managing it's lifetime */
     std::thread th(callback, std::ref(render_scene_data), std::ref(image_holder));
-    NovaBakingStructure &nova_baking_structure = app_controller->getBakingStructure();
+    nova_baker_utils::NovaBakingStructure &nova_baking_structure = app_controller->getBakingStructure();
     nova_baking_structure.rendering_thread = std::move(th);
     try {
       display_render(app_controller, image_holder);
@@ -371,13 +374,19 @@ namespace controller {
     try {
       nova_baking_structure.reinitialize();
       nova_baker_utils::engine_data engine_data = generate_engine_data(mesh_collection, render_options, misc_options, *renderer_camera, renderer);
-      std::unique_ptr<nova::NovaResourceManager> resource_manager = std::make_unique<nova::NovaResourceManager>();
+      std::unique_ptr<nova::NovaResourceManager> resource_manager =
+          std::make_unique<nova::NovaResourceManager>();  // TODO : pass Controller's memory pool
       std::unique_ptr<nova::NovaExceptionManager> exception_manager = std::make_unique<nova::NovaExceptionManager>();
-      nova_baker_utils::initialize_manager(engine_data, *resource_manager);
+      nova_baker_utils::initialize_manager(engine_data, *resource_manager, shared_caches);
       std::unique_ptr<NovaRenderEngineInterface> engine_instance = create_engine(engine_data);
       threading::ThreadPool *thread_pool = global_application_config->getThreadPool();
-      setup_render_scene_data(
-          render_options, std::move(resource_manager), std::move(exception_manager), std::move(engine_instance), nova_baking_structure, thread_pool);
+      setup_render_scene_data(render_options,
+                              std::move(resource_manager),
+                              std::move(exception_manager),
+                              std::move(engine_instance),
+                              shared_caches,
+                              nova_baking_structure,
+                              thread_pool);
       start_baking(nova_baking_structure.nova_render_scene, this, nova_baking_structure.bake_buffers.image_holder, misc_options.use_gpu);
       ignore_skybox(renderer, false);
     } catch (const exception::CatastrophicFailureException &e) {
@@ -508,6 +517,8 @@ namespace controller {
       /* Synchronize the threads. */
       global_application_config->getThreadPool()->fence(NOVABAKE_POOL_TAG);
     }
+
+    /* Cleanup gpu resources */
   }
 
   void Controller::cleanupNova() {

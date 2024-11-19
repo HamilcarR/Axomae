@@ -15,20 +15,26 @@ namespace resrc = device::gpgpu;
 /* Serves only as a baseline for performance to compare against */
 namespace nova {
   namespace gpu {
-    ax_kernel void test_func(float *ptr, cudaTextureObject_t host_texture, unsigned width, unsigned height, int i_width, int i_height) {
-      unsigned int x = blockDim.x * blockIdx.x + threadIdx.x;
-      unsigned int y = blockDim.y * blockIdx.y + threadIdx.y;
+    ax_kernel void test_func(float *ptr,
+                             cudaTextureObject_t host_texture,
+                             unsigned width,
+                             unsigned height,
+                             int i_width,
+                             int i_height,
+                             texturing::NovaTextureInterface other_tex) {
+      unsigned int x = ax_device_thread_idx_x;
+      unsigned int y = ax_device_thread_idx_y;
       unsigned int offset = (y * width + x) * 4;
 
       if (offset < width * height * 4) {
         float u = math::texture::pixelToUv(x, width);
         float v = math::texture::pixelToUv(y, height);
-
-        float4 sample{};
-        sample = tex2D<float4>(host_texture, u, v);
-        ptr[offset] = sample.x;
-        ptr[offset + 1] = sample.y;
-        ptr[offset + 2] = sample.z;
+        texturing::texture_sample_data sample_data{};
+        glm::vec4 other_value = other_tex.sample(u, v, sample_data);
+        float4 sample{other_value.r, other_value.g, other_value.b};
+        ptr[offset] = sample.x / 10;
+        ptr[offset + 1] = sample.y / 10;
+        ptr[offset + 2] = sample.z / 10;
         ptr[offset + 3] = 1.f;
       }
     }
@@ -54,7 +60,8 @@ namespace nova {
                          unsigned screen_width,
                          unsigned screen_height,
                          NovaRenderEngineInterface *engine_interface,
-                         nova::nova_eng_internals &nova_internals) {
+                         nova::nova_eng_internals &nova_internals,
+                         const internal_gpu_integrator_shared_host_mem_t &shared_host_caches) {
 
     if (ax_cuda::utils::cuda_info_device().empty()) {
       LOGS("No suitable gpu detected.");
@@ -66,6 +73,7 @@ namespace nova {
     const texturing::TextureRawData image_texture = resource_manager->getEnvmapData();
     std::size_t screen_size = screen_width * screen_height * buffers->channels * sizeof(float);
 
+    texturing::NovaTextureInterface some_image = resource_manager->getTexturesData().get_textures()[0];
     resrc::texture_descriptor tex_desc{};
     resrc::resource_descriptor res_desc{};
     setup_descriptors(tex_desc, res_desc);
@@ -73,7 +81,6 @@ namespace nova {
         (const void *)image_texture.raw_data, image_texture.width, image_texture.height, tex_desc, res_desc);
     resrc::GPU_query_result draw_buffer = resrc::allocate_buffer(screen_size);
     DEVICE_ERROR_CHECK(draw_buffer.error_status);
-
     kernel_argpack_t argpack;
     argpack.num_blocks = {screen_width / 32, screen_height, 1};
     argpack.block_size = {32, 1, 1};
@@ -84,7 +91,8 @@ namespace nova {
                 screen_width,
                 screen_height,
                 image_texture.width,
-                image_texture.height);
+                image_texture.height,
+                some_image);
     DEVICE_ERROR_CHECK(resrc::copy_buffer(draw_buffer.device_ptr, buffers->partial_buffer, screen_size, resrc::DEVICE_HOST).error_status);
     DEVICE_ERROR_CHECK(resrc::deallocate_buffer(draw_buffer.device_ptr).error_status);
     resrc::destroy_texture(texture_resrc);
