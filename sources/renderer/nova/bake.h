@@ -3,8 +3,8 @@
 #include "NovaInterface.h"
 #include "Texture.h"
 #include "bake_render_data.h"
-#include "boost/core/span.hpp"
 #include "engine/nova_exception.h"
+#include "internal/common/axstd/span.h"
 
 class Camera;
 class TextureGroup;
@@ -50,7 +50,8 @@ namespace nova_baker_utils {
                                                             std::size_t &alloc_offset_materials);
   bake_buffers_storage_t build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager);
   /* Uses the primitives in the SceneResourceHolder to build the acceleration structure stored in the manager's Accelerator structure*/
-  void build_acceleration_structure(nova::NovaResourceManager &manager);
+  nova::aggregate::Accelerator build_performance_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives);
+  nova::aggregate::Accelerator build_quality_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives);
   void transform_vertices(const geometry::face_data_tri &tri_primitive, const glm::mat4 &final_transfo, glm::vec3 vertices[3]);
   void transform_normals(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 normals[3]);
   void transform_tangents(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 tangents[3]);

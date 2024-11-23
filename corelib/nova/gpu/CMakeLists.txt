@@ -1,6 +1,4 @@
-add_library(ax_core_nova_gpu STATIC
-        nova_gpu_utils.cpp
-)
+add_library(ax_core_nova_gpu STATIC)
 
 target_link_libraries(ax_core_nova_gpu
 PRIVATE

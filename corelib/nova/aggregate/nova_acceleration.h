@@ -6,9 +6,10 @@ namespace nova::aggregate {
   struct Accelerator {
     Bvhtl accelerator;
 
-    template<class... Args>
-    void build(Args &&...args) {
-      accelerator.build(std::forward<Args>(args)...);
+    void buildBVH(const axstd::span<primitive::NovaPrimitiveInterface> &primitives,
+                  BvhtlBuilder::BUILD_TYPE build_type = BvhtlBuilder::PERFORMANCE,
+                  BvhtlBuilder::SEGMENTATION segmentation = BvhtlBuilder::SAH) {
+      accelerator.build(primitives, build_type, segmentation);
     }
   };
 }  // namespace nova::aggregate
