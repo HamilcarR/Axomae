@@ -2,10 +2,10 @@
 #include "Mesh.h"
 #include "TextureGroup.h"
 #include "bake.h"
+#include "internal/common/axstd/span.h"
 #include "internal/macro/project_macros.h"
 #include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
-
 namespace nova_baker_utils {
 
   static std::size_t compute_primitive_number(const std::vector<Mesh *> &meshes, int indices_padding = 3) {
@@ -48,7 +48,7 @@ namespace nova_baker_utils {
     auto *image_texture_buffer = reinterpret_cast<uint8_t *>(
         memory_pool.construct<nova::texturing::ImageTexture>(PBR_PIPELINE_TEX_NUM * meshes.size(), true));
     texture_buffers_t texture_buffers{};
-    texture_buffers.image_alloc_buffer = boost::span(image_texture_buffer, PBR_PIPELINE_TEX_NUM * meshes.size());
+    texture_buffers.image_alloc_buffer = axstd::span<uint8_t>(image_texture_buffer, PBR_PIPELINE_TEX_NUM * meshes.size());
     material_buffers_t material_buffers = allocate_materials_buffers(manager.getMemoryPool(), meshes.size());
     std::size_t alloc_offset_primitives = 0, alloc_offset_materials = 0;
 
@@ -63,8 +63,16 @@ namespace nova_baker_utils {
     return bake_buffers_storage;
   }
 
-  void build_acceleration_structure(nova::NovaResourceManager &manager) {
-    const auto *primitive_collection_ptr = &manager.getPrimitiveData().get_primitives();
-    manager.getAccelerationData().build(primitive_collection_ptr);
+  nova::aggregate::Accelerator build_performance_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives) {
+    nova::aggregate::Accelerator accelerator{};
+    accelerator.buildBVH(primitives);
+    return accelerator;
   }
+
+  nova::aggregate::Accelerator build_quality_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives) {
+    nova::aggregate::Accelerator accelerator{};
+    accelerator.buildBVH(primitives);
+    return accelerator;
+  }
+
 }  // namespace nova_baker_utils

@@ -12,4 +12,8 @@ namespace nova {
     envmap_data.channels = channels;
   }
 
+  void NovaResourceManager::setAccelerationStructure(aggregate::Accelerator acceleration_structure) {
+    resources.scene_data.acceleration_data = std::move(acceleration_structure);
+  }
+
 }  // namespace nova

@@ -19,7 +19,7 @@ namespace nova_baker_utils {
   };
 
   struct texture_buffers_t {
-    boost::span<uint8_t> image_alloc_buffer;
+    axstd::span<uint8_t> image_alloc_buffer;
   };
 
   struct primitive_buffers_t {

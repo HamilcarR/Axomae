@@ -4,6 +4,8 @@
 
 #include "internal/common/exception/GenericException.h"
 
+#include <internal/common/axstd/span.h>
+
 namespace exception {
   class BadSizeException : public GenericException {
    public:
@@ -13,7 +15,7 @@ namespace exception {
 
 namespace nova::aggregate {
 
-  Bvht_data BvhtlBuilder::build(const std::vector<primitive::NovaPrimitiveInterface> &primitives, BUILD_TYPE type, SEGMENTATION segmentation) {
+  Bvht_data BvhtlBuilder::build(const axstd::span<primitive::NovaPrimitiveInterface> &primitives, BUILD_TYPE type, SEGMENTATION segmentation) {
 
     Bvht_data bvh_data;
     const std::size_t prim_size = primitives.size();
@@ -34,7 +36,7 @@ namespace nova::aggregate {
     return bvh_data;
   }
 
-  void BvhtlBuilder::update_aabb(const std::vector<primitive::NovaPrimitiveInterface> &primitives, int32_t node_id, Bvht_data &bvh_data) {
+  void BvhtlBuilder::update_aabb(const axstd::span<primitive::NovaPrimitiveInterface> &primitives, int32_t node_id, Bvht_data &bvh_data) {
     AX_ASSERT_FALSE(primitives.empty());
     AX_ASSERT_LT(node_id, bvh_data.l_tree.size());
 
@@ -72,7 +74,7 @@ namespace nova::aggregate {
   }
 
   static float eval_sah(
-      const Bvht_data &tree, const std::vector<primitive::NovaPrimitiveInterface> &primitives, const Bvhnl &node, int axis, float candidate_pos) {
+      const Bvht_data &tree, const axstd::span<primitive::NovaPrimitiveInterface> &primitives, const Bvhnl &node, int axis, float candidate_pos) {
     AX_ASSERT_LT(axis, 3);
     AX_ASSERT_GE(axis, 0);
     geometry::BoundingBox aabb_left, aabb_right;
@@ -111,7 +113,7 @@ namespace nova::aggregate {
   }
 
   static int axis_subdiv_sah(const Bvht_data &bvh_tree_data,
-                             const std::vector<primitive::NovaPrimitiveInterface> &primitives,
+                             const axstd::span<primitive::NovaPrimitiveInterface> &primitives,
                              int32_t node_id,
                              float &best_coast_r,
                              float subdivided_axis[3],
@@ -145,7 +147,7 @@ namespace nova::aggregate {
     return best_axis;
   }
 
-  static int32_t create_nodes(const std::vector<primitive::NovaPrimitiveInterface> &primitives,
+  static int32_t create_nodes(const axstd::span<primitive::NovaPrimitiveInterface> &primitives,
                               std::vector<int32_t> &prim_idx,
                               Bvhnl &node,
                               const float split_axis[3],
@@ -168,7 +170,7 @@ namespace nova::aggregate {
     return i;
   }
 
-  void BvhtlBuilder::subdivide(const std::vector<primitive::NovaPrimitiveInterface> &primitives,
+  void BvhtlBuilder::subdivide(const axstd::span<primitive::NovaPrimitiveInterface> &primitives,
                                int32_t node_id,
                                int32_t &nodes_used,
                                BUILD_TYPE build_type,

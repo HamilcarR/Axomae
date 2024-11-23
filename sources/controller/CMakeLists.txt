@@ -11,6 +11,7 @@ add_library(ax_controller STATIC
     cmd/ProgramOptionsManager.cpp
     event/EventController.h
     event/EventInterface.h
+    DisplayManager3D.cpp
 )
 
 target_link_libraries(ax_controller
