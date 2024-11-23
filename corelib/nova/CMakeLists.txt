@@ -2,6 +2,7 @@
 add_library(ax_core_nova STATIC
         DrawEngine.cpp
         DrawEngine_GPU.cpp
+        nova_gpu_utils.cpp
 )
 
 target_link_libraries(ax_core PRIVATE ax_core_nova)

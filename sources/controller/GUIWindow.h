@@ -1,6 +1,7 @@
 #ifndef GUIWINDOW_H
 #define GUIWINDOW_H
 
+#include "DisplayManager3D.h"
 #include "LightControllerUI.h"
 #include "Renderer.h"
 #include "SceneListView.h"
@@ -9,7 +10,6 @@
 #include "nova/bake.h"
 #include "nova/bake_render_data.h"
 #include "ui_main_window.h"
-
 #include <QtWidgets/qmainwindow.h>
 
 /**
@@ -50,8 +50,6 @@ namespace controller {
    private:
     Ui::MainWindow main_window_ui;
 
-    /* The 3D model viewer */
-    GLViewer *realtime_viewer;
     SceneListView *renderer_scene_list;
     ResourceDatabaseManager &resource_database;
     std::unique_ptr<LightController> light_controller;
@@ -64,12 +62,12 @@ namespace controller {
     std::unique_ptr<WorkspaceTracker> current_workspace;
     /* Timer for renderer synchro */
     std::unique_ptr<QTimer> timer;
-    /* Raytracing engine display*/
-    GLViewer *nova_viewer;
 
     core::memory::ByteArena memory_pool;
     nova_baker_utils::NovaBakingStructure nova_baking_structure;
     nova::device_shared_caches_t shared_caches;
+
+    DisplayManager3D display_manager;
 
    public:
     static HeapManagement *_MemManagement;  // TODO : Useless , Refactor

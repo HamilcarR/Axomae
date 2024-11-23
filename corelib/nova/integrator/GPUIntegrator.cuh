@@ -1,10 +1,10 @@
 #ifndef GPU_CUH
 #define GPU_CUH
-
+#include "internal/common/axstd/span.h"
 namespace nova {
 
   struct internal_gpu_integrator_shared_host_mem_t {
-    std::vector<boost::span<uint8_t>> buffers;
+    std::vector<axstd::span<uint8_t>> buffers;
   };
   void launch_gpu_kernel(HdrBufferStruct *buffers,
                          unsigned screen_width,
