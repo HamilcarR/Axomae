@@ -54,6 +54,9 @@ namespace nova {
       getMaterialData().clear();
     }
 
+    /* Will take ownership of acceleration_structure */
+    void setAccelerationStructure(aggregate::Accelerator acceleration_structure);
+
     /* Scene: Textures */
     void envmapSetData(float *raw_data, int width, int height, int channels);
   };

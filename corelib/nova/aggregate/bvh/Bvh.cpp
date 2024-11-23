@@ -7,18 +7,18 @@
 
 namespace nova::aggregate {
   namespace prim = nova::primitive;
-  Bvhtl::Bvhtl(const std::vector<primitive::NovaPrimitiveInterface> *primitives_, BvhtlBuilder::BUILD_TYPE type, BvhtlBuilder::SEGMENTATION seg)
+  Bvhtl::Bvhtl(const axstd::span<primitive::NovaPrimitiveInterface> &primitives_, BvhtlBuilder::BUILD_TYPE type, BvhtlBuilder::SEGMENTATION seg)
       : primitives(primitives_) {
     AX_ASSERT_NOTNULL(primitives);
-    bvh = BvhtlBuilder::build(*primitives, type, seg);
+    bvh = BvhtlBuilder::build(primitives, type, seg);
   }
 
-  void Bvhtl::build(const std::vector<primitive::NovaPrimitiveInterface> *primitives_,
+  void Bvhtl::build(const axstd::span<primitive::NovaPrimitiveInterface> &primitives_,
                     BvhtlBuilder::BUILD_TYPE type,
                     BvhtlBuilder::SEGMENTATION segmentation) {
     AX_ASSERT_NOTNULL(primitives_);
     primitives = primitives_;
-    bvh = BvhtlBuilder::build(*primitives, type, segmentation);
+    bvh = BvhtlBuilder::build(primitives, type, segmentation);
   }
 
   using primitive_ptr = prim::NovaPrimitiveInterface;
@@ -28,7 +28,7 @@ namespace nova::aggregate {
                            float tmax,
                            hit_data &data,
                            base_options *user_options,
-                           const std::vector<primitive_ptr> *primitives,
+                           const axstd::span<primitive_ptr> &primitives,
                            const Bvht_data &bvh,
                            int32_t node_id) const {
 
@@ -49,7 +49,7 @@ namespace nova::aggregate {
         AX_ASSERT_LT(offset, bvh.prim_idx.size());
         int32_t p_idx = bvh.prim_idx[offset];
         AX_ASSERT_LT(p_idx, primitives->size());
-        const primitive::NovaPrimitiveInterface *prim = &(*primitives)[p_idx];
+        const primitive::NovaPrimitiveInterface *prim = &(primitives)[p_idx];
 
         if (prim->hit(r, tmin, hit_option->data.tmin, data, nullptr)) {
           hit = true;
@@ -78,7 +78,7 @@ namespace nova::aggregate {
                             float /*tmax*/,
                             hit_data &data,
                             base_options *user_options,
-                            const std::vector<primitive_ptr> *primitives,
+                            const axstd::span<primitive_ptr> &primitives,
                             const Bvht_data &bvh) const {
     AX_ASSERT_NOTNULL(user_options);
     auto *options = (base_options_bvh *)user_options;
@@ -129,7 +129,7 @@ namespace nova::aggregate {
           AX_ASSERT_LT(primitive_offset, bvh.prim_idx.size());
           int32_t p_idx = bvh.prim_idx[primitive_offset];
           AX_ASSERT_LT(p_idx, primitives->size());
-          const primitive::NovaPrimitiveInterface *prim = &(*primitives)[p_idx];
+          const primitive::NovaPrimitiveInterface *prim = &(primitives)[p_idx];
           if (!prim->hit(r, tmin, options->data.tmin, data, nullptr))
             continue;
           hit = true;
@@ -144,7 +144,7 @@ namespace nova::aggregate {
   }
 
   bool Bvhtl::hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const {
-    if (!primitives)
+    if (primitives.empty())
       return false;
     return iter_traverse(r, tmin, tmax, data, user_options, primitives, bvh);
   }

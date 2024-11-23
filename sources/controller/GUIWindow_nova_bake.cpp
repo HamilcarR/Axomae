@@ -348,6 +348,7 @@ namespace controller {
 
   void Controller::do_nova_render(const ui_render_options &render_options, const engine_misc_options &misc_options) {
 
+    GLViewer *realtime_viewer = display_manager.getRealtimeViewer();
     if (!(current_workspace->getContext() & UI_RENDERER_RASTER))
       return;
     if (!realtime_viewer)
@@ -377,7 +378,10 @@ namespace controller {
       std::unique_ptr<nova::NovaResourceManager> resource_manager =
           std::make_unique<nova::NovaResourceManager>();  // TODO : pass Controller's memory pool
       std::unique_ptr<nova::NovaExceptionManager> exception_manager = std::make_unique<nova::NovaExceptionManager>();
-      nova_baker_utils::initialize_manager(engine_data, *resource_manager, shared_caches);
+      initialize_manager(engine_data, *resource_manager, shared_caches);
+      nova::aggregate::Accelerator accelerator = nova_baker_utils::build_performance_acceleration_structure(
+          resource_manager->getPrimitiveData().get_primitives());
+      resource_manager->setAccelerationStructure(accelerator);
       std::unique_ptr<NovaRenderEngineInterface> engine_instance = create_engine(engine_data);
       threading::ThreadPool *thread_pool = global_application_config->getThreadPool();
       setup_render_scene_data(render_options,

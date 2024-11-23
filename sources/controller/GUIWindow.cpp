@@ -240,20 +240,10 @@ namespace controller {
     progress_manager = std::make_unique<controller::ProgressStatus>(main_window_ui.progressBar);
     resource_database.setProgressManagerAllDb(progress_manager.get());
 
-    /* Realtime renderer initialization*/
-    realtime_viewer = main_window_ui.renderer_view;
-    renderer_scene_list = main_window_ui.renderer_scene_list;
-    main_window_ui.renderer_envmap_list->setWidget(realtime_viewer);
-    realtime_viewer->getRenderer().getRenderPipeline().setProgressManager(progress_manager.get());
-    realtime_viewer->setProgressManager(progress_manager.get());
-    realtime_viewer->setApplicationConfig(global_application_config.get());
+    display_manager.init(main_window_ui, global_application_config.get(), progress_manager.get());
 
-    /* Nova raytracer */
-    nova_viewer = main_window_ui.nova_viewer->getViewer();
-    nova_viewer->renderOnTimer(0);
-    nova_viewer->getRenderer().getRenderPipeline().setProgressManager(progress_manager.get());
-    nova_viewer->setProgressManager(progress_manager.get());
-    nova_viewer->setApplicationConfig(global_application_config.get());
+    main_window_ui.renderer_envmap_list->setWidget(display_manager.getRealtimeViewer());
+    renderer_scene_list = main_window_ui.renderer_scene_list;
 
     /* UV editor initialization*/
     uv_editor_mesh_list = main_window_ui.meshes_list;
@@ -261,7 +251,7 @@ namespace controller {
 
     /*Lighting GUI initialization*/
     light_controller = std::make_unique<LightController>(main_window_ui);
-    light_controller->setup(realtime_viewer, renderer_scene_list);
+    light_controller->setup(display_manager.getRealtimeViewer(), renderer_scene_list);
 
     /* Undo pointers setup*/
     init_image_session_ptr();
@@ -318,7 +308,7 @@ namespace controller {
   void Controller::closeEvent(QCloseEvent *event) {
     QMainWindow::closeEvent(event);
     if (current_workspace->getContext() & UI_RENDERER_NOVA)
-      nova_viewer->closeEvent(event);
+      display_manager.getNovaViewer()->closeEvent(event);
   }
   /**************************************************************************************************************/
   QGraphicsView *Controller::get_corresponding_view(IMAGETYPE type) {
@@ -657,28 +647,31 @@ namespace controller {
   bool Controller::slot_import_3DOBJ() {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
     if (!filename.isEmpty()) {
-      cleanupNova();
-      emptySceneCaches();
-      realtime_viewer->prepareRendererSceneChange();
-      nova_viewer->prepareRendererSceneChange();
+      try {
+        cleanupNova();
+        emptySceneCaches();
 
-      resource_database.getNodeDatabase()->clean();
-      resource_database.getTextureDatabase()->clean();
-      resource_database.getRawImgdatabase()->clean();
+        resource_database.getNodeDatabase()->clean();
+        resource_database.getTextureDatabase()->clean();
+        resource_database.getRawImgdatabase()->clean();
 
-      IO::Loader loader(progress_manager.get());
-      IO::loader_data_t loader_data = loader.load(filename.toStdString().c_str());
-      shared_caches.addSharedCacheAddress(loader_data.texture_cache);
+        IO::Loader loader(progress_manager.get());
+        IO::loader_data_t loader_data = loader.load(filename.toStdString().c_str());
+        shared_caches.addSharedCacheAddress(loader_data.texture_cache);
 
-      std::vector<Mesh *> scene = loader_data.mesh_list;
-      SceneChangeData scene_data = {&loader_data.scene_tree, loader_data.mesh_list};
-      realtime_viewer->setNewScene(scene_data);
-      nova_viewer->setNewScene(scene_data);
-      uv_mesh_selector.setScene(scene);
-      main_window_ui.meshes_list->setList(scene);
-      SceneTree &scene_hierarchy = realtime_viewer->getRenderer().getScene().getSceneTreeRef();
-      main_window_ui.renderer_scene_list->setScene(scene_hierarchy);
-      return true;
+        std::vector<Mesh *> scene = loader_data.mesh_list;
+        SceneChangeData scene_data = {&loader_data.scene_tree, loader_data.mesh_list};
+        display_manager.setNewScene(scene_data);
+        uv_mesh_selector.setScene(scene);
+        main_window_ui.meshes_list->setList(scene);
+        SceneTree &scene_hierarchy = display_manager.getSceneTree();
+        main_window_ui.renderer_scene_list->setScene(scene_hierarchy);
+        return true;
+      } catch (const exception::CatastrophicFailureException &e) {
+        LOG(e.what(), LogLevel::CRITICAL);
+        ExceptionInfoBoxHandler::handle(e);
+        return false;
+      }
     }
     return false;
   }
@@ -706,7 +699,7 @@ namespace controller {
     QString filename = QFileDialog::getSaveFileName(this, tr("Save files"), "./", tr("All Files (*)"));
     uint64_t flag = current_workspace->getContext();
     if (flag & UI_RENDERER_NOVA) {
-      image::ImageHolder<float> raw_image = nova_viewer->getRenderScreenshotFloat(1920, 1080);
+      image::ImageHolder<float> raw_image = display_manager.getNovaViewer()->getRenderScreenshotFloat(1920, 1080);
       IO::Loader loader(progress_manager.get());
       loader.writeHdr(filename.toStdString().c_str(), raw_image, true);
     } else if (flag & UI_EDITOR_BAKER_NMAP) {
@@ -777,6 +770,8 @@ namespace controller {
   /**************************************************************************************************************/
   void Controller::slot_set_renderer_gamma_value(int value) {
     float v = (float)value / POSTP_SLIDER_DIV;
+    GLViewer *realtime_viewer = display_manager.getRealtimeViewer();
+    GLViewer *nova_viewer = display_manager.getNovaViewer();
     if (realtime_viewer)
       realtime_viewer->rendererCallback<SET_GAMMA>(v);
     if (nova_viewer)
@@ -785,6 +780,8 @@ namespace controller {
 
   /**************************************************************************************************************/
   void Controller::slot_reset_renderer_camera() {
+    GLViewer *realtime_viewer = display_manager.getRealtimeViewer();
+    GLViewer *nova_viewer = display_manager.getNovaViewer();
     if (realtime_viewer != nullptr) {
       realtime_viewer->rendererCallback<SET_DISPLAY_RESET_CAMERA>();
     }
@@ -796,6 +793,8 @@ namespace controller {
   /**************************************************************************************************************/
   void Controller::slot_set_renderer_exposure_value(int value) {
     float v = (float)value / POSTP_SLIDER_DIV;
+    GLViewer *realtime_viewer = display_manager.getRealtimeViewer();
+    GLViewer *nova_viewer = display_manager.getNovaViewer();
     if (realtime_viewer)
       realtime_viewer->rendererCallback<SET_EXPOSURE>(v);
     if (nova_viewer)
@@ -803,12 +802,14 @@ namespace controller {
   }
   /**************************************************************************************************************/
   void Controller::slot_set_renderer_no_post_process() {
+    GLViewer *realtime_viewer = display_manager.getRealtimeViewer();
     if (realtime_viewer != nullptr) {
       realtime_viewer->rendererCallback<SET_POSTPROCESS_NOPROCESS>();
     }
   }
   /**************************************************************************************************************/
   void Controller::slot_set_renderer_edge_post_process() {
+    GLViewer *realtime_viewer = display_manager.getRealtimeViewer();
     if (realtime_viewer != nullptr) {
       realtime_viewer->rendererCallback<SET_POSTPROCESS_EDGE>();
     }
@@ -816,6 +817,7 @@ namespace controller {
 
   /**************************************************************************************************************/
   void Controller::slot_set_renderer_sharpen_post_process() {
+    GLViewer *realtime_viewer = display_manager.getRealtimeViewer();
     if (realtime_viewer != nullptr) {
       realtime_viewer->rendererCallback<SET_POSTPROCESS_SHARPEN>();
     }
@@ -823,6 +825,7 @@ namespace controller {
 
   /**************************************************************************************************************/
   void Controller::slot_set_renderer_blurr_post_process() {
+    GLViewer *realtime_viewer = display_manager.getRealtimeViewer();
     if (realtime_viewer != nullptr) {
       realtime_viewer->rendererCallback<SET_POSTPROCESS_BLURR>();
     }
@@ -830,6 +833,7 @@ namespace controller {
 
   /**************************************************************************************************************/
   void Controller::slot_set_rasterizer_point() {
+    GLViewer *realtime_viewer = display_manager.getRealtimeViewer();
     if (realtime_viewer) {
       realtime_viewer->rendererCallback<SET_RASTERIZER_POINT>();
     }
@@ -837,6 +841,7 @@ namespace controller {
 
   /**************************************************************************************************************/
   void Controller::slot_set_rasterizer_fill() {
+    GLViewer *realtime_viewer = display_manager.getRealtimeViewer();
     if (realtime_viewer) {
       realtime_viewer->rendererCallback<SET_RASTERIZER_FILL>();
     }
@@ -844,6 +849,7 @@ namespace controller {
 
   /**************************************************************************************************************/
   void Controller::slot_set_rasterizer_wireframe() {
+    GLViewer *realtime_viewer = display_manager.getRealtimeViewer();
     if (realtime_viewer) {
       realtime_viewer->rendererCallback<SET_RASTERIZER_WIREFRAME>();
     }
@@ -851,6 +857,7 @@ namespace controller {
 
   /**************************************************************************************************************/
   void Controller::slot_set_display_boundingbox(bool display) {
+    GLViewer *realtime_viewer = display_manager.getRealtimeViewer();
     if (realtime_viewer) {
       realtime_viewer->rendererCallback<SET_DISPLAY_BOUNDINGBOX>(display);
     }

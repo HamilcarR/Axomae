@@ -3,6 +3,7 @@
 #include "Image.h"
 #include "RendererCallbacks.h"
 #include "event/EventInterface.h"
+#include "manager/NovaResourceManager.h"
 class Scene;
 class SceneTree;
 class RenderPipeline;
@@ -14,10 +15,14 @@ class EnvmapTextureManager;
 namespace controller::event {
   class Event;
 }  // namespace controller::event
-
+namespace nova::aggregate {
+  struct Accelerator;
+}
 struct SceneChangeData {
-  SceneTree *scene;
+  SceneTree *scene{};
   std::vector<Mesh *> mesh_list;
+  nova::aggregate::Accelerator *accelerator{};
+  nova::NovaResourceManager *nova_resource_manager{};
 };
 
 class RendererInterface : public EventInterface {
