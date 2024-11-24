@@ -4,6 +4,7 @@
 #include "RendererCallbacks.h"
 #include "event/EventInterface.h"
 #include "manager/NovaResourceManager.h"
+#include "nova/bake.h"
 class Scene;
 class SceneTree;
 class RenderPipeline;
@@ -21,8 +22,8 @@ namespace nova::aggregate {
 struct SceneChangeData {
   SceneTree *scene{};
   std::vector<Mesh *> mesh_list;
-  nova::aggregate::Accelerator *accelerator{};
   nova::NovaResourceManager *nova_resource_manager{};
+  nova_baker_utils::bake_buffers_storage_t *bake_buffers_storage{};
 };
 
 class RendererInterface : public EventInterface {

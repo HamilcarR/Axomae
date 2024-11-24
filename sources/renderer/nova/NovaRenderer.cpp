@@ -25,7 +25,6 @@ NovaRenderer::NovaRenderer(unsigned int width, unsigned int height, GLViewer *wi
   scene = std::make_unique<Scene>(*resource_database);
   envmap_manager = std::make_unique<EnvmapTextureManager>(
       *resource_database, screen_size, default_framebuffer_id, *render_pipeline, nullptr, EnvmapTextureManager::SELECTED);
-  nova_resource_manager = std::make_unique<nova::NovaResourceManager>();
   nova_exception_manager = std::make_unique<nova::NovaExceptionManager>();
   // TODO: Replace by a NovaBakingStructure
   partial_render_buffer.resize(resolution.width * resolution.height * 4);

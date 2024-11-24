@@ -43,7 +43,7 @@ class NovaRenderer final : public IRenderer {
   std::unique_ptr<GLMutablePixelBufferObject> pbo_read;
   std::unique_ptr<NovaRenderEngineInterface> nova_engine;
   std::unique_ptr<EnvmapTextureManager> envmap_manager;
-  std::unique_ptr<nova::NovaResourceManager> nova_resource_manager;
+  nova::NovaResourceManager *nova_resource_manager{nullptr};
   std::unique_ptr<nova::NovaExceptionManager> nova_exception_manager;
   ApplicationConfig *global_application_config{};
   std::vector<std::future<void>> nova_result_futures;
@@ -57,7 +57,6 @@ class NovaRenderer final : public IRenderer {
   float *pbo_map_buffer{};
   NovaInternalMetadata renderer_data{};
   nova::HdrBufferStruct engine_render_buffers;  // TODO : replace by render_scene_data
-  nova_baker_utils::bake_buffers_storage_t bake_buffers_storage;
 
  private:
   void updateNovaCameraFields();
@@ -91,7 +90,6 @@ class NovaRenderer final : public IRenderer {
   NovaRenderer(NovaRenderer &&move) noexcept = default;
   NovaRenderer &operator=(NovaRenderer &&move) noexcept = default;
 
-  ax_no_discard const nova_baker_utils::bake_buffers_storage_t &getBakeBuffersStorage() const { return bake_buffers_storage; }
   ax_no_discard const EnvmapTextureManager &getCurrentEnvmapId() const override { return *envmap_manager; }
   void prepSceneChange() override;
   void syncRenderEngineThreads();

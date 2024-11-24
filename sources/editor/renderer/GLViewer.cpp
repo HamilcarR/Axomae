@@ -221,9 +221,10 @@ void GLViewer::mouseDoubleClickEvent(QMouseEvent *event) {
 }
 
 void GLViewer::setNewScene(const SceneChangeData &new_scene) {
+  if (!renderer)
+    return;
   makeCurrent();
-  auto *r = renderer.get();
-  r->setNewScene(new_scene);
+  renderer->setNewScene(new_scene);
   doneCurrent();
 }
 
