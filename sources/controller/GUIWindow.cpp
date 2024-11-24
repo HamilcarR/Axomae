@@ -642,7 +642,7 @@ namespace controller {
   }
   /**************************************************************************************************************/
 
-  void Controller::emptySceneCaches() { shared_caches.clear(); }
+  void Controller::emptySceneCaches() { display_manager.getSharedCaches().clear(); }
 
   bool Controller::slot_import_3DOBJ() {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "./", tr("3D models (*.obj *.fbx *.glb)"));
@@ -657,7 +657,7 @@ namespace controller {
 
         IO::Loader loader(progress_manager.get());
         IO::loader_data_t loader_data = loader.load(filename.toStdString().c_str());
-        shared_caches.addSharedCacheAddress(loader_data.texture_cache);
+        display_manager.getSharedCaches().addSharedCacheAddress(loader_data.texture_cache);
 
         std::vector<Mesh *> scene = loader_data.mesh_list;
         SceneChangeData scene_data = {&loader_data.scene_tree, loader_data.mesh_list};
