@@ -7,18 +7,10 @@
 #include "manager/NovaResourceManager.h"
 
 void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
-  try {
-    nova_resource_manager = new_scene.nova_resource_manager;
-    AX_ASSERT_NOTNULL(nova_resource_manager);
-    resetToBaseState();
-
-    nova_resource_manager->getEngineData().is_rendering = true;
-  } catch (const exception::CatastrophicFailureException &e) {  // TODO: Handle in Controller
-    LOG(e.what(), LogLevel::CRITICAL);
-    controller::ExceptionInfoBoxHandler::handle(e);
-    nova_resource_manager->clearResources();
-    abort();
-  }
+  nova_resource_manager = new_scene.nova_resource_manager;
+  AX_ASSERT_NOTNULL(nova_resource_manager);
+  resetToBaseState();
+  nova_resource_manager->getEngineData().is_rendering = true;
 }
 
 void NovaRenderer::prepSceneChange() {
