@@ -65,7 +65,6 @@ namespace controller {
 
     core::memory::ByteArena memory_pool;
     nova_baker_utils::NovaBakingStructure nova_baking_structure;
-    nova::device_shared_caches_t shared_caches;
 
     DisplayManager3D display_manager;
 
@@ -93,7 +92,7 @@ namespace controller {
     ax_no_discard nova_baker_utils::NovaBakingStructure &getBakingStructure() { return nova_baking_structure; }
     void novaStopBake();
     void emptySceneCaches();
-    nova::device_shared_caches_t &getSharedCaches() { return shared_caches; }
+    nova::device_shared_caches_t &getSharedCaches() { return display_manager.getSharedCaches(); }
 
    private:
     void connect_all_slots();

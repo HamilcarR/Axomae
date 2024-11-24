@@ -147,7 +147,7 @@ namespace controller {
   }
 
   static void setup_render_scene_data(const ui_render_options &render_options,
-                                      std::unique_ptr<nova::NovaResourceManager> manager,
+                                      nova::NovaResourceManager *manager,
                                       std::unique_ptr<nova::NovaExceptionManager> exception_manager,
                                       std::unique_ptr<NovaRenderEngineInterface> engine_instance,
                                       const nova::device_shared_caches_t &shared_caches,
@@ -160,7 +160,7 @@ namespace controller {
     render_scene_data.width = render_options.width;
     render_scene_data.height = render_options.height;
     render_scene_data.engine_instance = std::move(engine_instance);
-    render_scene_data.nova_resource_manager = std::move(manager);
+    render_scene_data.nova_resource_manager = manager;
     render_scene_data.nova_exception_manager = std::move(exception_manager);
     render_scene_data.thread_pool = thread_pool;
     render_scene_data.shared_caches = shared_caches;
@@ -362,6 +362,13 @@ namespace controller {
       return;
     }
 
+    nova::NovaResourceManager *resource_manager = display_manager.getNovaResourceManager();
+    if (!resource_manager) {
+      LOG("Resource manager is not initialized.", LogLevel::ERROR);
+      ExceptionInfoBoxHandler::handle(exception::CRITICAL_TXT, exception::CRITICAL);
+      return;
+    }
+
     /* Meshes */
     ignore_skybox(renderer, true);
     const Scene &scene = renderer.getScene();
@@ -372,23 +379,19 @@ namespace controller {
       ignore_skybox(renderer, false);
       return;
     }
+
     try {
       nova_baking_structure.reinitialize();
       nova_baker_utils::engine_data engine_data = generate_engine_data(mesh_collection, render_options, misc_options, *renderer_camera, renderer);
-      std::unique_ptr<nova::NovaResourceManager> resource_manager =
-          std::make_unique<nova::NovaResourceManager>();  // TODO : pass Controller's memory pool
       std::unique_ptr<nova::NovaExceptionManager> exception_manager = std::make_unique<nova::NovaExceptionManager>();
-      initialize_manager(engine_data, *resource_manager, shared_caches);
-      nova::aggregate::Accelerator accelerator = nova_baker_utils::build_performance_acceleration_structure(
-          resource_manager->getPrimitiveData().get_primitives());
-      resource_manager->setAccelerationStructure(accelerator);
+      initialize_nova_manager(engine_data, *resource_manager);
       std::unique_ptr<NovaRenderEngineInterface> engine_instance = create_engine(engine_data);
       threading::ThreadPool *thread_pool = global_application_config->getThreadPool();
       setup_render_scene_data(render_options,
-                              std::move(resource_manager),
+                              resource_manager,
                               std::move(exception_manager),
                               std::move(engine_instance),
-                              shared_caches,
+                              getSharedCaches(),
                               nova_baking_structure,
                               thread_pool);
       start_baking(nova_baking_structure.nova_render_scene, this, nova_baking_structure.bake_buffers.image_holder, misc_options.use_gpu);
