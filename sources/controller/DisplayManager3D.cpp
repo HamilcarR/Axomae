@@ -34,10 +34,25 @@ namespace controller {
     nova_resource_manager = std::make_unique<nova::NovaResourceManager>();
   }
 
+  static void add_caches_addresses(nova::device_shared_caches_t &shared_caches,
+                                   const nova_baker_utils::bake_buffers_storage_t &bake_buffers_storage) {
+    /* Only texture buffers are taken into account for now.*/
+    shared_caches.addSharedCacheAddress(bake_buffers_storage.texture_buffers.image_alloc_buffer);
+  }
+
   void DisplayManager3D::setNewScene(SceneChangeData scene_data_mv) {
     SceneChangeData scene_data = std::move(scene_data_mv);
     prepareSceneChange();
     scene_data.nova_resource_manager = nova_resource_manager.get();
+
+    nova_resource_manager->clearResources();
+    bake_buffers_storage = nova_baker_utils::build_scene(scene_data.mesh_list, *nova_resource_manager);
+    add_caches_addresses(shared_caches, bake_buffers_storage);
+
+    /* Build acceleration. */
+    nova::aggregate::Accelerator accelerator = nova_baker_utils::build_performance_acceleration_structure(
+        nova_resource_manager->getPrimitiveData().get_primitives());
+    nova_resource_manager->setAccelerationStructure(accelerator);
 
     realtime_viewer->setNewScene(scene_data);
     nova_viewer->setNewScene(scene_data);

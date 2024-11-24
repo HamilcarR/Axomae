@@ -37,9 +37,9 @@ namespace nova_baker_utils {
     std::unique_ptr<nova::HdrBufferStruct> buffers;
     int width, height;
     std::unique_ptr<NovaRenderEngineInterface> engine_instance;
-    std::unique_ptr<nova::NovaResourceManager> nova_resource_manager;
+    nova::NovaResourceManager *nova_resource_manager{nullptr};
     std::unique_ptr<nova::NovaExceptionManager> nova_exception_manager;
-    threading::ThreadPool *thread_pool;
+    threading::ThreadPool *thread_pool{nullptr};
     nova::device_shared_caches_t shared_caches;
   };
 

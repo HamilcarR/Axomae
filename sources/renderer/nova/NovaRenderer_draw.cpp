@@ -34,14 +34,18 @@ void NovaRenderer::populateNovaSceneResources() {
 
 void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int channels) {
   float max = 0.f;
-  for (int i = 0; i < width * height * channels; i++) {
-    const float old = accumulated_render_buffer[i] / (current_frame + 1);
-    const float new_ = partial_render_buffer[i];
-    const float pix = old + 0.8f * (new_ - old);
-    final_render_buffer[i] = pix;
-    pbo_map[i] = pix;
-    max = std::max(max, pix);
-  }
+  // for (int i = 0; i < width * height * channels; i++) {
+  for (int i = 0; i < height; i++)
+    for (int j = 0; j < width * channels; j++) {
+      int inv_idx = (height - 1 - i) * width * channels + j;
+      int idx = i * width * channels + j;
+      const float old = accumulated_render_buffer[inv_idx] / (current_frame + 1);
+      const float new_ = partial_render_buffer[inv_idx];
+      const float pix = old + 0.8f * (new_ - old);
+      final_render_buffer[idx] = pix;
+      pbo_map[idx] = pix;
+      max = std::max(max, pix);
+    }
 }
 
 void NovaRenderer::initializeEngine() {
@@ -51,14 +55,14 @@ void NovaRenderer::initializeEngine() {
   engine_opts.depth_max = MAX_RECUR_DEPTH;
   engine_opts.samples_max = MAX_SAMPLES;
   engine_opts.threadpool_tag = NOVA_REALTIME_TAG;
-  engine_opts.flip_v = true;
+  engine_opts.flip_v = false;
   engine_opts.engine_type_flag = nova::integrator::COMBINED | nova::integrator::PATH;
 
   initialize_engine_opts(engine_opts, nova_resource_manager->getEngineData());
 }
 
 void NovaRenderer::drawBatch() {
-  nova::nova_eng_internals interns{nova_resource_manager.get(), nova_exception_manager.get()};
+  nova::nova_eng_internals interns{nova_resource_manager, nova_exception_manager.get()};
   nova_result_futures = nova::draw(
       &engine_render_buffers, screen_size.width, screen_size.height, nova_engine.get(), global_application_config->getThreadPool(), interns);
 }

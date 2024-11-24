@@ -67,7 +67,7 @@ namespace nova_baker_utils {
     texture_raw_data.height = envmap.hdr_envmap->metadata.height;
   }
 
-  void initialize_manager(const engine_data &engine_opts, nova::NovaResourceManager &manager, nova::device_shared_caches_t &shared_caches) {
+  void initialize_nova_manager(const engine_data &engine_opts, nova::NovaResourceManager &manager) {
     /* Initialize every matrix of the scene , and camera structures*/
     nova::camera::CameraResourcesHolder &camera_resources_holder = manager.getCameraData();
     nova::scene::SceneTransformations &scene_transformations = manager.getSceneTransformation();
@@ -79,16 +79,10 @@ namespace nova_baker_utils {
 
     /* Environment map */
     initialize_environment_texture(engine_opts.envmap, manager.getEnvmapData());
-
-    /* Build Scene */
-    if (!engine_opts.mesh_list)
-      throw exception::NullMeshListException();
-    nova_baker_utils::bake_buffers_storage_t buffers = build_scene(*engine_opts.mesh_list, manager);
-    shared_caches.addSharedCacheAddress(buffers.texture_buffers.image_alloc_buffer);
   }
 
   void bake_scene(render_scene_context &rendering_data) {
-    nova::nova_eng_internals interns{rendering_data.nova_resource_manager.get(), rendering_data.nova_exception_manager.get()};
+    nova::nova_eng_internals interns{rendering_data.nova_resource_manager, rendering_data.nova_exception_manager.get()};
     nova::draw(rendering_data.buffers.get(),
                rendering_data.width,
                rendering_data.height,
@@ -99,7 +93,7 @@ namespace nova_baker_utils {
     );
   }
   void bake_scene_gpu(render_scene_context &rendering_data) {
-    nova::nova_eng_internals interns{rendering_data.nova_resource_manager.get(), rendering_data.nova_exception_manager.get()};
+    nova::nova_eng_internals interns{rendering_data.nova_resource_manager, rendering_data.nova_exception_manager.get()};
     const nova::device_shared_caches_t &buffer_collection = rendering_data.shared_caches;
     nova::gputils::lock_host_memory_default(buffer_collection);
     nova::gpu_draw(
