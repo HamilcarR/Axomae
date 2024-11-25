@@ -119,7 +119,7 @@ namespace IO {
   template<class T>
   void load_geometry_buffer(std::vector<T> &dest, const aiVector3D *from, int size, int dimension) {
     for (int f = 0, i = 0; f < size; f++) {
-      const aiVector3D vect = from[f];
+      const aiVector3D &vect = from[f];
       if (dimension == 3) {
         dest[i] = vect.x;
         dest[i + 1] = vect.y;
