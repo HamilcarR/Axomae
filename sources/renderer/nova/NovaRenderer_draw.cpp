@@ -34,7 +34,6 @@ void NovaRenderer::populateNovaSceneResources() {
 
 void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int channels) {
   float max = 0.f;
-  // for (int i = 0; i < width * height * channels; i++) {
   for (int i = 0; i < height; i++)
     for (int j = 0; j < width * channels; j++) {
       int inv_idx = (height - 1 - i) * width * channels + j;
@@ -69,10 +68,8 @@ void NovaRenderer::drawBatch() {
 
 void NovaRenderer::doProgressiveRender() {
   nova_result_futures.clear();
-  /* Solves the sum :  MAX_SAMPLES = 1 + 2 + 3 + 4 + ...+ smax .*/
-  const float s1 = (-1 - std::sqrt(1.f + 8 * nova_resource_manager->getEngineData().renderer_max_samples)) * 0.5f;
-  const float s2 = (-1 + std::sqrt(1.f + 8 * nova_resource_manager->getEngineData().renderer_max_samples)) * 0.5f;
-  const float smax = std::max(s1, s2);
+
+  const float smax = math::calculus::compute_serie_term(nova_resource_manager->getEngineData().renderer_max_samples);
   nova_resource_manager->getEngineData().max_depth = nova_resource_manager->getEngineData().max_depth < MAX_RECUR_DEPTH ?
                                                          nova_resource_manager->getEngineData().max_depth + 1 :
                                                          MAX_RECUR_DEPTH;

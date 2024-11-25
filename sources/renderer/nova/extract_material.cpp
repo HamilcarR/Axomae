@@ -35,7 +35,6 @@ namespace nova_baker_utils {
   /* Will be removed when BSDFs will be implemented */
   material_buffers_t allocate_materials_buffers(core::memory::ByteArena &memory_pool, std::size_t number_elements) {
     material_buffers_t buffers{};
-
     buffers.diffuse_alloc_buffer = memory_pool.construct<nova::material::NovaDiffuseMaterial>(number_elements, false);
     buffers.conductor_alloc_buffer = memory_pool.construct<nova::material::NovaConductorMaterial>(number_elements, false);
     buffers.dielectric_alloc_buffer = memory_pool.construct<nova::material::NovaDielectricMaterial>(number_elements, false);

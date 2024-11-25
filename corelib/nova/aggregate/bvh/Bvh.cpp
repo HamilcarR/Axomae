@@ -9,14 +9,14 @@ namespace nova::aggregate {
   namespace prim = nova::primitive;
   Bvhtl::Bvhtl(const axstd::span<primitive::NovaPrimitiveInterface> &primitives_, BvhtlBuilder::BUILD_TYPE type, BvhtlBuilder::SEGMENTATION seg)
       : primitives(primitives_) {
-    AX_ASSERT_NOTNULL(primitives);
+    AX_ASSERT_FALSE(primitives.empty());
     bvh = BvhtlBuilder::build(primitives, type, seg);
   }
 
   void Bvhtl::build(const axstd::span<primitive::NovaPrimitiveInterface> &primitives_,
                     BvhtlBuilder::BUILD_TYPE type,
                     BvhtlBuilder::SEGMENTATION segmentation) {
-    AX_ASSERT_NOTNULL(primitives_);
+    AX_ASSERT_FALSE(primitives_.empty());
     primitives = primitives_;
     bvh = BvhtlBuilder::build(primitives, type, segmentation);
   }
@@ -48,7 +48,7 @@ namespace nova::aggregate {
         int32_t offset = i + node.left;
         AX_ASSERT_LT(offset, bvh.prim_idx.size());
         int32_t p_idx = bvh.prim_idx[offset];
-        AX_ASSERT_LT(p_idx, primitives->size());
+        AX_ASSERT_LT(p_idx, primitives.size());
         const primitive::NovaPrimitiveInterface *prim = &(primitives)[p_idx];
 
         if (prim->hit(r, tmin, hit_option->data.tmin, data, nullptr)) {
@@ -128,7 +128,7 @@ namespace nova::aggregate {
           int32_t primitive_offset = iterator_node->left + i;
           AX_ASSERT_LT(primitive_offset, bvh.prim_idx.size());
           int32_t p_idx = bvh.prim_idx[primitive_offset];
-          AX_ASSERT_LT(p_idx, primitives->size());
+          AX_ASSERT_LT(p_idx, primitives.size());
           const primitive::NovaPrimitiveInterface *prim = &(primitives)[p_idx];
           if (!prim->hit(r, tmin, options->data.tmin, data, nullptr))
             continue;
