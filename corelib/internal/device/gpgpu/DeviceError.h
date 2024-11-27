@@ -4,7 +4,17 @@
 #include <cstdint>
 #if defined(AXOMAE_USE_CUDA)
 #  include <driver_types.h>
+class DeviceError;
+#  define DEVICE_ERROR_CHECK(ans) \
+    { \
+      gpgpu_err_log((ans), __FILE__, __LINE__); \
+    }
+void gpgpu_err_log(const DeviceError &err, const char *file, int line, bool abort = false);
+
+#else
+#  define DEVICE_ERROR_CHECK(ans)
 #endif
+
 class DeviceError {
 
 #if defined(AXOMAE_USE_CUDA)
@@ -20,15 +30,4 @@ class DeviceError {
   ax_no_discard bool isOk() const;
 };
 
-#if defined(AXOMAE_USE_CUDA)
-
-#  define DEVICE_ERROR_CHECK(ans) \
-    { \
-      gpgpu_err_log((ans), __FILE__, __LINE__); \
-    }
-void gpgpu_err_log(const DeviceError &err, const char *file, int line, bool abort = false);
-
-#else
-#  define DEVICE_ERROR_CHECK(ans)
-#endif
 #endif  // DEVICEERROR_H

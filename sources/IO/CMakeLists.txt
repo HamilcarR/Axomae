@@ -2,7 +2,9 @@ add_library(ax_io STATIC
     ImageImporter.cpp 
     Loader_file.cpp 
     Loader_image.cpp
-    Loader_scene.cpp 
+    Loader_scene.cpp
+    Loader_material.cpp
+    Loader_geometry.cpp
 )
 
 target_link_libraries(ax_io
