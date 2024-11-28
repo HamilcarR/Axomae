@@ -110,17 +110,21 @@ namespace core::memory {
 
     template<class U, class... Args>
     U *constructAtMemPosition(U *start_buffer_address, std::size_t cache_element_position, Args &&...args) {
-      AX_ASSERT_EQ(reinterpret_cast<uintptr_t>(start_buffer_address) % current_block.current_alignment, 0);
-      std::size_t offset = cache_element_position * compute_alignment(sizeof(U), current_block.current_alignment);
+      block_t present_block = searchBlock(start_buffer_address);
+      if (!present_block.current_block_ptr)
+        return nullptr;
+
+      AX_ASSERT_EQ(reinterpret_cast<uintptr_t>(start_buffer_address) % present_block.current_alignment, 0);
+      std::size_t offset = cache_element_position * compute_alignment(sizeof(U), present_block.current_alignment);
       uintptr_t new_address = reinterpret_cast<uintptr_t>(start_buffer_address) + offset;
-      if (new_address % current_block.current_alignment != 0) {
-        new_address = compute_alignment(new_address, current_block.current_alignment);
+      if (new_address % present_block.current_alignment != 0) {
+        new_address = compute_alignment(new_address, present_block.current_alignment);
       }
       return construct(reinterpret_cast<U *>(new_address), std::forward<Args>(args)...);
     }
 
     /**
-     * Copy data to current block and returns an aligned pointer to it.
+     * Copy data to a buffer in a block and returns an aligned pointer to it.
      * @param size : size in bytes
      * @param offset : copy offset from the beginning address of dest , in bytes
      *
@@ -128,14 +132,15 @@ namespace core::memory {
     void *copyRange(const void *src, void *dest, std::size_t size, std::size_t offset) noexcept {
       if (!src || !dest)
         return nullptr;
-      if (dest != current_block.current_block_ptr)
+      block_t present_block = searchBlock(dest);
+      if (!present_block.current_block_ptr)
         return nullptr;
-      if (size > current_block.current_alloc_size)
+      if (size > present_block.current_alloc_size)
         return nullptr;
 
       uintptr_t new_address = reinterpret_cast<uintptr_t>(dest) + offset;
-      if (new_address % current_block.current_alignment != 0) {
-        new_address = compute_alignment(new_address, current_block.current_alignment);
+      if (new_address % present_block.current_alignment != 0) {
+        new_address = compute_alignment(new_address, present_block.current_alignment);
       }
       std::memcpy(reinterpret_cast<void *>(new_address), src, size);
       return reinterpret_cast<void *>(new_address);
@@ -185,6 +190,22 @@ namespace core::memory {
    private:
     std::size_t compute_alignment(std::size_t value, std::size_t align = PLATFORM_ALIGN) { return (value + align - 1) & ~(align - 1); }
 
+    bool belong(const void *address, const block_t &block) const {
+      auto ptr_address = reinterpret_cast<std::uintptr_t>(address);
+      auto block_address = reinterpret_cast<std::uintptr_t>(block.current_block_ptr);
+      if (ptr_address >= block_address && ptr_address < block_address + block.current_alloc_size)
+        return true;
+      return false;
+    }
+
+    block_t searchBlock(const void *ptr) const {
+      if (belong(ptr, current_block))
+        return current_block;
+      for (const block_t &block : used_blocks)
+        if (belong(ptr, block))
+          return block;
+      return {};
+    }
     const_block_t getCurrentBlock() const {
       const_block_t current;
       current.current_block_ptr = current_block.current_block_ptr;
