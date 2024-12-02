@@ -1,9 +1,13 @@
 #include "INodeDatabase.h"
 #include <algorithm>
 using namespace datastructure;
-INodeDatabase::INodeDatabase(controller::ProgressStatus *progress_manager_) { progress_manager = progress_manager_; }
+INodeDatabase::INodeDatabase(core::memory::ByteArena *arena, controller::ProgressStatus *progress_manager_) {
+  setUpCacheMemory(arena);
+  progress_manager = progress_manager_;
+}
 
 void INodeDatabase::clean() {
+  invalidateCaches();
   Mutex::Lock lock(mutex);
   std::vector<int> to_delete;
   for (auto &A : database_map) {

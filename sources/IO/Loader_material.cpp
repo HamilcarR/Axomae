@@ -39,13 +39,13 @@ namespace IO {
           temp_texdata[i] = rgba;
         }
         totexture->data = texture_database.copyRangeToCache(temp_texdata.data(), nullptr, width * height, texcache_element_count);
+        AX_ASSERT_NOTNULL(totexture->data);
         texcache_element_count += 1;
       }
       /* If mHeight = 0 , the texture is compressed , and we need to uncompress and convert it to ARGB32 */
       else
       {
         QImage image;
-        std::vector<uint8_t> buffer;
         progress_manager.initProgress(std::string("Loading texture  ") + texture_type, static_cast<float>(fromtexture->mWidth));
 
         image.loadFromData(reinterpret_cast<const uint8_t *>(fromtexture->pcData), static_cast<int>(fromtexture->mWidth));
@@ -55,6 +55,7 @@ namespace IO {
         unsigned image_height = image.height();
         uint32_t *from_buffer = reinterpret_cast<uint32_t *>(image.bits());
         totexture->data = texture_database.copyRangeToCache(from_buffer, nullptr, image_width * image_height, texcache_element_count);
+        AX_ASSERT_NOTNULL(totexture->data);
         texcache_element_count += image_width * image_height;
         totexture->width = image_width;
         totexture->height = image_height;
