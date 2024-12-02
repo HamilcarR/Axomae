@@ -241,7 +241,7 @@ uint8_t *IResourceDB<U, T>::reserveCache(std::size_t size_bytes, std::size_t ali
     return nullptr;
   uint8_t *allocated = nullptr;
   Mutex::Lock lock(mutex);
-  allocated = static_cast<uint8_t *>(memory_arena->allocate(size_bytes, alignment));
+  allocated = static_cast<uint8_t *>(memory_arena->allocate(size_bytes, label, alignment));
   if (!allocated) {
     LOG("Error allocating cache database.", LogLevel::CRITICAL);
     return nullptr;

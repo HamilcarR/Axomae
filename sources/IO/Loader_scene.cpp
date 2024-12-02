@@ -23,7 +23,6 @@ namespace IO {
                                          TextureDatabase *texture_database,
                                          INodeDatabase *node_database,
                                          controller::IProgressManager &progress_manager) {
-    std::vector<std::future<std::pair<unsigned, std::unique_ptr<Object3D>>>> loaded_meshes_futures;
     std::vector<GLMaterial> material_array;
     std::vector<Mesh *> node_lookup_table;
     Shader *shader_program = shader_database->get(Shader::BRDF);
@@ -39,15 +38,12 @@ namespace IO {
     std::size_t texcache_element_count = 0, geocache_element_count = 0;
     for (unsigned int mesh_index = 0; mesh_index < modelScene->mNumMeshes; mesh_index++) {
 
-      auto lambda = [&]() { return load_geometry(modelScene, mesh_index, *node_database, geocache_element_count, progress_manager); };
-      loaded_meshes_futures.push_back(std::async(std::launch::async, lambda));
+      std::pair<unsigned, std::unique_ptr<Object3D>> geometry_loaded = load_geometry(
+          modelScene, mesh_index, *node_database, geocache_element_count, progress_manager);
 
       unsigned int mMaterialIndex = modelScene->mMeshes[mesh_index]->mMaterialIndex;
       material_array[mesh_index] = load_materials(modelScene, mMaterialIndex, *texture_database, texcache_element_count, progress_manager).second;
-    }
-    for (auto &loaded_meshes_future : loaded_meshes_futures) {
-      std::pair<unsigned, std::unique_ptr<Object3D>> geometry_loaded = loaded_meshes_future.get();
-      unsigned mesh_index = geometry_loaded.first;
+
       const aiMesh *mesh = modelScene->mMeshes[mesh_index];
       const char *mesh_name = mesh->mName.C_Str();
       std::string name(mesh_name);

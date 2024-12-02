@@ -32,12 +32,6 @@ namespace image {
 }
 namespace nova_baker_utils {
 
-  const nova::texturing::ImageTexture *extract_texture(const TextureGroup &tgroup, nova::NovaResourceManager &manager, GenericTexture::TYPE type);
-  nova::material::texture_pack extract_materials(texture_buffers_t &texture_buffers,
-                                                 std::size_t offset,
-                                                 const Mesh *mesh,
-                                                 nova::NovaResourceManager &manager);
-
   void setup_geometry_data(primitive_buffers_t &geometry_buffers,
                            Mesh *mesh,
                            std::size_t &alloc_offset_primitives,
@@ -47,9 +41,9 @@ namespace nova_baker_utils {
                                                             texture_buffers_t &texture_buffers,
                                                             const Mesh *mesh,
                                                             nova::NovaResourceManager &manager,
+                                                            std::size_t &alloc_offset_textures,
                                                             std::size_t &alloc_offset_materials);
   bake_buffers_storage_t build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager);
-  /* Uses the primitives in the SceneResourceHolder to build the acceleration structure stored in the manager's Accelerator structure*/
   nova::aggregate::Accelerator build_performance_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives);
   nova::aggregate::Accelerator build_quality_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives);
   void transform_vertices(const geometry::face_data_tri &tri_primitive, const glm::mat4 &final_transfo, glm::vec3 vertices[3]);
