@@ -7,6 +7,7 @@
 #include <cstring>
 #include <list>
 #include <new>
+#include <unordered_map>
 
 /*
  * Implementation of a simple memory pool.
@@ -17,37 +18,50 @@
  * Deallocation of individual resource should be made by the caller.This structures doesn't execute destructors.
  */
 namespace core::memory {
+  constexpr std::size_t B256_ALIGN = 256;
   constexpr std::size_t B128_ALIGN = 128;
   constexpr std::size_t B64_ALIGN = 64;
   constexpr std::size_t B32_ALIGN = 32;
   constexpr std::size_t B16_ALIGN = 16;
   constexpr std::size_t B8_ALIGN = 8;
+#if defined(AXOMAE_USE_CUDA)
+  constexpr std::size_t PLATFORM_ALIGN = B256_ALIGN;
+#else
   constexpr std::size_t PLATFORM_ALIGN = alignof(std::max_align_t);
+#endif
   constexpr std::size_t DEFAULT_BLOCK_SIZE = 262144;
   template<class T = std::byte>
   class MemoryArena {
    private:
+    using value_type = T;
+    /* Keep track of named allocations... useful for debug */
+    using tag_map_t = std::unordered_map<const void *, const char *>;
+    using ptr_list_t = std::list<void *>;
+
     struct block_t {
-      T *current_block_ptr{nullptr};
+      value_type *current_block_ptr{nullptr};
       std::size_t current_alignment{};
       std::size_t current_alloc_size{};
     };
     struct const_block_t {
-      const T *current_block_ptr{nullptr};
+      const value_type *current_block_ptr{nullptr};
       std::size_t current_alignment{};
       std::size_t current_alloc_size{};
     };
-    using value_type = T;
+
+    /* Keep track of the list of allocated buffers inside a block*/
+    using internal_block_alloc_map_t = std::unordered_map<const void *, ptr_list_t>;
     using block_list_t = std::list<block_t>;
 
    private:
     std::size_t block_size;
     /* This is implicit block, used block list can be empty ,
      * but current_block_ptr can be used , so there's in fact 1 used block even though used_blocks is empty*/
-
     block_t current_block;
     std::size_t current_block_offset{};
     block_list_t used_blocks, free_blocks;
+    tag_map_t tag_map;
+    internal_block_alloc_map_t internal_block_alloc_map;
 
    public:
     MemoryArena(const MemoryArena &) = delete;
@@ -91,8 +105,8 @@ namespace core::memory {
     }
 
     template<class U>
-    U *construct(std::size_t num_instances, bool constructor = true, std::size_t alignment = PLATFORM_ALIGN) noexcept {
-      U *memory_alloc = static_cast<U *>(allocate(num_instances * sizeof(U), alignment));
+    U *construct(std::size_t num_instances, bool constructor = true, const char *tag = "", std::size_t alignment = PLATFORM_ALIGN) noexcept {
+      U *memory_alloc = static_cast<U *>(allocate(num_instances * sizeof(U), tag, alignment));
       if (constructor) {
         for (std::size_t i = 0; i < num_instances; i++)
           ::new (&memory_alloc[i]) U();
@@ -115,11 +129,8 @@ namespace core::memory {
         return nullptr;
 
       AX_ASSERT_EQ(reinterpret_cast<uintptr_t>(start_buffer_address) % present_block.current_alignment, 0);
-      std::size_t offset = cache_element_position * compute_alignment(sizeof(U), present_block.current_alignment);
+      std::size_t offset = cache_element_position * sizeof(U);
       uintptr_t new_address = reinterpret_cast<uintptr_t>(start_buffer_address) + offset;
-      if (new_address % present_block.current_alignment != 0) {
-        new_address = compute_alignment(new_address, present_block.current_alignment);
-      }
       return construct(reinterpret_cast<U *>(new_address), std::forward<Args>(args)...);
     }
 
@@ -147,7 +158,7 @@ namespace core::memory {
     }
 
     /* Allocates a buffer of size_bytes size and returns it's desired aligned address. */
-    void *allocate(std::size_t size_bytes, std::size_t alignment = PLATFORM_ALIGN) {
+    void *allocate(std::size_t size_bytes, const char *tag = "", std::size_t alignment = PLATFORM_ALIGN) {
       size_bytes = compute_alignment(size_bytes, alignment);
       if (current_block_offset + size_bytes > current_block.current_alloc_size) {
         /* Adds current block to used list*/
@@ -170,6 +181,9 @@ namespace core::memory {
       }
       T *ret_ptr = current_block.current_block_ptr + current_block_offset;
       current_block_offset += size_bytes;
+      std::memset(ret_ptr, 0x00, size_bytes);
+      tag_map[static_cast<const void *>(ret_ptr)] = tag;
+      internal_block_alloc_map[static_cast<const void *>(current_block.current_block_ptr)].push_back(ret_ptr);
       return ret_ptr;
     }
 
@@ -179,6 +193,7 @@ namespace core::memory {
     void deallocate(void *ptr) {
       if (!ptr)
         return;
+      tag_map.erase(ptr);
       if (current_block.current_block_ptr == ptr)
         addCurrentBlockToFree();
       auto to_dealloc = getUsedBlockItr(ptr);
