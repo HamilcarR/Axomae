@@ -9,9 +9,9 @@ namespace nova::material {
     std::vector<NovaMaterialInterface> materials;
 
     template<class T, class... Args>
-    NovaMaterialInterface add_material(T *allocation_buffer, std::size_t offset, Args &&...args) {
+    NovaMaterialInterface add_material(core::memory::ByteArena &arena, T *allocation_buffer, std::size_t offset, Args &&...args) {
       static_assert(core::has<T, TYPELIST>::has_type, "Provided type is not a Material type.");
-      T *allocated_ptr = core::memory::MemoryArena<>::construct<T>(&allocation_buffer[offset], std::forward<Args>(args)...);
+      T *allocated_ptr = arena.constructAtMemPosition(allocation_buffer, offset, std::forward<Args>(args)...);
       materials.push_back(allocated_ptr);
       return materials.back();
     }

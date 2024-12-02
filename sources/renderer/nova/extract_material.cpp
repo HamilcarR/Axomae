@@ -35,16 +35,25 @@ namespace nova_baker_utils {
   /* Will be removed when BSDFs will be implemented */
   material_buffers_t allocate_materials_buffers(core::memory::ByteArena &memory_pool, std::size_t number_elements) {
     material_buffers_t buffers{};
-    buffers.diffuse_alloc_buffer = memory_pool.construct<nova::material::NovaDiffuseMaterial>(number_elements, false);
-    buffers.conductor_alloc_buffer = memory_pool.construct<nova::material::NovaConductorMaterial>(number_elements, false);
-    buffers.dielectric_alloc_buffer = memory_pool.construct<nova::material::NovaDielectricMaterial>(number_elements, false);
+
+    buffers.diffuse_alloc_buffer = reinterpret_cast<nova::material::NovaDiffuseMaterial *>(
+        memory_pool.allocate(number_elements * sizeof(nova::material::NovaDiffuseMaterial), "NovaDiffuseMaterial buffer"));
+
+    buffers.dielectric_alloc_buffer = reinterpret_cast<nova::material::NovaDielectricMaterial *>(
+        memory_pool.allocate(number_elements * sizeof(nova::material::NovaDielectricMaterial), "NovaDielectricMaterial buffer"));
+
+    buffers.conductor_alloc_buffer = reinterpret_cast<nova::material::NovaConductorMaterial *>(
+        memory_pool.allocate(number_elements * sizeof(nova::material::NovaConductorMaterial), "NovaConductorMaterial buffer"));
+    AX_ASSERT_NOTNULL(buffers.diffuse_alloc_buffer);
+    AX_ASSERT_NOTNULL(buffers.conductor_alloc_buffer);
+    AX_ASSERT_NOTNULL(buffers.dielectric_alloc_buffer);
     return buffers;
   }
 
-  nova::material::texture_pack extract_materials(texture_buffers_t &texture_buffers,
-                                                 std::size_t offset,
-                                                 const Mesh *mesh,
-                                                 nova::NovaResourceManager &manager) {
+  static nova::material::texture_pack extract_materials(texture_buffers_t &texture_buffers,
+                                                        std::size_t offset,
+                                                        const Mesh *mesh,
+                                                        nova::NovaResourceManager &manager) {
     const MaterialInterface *material = mesh->getMaterial();
     const TextureGroup &texture_group = material->getTextureGroup();
     nova::material::texture_pack tpack{};
@@ -66,21 +75,23 @@ namespace nova_baker_utils {
                                                                       std::size_t &offset) {
     int r = math::random::nrandi(0, 1);
     nova::material::NovaMaterialInterface mat_ptr{};
+    core::memory::ByteArena &arena = manager.getMemoryPool();
     switch (r) {
       case 0:
         mat_ptr = manager.getMaterialData().add_material<nova::material::NovaConductorMaterial>(
-            material_buffers.conductor_alloc_buffer, offset, tpack, math::random::nrandf(0.001, 0.5));
+            arena, material_buffers.conductor_alloc_buffer, offset, tpack, math::random::nrandf(0.001, 0.5));
         break;
       case 1:
         mat_ptr = manager.getMaterialData().add_material<nova::material::NovaDielectricMaterial>(
-            material_buffers.dielectric_alloc_buffer, offset, tpack, math::random::nrandf(1.5, 2.4));
+            arena, material_buffers.dielectric_alloc_buffer, offset, tpack, math::random::nrandf(1.5, 2.4));
         break;
       case 2:
-        mat_ptr = manager.getMaterialData().add_material<nova::material::NovaDiffuseMaterial>(material_buffers.diffuse_alloc_buffer, offset, tpack);
+        mat_ptr = manager.getMaterialData().add_material<nova::material::NovaDiffuseMaterial>(
+            arena, material_buffers.diffuse_alloc_buffer, offset, tpack);
         break;
       default:
         mat_ptr = manager.getMaterialData().add_material<nova::material::NovaConductorMaterial>(
-            material_buffers.conductor_alloc_buffer, offset, tpack, 0.004);
+            arena, material_buffers.conductor_alloc_buffer, offset, tpack, 0.004);
         break;
     }
     return mat_ptr;
@@ -90,14 +101,16 @@ namespace nova_baker_utils {
                                                             texture_buffers_t &texture_buffer,
                                                             const Mesh *mesh,
                                                             nova::NovaResourceManager &manager,
+                                                            std::size_t &alloc_offset_textures,
                                                             std::size_t &alloc_offset_materials) {
     const MaterialInterface *material = mesh->getMaterial();
     if (!material) {
       return nullptr;
     }
-    nova::material::texture_pack tpack = extract_materials(texture_buffer, alloc_offset_materials, mesh, manager);
+    nova::material::texture_pack tpack = extract_materials(texture_buffer, alloc_offset_textures, mesh, manager);
     nova::material::NovaMaterialInterface mat = assign_random_material(material_buffers, tpack, manager, alloc_offset_materials);
-    alloc_offset_materials = alloc_offset_materials + PBR_PIPELINE_TEX_NUM;
+    alloc_offset_textures = alloc_offset_textures + PBR_PIPELINE_TEX_NUM;
+    alloc_offset_materials += 1;
     return mat;
   }
 }  // namespace nova_baker_utils

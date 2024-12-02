@@ -10,7 +10,7 @@ class INodeDatabase final : public IntegerResourceDB<datastructure::NodeInterfac
   using NodeIdMap ax_maybe_unused = std::map<int, std::unique_ptr<datastructure::NodeInterface>>;
 
  public:
-  explicit INodeDatabase(controller::ProgressStatus *progress_manager = nullptr);
+  explicit INodeDatabase(core::memory::ByteArena *arena = nullptr, controller::ProgressStatus *progress_manager = nullptr);
   ~INodeDatabase() override = default;
   void clean() override;
   void purge() override;

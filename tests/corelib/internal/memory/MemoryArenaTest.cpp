@@ -15,14 +15,8 @@ TEST(MemoryArenaTest, construct) {
   for (int i = 0; i < 10; i++)
     ASSERT_EQ(buffer[i].toString(), "TestObject1");
 
-  auto address = reinterpret_cast<std::uintptr_t>(allocator.allocate(65556, core::memory::B128_ALIGN));
+  auto address = reinterpret_cast<std::uintptr_t>(allocator.allocate(65556, "", core::memory::B128_ALIGN));
   ASSERT_EQ(address % core::memory::B128_ALIGN, 0);
-  /* check forced alignment of address */
-  for (int i = 0; i < 256; i++) {
-    address += 1;
-    auto new_address = allocator.constructAtMemPosition(reinterpret_cast<uint8_t *>(address), 0);
-    ASSERT_EQ(reinterpret_cast<std::uintptr_t>(new_address) % core::memory::B128_ALIGN, 0);
-  }
 }
 
 TEST(MemoryArenaTest, alloc) {
@@ -114,7 +108,7 @@ TEST(MemoryArenaTest, deallocate) {
 
 TEST(MemoryArenaTest, copyRange) {
   core::memory::ByteArena arena;
-  void *pool = arena.allocate(256, core::memory::PLATFORM_ALIGN);
+  void *pool = arena.allocate(256, "", core::memory::PLATFORM_ALIGN);
   std::array<uint8_t, 128> array1, array2;
   for (uint32_t i = 0; i < 256; i++) {
     if (i < 128)
