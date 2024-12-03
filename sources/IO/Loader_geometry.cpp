@@ -137,8 +137,9 @@ namespace IO {
     }
   }
 
-  std::size_t total_geometry_size(const aiScene *scene) {
+  std::size_t total_geometry_size(const aiScene *scene, controller::IProgressManager *progress_manager) {
     std::size_t total_size = 0;
+    progress_manager->initProgress("Computing geometry cache size ", static_cast<float>(scene->mNumMeshes));
     for (std::size_t mesh_index = 0; mesh_index < scene->mNumMeshes; mesh_index++) {
       const aiMesh *mesh = scene->mMeshes[mesh_index];
       /* vertices , normals , bitangents , tangents */
@@ -158,7 +159,10 @@ namespace IO {
       total_size += mesh->mNumVertices * float_buffers_3d;
       total_size += mesh->mNumVertices * float_buffers_2d;
       total_size += mesh->mNumFaces * uint_buffers_3d;
+      progress_manager->setCurrent((float)mesh_index);
+      progress_manager->notifyProgress();
     }
+    progress_manager->resetProgress();
     return total_size;
   }
 
@@ -168,8 +172,7 @@ namespace IO {
   std::pair<unsigned, std::unique_ptr<Object3D>> load_geometry(const aiScene *modelScene,
                                                                unsigned mesh_index,
                                                                INodeDatabase &mesh_database,
-                                                               std::size_t &element_count,
-                                                               controller::IProgressManager &progress_manager) {
+                                                               std::size_t &element_count) {
     const aiMesh *mesh = modelScene->mMeshes[mesh_index];
     AX_ASSERT_NOTNULL(mesh->mVertices);
 

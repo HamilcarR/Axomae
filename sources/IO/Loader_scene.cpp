@@ -22,6 +22,7 @@ namespace IO {
                                          ShaderDatabase *shader_database,
                                          TextureDatabase *texture_database,
                                          INodeDatabase *node_database,
+                                         const std::string &scene_name,
                                          controller::IProgressManager &progress_manager) {
     std::vector<GLMaterial> material_array;
     std::vector<Mesh *> node_lookup_table;
@@ -29,20 +30,23 @@ namespace IO {
     node_lookup_table.resize(modelScene->mNumMeshes);
     material_array.resize(modelScene->mNumMeshes);
     loader_data_t scene_data;
-    std::size_t texture_cache_size = total_textures_size(modelScene);
-    std::size_t geometry_cache_size = total_geometry_size(modelScene);
+
+    std::size_t texture_cache_size = total_textures_size(modelScene, &progress_manager);
+    std::size_t geometry_cache_size = total_geometry_size(modelScene, &progress_manager);
     uint8_t *texture_cache_address = texture_database->reserveCache(texture_cache_size, core::memory::PLATFORM_ALIGN);
     uint8_t *geometry_cache_address = node_database->reserveCache(geometry_cache_size, core::memory::PLATFORM_ALIGN);
     scene_data.texture_cache = axstd::span<uint8_t>(texture_cache_address, texture_cache_size);
     scene_data.geometry_cache = axstd::span<uint8_t>(geometry_cache_address, geometry_cache_size);
     std::size_t texcache_element_count = 0, geocache_element_count = 0;
-    for (unsigned int mesh_index = 0; mesh_index < modelScene->mNumMeshes; mesh_index++) {
 
-      std::pair<unsigned, std::unique_ptr<Object3D>> geometry_loaded = load_geometry(
-          modelScene, mesh_index, *node_database, geocache_element_count, progress_manager);
+    progress_manager.initProgress(std::string("Loading scene: ") + scene_name, static_cast<float>(modelScene->mNumMeshes));
+    for (unsigned int mesh_index = 0; mesh_index < modelScene->mNumMeshes; mesh_index++) {
+      progress_manager.setCurrent(mesh_index);
+      progress_manager.notifyProgress();
+      std::pair<unsigned, std::unique_ptr<Object3D>> geometry_loaded = load_geometry(modelScene, mesh_index, *node_database, geocache_element_count);
 
       unsigned int mMaterialIndex = modelScene->mMeshes[mesh_index]->mMaterialIndex;
-      material_array[mesh_index] = load_materials(modelScene, mMaterialIndex, *texture_database, texcache_element_count, progress_manager).second;
+      material_array[mesh_index] = load_materials(modelScene, mMaterialIndex, *texture_database, texcache_element_count).second;
 
       const aiMesh *mesh = modelScene->mMeshes[mesh_index];
       const char *mesh_name = mesh->mName.C_Str();
@@ -80,7 +84,10 @@ namespace IO {
     const aiScene *modelScene = importer.ReadFile(
         file, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs);
     if (modelScene) {
-      return loadSceneElements(modelScene, shader_database, texture_database, node_database, progress_manager);
+      std::vector<std::string> scene_name = utils::string::tokenize(file, '/');
+      loader_data_t data = loadSceneElements(modelScene, shader_database, texture_database, node_database, scene_name.back(), progress_manager);
+      progress_manager.reset();
+      return data;
     } else {
       LOG("Cannot read file.", LogLevel::ERROR);
       return loader_data;
