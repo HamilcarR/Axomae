@@ -32,6 +32,7 @@ namespace controller {
     explicit OperatorProgressStatus(ProgressStatusWidget *progress_bar);
     bool op(ioperator::OpData<progress_bar::ProgressBarTextFormat> *data) const override;
     void reset() const override;
+    void displayText(const std::string &message);
   };
 
   using ProgressStatus = OperatorProgressStatus;
@@ -47,6 +48,8 @@ namespace controller {
     void initProgress(const std::string &message, float target);
     void setProgressStatusText(const std::string &mes) { message = mes; }
     void resetProgress();
+    void reset();
+    void displayStatusText(const std::string &message);
     void setCurrent(float current_val) { current = current_val; }
     float getTarget() const { return target; }
 

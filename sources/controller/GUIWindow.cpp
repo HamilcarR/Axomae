@@ -661,7 +661,7 @@ namespace controller {
 
         std::vector<Mesh *> scene = loader_data.mesh_list;
         SceneChangeData scene_data = {&loader_data.scene_tree, loader_data.mesh_list};
-        display_manager.setNewScene(scene_data);
+        display_manager.setNewScene(scene_data, progress_manager.get());
         uv_mesh_selector.setScene(scene);
         main_window_ui.meshes_list->setList(scene);
         SceneTree &scene_hierarchy = display_manager.getSceneTree();

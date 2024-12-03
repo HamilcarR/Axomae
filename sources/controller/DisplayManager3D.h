@@ -10,14 +10,15 @@ class ApplicationConfig;
 
 namespace controller {
   class OperatorProgressStatus;
+  class IProgressManager;
 
   class DisplayManager3D {
 
    private:
     /* The 3D model viewer */
-    GLViewer *realtime_viewer;
+    GLViewer *realtime_viewer{};
     /* Raytracing engine display*/
-    GLViewer *nova_viewer;
+    GLViewer *nova_viewer{};
     std::unique_ptr<nova::NovaResourceManager> nova_resource_manager{};
     nova::device_shared_caches_t shared_caches;
     nova_baker_utils::bake_buffers_storage_t bake_buffers_storage;
@@ -32,7 +33,7 @@ namespace controller {
     ax_no_discard const nova::device_shared_caches_t &getSharedCaches() const { return shared_caches; }
     ax_no_discard nova::device_shared_caches_t &getSharedCaches() { return shared_caches; }
     ax_no_discard nova::NovaResourceManager *getNovaResourceManager() const { return nova_resource_manager.get(); };
-    void setNewScene(SceneChangeData scene_change_data);
+    void setNewScene(SceneChangeData scene_change_data, ProgressStatus *progress_manager = nullptr);
     void prepareSceneChange();
   };
 }  // namespace controller
