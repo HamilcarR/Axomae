@@ -16,6 +16,9 @@
  */
 
 class aiScene;
+namespace controller {
+  class IProgressManager;
+}
 namespace IO {
   struct loader_data_t {
     axstd::span<uint8_t> texture_cache;
@@ -24,19 +27,17 @@ namespace IO {
     SceneTree scene_tree;
   };
 
-  std::size_t total_textures_size(const aiScene *scene);
-  std::size_t total_geometry_size(const aiScene *scene);
+  std::size_t total_textures_size(const aiScene *scene, controller::IProgressManager *progress_manager = nullptr);
+  std::size_t total_geometry_size(const aiScene *scene, controller::IProgressManager *progress_manager = nullptr);
   std::pair<unsigned, std::unique_ptr<Object3D>> load_geometry(const aiScene *modelScene,
                                                                unsigned mesh_index,
                                                                INodeDatabase &mesh_database,
-                                                               std::size_t &geocache_element_count,
-                                                               controller::IProgressManager &progress_manager);
+                                                               std::size_t &geocache_element_count);
 
   std::pair<unsigned, GLMaterial> load_materials(const aiScene *scene,
                                                  unsigned mesh_material_index,
                                                  TextureDatabase &texture_database,
-                                                 std::size_t &texcache_element_count,
-                                                 controller::IProgressManager &progress_manager);
+                                                 std::size_t &texcache_element_count);
 
   SceneTree generateSceneTree(const aiScene *modelScene, const std::vector<Mesh *> &node_lookup);
 

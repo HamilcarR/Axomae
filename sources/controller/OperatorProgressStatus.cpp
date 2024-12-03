@@ -20,6 +20,11 @@ namespace controller {
     module->setValue(0);
   }
 
+  void OperatorProgressStatus::displayText(const std::string &message) {
+    module->setValue(10);
+    module->setFormat(QString(message.c_str()));
+  }
+
   /******************************************************************************************************************************************/
 
   void IProgressManager::initProgress(ProgressStatus *status, const std::string &message_, float target_) {
@@ -29,10 +34,21 @@ namespace controller {
     target = target_;
   }
 
+  void IProgressManager::reset() {
+    if (!progress_manager)
+      return;
+    progress_manager->reset();
+  }
+
   void IProgressManager::initProgress(const std::string &message_, float target_) {
     current = 0;
     message = message_;
     target = target_;
+  }
+  void IProgressManager::displayStatusText(const std::string &message) {
+    if (!progress_manager)
+      return;
+    progress_manager->displayText(message);
   }
 
   void IProgressManager::notifyProgress() {
@@ -47,7 +63,8 @@ namespace controller {
 
   void IProgressManager::resetProgress() {
     message = "";
-    current = -1;
+    current = 0;
+    notifyProgress();
   }
 
   /******************************************************************************************************************************************/
