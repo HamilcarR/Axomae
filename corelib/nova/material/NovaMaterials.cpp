@@ -10,10 +10,10 @@ namespace nova::material {
     texture_pack tpack{};
 
    public:
-    CLASS_CM(TexturePackSampler)
-    explicit TexturePackSampler(const texture_pack &texture_p) : tpack(texture_p) {}
+    CLASS_DCM(TexturePackSampler)
+    ax_device_callable explicit TexturePackSampler(const texture_pack &texture_p) : tpack(texture_p) {}
 
-    ax_no_discard glm::vec4 emissive(float u, float v, const texturing::texture_sample_data &sample_data) const {
+    ax_device_callable ax_no_discard glm::vec4 emissive(float u, float v, const texturing::texture_sample_data &sample_data) const {
       using namespace math::texture;
       if (tpack.emissive) {
         glm::vec4 value = tpack.emissive->sample(u, v, sample_data);
@@ -22,7 +22,7 @@ namespace nova::material {
       return glm::vec4(0.f);
     }
 
-    ax_no_discard glm::vec4 albedo(float u, float v, const texturing::texture_sample_data &sample_data) const {
+    ax_device_callable ax_no_discard glm::vec4 albedo(float u, float v, const texturing::texture_sample_data &sample_data) const {
       using namespace math::texture;
       if (tpack.albedo) {
         glm::vec4 value = tpack.albedo->sample(u, v, sample_data);
@@ -31,7 +31,7 @@ namespace nova::material {
       return glm::vec4(1.f);
     }
 
-    ax_no_discard glm::vec4 metallic(float u, float v, const texturing::texture_sample_data &sample_data) const {
+    ax_device_callable ax_no_discard glm::vec4 metallic(float u, float v, const texturing::texture_sample_data &sample_data) const {
       using namespace math::texture;
       if (tpack.metallic) {
         glm::vec4 value = tpack.metallic->sample(u, v, sample_data);
@@ -40,7 +40,7 @@ namespace nova::material {
       return glm::vec4(0.f);
     }
 
-    ax_no_discard glm::vec4 roughness(float u, float v, const texturing::texture_sample_data &sample_data) const {
+    ax_device_callable ax_no_discard glm::vec4 roughness(float u, float v, const texturing::texture_sample_data &sample_data) const {
       using namespace math::texture;
       if (tpack.roughness) {
         glm::vec4 value = tpack.roughness->sample(u, v, sample_data);
@@ -49,7 +49,7 @@ namespace nova::material {
       return glm::vec4(0.f);
     }
 
-    ax_no_discard glm::vec4 normal(float u, float v, const texturing::texture_sample_data &sample_data) const {
+    ax_device_callable ax_no_discard glm::vec4 normal(float u, float v, const texturing::texture_sample_data &sample_data) const {
       using namespace math::texture;
       if (tpack.normalmap) {
         glm::vec4 value = tpack.normalmap->sample(u, v, sample_data);
@@ -58,7 +58,7 @@ namespace nova::material {
       return glm::vec4(0.f, 0.f, 1.f, 0.f);
     }
 
-    ax_no_discard glm::vec4 ao(float u, float v, const texturing::texture_sample_data &sample_data) const {
+    ax_device_callable ax_no_discard glm::vec4 ao(float u, float v, const texturing::texture_sample_data &sample_data) const {
       using namespace math::texture;
       if (tpack.ao) {
         glm::vec4 value = tpack.ao->sample(u, v, sample_data);
@@ -76,15 +76,14 @@ namespace nova::material {
 
   NovaDiffuseMaterial::NovaDiffuseMaterial(const texture_pack &texture) { t_pack = texture; }
 
-  static glm::vec3 hemi_sample(const glm::mat3 &tbn, sampler::SamplerInterface &sampler) {
+  inline glm::vec3 hemi_sample(const glm::mat3 & /*tbn*/, sampler::SamplerInterface &sampler) {
     using namespace math::random;
     using namespace math::spherical;
-    int err_flag = 0;
     auto random_sample = sampler.sample();
     return glm::normalize(random_sample);
   }
 
-  bool NovaDiffuseMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const {
+  bool NovaDiffuseMaterial::scatter(const Ray & /*in*/, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const {
     TexturePackSampler texture_pack_sampler(t_pack);
     const glm::mat3 tbn = math::geometry::construct_tbn(hit_d.normal, hit_d.tangent, hit_d.bitangent);
     glm::vec3 normal = compute_map_normal(hit_d, texture_pack_sampler, tbn);
@@ -134,7 +133,7 @@ namespace nova::material {
     t_pack = texture;
     eta = ior;
   }
-  static bool refract(const glm::vec3 &v, const glm::vec3 &n, float eta, glm::vec3 &refracted) {
+  inline bool refract(const glm::vec3 &v, const glm::vec3 &n, float eta, glm::vec3 &refracted) {
     glm::vec3 inc = glm::normalize(v);
     float dt = glm::dot(inc, n);
     float discriminant = 1.f - eta * eta * (1 - dt * dt);
@@ -145,7 +144,7 @@ namespace nova::material {
     return false;
   }
 
-  static float schlick(float cosine, float eta) {
+  inline float schlick(float cosine, float eta) {
     float r0 = (1 - eta) / (1 + eta);
     r0 *= r0;
     return r0 + (1 - r0) * std::pow((1 - cosine), 5);
