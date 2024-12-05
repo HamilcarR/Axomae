@@ -6,6 +6,7 @@
 #  define ax_device_callable __host__ __device__
 #  define ax_device_shared __shared__
 #  define ax_device_only __device__
+#  define ax_device_inlined __device__ inline
 #  define ax_device_const __device__ __constant__
 #  define ax_host_only __host__
 #  define ax_kernel __global__

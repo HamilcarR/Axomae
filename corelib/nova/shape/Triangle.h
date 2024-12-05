@@ -23,21 +23,21 @@ namespace nova::shape {
     bool uv_valid{false};
 
    public:
-    CLASS_CM(Triangle)
+    CLASS_DCM(Triangle)
 
-    explicit Triangle(const glm::vec3 vertices[3],
-                      const glm::vec3 normals[3] = nullptr,
-                      const glm::vec2 textures[3] = nullptr,
-                      const glm::vec3 tangents[3] = nullptr,
-                      const glm::vec3 bitangents[3] = nullptr);
-    bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const;
-    ax_no_discard glm::vec3 centroid() const { return center; }
-    ax_no_discard geometry::BoundingBox computeAABB() const;
+    ax_device_callable explicit Triangle(const glm::vec3 vertices[3],
+                                         const glm::vec3 normals[3] = nullptr,
+                                         const glm::vec2 textures[3] = nullptr,
+                                         const glm::vec3 tangents[3] = nullptr,
+                                         const glm::vec3 bitangents[3] = nullptr);
+    ax_device_callable bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const;
+    ax_device_callable ax_no_discard glm::vec3 centroid() const { return center; }
+    ax_device_callable ax_no_discard geometry::BoundingBox computeAABB() const;
 
-    ax_no_discard bool hasValidTangents() const { return t0 != glm::vec3(0.f) || t1 != glm::vec3(0.f) || t2 != glm::vec3(0.f); }
-    ax_no_discard bool hasValidBitangents() const { return b0 != glm::vec3(0.f) || b1 != glm::vec3(0.f) || b2 != glm::vec3(0.f); }
-    ax_no_discard bool hasValidNormals() const { return n0 != glm::vec3(0.f) || n1 != glm::vec3(0.f) || n2 != glm::vec3(0.f); }
-    ax_no_discard bool hasValidUvs() const { return uv_valid; }
+    ax_device_callable ax_no_discard bool hasValidTangents() const { return t0 != glm::vec3(0.f) || t1 != glm::vec3(0.f) || t2 != glm::vec3(0.f); }
+    ax_device_callable ax_no_discard bool hasValidBitangents() const { return b0 != glm::vec3(0.f) || b1 != glm::vec3(0.f) || b2 != glm::vec3(0.f); }
+    ax_device_callable ax_no_discard bool hasValidNormals() const { return n0 != glm::vec3(0.f) || n1 != glm::vec3(0.f) || n2 != glm::vec3(0.f); }
+    ax_device_callable ax_no_discard bool hasValidUvs() const { return uv_valid; }
   };
 }  // namespace nova::shape
 
