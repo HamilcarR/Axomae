@@ -22,8 +22,8 @@ namespace nova_baker_utils {
     auto *triangle_buffer = memory_pool.construct<nova::shape::Triangle>(primitive_number, false, "Triangle buffer");
     auto *primitive_buffer = memory_pool.construct<nova::primitive::NovaGeoPrimitive>(primitive_number, false, "Primitive buffer");
     primitive_buffers_t geometry_buffers{};
-    geometry_buffers.geo_primitive_alloc_buffer = primitive_buffer;
-    geometry_buffers.triangle_alloc_buffer = triangle_buffer;
+    geometry_buffers.geo_primitive_alloc_buffer = axstd::span<nova::primitive::NovaGeoPrimitive>(primitive_buffer, primitive_number);
+    geometry_buffers.triangle_alloc_buffer = axstd::span<nova::shape::Triangle>(triangle_buffer, primitive_number);
     return geometry_buffers;
   }
 
@@ -45,10 +45,10 @@ namespace nova_baker_utils {
     primitive_buffers_t primitive_buffers = allocate_primitive_triangle_buffers(memory_pool, primitive_number);
 
     /* Allocate one singular contiguous buffer of ImageTexture objects*/
-    auto *image_texture_buffer = reinterpret_cast<uint8_t *>(
+    auto *image_texture_buffer = reinterpret_cast<nova::texturing::ImageTexture *>(
         memory_pool.allocate(PBR_PIPELINE_TEX_NUM * meshes.size() * sizeof(nova::texturing::ImageTexture), "ImageTexture buffer"));
     texture_buffers_t texture_buffers{};
-    texture_buffers.image_alloc_buffer = axstd::span<uint8_t>(image_texture_buffer, PBR_PIPELINE_TEX_NUM * meshes.size());
+    texture_buffers.image_alloc_buffer = axstd::span<nova::texturing::ImageTexture>(image_texture_buffer, PBR_PIPELINE_TEX_NUM * meshes.size());
     material_buffers_t material_buffers = allocate_materials_buffers(manager.getMemoryPool(), meshes.size());
     std::size_t alloc_offset_primitives = 0, alloc_offset_materials = 0, alloc_offset_textures = 0;
 

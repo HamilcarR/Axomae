@@ -34,10 +34,25 @@ namespace controller {
     nova_resource_manager = std::make_unique<nova::NovaResourceManager>();
   }
 
+  template<class T>
+  axstd::span<uint8_t> convert_to_byte_span(const axstd::span<T> &to_convert) {
+    std::size_t size_in_bytes = sizeof(T) * to_convert.size();
+    auto buffer_in_bytes = reinterpret_cast<uint8_t *>(to_convert.data());
+    return {buffer_in_bytes, size_in_bytes};
+  }
+
   static void add_caches_addresses(nova::device_shared_caches_t &shared_caches,
                                    const nova_baker_utils::bake_buffers_storage_t &bake_buffers_storage) {
-    /* Only texture buffers are taken into account for now.*/
-    shared_caches.addSharedCacheAddress(bake_buffers_storage.texture_buffers.image_alloc_buffer);
+    /* Register textures */
+    shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.texture_buffers.image_alloc_buffer));
+    /* Register materials */
+    shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.material_buffers.diffuse_alloc_buffer));
+    shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.material_buffers.conductor_alloc_buffer));
+    shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.material_buffers.dielectric_alloc_buffer));
+    /* Register shapes */
+    shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.primitive_buffers.triangle_alloc_buffer));
+    /*Register primitives */
+    shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.primitive_buffers.geo_primitive_alloc_buffer));
   }
 
   static void notify_simple_progress(const char *str, IProgressManager *progress_manager) {

@@ -35,18 +35,18 @@ namespace nova_baker_utils {
   /* Will be removed when BSDFs will be implemented */
   material_buffers_t allocate_materials_buffers(core::memory::ByteArena &memory_pool, std::size_t number_elements) {
     material_buffers_t buffers{};
-
-    buffers.diffuse_alloc_buffer = reinterpret_cast<nova::material::NovaDiffuseMaterial *>(
+    auto *alloc_diffuse = reinterpret_cast<nova::material::NovaDiffuseMaterial *>(
         memory_pool.allocate(number_elements * sizeof(nova::material::NovaDiffuseMaterial), "NovaDiffuseMaterial buffer"));
-
-    buffers.dielectric_alloc_buffer = reinterpret_cast<nova::material::NovaDielectricMaterial *>(
+    auto *alloc_dielec = reinterpret_cast<nova::material::NovaDielectricMaterial *>(
         memory_pool.allocate(number_elements * sizeof(nova::material::NovaDielectricMaterial), "NovaDielectricMaterial buffer"));
-
-    buffers.conductor_alloc_buffer = reinterpret_cast<nova::material::NovaConductorMaterial *>(
+    auto *alloc_conduc = reinterpret_cast<nova::material::NovaConductorMaterial *>(
         memory_pool.allocate(number_elements * sizeof(nova::material::NovaConductorMaterial), "NovaConductorMaterial buffer"));
-    AX_ASSERT_NOTNULL(buffers.diffuse_alloc_buffer);
-    AX_ASSERT_NOTNULL(buffers.conductor_alloc_buffer);
-    AX_ASSERT_NOTNULL(buffers.dielectric_alloc_buffer);
+    AX_ASSERT_NOTNULL(alloc_diffuse);
+    AX_ASSERT_NOTNULL(alloc_dielec);
+    AX_ASSERT_NOTNULL(alloc_conduc);
+    buffers.diffuse_alloc_buffer = axstd::span<nova::material::NovaDiffuseMaterial>(alloc_diffuse, number_elements);
+    buffers.dielectric_alloc_buffer = axstd::span<nova::material::NovaDielectricMaterial>(alloc_dielec, number_elements);
+    buffers.conductor_alloc_buffer = axstd::span<nova::material::NovaConductorMaterial>(alloc_conduc, number_elements);
     return buffers;
   }
 
@@ -57,7 +57,7 @@ namespace nova_baker_utils {
     const MaterialInterface *material = mesh->getMaterial();
     const TextureGroup &texture_group = material->getTextureGroup();
     nova::material::texture_pack tpack{};
-    auto *allocated_texture_buffer = reinterpret_cast<nova::texturing::ImageTexture *>(texture_buffers.image_alloc_buffer.data());
+    auto *allocated_texture_buffer = texture_buffers.image_alloc_buffer.data();
     tpack.albedo = extract_texture(allocated_texture_buffer, offset, texture_group, manager, GenericTexture::DIFFUSE);
     tpack.metallic = extract_texture(allocated_texture_buffer, offset + 1, texture_group, manager, GenericTexture::METALLIC);
     tpack.normalmap = extract_texture(allocated_texture_buffer, offset + 2, texture_group, manager, GenericTexture::NORMAL);
@@ -79,19 +79,19 @@ namespace nova_baker_utils {
     switch (r) {
       case 0:
         mat_ptr = manager.getMaterialData().add_material<nova::material::NovaConductorMaterial>(
-            arena, material_buffers.conductor_alloc_buffer, offset, tpack, math::random::nrandf(0.001, 0.5));
+            arena, material_buffers.conductor_alloc_buffer.data(), offset, tpack, math::random::nrandf(0.001, 0.5));
         break;
       case 1:
         mat_ptr = manager.getMaterialData().add_material<nova::material::NovaDielectricMaterial>(
-            arena, material_buffers.dielectric_alloc_buffer, offset, tpack, math::random::nrandf(1.5, 2.4));
+            arena, material_buffers.dielectric_alloc_buffer.data(), offset, tpack, math::random::nrandf(1.5, 2.4));
         break;
       case 2:
         mat_ptr = manager.getMaterialData().add_material<nova::material::NovaDiffuseMaterial>(
-            arena, material_buffers.diffuse_alloc_buffer, offset, tpack);
+            arena, material_buffers.diffuse_alloc_buffer.data(), offset, tpack);
         break;
       default:
         mat_ptr = manager.getMaterialData().add_material<nova::material::NovaConductorMaterial>(
-            arena, material_buffers.conductor_alloc_buffer, offset, tpack, 0.004);
+            arena, material_buffers.conductor_alloc_buffer.data(), offset, tpack, 0.004);
         break;
     }
     return mat_ptr;

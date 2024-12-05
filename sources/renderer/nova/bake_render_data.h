@@ -13,18 +13,18 @@ class Mesh;
 namespace nova_baker_utils {
 
   struct material_buffers_t {
-    nova::material::NovaConductorMaterial *conductor_alloc_buffer;
-    nova::material::NovaDielectricMaterial *dielectric_alloc_buffer;
-    nova::material::NovaDiffuseMaterial *diffuse_alloc_buffer;
+    axstd::span<nova::material::NovaConductorMaterial> conductor_alloc_buffer;
+    axstd::span<nova::material::NovaDielectricMaterial> dielectric_alloc_buffer;
+    axstd::span<nova::material::NovaDiffuseMaterial> diffuse_alloc_buffer;
   };
 
   struct texture_buffers_t {
-    axstd::span<uint8_t> image_alloc_buffer;
+    axstd::span<nova::texturing::ImageTexture> image_alloc_buffer;
   };
 
   struct primitive_buffers_t {
-    nova::shape::Triangle *triangle_alloc_buffer;
-    nova::primitive::NovaGeoPrimitive *geo_primitive_alloc_buffer;
+    axstd::span<nova::shape::Triangle> triangle_alloc_buffer;
+    axstd::span<nova::primitive::NovaGeoPrimitive> geo_primitive_alloc_buffer;
   };
 
   struct bake_buffers_storage_t {

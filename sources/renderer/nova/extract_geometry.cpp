@@ -61,8 +61,8 @@ namespace nova_baker_utils {
                               const glm::mat4 &final_transfo,
                               const glm::mat3 &normal_matrix,
                               std::size_t alloc_offset_primitives,
-                              nova::shape::Triangle *triangle_buffer,
-                              nova::primitive::NovaGeoPrimitive *primitive_buffer,
+                              axstd::span<nova::shape::Triangle> &triangle_buffer,
+                              axstd::span<nova::primitive::NovaGeoPrimitive> &primitive_buffer,
                               const nova::material::NovaMaterialInterface &mat,
                               nova::NovaResourceManager &manager,
                               int i) {
@@ -77,8 +77,8 @@ namespace nova_baker_utils {
     transform_vertices(tri_primitive, final_transfo, vertices);
     transform_normals(tri_primitive, normal_matrix, normals);
     auto tri = manager.getShapeData().add_shape<nova::shape::Triangle>(
-        triangle_buffer, alloc_offset_primitives, vertices, normals, uv, tangents, bitangents);
-    manager.getPrimitiveData().add_primitive<nova::primitive::NovaGeoPrimitive>(primitive_buffer, alloc_offset_primitives, tri, mat);
+        triangle_buffer.data(), alloc_offset_primitives, vertices, normals, uv, tangents, bitangents);
+    manager.getPrimitiveData().add_primitive<nova::primitive::NovaGeoPrimitive>(primitive_buffer.data(), alloc_offset_primitives, tri, mat);
   }
 
   void setup_geometry_data(primitive_buffers_t &geometry_buffers,
