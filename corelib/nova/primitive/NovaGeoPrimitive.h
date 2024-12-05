@@ -18,7 +18,7 @@ namespace nova::primitive {
     const shape::NovaShapeInterface shape{};
 
    public:
-    CLASS_CM(NovaGeoPrimitive)
+    CLASS_DCM(NovaGeoPrimitive)
 
     ax_device_callable NovaGeoPrimitive(const shape::NovaShapeInterface &shape, const material::NovaMaterialInterface &material);
     ax_device_callable bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const;
