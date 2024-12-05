@@ -1,0 +1,5 @@
+function(register_device_compilation)
+    if(AXOMAE_USE_CUDA)
+        set_source_files_properties(${ARGN} PROPERTIES LANGUAGE CUDA)
+    endif()
+endfunction()

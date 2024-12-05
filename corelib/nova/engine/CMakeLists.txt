@@ -1,3 +1,4 @@
+autoload_build_utils()
 
 add_library(ax_core_nova_engine STATIC
         nova_engine.cpp
@@ -18,6 +19,4 @@ target_include_directories(ax_core_nova_engine PUBLIC
         ${AXOMAE_CORELIB_ROOT}
 )
 
-if(AXOMAE_USE_CUDA)
-    set_source_files_properties(nova_exception.cpp PROPERTIES LANGUAGE CUDA)
-    endif()
+register_device_compilation(nova_exception.cpp)
