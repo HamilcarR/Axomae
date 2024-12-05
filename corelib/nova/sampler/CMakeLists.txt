@@ -1,3 +1,5 @@
+autoload_build_utils()
+
 add_library(ax_core_nova_sampler STATIC
         Sampler.cpp
 )

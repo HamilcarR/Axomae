@@ -1,3 +1,5 @@
+autoload_build_utils()
+
 add_library(ax_core_nova_texturing STATIC
         nova_texturing.cpp
         NovaTexture.cpp
@@ -15,6 +17,4 @@ target_include_directories(ax_core_nova_texturing PUBLIC
     ${AXOMAE_CORELIB_ROOT}
 )
 
-if(AXOMAE_USE_CUDA)
-    set_source_files_properties(NovaTexture.cpp PROPERTIES LANGUAGE CUDA)
-endif()
+register_device_compilation(NovaTexture.cpp)
