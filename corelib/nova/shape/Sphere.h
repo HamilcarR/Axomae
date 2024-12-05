@@ -11,16 +11,12 @@ namespace nova::shape {
     glm::vec3 origin{};
 
    public:
-    Sphere() = default;
-    Sphere(const glm::vec3 &origin, float radius);
-    ~Sphere() = default;
-    Sphere(const Sphere &copy) = delete;
-    Sphere(Sphere &&move) noexcept = default;
-    Sphere &operator=(const Sphere &copy) = delete;
-    Sphere &operator=(Sphere &&move) noexcept = default;
-    bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const;
-    ax_no_discard glm::vec3 centroid() const { return origin; }
-    ax_no_discard geometry::BoundingBox computeAABB() const;
+    CLASS_DCM(Sphere)
+
+    ax_device_callable Sphere(const glm::vec3 &origin, float radius);
+    ax_device_callable bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const;
+    ax_device_callable ax_no_discard glm::vec3 centroid() const { return origin; }
+    ax_device_callable ax_no_discard geometry::BoundingBox computeAABB() const;
   };
 }  // namespace nova::shape
 #endif  // SPHERE_H

@@ -2,6 +2,14 @@
 #include "ray/Ray.h"
 
 namespace nova::shape {
+
+  Square::Square(const glm::vec3 &origin_) : origin(origin_) {}
+
+  Square::Square(const glm::vec3 &origin_, const glm::vec3 &side_w_, const glm::vec3 &side_h_) : origin(origin_), side_w(side_w_), side_h(side_h_) {
+    normal = glm::normalize(glm::cross(side_w, side_h));
+    center = (side_h + side_w) * 0.5f;
+  }
+
   bool Square::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const {
     glm::vec3 n = normal;
     if (glm::dot(ray.origin - origin, n) < 0)
