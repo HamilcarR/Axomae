@@ -1,5 +1,6 @@
 add_library(ax_core_math
         math_acos_lt.cpp
+        math_random.cpp
 )
 target_link_libraries(ax_core_common PUBLIC ax_core_math)
 target_link_libraries(ax_core_math

@@ -27,7 +27,8 @@ class ImageMetadataAndData {
 namespace image_database_test {
   template<class DATATYPE>
   void addImage(IResourceDB<int, image::ThumbnailImageHolder<DATATYPE>> &database) {
-    bool persistence = math::random::randb();
+    math::random::CPURandomGenerator generator;
+    bool persistence = generator.randb();
     std::vector<DATATYPE> vec;
     image::Metadata metadata;
     database::image::store(database, persistence);

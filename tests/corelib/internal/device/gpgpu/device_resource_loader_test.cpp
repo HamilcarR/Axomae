@@ -28,8 +28,10 @@ static void check_array_equal(const std::array<T, BUFFER_SIZE> &test, const std:
 }
 
 static void generate_random_arrayi(std::array<int, BUFFER_SIZE> &array) {
+
+  math::random::CPURandomGenerator generator;
   for (int i = 0; i < BUFFER_SIZE; i++)
-    array[i] = math::random::nrandi(0, BUFFER_SIZE);
+    array[i] = generator.nrandi(0, BUFFER_SIZE);
 }
 
 TEST(device_resource_loader_test, copy_buffer) {

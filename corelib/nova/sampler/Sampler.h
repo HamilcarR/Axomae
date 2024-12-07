@@ -5,53 +5,63 @@
 #include "internal/device/gpgpu/device_utils.h"
 #include "internal/macro/project_macros.h"
 #include "internal/memory/tag_ptr.h"
-
 #include <boost/random/sobol.hpp>
 #include <engine/nova_exception.h>
 #include <memory>
 #include <variant>
+#if defined(AXOMAE_USE_CUDA)
+#  include "gpu/GPURandomGenerator.h"
+#endif
 
 namespace nova::sampler {
 
   class RandomSampler {
-    mutable nova::exception::NovaException exception{};
+    exception::NovaException exception{};
+#ifndef __CUDA_ARCH__
+    math::random::CPURandomGenerator generator;
+#else
+    math::random::GPURandomGenerator generator;
+#endif
 
    public:
-    CLASS_M(RandomSampler)
+    CLASS_DCM(RandomSampler)
 
-    ax_device_callable glm::vec3 sample();
-    ax_device_callable nova::exception::NovaException getErrorState() const;
+    ax_device_callable explicit RandomSampler(uint64_t seed);
+    ax_device_callable ax_no_discard glm::vec3 sample();
+    ax_device_callable ax_no_discard exception::NovaException getErrorState() const;
   };
 
   class HammersleySampler {
     int i{0}, N{0};
-    mutable nova::exception::NovaException exception{};
+    exception::NovaException exception{};
 
    public:
-    CLASS_M(HammersleySampler)
+    CLASS_DCM(HammersleySampler)
 
     explicit HammersleySampler(int N);
     /* Will increment the index*/
-    ax_device_callable glm::vec3 sample();
-    ax_device_callable nova::exception::NovaException getErrorState() const { return exception; }
+    ax_device_callable ax_no_discard glm::vec3 sample();
+    ax_device_callable ax_no_discard exception::NovaException getErrorState() const { return exception; }
   };
 
   class SobolSampler {
-    std::unique_ptr<boost::random::sobol> sobol_engine;
+    boost::random::sobol sobol_engine{1};
+    exception::NovaException exception{};
     int i{0}, N{0};
-    mutable nova::exception::NovaException exception{};
 
    public:
-    explicit SobolSampler(int seed, int dimension = 1);
+    CLASS_DCM(SobolSampler)
+
+    ax_device_callable explicit SobolSampler(int seed, int dimension = 1);
     ax_device_callable glm::vec3 sample();
-    ax_device_callable nova::exception::NovaException getErrorState() const { return exception; }
+    ax_device_callable ax_no_discard exception::NovaException getErrorState() const { return exception; }
   };
 
   class SamplerInterface : public core::tag_ptr<HammersleySampler, SobolSampler, RandomSampler> {
    public:
     using tag_ptr::tag_ptr;
 
-    ax_device_callable ax_no_discard nova::exception::NovaException getErrorState() const {
+    ax_device_callable ax_no_discard exception::NovaException getErrorState() const {
       auto d = [&](auto ptr) { return ptr->getErrorState(); };
       return dispatch(d);
     }
@@ -62,6 +72,6 @@ namespace nova::sampler {
     }
   };
 
-  inline nova::exception::NovaException retrieve_sampler_error(const SamplerInterface &sampler) { return sampler.getErrorState(); }
+  inline exception::NovaException retrieve_sampler_error(const SamplerInterface &sampler) { return sampler.getErrorState(); }
 }  // namespace nova::sampler
 #endif  // SAMPLER_H
