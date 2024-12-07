@@ -4,7 +4,6 @@
 #include "internal/debug/Logger.h"
 #include <gtest/gtest.h>
 int main(int argv, char **argc) {
-  math::random::init_rand();
   LoggerConfigDataStruct config;
   std::shared_ptr<std::ostream> out(&std::cout, [](std::ostream *) {});
   config.write_destination = out;

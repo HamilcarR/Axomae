@@ -29,7 +29,8 @@ class TestDatabase : public IntegerResourceDB<TestString> {
 
 TEST(IResourceDB, reserveCache) {
   for (uint32_t test_i = 0; test_i < NUM_TESTS; test_i++) {
-    std::size_t block_size_arena = math::random::nrandi(2048, 65556);
+    math::random::CPURandomGenerator generator;
+    std::size_t block_size_arena = generator.nrandi(2048, 65556);
     core::memory::MemoryArena arena(block_size_arena);
     TestDatabase test_database(&arena);
     auto ptr = test_database.reserveCache(ALLOC_SIZE, core::memory::PLATFORM_ALIGN);
@@ -42,13 +43,14 @@ TEST(IResourceDB, getCacheSize) {
   core::memory::MemoryArena arena;
   TestDatabase test_database(&arena);
   ASSERT_EQ(test_database.getCacheSize(nullptr), DATABASE_CACHE_INVALID_SIZE);
+  math::random::CPURandomGenerator generator;
   for (uint32_t i = 0; i < NUM_TESTS; i++) {
-    uint8_t *ptr = reinterpret_cast<uint8_t *>(math::random::nrandi(1, 65556));
+    uint8_t *ptr = reinterpret_cast<uint8_t *>(generator.nrandi(1, 65556));
     std::size_t size = test_database.getCacheSize(ptr);
     ASSERT_EQ(size, DATABASE_CACHE_INVALID_SIZE);
   }
   for (uint32_t i = 0; i < NUM_TESTS; i++) {
-    std::size_t block_size_arena = math::random::nrandi(2048, 65556);
+    std::size_t block_size_arena = generator.nrandi(2048, 65556);
     uint8_t *ptr = nullptr;
     ASSERT_NE(ptr = test_database.reserveCache(block_size_arena, core::memory::PLATFORM_ALIGN), nullptr);
     EXPECT_EQ(block_size_arena, test_database.getCacheSize(ptr));
@@ -57,9 +59,10 @@ TEST(IResourceDB, getCacheSize) {
 
 TEST(IResourceDB, invalidateCaches) {
   core::memory::MemoryArena arena;
+  math::random::CPURandomGenerator generator;
   TestDatabase test_database(&arena);
   for (uint32_t i = 0; i < NUM_TESTS; i++) {
-    std::size_t block_size_arena = math::random::nrandi(2048, 65556);
+    std::size_t block_size_arena = generator.nrandi(2048, 65556);
     ASSERT_NE(test_database.reserveCache(block_size_arena, core::memory::PLATFORM_ALIGN), nullptr);
   }
   ASSERT_NE(arena.getUsedBlocksNum(), 0);

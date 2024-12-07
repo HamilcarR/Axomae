@@ -7,7 +7,8 @@ namespace texture_database_test {
 
   template<class HEAD, class... TAIL>
   constexpr void addTexture(IResourceDB<int, GenericTexture> &database, U32TexData *data) {
-    bool persistence = math::random::randb();
+    math::random::CPURandomGenerator generator;
+    bool persistence = generator.randb();
     database::texture::store<HEAD>(database, persistence, data);
     if constexpr (sizeof...(TAIL) > 0)
       addTexture<TAIL...>(database, data);
@@ -94,11 +95,13 @@ TEST(TextureDatabaseTest, contains) {
 }
 
 TEST(TextureDatabaseTest, remove) {
+
+  math::random::CPURandomGenerator generator;
   TextureDatabase database;
   TextureDatabaseTest test(database);
   EXPECT_FALSE(database.remove(nullptr));
   for (int i = 0; i < COUNT; i++) {
-    int pos = math::random::nrandi(0, COUNT - 1);
+    int pos = generator.nrandi(0, COUNT - 1);
     auto iterator = database.getConstData().find(pos);
     bool contain = iterator != database.getConstData().end();
     EXPECT_EQ(contain, database.remove(iterator->second.get()));
@@ -108,6 +111,7 @@ TEST(TextureDatabaseTest, remove) {
 TEST(TextureDatabaseTest, get) {
   TextureDatabase database;
   TextureDatabaseTest test(database);
+  math::random::CPURandomGenerator generator;
   std::vector<GenericTexture *> ptr_list;
   for (const auto &elem : database.getConstData())
     ptr_list.push_back(elem.second.get());
@@ -127,7 +131,7 @@ TEST(TextureDatabaseTest, get) {
   EXPECT_EQ(ptr, nullptr);
   ptr = database.get(database.size() + 1);
   EXPECT_EQ(ptr, nullptr);
-  int pos = math::random::nrandi(0, COUNT - 1);
+  int pos = generator.nrandi(0, COUNT - 1);
   ptr = database.get(pos);
   i = 0;
   bool found = false;

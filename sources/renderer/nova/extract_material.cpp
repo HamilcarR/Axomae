@@ -73,17 +73,18 @@ namespace nova_baker_utils {
                                                                       nova::material::texture_pack &tpack,
                                                                       nova::NovaResourceManager &manager,
                                                                       std::size_t &offset) {
-    int r = math::random::nrandi(0, 2);
+    math::random::CPURandomGenerator rand_gen;
+    int r = rand_gen.nrandi(0, 2);
     nova::material::NovaMaterialInterface mat_ptr{};
     core::memory::ByteArena &arena = manager.getMemoryPool();
     switch (r) {
       case 0:
         mat_ptr = manager.getMaterialData().add_material<nova::material::NovaConductorMaterial>(
-            arena, material_buffers.conductor_alloc_buffer.data(), offset, tpack, math::random::nrandf(0.001, 0.5));
+            arena, material_buffers.conductor_alloc_buffer.data(), offset, tpack, rand_gen.nrandf(0.001, 0.5));
         break;
       case 1:
         mat_ptr = manager.getMaterialData().add_material<nova::material::NovaDielectricMaterial>(
-            arena, material_buffers.dielectric_alloc_buffer.data(), offset, tpack, math::random::nrandf(1.5, 2.4));
+            arena, material_buffers.dielectric_alloc_buffer.data(), offset, tpack, rand_gen.nrandf(1.5, 2.4));
         break;
       case 2:
         mat_ptr = manager.getMaterialData().add_material<nova::material::NovaDiffuseMaterial>(

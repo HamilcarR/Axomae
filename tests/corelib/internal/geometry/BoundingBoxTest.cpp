@@ -6,8 +6,9 @@ TEST(BoundingBoxTest, minMaxCompute) {
   std::vector<float> v;
   glm::vec3 max_coords = glm::vec3(-INT_MAX, -INT_MAX, -INT_MAX);
   glm::vec3 min_coords = glm::vec3(-1.f) * max_coords;
+  math::random::CPURandomGenerator generator;
   for (unsigned i = 0; i < 24; i++)
-    v.push_back(f_rand);
+    v.push_back(f_rand(generator));
   for (unsigned i = 0; i < 24; i += 3) {
     max_coords.x = v[i] >= max_coords.x ? v[i] : max_coords.x;
     max_coords.y = v[i + 1] >= max_coords.y ? v[i + 1] : max_coords.y;
@@ -25,14 +26,15 @@ TEST(BoundingBoxTest, minMaxCompute) {
 
 TEST(BoundingBoxTest, productOperatorTest) {
   BoundingBox B1(vertices);
+  math::random::CPURandomGenerator generator;
   std::vector<std::pair<glm::mat4, glm::vec3[3]>>
       matrix_result;  // first = matrices , second = result matrix x coords => {min_coords , max_coords , center}
   matrix_result.resize(ITERATION_NUMBER);
   for (unsigned i = 0; i < ITERATION_NUMBER; i++) {
-    glm::vec4 row1(f_rand, f_rand, f_rand, f_rand);
-    glm::vec4 row2(f_rand, f_rand, f_rand, f_rand);
-    glm::vec4 row3(f_rand, f_rand, f_rand, f_rand);
-    glm::vec4 row4(f_rand, f_rand, f_rand, f_rand);
+    glm::vec4 row1(f_rand(generator), f_rand(generator), f_rand(generator), f_rand(generator));
+    glm::vec4 row2(f_rand(generator), f_rand(generator), f_rand(generator), f_rand(generator));
+    glm::vec4 row3(f_rand(generator), f_rand(generator), f_rand(generator), f_rand(generator));
+    glm::vec4 row4(f_rand(generator), f_rand(generator), f_rand(generator), f_rand(generator));
     glm::mat4 mat(row1, row2, row3, row4);
     glm::vec3 min_coords = mat * glm::vec4(B1.getMinCoords(), 1.f);
     glm::vec3 max_coords = mat * glm::vec4(B1.getMaxCoords(), 1.f);
@@ -60,11 +62,12 @@ TEST(BoundingBoxTest, productOperatorTest) {
 }
 
 TEST(BoundingBoxTest, addOperatorTest) {
+  math::random::CPURandomGenerator generator;
   for (int i = 0; i < ITERATION_NUMBER; i++) {
-    glm::vec3 B1_min{f_rand, f_rand, f_rand};
-    glm::vec3 B1_max{f_rand, f_rand, f_rand};
-    glm::vec3 B2_min{f_rand, f_rand, f_rand};
-    glm::vec3 B2_max{f_rand, f_rand, f_rand};
+    glm::vec3 B1_min{f_rand(generator), f_rand(generator), f_rand(generator)};
+    glm::vec3 B1_max{f_rand(generator), f_rand(generator), f_rand(generator)};
+    glm::vec3 B2_min{f_rand(generator), f_rand(generator), f_rand(generator)};
+    glm::vec3 B2_max{f_rand(generator), f_rand(generator), f_rand(generator)};
     glm::vec3 E_min = glm::min(B1_min, B2_min);
     glm::vec3 E_max = glm::max(B1_max, B2_max);
 
