@@ -19,3 +19,5 @@ target_include_directories(ax_core_nova_sampler PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/../
         ${AXOMAE_CORELIB_ROOT}
 )
+
+register_device_compilation(Sampler.cpp)

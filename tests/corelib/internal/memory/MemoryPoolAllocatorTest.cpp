@@ -29,8 +29,9 @@ TEST(MemoryPoolAllocatorTest, allocate) {
 
 template<class T>
 void test_fill_buffer(T *buffer, std::size_t size) {
+  math::random::CPURandomGenerator generator;
   for (std::size_t i = 0; i < size; i++) {
-    buffer[i] = math::random::nrandi(0, 200);
+    buffer[i] = generator.nrandi(0, 200);
   }
 }
 
@@ -38,10 +39,11 @@ TEST(MemoryPoolAllocatorTest, deallocate) {
   auto arena = memory::MemoryArena<>();
   core::memory::MemoryPoolAllocator<int> custom_alloc;
   ASSERT_THROW(custom_alloc.deallocate(nullptr), memory::exception::ArenaInvalidStateException);
+  math::random::CPURandomGenerator generator;
   for (int i = 0; i < NUM_TESTS; i++) {
     custom_alloc = core::memory::MemoryPoolAllocator<int>(&arena);
     int *buffer = nullptr;
-    std::size_t buffer_size = math::random::nrandi(0, MAX_ALLOCATION_SIZE);
+    std::size_t buffer_size = generator.nrandi(0, MAX_ALLOCATION_SIZE);
     ASSERT_NO_THROW(buffer = custom_alloc.allocate(buffer_size));
     test_fill_buffer(buffer, buffer_size);
     ASSERT_NO_THROW(custom_alloc.deallocate(buffer));
