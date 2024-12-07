@@ -176,8 +176,8 @@ namespace nova::material {
       reflect_prob = schlick(cosine, eta);
     else
       reflect_prob = 1.f;
-
-    if (math::random::nrandf(0, 1) < reflect_prob)
+    float sampler_random = (sampler.sample().x + 1) / 2;
+    if (sampler_random < reflect_prob)
       out.direction = glm::normalize(reflected);
     else
       out.direction = glm::normalize(refracted);

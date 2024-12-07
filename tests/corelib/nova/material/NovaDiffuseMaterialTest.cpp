@@ -44,9 +44,10 @@ TEST(NovaDiffuseMaterialTest, scatter_direction) {
   nova::sampler::SobolSampler sobol = nova::sampler::SobolSampler(1000, 3);
   nova::sampler::SamplerInterface sampler = &sobol;
   nova::Ray out{};
+  math::random::CPURandomGenerator generator;
   for (int i = 0; i < MAX_ITER; i++) {
-    hit_data.u = math::random::nrandf(0, 1);
-    hit_data.v = math::random::nrandf(0, 1);
+    hit_data.u = (float)generator.nrandf(0, 1);
+    hit_data.v = (float)generator.nrandf(0, 1);
     if (diffuse_material.scatter(ray, out, hit_data, sampler)) {
       const glm::vec3 transformed_normal_computed = hit_data.normal;
       ASSERT_GT(glm::dot(transformed_normal_computed, out.direction), 0);

@@ -79,8 +79,9 @@ namespace nova::integrator {
       const NovaResourceManager *nova_resource_manager = nova_internals.resource_manager;
       NovaExceptionManager *nova_exception_manager = nova_internals.exception_manager;
 
-      sampler::SobolSampler sobol = sampler::SobolSampler(nova_resource_manager->getEngineData().renderer_max_samples, 20);
-      sampler::SamplerInterface sampler = &sobol;
+      sampler::SobolSampler sobol_s = sampler::SobolSampler(nova_resource_manager->getEngineData().renderer_max_samples, 20);
+      sampler::RandomSampler random_s = sampler::RandomSampler();
+      sampler::SamplerInterface sampler = &sobol_s;
 
       for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
         for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
@@ -99,8 +100,11 @@ namespace nova::integrator {
             if (!nova_resource_manager->getEngineData().is_rendering)
               return;
             /* Samples random direction around the pixel for AA. */
-            const float dx = math::random::nrandf(-RAND_DX, RAND_DX);
-            const float dy = math::random::nrandf(-RAND_DY, RAND_DY);
+            /*const float dx = math::random::nrandf(-RAND_DX, RAND_DX);
+            const float dy = math::random::nrandf(-RAND_DY, RAND_DY);*/
+            const glm::vec3 sampled_camera_directions = random_s.sample();
+            const float dx = sampled_camera_directions.x * RAND_DX;
+            const float dy = sampled_camera_directions.y * RAND_DY;
             math::camera::camera_ray r = math::camera::ray_inv_mat(
                 ndc.x + dx, ndc.y + dy, nova_resource_manager->getCameraData().inv_P, nova_resource_manager->getCameraData().inv_V);
             Ray ray(r.near, r.far);

@@ -1,35 +1,37 @@
 #ifndef MATH_RANDOM_H
 #define MATH_RANDOM_H
 
-#include <ctime>
+#include <internal/device/gpgpu/device_utils.h>
+#include <internal/macro/class_macros.h>
 #include <random>
+
+#if defined(AXOMAE_USE_CUDA)
+struct kernel_argpack_t;
+#endif
+
 namespace math::random {
 
-  inline std::minstd_rand &init_rand() {
-    static thread_local std::minstd_rand gen(std::random_device{}());
-    return gen;
-  }
+  class RandomGeneratorInterface {
+   public:
+    virtual ~RandomGeneratorInterface() = default;
+    virtual int nrandi(int min, int max) = 0;
+    virtual double nrandf(double min, double max) = 0;
+    virtual bool randb() = 0;
+  };
 
-  inline std::uniform_int_distribution<int> getUniformIntDistrib(int min, int max) { return std::uniform_int_distribution<int>(min, max); }
+  class CPURandomGenerator : public RandomGeneratorInterface {
+   private:
+    std::mt19937 m_generator;
+    std::uniform_int_distribution<int> m_int_distrib;
+    std::uniform_real_distribution<double> m_float_distrib;
 
-  inline std::uniform_real_distribution<double> getUniformDoubleDistrib(double min, double max) {
-    return std::uniform_real_distribution<double>(min, max);
-  }
+   public:
+    CPURandomGenerator();
+    explicit CPURandomGenerator(uint64_t seed);
+    int nrandi(int min, int max) override;
+    double nrandf(double min, double max) override;
+    bool randb() override;
+  };
 
-  inline int nrandi(int n1, int n2) {
-    auto &gen = init_rand();
-    auto distrib = getUniformIntDistrib(n1, n2);
-    return distrib(gen);
-  }
-
-  inline double nrandf(double n1, double n2) {
-    auto &gen = init_rand();
-    auto distrib = getUniformDoubleDistrib(n1, n2);
-    return distrib(gen);
-  }
-
-
-
-  inline bool randb() { return nrandi(0, 1); }
 };      // namespace math::random
 #endif  // math_random_H

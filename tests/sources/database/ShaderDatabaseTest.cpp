@@ -11,7 +11,8 @@ namespace shader_database_test {
 
   template<class HEAD, class... TAIL>
   void addShader(IResourceDB<Shader::TYPE, Shader> &database, ResultList &store_list) {
-    bool persistence = math::random::randb();
+    math::random::CPURandomGenerator generator;
+    bool persistence = generator.randb();
     auto result = database::shader::store<HEAD>(database, persistence);
     database::Result<Shader::TYPE, Shader> cast = {result.id, static_cast<Shader *>(result.object)};
     store_list.push_back(cast);

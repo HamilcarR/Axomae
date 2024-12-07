@@ -18,10 +18,11 @@ class TextureBuilder {
     srand(time(nullptr));
     width = _width;
     height = _height;
-    if (random)
+    if (random) {
+      math::random::CPURandomGenerator generator;
       for (unsigned i = 0; i < width * height * NUM_CHANNELS; i++)
-        data.push_back(math::random::nrandf(0, 1));
-    else
+        data.push_back(generator.nrandf(0, 1));
+    } else
       for (unsigned i = 0; i < width * height * NUM_CHANNELS; i++)
         data.push_back(value_if_not_random);
   }
@@ -44,7 +45,10 @@ template<class T>
 class RandomVecBuilder {
  public:
   RandomVecBuilder() { srand(time(nullptr)); }
-  T generate() { return T(math::random::nrandf(0, 1)); }
+  T generate() {
+    math::random::CPURandomGenerator generator;
+    return T(generator.nrandf(0, 1));
+  }
 };
 
 TEST(TexturingTest, WrapPixelCoords) {

@@ -18,11 +18,12 @@ TEST(BoxTest, outIntersection) {
   vector_vertices.resize(vert_gen.vertices.size());
   std::copy(vert_gen.vertices.begin(), vert_gen.vertices.end(), vector_vertices.begin());
   Box B1(vector_vertices);
+  math::random::CPURandomGenerator generator;
   for (unsigned i = 0; i < ITERATION_NUMBER; i++) {
     glm::vec3 out_position;
     bool isoutside = false;
     do {
-      out_position = {f_rand, f_rand, f_rand};
+      out_position = {f_rand(generator), f_rand(generator), f_rand(generator)};
       isoutside = is_outside_box(out_position, B1.computeAABB());
     } while (!isoutside);
     const nova::Ray ray(out_position, glm::normalize(B1.getPosition() - out_position));
@@ -37,11 +38,12 @@ TEST(BoxTest, inIntersection) {
   vector_vertices.resize(vert_gen.vertices.size());
   std::copy(vert_gen.vertices.begin(), vert_gen.vertices.end(), vector_vertices.begin());
   Box B1(vector_vertices);
+  math::random::CPURandomGenerator generator;
   for (unsigned i = 0; i < ITERATION_NUMBER; i++) {
     glm::vec3 out_position;
     bool isoutside = false;
     do {
-      out_position = {f_rand, f_rand, f_rand};
+      out_position = {f_rand(generator), f_rand(generator), f_rand(generator)};
       isoutside = is_outside_box(out_position, B1.computeAABB());
     } while (isoutside);
     for (int i = 0; i < directions.size(); i += 3) {
