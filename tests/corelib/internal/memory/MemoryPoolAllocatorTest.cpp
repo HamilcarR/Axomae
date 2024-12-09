@@ -29,7 +29,7 @@ TEST(MemoryPoolAllocatorTest, allocate) {
 
 template<class T>
 void test_fill_buffer(T *buffer, std::size_t size) {
-  math::random::CPURandomGenerator generator;
+  math::random::CPUPseudoRandomGenerator generator;
   for (std::size_t i = 0; i < size; i++) {
     buffer[i] = generator.nrandi(0, 200);
   }
@@ -39,7 +39,7 @@ TEST(MemoryPoolAllocatorTest, deallocate) {
   auto arena = memory::MemoryArena<>();
   core::memory::MemoryPoolAllocator<int> custom_alloc;
   ASSERT_THROW(custom_alloc.deallocate(nullptr), memory::exception::ArenaInvalidStateException);
-  math::random::CPURandomGenerator generator;
+  math::random::CPUPseudoRandomGenerator generator;
   for (int i = 0; i < NUM_TESTS; i++) {
     custom_alloc = core::memory::MemoryPoolAllocator<int>(&arena);
     int *buffer = nullptr;

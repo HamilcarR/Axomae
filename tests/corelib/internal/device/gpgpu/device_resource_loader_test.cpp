@@ -29,7 +29,7 @@ static void check_array_equal(const std::array<T, BUFFER_SIZE> &test, const std:
 
 static void generate_random_arrayi(std::array<int, BUFFER_SIZE> &array) {
 
-  math::random::CPURandomGenerator generator;
+  math::random::CPUPseudoRandomGenerator generator;
   for (int i = 0; i < BUFFER_SIZE; i++)
     array[i] = generator.nrandi(0, BUFFER_SIZE);
 }
