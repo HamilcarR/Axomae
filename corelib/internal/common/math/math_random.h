@@ -11,26 +11,26 @@ struct kernel_argpack_t;
 
 namespace math::random {
 
-  class RandomGeneratorInterface {
+  template<class T>
+  class AbstractRandomGenerator {
    public:
-    virtual ~RandomGeneratorInterface() = default;
-    virtual int nrandi(int min, int max) = 0;
-    virtual double nrandf(double min, double max) = 0;
-    virtual bool randb() = 0;
+    ax_device_callable int nrandi(int min, int max) { return this->nrandi(min, max); };
+    ax_device_callable double nrandf(double min, double max) { return this->nrandf(min, max); }
+    ax_device_callable bool randb() { return this->randb(); }
   };
 
-  class CPURandomGenerator : public RandomGeneratorInterface {
+  class CPUPseudoRandomGenerator : public AbstractRandomGenerator<CPUPseudoRandomGenerator> {
    private:
     std::mt19937 m_generator;
     std::uniform_int_distribution<int> m_int_distrib;
     std::uniform_real_distribution<double> m_float_distrib;
 
    public:
-    CPURandomGenerator();
-    explicit CPURandomGenerator(uint64_t seed);
-    int nrandi(int min, int max) override;
-    double nrandf(double min, double max) override;
-    bool randb() override;
+    CPUPseudoRandomGenerator();
+    explicit CPUPseudoRandomGenerator(uint64_t seed);
+    int nrandi(int min, int max);
+    double nrandf(double min, double max);
+    bool randb();
   };
 
 };      // namespace math::random

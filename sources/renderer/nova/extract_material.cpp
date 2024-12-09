@@ -73,7 +73,7 @@ namespace nova_baker_utils {
                                                                       nova::material::texture_pack &tpack,
                                                                       nova::NovaResourceManager &manager,
                                                                       std::size_t &offset) {
-    math::random::CPURandomGenerator rand_gen;
+    math::random::CPUPseudoRandomGenerator rand_gen;
     int r = rand_gen.nrandi(0, 2);
     nova::material::NovaMaterialInterface mat_ptr{};
     core::memory::ByteArena &arena = manager.getMemoryPool();

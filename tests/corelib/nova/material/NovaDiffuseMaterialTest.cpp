@@ -44,7 +44,7 @@ TEST(NovaDiffuseMaterialTest, scatter_direction) {
   nova::sampler::SobolSampler sobol = nova::sampler::SobolSampler(1000, 3);
   nova::sampler::SamplerInterface sampler = &sobol;
   nova::Ray out{};
-  math::random::CPURandomGenerator generator;
+  math::random::CPUPseudoRandomGenerator generator;
   for (int i = 0; i < MAX_ITER; i++) {
     hit_data.u = (float)generator.nrandf(0, 1);
     hit_data.v = (float)generator.nrandf(0, 1);
