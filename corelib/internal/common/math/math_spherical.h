@@ -61,13 +61,15 @@ namespace math::spherical {
     return {atan2_approx(-xyz.x, -xyz.z), (float)std::asin(xyz.y / glm::length(xyz)), 0.f};
   }
 
-  inline glm::vec3 rand_p_hemisphere(random::RandomGeneratorInterface &generator) {
+  template<class T>
+  glm::vec3 rand_p_hemisphere(random::AbstractRandomGenerator<T> &generator) {
     float phi = generator.nrandf(0.f, 2 * PI);
     float theta = generator.nrandf(0.f, PI * 0.5f);
     return glm::normalize(math::spherical::sphericalToCartesian(phi, theta));
   }
 
-  inline glm::vec3 rand_p_sphere(random::RandomGeneratorInterface &generator) {
+  template<class T>
+  glm::vec3 rand_p_sphere(random::AbstractRandomGenerator<T> &generator) {
     glm::vec3 p;
     do {
       double x = generator.nrandf(0, 1);

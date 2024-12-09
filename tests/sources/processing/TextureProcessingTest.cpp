@@ -19,7 +19,7 @@ class TextureBuilder {
     width = _width;
     height = _height;
     if (random) {
-      math::random::CPURandomGenerator generator;
+      math::random::CPUPseudoRandomGenerator generator;
       for (unsigned i = 0; i < width * height * NUM_CHANNELS; i++)
         data.push_back(generator.nrandf(0, 1));
     } else
@@ -46,7 +46,7 @@ class RandomVecBuilder {
  public:
   RandomVecBuilder() { srand(time(nullptr)); }
   T generate() {
-    math::random::CPURandomGenerator generator;
+    math::random::CPUPseudoRandomGenerator generator;
     return T(generator.nrandf(0, 1));
   }
 };

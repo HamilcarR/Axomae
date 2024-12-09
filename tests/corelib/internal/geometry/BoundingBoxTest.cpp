@@ -6,7 +6,7 @@ TEST(BoundingBoxTest, minMaxCompute) {
   std::vector<float> v;
   glm::vec3 max_coords = glm::vec3(-INT_MAX, -INT_MAX, -INT_MAX);
   glm::vec3 min_coords = glm::vec3(-1.f) * max_coords;
-  math::random::CPURandomGenerator generator;
+  math::random::CPUPseudoRandomGenerator generator;
   for (unsigned i = 0; i < 24; i++)
     v.push_back(f_rand(generator));
   for (unsigned i = 0; i < 24; i += 3) {
@@ -26,7 +26,7 @@ TEST(BoundingBoxTest, minMaxCompute) {
 
 TEST(BoundingBoxTest, productOperatorTest) {
   BoundingBox B1(vertices);
-  math::random::CPURandomGenerator generator;
+  math::random::CPUPseudoRandomGenerator generator;
   std::vector<std::pair<glm::mat4, glm::vec3[3]>>
       matrix_result;  // first = matrices , second = result matrix x coords => {min_coords , max_coords , center}
   matrix_result.resize(ITERATION_NUMBER);
@@ -62,7 +62,7 @@ TEST(BoundingBoxTest, productOperatorTest) {
 }
 
 TEST(BoundingBoxTest, addOperatorTest) {
-  math::random::CPURandomGenerator generator;
+  math::random::CPUPseudoRandomGenerator generator;
   for (int i = 0; i < ITERATION_NUMBER; i++) {
     glm::vec3 B1_min{f_rand(generator), f_rand(generator), f_rand(generator)};
     glm::vec3 B1_max{f_rand(generator), f_rand(generator), f_rand(generator)};

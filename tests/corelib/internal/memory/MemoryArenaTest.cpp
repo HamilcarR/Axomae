@@ -22,7 +22,7 @@ TEST(MemoryArenaTest, construct) {
 TEST(MemoryArenaTest, alloc) {
   core::memory::MemoryArena<> allocator;
   /* check 16 bytes alignment addresses*/
-  math::random::CPURandomGenerator generator;
+  math::random::CPUPseudoRandomGenerator generator;
   for (int i = 0; i < 1024; i++) {
     void *ptr = allocator.allocate(generator.nrandi(1, 10000));
     ASSERT_EQ(reinterpret_cast<uintptr_t>(ptr) % allocator.getCurrentAlignment(), 0);
@@ -37,7 +37,7 @@ TEST(MemoryArenaTest, getTotalSize) {
   ASSERT_EQ(allocator.getTotalSize(), default_block_size);
   std::size_t align_size{};
 
-  math::random::CPURandomGenerator generator;
+  math::random::CPUPseudoRandomGenerator generator;
   /* check platform alignment. */
   for (int i = 0; i < 200; i++) {
     align_size = generator.nrandi(1, core::memory::DEFAULT_BLOCK_SIZE);

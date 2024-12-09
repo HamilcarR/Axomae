@@ -7,7 +7,7 @@ namespace texture_database_test {
 
   template<class HEAD, class... TAIL>
   constexpr void addTexture(IResourceDB<int, GenericTexture> &database, U32TexData *data) {
-    math::random::CPURandomGenerator generator;
+    math::random::CPUPseudoRandomGenerator generator;
     bool persistence = generator.randb();
     database::texture::store<HEAD>(database, persistence, data);
     if constexpr (sizeof...(TAIL) > 0)
@@ -96,7 +96,7 @@ TEST(TextureDatabaseTest, contains) {
 
 TEST(TextureDatabaseTest, remove) {
 
-  math::random::CPURandomGenerator generator;
+  math::random::CPUPseudoRandomGenerator generator;
   TextureDatabase database;
   TextureDatabaseTest test(database);
   EXPECT_FALSE(database.remove(nullptr));
@@ -111,7 +111,7 @@ TEST(TextureDatabaseTest, remove) {
 TEST(TextureDatabaseTest, get) {
   TextureDatabase database;
   TextureDatabaseTest test(database);
-  math::random::CPURandomGenerator generator;
+  math::random::CPUPseudoRandomGenerator generator;
   std::vector<GenericTexture *> ptr_list;
   for (const auto &elem : database.getConstData())
     ptr_list.push_back(elem.second.get());
