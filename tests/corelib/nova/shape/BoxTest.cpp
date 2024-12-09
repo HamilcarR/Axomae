@@ -18,7 +18,7 @@ TEST(BoxTest, outIntersection) {
   vector_vertices.resize(vert_gen.vertices.size());
   std::copy(vert_gen.vertices.begin(), vert_gen.vertices.end(), vector_vertices.begin());
   Box B1(vector_vertices);
-  math::random::CPURandomGenerator generator;
+  math::random::CPUPseudoRandomGenerator generator;
   for (unsigned i = 0; i < ITERATION_NUMBER; i++) {
     glm::vec3 out_position;
     bool isoutside = false;
@@ -38,7 +38,7 @@ TEST(BoxTest, inIntersection) {
   vector_vertices.resize(vert_gen.vertices.size());
   std::copy(vert_gen.vertices.begin(), vert_gen.vertices.end(), vector_vertices.begin());
   Box B1(vector_vertices);
-  math::random::CPURandomGenerator generator;
+  math::random::CPUPseudoRandomGenerator generator;
   for (unsigned i = 0; i < ITERATION_NUMBER; i++) {
     glm::vec3 out_position;
     bool isoutside = false;

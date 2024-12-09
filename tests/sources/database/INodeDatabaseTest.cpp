@@ -12,7 +12,7 @@ const int COUNT = 10;  // Number of subtypes
 namespace node_database_test {
   template<class HEAD, class... TAIL>
   constexpr void addNode(IResourceDB<int, datastructure::NodeInterface> &database) {
-    math::random::CPURandomGenerator generator;
+    math::random::CPUPseudoRandomGenerator generator;
     bool persistence = generator.randb();
     database::node::store<HEAD>(database, persistence);
     if constexpr (sizeof...(TAIL) > 0)
