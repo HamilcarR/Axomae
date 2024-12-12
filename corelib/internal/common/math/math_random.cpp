@@ -27,4 +27,28 @@ namespace math::random {
 
   bool CPUPseudoRandomGenerator::randb() { return nrandi(0, 1); }
 
+  CPUQuasiRandomGenerator::CPUQuasiRandomGenerator() {
+    sobol_engine.seed(0xDEADBEEF);
+    sobol_engine = boost::random::sobol(1);
+  }
+
+  CPUQuasiRandomGenerator::CPUQuasiRandomGenerator(uint64_t seed, uint64_t dimension) {
+    sobol_engine = boost::random::sobol(dimension);
+    sobol_engine.seed(seed);
+  }
+
+  int CPUQuasiRandomGenerator::nrandi(int min, int max) {
+    if (min > max)
+      std::swap(min, max);
+    return to_interval(min, max, dist(sobol_engine));
+  }
+
+  double CPUQuasiRandomGenerator::nrandf(double min, double max) {
+    if (min > max)
+      std::swap(min, max);
+    return to_interval(min, max, dist(sobol_engine));
+  }
+
+  bool CPUQuasiRandomGenerator::randb() { return nrandi(0, 1) == 1; }
+
 }  // namespace math::random

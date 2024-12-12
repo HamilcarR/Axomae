@@ -100,8 +100,6 @@ namespace nova::integrator {
             if (!nova_resource_manager->getEngineData().is_rendering)
               return;
             /* Samples random direction around the pixel for AA. */
-            /*const float dx = math::random::nrandf(-RAND_DX, RAND_DX);
-            const float dy = math::random::nrandf(-RAND_DY, RAND_DY);*/
             const glm::vec3 sampled_camera_directions = random_s.sample();
             const float dx = sampled_camera_directions.x * RAND_DX;
             const float dy = sampled_camera_directions.y * RAND_DY;

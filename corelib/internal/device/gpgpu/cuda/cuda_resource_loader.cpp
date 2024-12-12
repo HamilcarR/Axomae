@@ -1,5 +1,4 @@
 #include "../device_transfer_interface.h"
-
 #include "../device_utils.h"
 #include "CudaDevice.h"
 
@@ -12,6 +11,26 @@ namespace device::gpgpu {
     return gpu_resource;
   }
 
+  GPU_query_result synchronize_device() {
+    if (!validate_gpu_state())
+      return ret_error();
+    ax_cuda::CudaDevice device;
+    GPU_query_result gpu_resource;
+    gpu_resource.error_status = device.GPUDeviceSynchronize();
+    gpu_resource.device_ptr = nullptr;
+    return gpu_resource;
+  }
+
+  GPU_query_result allocate_symbol(void *sym, std::size_t size_bytes) {
+    if (!validate_gpu_state())
+      return ret_error();
+    ax_cuda::CudaDevice device;
+    GPU_query_result gpu_resource;
+    gpu_resource.error_status = device.GPUMalloc(&sym, size_bytes);
+    gpu_resource.device_ptr = sym;
+    return gpu_resource;
+  }
+
   GPU_query_result allocate_buffer(size_t size) {
     if (!validate_gpu_state())
       return ret_error();
@@ -21,30 +40,46 @@ namespace device::gpgpu {
     return gpu_resource;
   }
 
+  inline cudaMemcpyKind get_kind(COPY_MODE copy_type) {
+    switch (copy_type) {
+      case HOST_HOST:
+        return cudaMemcpyHostToHost;
+      case HOST_DEVICE:
+        return cudaMemcpyHostToDevice;
+        break;
+      case DEVICE_HOST:
+        return cudaMemcpyDeviceToHost;
+        break;
+      case DEVICE_DEVICE:
+        return cudaMemcpyDeviceToDevice;
+        break;
+      default:
+        return cudaMemcpyDefault;
+        break;
+    }
+  }
+
   GPU_query_result copy_buffer(const void *src, void *dest, std::size_t buffer_size, COPY_MODE copy_type) {
     if (!validate_gpu_state())
       return ret_error();
     ax_cuda::CudaDevice device;
     GPU_query_result gpu_resource;
     ax_cuda::CudaParams params;
-    switch (copy_type) {
-      case HOST_HOST:
-        params.setMemcpyKind(cudaMemcpyHostToHost);
-      case HOST_DEVICE:
-        params.setMemcpyKind(cudaMemcpyHostToDevice);
-        break;
-      case DEVICE_HOST:
-        params.setMemcpyKind(cudaMemcpyDeviceToHost);
-        break;
-      case DEVICE_DEVICE:
-        params.setMemcpyKind(cudaMemcpyDeviceToDevice);
-        break;
-      default:
-        params.setMemcpyKind(cudaMemcpyDefault);
-        break;
-    }
+    params.setMemcpyKind(get_kind(copy_type));
     gpu_resource.error_status = device.GPUMemcpy(src, dest, buffer_size, params);
     gpu_resource.device_ptr = dest;
+    return gpu_resource;
+  }
+
+  GPU_query_result copy_to_symbol(const void *src, void *symbol, std::size_t buffer_size_bytes, COPY_MODE copy_type) {
+    if (!validate_gpu_state())
+      return ret_error();
+    ax_cuda::CudaDevice device;
+    GPU_query_result gpu_resource;
+    ax_cuda::CudaParams params;
+    params.setMemcpyKind(get_kind(copy_type));
+    gpu_resource.error_status = device.GPUMemcpyToSym(src, symbol, buffer_size_bytes, 0, params);
+    gpu_resource.device_ptr = symbol;
     return gpu_resource;
   }
 

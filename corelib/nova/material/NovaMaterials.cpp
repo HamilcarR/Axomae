@@ -68,7 +68,7 @@ namespace nova::material {
     }
   };
 
-  static glm::vec3 compute_map_normal(const hit_data &hit_d, const TexturePackSampler &t_pack, const glm::mat3 &tbn) {
+  inline glm::vec3 compute_map_normal(const hit_data &hit_d, const TexturePackSampler &t_pack, const glm::mat3 &tbn) {
 
     const glm::vec3 map_normal = t_pack.normal(hit_d.u, hit_d.v, {}) * 2.f - 1.f;
     return glm::normalize(tbn * map_normal);
