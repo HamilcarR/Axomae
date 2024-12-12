@@ -2,6 +2,7 @@
 #include "GPUIntegrator.cuh"
 #include "Integrator.h"
 #include "engine/nova_exception.h"
+#include "gpu/GPURandomGenerator.h"
 #include "internal/common/math/math_texturing.h"
 #include "internal/debug/Logger.h"
 #include "internal/device/gpgpu/cuda/CudaDevice.h"
@@ -9,6 +10,8 @@
 #include "internal/device/gpgpu/device_utils.h"
 #include "internal/device/gpgpu/kernel_launch_interface.h"
 #include "manager/NovaResourceManager.h"
+
+#include <curand_kernel.h>
 
 namespace resrc = device::gpgpu;
 
@@ -21,22 +24,30 @@ namespace nova {
                              unsigned height,
                              int i_width,
                              int i_height,
-                             texturing::NovaTextureInterface other_tex) {
+                             texturing::NovaTextureInterface other_tex,
+                             curandStateScrambledSobol32 *rand_array,
+                             unsigned seed) {
       unsigned int x = ax_device_thread_idx_x;
       unsigned int y = ax_device_thread_idx_y;
       unsigned int offset = (y * width + x) * 4;
 
-      if (offset < width * height * 4) {
-        float u = math::texture::pixelToUv(x, width);
-        float v = math::texture::pixelToUv(y, height);
-        texturing::texture_sample_data sample_data{};
-        glm::vec4 other_value = other_tex.sample(u, v, sample_data);
-        float4 sample{other_value.r, other_value.g, other_value.b};
-        ptr[offset] = sample.x / 10;
-        ptr[offset + 1] = sample.y / 10;
-        ptr[offset + 2] = sample.z / 10;
-        ptr[offset + 3] = 1.f;
-      }
+      if (offset >= width * height * 4)
+        return;
+      float u = math::texture::pixelToUv(x, width);
+      float v = math::texture::pixelToUv(y, height);
+
+#ifdef __CUDA_ARCH__
+      int px = 0, py = 0;
+      sampler::SobolSampler sampler = sampler::SobolSampler(rand_array, seed);
+      glm::vec3 sample = sampler.sample() * 0.5f + 0.5f;
+      px = math::texture::uvToPixel(sample.x, width);
+      py = math::texture::uvToPixel(sample.y, height);
+      offset = (py * width + px) * 4;
+      ptr[offset] = 1.f;
+      ptr[offset + 1] = 1.f;
+      ptr[offset + 2] = 1.f;
+      ptr[offset + 3] = 1.f;
+#endif
     }
   }  // namespace gpu
 
@@ -72,7 +83,6 @@ namespace nova {
     const NovaResourceManager *resource_manager = nova_internals.resource_manager;
     const texturing::TextureRawData image_texture = resource_manager->getEnvmapData();
     std::size_t screen_size = screen_width * screen_height * buffers->channels * sizeof(float);
-
     texturing::NovaTextureInterface some_image = resource_manager->getTexturesData().get_textures()[0];
     resrc::texture_descriptor tex_desc{};
     resrc::resource_descriptor res_desc{};
@@ -84,6 +94,8 @@ namespace nova {
     kernel_argpack_t argpack;
     argpack.num_blocks = {screen_width / 32, screen_height, 1};
     argpack.block_size = {32, 1, 1};
+    math::random::qrand_alloc_result_t alloc = math::random::GPUQuasiRandomGenerator::init(argpack, 5);
+
     exec_kernel(argpack,
                 gpu::test_func,
                 (float *)draw_buffer.device_ptr,
@@ -92,9 +104,13 @@ namespace nova {
                 screen_height,
                 image_texture.width,
                 image_texture.height,
-                some_image);
+                some_image,
+                alloc.states_array,
+                alloc.dimension);
+
     DEVICE_ERROR_CHECK(resrc::copy_buffer(draw_buffer.device_ptr, buffers->partial_buffer, screen_size, resrc::DEVICE_HOST).error_status);
     DEVICE_ERROR_CHECK(resrc::deallocate_buffer(draw_buffer.device_ptr).error_status);
     resrc::destroy_texture(texture_resrc);
+    math::random::GPUQuasiRandomGenerator::cleanStates(alloc.states_array);
   }
 }  // namespace nova

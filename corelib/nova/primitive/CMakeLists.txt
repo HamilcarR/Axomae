@@ -24,4 +24,4 @@ target_include_directories(ax_core_nova_primitive PUBLIC
         ${AXOMAE_CORELIB_ROOT}
 )
 
-register_device_compilation(PrimitiveInterface.cpp NovaGeoPrimitive.cpp)
+#register_device_compilation(PrimitiveInterface.cpp NovaGeoPrimitive.cpp)

@@ -25,6 +25,17 @@ namespace ax_cuda {
     return DeviceError(cudaMemcpy(ptr_dest, ptr_source, byte_count, copy_type));
   }
 
+  DeviceError CudaDevice::GPUMemcpyToSym(
+      const void *ptr_src, const void *symbol, std::size_t byte_count, std::size_t offset, const CudaParams &params) {
+    cudaMemcpyKind copy_type = params.getMemcpyKind();
+    return DeviceError(cudaMemcpyToSymbol(symbol, ptr_src, byte_count, offset, copy_type));
+  }
+
+  DeviceError CudaDevice::GPUMemcpyFromSym(const void *symbol, void *dest, std::size_t byte_count, std::size_t offset, const CudaParams &params) {
+    cudaMemcpyKind copy_type = params.getMemcpyKind();
+    return DeviceError(cudaMemcpyFromSymbol(dest, symbol, byte_count, offset, copy_type));
+  }
+
   DeviceError CudaDevice::GPUMallocArray(cudaArray_t *array, const CudaParams &params, unsigned width, unsigned height, unsigned flags) {
     cudaChannelFormatDesc chan_desc = params.getChanDescriptors();
     return DeviceError(cudaMallocArray(array, &chan_desc, width, height, flags));
