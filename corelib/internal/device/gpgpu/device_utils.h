@@ -12,8 +12,8 @@
 #  define ax_kernel __global__
 
 struct kernel_argpack_t {
-  dim3 num_blocks;
-  dim3 block_size;
+  dim3 num_blocks{1, 1, 1};
+  dim3 block_size{1, 1, 1};
   std::size_t shared_mem_bytes{};
   cudaStream_t stream{};
 };

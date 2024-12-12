@@ -1,4 +1,7 @@
-add_library(ax_core_nova_gpu STATIC)
+autoload_build_utils()
+
+add_library(ax_core_nova_gpu STATIC
+        GPURandomGenerator.cpp)
 
 target_link_libraries(ax_core_nova_gpu
 PRIVATE
@@ -9,6 +12,7 @@ PRIVATE
         ax_core_macro
         ax_core_device
         ax_core_debug
+        CUDA::curand
 )
 
 
@@ -23,3 +27,6 @@ if(AXOMAE_USE_CUDA)
     target_compile_definitions(ax_core_nova_gpu PUBLIC AXOMAE_USE_CUDA)
     target_link_libraries(ax_core_nova PRIVATE ax_core_nova_gpu)
 endif ()
+
+
+register_device_compilation(GPURandomGenerator.cpp)
