@@ -37,6 +37,7 @@ add_subdirectory(camera)
 add_subdirectory(aggregate)
 add_subdirectory(sampler)
 add_subdirectory(manager)
+add_subdirectory(spectrum)
 
 if(AXOMAE_USE_CUDA)
     add_subdirectory(gpu)
