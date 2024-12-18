@@ -78,10 +78,11 @@ namespace nova::integrator {
 
       const NovaResourceManager *nova_resource_manager = nova_internals.resource_manager;
       NovaExceptionManager *nova_exception_manager = nova_internals.exception_manager;
-
-      sampler::SobolSampler sobol_s = sampler::SobolSampler(nova_resource_manager->getEngineData().renderer_max_samples, 20);
-      sampler::RandomSampler random_s = sampler::RandomSampler();
-      sampler::SamplerInterface sampler = &sobol_s;
+      auto quasi_generator = math::random::CPUQuasiRandomGenerator(0xDEADBEEF, 5);
+      auto pseudo_generator = math::random::CPUPseudoRandomGenerator(0xDEADBEEF);
+      sampler::SobolSampler sobol_s = sampler::SobolSampler(quasi_generator);
+      sampler::RandomSampler random_s = sampler::RandomSampler(pseudo_generator);
+      sampler::SamplerInterface sampler = &random_s;
 
       for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
         for (int x = tile.width_start; x < tile.width_end; x = x + 1) {

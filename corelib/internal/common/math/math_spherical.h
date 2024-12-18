@@ -72,9 +72,9 @@ namespace math::spherical {
   glm::vec3 rand_p_sphere(random::AbstractRandomGenerator<T> &generator) {
     glm::vec3 p;
     do {
-      double x = generator.nrandf(0, 1);
-      double y = generator.nrandf(0, 1);
-      double z = generator.nrandf(0, 1);
+      float x = generator.nrandf(0, 1);
+      float y = generator.nrandf(0, 1);
+      float z = generator.nrandf(0, 1);
       p = 2.f * glm::vec3(x, y, z) - glm::vec3(1, 1, 1);
     } while ((p.x * p.x + p.y * p.y + p.z * p.z) >= 1.f);
     return p;
