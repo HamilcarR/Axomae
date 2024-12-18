@@ -255,7 +255,13 @@ namespace controller {
 
   static void do_progressive_render_gpu(nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder) {
     int sample_increment = 1;
+
+    auto gpu_structures = nova::gputils::initialize_gpu_structures(render_scene_data.width * render_scene_data.height,
+                                                                   render_scene_data.nova_resource_manager->getMemoryPool());
+    nova::device_shared_caches_t &buffer_collection = render_scene_data.shared_caches;
+    nova::gputils::lock_host_memory_default(buffer_collection);
     progressive_render_metadata metadata = create_render_metadata(render_scene_data);
+
     while (sample_increment < metadata.max_samples && metadata.is_rendering) {
       render_scene_data.nova_resource_manager->getEngineData().sample_increment = sample_increment;
       int new_depth = render_scene_data.nova_resource_manager->getEngineData().max_depth < metadata.max_depth ?
@@ -263,17 +269,22 @@ namespace controller {
                           metadata.max_depth;
       render_scene_data.nova_resource_manager->getEngineData().max_depth = new_depth;
       try {
-        nova_baker_utils::bake_scene_gpu(render_scene_data);
+        bake_scene_gpu(render_scene_data, gpu_structures);
       } catch (const exception::GenericException &e) {
         ExceptionInfoBoxHandler::handle(e);
+        nova::gputils::unlock_host_memory(buffer_collection);
         return;
       }
 
-      if (on_exception_shutdown(*render_scene_data.nova_exception_manager))
+      if (on_exception_shutdown(*render_scene_data.nova_exception_manager)) {
+        nova::gputils::unlock_host_memory(buffer_collection);
         return;
+      }
       color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)sample_increment);
       sample_increment++;
     }
+    nova::gputils::cleanup_gpu_structures(gpu_structures, render_scene_data.nova_resource_manager->getMemoryPool());
+    nova::gputils::unlock_host_memory(buffer_collection);
   }
 
   static void do_progressive_render(nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder) {

@@ -8,77 +8,49 @@
 
 #include <engine/nova_exception.h>
 #include <memory>
-#include <variant>
+
 #if defined(AXOMAE_USE_CUDA)
 #  include "gpu/GPURandomGenerator.h"
 #endif
 
 namespace nova::sampler {
 
-#ifndef __CUDA_ARCH__
-  class RandomSampler {
-    exception::NovaException exception{};
-    math::random::CPUPseudoRandomGenerator generator;
+  using PRandomGenerator = math::random::CPUPseudoRandomGenerator;
+  using QRandomGenerator = math::random::CPUQuasiRandomGenerator;
+  using DPRandomGenerator = math::random::GPUPseudoRandomGenerator;
+  using DQRandomGenerator = math::random::GPUQuasiRandomGenerator;
 
-   public:
-    CLASS_DCM(RandomSampler)
-
-    ax_host_only explicit RandomSampler(uint64_t seed) : generator(seed) {}
-    ax_host_only glm::vec3 sample() { return {generator.nrandf(-1, 1), generator.nrandf(-1, 1), generator.nrandf(-1, 1)}; }
-    ax_host_only ax_no_discard exception::NovaException getErrorState() const { return exception; }
-  };
-
+  template<class T>
   class SobolSampler {
-    math::random::CPUQuasiRandomGenerator generator;
+   private:
     exception::NovaException exception{};
+    T generator;
 
    public:
     CLASS_DCM(SobolSampler)
 
-    ax_host_only explicit SobolSampler(int seed, int dimension = 1) {
-      if (seed <= 0 || dimension <= 0)
-        exception.addErrorType(nova::exception::INVALID_SAMPLER_DIM);
-      else {
-        generator = math::random::CPUQuasiRandomGenerator(seed, dimension);
-      }
-    }
-    ax_host_only ax_no_discard glm::vec3 sample() { return {generator.nrandf(-1, 1), generator.nrandf(-1, 1), generator.nrandf(-1, 1)}; }
-    ax_host_only ax_no_discard exception::NovaException getErrorState() const { return exception; }
+    ax_device_callable explicit SobolSampler(const T &generator_) : generator(generator_) {}
+    ax_device_callable ax_no_discard glm::vec3 sample() { return generator.nrand3f(-1, 1); }
+    ax_device_callable ax_no_discard exception::NovaException getErrorState() const { return exception; }
   };
-#else
+
+  template<class T>
   class RandomSampler {
     exception::NovaException exception{};
-    math::random::GPUPseudoRandomGenerator generator;
+    T generator;
 
    public:
     CLASS_DCM(RandomSampler)
-    /* Maybe for a HIP compatible implementation*/
-    template<class T>
-    ax_device_only RandomSampler(T *gpu_rand_states_buffer, uint64_t seed) : generator(gpu_rand_states_buffer, seed) {}
-    ax_device_only explicit RandomSampler(const math::random::GPUPseudoRandomGenerator &gen) { generator = gen; }
-    ax_device_only glm::vec3 sample() { return {generator.nrandf(-1, 1), generator.nrandf(-1, 1), generator.nrandf(-1, 1)}; }
-    ax_device_only ax_no_discard exception::NovaException getErrorState() const { return exception; }
+
+    ax_device_callable explicit RandomSampler(const T &generator_) : generator(generator_) {}
+    ax_device_callable ax_no_discard glm::vec3 sample() { return generator.nrand3f(-1, 1); }
+    ax_device_callable ax_no_discard exception::NovaException getErrorState() const { return exception; }
   };
 
-  class SobolSampler {
-    exception::NovaException exception{};
-    math::random::GPUQuasiRandomGenerator generator;
-
-   public:
-    CLASS_DCM(SobolSampler)
-
-    template<class T>
-    ax_device_only SobolSampler(T *gpu_rand_states_buffer, unsigned dimension) : generator(gpu_rand_states_buffer, dimension) {}
-    ax_device_only SobolSampler(const math::random::GPUQuasiRandomGenerator &gen) { generator = gen; }
-    ax_device_only ax_no_discard glm::vec3 sample() {
-      // return {generator.nrandf(-1, 1), generator.nrandf(-1, 1), generator.nrandf(-1, 1)};
-      return generator.nrand3f(-1, 1);
-    }
-    ax_device_only ax_no_discard exception::NovaException getErrorState() const { return exception; }
-  };
-#endif
-
-  class SamplerInterface : public core::tag_ptr<SobolSampler, RandomSampler> {
+  class SamplerInterface : public core::tag_ptr<SobolSampler<QRandomGenerator>,
+                                                SobolSampler<DQRandomGenerator>,
+                                                RandomSampler<PRandomGenerator>,
+                                                RandomSampler<DPRandomGenerator>> {
    public:
     using tag_ptr::tag_ptr;
 
