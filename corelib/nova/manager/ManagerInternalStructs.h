@@ -6,8 +6,8 @@
 
 namespace nova {
   struct nova_eng_internals {
-    const NovaResourceManager *resource_manager;
-    NovaExceptionManager *exception_manager;
+    const NovaResourceManager *resource_manager{};
+    NovaExceptionManager *exception_manager{};
   };
 }  // namespace nova
 

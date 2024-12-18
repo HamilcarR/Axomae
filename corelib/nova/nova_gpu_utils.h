@@ -5,8 +5,15 @@
 #include <cstdint>
 #include <vector>
 
-/* defines functions and interfaces for nova to communicate with the device */
+#ifdef AXOMAE_USE_CUDA
+#  include "gpu/GPURandomGenerator.h"
+#endif
 
+namespace core::memory {
+  template<class T>
+  class MemoryArena;
+}
+/* defines functions and interfaces for nova to communicate with the device */
 namespace nova {
   using cache_collection_t = std::vector<axstd::span<uint8_t>>;
 
@@ -25,7 +32,27 @@ namespace nova {
     void clear() { contiguous_caches.clear(); }
   };
 }  // namespace nova
+
 namespace nova::gputils {
+
+#ifdef AXOMAE_USE_CUDA
+  struct gpu_random_generator_t {
+    math::random::GPUPseudoRandomGenerator xorshift;
+    math::random::GPUQuasiRandomGenerator sobol;
+  };
+
+#else
+  struct gpu_random_generator_t {};
+#endif
+  struct gpu_util_structures_t {
+    gpu_random_generator_t random_generator;
+    kernel_argpack_t threads_distribution;
+  };
+
+  gpu_util_structures_t initialize_gpu_structures(unsigned thread_distribution_size, core::memory::MemoryArena<std::byte> &arena);
+  void cleanup_gpu_structures(gpu_util_structures_t &gpu_structures, core::memory::MemoryArena<std::byte> &arena);
+  gpu_random_generator_t initialize_rand(const kernel_argpack_t &argpack, core::memory::MemoryArena<std::byte> &arena);
+  void clean_generators(gpu_random_generator_t &generators);
 
   void lock_host_memory_default(const device_shared_caches_t &collection);
   void unlock_host_memory(const device_shared_caches_t &collection);
