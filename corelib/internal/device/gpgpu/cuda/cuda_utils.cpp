@@ -1,5 +1,15 @@
 #include "cuda_utils.h"
 #include <sstream>
+
+std::size_t kernel_argpack_t::computeThreadsNumber() const {
+  return (block_size.x * num_blocks.x) * (block_size.y * num_blocks.y) * (block_size.z * num_blocks.z);
+}
+
+std::size_t kernel_argpack_t::computeWarpNumber() const {
+  std::size_t thread_num = computeThreadsNumber();
+  return thread_num % AX_GPU_WARP_SIZE == 0 ? thread_num / AX_GPU_WARP_SIZE : (thread_num / AX_GPU_WARP_SIZE) + 1;
+}
+
 namespace ax_cuda::utils {
 
   /* Get device info . Throws GenericException*/

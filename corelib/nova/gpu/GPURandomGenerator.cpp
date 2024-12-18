@@ -1,8 +1,10 @@
 #include "GPURandomGenerator.h"
 #include "internal/device/gpgpu/device_utils.h"
+
 #include <curand.h>
 #include <curand_kernel.h>
 #include <device_launch_parameters.h>
+#include <internal/debug/debug_utils.h>
 #include <internal/device/gpgpu/DeviceError.h>
 #include <internal/device/gpgpu/device_transfer_interface.h>
 #include <internal/device/gpgpu/kernel_launch_interface.h>
@@ -10,68 +12,82 @@
 namespace gpgpu = device::gpgpu;
 namespace math::random {
 
-  ax_device_only GPUPseudoRandomGenerator::GPUPseudoRandomGenerator(curandState_t *curand_states_buffer, uint64_t seed_)
+  ax_device_callable GPUPseudoRandomGenerator::GPUPseudoRandomGenerator(curandState_t *curand_states_buffer, uint64_t seed_)
       : seed(seed_), device_curand_states(curand_states_buffer) {}
 
   ax_device_only int GPUPseudoRandomGenerator::nrandi(int min, int max) {
-    int idx = ax_linearCM3D_idx;
+    uint64_t idx = ax_linearCM3D_idx;
+    if (idx >= state_buffer_size)
+      idx = 0;
     curandState_t &state = device_curand_states[idx];
     int eval = to_interval(min, max, curand_uniform(&state));
     return eval;
   }
 
-  ax_device_only double GPUPseudoRandomGenerator::nrandf(double min, double max) {
-    int idx = ax_linearCM3D_idx;
+  ax_device_only float GPUPseudoRandomGenerator::nrandf(float min, float max) {
+    uint64_t idx = ax_linearCM3D_idx;
+    if (idx >= state_buffer_size)
+      idx = 0;
     curandState &state = device_curand_states[idx];
-    double eval = to_interval(min, max, curand_uniform(&state));
+    float eval = to_interval(min, max, curand_uniform(&state));
     return eval;
   }
+
+  ax_device_only glm::vec3 GPUPseudoRandomGenerator::nrand3f(float min, float max) { return {nrandf(min, max), nrandf(min, max), nrandf(min, max)}; }
 
   ax_device_only bool GPUPseudoRandomGenerator::randb() { return nrandi(0, 1) == 1; }
 
   ax_kernel void kernel_init_pseudo(curandState_t *states, uint64_t seed) {
-    int idx = ax_linearCM3D_idx;
-    curand_init(seed % idx, 0, 0, &states[idx]);
+    uint64_t idx = ax_linearCM3D_idx;
+    curand_init(seed % idx, 0, idx, &states[idx]);
   }
 
-  ax_host_only prand_alloc_result_t GPUPseudoRandomGenerator::init(const kernel_argpack_t &argpack, uint64_t seed) {
-    std::size_t thread_number = (argpack.block_size.x * argpack.num_blocks.x) * (argpack.block_size.y * argpack.num_blocks.y) *
-                                (argpack.block_size.z * argpack.num_blocks.z);
-    auto curands_states = gpgpu::allocate_buffer(thread_number * sizeof(curandState_t));
+  ax_host_only void GPUPseudoRandomGenerator::init(const kernel_argpack_t &argpack, uint64_t seed) {
+    state_buffer_size = argpack.computeThreadsNumber();
+    auto curands_states = gpgpu::allocate_buffer(state_buffer_size * sizeof(curandState_t));
     DEVICE_ERROR_CHECK(curands_states.error_status);
-    exec_kernel(argpack, kernel_init_pseudo, static_cast<curandState_t *>(curands_states.device_ptr), seed);
+    device_curand_states = static_cast<curandState_t *>(curands_states.device_ptr);
+    exec_kernel(argpack, kernel_init_pseudo, device_curand_states, seed);
     gpgpu::synchronize_device();
-    return {static_cast<curandState_t *>(curands_states.device_ptr), seed, thread_number};
   }
 
-  ax_host_only void GPUPseudoRandomGenerator::cleanStates(curandState_t *device_curand_states) {
+  ax_host_only void GPUPseudoRandomGenerator::cleanStates() {
+    if (!device_curand_states)
+      return;
     DEVICE_ERROR_CHECK(gpgpu::deallocate_buffer(device_curand_states).error_status);
   }
   /*******************************************************************************************************************************************************************************/
 
-  ax_device_only GPUQuasiRandomGenerator::GPUQuasiRandomGenerator(curandStateScrambledSobol32 *curand_states_buffer_, unsigned dimension_)
+  ax_device_callable GPUQuasiRandomGenerator::GPUQuasiRandomGenerator(curandStateScrambledSobol32 *curand_states_buffer_, unsigned dimension_)
       : device_curand_states(curand_states_buffer_), dimension(dimension_) {
-    AX_ASSERT_LT(dimension_, 32);
+    if (dimension_ < 3)
+      dimension = 3;
   }
 
   ax_device_only int GPUQuasiRandomGenerator::nrandi(int min, int max) {
-    int idx = ax_linearCM3D_idx * dimension;
+    uint64_t idx = ax_gpu_warp_id * dimension;
+    if (idx >= state_buffer_size)
+      idx = 0;
     curandStateScrambledSobol32_t &state = device_curand_states[idx];
     int rand = (int)curand_uniform(&state);
     int eval = to_interval(min, max, rand);
     return eval;
   }
 
-  ax_device_only double GPUQuasiRandomGenerator::nrandf(double min, double max) {
-    uint64_t idx = ax_linearCM3D_idx;
+  ax_device_only float GPUQuasiRandomGenerator::nrandf(float min, float max) {
+    uint64_t idx = ax_gpu_warp_id * dimension;
+    if (idx >= state_buffer_size)
+      idx = 0;
     curandStateScrambledSobol32_t &state = device_curand_states[idx];
-    double rand = curand_uniform(&state);
-    double eval = to_interval(min, max, rand);
+    float rand = curand_uniform(&state);
+    float eval = to_interval(min, max, rand);
     return eval;
   }
 
-  ax_device_only glm::vec3 GPUQuasiRandomGenerator::nrand3f(double min, double max) {
-    uint64_t idx = ax_linearCM3D_idx;
+  ax_device_only glm::vec3 GPUQuasiRandomGenerator::nrand3f(float min, float max) {
+    uint64_t idx = ax_gpu_warp_id * dimension;
+    if (idx + 2 >= state_buffer_size)
+      idx = 0;
     glm::vec3 eval{};
     eval.x = to_interval(min, max, curand_uniform(&device_curand_states[idx]));
     eval.y = to_interval(min, max, curand_uniform(&device_curand_states[idx + 1]));
@@ -81,19 +97,25 @@ namespace math::random {
 
   ax_device_only bool GPUQuasiRandomGenerator::randb() { return nrandi(0, 1) == 1; }
 
-  ax_kernel void kernel_init_rand(curandStateScrambledSobol32_t *states, curandDirectionVectors32_t *vectors32, uint32_t *scramble, int dimension) {
-    uint32_t idx = ax_linearCM3D_idx * dimension;
+  ax_kernel void kernel_init_rand(curandStateScrambledSobol32_t *states,
+                                  curandDirectionVectors32_t *vectors32,
+                                  uint32_t *scramble,
+                                  unsigned dimension) {
+    uint64_t idx = ax_gpu_warp_id * dimension;
     for (int i = 0; i < dimension; i++) {
       curand_init(vectors32[i], scramble[i], idx + i, &states[idx + i]);
     }
   }
 
-  ax_host_only qrand_alloc_result_t GPUQuasiRandomGenerator::init(const kernel_argpack_t &argpack, unsigned dimension) {
-    std::size_t thread_number = (argpack.block_size.x * argpack.num_blocks.x) * (argpack.block_size.y * argpack.num_blocks.y) *
-                                (argpack.block_size.z * argpack.num_blocks.z);
-    AX_ASSERT_LT(dimension, 32);
-    auto curands_states = gpgpu::allocate_buffer(thread_number * dimension * sizeof(curandStateScrambledSobol32_t));
+  ax_host_only ax_dbg_optimize0 void GPUQuasiRandomGenerator::init(const kernel_argpack_t &argpack, unsigned dim) {
+    std::size_t warp_number = argpack.computeWarpNumber();
+    if (dim < 3)
+      dim = 3;
+    dimension = dim;
+    state_buffer_size = warp_number * dimension * sizeof(curandStateScrambledSobol32_t);
+    auto curands_states = gpgpu::allocate_buffer(state_buffer_size);
     DEVICE_ERROR_CHECK(curands_states.error_status);
+    device_curand_states = static_cast<curandStateScrambledSobol32_t *>(curands_states.device_ptr);
 
     auto device_direction_vectors = gpgpu::allocate_buffer(dimension * sizeof(curandDirectionVectors32_t));
     DEVICE_ERROR_CHECK(device_direction_vectors.error_status);
@@ -110,22 +132,20 @@ namespace math::random {
     CUDA_ERROR_CHECK(curandGetScrambleConstants32(&host_scramble_cste));
     DEVICE_ERROR_CHECK(
         gpgpu::copy_buffer(host_scramble_cste, device_scramble_cste.device_ptr, dimension * sizeof(uint32_t), gpgpu::HOST_DEVICE).error_status);
-
     exec_kernel(argpack,
                 kernel_init_rand,
-                static_cast<curandStateScrambledSobol32_t *>(curands_states.device_ptr),
+                device_curand_states,
                 static_cast<curandDirectionVectors32_t *>(device_direction_vectors.device_ptr),
                 static_cast<uint32_t *>(device_scramble_cste.device_ptr),
                 dimension);
     gpgpu::synchronize_device();
-
     DEVICE_ERROR_CHECK(gpgpu::deallocate_buffer(device_direction_vectors.device_ptr).error_status);
     DEVICE_ERROR_CHECK(gpgpu::deallocate_buffer(device_scramble_cste.device_ptr).error_status);
-    return {static_cast<curandStateScrambledSobol32_t *>(curands_states.device_ptr), dimension, thread_number};
   }
 
-  ax_host_only void GPUQuasiRandomGenerator::cleanStates(curandStateScrambledSobol32 *ptr_on_curands) {
-    DEVICE_ERROR_CHECK(gpgpu::deallocate_buffer(ptr_on_curands).error_status);
+  ax_host_only void GPUQuasiRandomGenerator::cleanStates() {
+    if (!device_curand_states)
+      DEVICE_ERROR_CHECK(gpgpu::deallocate_buffer(device_curand_states).error_status);
   }
 
 }  // namespace math::random

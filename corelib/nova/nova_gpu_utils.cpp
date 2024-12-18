@@ -16,35 +16,36 @@ namespace nova::gputils {
       DEVICE_ERROR_CHECK(resrc::unpin_host_memory(element.data()).error_status);
   }
 
-  gpu_random_generator_t initialize_rand(const kernel_argpack_t &argpack, core::memory::ByteArena &arena) {
+  gpu_random_generator_t initialize_rand(const kernel_argpack_t &argpack) {
     gpu_random_generator_t gpu_generators;
-    gpu_generators.sobol.init(argpack, arena);
+    gpu_generators.sobol.init(argpack);
     gpu_generators.xorshift.init(argpack);
     return gpu_generators;
   }
 
-  void clean_generators(gpu_random_generator_t &generators, core::memory::ByteArena &arena) {
-    generators.sobol.cleanStates(arena);
+  void clean_generators(gpu_random_generator_t &generators, core::memory::ByteArena & /*arena*/) {
+    generators.sobol.cleanStates();
     generators.xorshift.cleanStates();
   }
 
-  gpu_util_structures_t initialize_gpu_structures(unsigned thread_distrib, core::memory::ByteArena &arena) {
+  gpu_util_structures_t initialize_gpu_structures(unsigned thread_distrib, core::memory::ByteArena & /*arena*/) {
     kernel_argpack_t argpack;
     if (thread_distrib % AX_GPU_WARP_SIZE != 0) {
       thread_distrib = (thread_distrib + (AX_GPU_WARP_SIZE - 1)) & ~(AX_GPU_WARP_SIZE - 1);
     }
 
-    argpack.block_size = AX_GPU_WARP_SIZE;
+    argpack.block_size = {AX_GPU_WARP_SIZE * AX_GPU_WARP_SIZE};
     argpack.num_blocks = (thread_distrib + argpack.block_size.x - 1) / argpack.block_size.x;
 
+    AX_ASSERT_LT(argpack.num_blocks, AX_GPU_MAX_BLOCKDIM);
     gpu_util_structures_t gpu_structures;
     gpu_structures.threads_distribution = argpack;
-    gpu_structures.random_generator = initialize_rand(argpack, arena);
+    gpu_structures.random_generator = initialize_rand(argpack);
     return gpu_structures;
   }
 
-  void cleanup_gpu_structures(gpu_util_structures_t &gpu_structures, core::memory::ByteArena &arena) {
-    gpu_structures.random_generator.sobol.cleanStates(arena);
+  void cleanup_gpu_structures(gpu_util_structures_t &gpu_structures, core::memory::ByteArena & /*arena*/) {
+    gpu_structures.random_generator.sobol.cleanStates();
     gpu_structures.random_generator.xorshift.cleanStates();
   }
 
@@ -57,7 +58,11 @@ namespace nova::gputils {
   }
   void clean_generators(gpu_random_generator_t &generators) { EMPTY_FUNCBODY }
 
-  void cleanup_gpu_structures(gpu_structures_t &gpu_structures) { EMPTY_FUNCBODY }
+  void cleanup_gpu_structures(gpu_structures_t &gpu_structures){EMPTY_FUNCBODY}
+
+  gpu_util_structures_t initialize_gpu_structures(unsigned thread_distribution_size, core::memory::MemoryArena<std::byte> &arena) {
+    return {};
+  }
 
 #endif
 }  // namespace nova::gputils
