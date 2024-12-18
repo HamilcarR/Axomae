@@ -56,7 +56,7 @@ namespace nova_baker_utils {
 
   /* Takes an initialized NovaResourceManager.*/
   void bake_scene(render_scene_context &rendering_data);
-  void bake_scene_gpu(render_scene_context &rendering_data);
+  void bake_scene_gpu(render_scene_context &rendering_data, nova::gputils::gpu_util_structures_t &gpu_structures);
   void initialize_nova_manager(const engine_data &render_data, nova::NovaResourceManager &nova_resource_manager);
   void initialize_scene_data(const camera_data &scene_camera,
                              const scene_transform_data &scene_data,

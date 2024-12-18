@@ -31,6 +31,7 @@ static nova::material::texture_pack setup_tpack(const nova::texturing::ImageText
 }
 
 TEST(NovaDiffuseMaterialTest, scatter_direction) {
+  math::random::CPUPseudoRandomGenerator generator;
   const uint32_t buffer[4] = {RED, GREEN, BLUE, BLUE};
   nova::texturing::ImageTexture img = generate_image_texture((const uint32_t *)buffer, 2, 2, 4);
   nova::material::texture_pack tpack = setup_tpack(&img);
@@ -41,10 +42,11 @@ TEST(NovaDiffuseMaterialTest, scatter_direction) {
   /* We set up a horizontal plane , with y as normal , centered on 0 */
   hit_data.position = {0.f, 0.f, 0.f};
   const nova::Ray ray(glm::vec3(-1.f, 1.f, 0.f), glm::vec3(1.f, -1.f, 0.f));
-  nova::sampler::SobolSampler sobol = nova::sampler::SobolSampler(1000, 3);
+  math::random::CPUQuasiRandomGenerator quasi_random(1000, 3);
+  nova::sampler::SobolSampler sobol = nova::sampler::SobolSampler(quasi_random);
   nova::sampler::SamplerInterface sampler = &sobol;
   nova::Ray out{};
-  math::random::CPUPseudoRandomGenerator generator;
+
   for (int i = 0; i < MAX_ITER; i++) {
     hit_data.u = (float)generator.nrandf(0, 1);
     hit_data.v = (float)generator.nrandf(0, 1);
@@ -68,7 +70,8 @@ TEST(NovaDiffuseMaterialTest, sample_normal) {
   /* We set up a horizontal plane , with y as normal , centered on 0 */
   hit_data.position = {0.f, 0.f, 0.f};
   const nova::Ray ray(glm::vec3(-1.f, 1.f, 0.f), glm::vec3(1.f, -1.f, 0.f));
-  nova::sampler::SobolSampler sobol = nova::sampler::SobolSampler(1000, 3);
+  math::random::CPUQuasiRandomGenerator quasi_random(1000, 3);
+  nova::sampler::SobolSampler sobol = nova::sampler::SobolSampler(quasi_random);
   nova::sampler::SamplerInterface sampler = &sobol;
   nova::Ray out{};
   ASSERT_TRUE(diffuse_material.scatter(ray, out, hit_data, sampler));

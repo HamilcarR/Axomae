@@ -4,7 +4,8 @@ namespace nova::integrator {
   void EmissiveIntegrator::render(RenderBuffers<float> *buffers, Tile &tile, nova_eng_internals &nova_internals) const {
     const NovaResourceManager *nova_resource_manager = nova_internals.resource_manager;
     NovaExceptionManager *nova_exception_manager = nova_internals.exception_manager;
-    sampler::RandomSampler random_sampler = sampler::RandomSampler();
+    auto pseudo_generator = math::random::CPUPseudoRandomGenerator(0xDEADBEEF);
+    sampler::RandomSampler random_sampler = sampler::RandomSampler(pseudo_generator);
     sampler::SamplerInterface sampler = &random_sampler;
     for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
       for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
