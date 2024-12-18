@@ -17,12 +17,20 @@ namespace math::random {
     return m_int_distrib(m_generator);
   }
 
-  double CPUPseudoRandomGenerator::nrandf(double min, double max) {
+  float CPUPseudoRandomGenerator::nrandf(float min, float max) {
     if (min > max)
       std::swap(min, max);
     std::uniform_real_distribution<double>::param_type dist(min, max);
     m_float_distrib.param(dist);
-    return m_float_distrib(m_generator);
+    return (float)m_float_distrib(m_generator);
+  }
+
+  glm::vec3 CPUPseudoRandomGenerator::nrand3f(float min, float max) {
+    if (min > max)
+      std::swap(min, max);
+    std::uniform_real_distribution<double>::param_type dist(min, max);
+    m_float_distrib.param(dist);
+    return {m_float_distrib(m_generator), m_float_distrib(m_generator), m_float_distrib(m_generator)};
   }
 
   bool CPUPseudoRandomGenerator::randb() { return nrandi(0, 1); }
@@ -42,11 +50,16 @@ namespace math::random {
       std::swap(min, max);
     return to_interval(min, max, dist(sobol_engine));
   }
-
-  double CPUQuasiRandomGenerator::nrandf(double min, double max) {
+  float CPUQuasiRandomGenerator::nrandf(float min, float max) {
     if (min > max)
       std::swap(min, max);
     return to_interval(min, max, dist(sobol_engine));
+  }
+
+  glm::vec3 CPUQuasiRandomGenerator::nrand3f(float min, float max) {
+    if (min > max)
+      std::swap(min, max);
+    return {to_interval(min, max, dist(sobol_engine)), to_interval(min, max, dist(sobol_engine)), to_interval(min, max, dist(sobol_engine))};
   }
 
   bool CPUQuasiRandomGenerator::randb() { return nrandi(0, 1) == 1; }
