@@ -13,7 +13,8 @@ namespace nova::integrator {
     float near = camera.near;
     float far = camera.far;
 
-    sampler::RandomSampler random_sampler = sampler::RandomSampler();
+    auto pseudo_generator = math::random::CPUPseudoRandomGenerator(0xDEADBEEF);
+    sampler::RandomSampler random_sampler = sampler::RandomSampler(pseudo_generator);
     sampler::SamplerInterface sampler = &random_sampler;
     const scene::SceneTransformations &scene_transformations = nova_resource_manager->getSceneTransformation();
 
