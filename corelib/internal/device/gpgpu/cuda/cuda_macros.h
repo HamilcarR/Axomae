@@ -14,7 +14,7 @@
 #define ax_linearCM3D_idx (ax_device_thread_idx_x * ax_grid_dim_z * ax_grid_dim_y + ax_device_thread_idx_y * ax_grid_dim_z + ax_device_thread_idx_z)
 #define ax_linearRM3D_idx (ax_device_thread_idx_z * ax_grid_dim_x * ax_grid_dim_y + ax_device_thread_idx_y * ax_grid_dim_x + ax_device_thread_idx_x)
 
-#define AX_GPU_WARP_SIZE 32;
+constexpr unsigned AX_GPU_WARP_SIZE = 32;
 #define ax_gpu_lane_id (threadIdx.x % AX_GPU_WARP_SIZE)
 #define ax_gpu_warp_id (threadIdx.x / AX_GPU_WARP_SIZE)
 

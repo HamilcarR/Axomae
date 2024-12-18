@@ -16,6 +16,8 @@ struct kernel_argpack_t {
   dim3 block_size{1, 1, 1};
   std::size_t shared_mem_bytes{};
   cudaStream_t stream{};
+
+  std::size_t computeThreadsNumber() const { return (block_size.x * num_blocks.x) * (block_size.y * num_blocks.y) * (block_size.z * num_blocks.z); }
 };
 
 #else

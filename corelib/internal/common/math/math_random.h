@@ -3,6 +3,7 @@
 
 #include <boost/random/sobol.hpp>
 #include <boost/random/uniform_01.hpp>
+#include <glm/vec3.hpp>
 #include <internal/device/gpgpu/device_utils.h>
 #include <internal/macro/class_macros.h>
 #include <internal/macro/project_macros.h>
@@ -23,9 +24,10 @@ namespace math::random {
   template<class T>
   class AbstractRandomGenerator {
    public:
-    ax_device_callable int nrandi(int min, int max) { return static_cast<T*>(this)->nrandi(min, max); };
-    ax_device_callable double nrandf(double min, double max) { return static_cast<T*>(this)->nrandf(min, max); }
-    ax_device_callable bool randb() { return static_cast<T*>(this)->randb(); }
+    ax_device_callable int nrandi(int min, int max) { return static_cast<T *>(this)->nrandi(min, max); };
+    ax_device_callable float nrandf(float min, float max) { return static_cast<T *>(this)->nrandf(min, max); }
+    ax_device_callable glm::vec3 nrand3f(float min, float max) { return static_cast<T *>(this)->nrand3f(min, max); };
+    ax_device_callable bool randb() { return static_cast<T *>(this)->randb(); }
   };
 
   class CPUPseudoRandomGenerator : public AbstractRandomGenerator<CPUPseudoRandomGenerator> {
@@ -38,7 +40,8 @@ namespace math::random {
     CPUPseudoRandomGenerator();
     explicit CPUPseudoRandomGenerator(uint64_t seed);
     int nrandi(int min, int max);
-    double nrandf(double min, double max);
+    float nrandf(float min, float max);
+    glm::vec3 nrand3f(float min, float max);
     bool randb();
   };
 
@@ -51,7 +54,8 @@ namespace math::random {
     CPUQuasiRandomGenerator();
     CPUQuasiRandomGenerator(uint64_t seed, uint64_t dimension);
     int nrandi(int min, int max);
-    double nrandf(double min, double max);
+    float nrandf(float min, float max);
+    glm::vec3 nrand3f(float min, float max);
     bool randb();
   };
 
