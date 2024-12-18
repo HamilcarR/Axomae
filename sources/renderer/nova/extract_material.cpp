@@ -3,6 +3,9 @@
 #include "bake.h"
 #include "texturing/nova_texturing.h"
 #include <internal/common/exception/GenericException.h>
+
+// TODO : this could be replaced with cuda<->opengl interop
+
 namespace exception {
   class InvalidTexTypeConversionException : public CatastrophicFailureException {
    public:

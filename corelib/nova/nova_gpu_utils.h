@@ -51,7 +51,7 @@ namespace nova::gputils {
 
   gpu_util_structures_t initialize_gpu_structures(unsigned thread_distribution_size, core::memory::MemoryArena<std::byte> &arena);
   void cleanup_gpu_structures(gpu_util_structures_t &gpu_structures, core::memory::MemoryArena<std::byte> &arena);
-  gpu_random_generator_t initialize_rand(const kernel_argpack_t &argpack, core::memory::MemoryArena<std::byte> &arena);
+  gpu_random_generator_t initialize_rand(const kernel_argpack_t &argpack);
   void clean_generators(gpu_random_generator_t &generators);
 
   void lock_host_memory_default(const device_shared_caches_t &collection);
