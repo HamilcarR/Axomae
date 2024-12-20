@@ -9,7 +9,7 @@ constexpr unsigned ITERATION_NUMBER = 50;
 const float MIN_COORD = -200.f;
 const float MAX_COORD = 200.f;
 
-inline float f_rand(math::random::CPURandomGenerator &generator) { return (float)generator.nrandf(-2000.f, 2000.f); }
+inline float f_rand(math::random::CPUPseudoRandomGenerator &generator) { return (float)generator.nrandf(-2000.f, 2000.f); }
 
 const std::vector<float> vertices = CUBE::vertices;
 
