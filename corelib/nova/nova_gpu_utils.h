@@ -2,6 +2,7 @@
 #define NOVA_GPU_UTILS_H
 
 #include "internal/common/axstd/span.h"
+#include "internal/device/gpgpu/device_utils.h"
 #include <cstdint>
 #include <vector>
 
@@ -35,23 +36,29 @@ namespace nova {
 
 namespace nova::gputils {
 
+  struct domain2d {
+    unsigned x;
+    unsigned y;
+  };
+
 #ifdef AXOMAE_USE_CUDA
   struct gpu_random_generator_t {
     math::random::GPUPseudoRandomGenerator xorshift;
     math::random::GPUQuasiRandomGenerator sobol;
   };
-
-#else
-  struct gpu_random_generator_t {};
-#endif
   struct gpu_util_structures_t {
     gpu_random_generator_t random_generator;
     kernel_argpack_t threads_distribution;
   };
+#else
+  struct gpu_random_generator_t {};
+  struct gpu_util_structures_t {};
 
-  gpu_util_structures_t initialize_gpu_structures(unsigned thread_distribution_size, core::memory::MemoryArena<std::byte> &arena);
+#endif
+
+  gpu_util_structures_t initialize_gpu_structures(const domain2d &domain, core::memory::MemoryArena<std::byte> &arena);
   void cleanup_gpu_structures(gpu_util_structures_t &gpu_structures, core::memory::MemoryArena<std::byte> &arena);
-  gpu_random_generator_t initialize_rand(const kernel_argpack_t &argpack);
+
   void clean_generators(gpu_random_generator_t &generators);
 
   void lock_host_memory_default(const device_shared_caches_t &collection);
