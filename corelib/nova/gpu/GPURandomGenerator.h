@@ -21,6 +21,7 @@ namespace math::random {
     /* Pointer to an array of states */
     curandStateXORWOW *device_curand_states{};
     uint64_t seed{1};
+    std::size_t state_buffer_size{};
 
    public:
     CLASS_DCM(GPUPseudoRandomGenerator)
@@ -39,6 +40,7 @@ namespace math::random {
     /* Pointer to an array of states */
     curandStateScrambledSobol32 *device_curand_states{};
     uint64_t dimension{1};
+    std::size_t state_buffer_size{0};
 
    public:
     CLASS_DCM(GPUQuasiRandomGenerator)

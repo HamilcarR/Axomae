@@ -27,10 +27,8 @@ namespace nova {
   void gpu_draw(HdrBufferStruct *buffers,
                 unsigned width_resolution,
                 unsigned height_resolution,
-                NovaRenderEngineInterface *engine_interface,
                 nova::nova_eng_internals &nova_internals,
-                gputils::gpu_util_structures_t &gpu_structures,
-                const device_shared_caches_t &shared_buffer_collection);
+                gputils::gpu_util_structures_t &gpu_structures);
 
 }  // namespace nova
 #endif

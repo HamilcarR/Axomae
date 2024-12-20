@@ -1,6 +1,9 @@
 #ifndef CUDA_MACROS_H
 #define CUDA_MACROS_H
 
+constexpr unsigned AX_GPU_WARP_SIZE = 32;
+constexpr unsigned AX_GPU_MAX_BLOCKS = 65535;
+
 #define ax_device_thread_idx_x (blockDim.x * blockIdx.x + threadIdx.x)
 #define ax_device_thread_idx_y (blockDim.y * blockIdx.y + threadIdx.y)
 #define ax_device_thread_idx_z (blockDim.z * blockIdx.z + threadIdx.z)
@@ -14,9 +17,8 @@
 #define ax_linearCM3D_idx (ax_device_thread_idx_x * ax_grid_dim_z * ax_grid_dim_y + ax_device_thread_idx_y * ax_grid_dim_z + ax_device_thread_idx_z)
 #define ax_linearRM3D_idx (ax_device_thread_idx_z * ax_grid_dim_x * ax_grid_dim_y + ax_device_thread_idx_y * ax_grid_dim_x + ax_device_thread_idx_x)
 
-constexpr unsigned AX_GPU_WARP_SIZE = 32;
-#define ax_gpu_lane_id (threadIdx.x % AX_GPU_WARP_SIZE)
-#define ax_gpu_warp_id (threadIdx.x / AX_GPU_WARP_SIZE)
+#define ax_gpu_lane_id (ax_linearCM3D_idx % AX_GPU_WARP_SIZE)
+#define ax_gpu_warp_id (ax_linearCM3D_idx / AX_GPU_WARP_SIZE)
 
 /* Synchronization */
 #define ax_gpu_syncthread __syncthreads()
@@ -49,5 +51,5 @@ constexpr unsigned AX_GPU_WARP_SIZE = 32;
 /* Bounds checking */
 #define AX_GPU_IN_BOUNDS_3D(x, y, z, width, height, depth) ((x) < (width) && (y) < (height) && (z) < (depth))
 #define AX_GPU_IN_BOUNDS_2D(x, y, width, height) ((x) < (width) && (y) < (height))
-
+#define AX_GPU_IN_BOUNDS(x, size) ((x) < (size))
 #endif  // CUDA_MACROS_H

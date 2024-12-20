@@ -34,9 +34,10 @@ namespace nova::gputils {
       thread_distrib = (thread_distrib + (AX_GPU_WARP_SIZE - 1)) & ~(AX_GPU_WARP_SIZE - 1);
     }
 
-    argpack.block_size = AX_GPU_WARP_SIZE;
+    argpack.block_size = {AX_GPU_WARP_SIZE * AX_GPU_WARP_SIZE};
     argpack.num_blocks = (thread_distrib + argpack.block_size.x - 1) / argpack.block_size.x;
 
+    AX_ASSERT_LT(argpack.num_blocks, AX_GPU_MAX_BLOCKDIM);
     gpu_util_structures_t gpu_structures;
     gpu_structures.threads_distribution = argpack;
     gpu_structures.random_generator = initialize_rand(argpack);
@@ -57,7 +58,11 @@ namespace nova::gputils {
   }
   void clean_generators(gpu_random_generator_t &generators) { EMPTY_FUNCBODY }
 
-  void cleanup_gpu_structures(gpu_structures_t &gpu_structures) { EMPTY_FUNCBODY }
+  void cleanup_gpu_structures(gpu_structures_t &gpu_structures){EMPTY_FUNCBODY}
+
+  gpu_util_structures_t initialize_gpu_structures(unsigned thread_distribution_size, core::memory::MemoryArena<std::byte> &arena) {
+    return {};
+  }
 
 #endif
 }  // namespace nova::gputils

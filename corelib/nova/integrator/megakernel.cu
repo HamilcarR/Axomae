@@ -49,26 +49,18 @@ namespace nova {
       render_buffer.render_target[offset + 3] = color.a;
     }
 
-    ax_kernel void test_func(float *ptr,
-                             cudaTextureObject_t host_texture,
-                             unsigned width,
-                             unsigned height,
-                             int i_width,
-                             int i_height,
-                             utils::gpu_random_generator_t generator) {
+    ax_kernel void test_func(
+        render_buffer_t render_buffer, cudaTextureObject_t host_texture, int i_width, int i_height, utils::gpu_random_generator_t generator) {
       unsigned int x = ax_device_thread_idx_x;
       unsigned int y = ax_device_thread_idx_y;
-      // unsigned int offset = ax_linearCM2D_idx;
-      uint64_t offset = (y * width + x);
-      render_buffer_t render_buffer{ptr, width, height};
-      if (x >= width || y >= height)
+      if (!AX_GPU_IN_BOUNDS_2D(x, y, render_buffer.width, render_buffer.height))
         return;
       sampler::SobolSampler sobol = sampler::SobolSampler(generator.sobol);
       sampler::RandomSampler pseudo = sampler::RandomSampler(generator.xorshift);
       glm::vec3 sample{};
       sample = sobol.sample() * 0.5f + 0.5f;
-      float u = (float)math::texture::pixelToUv(x, width);
-      float v = (float)math::texture::pixelToUv(y, height);
+      float u = (float)math::texture::pixelToUv(x, render_buffer.width);
+      float v = (float)math::texture::pixelToUv(y, render_buffer.height);
       float4 tex = tex2D<float4>(host_texture, u, v);
       shade(render_buffer, sample.x, sample.y, glm::vec4(tex.x, tex.y, tex.z, tex.w));
     }
@@ -93,10 +85,8 @@ namespace nova {
   void launch_gpu_kernel(HdrBufferStruct *buffers,
                          unsigned screen_width,
                          unsigned screen_height,
-                         NovaRenderEngineInterface *engine_interface,
                          nova::nova_eng_internals &nova_internals,
-                         gputils::gpu_util_structures_t &gpu_structures,
-                         const gpu_shared_data_t &shared_gpu_data) {
+                         gputils::gpu_util_structures_t &gpu_structures) {
 
     if (ax_cuda::utils::cuda_info_device().empty()) {
       LOGS("No suitable gpu detected.");
@@ -115,15 +105,16 @@ namespace nova {
     resrc::GPU_query_result draw_buffer = resrc::allocate_buffer(screen_size);  // TODO: Bottleneck. Generate only 1 buffer for the whole app life
     DEVICE_ERROR_CHECK(draw_buffer.error_status);
     kernel_argpack_t argpack;
-    argpack.block_size = {32, 32};
+    argpack.block_size = {AX_GPU_WARP_SIZE, AX_GPU_WARP_SIZE};
     argpack.num_blocks = {(screen_width + argpack.block_size.x - 1) / argpack.block_size.x,
                           (screen_height + argpack.block_size.y - 1) / argpack.block_size.y};
+
+    gpu::render_buffer_t render_buffer{static_cast<float *>(draw_buffer.device_ptr), screen_width, screen_height};
+
     exec_kernel(argpack,
                 gpu::test_func,
-                (float *)draw_buffer.device_ptr,
+                render_buffer,
                 std::any_cast<cudaTextureObject_t>(texture_resrc.texture_object),
-                screen_width,
-                screen_height,
                 image_texture.width,
                 image_texture.height,
                 gpu_structures.random_generator);

@@ -8,6 +8,16 @@
 #include <cuda_runtime_api.h>
 #include <curand.h>
 
+struct kernel_argpack_t {
+  dim3 num_blocks{1, 1, 1};
+  dim3 block_size{1, 1, 1};
+  std::size_t shared_mem_bytes{};
+  cudaStream_t stream{};
+
+  std::size_t computeWarpNumber() const;
+  std::size_t computeThreadsNumber() const;
+};
+
 #define CUDA_ERROR_CHECK(ans) \
   { \
     gpuAssert((ans), __FILE__, __LINE__); \
