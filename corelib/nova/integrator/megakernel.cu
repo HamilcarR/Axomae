@@ -55,14 +55,15 @@ namespace nova {
       unsigned int y = ax_device_thread_idx_y;
       if (!AX_GPU_IN_BOUNDS_2D(x, y, render_buffer.width, render_buffer.height))
         return;
-      sampler::SobolSampler sobol = sampler::SobolSampler(generator.sobol);
-      sampler::RandomSampler pseudo = sampler::RandomSampler(generator.xorshift);
-      glm::vec3 sample{};
-      sample = sobol.sample() * 0.5f + 0.5f;
-      float u = (float)math::texture::pixelToUv(x, render_buffer.width);
-      float v = (float)math::texture::pixelToUv(y, render_buffer.height);
-      float4 tex = tex2D<float4>(host_texture, u, v);
-      shade(render_buffer, sample.x, sample.y, glm::vec4(tex.x, tex.y, tex.z, tex.w));
+      sampler::SobolSampler sobol_sampler = sampler::SobolSampler(generator.sobol);
+      sampler::RandomSampler random_sampler = sampler::RandomSampler(generator.xorshift);
+      glm::vec3 sobol{}, random{};
+      sobol = sobol_sampler.sample(-0.01f, 0.01f);
+      random = random_sampler.sample(-1, 1);
+      float u = (float)math::texture::pixelToUv(x, render_buffer.width - 1);
+      float v = (float)math::texture::pixelToUv(y, render_buffer.height - 1);
+      float4 tex = tex2D<float4>(host_texture, u + sobol.y, v + sobol.x);
+      shade(render_buffer, u, v, glm::vec4(tex.x, tex.y, tex.z, tex.w));
     }
   }  // namespace gpu
 
@@ -76,7 +77,7 @@ namespace nova {
 
     tex_desc.filter_mode = resrc::FILTER_LINEAR;
     tex_desc.read_mode = resrc::READ_ELEMENT_TYPE;
-    tex_desc.address_mode[0] = tex_desc.address_mode[1] = resrc::ADDRESS_BORDER;
+    tex_desc.address_mode[0] = tex_desc.address_mode[1] = resrc::ADDRESS_WRAP;
     tex_desc.normalized_coords = true;
     resrc_desc.resource_buffer_descriptors.res.array.array = nullptr;
     resrc_desc.type = resrc::RESOURCE_ARRAY;
@@ -104,14 +105,9 @@ namespace nova {
 
     resrc::GPU_query_result draw_buffer = resrc::allocate_buffer(screen_size);  // TODO: Bottleneck. Generate only 1 buffer for the whole app life
     DEVICE_ERROR_CHECK(draw_buffer.error_status);
-    kernel_argpack_t argpack;
-    argpack.block_size = {AX_GPU_WARP_SIZE, AX_GPU_WARP_SIZE};
-    argpack.num_blocks = {(screen_width + argpack.block_size.x - 1) / argpack.block_size.x,
-                          (screen_height + argpack.block_size.y - 1) / argpack.block_size.y};
-
     gpu::render_buffer_t render_buffer{static_cast<float *>(draw_buffer.device_ptr), screen_width, screen_height};
 
-    exec_kernel(argpack,
+    exec_kernel(gpu_structures.threads_distribution,
                 gpu::test_func,
                 render_buffer,
                 std::any_cast<cudaTextureObject_t>(texture_resrc.texture_object),

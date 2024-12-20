@@ -14,7 +14,7 @@ namespace device::gpgpu {
 
   /* Allocate a buffer of size_bytes bytes on device*/
   GPU_query_result allocate_buffer(std::size_t buffer_size_bytes);
-  GPU_query_result allocate_symbol(void *symbol, std::size_t buffer_size_bytes);
+  GPU_query_result allocate_symbol(void **symbol, std::size_t buffer_size_bytes);
 
   enum COPY_MODE { HOST_HOST = 0, HOST_DEVICE = 1, DEVICE_HOST = 2, DEVICE_DEVICE = 3 };
   GPU_query_result copy_buffer(const void *src, void *dest, std::size_t buffer_size_bytes, COPY_MODE copy_type);

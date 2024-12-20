@@ -17,8 +17,13 @@ namespace nova::sampler {
 
   using PRandomGenerator = math::random::CPUPseudoRandomGenerator;
   using QRandomGenerator = math::random::CPUQuasiRandomGenerator;
+#if defined AXOMAE_USE_CUDA
   using DPRandomGenerator = math::random::GPUPseudoRandomGenerator;
   using DQRandomGenerator = math::random::GPUQuasiRandomGenerator;
+#else
+  using DPRandomGenerator = PRandomGenerator;
+  using DQRandomGenerator = QRandomGenerator;
+#endif
 
   template<class T>
   class SobolSampler {
@@ -31,6 +36,10 @@ namespace nova::sampler {
 
     ax_device_callable explicit SobolSampler(const T &generator_) : generator(generator_) {}
     ax_device_callable ax_no_discard glm::vec3 sample() { return generator.nrand3f(-1, 1); }
+    template<class U>
+    ax_device_callable ax_no_discard glm::vec3 sample(U min, U max) {
+      return generator.nrand3f(min, max);
+    }
     ax_device_callable ax_no_discard exception::NovaException getErrorState() const { return exception; }
   };
 
@@ -44,6 +53,10 @@ namespace nova::sampler {
 
     ax_device_callable explicit RandomSampler(const T &generator_) : generator(generator_) {}
     ax_device_callable ax_no_discard glm::vec3 sample() { return generator.nrand3f(-1, 1); }
+    template<class U>
+    ax_device_callable ax_no_discard glm::vec3 sample(U min, U max) {
+      return generator.nrand3f(min, max);
+    }
     ax_device_callable ax_no_discard exception::NovaException getErrorState() const { return exception; }
   };
 
@@ -61,6 +74,11 @@ namespace nova::sampler {
 
     ax_device_callable ax_no_discard glm::vec3 sample() {
       auto d = [&](auto ptr) { return ptr->sample(); };
+      return dispatch(d);
+    }
+    template<class T>
+    ax_device_callable ax_no_discard glm::vec3 sample(T min, T max) {
+      auto d = [&](auto ptr) { return ptr->sample(min, max); };
       return dispatch(d);
     }
   };
