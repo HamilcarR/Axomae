@@ -255,9 +255,8 @@ namespace controller {
 
   static void do_progressive_render_gpu(nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder) {
     int sample_increment = 1;
-
-    auto gpu_structures = nova::gputils::initialize_gpu_structures(render_scene_data.width * render_scene_data.height,
-                                                                   render_scene_data.nova_resource_manager->getMemoryPool());
+    nova::gputils::domain2d domain{(unsigned)render_scene_data.width, (unsigned)render_scene_data.height};
+    auto gpu_structures = nova::gputils::initialize_gpu_structures(domain, render_scene_data.nova_resource_manager->getMemoryPool());
     nova::device_shared_caches_t &buffer_collection = render_scene_data.shared_caches;
     nova::gputils::lock_host_memory_default(buffer_collection);
     progressive_render_metadata metadata = create_render_metadata(render_scene_data);

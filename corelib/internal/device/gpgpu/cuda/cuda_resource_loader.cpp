@@ -21,12 +21,12 @@ namespace device::gpgpu {
     return gpu_resource;
   }
 
-  GPU_query_result allocate_symbol(void *sym, std::size_t size_bytes) {
+  GPU_query_result allocate_symbol(void **sym, std::size_t size_bytes) {
     if (!validate_gpu_state())
       return ret_error();
     ax_cuda::CudaDevice device;
     GPU_query_result gpu_resource;
-    gpu_resource.error_status = device.GPUMalloc(&sym, size_bytes);
+    gpu_resource.error_status = device.GPUMalloc(sym, size_bytes);
     gpu_resource.device_ptr = sym;
     return gpu_resource;
   }
