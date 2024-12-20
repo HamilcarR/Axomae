@@ -1,4 +1,4 @@
 set(NOVA_MODULE_SAMPLER_SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/SamplerPGC3DTest.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SamplerTest.cpp
         PARENT_SCOPE
 )
