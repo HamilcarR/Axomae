@@ -20,13 +20,15 @@ namespace math::random {
   class GPUPseudoRandomGenerator : public AbstractRandomGenerator<GPUPseudoRandomGenerator> {
     /* Pointer to an array of states */
     curandStateXORWOW *device_curand_states{};
-    uint64_t seed{1};
+    uint64_t seed{};
     std::size_t state_buffer_size{};
 
    public:
     CLASS_DCM(GPUPseudoRandomGenerator)
 
-    ax_device_callable explicit GPUPseudoRandomGenerator(curandStateXORWOW *curand_states_buffer, uint64_t seed = 0xDEADBEEF);
+    ax_device_callable explicit GPUPseudoRandomGenerator(curandStateXORWOW *curand_states_buffer,
+                                                         std::size_t state_buffer_size,
+                                                         uint64_t seed = 0xDEADBEEF);
     ax_device_only int nrandi(int min, int max);
     ax_device_only float nrandf(float min, float max);
     ax_device_only glm::vec3 nrand3f(float min, float max);
@@ -39,7 +41,7 @@ namespace math::random {
   class GPUQuasiRandomGenerator : public AbstractRandomGenerator<GPUQuasiRandomGenerator> {
     /* Pointer to an array of states */
     curandStateScrambledSobol32 *device_curand_states{};
-    uint64_t dimension{1};
+    uint64_t dimension{};
     std::size_t state_buffer_size{0};
 
    public:
