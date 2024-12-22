@@ -41,6 +41,7 @@ namespace nova_baker_utils {
     std::unique_ptr<nova::NovaExceptionManager> nova_exception_manager;
     threading::ThreadPool *thread_pool{nullptr};
     nova::device_shared_caches_t shared_caches;
+    nova::gputils::gpu_util_structures_t gpu_util_structures;
   };
 
   struct camera_data {
@@ -86,11 +87,11 @@ namespace nova_baker_utils {
   struct NovaBakingStructure {
     bake_temp_buffers bake_buffers;
     std::unique_ptr<QWidget> spawned_window;
-    render_scene_context nova_render_scene;
+    render_scene_context render_context;
     std::thread rendering_thread;
 
     void reinitialize() {
-      auto &nova_resource_manager = nova_render_scene.nova_resource_manager;
+      auto &nova_resource_manager = render_context.nova_resource_manager;
       if (nova_resource_manager)
         nova_resource_manager->getEngineData().is_rendering = false;
       if (rendering_thread.joinable())
@@ -102,6 +103,8 @@ namespace nova_baker_utils {
       bake_buffers.partial.clear();
       /* Remove reference to the widget. */
       spawned_window = nullptr;
+      /* If gpu is used , cleanup whatever has been allocated */
+      nova::gputils::cleanup_gpu_structures(render_context.gpu_util_structures);
     }
   };
 

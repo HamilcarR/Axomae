@@ -154,8 +154,8 @@ namespace controller {
                                       nova_baker_utils::NovaBakingStructure &nova_baking_structure,
                                       threading::ThreadPool *thread_pool) {
     /* Engine type */
-    nova_baking_structure.nova_render_scene = nova_baker_utils::render_scene_context{};
-    nova_baker_utils::render_scene_context &render_scene_data = nova_baking_structure.nova_render_scene;
+    nova_baking_structure.render_context = nova_baker_utils::render_scene_context{};
+    nova_baker_utils::render_scene_context &render_scene_data = nova_baking_structure.render_context;
     render_scene_data.buffers = allocate_buffers(nova_baking_structure, render_options);
     render_scene_data.width = render_options.width;
     render_scene_data.height = render_options.height;
@@ -256,7 +256,7 @@ namespace controller {
   static void do_progressive_render_gpu(nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder) {
     int sample_increment = 1;
     nova::gputils::domain2d domain{(unsigned)render_scene_data.width, (unsigned)render_scene_data.height};
-    auto gpu_structures = nova::gputils::initialize_gpu_structures(domain, render_scene_data.nova_resource_manager->getMemoryPool());
+    nova::gputils::initialize_gpu_structures(domain, render_scene_data.gpu_util_structures);
     nova::device_shared_caches_t &buffer_collection = render_scene_data.shared_caches;
     nova::gputils::lock_host_memory_default(buffer_collection);
     progressive_render_metadata metadata = create_render_metadata(render_scene_data);
@@ -268,7 +268,7 @@ namespace controller {
                           metadata.max_depth;
       render_scene_data.nova_resource_manager->getEngineData().max_depth = new_depth;
       try {
-        bake_scene_gpu(render_scene_data, gpu_structures);
+        bake_scene_gpu(render_scene_data, render_scene_data.gpu_util_structures);
       } catch (const exception::GenericException &e) {
         ExceptionInfoBoxHandler::handle(e);
         nova::gputils::unlock_host_memory(buffer_collection);
@@ -282,7 +282,6 @@ namespace controller {
       color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)sample_increment);
       sample_increment++;
     }
-    nova::gputils::cleanup_gpu_structures(gpu_structures, render_scene_data.nova_resource_manager->getMemoryPool());
     nova::gputils::unlock_host_memory(buffer_collection);
   }
 
@@ -404,7 +403,7 @@ namespace controller {
                               getSharedCaches(),
                               nova_baking_structure,
                               thread_pool);
-      start_baking(nova_baking_structure.nova_render_scene, this, nova_baking_structure.bake_buffers.image_holder, misc_options.use_gpu);
+      start_baking(nova_baking_structure.render_context, this, nova_baking_structure.bake_buffers.image_holder, misc_options.use_gpu);
       ignore_skybox(renderer, false);
     } catch (const exception::CatastrophicFailureException &e) {
       ignore_skybox(renderer, false);
@@ -524,7 +523,7 @@ namespace controller {
 
   void Controller::novaStopBake() {
     /* Stop the threads. */
-    auto &nova_resource_manager = nova_baking_structure.nova_render_scene.nova_resource_manager;
+    auto &nova_resource_manager = nova_baking_structure.render_context.nova_resource_manager;
     if (nova_resource_manager)
       nova_resource_manager->getEngineData().is_rendering = false;
 
