@@ -4,8 +4,9 @@
 #include "device_resource_data.h"
 #include "device_resource_descriptors.h"
 #include "device_texture_descriptors.h"
-/* Interface to load various nova resources to gpu , like textures , materials etc */
+/* Interface to load various resources to gpu in an agnostic way. */
 
+// TODO : Add GL->cuda interop
 namespace device::gpgpu {
 
   bool validate_gpu_state();

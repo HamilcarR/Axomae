@@ -16,7 +16,11 @@ namespace core::memory {
 }
 /* defines functions and interfaces for nova to communicate with the device */
 namespace nova {
-  using cache_collection_t = std::vector<axstd::span<uint8_t>>;
+  struct lockable_buffer_t {
+    bool locked{false};
+    axstd::span<uint8_t> buffer;
+  };
+  using cache_collection_t = std::vector<lockable_buffer_t>;
 
   /* Tracks memory pool buffers that are potentially shared with devices.
    * Is cleared before scene loading , and rebuilt after.
@@ -29,8 +33,12 @@ namespace nova {
      */
     cache_collection_t contiguous_caches;
 
-    void addSharedCacheAddress(axstd::span<uint8_t> buffer) { contiguous_caches.push_back(buffer); }
-    void clear() { contiguous_caches.clear(); }
+    void addSharedCacheAddress(axstd::span<uint8_t> buffer) {
+      contiguous_caches.push_back({false,buffer});
+    }
+    void clear() {
+      contiguous_caches.clear();
+    }
   };
 }  // namespace nova
 
@@ -56,13 +64,13 @@ namespace nova::gputils {
 
 #endif
 
-  gpu_util_structures_t initialize_gpu_structures(const domain2d &domain, core::memory::MemoryArena<std::byte> &arena);
-  void cleanup_gpu_structures(gpu_util_structures_t &gpu_structures, core::memory::MemoryArena<std::byte> &arena);
+  void initialize_gpu_structures(const domain2d &domain, gpu_util_structures_t &gpu_util_structures);
+  void cleanup_gpu_structures(gpu_util_structures_t &gpu_structures);
 
   void clean_generators(gpu_random_generator_t &generators);
 
-  void lock_host_memory_default(const device_shared_caches_t &collection);
-  void unlock_host_memory(const device_shared_caches_t &collection);
+  void lock_host_memory_default(device_shared_caches_t &collection);
+  void unlock_host_memory(device_shared_caches_t &collection);
 
 }  // namespace nova::gputils
 #endif  // NOVA_GPU_UTILS_H

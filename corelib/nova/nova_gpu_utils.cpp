@@ -6,29 +6,35 @@
 namespace resrc = device::gpgpu;
 namespace nova::gputils {
 #if defined(AXOMAE_USE_CUDA)
-  void lock_host_memory_default(const device_shared_caches_t &collection) {
-    for (const auto &element : collection.contiguous_caches)
-      DEVICE_ERROR_CHECK(resrc::pin_host_memory(element.data(), element.size(), device::gpgpu::PIN_MODE_DEFAULT).error_status);
+  void lock_host_memory_default(device_shared_caches_t &collection) {
+    for (auto &element : collection.contiguous_caches)
+      if (!element.locked){
+        DEVICE_ERROR_CHECK(resrc::pin_host_memory(element.buffer.data(), element.buffer.size(), device::gpgpu::PIN_MODE_DEFAULT).error_status);
+        element.locked = true;
+      }
   }
 
-  void unlock_host_memory(const device_shared_caches_t &collection) {
-    for (const auto &element : collection.contiguous_caches)
-      DEVICE_ERROR_CHECK(resrc::unpin_host_memory(element.data()).error_status);
+  void unlock_host_memory( device_shared_caches_t &collection) {
+    for (auto &element : collection.contiguous_caches)
+      if (element.locked){
+        DEVICE_ERROR_CHECK(resrc::unpin_host_memory(element.buffer.data()).error_status);
+        element.locked = false;
+      }
   }
 
   static gpu_random_generator_t initialize_rand(const kernel_argpack_t &argpack) {
     gpu_random_generator_t gpu_generators;
-    gpu_generators.sobol.init(argpack);
+    gpu_generators.sobol.init(argpack, 7);
     gpu_generators.xorshift.init(argpack);
     return gpu_generators;
   }
 
-  void clean_generators(gpu_random_generator_t &generators, core::memory::ByteArena & /*arena*/) {
+  void clean_generators(gpu_random_generator_t &generators) {
     generators.sobol.cleanStates();
     generators.xorshift.cleanStates();
   }
 
-  gpu_util_structures_t initialize_gpu_structures(const domain2d &domain, core::memory::ByteArena & /*arena*/) {
+  void initialize_gpu_structures(const domain2d &domain, gpu_util_structures_t &gpu_structures) {
     kernel_argpack_t argpack;
     argpack.block_size = {AX_GPU_WARP_SIZE, AX_GPU_WARP_SIZE};
     unsigned block_x = std::ceil((domain.x + argpack.block_size.x - 1) / argpack.block_size.x);
@@ -36,26 +42,24 @@ namespace nova::gputils {
     argpack.num_blocks = {block_x, block_y};
 
     AX_ASSERT_LT(argpack.num_blocks, AX_GPU_MAX_BLOCKDIM);
-    gpu_util_structures_t gpu_structures;
     gpu_structures.threads_distribution = argpack;
     gpu_structures.random_generator = initialize_rand(argpack);
-    return gpu_structures;
   }
 
-  void cleanup_gpu_structures(gpu_util_structures_t &gpu_structures, core::memory::ByteArena & /*arena*/) {
+  void cleanup_gpu_structures(gpu_util_structures_t &gpu_structures) {
     gpu_structures.random_generator.sobol.cleanStates();
     gpu_structures.random_generator.xorshift.cleanStates();
   }
 
 #else
-  void lock_host_memory_default(const device_shared_caches_t &collection) { EMPTY_FUNCBODY }
-  void unlock_host_memory(const device_shared_caches_t &collection) { EMPTY_FUNCBODY }
+  void lock_host_memory_default(device_shared_caches_t &) { EMPTY_FUNCBODY }
+  void unlock_host_memory(device_shared_caches_t &) { EMPTY_FUNCBODY }
 
   void clean_generators(gpu_random_generator_t &) { EMPTY_FUNCBODY }
 
-  void cleanup_gpu_structures(gpu_util_structures_t & /*gpu_structures*/, core::memory::ByteArena &){EMPTY_FUNCBODY}
+  void cleanup_gpu_structures(gpu_util_structures_t &){EMPTY_FUNCBODY}
 
-  gpu_util_structures_t initialize_gpu_structures(const domain2d &domain, core::memory::ByteArena &) {
+  gpu_util_structures_t initialize_gpu_structures(const domain2d &) {
     return {};
   }
 
