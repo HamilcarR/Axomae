@@ -16,7 +16,7 @@ namespace math::random {
       : seed(seed_), state_buffer_size(size), device_curand_states(curand_states_buffer) {}
 
   ax_device_only int GPUPseudoRandomGenerator::nrandi(int min, int max) {
-    uint64_t idx = ax_linearCM3D_idx;
+    uint64_t idx = ax_device_linearCM3D_idx;
     if (idx >= state_buffer_size)
       idx = 0;
     curandState_t &state = device_curand_states[idx];
@@ -25,7 +25,7 @@ namespace math::random {
   }
 
   ax_device_only float GPUPseudoRandomGenerator::nrandf(float min, float max) {
-    uint64_t idx = ax_linearCM3D_idx;
+    uint64_t idx = ax_device_linearCM3D_idx;
     if (idx >= state_buffer_size)
       idx = 0;
     curandState &state = device_curand_states[idx];
@@ -38,7 +38,7 @@ namespace math::random {
   ax_device_only bool GPUPseudoRandomGenerator::randb() { return nrandi(0, 1) == 1; }
 
   ax_kernel void kernel_init_pseudo(curandState_t *states, uint64_t seed) {
-    uint64_t idx = ax_linearCM3D_idx;
+    uint64_t idx = ax_device_linearCM3D_idx;
     curand_init(seed % idx, 0, idx, &states[idx]);
   }
 
@@ -65,7 +65,7 @@ namespace math::random {
   }
 
   ax_device_only int GPUQuasiRandomGenerator::nrandi(int min, int max) {
-    uint64_t idx = ax_linearCM3D_idx * dimension;
+    uint64_t idx = ax_device_linearCM3D_idx * dimension;
     if (idx >= state_buffer_size)
       idx = 0;
     curandStateScrambledSobol32_t &state = device_curand_states[idx];
@@ -75,7 +75,7 @@ namespace math::random {
   }
 
   ax_device_only float GPUQuasiRandomGenerator::nrandf(float min, float max) {
-    uint64_t idx = ax_linearCM3D_idx * dimension;
+    uint64_t idx = ax_device_linearCM3D_idx * dimension;
     if (idx >= state_buffer_size)
       idx = 0;
     curandStateScrambledSobol32_t &state = device_curand_states[idx];
@@ -85,10 +85,8 @@ namespace math::random {
   }
 
   ax_device_only glm::vec3 GPUQuasiRandomGenerator::nrand3f(float min, float max) {
-    uint64_t idx = ax_linearCM2D_idx * dimension;
-
+    uint64_t idx = ax_device_linearCM3D_idx * dimension;
     glm::vec3 eval{};
-
     eval.x = to_interval(min, max, curand_uniform(&device_curand_states[idx]));
     eval.y = to_interval(min, max, curand_uniform(&device_curand_states[idx + 1]));
     eval.z = to_interval(min, max, curand_uniform(&device_curand_states[idx + 2]));
@@ -101,9 +99,9 @@ namespace math::random {
                                   curandDirectionVectors32_t *vectors32,
                                   uint32_t *scramble,
                                   unsigned dimension) {
-    uint64_t idx = ax_linearCM2D_idx * dimension;
+    uint64_t idx = ax_device_linearCM3D_idx * dimension;
     for (int i = 0; i < dimension; i++) {
-      curand_init(vectors32[i], scramble[i], ax_device_thread_idx_x * ax_device_thread_idx_y, &states[idx + i]);
+      curand_init(vectors32[i], scramble[i], ax_device_linearRM2D_idx, &states[idx + i]);
     }
   }
 
