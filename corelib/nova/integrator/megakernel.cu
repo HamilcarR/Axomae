@@ -58,12 +58,12 @@ namespace nova {
       sampler::SobolSampler sobol_sampler = sampler::SobolSampler(generator.sobol);
       sampler::RandomSampler random_sampler = sampler::RandomSampler(generator.xorshift);
       glm::vec3 sobol{}, random{};
-      sobol = sobol_sampler.sample(-0.01f, 0.01f);
-      random = random_sampler.sample(-1, 1);
+      sobol = sobol_sampler.sample(0, 1);
+      random = random_sampler.sample(0, 1);
       float u = (float)math::texture::pixelToUv(x, render_buffer.width - 1);
       float v = (float)math::texture::pixelToUv(y, render_buffer.height - 1);
-      float4 tex = tex2D<float4>(host_texture, u + sobol.y, v + sobol.x);
-      shade(render_buffer, u, v, glm::vec4(tex.x, tex.y, tex.z, tex.w));
+      float4 tex = tex2D<float4>(host_texture, u, v);
+      shade(render_buffer, sobol.y, sobol.z, glm::vec4(tex.x, tex.y, tex.z, 1.f));
     }
   }  // namespace gpu
 
