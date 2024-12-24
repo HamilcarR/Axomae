@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <cstddef>
 #include <list>
 #include <new>
 #include <unordered_map>
