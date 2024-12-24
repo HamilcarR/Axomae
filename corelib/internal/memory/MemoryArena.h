@@ -3,6 +3,7 @@
 #include "internal/debug/debug_utils.h"
 #include "internal/macro/project_macros.h"
 #include <cstdint>
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <list>
