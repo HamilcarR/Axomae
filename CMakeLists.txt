@@ -23,6 +23,15 @@ set(CMAKE_LIBRARY_PATH "" CACHE FILEPATH "")
 set(AXOMAE_USE_GOLD "ON" CACHE BOOL "Use GOLD linker")
 set(AXOMAE_USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
 set(AXOMAE_USE_LLD "OFF" CACHE BOOL "USE LLVM linker")
+option(AXOMAE_USE_SCCACHE "Use sccache for build optimization" OFF)
+if(AXOMAE_USE_SCCACHE)
+    find_program(SCCACHE sccache)
+    if(NOT SCCACHE)
+        message(WARNING "sccache is not found on the system")
+    else ()
+        set(CMAKE_CXX_COMPILER_LAUNCHER "sccache")
+    endif ()
+endif ()
 
 # CUDA Compilation
 option(AXOMAE_USE_CUDA "Use GPU when available" OFF)
@@ -35,6 +44,7 @@ option(AXOMAE_LUT_MEDIUMP "Enable medium precision when computing lookup tables.
 option(AXOMAE_LUT_LOWP "Enable low precision when computing lookup tables." OFF)
 option(AXOMAE_BUILD_TESTS "Build unit tests." ON)
 option(AXOMAE_FROMSOURCE_QT_BUILD "Build QT from source." ON)
+
 #****************************************************************************************************
 # Dependencies
 if(AXOMAE_FROMSOURCE_QT_BUILD)
