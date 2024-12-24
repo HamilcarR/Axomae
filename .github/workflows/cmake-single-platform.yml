@@ -3,10 +3,10 @@ name: Build and Tests
 on:
   push:
     branches:
-    - "Feature-CI_CD"
+    - "Build_Test_Deployment"
     - "master"
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master" , "Build_Test_Deployment"]
 
 env:
   BUILD_TYPE: RelWithDebInfo
