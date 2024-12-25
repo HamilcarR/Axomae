@@ -14,8 +14,8 @@ namespace datastructure {
     NodeInterface *root{};
 
    private:
-    mutable NodeInterface *iterator{};  // TODO : why mutable ??
-    mutable const NodeInterface *const_iterator{};
+    NodeInterface *iterator{};
+    const NodeInterface *const_iterator{};
 
    protected:
     AbstractHierarchy() = default;
@@ -39,13 +39,13 @@ namespace datastructure {
     void dfs(NodeInterface *begin, F &&func, Args &&...args);
 
     template<class F, class... Args>
-    void dfsConst(const NodeInterface *begin, const F &&func, const Args &&...args) const;
+    void dfsConst(const NodeInterface *begin, const F &&func, const Args &&...args) ;
 
     template<class F, class... Args>
     void bfs(NodeInterface *begin, F &&func, Args &&...args);
 
     template<class F, class... Args>
-    void bfsConst(const NodeInterface *begin, const F &&func, const Args &&...args) const;
+    void bfsConst(const NodeInterface *begin, const F &&func, const Args &&...args) ;
 
    private:
     template<class F, class... Args>
@@ -78,7 +78,7 @@ namespace datastructure {
   }
 
   template<class F, class... Args>
-  void AbstractHierarchy::dfsConst(const NodeInterface *begin, const F &&func, const Args &&...args) const {
+  void AbstractHierarchy::dfsConst(const NodeInterface *begin, const F &&func, const Args &&...args)  {
     if ((const_iterator = begin) != nullptr) {
       dfsConstTraverse(const_iterator, std::forward<F>(func), std::forward<Args>(args)...);
     }
@@ -116,7 +116,7 @@ namespace datastructure {
   }
 
   template<class F, class... Args>
-  void AbstractHierarchy::bfsConst(const NodeInterface *begin, const F &&func, const Args &&...args) const {
+  void AbstractHierarchy::bfsConst(const NodeInterface *begin, const F &&func, const Args &&...args)  {
     if ((const_iterator = begin) != nullptr) {
       bfsConstTraverse(const_iterator, std::forward<F>(func), std::forward<Args>(args)...);
     }
