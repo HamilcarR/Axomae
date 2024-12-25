@@ -59,9 +59,7 @@ namespace nova::gputils {
 
   void cleanup_gpu_structures(gpu_util_structures_t &){EMPTY_FUNCBODY}
 
-  gpu_util_structures_t initialize_gpu_structures(const domain2d &) {
-    return {};
-  }
+  void initialize_gpu_structures(const domain2d & , gpu_util_structures_t& ) {EMPTY_FUNCBODY}
 
 #endif
 }  // namespace nova::gputils
