@@ -22,7 +22,7 @@ TEST(Object3DTest, get_tri_vertices) {
     idx[1] = CUBE::indices[i + 1];
     idx[2] = CUBE::indices[i + 2];
 
-    cube.get_tri(triangle, idx);
+    cube.getTri(triangle, idx);
     const std::vector<float> &vertices = CUBE::vertices;
     float v0[3], v1[3], v2[3];
     for (int i = 0; i < 3; i++) {
@@ -47,7 +47,7 @@ TEST(Object3DTest, get_tri_normals) {
     idx[1] = CUBE::indices[i + 1];
     idx[2] = CUBE::indices[i + 2];
 
-    cube.get_tri(triangle, idx);
+    cube.getTri(triangle, idx);
 
     float n0[3], n1[3], n2[3];
     const std::vector<float> &normals = CUBE::normals;
@@ -73,7 +73,7 @@ TEST(Object3DTest, get_tri_colors) {
     idx[1] = CUBE::indices[i + 1];
     idx[2] = CUBE::indices[i + 2];
 
-    cube.get_tri(triangle, idx);
+    cube.getTri(triangle, idx);
 
     float c0[3], c1[3], c2[3];
     const std::vector<float> &colors = CUBE::colors;
@@ -99,7 +99,7 @@ TEST(Object3DTest, get_tri_uv) {
     idx[1] = CUBE::indices[i + 1];
     idx[2] = CUBE::indices[i + 2];
 
-    cube.get_tri(triangle, idx);
+    cube.getTri(triangle, idx);
 
     float uv0[2], uv1[2], uv2[2];
     const std::vector<float> &uv = CUBE::uv;
@@ -125,7 +125,7 @@ TEST(Object3DTest, get_tri_tangent) {
     idx[1] = CUBE::indices[i + 1];
     idx[2] = CUBE::indices[i + 2];
 
-    cube.get_tri(triangle, idx);
+    cube.getTri(triangle, idx);
 
     float tan0[3], tan1[3], tan2[3];
     const std::vector<float> &tangent = CUBE::tangents;
@@ -151,7 +151,7 @@ TEST(Object3DTest, get_tri_bitangent) {
     idx[1] = CUBE::indices[i + 1];
     idx[2] = CUBE::indices[i + 2];
 
-    cube.get_tri(triangle, idx);
+    cube.getTri(triangle, idx);
 
     float bit0[3], bit1[3], bit2[3];
     const std::vector<float> &bitangents = CUBE::bitangents;

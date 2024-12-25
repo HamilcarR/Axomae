@@ -1,9 +1,11 @@
 #ifndef OBJECT3D_H
 #define OBJECT3D_H
 #include "internal/macro/project_macros.h"
+#include <glm/glm.hpp>
 #include <vector>
 
 namespace geometry {
+
   struct face_data_tri {
     float v0[3], v1[3], v2[3];        // vertices
     float n0[3], n1[3], n2[3];        // normals
@@ -33,23 +35,31 @@ namespace geometry {
       c2[i] = attribute[idx[2] * 2 + i];
     }
   }
+
+  void transform_vertices(const face_data_tri &tri_primitive, const glm::mat4 &final_transfo, glm::vec3 vertices[3]);
+  void transform_normals(const face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 normals[3]);
+  void transform_tangents(const face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 tangents[3]);
+  void transform_bitangents(const face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 bitangents[3]);
+  void extract_uvs(const face_data_tri &tri_primitive, glm::vec2 textures[3]);
+
+
 }  // namespace geometry
 
-/* Contains vertices data (a lot) */
+/* Contains vertices data */
 class Object3D {
  public:
-  std::vector<float> vertices;       /*<Vertices array*/
-  std::vector<float> uv;             /*<UV arrays of dimension 2*/
-  std::vector<float> colors;         /*<Colors array , Format is RGB*/
-  std::vector<float> normals;        /*<Normals of the geometry*/
-  std::vector<float> bitangents;     /*<Bitangent of each vertex*/
-  std::vector<float> tangents;       /*<Tangent of each vertex*/
-  std::vector<unsigned int> indices; /*<Indices of the vertices buffer*/
+  std::vector<float> vertices;
+  std::vector<float> uv;
+  std::vector<float> colors;
+  std::vector<float> normals;
+  std::vector<float> bitangents;
+  std::vector<float> tangents;
+  std::vector<unsigned int> indices;
 
  public:
   CLASS_CM(Object3D)
 
-  void get_tri(geometry::face_data_tri &geom, const unsigned int indices[3]) const;
+  void getTri(geometry::face_data_tri &geom, const unsigned int indices[3]) const;
 
   void clean() {
     vertices.clear();

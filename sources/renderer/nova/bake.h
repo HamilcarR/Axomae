@@ -46,11 +46,6 @@ namespace nova_baker_utils {
   bake_buffers_storage_t build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager);
   nova::aggregate::Accelerator build_performance_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives);
   nova::aggregate::Accelerator build_quality_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives);
-  void transform_vertices(const geometry::face_data_tri &tri_primitive, const glm::mat4 &final_transfo, glm::vec3 vertices[3]);
-  void transform_normals(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 normals[3]);
-  void transform_tangents(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 tangents[3]);
-  void transform_bitangents(const geometry::face_data_tri &tri_primitive, const glm::mat3 &normal_matrix, glm::vec3 bitangents[3]);
-  void extract_uvs(const geometry::face_data_tri &tri_primitive, glm::vec2 textures[3]);
   primitive_buffers_t allocate_primitive_triangle_buffers(core::memory::ByteArena &memory_pool, std::size_t number_elements);
   material_buffers_t allocate_materials_buffers(core::memory::ByteArena &memory_pool, std::size_t number_elements);
 
