@@ -12,7 +12,8 @@ static bool eq_type2(const T comp[2], const T templ[2]) {
 }
 
 TEST(Object3DTest, get_tri_vertices) {
-  Object3D cube = Object3DBuilder::build_cube();
+  Object3DBuilder builder;
+  Object3D cube = builder.build_cube();
   geometry::face_data_tri triangle{};
 
   for (int i = 0; i < CUBE::indices.size(); i += 3) {
@@ -37,7 +38,8 @@ TEST(Object3DTest, get_tri_vertices) {
 }
 
 TEST(Object3DTest, get_tri_normals) {
-  Object3D cube = Object3DBuilder::build_cube();
+  Object3DBuilder builder;
+  Object3D cube = builder.build_cube();
   geometry::face_data_tri triangle{};
 
   for (int i = 0; i < CUBE::indices.size(); i += 3) {
@@ -63,7 +65,8 @@ TEST(Object3DTest, get_tri_normals) {
 }
 
 TEST(Object3DTest, get_tri_colors) {
-  Object3D cube = Object3DBuilder::build_cube();
+  Object3DBuilder builder;
+  Object3D cube = builder.build_cube();
   geometry::face_data_tri triangle{};
 
   for (int i = 0; i < CUBE::indices.size(); i += 3) {
@@ -89,7 +92,8 @@ TEST(Object3DTest, get_tri_colors) {
 }
 
 TEST(Object3DTest, get_tri_uv) {
-  Object3D cube = Object3DBuilder::build_cube();
+  Object3DBuilder builder;
+  Object3D cube = builder.build_cube();
   geometry::face_data_tri triangle{};
 
   for (int i = 0; i < CUBE::indices.size(); i += 3) {
@@ -115,7 +119,8 @@ TEST(Object3DTest, get_tri_uv) {
 }
 
 TEST(Object3DTest, get_tri_tangent) {
-  Object3D cube = Object3DBuilder::build_cube();
+  Object3DBuilder builder;
+  Object3D cube = builder.build_cube();
   geometry::face_data_tri triangle{};
 
   for (int i = 0; i < CUBE::indices.size(); i += 3) {
@@ -141,7 +146,8 @@ TEST(Object3DTest, get_tri_tangent) {
 }
 
 TEST(Object3DTest, get_tri_bitangent) {
-  Object3D cube = Object3DBuilder::build_cube();
+  Object3DBuilder builder;
+  Object3D cube = builder.build_cube();
   geometry::face_data_tri triangle{};
 
   for (int i = 0; i < CUBE::indices.size(); i += 3) {

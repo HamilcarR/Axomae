@@ -132,7 +132,7 @@ std::vector<uint8_t> ImageManager::projectUVNormals(const Object3D &object, int 
 
   /*project normals on texture coordinates and interpolate them between each vertex of a face*/
   for (unsigned int i = 0; i < object.indices.size(); i += 3) {
-    const std::vector<unsigned int> &index = object.indices;
+    const axstd::span<unsigned int> &index = object.indices;
     /* texture coordinates of each vertex in a face */
     Vec2f P1 = {object.uv[index[i] * 2], object.uv[index[i] * 2 + 1]};
     Vec2f P2 = {object.uv[index[i + 1] * 2], object.uv[index[i + 1] * 2 + 1]};

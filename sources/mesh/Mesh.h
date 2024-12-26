@@ -86,6 +86,33 @@ class Mesh : public SceneTreeNode, public MeshInterface {
 /*****************************************************************************************************************/
 
 class CubeMesh : public Mesh {
+private:
+    std::vector<float> vertices = {-1, -1, -1,  // 0
+                                 1,  -1, -1,  // 1
+                                 -1, 1,  -1,  // 2
+                                 1,  1,  -1,  // 3
+                                 -1, -1, 1,   // 4
+                                 1,  -1, 1,   // 5
+                                 -1, 1,  1,   // 6
+                                 1,  1,  1};  // 7
+
+   std::vector<unsigned int> indices = {0, 1, 2,  // Front face
+                                       1, 3, 2,  //
+                                       5, 4, 6,  // Back face
+                                       6, 7, 5,  //
+                                       0, 2, 6,  // Left face
+                                       0, 6, 4,  //
+                                       1, 5, 7,  // Right face
+                                       7, 3, 1,  //
+                                       3, 7, 6,  // Up face
+                                       2, 3, 6,  //
+                                       0, 4, 5,  // Down face
+                                       0, 5, 1};
+
+  std::vector<float> textures = {0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1};
+
+  std::vector<float> colors = {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0};
+
  public:
   explicit CubeMesh(SceneTreeNode *parent = nullptr);
   void preRenderSetup() override;
@@ -105,6 +132,10 @@ class CubeMapMesh : public CubeMesh {
 
 /*****************************************************************************************************************/
 class QuadMesh : public Mesh {
+private:
+  std::vector<float> vertices = {-1.0f, -1.0f, 0.f, -1.0f, 1.0f, 0.f, 1.0f, 1.0f, 0.f, 1.0f, -1.0f, 0.f};
+  std::vector<unsigned> indices = {2, 1, 0, 3, 2, 0};
+  std::vector<float> textures = {0, 0, 0, 1, 1, 1, 1, 0};
  public:
   explicit QuadMesh(SceneTreeNode *parent = nullptr);
   void preRenderSetup() override;

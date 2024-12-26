@@ -3,6 +3,7 @@
 #include "ray/Ray.h"
 namespace nova::shape {
   Box::Box(const glm::vec3 &min_coords, const glm::vec3 &max_coords) : aabb(min_coords, max_coords) {}
+  Box::Box(const float *vertices , std::size_t size) : aabb(vertices , size) {}
   Box::Box(const std::vector<float> &vertices) : aabb(vertices) {}
   Box::Box(const geometry::BoundingBox &aabb_) : aabb(aabb_) {}
 

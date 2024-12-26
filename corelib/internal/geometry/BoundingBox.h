@@ -2,6 +2,7 @@
 #define BOUNDINGBOX_H
 
 #include "internal/common/math/math_utils.h"
+#include <internal/common/axstd/span.h>
 #include <internal/macro/project_macros.h>
 #include <vector>
 
@@ -30,6 +31,8 @@ namespace geometry {
     BoundingBox(const glm::vec3 &min_coords, const glm::vec3 &max_coords);
     explicit BoundingBox(const std::vector<glm::vec3> &vertices);
     explicit BoundingBox(const std::vector<float> &geometry);
+    explicit BoundingBox(const axstd::span<float>& geometry);
+    explicit BoundingBox(const float* geometry , size_t size);
     /* Generates the maximum bounding box of a bounding boxes collection*/
     explicit BoundingBox(const std::vector<BoundingBox> &bboxes);
     ~BoundingBox() = default;

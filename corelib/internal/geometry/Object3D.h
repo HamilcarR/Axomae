@@ -2,6 +2,7 @@
 #define OBJECT3D_H
 #include "internal/macro/project_macros.h"
 #include <glm/glm.hpp>
+#include <internal/common/axstd/span.h>
 #include <vector>
 
 namespace geometry {
@@ -15,7 +16,7 @@ namespace geometry {
     float bit0[3], bit1[3], bit2[3];  // bitangents
   };
   template<class T>
-  static void load_vertex_attribute3f(T c0[3], T c1[3], T c2[3], const unsigned idx[3], const std::vector<T> &attribute) {
+  static void load_vertex_attribute3f(T c0[3], T c1[3], T c2[3], const unsigned idx[3], const axstd::span<T> &attribute) {
     if (attribute.empty())
       return;
     for (int i = 0; i < 3; i++) {
@@ -26,7 +27,7 @@ namespace geometry {
   }
 
   template<class T>
-  static void load_vertex_attribute2f(T c0[2], T c1[2], T c2[2], const unsigned idx[3], const std::vector<T> &attribute) {
+  static void load_vertex_attribute2f(T c0[2], T c1[2], T c2[2], const unsigned idx[3], const axstd::span<T> &attribute) {
     if (attribute.empty())
       return;
     for (int i = 0; i < 2; i++) {
@@ -45,31 +46,21 @@ namespace geometry {
 
 }  // namespace geometry
 
-/* Contains vertices data */
 class Object3D {
  public:
-  std::vector<float> vertices;
-  std::vector<float> uv;
-  std::vector<float> colors;
-  std::vector<float> normals;
-  std::vector<float> bitangents;
-  std::vector<float> tangents;
-  std::vector<unsigned int> indices;
+  axstd::span<float> vertices;
+  axstd::span<float> uv;
+  axstd::span<float> colors;
+  axstd::span<float> normals;
+  axstd::span<float> bitangents;
+  axstd::span<float> tangents;
+  axstd::span<unsigned int> indices;
 
  public:
   CLASS_CM(Object3D)
 
   void getTri(geometry::face_data_tri &geom, const unsigned int indices[3]) const;
 
-  void clean() {
-    vertices.clear();
-    uv.clear();
-    colors.clear();
-    normals.clear();
-    bitangents.clear();
-    tangents.clear();
-    indices.clear();
-  }
 };
 
 #endif

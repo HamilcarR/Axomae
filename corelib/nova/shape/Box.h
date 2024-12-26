@@ -13,8 +13,9 @@ namespace nova::shape {
     CLASS_DCM(Box)
 
     ax_device_callable Box(const glm::vec3 &min_coords, const glm::vec3 &max_coords);
-    ax_device_callable explicit Box(const std::vector<float> &vertices);
+    ax_device_callable explicit Box(const float* vertices , std::size_t size);
     ax_device_callable explicit Box(const geometry::BoundingBox &aabb);
+    ax_host_only explicit Box(const std::vector<float> &vertices);
 
     /**
      * @brief tmin must be initialized to a small value (0.f) while tmax should be set at a highest value.

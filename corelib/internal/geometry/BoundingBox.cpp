@@ -98,6 +98,7 @@ BoundingBox::BoundingBox(const std::vector<glm::vec3> &vertices) {
   center = calculateCenter(min_coords, max_coords);
 }
 
+
 BoundingBox::BoundingBox(const std::vector<BoundingBox> &bboxes) {
   glm::vec3 min{INT_MAX, INT_MAX, INT_MAX};
   glm::vec3 max{INT_MIN, INT_MIN, INT_MIN};
@@ -121,12 +122,13 @@ BoundingBox::BoundingBox(const std::vector<BoundingBox> &bboxes) {
   center = calculateCenter(min_coords, max_coords);
 }
 
-BoundingBox::BoundingBox(const std::vector<float> &vertices) : BoundingBox() {
-  float x_max, y_max, z_max;
-  float x_min, y_min, z_min;
+
+static std::pair<glm::vec3 , glm::vec3> compute_min_max(const float* vertices , std::size_t size) {
+  float x_max{}, y_max{}, z_max{};
+  float x_min{}, y_min{}, z_min{};
   x_max = y_max = z_max = INT_MIN;
   x_min = y_min = z_min = INT_MAX;
-  for (unsigned i = 0; i < vertices.size(); i += 3) {
+  for (unsigned i = 0; i < size; i += 3) {
     float x_compare = vertices[i], y_compare = vertices[i + 1], z_compare = vertices[i + 2];
     x_max = x_max <= x_compare ? x_compare : x_max;
     y_max = y_max <= y_compare ? y_compare : y_max;
@@ -135,8 +137,29 @@ BoundingBox::BoundingBox(const std::vector<float> &vertices) : BoundingBox() {
     y_min = y_compare <= y_min ? y_compare : y_min;
     z_min = z_compare <= z_min ? z_compare : z_min;
   }
-  min_coords = {x_min, y_min, z_min};
-  max_coords = {x_max, y_max, z_max};
+  glm::vec3 min{x_min, y_min, z_min};
+  glm::vec3 max{x_max, y_max, z_max};
+  return {min, max};
+}
+
+BoundingBox::BoundingBox(const std::vector<float> &vertices) : BoundingBox() {
+  std::pair<glm::vec3 , glm::vec3> min_max = compute_min_max(vertices.data(), vertices.size());
+  min_coords ={ min_max.first.x, min_max.first.y, min_max.first.z };
+  max_coords = {min_max.second.x, min_max.second.y, min_max.second.z};
+  center = calculateCenter(min_coords, max_coords);
+}
+
+BoundingBox::BoundingBox(const axstd::span<float>& vertices): BoundingBox() {
+  std::pair<glm::vec3 , glm::vec3> min_max = compute_min_max(vertices.data(), vertices.size());
+  min_coords ={ min_max.first.x, min_max.first.y, min_max.first.z };
+  max_coords = {min_max.second.x, max_coords.x, max_coords.y};
+  center = calculateCenter(min_coords, max_coords);
+}
+
+BoundingBox::BoundingBox(const float* vertices , size_t size) : BoundingBox() {
+   std::pair<glm::vec3 , glm::vec3> min_max = compute_min_max(vertices, size);
+  min_coords ={ min_max.first.x, min_max.first.y, min_max.first.z };
+  max_coords = {min_max.second.x, min_max.second.y , min_max.second.z};
   center = calculateCenter(min_coords, max_coords);
 }
 
