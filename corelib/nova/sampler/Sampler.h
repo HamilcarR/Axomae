@@ -10,7 +10,7 @@
 #include <memory>
 
 #if defined(AXOMAE_USE_CUDA)
-#  include "gpu/GPURandomGenerator.h"
+#  include <internal/common/math/gpu/math_random_gpu.h>
 #endif
 
 namespace nova::sampler {
@@ -45,7 +45,7 @@ namespace nova::sampler {
 
   template<class T>
   class RandomSampler {
-  private:
+   private:
     exception::NovaException exception{};
     T generator;
 

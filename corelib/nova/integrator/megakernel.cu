@@ -2,7 +2,6 @@
 #include "GPUIntegrator.cuh"
 #include "Integrator.h"
 #include "engine/nova_exception.h"
-#include "gpu/GPURandomGenerator.h"
 #include "internal/common/math/math_texturing.h"
 #include "internal/debug/Logger.h"
 #include "internal/device/gpgpu/cuda/CudaDevice.h"
@@ -11,6 +10,7 @@
 #include "internal/device/gpgpu/kernel_launch_interface.h"
 #include "manager/NovaResourceManager.h"
 #include <curand_kernel.h>
+#include <internal/common/math/gpu/math_random_gpu.h>
 
 namespace resrc = device::gpgpu;
 namespace utils = nova::gputils;

@@ -1,13 +1,13 @@
-#include "GPURandomGenerator.h"
-#include "internal/device/gpgpu/device_utils.h"
 
+// clang-format off
+#include "math_random_gpu.h"
+#include <internal/device/gpgpu/device_utils.h>
 #include <curand.h>
 #include <curand_kernel.h>
-#include <device_launch_parameters.h>
-#include <internal/debug/debug_utils.h>
 #include <internal/device/gpgpu/DeviceError.h>
 #include <internal/device/gpgpu/device_transfer_interface.h>
 #include <internal/device/gpgpu/kernel_launch_interface.h>
+// clang-format on
 
 namespace gpgpu = device::gpgpu;
 namespace math::random {
@@ -106,7 +106,7 @@ namespace math::random {
     }
   }
 
-  ax_host_only ax_dbg_optimize0 void GPUQuasiRandomGenerator::init(const kernel_argpack_t &argpack, unsigned dim) {
+  ax_host_only void GPUQuasiRandomGenerator::init(const kernel_argpack_t &argpack, unsigned dim) {
     std::size_t thread_number = argpack.computeThreadsNumber();
     if (dim < 3)
       dim = 3;
