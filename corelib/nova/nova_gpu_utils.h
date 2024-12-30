@@ -7,7 +7,7 @@
 #include <vector>
 
 #ifdef AXOMAE_USE_CUDA
-#  include "gpu/GPURandomGenerator.h"
+#  include <internal/common/math/gpu/math_random_gpu.h>
 #endif
 
 namespace core::memory {
@@ -33,12 +33,8 @@ namespace nova {
      */
     cache_collection_t contiguous_caches;
 
-    void addSharedCacheAddress(axstd::span<uint8_t> buffer) {
-      contiguous_caches.push_back({false,buffer});
-    }
-    void clear() {
-      contiguous_caches.clear();
-    }
+    void addSharedCacheAddress(axstd::span<uint8_t> buffer) { contiguous_caches.push_back({false, buffer}); }
+    void clear() { contiguous_caches.clear(); }
   };
 }  // namespace nova
 

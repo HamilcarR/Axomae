@@ -30,7 +30,7 @@ namespace nova_baker_utils {
   void setup_geometry_data(primitive_buffers_t &geometry_buffers,
                            Mesh *mesh_object,
                            std::size_t &alloc_offset_primitives,
-                           nova::material::NovaMaterialInterface &mat,
+                           nova::material::NovaMaterialInterface &material,
                            nova::NovaResourceManager &manager) {
     glm::mat4 final_transfo = mesh_object->computeFinalTransformation();
     glm::mat3 normal_matrix = math::geometry::compute_normal_mat(final_transfo);
@@ -42,7 +42,7 @@ namespace nova_baker_utils {
                       alloc_offset_primitives,
                       geometry_buffers.triangle_alloc_buffer,
                       geometry_buffers.geo_primitive_alloc_buffer,
-                      mat,
+                      material,
                       manager,
                       i);
       alloc_offset_primitives++;

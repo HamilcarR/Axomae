@@ -1,4 +1,4 @@
-add_library(ax_core_math
+add_library(ax_core_math STATIC
         math_acos_lt.cpp
         math_random.cpp
 )
@@ -60,5 +60,11 @@ else()
 endif()
 
 if(AXOMAE_USE_CUDA)
+    autoload_build_utils()
     target_compile_definitions(ax_core_math PUBLIC AXOMAE_USE_CUDA)
+    target_sources(ax_core_math PRIVATE gpu/math_random_gpu.cpp)
+    target_link_libraries(ax_core_math PRIVATE
+        CUDA::curand
+    )
+    register_device_compilation(gpu/math_random_gpu.cpp)
 endif()

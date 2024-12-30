@@ -1,6 +1,6 @@
-#ifndef GPURANDOMGENERATOR_H
-#define GPURANDOMGENERATOR_H
-#include "internal/common/math/math_random_interface.h"
+#ifndef MATH_RANDOM_GPU_H
+#define MATH_RANDOM_GPU_H
+#include "../math_random_interface.h"
 #include <internal/device/gpgpu/device_utils.h>
 #include <internal/macro/project_macros.h>
 
@@ -58,4 +58,4 @@ namespace math::random {
   };
 
 }  // namespace math::random
-#endif  // GPURANDOMGENERATOR_H
+#endif

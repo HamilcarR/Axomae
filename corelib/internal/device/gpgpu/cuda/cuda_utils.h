@@ -7,6 +7,7 @@
 #include <cuda/atomic>
 #include <cuda_runtime_api.h>
 #include <curand.h>
+#include <device_launch_parameters.h>
 
 struct kernel_argpack_t {
   dim3 num_blocks{1, 1, 1};
