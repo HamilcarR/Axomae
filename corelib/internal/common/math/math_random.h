@@ -2,18 +2,12 @@
 #define MATH_RANDOM_H
 #include "math_includes.h"
 #include "math_random_interface.h"
-#include <boost/random/sobol.hpp>
-#include <boost/random/uniform_01.hpp>
-#include <internal/macro/class_macros.h>
-#include <internal/macro/project_macros.h>
-#include <random>
-
+#include <memory>
 namespace math::random {
 
   class CPUPseudoRandomGenerator : public AbstractRandomGenerator<CPUPseudoRandomGenerator> {
-    std::mt19937 m_generator;
-    std::uniform_int_distribution<int> m_int_distrib;
-    std::uniform_real_distribution<double> m_float_distrib;
+    class Impl;
+    std::shared_ptr<Impl> pimpl{};
 
    public:
     CPUPseudoRandomGenerator();
@@ -25,8 +19,9 @@ namespace math::random {
   };
 
   class CPUQuasiRandomGenerator : public AbstractRandomGenerator<CPUQuasiRandomGenerator> {
-    boost::random::sobol sobol_engine{1};
-    boost::random::uniform_01<> dist;
+   private:
+    class Impl;
+    std::shared_ptr<Impl> pimpl{};
 
    public:
     CPUQuasiRandomGenerator();

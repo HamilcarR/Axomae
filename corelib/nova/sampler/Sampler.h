@@ -45,6 +45,7 @@ namespace nova::sampler {
 
   template<class T>
   class RandomSampler {
+  private:
     exception::NovaException exception{};
     T generator;
 

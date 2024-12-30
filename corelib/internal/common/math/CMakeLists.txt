@@ -6,10 +6,9 @@ target_link_libraries(ax_core_common PUBLIC ax_core_math)
 target_link_libraries(ax_core_math
 PRIVATE
         ax_core_macro
-
+        Boost::random
 PUBLIC
         ax_core_device
-        Boost::random
         glm::glm
 
 )
