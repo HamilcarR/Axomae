@@ -12,11 +12,10 @@
 #include <curand_kernel.h>
 #include <internal/common/math/gpu/math_random_gpu.h>
 
-/* Serves only as a baseline for performance to compare against */
-
 namespace resrc = device::gpgpu;
 namespace utils = nova::gputils;
 
+/* Serves only as a baseline for performance to compare against */
 namespace nova {
   namespace gpu {
 
@@ -61,15 +60,6 @@ namespace nova {
       glm::vec3 sobol{}, random{};
       sobol = sobol_sampler.sample(0, 1);
       random = random_sampler.sample(0, 1);
-      nova::shape::Triangle tri;
-
-      const Object3D *mesh = tri.getMesh();
-      if (ax_device_linearRM3D_idx < mesh->uv.size())
-        printf("warp id:%u ::: lane id:%u ::: i:%d  ::: value:%f\n",
-               ax_device_warp_id,
-               ax_device_lane_id,
-               ax_device_linearRM3D_idx,
-               mesh->uv[ax_device_linearRM3D_idx]);
       float u = (float)math::texture::pixelToUv(x, render_buffer.width - 1);
       float v = (float)math::texture::pixelToUv(y, render_buffer.height - 1);
       float4 tex = tex2D<float4>(host_texture, u, v);
