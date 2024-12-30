@@ -1,6 +1,6 @@
 #include "ImageDatabase.h"
 #include "DatabaseBuilderTest.h"
-
+#include <internal/common/math/math_random.h>
 #define DATATYPE_LIST uint8_t, float
 
 const int COUNT = 18;

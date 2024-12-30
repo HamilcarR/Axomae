@@ -1,8 +1,8 @@
 #ifndef GPURANDOMGENERATOR_H
 #define GPURANDOMGENERATOR_H
-#include "internal/common/math/math_random.h"
-
-#include <glm/vec3.hpp>
+#include "internal/common/math/math_random_interface.h"
+#include <internal/device/gpgpu/device_utils.h>
+#include <internal/macro/project_macros.h>
 
 /* Generates random numbers specifically for the GPU .
  * There's two generators :

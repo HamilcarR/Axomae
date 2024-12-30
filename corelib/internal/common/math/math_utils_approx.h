@@ -3,7 +3,6 @@
 #include <array>
 #include <cmath>
 #include <cstdlib>
-#include <glm/common.hpp>
 /**
  * trig functions optimization / approximations
  */

@@ -10,12 +10,13 @@ PRIVATE
 PUBLIC
         ax_core_device
         Boost::random
+        glm::glm
+
 )
 
 
 target_include_directories(ax_core_math
 PUBLIC
-    ${GLM_INCLUDE_PATH}
     ${AXOMAE_CORELIB_ROOT}
 )
 

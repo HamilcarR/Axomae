@@ -10,8 +10,8 @@
 #include "internal/device/gpgpu/device_utils.h"
 #include "internal/device/gpgpu/kernel_launch_interface.h"
 #include "manager/NovaResourceManager.h"
-
 #include <curand_kernel.h>
+
 namespace resrc = device::gpgpu;
 namespace utils = nova::gputils;
 

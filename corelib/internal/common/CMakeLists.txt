@@ -17,7 +17,10 @@ target_include_directories(ax_core_common
 PUBLIC
     ${AXOMAE_CORELIB_ROOT}
 )
-
+add_compile_options(
+        "$<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Wno-ignored-qualifiers>"
+        "$<$<COMPILE_LANG_AND_ID:CXX,Clang>:-Wno-ignored-qualifiers>"
+)
 add_subdirectory(math)
 add_subdirectory(exception)
 add_subdirectory(image)

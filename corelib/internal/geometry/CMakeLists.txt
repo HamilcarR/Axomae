@@ -1,3 +1,5 @@
+autoload_build_utils()
+
 add_library(ax_core_geometry
         BoundingBox.cpp
         Object3D.cpp
@@ -14,3 +16,5 @@ target_include_directories(ax_core_geometry
 PUBLIC
     ${AXOMAE_CORELIB_ROOT}
 )
+
+register_device_compilation(BoundingBox.cpp)

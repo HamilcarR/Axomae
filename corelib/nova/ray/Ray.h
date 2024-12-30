@@ -10,20 +10,11 @@ namespace nova {
     glm::vec3 direction;
 
    public:
-    Ray() = default;
-    Ray(const glm::vec3 &origin, const glm::vec3 &direction);
-    explicit Ray(const glm::vec3 &direction);
-    ~Ray() = default;
-    Ray(const Ray &) = default;
-    Ray(Ray &&) = default;
-    Ray &operator=(const Ray &) = default;
-    Ray &operator=(Ray &&) = default;
-
-    ax_no_discard glm::vec3 pointAt(float t) const;
+    CLASS_DCM(Ray)
+    ax_device_callable Ray(const glm::vec3 &o, const glm::vec3 &d) : origin(o), direction(d) {}
+    ax_device_callable explicit Ray(const glm::vec3 &d) : origin(0), direction(d) {}
+    ax_device_callable ax_no_discard glm::vec3 pointAt(float t) const { return origin + t * direction; }
   };
-
-  /* Generalized ray*/
-  class GenRay {};
 
 }  // namespace nova
 #endif

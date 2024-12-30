@@ -1,10 +1,8 @@
 #ifndef MATH_CAMERA_H
 #define MATH_CAMERA_H
+#include "math_includes.h"
 #include "vector/Vector.h"
-#include <glm/common.hpp>
-#include <glm/geometric.hpp>
-#include <glm/glm.hpp>
-#include <glm/matrix.hpp>
+
 namespace math::camera {
 
   struct camera_ray {

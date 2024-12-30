@@ -21,6 +21,9 @@ endif()
 #########################################################################################
 # GLM
 set(GLM_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/glm PARENT_SCOPE)
+message(NOTICE "Initializing GLM build from sources.")
+add_subdirectory(glm EXCLUDE_FROM_ALL)
+
 #########################################################################################
 # Optix
 set(OPTIX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Optix PARENT_SCOPE)

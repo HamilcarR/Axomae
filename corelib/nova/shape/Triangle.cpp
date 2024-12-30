@@ -5,7 +5,7 @@
 
 namespace nova::shape {
 
-  Triangle::Triangle(const glm::vec3 vertices[3],
+  ax_device_callable Triangle::Triangle(const glm::vec3 vertices[3],
                      const glm::vec3 normals[3],
                      const glm::vec2 textures[3],
                      const glm::vec3 tangents[3],
@@ -65,7 +65,7 @@ namespace nova::shape {
   /*
    * https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
    */
-  bool Triangle::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const {
+ ax_device_callable bool Triangle::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const {
     using namespace math::geometry;
     glm::vec3 P = glm::cross(ray.direction, e2);
     const float det = glm::dot(P, e1);
@@ -111,7 +111,7 @@ namespace nova::shape {
     return true;
   }
 
-  geometry::BoundingBox Triangle::computeAABB() const {
+  ax_device_callable geometry::BoundingBox Triangle::computeAABB() const {
     glm::vec3 min = glm::min(v0, glm::min(v1, v2));
     glm::vec3 max = glm::max(v0, glm::max(v1, v2));
     return {min, max};

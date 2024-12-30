@@ -1,9 +1,8 @@
 #ifndef OBJECT3D_H
 #define OBJECT3D_H
-#include "internal/macro/project_macros.h"
-#include <glm/glm.hpp>
+#include <internal/macro/project_macros.h>
 #include <internal/common/axstd/span.h>
-#include <vector>
+#include <internal/common/math/math_utils.h>
 
 namespace geometry {
 

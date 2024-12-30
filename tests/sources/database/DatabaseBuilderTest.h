@@ -6,6 +6,7 @@
 #include "ShaderDatabase.h"
 #include "Test.h"
 #include "TextureDatabase.h"
+#include <internal/common/math/math_random.h>
 
 static void rand_init() { srand(time(nullptr)); }
 

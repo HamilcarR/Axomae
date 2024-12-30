@@ -2,7 +2,7 @@
 #define AABB_UTILS_TEST_H
 #include "geometry_shapes.h"
 #include "internal/common/math/math_utils.h"
-
+#include <internal/common/math/math_random.h>
 constexpr float EPSILON = 0.001f;
 constexpr unsigned ITERATION_NUMBER = 50;
 

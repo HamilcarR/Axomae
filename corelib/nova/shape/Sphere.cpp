@@ -3,9 +3,9 @@
 #include "ray/Ray.h"
 
 namespace nova::shape {
-  Sphere::Sphere(const glm::vec3 &o, float r) : origin(o), radius(r) {}
+  ax_device_callable Sphere::Sphere(const glm::vec3 &o, float r) : origin(o), radius(r) {}
 
-  bool Sphere::hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options * /*user_options*/) const {
+  ax_device_callable bool Sphere::hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options * /*user_options*/) const {
     const glm::vec3 oc = r.origin - origin;
     const float b = 2.f * glm::dot(r.direction, oc);
     const float a = glm::dot(r.direction, r.direction);
@@ -28,5 +28,5 @@ namespace nova::shape {
     return false;
   }
 
-  geometry::BoundingBox Sphere::computeAABB() const { return {origin - glm::vec3(radius), origin + glm::vec3(radius)}; }
+  ax_device_callable geometry::BoundingBox Sphere::computeAABB() const { return {origin - glm::vec3(radius), origin + glm::vec3(radius)}; }
 }  // namespace nova::shape
