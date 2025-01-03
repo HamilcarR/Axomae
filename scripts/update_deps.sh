@@ -5,6 +5,9 @@
 ROOT="$(pwd)"
 echo 'Downloading dependencies ...'
 
+# Update metadata of the repos
+git submodule sync --recursive
+
 # Initialize dependencies that also need their submodules downloaded as well
 for dependency in assimp boost glm googletest imath libdeflate openexr SDL SDL_image stb zlib ; do
   git submodule update --init --recursive vendor/$dependency
