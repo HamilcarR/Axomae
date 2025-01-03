@@ -21,7 +21,7 @@
 [submodule "vendor/assimp"]
 	path = vendor/assimp
 	url = https://github.com/assimp/assimp
-    branch = v5.4.2
+    branch = v5.4.3
     ignore = all
     fetchRecurseSubmodules = true
 
