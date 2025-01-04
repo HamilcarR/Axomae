@@ -2,14 +2,43 @@
 #include "internal/common/math/math_utils.h"
 #include "internal/common/math/utils_3D.h"
 #include "ray/Ray.h"
+#include <internal/device/gpgpu/device_transfer_interface.h>
+#include <internal/geometry/Object3D.h>
 
 namespace nova::shape {
 
+  const axstd::span<const Object3D *> *Triangle::triangle_mesh_list = nullptr;
+#ifdef AXOMAE_USE_CUDA
+  ax_device_const axstd::span<const Object3D *> *device_triangle_mesh_list;
+#endif
+
+  ax_host_only void Triangle::init(const axstd::span<const Object3D *> *mesh_list) {
+    triangle_mesh_list = mesh_list;
+#ifdef AXOMAE_USE_CUDA
+    device::gpgpu::copy_to_symbol(triangle_mesh_list, device_triangle_mesh_list, sizeof(axstd::span<const Object3D *>), device::gpgpu::HOST_DEVICE);
+#endif
+  }
+
+  ax_device_callable const Object3D *Triangle::getMesh() const {
+#ifdef __CUDA_ARCH__
+    AX_ASSERT_NOTNULL(device_triangle_mesh_list);
+    return (*device_triangle_mesh_list)[mesh_id];
+#else
+    AX_ASSERT_NOTNULL(triangle_mesh_list);
+    return (*triangle_mesh_list)[mesh_id];
+#endif
+  }
+
+  ax_device_callable Triangle::Triangle(std::size_t mesh_id_, std::size_t triangle_id_) {
+    mesh_id = mesh_id_;
+    triangle_id = triangle_id_;
+  }
+
   ax_device_callable Triangle::Triangle(const glm::vec3 vertices[3],
-                     const glm::vec3 normals[3],
-                     const glm::vec2 textures[3],
-                     const glm::vec3 tangents[3],
-                     const glm::vec3 bitangents[3]) {
+                                        const glm::vec3 normals[3],
+                                        const glm::vec2 textures[3],
+                                        const glm::vec3 tangents[3],
+                                        const glm::vec3 bitangents[3]) {
 
     bool can_compute_tangents = normals && bitangents;
     bool can_compute_bitangents = normals && tangents;
@@ -65,7 +94,7 @@ namespace nova::shape {
   /*
    * https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
    */
- ax_device_callable bool Triangle::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const {
+  ax_device_callable bool Triangle::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const {
     using namespace math::geometry;
     glm::vec3 P = glm::cross(ray.direction, e2);
     const float det = glm::dot(P, e1);

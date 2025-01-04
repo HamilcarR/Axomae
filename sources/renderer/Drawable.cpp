@@ -1,5 +1,10 @@
 #include "Drawable.h"
+#include "Camera.h"
+#include "LightingDatabase.h"
+#include "Mesh.h"
+#include "TextureGroup.h"
 #include "internal/device/rendering/opengl/DebugGL.h"
+
 using namespace axomae;
 
 Drawable::Drawable() : mesh_object(nullptr), camera_pointer(nullptr) {}

@@ -1,15 +1,14 @@
 #ifndef SHAPEINTERFACE_H
 #define SHAPEINTERFACE_H
+#include "Box.h"
+#include "Sphere.h"
+#include "Square.h"
+#include "Triangle.h"
 #include "internal/geometry/BoundingBox.h"
 #include "internal/memory/tag_ptr.h"
 #include "ray/Hitable.h"
 
 namespace nova::shape {
-  class Sphere;
-  class Square;
-  class Triangle;
-  class Box;
-
   class NovaShapeInterface : public core::tag_ptr<Triangle, Sphere, Square, Box> {
    public:
     using tag_ptr::tag_ptr;

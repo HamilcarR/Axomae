@@ -55,31 +55,63 @@ namespace controller {
     shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.primitive_buffers.geo_primitive_alloc_buffer));
   }
 
-  static void notify_simple_progress(const char *str, IProgressManager *progress_manager) {
-    if (progress_manager) {
-      progress_manager->initProgress(str, 100.f);
-      progress_manager->setCurrent(90);
-      progress_manager->notifyProgress();
-    }
+  static void notify_simple_progress(const char *str, IProgressManager &progress_manager) {
+    progress_manager.initProgress(str, 100.f);
+    progress_manager.setCurrent(90);
+    progress_manager.notifyProgress();
   }
 
-  void DisplayManager3D::setNewScene(SceneChangeData scene_data_mv, ProgressStatus *progress_status) {
-    SceneChangeData scene_data = std::move(scene_data_mv);
+  struct mesh_transform_t {
+    Mesh *mesh;
+    glm::mat4 original_transfo;
+  };
+
+  static std::vector<mesh_transform_t> retrieve_original_mesh_transform(const SceneChangeData &scene_change) {
+    std::vector<mesh_transform_t> mesh_transf;
+    for (Mesh *elem : scene_change.mesh_list) {
+      mesh_transf.push_back({elem, elem->computeFinalTransformation()});
+    }
+    return mesh_transf;
+  }
+
+  /* Allows to retrieve only the meshes of the imported scene file ... Other meshes like skyboxes , bounding boxes , sprites are discarded . */
+  static std::vector<nova_baker_utils::drawable_original_transform> retrieve_scene_main_drawables(
+      const std::vector<Drawable *> &scene_retrieved_drawables_ptrs, const std::vector<mesh_transform_t> &loaded_meshes) {
+
+    std::vector<nova_baker_utils::drawable_original_transform> scene_mesh_drawables;
+    scene_mesh_drawables.reserve(loaded_meshes.size());
+
+    for (Drawable *drawable : scene_retrieved_drawables_ptrs)
+      for (const mesh_transform_t &mesh_trf : loaded_meshes)
+        if (drawable->getMeshPointer() == mesh_trf.mesh)
+          scene_mesh_drawables.push_back({drawable, mesh_trf.original_transfo});
+    return scene_mesh_drawables;
+  }
+
+  void DisplayManager3D::setNewScene(SceneChangeData &scene_data, ProgressStatus *progress_status) {
     prepareSceneChange();
     scene_data.nova_resource_manager = nova_resource_manager.get();
     IProgressManager progress_manager;
     progress_manager.setProgressManager(progress_status);
     nova_resource_manager->clearResources();
-    notify_simple_progress("Initializing Nova , building BVH and allocating shared GPU caches", &progress_manager);
-    bake_buffers_storage = nova_baker_utils::build_scene(scene_data.mesh_list, *nova_resource_manager);
+    std::vector<mesh_transform_t> original_transforms = retrieve_original_mesh_transform(scene_data);
+    notify_simple_progress("Initializing Nova , building BVH and allocating shared GPU caches", progress_manager);
+
+    /* Scene initialization modifies the tree. */
+    realtime_viewer->setNewScene(scene_data);
+    nova_viewer->setNewScene(scene_data);
+
+    const RendererInterface &realtime_renderer = realtime_viewer->getRenderer();
+    const Scene &realtime_scene = realtime_renderer.getScene();
+    auto drawable_collection = retrieve_scene_main_drawables(realtime_scene.getDrawables(), original_transforms);
+
+    bake_buffers_storage = nova_baker_utils::build_scene(drawable_collection, *nova_resource_manager);
     add_caches_addresses(shared_caches, bake_buffers_storage);
     /* Build acceleration. */
     nova::aggregate::Accelerator accelerator = nova_baker_utils::build_performance_acceleration_structure(
         nova_resource_manager->getPrimitiveData().get_primitives());
     nova_resource_manager->setAccelerationStructure(accelerator);
 
-    realtime_viewer->setNewScene(scene_data);
-    nova_viewer->setNewScene(scene_data);
     progress_manager.reset();
   }
 

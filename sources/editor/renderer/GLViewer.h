@@ -63,7 +63,7 @@ class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
   void closeEvent(QCloseEvent *event) override;
   void prepareRendererSceneChange();
   template<RENDERER_CALLBACK_ENUM callback_id, class... Args>
-  constexpr void rendererCallback(Args &&...args);
+  void rendererCallback(Args &&...args);
 
  protected:
   void initializeGL() override;
@@ -86,7 +86,7 @@ class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
 
 /* Replace by an event structure in Controller class and send it to the renderer */
 template<RENDERER_CALLBACK_ENUM callback_id, class... Args>
-constexpr void GLViewer::rendererCallback(Args &&...args) {
+void GLViewer::rendererCallback(Args &&...args) {
   renderer->executeMethod<callback_id>(std::forward<Args>(args)...);
   update();
 }

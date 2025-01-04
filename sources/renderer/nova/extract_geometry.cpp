@@ -1,6 +1,6 @@
+#include "Drawable.h"
 #include "Mesh.h"
 #include "bake.h"
-
 namespace nova_baker_utils {
 
   static void store_primitive(const Object3D &geometry,
@@ -22,18 +22,21 @@ namespace nova_baker_utils {
     geometry::transform_bitangents(tri_primitive, normal_matrix, bitangents);
     geometry::transform_vertices(tri_primitive, final_transfo, vertices);
     geometry::transform_normals(tri_primitive, normal_matrix, normals);
-    auto tri = manager.getShapeData().add_shape<nova::shape::Triangle>(
+    nova::shape::ShapeResourcesHolder res_holder = manager.getShapeData();
+    auto tri = res_holder.add_shape<nova::shape::Triangle>(
         triangle_buffer.data(), alloc_offset_primitives, vertices, normals, uv, tangents, bitangents);
     manager.getPrimitiveData().add_primitive<nova::primitive::NovaGeoPrimitive>(primitive_buffer.data(), alloc_offset_primitives, tri, mat);
   }
 
   void setup_geometry_data(primitive_buffers_t &geometry_buffers,
-                           Mesh *mesh_object,
+                           const drawable_original_transform &drawable_transform,
                            std::size_t &alloc_offset_primitives,
                            nova::material::NovaMaterialInterface &material,
                            nova::NovaResourceManager &manager) {
-    glm::mat4 final_transfo = mesh_object->computeFinalTransformation();
+    glm::mat4 final_transfo = drawable_transform.mesh_original_transformation;
     glm::mat3 normal_matrix = math::geometry::compute_normal_mat(final_transfo);
+    const Drawable *drawable = drawable_transform.mesh;
+    const Mesh *mesh_object = drawable->getMeshPointer();
     const Object3D &geometry = mesh_object->getGeometry();
     for (int i = 0; i < geometry.indices.size(); i += 3) {
       store_primitive(geometry,
@@ -47,5 +50,7 @@ namespace nova_baker_utils {
                       i);
       alloc_offset_primitives++;
     }
+    nova::shape::ShapeResourcesHolder res_holder = manager.getShapeData();
+    res_holder.addTriangleMesh(&geometry);
   }
 }  // namespace nova_baker_utils

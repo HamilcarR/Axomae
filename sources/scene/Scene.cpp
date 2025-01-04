@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Drawable.h"
 #include "INodeDatabase.h"
+#include "LightingDatabase.h"
 #include "Shader.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
@@ -261,4 +262,12 @@ void Scene::processEvent(const controller::event::Event *event) {
   if (event->flag & Event::EVENT_MOUSE_L_DOUBLE) {
     focusOnRenderable(event->mouse_state.pos_x, event->mouse_state.pos_y);
   }
+}
+
+std::vector<Drawable *> Scene::getDrawables() const {
+  std::vector<Drawable *> to_ret;
+  to_ret.reserve(scene.size());
+  for (const auto &elem : drawable_collection)
+    to_ret.push_back(elem.get());
+  return to_ret;
 }

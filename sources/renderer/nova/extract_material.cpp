@@ -1,3 +1,4 @@
+#include "Drawable.h"
 #include "MaterialInterface.h"
 #include "Mesh.h"
 #include "bake.h"
@@ -5,7 +6,6 @@
 #include <internal/common/exception/GenericException.h>
 
 // TODO : this could be replaced with cuda<->opengl interop
-
 namespace exception {
   class InvalidTexTypeConversionException : public CatastrophicFailureException {
    public:
@@ -103,10 +103,11 @@ namespace nova_baker_utils {
 
   nova::material::NovaMaterialInterface setup_material_data(material_buffers_t &material_buffers,
                                                             texture_buffers_t &texture_buffer,
-                                                            const Mesh *mesh,
+                                                            const Drawable &drawable,
                                                             nova::NovaResourceManager &manager,
                                                             std::size_t &alloc_offset_textures,
                                                             std::size_t &alloc_offset_materials) {
+    const Mesh *mesh = drawable.getMeshPointer();
     const MaterialInterface *material = mesh->getMaterial();
     if (!material) {
       return nullptr;

@@ -5,13 +5,15 @@
 #include "internal/macro/project_macros.h"
 #include "ray/Hitable.h"
 
+class Object3D;
+
 namespace nova::shape {
 
-  /* Not cache efficient , for now.
-   * leave this optimization for later.
-   */
   class Triangle {
    private:
+    static const axstd::span<const Object3D *> *triangle_mesh_list;  // Debatable, but it does lower the memory footprint of the whole scene.
+    uint32_t triangle_id{}, mesh_id{};
+
     glm::vec3 e1{};
     glm::vec3 e2{};
     glm::vec3 center{};
@@ -25,11 +27,14 @@ namespace nova::shape {
    public:
     CLASS_DCM(Triangle)
 
+    ax_device_callable const Object3D *getMesh() const;
+    ax_host_only static void init(const axstd::span<const Object3D *> *tri_mesh_list);
     ax_device_callable explicit Triangle(const glm::vec3 vertices[3],
                                          const glm::vec3 normals[3] = nullptr,
                                          const glm::vec2 textures[3] = nullptr,
                                          const glm::vec3 tangents[3] = nullptr,
                                          const glm::vec3 bitangents[3] = nullptr);
+    ax_device_callable Triangle(std::size_t mesh_id, std::size_t triangle_id);
     ax_device_callable bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const;
     ax_device_callable ax_no_discard glm::vec3 centroid() const { return center; }
     ax_device_callable ax_no_discard geometry::BoundingBox computeAABB() const;

@@ -1,0 +1,10 @@
+CompileFlags:
+  Add:
+    - -std=c++17
+    - --cuda-path=/opt/cuda
+    - -I/opt/cuda/include
+    - -L/opt/cuda/lib64
+    - --cuda-gpu-arch=sm_70 
+  Remove:
+    - -forward-unknown-to-host-compiler
+    - -fno-gpu-rdc
