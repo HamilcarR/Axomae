@@ -8,6 +8,7 @@
 
 class Camera;
 class TextureGroup;
+class Drawable;
 
 namespace nova {
   class NovaResourceManager;
@@ -33,17 +34,18 @@ namespace image {
 namespace nova_baker_utils {
 
   void setup_geometry_data(primitive_buffers_t &geometry_buffers,
-                           Mesh *mesh,
+                           const drawable_original_transform &drawable,
                            std::size_t &alloc_offset_primitives,
                            nova::material::NovaMaterialInterface &material,
                            nova::NovaResourceManager &manager);
+
   nova::material::NovaMaterialInterface setup_material_data(material_buffers_t &material_buffers,
                                                             texture_buffers_t &texture_buffers,
-                                                            const Mesh *mesh,
+                                                            const Drawable &drawable,
                                                             nova::NovaResourceManager &manager,
                                                             std::size_t &alloc_offset_textures,
                                                             std::size_t &alloc_offset_materials);
-  bake_buffers_storage_t build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager);
+  bake_buffers_storage_t build_scene(const std::vector<drawable_original_transform> &drawables, nova::NovaResourceManager &manager);
   nova::aggregate::Accelerator build_performance_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives);
   nova::aggregate::Accelerator build_quality_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives);
   primitive_buffers_t allocate_primitive_triangle_buffers(core::memory::ByteArena &memory_pool, std::size_t number_elements);

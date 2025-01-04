@@ -1,6 +1,8 @@
 #include "CameraFrameBuffer.h"
 #include "Drawable.h"
+#include "INodeDatabase.h"
 #include "INodeFactory.h"
+#include "Mesh.h"
 #include "Shader.h"
 #include "ShaderDatabase.h"
 #include "internal/device/rendering/opengl/DebugGL.h"

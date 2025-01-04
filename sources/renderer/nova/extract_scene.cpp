@@ -1,3 +1,4 @@
+#include "Drawable.h"
 #include "MaterialInterface.h"
 #include "Mesh.h"
 #include "TextureGroup.h"
@@ -37,9 +38,17 @@ namespace nova_baker_utils {
     return memory_arena.allocate(sizeof(T) * num_textures, "", alignment);
   }
 
-  bake_buffers_storage_t build_scene(const std::vector<Mesh *> &meshes, nova::NovaResourceManager &manager) {
-    core::memory::ByteArena &memory_pool = manager.getMemoryPool();
+  static std::vector<Mesh *> retrieve_meshes_from_drawables(const std::vector<drawable_original_transform> &drawables) {
+    std::vector<Mesh *> meshes;
+    meshes.reserve(drawables.size());
+    for (const auto &elem : drawables)
+      meshes.push_back(elem.mesh->getMeshPointer());
+    return meshes;
+  }
 
+  bake_buffers_storage_t build_scene(const std::vector<drawable_original_transform> &drawables_orig_transfo, nova::NovaResourceManager &manager) {
+    core::memory::ByteArena &memory_pool = manager.getMemoryPool();
+    std::vector<Mesh *> meshes = retrieve_meshes_from_drawables(drawables_orig_transfo);
     /* Allocate for triangles */
     std::size_t primitive_number = compute_primitive_number(meshes);
     primitive_buffers_t primitive_buffers = allocate_primitive_triangle_buffers(memory_pool, primitive_number);
@@ -52,10 +61,12 @@ namespace nova_baker_utils {
     material_buffers_t material_buffers = allocate_materials_buffers(manager.getMemoryPool(), meshes.size());
     std::size_t alloc_offset_primitives = 0, alloc_offset_materials = 0, alloc_offset_textures = 0;
 
-    for (const auto &elem : meshes) {
+    for (const drawable_original_transform &dtf : drawables_orig_transfo) {
+
       nova::material::NovaMaterialInterface material = setup_material_data(
-          material_buffers, texture_buffers, elem, manager, alloc_offset_textures, alloc_offset_materials);
-      setup_geometry_data(primitive_buffers, elem, alloc_offset_primitives, material, manager);
+          material_buffers, texture_buffers, *dtf.mesh, manager, alloc_offset_textures, alloc_offset_materials);
+
+      setup_geometry_data(primitive_buffers, dtf, alloc_offset_primitives, material, manager);
     }
     bake_buffers_storage_t bake_buffers_storage{};
     bake_buffers_storage.material_buffers = material_buffers;

@@ -33,7 +33,7 @@ namespace controller {
     ax_no_discard const nova::device_shared_caches_t &getSharedCaches() const { return shared_caches; }
     ax_no_discard nova::device_shared_caches_t &getSharedCaches() { return shared_caches; }
     ax_no_discard nova::NovaResourceManager *getNovaResourceManager() const { return nova_resource_manager.get(); };
-    void setNewScene(SceneChangeData scene_change_data, ProgressStatus *progress_manager = nullptr);
+    void setNewScene(SceneChangeData &scene_change_data, ProgressStatus *progress_manager = nullptr);
     void prepareSceneChange();
   };
 }  // namespace controller
