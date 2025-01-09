@@ -23,6 +23,20 @@ static QSurfaceFormat setupFormat() {
   return format;
 }
 
+void GLViewer::syncRenderer() {
+  makeCurrent();
+  glFinish();
+  doneCurrent();
+}
+void GLViewer::haltRender() {
+  makeCurrent();
+  glFinish();
+  is_rendering = false;
+  doneCurrent();
+}
+
+void GLViewer::resumeRender() { is_rendering = true; }
+
 GLViewer::GLViewer(QWidget *parent) : QOpenGLWidget(parent), glew_initialized(false) {
   setFormat(setupFormat());
   renderer = std::make_unique<Renderer>(width(), height(), this);
@@ -93,7 +107,7 @@ void GLViewer::initializeGL() {
 }
 
 void GLViewer::paintGL() {
-  if (renderer->prep_draw()) {
+  if (renderer->prep_draw() && is_rendering) {
     renderer->setDefaultFrameBufferId(defaultFramebufferObject());
     renderer->draw();
   }

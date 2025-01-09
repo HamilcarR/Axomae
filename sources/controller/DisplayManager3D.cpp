@@ -32,7 +32,12 @@ namespace controller {
     nova_viewer->setApplicationConfig(global_application_config);
 
     nova_resource_manager = std::make_unique<nova::NovaResourceManager>();
+    connect(this, &DisplayManager3D::signal_halt_renderers, realtime_viewer, &GLViewer::haltRender);
+    connect(this, &DisplayManager3D::signal_resume_renderers, realtime_viewer, &GLViewer::resumeRender);
   }
+
+  void DisplayManager3D::haltRenderers() { emit signal_halt_renderers(); }
+  void DisplayManager3D::resumeRenderers() { emit signal_resume_renderers(); }
 
   template<class T>
   axstd::span<uint8_t> convert_to_byte_span(const axstd::span<T> &to_convert) {

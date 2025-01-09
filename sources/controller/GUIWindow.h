@@ -93,6 +93,8 @@ namespace controller {
     void novaStopBake();
     void emptySceneCaches();
     nova::device_shared_caches_t &getSharedCaches() { return display_manager.getSharedCaches(); }
+    DisplayManager3D &getDisplayManager() { return display_manager; }
+    const DisplayManager3D &getDisplayManager() const { return display_manager; }
 
    private:
     void connect_all_slots();

@@ -41,6 +41,7 @@ class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
  private:
   bool render_on_timer{false};
   std::unique_ptr<QTimer> timer;
+  bool is_rendering{true};
 
  public:
   explicit GLViewer(QWidget *parent = nullptr);
@@ -82,6 +83,9 @@ class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
  public slots:
   void onUpdateDrawEvent();
   void onTimerTimeout();
+  void syncRenderer();
+  void haltRender();
+  void resumeRender();
 };
 
 /* Replace by an event structure in Controller class and send it to the renderer */

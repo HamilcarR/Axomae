@@ -12,8 +12,8 @@ namespace controller {
   class OperatorProgressStatus;
   class IProgressManager;
 
-  class DisplayManager3D {
-
+  class DisplayManager3D : public QObject {
+    Q_OBJECT
    private:
     /* The 3D model viewer */
     GLViewer *realtime_viewer{};
@@ -25,6 +25,7 @@ namespace controller {
 
    public:
     CLASS_CM(DisplayManager3D)
+
     void init(Ui::MainWindow &main_window_ui, ApplicationConfig *global_application_config, OperatorProgressStatus *progress_manager);
 
     ax_no_discard GLViewer *getRealtimeViewer() const { return realtime_viewer; };
@@ -35,6 +36,13 @@ namespace controller {
     ax_no_discard nova::NovaResourceManager *getNovaResourceManager() const { return nova_resource_manager.get(); };
     void setNewScene(SceneChangeData &scene_change_data, ProgressStatus *progress_manager = nullptr);
     void prepareSceneChange();
+    void haltRenderers();
+    void resumeRenderers();
+
+   public:
+   signals:
+    void signal_halt_renderers();
+    void signal_resume_renderers();
   };
 }  // namespace controller
 #endif  // DISPLAYMANAGER3D_H
