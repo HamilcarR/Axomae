@@ -671,7 +671,11 @@ namespace controller {
         LOG(e.what(), LogLevel::CRITICAL);
         ExceptionInfoBoxHandler::handle(e);
         return false;
-      }
+      } catch (const exception::GenericException &e) {
+        LOG(e.what(), LogLevel::ERROR);
+        ExceptionInfoBoxHandler::handle(e);
+        return false;
+      };
     }
     return false;
   }

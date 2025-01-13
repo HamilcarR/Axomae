@@ -13,6 +13,13 @@ namespace exception {
 }  // namespace exception
 
 namespace controller {
+
+  void DisplayManager3D::connect_slots() {
+    connect(this, &DisplayManager3D::signal_halt_renderers, realtime_viewer, &GLViewer::haltRender);
+    connect(this, &DisplayManager3D::signal_resume_renderers, realtime_viewer, &GLViewer::resumeRender);
+    connect(this, &DisplayManager3D::signal_sync_renderers, realtime_viewer, &GLViewer::syncRenderer);
+  }
+
   void DisplayManager3D::init(Ui::MainWindow &main_window_ui,
                               ApplicationConfig *global_application_config,
                               OperatorProgressStatus *progress_manager) {
@@ -32,8 +39,7 @@ namespace controller {
     nova_viewer->setApplicationConfig(global_application_config);
 
     nova_resource_manager = std::make_unique<nova::NovaResourceManager>();
-    connect(this, &DisplayManager3D::signal_halt_renderers, realtime_viewer, &GLViewer::haltRender);
-    connect(this, &DisplayManager3D::signal_resume_renderers, realtime_viewer, &GLViewer::resumeRender);
+    connect_slots();
   }
 
   void DisplayManager3D::haltRenderers() { emit signal_halt_renderers(); }

@@ -109,15 +109,14 @@ namespace nova_baker_utils {
     }
   };
 
-    /* We use this because of the sequence of scene initialization through the renderers :
+  /* We use this because of the sequence of scene initialization through the renderers :
    * 1) Retrieve original transformation matrices of each mesh.
    * 2) Drawables are built first by building the scene in each renderer :
-   * this will introduce the camera + skybox object on top of the dependency tree , modifying each mesh transformation
-   * 3) Hence we need the original transformations to reconstruct the scene in Nova as we do not use the same hierarchy of objects
+   * this will introduce the camera + skybox nodes on top of the dependency tree , modifying each mesh transformation
+   * 3) Hence we need the original transformations to reconstruct the scene in Nova as we need the unchanged node transformations.
    *
-   * The reason why it is convoluted is because we need the drawables to have initialized the opengl VBOs first so that Nova could use them if we use
-   * GPU rendering through cuda<->opengl interops. This allows for a greater reduction in memory footprint in all renderers by using only one
-   * reference to scene buffers.
+   * Access to drawables gives access to the different VBOs used which we can register using cuda-GL interop.
+   * This is required to reduce the memory footprint of a scene by loading only one set of geometry buffers , and just referencing it.
    */
   struct drawable_original_transform {
     Drawable *mesh;

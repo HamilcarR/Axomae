@@ -6,6 +6,7 @@
 namespace device::gpgpu {
   enum FORMAT_TYPE { FLOAT, UINT8X4N };
 
+  enum ACCESS_TYPE { READ_WRITE, WRITE_ONLY, READ_ONLY };
   struct channel_format {
     int bits_size_x, bits_size_y, bits_size_z, bits_size_a;
     FORMAT_TYPE format_type;

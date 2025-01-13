@@ -39,10 +39,14 @@ namespace controller {
     void haltRenderers();
     void resumeRenderers();
 
+   private:
+    void connect_slots();
+
    public:
    signals:
     void signal_halt_renderers();
     void signal_resume_renderers();
+    void signal_sync_renderers();
   };
 }  // namespace controller
 #endif  // DISPLAYMANAGER3D_H
