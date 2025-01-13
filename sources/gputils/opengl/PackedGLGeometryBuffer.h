@@ -47,6 +47,13 @@ class PackedGLGeometryBuffer : public DeviceMutableBufferInterface {
   void bindColorBuffer();
   void bindIndexBuffer();
   void bindTangentBuffer();
+
+  const GLVertexBufferObject<float> &getVertexBufferID() const { return vertex_buffer; }
+  const GLVertexBufferObject<float> &getNormalBufferID() const { return normal_buffer; }
+  const GLVertexBufferObject<float> &getUVBufferID() const { return texture_buffer; }
+  const GLVertexBufferObject<float> &getColorBufferID() const { return color_buffer; }
+  const GLVertexBufferObject<float> &getTangentxBufferID() const { return tangent_buffer; }
+  const GLIndexBufferObject &getIndexBufferID() const { return index_buffer; }
 };
 
 #endif

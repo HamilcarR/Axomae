@@ -14,7 +14,7 @@ namespace core::memory {
   template<class T>
   class MemoryArena;
 }
-/* defines functions and interfaces for nova to communicate with the device */
+/* defines functions and interfaces for nova to communicate with the device by means of memory pinning and memory allocations. */
 namespace nova {
   struct lockable_buffer_t {
     bool locked{false};

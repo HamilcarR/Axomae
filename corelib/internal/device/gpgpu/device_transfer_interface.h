@@ -4,9 +4,9 @@
 #include "device_resource_data.h"
 #include "device_resource_descriptors.h"
 #include "device_texture_descriptors.h"
-/* Interface to load various resources to gpu in an agnostic way. */
+#include <internal/device/rendering/opengl/gl_headers.h>
 
-// TODO : Add GL->cuda interop
+/* Interface to load various resources to gpu in an agnostic way. */
 namespace device::gpgpu {
 
   bool validate_gpu_state();
@@ -38,6 +38,18 @@ namespace device::gpgpu {
   GPU_query_result unpin_host_memory(void *buffer);
   enum PIN_EXT { PIN_EXT_NOOP };
   GPU_query_result get_pinned_memory_dptr(void *host_ptr, PIN_EXT flag = PIN_EXT_NOOP);
+
+  /* interops */
+  /* GL */
+  /* Takes corresponding pointers depending on if we use cuda (or hip later).
+   * In the case of cuda, we're working with a cudaGraphicsResource_t .
+   */
+  GPU_query_result interop_register_glbuffer(GLuint vbo_id, ACCESS_TYPE access_type);
+  GPU_query_result interop_register_glimage(GLuint tex_id, GLenum target, ACCESS_TYPE access_type);
+  GPU_query_result interop_unregister_resrc(void *gpu_graphics_resource);
+  GPU_query_result interop_map_resrc(int count, void **gpu_resources_array, void *stream = nullptr);
+  GPU_query_result interop_unmap_resrc(int count, void **gpu_resources_array, void *stream = nullptr);
+  GPU_query_result interop_get_mapped_ptr(void *gpu_graphics_resource);
 
 }  // namespace device::gpgpu
 

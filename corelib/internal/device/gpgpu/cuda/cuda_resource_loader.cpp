@@ -1,6 +1,7 @@
 #include "../device_transfer_interface.h"
 #include "../device_utils.h"
 #include "CudaDevice.h"
+#include <cuda_gl_interop.h>
 
 namespace device::gpgpu {
   bool validate_gpu_state() { return !ax_cuda::utils::cuda_info_device().empty(); }
@@ -298,4 +299,75 @@ namespace device::gpgpu {
     result.error_status = device.GPUHostGetDevicePointer(&result.device_ptr, host, 0); /* Keep flag to 0 */
     return result;
   }
+
+  static cudaGraphicsRegisterFlags get_interop_read_flag(ACCESS_TYPE access_type) {
+    switch (access_type) {
+      case READ_WRITE:
+        return cudaGraphicsRegisterFlagsNone;
+        break;
+      case WRITE_ONLY:
+        return cudaGraphicsRegisterFlagsWriteDiscard;
+        break;
+      case READ_ONLY:
+        return cudaGraphicsRegisterFlagsReadOnly;
+        break;
+      default:
+        return cudaGraphicsRegisterFlagsNone;
+        break;
+    }
+  }
+
+  GPU_query_result interop_register_glbuffer(GLuint vbo_id, ACCESS_TYPE access_type) {
+    GPU_query_result result;
+    ax_cuda::CudaDevice device;
+    result.device_ptr = nullptr;
+    unsigned flag = get_interop_read_flag(access_type);
+    cudaGraphicsResource *dev_ptr;
+    result.error_status = DeviceError(cudaGraphicsGLRegisterBuffer(&dev_ptr, vbo_id, flag));
+    result.device_ptr = dev_ptr;
+    return result;
+  }
+
+  GPU_query_result interop_register_glimage(GLuint tex_id, GLenum target, ACCESS_TYPE access_type) {
+    GPU_query_result result;
+    ax_cuda::CudaDevice device;
+    result.device_ptr = nullptr;
+    unsigned flag = get_interop_read_flag(access_type);
+    cudaGraphicsResource *dev_ptr;
+    result.error_status = DeviceError(cudaGraphicsGLRegisterImage(&dev_ptr, tex_id, target, flag));
+    result.device_ptr = dev_ptr;
+    return result;
+  }
+
+  GPU_query_result interop_map_resrc(int count, void **gpu_resources_array, void *stream) {
+    GPU_query_result result;
+    ax_cuda::CudaDevice device;
+    result.error_status = DeviceError(
+        cudaGraphicsMapResources(count, reinterpret_cast<cudaGraphicsResource_t *>(gpu_resources_array), static_cast<cudaStream_t>(stream)));
+    return result;
+  }
+
+  GPU_query_result interop_unmap_resrc(int count, void **gpu_resources_array, void *stream) {
+    GPU_query_result result;
+    ax_cuda::CudaDevice device;
+    result.error_status = DeviceError(
+        cudaGraphicsUnmapResources(count, reinterpret_cast<cudaGraphicsResource_t *>(gpu_resources_array), static_cast<cudaStream_t>(stream)));
+    return result;
+  }
+
+  GPU_query_result interop_get_mapped_ptr(void *gpu_resources) {
+    GPU_query_result result;
+    ax_cuda::CudaDevice device;
+    result.error_status = DeviceError(
+        cudaGraphicsResourceGetMappedPointer(&result.device_ptr, &result.size, static_cast<cudaGraphicsResource_t>(gpu_resources)));
+    return result;
+  }
+
+  GPU_query_result interop_unregister_resrc(void *gpu_resource) {
+    GPU_query_result result;
+    ax_cuda::CudaDevice device;
+    result.error_status = DeviceError(cudaGraphicsUnregisterResource(static_cast<cudaGraphicsResource_t>(gpu_resource)));
+    return result;
+  }
+
 }  // namespace device::gpgpu

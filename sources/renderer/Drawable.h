@@ -40,6 +40,7 @@ class Drawable {
   Mesh *getMeshPointer() const { return mesh_object; }
   ax_no_discard Shader *getMeshShaderPointer() const;
   ax_no_discard GLMaterial *getMaterialPointer() const;
+  ax_no_discard const PackedGLGeometryBuffer &getMeshGLBuffers() const { return gl_buffers; }
 };
 
 #endif

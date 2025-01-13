@@ -14,6 +14,7 @@ class DeviceBaseBufferInterface {
   virtual void bind() = 0;
   virtual void unbind() = 0;
   virtual void clean() = 0;
+  // TODO : add - virtual uint32_t getID() const = 0;
 };
 
 class DeviceMutableBufferInterface : public DeviceBaseBufferInterface {
