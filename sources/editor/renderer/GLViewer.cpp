@@ -23,11 +23,16 @@ static QSurfaceFormat setupFormat() {
   return format;
 }
 
+void GLViewer::currentCtx() { makeCurrent(); }
+
+void GLViewer::doneCtx() { doneCurrent(); }
+
 void GLViewer::syncRenderer() {
   makeCurrent();
   glFinish();
   doneCurrent();
 }
+
 void GLViewer::haltRender() {
   makeCurrent();
   glFinish();

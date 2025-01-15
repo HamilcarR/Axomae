@@ -1,17 +1,15 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
-#include "internal/common/math/math_utils.h"
-#include "internal/geometry/BoundingBox.h"
-#include "internal/macro/project_macros.h"
 #include "ray/Hitable.h"
-
-class Object3D;
+#include <internal/common/math/math_utils.h>
+#include <internal/geometry/BoundingBox.h>
+#include <internal/geometry/Object3D.h>
+#include <internal/macro/project_macros.h>
 
 namespace nova::shape {
 
   class Triangle {
    private:
-    static const axstd::span<const Object3D *> *triangle_mesh_list;  // Debatable, but it does lower the memory footprint of the whole scene.
     uint32_t triangle_id{}, mesh_id{};
 
     glm::vec3 e1{};
@@ -28,7 +26,10 @@ namespace nova::shape {
     CLASS_DCM(Triangle)
 
     ax_device_callable const Object3D *getMesh() const;
-    ax_host_only static void init(const axstd::span<const Object3D *> *tri_mesh_list);
+    /* Allocated using host side geometry data. */
+    ax_host_only static void initCPU(const axstd::span<Object3D> *tri_mesh_list);
+    /* Allocated using device side geometry data. Object3D addresses are on the gpu. */
+    ax_host_only static void initGPU(const axstd::span<Object3D> *tri_mesh_list);
     ax_device_callable explicit Triangle(const glm::vec3 vertices[3],
                                          const glm::vec3 normals[3] = nullptr,
                                          const glm::vec2 textures[3] = nullptr,

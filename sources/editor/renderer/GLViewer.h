@@ -86,6 +86,8 @@ class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
   void syncRenderer();
   void haltRender();
   void resumeRender();
+  void currentCtx();
+  void doneCtx();
 };
 
 /* Replace by an event structure in Controller class and send it to the renderer */

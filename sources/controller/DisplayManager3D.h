@@ -38,6 +38,8 @@ namespace controller {
     void prepareSceneChange();
     void haltRenderers();
     void resumeRenderers();
+    void makeCtxRealtime();
+    void doneCtxRealtime();
 
    private:
     void connect_slots();
@@ -47,6 +49,8 @@ namespace controller {
     void signal_halt_renderers();
     void signal_resume_renderers();
     void signal_sync_renderers();
+    void signal_switch_realtime_ctx();
+    void signal_done_realtime_ctx();
   };
 }  // namespace controller
 #endif  // DISPLAYMANAGER3D_H

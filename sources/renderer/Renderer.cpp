@@ -150,6 +150,7 @@ void Renderer::setNewScene(const SceneChangeData &new_scene) {
   start_draw = true;
   shader_database->initializeShaders();
   camera_framebuffer->updateFrameBufferShader();
+  scene->prepare_draw(scene_camera);
 }
 
 ax_no_discard image::ImageHolder<float> Renderer::getSnapshotFloat(int width, int height) const { AX_UNREACHABLE; }

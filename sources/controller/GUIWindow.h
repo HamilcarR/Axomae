@@ -43,8 +43,8 @@ namespace controller {
   template<typename T>
   struct image_type;
 
-  /* Controls the main editor window , deals with event management between main window and the rest of the app */
-  class Controller final : public QMainWindow {
+  /* Controls the main editor window , deals with event management between main window and the rest of the app. */
+  class Controller final : public QMainWindow {  // TODO : May be a bit monolithic for now, needs better separation and modularization.
     Q_OBJECT
 
    private:

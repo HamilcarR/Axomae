@@ -8,15 +8,15 @@ namespace nova::gputils {
 #if defined(AXOMAE_USE_CUDA)
   void lock_host_memory_default(device_shared_caches_t &collection) {
     for (auto &element : collection.contiguous_caches)
-      if (!element.locked){
+      if (!element.locked) {
         DEVICE_ERROR_CHECK(resrc::pin_host_memory(element.buffer.data(), element.buffer.size(), device::gpgpu::PIN_MODE_DEFAULT).error_status);
         element.locked = true;
       }
   }
 
-  void unlock_host_memory( device_shared_caches_t &collection) {
+  void unlock_host_memory(device_shared_caches_t &collection) {
     for (auto &element : collection.contiguous_caches)
-      if (element.locked){
+      if (element.locked) {
         DEVICE_ERROR_CHECK(resrc::unpin_host_memory(element.buffer.data()).error_status);
         element.locked = false;
       }
@@ -40,8 +40,8 @@ namespace nova::gputils {
     unsigned block_x = std::ceil((domain.x + argpack.block_size.x - 1) / argpack.block_size.x);
     unsigned block_y = std::ceil((domain.y + argpack.block_size.y - 1) / argpack.block_size.y);
     argpack.num_blocks = {block_x, block_y};
-
-    AX_ASSERT_LT(argpack.num_blocks, AX_GPU_MAX_BLOCKDIM);
+    std::size_t max_blocks = argpack.num_blocks.x * argpack.num_blocks.y * argpack.num_blocks.z;
+    AX_ASSERT_LT(max_blocks, AX_GPU_MAX_BLOCKS);
     gpu_structures.threads_distribution = argpack;
     gpu_structures.random_generator = initialize_rand(argpack);
   }
@@ -57,9 +57,9 @@ namespace nova::gputils {
 
   void clean_generators(gpu_random_generator_t &) { EMPTY_FUNCBODY }
 
-  void cleanup_gpu_structures(gpu_util_structures_t &){EMPTY_FUNCBODY}
+  void cleanup_gpu_structures(gpu_util_structures_t &) { EMPTY_FUNCBODY }
 
-  void initialize_gpu_structures(const domain2d & , gpu_util_structures_t& ) {EMPTY_FUNCBODY}
+  void initialize_gpu_structures(const domain2d &, gpu_util_structures_t &) { EMPTY_FUNCBODY }
 
 #endif
 }  // namespace nova::gputils

@@ -2,6 +2,7 @@
 #define DEVICE_RESOURCE_DESCRIPTORS_H
 
 #include <any>
+#include <memory>
 
 namespace device::gpgpu {
   enum FORMAT_TYPE { FLOAT, UINT8X4N };
@@ -49,5 +50,55 @@ namespace device::gpgpu {
     RESOURCE_TYPE type;
     GPU_resource resource_buffer_descriptors;
   };
+
+  /************************************************************************************************************************************************************************************/
+  class GPUGraphicsResrcHandle {
+    class Impl;
+
+   private:
+    bool is_registered{false};
+
+   public:
+    std::unique_ptr<Impl> pimpl;
+
+    GPUGraphicsResrcHandle();
+    ~GPUGraphicsResrcHandle();
+    GPUGraphicsResrcHandle(const GPUGraphicsResrcHandle &) = delete;
+    GPUGraphicsResrcHandle &operator=(const GPUGraphicsResrcHandle &) = delete;
+    GPUGraphicsResrcHandle(GPUGraphicsResrcHandle &&) noexcept;
+    GPUGraphicsResrcHandle &operator=(GPUGraphicsResrcHandle &&) noexcept;
+
+    void setRegistered(bool state) { is_registered = state; }
+    bool isRegistered() const { return is_registered; }
+  };
+
+  class GPUStream {
+    class Impl;
+
+   public:
+    std::unique_ptr<Impl> pimpl;
+    GPUStream();
+    ~GPUStream();
+    GPUStream(const GPUStream &) = delete;
+    GPUStream &operator=(const GPUStream &) = delete;
+    GPUStream(GPUStream &&) noexcept;
+    GPUStream &operator=(GPUStream &&) noexcept;
+  };
+
+  /************************************************************************************************************************************************************************************/
+  class GPUContext {
+    class Impl;
+
+   public:
+    std::unique_ptr<Impl> pimpl;
+
+    GPUContext();
+    ~GPUContext();
+    GPUContext(const GPUContext &) = delete;
+    GPUContext &operator=(const GPUContext &) = delete;
+    GPUContext(GPUContext &&) noexcept;
+    GPUContext &operator=(GPUContext &&) noexcept;
+  };
+
 }  // namespace device::gpgpu
 #endif
