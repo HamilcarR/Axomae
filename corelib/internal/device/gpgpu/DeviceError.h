@@ -15,6 +15,7 @@ void gpgpu_err_log(const DeviceError &err, const char *file, int line, bool abor
 #  define DEVICE_ERROR_CHECK(ans)
 #endif
 
+/* Replace with pimpl instead of conditional compilation*/
 class DeviceError {
 
 #if defined(AXOMAE_USE_CUDA)
@@ -27,7 +28,7 @@ class DeviceError {
 #endif
  public:
   CLASS_CM(DeviceError)
-  ax_no_discard bool isOk() const;
+  ax_no_discard bool isValid() const;
 };
 
 #endif  // DEVICEERROR_H

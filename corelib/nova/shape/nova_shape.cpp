@@ -4,19 +4,19 @@
 namespace nova::shape {
 
   void ShapeResourcesHolder::init() {
-    triangle_meshes_view = axstd::span(triangle_meshes.data(), triangle_meshes.size());
+    triangle_mesh_storage.init();
+
+    Triangle::initCPU(&triangle_mesh_storage.getCPUBuffersView());
 #ifdef AXOMAE_USE_CUDA
-    device::gpgpu::pin_host_memory(
-        triangle_meshes_view.data(), triangle_meshes_view.size() * sizeof(const Object3D *), device::gpgpu::PIN_MODE_DEFAULT);
-    is_mesh_structure_pinned = true;
+    Triangle::initGPU(&triangle_mesh_storage.getGPUBuffersView());
 #endif
-    Triangle::init(&triangle_meshes_view);
   }
+
+  void ShapeResourcesHolder::addTriangleMeshGPU(const triangle::mesh_vbo_ids &mesh_vbos) { triangle_mesh_storage.addGeometryGPU(mesh_vbos); }
 
   void ShapeResourcesHolder::release() {
 #ifdef AXOMAE_USE_CUDA
-    if (is_mesh_structure_pinned)
-      device::gpgpu::unpin_host_memory(triangle_meshes_view.data());
+    triangle_mesh_storage.release();
 #endif
   }
 

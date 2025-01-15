@@ -2,6 +2,7 @@
 #include "MaterialInterface.h"
 #include "Mesh.h"
 #include "bake.h"
+#include "material/nova_material.h"
 #include "texturing/nova_texturing.h"
 #include <internal/common/exception/GenericException.h>
 

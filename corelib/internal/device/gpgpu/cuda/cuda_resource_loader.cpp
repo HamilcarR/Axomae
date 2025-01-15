@@ -2,6 +2,8 @@
 #include "../device_utils.h"
 #include "CudaDevice.h"
 #include <cuda_gl_interop.h>
+#include <driver_types.h>
+#include <vector>
 
 namespace device::gpgpu {
   bool validate_gpu_state() { return !ax_cuda::utils::cuda_info_device().empty(); }
@@ -12,6 +14,27 @@ namespace device::gpgpu {
     return gpu_resource;
   }
 
+  /*******************************************************************************************************************************************************************************/
+  /** Context Sharing **/
+  class GPUContext::Impl {
+   public:
+    CUcontext context;
+    Impl() = default;
+    explicit Impl(CUcontext context) : context(context) {}
+  };
+
+  GPUContext::GPUContext() : pimpl(std::make_unique<Impl>()) {}
+  GPUContext::~GPUContext() = default;
+  GPUContext::GPUContext(GPUContext &&) noexcept = default;
+  GPUContext &GPUContext::operator=(GPUContext &&) noexcept = default;
+
+  void init_driver_API() { AX_ASSERT_EQ(cuInit(0), CUDA_SUCCESS); }
+  void create_context(GPUContext &context) { AX_ASSERT_EQ(cuCtxCreate(&context.pimpl->context, CU_CTX_SCHED_AUTO, 0), CUDA_SUCCESS); }
+  void set_current_context(GPUContext &context) { AX_ASSERT_EQ(cuCtxSetCurrent(context.pimpl->context), CUDA_SUCCESS); }
+
+  /*******************************************************************************************************************************************************************************/
+  /** Device Synchronizations **/
+
   GPU_query_result synchronize_device() {
     if (!validate_gpu_state())
       return ret_error();
@@ -21,6 +44,24 @@ namespace device::gpgpu {
     gpu_resource.device_ptr = nullptr;
     return gpu_resource;
   }
+
+  /*******************************************************************************************************************************************************************************/
+  /** Streams **/
+
+  class GPUStream::Impl {
+   public:
+    cudaStream_t stream{};
+
+    Impl() = default;
+    explicit Impl(cudaStream_t stream) : stream(stream) {}
+  };
+  GPUStream::GPUStream() : pimpl(std::make_unique<Impl>()) {}
+  GPUStream::~GPUStream() = default;
+  GPUStream::GPUStream(GPUStream &&) noexcept = default;
+  GPUStream &GPUStream::operator=(GPUStream &&) noexcept = default;
+
+  /*******************************************************************************************************************************************************************************/
+  /** Generic buffers allocation and deallocation **/
 
   GPU_query_result allocate_symbol(void **sym, std::size_t size_bytes) {
     if (!validate_gpu_state())
@@ -92,6 +133,9 @@ namespace device::gpgpu {
     gpu_resource.error_status = device.GPUFree(device_ptr);
     return gpu_resource;
   }
+
+  /*******************************************************************************************************************************************************************************/
+  /** Textures **/
 
   static int get_channels_num(const channel_format &desc) {
     int i = 0;
@@ -260,6 +304,9 @@ namespace device::gpgpu {
     DEVICE_ERROR_CHECK(device.GPUFreeArray(std::any_cast<cudaArray_t>(texture.array_object)));
   }
 
+  /*******************************************************************************************************************************************************************************/
+  /** Unified memory access */
+
   unsigned int get_cuda_host_register_flag(PIN_MODE mode) {
     switch (mode) {
       case PIN_MODE_DEFAULT:
@@ -300,6 +347,21 @@ namespace device::gpgpu {
     return result;
   }
 
+  /*******************************************************************************************************************************************************************************/
+  /** OpenGL<-> CUDA interop **/
+
+  class GPUGraphicsResrcHandle::Impl {
+   public:
+    cudaGraphicsResource_t handle{};
+    Impl() = default;
+    explicit Impl(cudaGraphicsResource_t resource_) : handle(resource_) {}
+  };
+
+  GPUGraphicsResrcHandle::GPUGraphicsResrcHandle() : pimpl(std::make_unique<Impl>()) {}
+  GPUGraphicsResrcHandle::~GPUGraphicsResrcHandle() = default;
+  GPUGraphicsResrcHandle::GPUGraphicsResrcHandle(GPUGraphicsResrcHandle &&) noexcept = default;
+  GPUGraphicsResrcHandle &GPUGraphicsResrcHandle::operator=(GPUGraphicsResrcHandle &&) noexcept = default;
+
   static cudaGraphicsRegisterFlags get_interop_read_flag(ACCESS_TYPE access_type) {
     switch (access_type) {
       case READ_WRITE:
@@ -317,56 +379,57 @@ namespace device::gpgpu {
     }
   }
 
-  GPU_query_result interop_register_glbuffer(GLuint vbo_id, ACCESS_TYPE access_type) {
-    GPU_query_result result;
-    ax_cuda::CudaDevice device;
-    result.device_ptr = nullptr;
+  GPU_query_result interop_register_glbuffer(GLuint vbo_id, GPUGraphicsResrcHandle &graphics_resrc, ACCESS_TYPE access_type) {
+    GPU_query_result result{};
     unsigned flag = get_interop_read_flag(access_type);
-    cudaGraphicsResource *dev_ptr;
-    result.error_status = DeviceError(cudaGraphicsGLRegisterBuffer(&dev_ptr, vbo_id, flag));
-    result.device_ptr = dev_ptr;
+    result.error_status = DeviceError(cudaGraphicsGLRegisterBuffer(&graphics_resrc.pimpl->handle, vbo_id, flag));
+    graphics_resrc.setRegistered(result.error_status.isValid());
     return result;
   }
 
-  GPU_query_result interop_register_glimage(GLuint tex_id, GLenum target, ACCESS_TYPE access_type) {
-    GPU_query_result result;
-    ax_cuda::CudaDevice device;
-    result.device_ptr = nullptr;
+  GPU_query_result interop_register_glimage(GLuint tex_id, GLenum target, GPUGraphicsResrcHandle &graphics_resrc, ACCESS_TYPE access_type) {
+    GPU_query_result result{};
     unsigned flag = get_interop_read_flag(access_type);
-    cudaGraphicsResource *dev_ptr;
-    result.error_status = DeviceError(cudaGraphicsGLRegisterImage(&dev_ptr, tex_id, target, flag));
-    result.device_ptr = dev_ptr;
+    result.error_status = DeviceError(cudaGraphicsGLRegisterImage(&graphics_resrc.pimpl->handle, tex_id, target, flag));
+    graphics_resrc.setRegistered(result.error_status.isValid());
     return result;
   }
 
-  GPU_query_result interop_map_resrc(int count, void **gpu_resources_array, void *stream) {
+  GPU_query_result interop_map_resrc(int count, GPUGraphicsResrcHandle *gpu_resources_array, GPUStream &stream) {
     GPU_query_result result;
-    ax_cuda::CudaDevice device;
-    result.error_status = DeviceError(
-        cudaGraphicsMapResources(count, reinterpret_cast<cudaGraphicsResource_t *>(gpu_resources_array), static_cast<cudaStream_t>(stream)));
+    std::vector<cudaGraphicsResource_t> resources;
+    resources.reserve(count);
+    for (int i = 0; i < count; i++)
+      resources.push_back(gpu_resources_array[i].pimpl->handle);
+    result.error_status = DeviceError(cudaGraphicsMapResources(count, resources.data(), stream.pimpl->stream));
     return result;
   }
 
-  GPU_query_result interop_unmap_resrc(int count, void **gpu_resources_array, void *stream) {
+  GPU_query_result interop_unmap_resrc(int count, GPUGraphicsResrcHandle *gpu_resources_array, GPUStream &stream) {
     GPU_query_result result;
-    ax_cuda::CudaDevice device;
-    result.error_status = DeviceError(
-        cudaGraphicsUnmapResources(count, reinterpret_cast<cudaGraphicsResource_t *>(gpu_resources_array), static_cast<cudaStream_t>(stream)));
+    std::vector<cudaGraphicsResource_t> resources;
+    resources.reserve(count);
+    for (int i = 0; i < count; i++)
+      resources.push_back(gpu_resources_array[i].pimpl->handle);
+    result.error_status = DeviceError(cudaGraphicsUnmapResources(count, resources.data(), stream.pimpl->stream));
     return result;
   }
 
-  GPU_query_result interop_get_mapped_ptr(void *gpu_resources) {
+  GPU_query_result interop_get_mapped_ptr(GPUGraphicsResrcHandle &gpu_resources) {
     GPU_query_result result;
-    ax_cuda::CudaDevice device;
-    result.error_status = DeviceError(
-        cudaGraphicsResourceGetMappedPointer(&result.device_ptr, &result.size, static_cast<cudaGraphicsResource_t>(gpu_resources)));
+    result.error_status = DeviceError(cudaGraphicsResourceGetMappedPointer(&result.device_ptr, &result.size, gpu_resources.pimpl->handle));
     return result;
   }
 
-  GPU_query_result interop_unregister_resrc(void *gpu_resource) {
+  GPU_query_result interop_unregister_resrc(GPUGraphicsResrcHandle &gpu_resource) {
     GPU_query_result result;
-    ax_cuda::CudaDevice device;
-    result.error_status = DeviceError(cudaGraphicsUnregisterResource(static_cast<cudaGraphicsResource_t>(gpu_resource)));
+    result.error_status = DeviceError(cudaGraphicsUnregisterResource(gpu_resource.pimpl->handle));
+    return result;
+  }
+
+  GPU_query_result create_stream(GPUStream &stream) {
+    GPU_query_result result;
+    result.error_status = DeviceError(cudaStreamCreate(&stream.pimpl->stream));
     return result;
   }
 

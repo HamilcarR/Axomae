@@ -5,7 +5,7 @@
 
 #define DEVICE_GTEST_ASSERT(ans) \
   { \
-    if (!ans.error_status.isOk()) { \
+    if (!ans.error_status.isValid()) { \
       LOGENABLE(); \
       DEVICE_ERROR_CHECK(ans.error_status); \
       ASSERT_TRUE(false); \

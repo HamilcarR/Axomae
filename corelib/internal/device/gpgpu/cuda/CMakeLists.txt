@@ -15,6 +15,7 @@ PUBLIC
         ax_core_common
         ax_core_thread
         CUDA::cudart_static
+        CUDA::cuda_driver
 )
 
 target_include_directories(ax_core_cuda PRIVATE

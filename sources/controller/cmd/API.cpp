@@ -7,7 +7,7 @@
 
 namespace controller::cmd {
 
-  API::API(int &argv_, char **argc_) {
+  API::API(int &argv_, char **argc_, std::thread::id main_thread_id) : config(main_thread_id) {
     argv = &argv_;
     argc = argc_;
   }

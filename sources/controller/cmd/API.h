@@ -20,7 +20,7 @@ namespace controller::cmd {
     ApplicationConfig config;
 
    public:
-    explicit API(int &argv, char **argc);
+    API(int &argv, char **argc, std::thread::id main_thread_id);
 
     /**
      * Use this method after completing the ApplicationConfig structure states.

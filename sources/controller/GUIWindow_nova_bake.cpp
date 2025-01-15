@@ -25,7 +25,7 @@ namespace exception {
 }  // namespace exception
 
 const char *const NOVABAKE_POOL_TAG = "_NOVABAKE_POOL_TAG_";
-
+const char *const NOVABAKE_GPU_POOL_TAG = "NOVABAKE_GPU_POOL_TAG_";
 /**************************************************************************************************************/
 namespace controller {
   /* To read options from the UI and transmit them to the bakery*/
@@ -302,11 +302,8 @@ namespace controller {
                           metadata.max_depth;
       render_scene_data.nova_resource_manager->getEngineData().max_depth = new_depth;
       try {
-        disp_manager.haltRenderers();
         nova_baker_utils::bake_scene(render_scene_data);
-        disp_manager.resumeRenderers();
       } catch (const exception::GenericException &e) {
-        disp_manager.resumeRenderers();
         ExceptionInfoBoxHandler::handle(e);
         nova_baker_utils::synchronize_render_threads(render_scene_data, NOVABAKE_POOL_TAG);
         return;
@@ -335,22 +332,26 @@ namespace controller {
                            Controller *app_controller,
                            image::ThumbnailImageHolder<float> &image_holder,
                            bool use_gpu) {
-    std::function<void(nova_baker_utils::render_scene_context &, image::ImageHolder<float> &, DisplayManager3D &)> callback;
+    std::function<void(nova_baker_utils::render_scene_context &, image::ImageHolder<float> &, DisplayManager3D &)> callback =
+        [](nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder, DisplayManager3D &disp_manager) {
+          return;
+        };
     try {
       display_render(app_controller, image_holder);
     } catch (const std::exception &e) {
       throw;
     }
-
+    // TODO: initialize a cuda thread and do all rendering on it.
     DisplayManager3D &disp_manager = app_controller->getDisplayManager();
     if (use_gpu) {
-      callback = [app_controller](nova_baker_utils::render_scene_context &render_scene_data,
-                                  image::ImageHolder<float> &image_holder,
-                                  DisplayManager3D &disp_manager) { do_progressive_render_gpu(render_scene_data, image_holder, disp_manager); };
+      callback = [](nova_baker_utils::render_scene_context &render_scene_data,
+                    image::ImageHolder<float> &image_holder,
+                    DisplayManager3D &disp_manager) { do_progressive_render_gpu(render_scene_data, image_holder, disp_manager); };
+
     } else {
-      callback = [app_controller](nova_baker_utils::render_scene_context &render_scene_data,
-                                  image::ImageHolder<float> &image_holder,
-                                  DisplayManager3D &disp_manager) { do_progressive_render(render_scene_data, image_holder, disp_manager); };
+      callback = [](nova_baker_utils::render_scene_context &render_scene_data,
+                    image::ImageHolder<float> &image_holder,
+                    DisplayManager3D &disp_manager) { do_progressive_render(render_scene_data, image_holder, disp_manager); };
     }
 
     /* Creates a rendering thread . Will be moved to the baking structure ,

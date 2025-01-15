@@ -28,8 +28,9 @@ static int exception_cleanup(const char *except_error) {
 
 int main(int argv, char **argc) {
   try {
+    std::thread::id main_thread = std::this_thread::get_id();
     signal(SIGSEGV, sigsegv_handler);
-    controller::cmd::API api(argv, argc);
+    controller::cmd::API api(argv, argc, main_thread);
     controller::cmd::ProgramOptionsManager options_manager(&api);
     api.configureDefault();
     init_graphics();

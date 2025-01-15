@@ -2,11 +2,15 @@
 #include "MaterialInterface.h"
 #include "Mesh.h"
 #include "TextureGroup.h"
+#include "aggregate/nova_acceleration.h"
 #include "bake.h"
-#include "internal/common/axstd/span.h"
-#include "internal/macro/project_macros.h"
 #include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
+#include "primitive/nova_primitive.h"
+#include "shape/nova_shape.h"
+#include <internal/common/axstd/span.h>
+#include <internal/macro/project_macros.h>
+
 namespace nova_baker_utils {
 
   static std::size_t compute_primitive_number(const std::vector<Mesh *> &meshes, int indices_padding = 3) {

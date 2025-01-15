@@ -2,26 +2,23 @@
 #define NOVA_SHAPE_H
 #include "ShapeInterface.h"
 #include "internal/memory/MemoryArena.h"
+#include "triangle_mesh_storage.h"
 #include <memory>
-
 namespace nova {
   class Ray;
 }
+
 namespace nova::shape {
 
   class ShapeResourcesHolder {
-
    private:
-    // TODO: Use allocator ?
+    /* Generic shape pointers*/
     std::vector<NovaShapeInterface> shapes;
-    std::vector<const Object3D *> triangle_meshes;
 
-    axstd::span<const Object3D *>
-        triangle_meshes_view;  // Gets initialized from triangle_meshes , and initializes the triangle mesh list of the Triangle class
-    bool is_mesh_structure_pinned;
+    triangle::Storage triangle_mesh_storage;
 
    public:
-    CLASS_CM(ShapeResourcesHolder)
+    CLASS_M(ShapeResourcesHolder)
 
     /* Since the creation of shapes is incremental (we don't copy a whole array here) , provide the current offset of the object to create.*/
     template<class T, class... Args>
@@ -33,13 +30,14 @@ namespace nova::shape {
       return shapes.back();
     }
 
-    void addTriangleMesh(const Object3D *triangle_mesh) { triangle_meshes.push_back(triangle_mesh); }
+    void addTriangleMesh(Object3D triangle_mesh) { triangle_mesh_storage.addGeometryCPU(triangle_mesh); }
+    void addTriangleMeshGPU(const triangle::mesh_vbo_ids &mesh_vbos);
     std::vector<NovaShapeInterface> &get_shapes() { return shapes; }
     ax_no_discard const std::vector<NovaShapeInterface> &get_shapes() const { return shapes; }
 
     void clear() {
       shapes.clear();
-      triangle_meshes.clear();
+      triangle_mesh_storage.clear();
     }
 
     void init();

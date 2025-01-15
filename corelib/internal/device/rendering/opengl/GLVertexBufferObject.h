@@ -22,6 +22,7 @@ class GLVertexBufferObject final : public DeviceBaseBufferInterface {
   void unbind() override;
   void clean() override;
   void fill(const T *buffer, size_t elements, DRAW_MODE draw_mode);
+  GLuint getID() const { return id; }
 };
 
 template<class T>

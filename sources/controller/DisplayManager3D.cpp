@@ -18,6 +18,8 @@ namespace controller {
     connect(this, &DisplayManager3D::signal_halt_renderers, realtime_viewer, &GLViewer::haltRender);
     connect(this, &DisplayManager3D::signal_resume_renderers, realtime_viewer, &GLViewer::resumeRender);
     connect(this, &DisplayManager3D::signal_sync_renderers, realtime_viewer, &GLViewer::syncRenderer);
+    connect(this, &DisplayManager3D::signal_switch_realtime_ctx, realtime_viewer, &GLViewer::currentCtx);
+    connect(this, &DisplayManager3D::signal_done_realtime_ctx, realtime_viewer, &GLViewer::doneCtx);
   }
 
   void DisplayManager3D::init(Ui::MainWindow &main_window_ui,
@@ -41,7 +43,8 @@ namespace controller {
     nova_resource_manager = std::make_unique<nova::NovaResourceManager>();
     connect_slots();
   }
-
+  void DisplayManager3D::makeCtxRealtime() { emit signal_switch_realtime_ctx(); }
+  void DisplayManager3D::doneCtxRealtime() { emit signal_done_realtime_ctx(); }
   void DisplayManager3D::haltRenderers() { emit signal_halt_renderers(); }
   void DisplayManager3D::resumeRenderers() { emit signal_resume_renderers(); }
 
@@ -115,8 +118,9 @@ namespace controller {
     const RendererInterface &realtime_renderer = realtime_viewer->getRenderer();
     const Scene &realtime_scene = realtime_renderer.getScene();
     auto drawable_collection = retrieve_scene_main_drawables(realtime_scene.getDrawables(), original_transforms);
-
+    realtime_viewer->makeCurrent();
     bake_buffers_storage = nova_baker_utils::build_scene(drawable_collection, *nova_resource_manager);
+    realtime_viewer->doneCurrent();
     add_caches_addresses(shared_caches, bake_buffers_storage);
     /* Build acceleration. */
     nova::aggregate::Accelerator accelerator = nova_baker_utils::build_performance_acceleration_structure(

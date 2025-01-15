@@ -12,7 +12,7 @@ namespace exception {
 
 DeviceError::DeviceError(cudaError_t error) : id(error) {}
 
-bool DeviceError::isOk() const { return id == cudaSuccess; }
+bool DeviceError::isValid() const { return id == cudaSuccess; }
 
 void gpgpu_err_log(const DeviceError &err, const char *file, int line, bool abort) {
   cudaError_t code = err.getId();
