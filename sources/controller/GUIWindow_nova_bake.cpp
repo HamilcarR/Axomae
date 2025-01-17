@@ -247,10 +247,14 @@ namespace controller {
 
   static progressive_render_metadata create_render_metadata(const nova_baker_utils::render_scene_context &render_scene_data) {
     int max_depth = render_scene_data.nova_resource_manager->getEngineData().max_depth;
-    int max_samples = render_scene_data.nova_resource_manager->getEngineData().max_depth;
+    int max_samples = render_scene_data.nova_resource_manager->getEngineData().renderer_max_samples;
     int smax = math::calculus::compute_serie_term(max_samples);
     bool is_rendering = render_scene_data.nova_resource_manager->getEngineData().is_rendering;
     return {max_depth, max_samples, smax, is_rendering};
+  }
+
+  static bool is_rendering(nova_baker_utils::render_scene_context &render_context) {
+    return render_context.nova_resource_manager->getEngineData().is_rendering;
   }
 
   static void do_progressive_render_gpu(nova_baker_utils::render_scene_context &render_scene_data,
@@ -263,7 +267,7 @@ namespace controller {
     nova::gputils::lock_host_memory_default(buffer_collection);
     progressive_render_metadata metadata = create_render_metadata(render_scene_data);
 
-    while (sample_increment < metadata.max_samples && metadata.is_rendering) {
+    while (sample_increment < metadata.max_samples && is_rendering(render_scene_data)) {
       render_scene_data.nova_resource_manager->getEngineData().sample_increment = sample_increment;
       int new_depth = render_scene_data.nova_resource_manager->getEngineData().max_depth < metadata.max_depth ?
                           render_scene_data.nova_resource_manager->getEngineData().max_depth + 1 :
@@ -295,7 +299,7 @@ namespace controller {
                                     DisplayManager3D &disp_manager) {
     int sample_increment = 1;
     progressive_render_metadata metadata = create_render_metadata(render_scene_data);
-    while (sample_increment < metadata.max_samples && metadata.is_rendering) {
+    while (sample_increment < metadata.max_samples && is_rendering(render_scene_data)) {
       render_scene_data.nova_resource_manager->getEngineData().sample_increment = sample_increment;
       int new_depth = render_scene_data.nova_resource_manager->getEngineData().max_depth < metadata.max_depth ?
                           render_scene_data.nova_resource_manager->getEngineData().max_depth + 1 :
