@@ -257,41 +257,15 @@ namespace controller {
     return render_context.nova_resource_manager->getEngineData().is_rendering;
   }
 
-  static void do_progressive_render_gpu(nova_baker_utils::render_scene_context &render_scene_data,
-                                        image::ImageHolder<float> &image_holder,
-                                        DisplayManager3D &disp_manager) {
-    int sample_increment = 1;
-    nova::gputils::domain2d domain{(unsigned)render_scene_data.width, (unsigned)render_scene_data.height};
-    nova::gputils::initialize_gpu_structures(domain, render_scene_data.gpu_util_structures);
-    nova::device_shared_caches_t &buffer_collection = render_scene_data.shared_caches;
-    nova::gputils::lock_host_memory_default(buffer_collection);
-    progressive_render_metadata metadata = create_render_metadata(render_scene_data);
-
-    while (sample_increment < metadata.max_samples && is_rendering(render_scene_data)) {
-      render_scene_data.nova_resource_manager->getEngineData().sample_increment = sample_increment;
-      int new_depth = render_scene_data.nova_resource_manager->getEngineData().max_depth < metadata.max_depth ?
-                          render_scene_data.nova_resource_manager->getEngineData().max_depth + 1 :
-                          metadata.max_depth;
-      render_scene_data.nova_resource_manager->getEngineData().max_depth = new_depth;
-      try {
-        disp_manager.haltRenderers();
-        bake_scene_gpu(render_scene_data, render_scene_data.gpu_util_structures);
-        disp_manager.resumeRenderers();
-      } catch (const exception::GenericException &e) {
-        disp_manager.resumeRenderers();
-        ExceptionInfoBoxHandler::handle(e);
-        nova::gputils::unlock_host_memory(buffer_collection);
-        return;
-      }
-
-      if (on_exception_shutdown(*render_scene_data.nova_exception_manager)) {
-        nova::gputils::unlock_host_memory(buffer_collection);
-        return;
-      }
-      color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)sample_increment);
-      sample_increment++;
-    }
-    nova::gputils::unlock_host_memory(buffer_collection);
+  static void display_render(controller::Controller *app_controller, const image::ThumbnailImageHolder<float> &image_holder) {
+    /* Creates a texture widget that will display the rendered image */
+    nova_baker_utils::NovaBakingStructure &nova_baking_structure = app_controller->getBakingStructure();
+    auto &texture_widget = nova_baking_structure.spawned_window;
+    texture_widget = texture_display_render(app_controller, image_holder);
+    if (!texture_widget)
+      throw exception::NullTextureWidgetException();
+    QWidget *img_ptr = texture_widget.get();
+    img_ptr->show();
   }
 
   static void do_progressive_render(nova_baker_utils::render_scene_context &render_scene_data,
@@ -321,48 +295,92 @@ namespace controller {
     }
   }
 
-  static void display_render(controller::Controller *app_controller, const image::ThumbnailImageHolder<float> &image_holder) {
-    /* Creates a texture widget that will display the rendered image */
-    nova_baker_utils::NovaBakingStructure &nova_baking_structure = app_controller->getBakingStructure();
-    auto &texture_widget = nova_baking_structure.spawned_window;
-    texture_widget = texture_display_render(app_controller, image_holder);
-    if (!texture_widget)
-      throw exception::NullTextureWidgetException();
-    QWidget *img_ptr = texture_widget.get();
-    img_ptr->show();
+  static void do_progressive_render_gpu(nova_baker_utils::render_scene_context &render_scene_data,
+                                        image::ImageHolder<float> &image_holder,
+                                        DisplayManager3D &disp_manager) {
+    int sample_increment = 1;
+    nova::gputils::domain2d domain{(unsigned)render_scene_data.width, (unsigned)render_scene_data.height};
+    nova::gputils::initialize_gpu_structures(domain, render_scene_data.gpu_util_structures);
+    nova::device_shared_caches_t &buffer_collection = render_scene_data.shared_caches;
+    nova::gputils::lock_host_memory_default(buffer_collection);
+    progressive_render_metadata metadata = create_render_metadata(render_scene_data);
+
+    while (sample_increment < metadata.max_samples && is_rendering(render_scene_data)) {
+      render_scene_data.nova_resource_manager->getEngineData().sample_increment = sample_increment;
+      int new_depth = render_scene_data.nova_resource_manager->getEngineData().max_depth < metadata.max_depth ?
+                          render_scene_data.nova_resource_manager->getEngineData().max_depth + 1 :
+                          metadata.max_depth;
+      render_scene_data.nova_resource_manager->getEngineData().max_depth = new_depth;
+      try {
+        bake_scene_gpu(render_scene_data, render_scene_data.gpu_util_structures);
+      } catch (const exception::GenericException &e) {
+        disp_manager.resumeRenderers();
+        ExceptionInfoBoxHandler::handle(e);
+        nova::gputils::unlock_host_memory(buffer_collection);
+        return;
+      }
+
+      if (on_exception_shutdown(*render_scene_data.nova_exception_manager)) {
+        nova::gputils::unlock_host_memory(buffer_collection);
+        return;
+      }
+      color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)sample_increment);
+      sample_increment++;
+    }
+    nova::gputils::unlock_host_memory(buffer_collection);
   }
+
+  static void pin_storage(const nova::shape::ShapeResourcesHolder &shape_resources_holder, nova::device_shared_caches_t &buffer_collection) {
+    const nova::shape::triangle::Storage &triangle_storage = shape_resources_holder.getTriangleMeshStorage();
+    const axstd::span<Object3D> triangle_mesh_geometry_view = triangle_storage.getGPUBuffersView();
+    buffer_collection.convert_and_add_to_cache(triangle_mesh_geometry_view);
+  }
+
+  using render_callback_f = std::function<void(nova_baker_utils::render_scene_context &, image::ImageHolder<float> &, DisplayManager3D &)>;
 
   static void start_baking(nova_baker_utils::render_scene_context &render_scene_data,
                            Controller *app_controller,
                            image::ThumbnailImageHolder<float> &image_holder,
                            bool use_gpu) {
-    std::function<void(nova_baker_utils::render_scene_context &, image::ImageHolder<float> &, DisplayManager3D &)> callback =
-        [](nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder, DisplayManager3D &disp_manager) {
-          return;
-        };
+    render_callback_f callback = [](nova_baker_utils::render_scene_context &render_scene_data,
+                                    image::ImageHolder<float> &image_holder,
+                                    DisplayManager3D &disp_manager) { return; };
     try {
       display_render(app_controller, image_holder);
     } catch (const std::exception &e) {
       throw;
     }
-    // TODO: initialize a cuda thread and do all rendering on it.
+    /*
+     * Using cuda GL interop necessitates the acquisition of resources to happen in the main thread because of the GL context.
+     * so we need to initialize graphics resource handles before launching the baking worker thread , and release it in NovaStopBake().
+     */
     DisplayManager3D &disp_manager = app_controller->getDisplayManager();
-    if (use_gpu) {
-      callback = [](nova_baker_utils::render_scene_context &render_scene_data,
-                    image::ImageHolder<float> &image_holder,
-                    DisplayManager3D &disp_manager) { do_progressive_render_gpu(render_scene_data, image_holder, disp_manager); };
 
+    if (use_gpu) {
+      nova::NovaResourceManager *res_manager = render_scene_data.nova_resource_manager;
+      res_manager->getShapeData().init();
+      render_scene_data.nova_resource_manager->getShapeData().updateMeshBuffers();
+      pin_storage(render_scene_data.nova_resource_manager->getShapeData(), render_scene_data.shared_caches);
+      callback =
+          [](nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder, DisplayManager3D &disp_manager) {
+            disp_manager.haltRenderers();
+            do_progressive_render_gpu(render_scene_data, image_holder, disp_manager);
+            disp_manager.resumeRenderers();
+          };
     } else {
-      callback = [](nova_baker_utils::render_scene_context &render_scene_data,
-                    image::ImageHolder<float> &image_holder,
-                    DisplayManager3D &disp_manager) { do_progressive_render(render_scene_data, image_holder, disp_manager); };
+      callback =
+          [](nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder, DisplayManager3D &disp_manager) {
+            disp_manager.haltRenderers();
+            do_progressive_render(render_scene_data, image_holder, disp_manager);
+            disp_manager.resumeRenderers();
+          };
     }
 
     /* Creates a rendering thread . Will be moved to the baking structure ,
      * which will take care of managing it's lifetime */
-    std::thread th(callback, std::ref(render_scene_data), std::ref(image_holder), std::ref(disp_manager));
+    std::thread worker_baking_thread(callback, std::ref(render_scene_data), std::ref(image_holder), std::ref(disp_manager));
     nova_baker_utils::NovaBakingStructure &nova_baking_structure = app_controller->getBakingStructure();
-    nova_baking_structure.rendering_thread = std::move(th);
+    nova_baking_structure.worker_baking_thread = std::move(worker_baking_thread);
   }
 
   static void ignore_skybox(const RendererInterface &renderer, bool ignore) {
@@ -540,17 +558,18 @@ namespace controller {
   void Controller::novaStopBake() {
     /* Stop the threads. */
     auto &nova_resource_manager = nova_baking_structure.render_context.nova_resource_manager;
-    if (nova_resource_manager)
+    if (nova_resource_manager) {
       nova_resource_manager->getEngineData().is_rendering = false;
-
+      /* Cleanup gpu resources */
+      nova_resource_manager->getShapeData().release();
+    }
     if (global_application_config && global_application_config->getThreadPool()) {
       /* Empty scheduler list. */
       global_application_config->getThreadPool()->emptyQueue(NOVABAKE_POOL_TAG);
       /* Synchronize the threads. */
       global_application_config->getThreadPool()->fence(NOVABAKE_POOL_TAG);
     }
-
-    /* Cleanup gpu resources */
+    display_manager.resumeRenderers();
   }
 
   void Controller::cleanupNova() {

@@ -42,6 +42,8 @@ namespace nova::shape {
 
     void init();
     void release();
+    void updateMeshBuffers();
+    const triangle::Storage &getTriangleMeshStorage() const { return triangle_mesh_storage; }
   };
 
 }  // namespace nova::shape
