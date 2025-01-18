@@ -55,9 +55,6 @@ namespace device::gpgpu {
   class GPUGraphicsResrcHandle {
     class Impl;
 
-   private:
-    bool is_registered{false};
-
    public:
     std::unique_ptr<Impl> pimpl;
 
@@ -68,8 +65,8 @@ namespace device::gpgpu {
     GPUGraphicsResrcHandle(GPUGraphicsResrcHandle &&) noexcept;
     GPUGraphicsResrcHandle &operator=(GPUGraphicsResrcHandle &&) noexcept;
 
-    void setRegistered(bool state) { is_registered = state; }
-    bool isRegistered() const { return is_registered; }
+    bool isMapped() const;
+    bool isRegistered() const;
   };
 
   class GPUStream {
