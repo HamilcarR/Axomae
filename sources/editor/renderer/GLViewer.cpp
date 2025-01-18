@@ -33,12 +33,7 @@ void GLViewer::syncRenderer() {
   doneCurrent();
 }
 
-void GLViewer::haltRender() {
-  makeCurrent();
-  glFinish();
-  is_rendering = false;
-  doneCurrent();
-}
+void GLViewer::haltRender() { is_rendering = false; }
 
 void GLViewer::resumeRender() { is_rendering = true; }
 
@@ -115,6 +110,9 @@ void GLViewer::paintGL() {
   if (renderer->prep_draw() && is_rendering) {
     renderer->setDefaultFrameBufferId(defaultFramebufferObject());
     renderer->draw();
+  } else {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0f);
   }
 }
 
