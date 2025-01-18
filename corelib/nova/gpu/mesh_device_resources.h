@@ -63,6 +63,8 @@ namespace nova::gpu {
     }
 
     void unmapResource() {
+      if (!gpgpu_api_handle.isMapped())
+        return;
       device::gpgpu::GPUStream current_stream;
       auto query_result = device::gpgpu::interop_unmap_resrc(1, &gpgpu_api_handle, current_stream);
       DEVICE_ERROR_CHECK(query_result.error_status);
@@ -74,6 +76,8 @@ namespace nova::gpu {
     }
 
     void unmapResource(stream_type &stream) {
+      if (!gpgpu_api_handle.isMapped())
+        return;
       auto query_result = device::gpgpu::interop_unmap_resrc(1, &gpgpu_api_handle, stream);
       DEVICE_ERROR_CHECK(query_result.error_status);
     }
