@@ -89,14 +89,14 @@ namespace nova_baker_utils {
     bake_temp_buffers bake_buffers;
     std::unique_ptr<QWidget> spawned_window;
     render_scene_context render_context;
-    std::thread rendering_thread;
+    std::thread worker_baking_thread;
 
     void reinitialize() {
       auto &nova_resource_manager = render_context.nova_resource_manager;
       if (nova_resource_manager)
         nova_resource_manager->getEngineData().is_rendering = false;
-      if (rendering_thread.joinable())
-        rendering_thread.join();
+      if (worker_baking_thread.joinable())
+        worker_baking_thread.join();
 
       /* Clear the render buffers. */
       bake_buffers.image_holder.clear();
