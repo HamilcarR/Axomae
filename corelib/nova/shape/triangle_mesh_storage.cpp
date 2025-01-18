@@ -25,7 +25,7 @@ namespace nova::shape::triangle {
     dev_buffers.indices.mapResource();
   }
 
-  inline void load_gpu_buffers(mesh_device_buffers &dev_buffers) {
+  inline void map_buffers(mesh_device_buffers &dev_buffers) {
     dev_buffers.positions.mapBuffer();
     dev_buffers.uv.mapBuffer();
     dev_buffers.tangents.mapBuffer();
@@ -33,7 +33,7 @@ namespace nova::shape::triangle {
     dev_buffers.indices.mapBuffer();
   }
 
-  static Object3D make_geometry_gpu(mesh_device_buffers &dev_buffers) {
+  static Object3D create_gpu_obj3d(mesh_device_buffers &dev_buffers) {
     Object3D geometry;
     geometry.vertices = dev_buffers.positions.getDeviceBuffer();
     geometry.indices = dev_buffers.indices.getDeviceBuffer();
@@ -52,15 +52,24 @@ namespace nova::shape::triangle {
   }
 #endif
 
-  void Storage::init() {
+  void Storage::mapBuffers() {
     cpu_geometry.geometry_view = axstd::span(cpu_geometry.geometry_storage.data(), cpu_geometry.geometry_storage.size());
+#ifdef AXOMAE_USE_CUDA
+    gpu_geometry.geometry_storage.clear();
+    for (auto &tracker : gpu_geometry.buffers_trackers) {
+      map_buffers(tracker);
+      gpu_geometry.geometry_storage.push_back(create_gpu_obj3d(tracker));
+    }
+    gpu_geometry.geometry_view = axstd::span(gpu_geometry.geometry_storage.data(), gpu_geometry.geometry_storage.size());
+#endif
+  }
+
+  void Storage::init() {
 #ifdef AXOMAE_USE_CUDA
     for (auto &tracker : gpu_geometry.buffers_trackers) {
       map_gpu_resources(tracker);
-      load_gpu_buffers(tracker);
-      gpu_geometry.geometry_storage.push_back(make_geometry_gpu(tracker));
     }
-    gpu_geometry.geometry_view = axstd::span(gpu_geometry.geometry_storage.data(), gpu_geometry.geometry_storage.size());
+
 #endif
   }
 

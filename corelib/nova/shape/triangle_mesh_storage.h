@@ -49,6 +49,7 @@ namespace nova::shape::triangle {
     const axstd::span<Object3D> &getCPUBuffersView() const;
     const axstd::span<Object3D> &getGPUBuffersView() const;
     void clear();
+    void mapBuffers();
     void init();
     void release();
   };
