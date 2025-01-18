@@ -30,11 +30,24 @@ namespace nova {
      * index 0 : All textures raw data
      * index 1 : All geometry for mesh
      * ...
+     * lock_host_memory_x(device_shared_caches_t&) will iterate through each cache and lock them.
+     * Same with unlock_host_memory(device_shared_caches_t&).
      */
     cache_collection_t contiguous_caches;
 
     void addSharedCacheAddress(axstd::span<uint8_t> buffer) { contiguous_caches.push_back({false, buffer}); }
     void clear() { contiguous_caches.clear(); }
+
+    /* Provides an utility function to convert any span to a byte format span */
+    template<class T>
+    axstd::span<uint8_t> convert(const axstd::span<T> &buffer) {
+      return {reinterpret_cast<uint8_t *>(buffer.data()), buffer.size() * sizeof(T)};
+    }
+    template<class T>
+    void convert_and_add_to_cache(const axstd::span<T> &buffer) {
+      axstd::span<uint8_t> to_save = axstd::span<uint8_t>(reinterpret_cast<uint8_t *>(buffer.data()), buffer.size() * sizeof(T));
+      contiguous_caches.push_back({false, to_save});
+    }
   };
 }  // namespace nova
 
