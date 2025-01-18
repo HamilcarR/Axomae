@@ -4,17 +4,20 @@
 namespace nova {
 
   /**
-   * @brief Provides additional data that can be passed to the hit method
+   * @brief Provides additional data that can be passed to the hit method.
    */
 
-  struct base_options {
+  class base_options {
+   public:
     virtual ~base_options() = default;
   };
   template<class T>
-  struct hit_options : public base_options {
+  class hit_options : public base_options {
+   public:
     T data;
   };
 
+  /* Each hit with a shape , primitive and their materials, fills this structure with the hit computed data. */
   struct hit_data {
     glm::vec4 attenuation{};
     glm::vec4 emissive{};

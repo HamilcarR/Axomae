@@ -16,5 +16,8 @@ namespace nova {
     ax_device_callable ax_no_discard glm::vec3 pointAt(float t) const { return origin + t * direction; }
   };
 
+  /* For AA */
+  class RayDifferential : public Ray {
+  };
 }  // namespace nova
 #endif
