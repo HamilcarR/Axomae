@@ -353,6 +353,8 @@ namespace device::gpgpu {
   class GPUGraphicsResrcHandle::Impl {
    public:
     cudaGraphicsResource_t handle{};
+    bool is_mapped{false};
+    bool is_registered{false};
     Impl() = default;
     explicit Impl(cudaGraphicsResource_t resource_) : handle(resource_) {}
   };
@@ -361,6 +363,9 @@ namespace device::gpgpu {
   GPUGraphicsResrcHandle::~GPUGraphicsResrcHandle() = default;
   GPUGraphicsResrcHandle::GPUGraphicsResrcHandle(GPUGraphicsResrcHandle &&) noexcept = default;
   GPUGraphicsResrcHandle &GPUGraphicsResrcHandle::operator=(GPUGraphicsResrcHandle &&) noexcept = default;
+
+  bool GPUGraphicsResrcHandle::isMapped() const { return pimpl->is_mapped; }
+  bool GPUGraphicsResrcHandle::isRegistered() const { return pimpl->is_registered; }
 
   static cudaGraphicsRegisterFlags get_interop_read_flag(ACCESS_TYPE access_type) {
     switch (access_type) {
@@ -383,7 +388,7 @@ namespace device::gpgpu {
     GPU_query_result result{};
     unsigned flag = get_interop_read_flag(access_type);
     result.error_status = DeviceError(cudaGraphicsGLRegisterBuffer(&graphics_resrc.pimpl->handle, vbo_id, flag));
-    graphics_resrc.setRegistered(result.error_status.isValid());
+    graphics_resrc.pimpl->is_registered = result.error_status.isValid();
     return result;
   }
 
@@ -391,7 +396,7 @@ namespace device::gpgpu {
     GPU_query_result result{};
     unsigned flag = get_interop_read_flag(access_type);
     result.error_status = DeviceError(cudaGraphicsGLRegisterImage(&graphics_resrc.pimpl->handle, tex_id, target, flag));
-    graphics_resrc.setRegistered(result.error_status.isValid());
+    graphics_resrc.pimpl->is_registered = result.error_status.isValid();
     return result;
   }
 
@@ -402,6 +407,8 @@ namespace device::gpgpu {
     for (int i = 0; i < count; i++)
       resources.push_back(gpu_resources_array[i].pimpl->handle);
     result.error_status = DeviceError(cudaGraphicsMapResources(count, resources.data(), stream.pimpl->stream));
+    for (int i = 0; i < count; i++)
+      gpu_resources_array[i].pimpl->is_mapped = result.error_status.isValid();
     return result;
   }
 
@@ -412,6 +419,10 @@ namespace device::gpgpu {
     for (int i = 0; i < count; i++)
       resources.push_back(gpu_resources_array[i].pimpl->handle);
     result.error_status = DeviceError(cudaGraphicsUnmapResources(count, resources.data(), stream.pimpl->stream));
+    for (int i = 0; i < count; i++)
+      if (result.error_status.isValid())
+        gpu_resources_array[i].pimpl->is_mapped = false;
+    ;
     return result;
   }
 
@@ -424,6 +435,7 @@ namespace device::gpgpu {
   GPU_query_result interop_unregister_resrc(GPUGraphicsResrcHandle &gpu_resource) {
     GPU_query_result result;
     result.error_status = DeviceError(cudaGraphicsUnregisterResource(gpu_resource.pimpl->handle));
+    gpu_resource.pimpl->is_registered = result.error_status.isValid();
     return result;
   }
 
