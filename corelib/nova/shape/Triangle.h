@@ -27,9 +27,9 @@ namespace nova::shape {
 
     ax_device_callable const Object3D *getMesh() const;
     /* Allocated using host side geometry data. */
-    ax_host_only static void initCPU(const axstd::span<Object3D> *tri_mesh_list);
+    ax_host_only static void updateCpuMeshList(const axstd::span<Object3D> *tri_mesh_list);
     /* Allocated using device side geometry data. Object3D addresses are on the gpu. */
-    ax_host_only static void initGPU(const axstd::span<Object3D> *tri_mesh_list);
+    ax_host_only static void updateGpuMeshList(const axstd::span<Object3D> *tri_mesh_list);
     ax_device_callable explicit Triangle(const glm::vec3 vertices[3],
                                          const glm::vec3 normals[3] = nullptr,
                                          const glm::vec2 textures[3] = nullptr,

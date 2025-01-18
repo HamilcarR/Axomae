@@ -9,21 +9,20 @@ namespace nova::shape {
   /* We keep track of the mesh list in a static variable to fit multiple Triangle instances into a cache line. */
   static const axstd::span<Object3D> *triangle_mesh_list = nullptr;
 #ifdef AXOMAE_USE_CUDA
-  ax_device_only axstd::span<Object3D> *device_triangle_mesh_list;
+  ax_device_managed axstd::span<Object3D> device_triangle_mesh_list;
 #endif
 
-  ax_host_only void Triangle::initCPU(const axstd::span<Object3D> *mesh_list) { triangle_mesh_list = mesh_list; }
+  ax_host_only void Triangle::updateCpuMeshList(const axstd::span<Object3D> *mesh_list) { triangle_mesh_list = mesh_list; }
 
-  ax_host_only void Triangle::initGPU(const axstd::span<Object3D> *mesh_list) {
+  ax_host_only void Triangle::updateGpuMeshList(const axstd::span<Object3D> *mesh_list) {
 #ifdef AXOMAE_USE_CUDA
-    device::gpgpu::copy_to_symbol(mesh_list, device_triangle_mesh_list, sizeof(axstd::span<Object3D>), device::gpgpu::HOST_DEVICE);
+    device_triangle_mesh_list = *mesh_list;
 #endif
   }
 
   ax_device_callable const Object3D *Triangle::getMesh() const {
 #ifdef __CUDA_ARCH__
-    AX_ASSERT_NOTNULL(device_triangle_mesh_list);
-    return &(*device_triangle_mesh_list)[mesh_id];
+    return &(device_triangle_mesh_list)[mesh_id];
 #else
     AX_ASSERT_NOTNULL(triangle_mesh_list);
     return &(*triangle_mesh_list)[mesh_id];
