@@ -1,30 +1,38 @@
-#include "internal/macro/project_macros.h"
 #include "math_spherical.h"
-
+#include "math_utils_approx.h"
 #include <bits/stl_algo.h>
+#include <boost/math/ccmath/ccmath.hpp>
+#include <internal/macro/project_macros.h>
+
+constexpr float math::acos_approx(float x) {
+  float negate = x < 0;
+  x = boost::math::ccmath::abs(x);
+  float ret = -0.0187293;
+  ret = ret * x;
+  ret = ret + 0.0742610;
+  ret = ret * x;
+  ret = ret - 0.2121144;
+  ret = ret * x;
+  ret = ret + 1.5707288;
+  ret = ret * boost::math::ccmath::sqrt(1.0f - x);
+  ret = ret - 2 * negate * ret;
+  return static_cast<float>(negate * PI + ret);
+}
 
 namespace math::spherical {
   namespace acos {
-#ifdef AXOMAE_LUT_HIGHP
-    constexpr int lt_width = 1000000;
-#elif AXOMAE_LUT_MEDIUMP
-    constexpr int lt_width = 500000;
-#else
-    constexpr int lt_width = 10000;
-#endif
-    constexpr float fill_lut(float i) { return std::acos(i); }
 
-    constexpr auto LUT = [] {
-      std::array<float, lt_width> table{};
-      for (int i = 0; i < lt_width; i++) {
-        float scaled = ((float)i / (float)lt_width) * 2.f - 1.f;
-        table[i] = fill_lut(scaled);
-      }
-      return table;
-    }();
+    constexpr int lut_precision = PRECISION_LUT;
+    extern const uint8_t _binary_acos_table_start[];
+    inline float lut(int pos) {
+      AX_ASSERT_LT(pos, lut_precision);
+      return reinterpret_cast<const float *>(_binary_acos_table_start)[pos];
+    }
+
   }  // namespace acos
-  float acos_lt(float a) {
-    int scaled = std::clamp((int)((a + 1.f) * acos::lt_width * 0.5f), 0, acos::lt_width - 1);
-    return acos::LUT[scaled];
+
+  inline float acos_lt(float a) {
+    int scaled = std::clamp((int)((a + 1.f) * acos::lut_precision * 0.5f), 0, acos::lut_precision - 1);
+    return acos::lut(scaled);
   }
 }  // namespace math::spherical
