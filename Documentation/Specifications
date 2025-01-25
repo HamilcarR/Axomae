@@ -1,0 +1,103 @@
+AXOMAE - Architectural Visualization & Lighting Analysis System
+Specification Document v1.0
+
+1. CURRENT SYSTEM FOUNDATION
+===========================
+A. Ray Tracer Core
+   - Path tracing implementation
+   - CUDA acceleration support
+   - PBR material system
+
+B. Real-time Viewer
+   - GLB file support
+   - PBR material visualization
+   - OpenGL-based rendering
+
+2. SYSTEM ARCHITECTURE
+============================
+A. Input Processing Module
+   │
+   ├── Photo Input Handler
+   │   - Single photo processing
+   │   - Multiple photo processing
+   │   - Panoramic photo support
+   │
+   └── Scene Understanding
+       - Room layout detection
+       - Structural element recognition
+       - Material property extraction
+
+B. Geometry Processing Pipeline
+   │
+   ├── Scene Reconstruction
+   │   - Wall/floor/ceiling extraction
+   │   - Object + Material evaluation
+   │   - Window/door detection
+   │   - Structural element modeling
+   │
+   └── Mesh Generation
+       - Geometric primitive creation
+       - UV mapping generation
+       - Normal map generation
+
+C. Lighting Analysis System
+   │
+   ├── Light Source Detection
+   │   - Natural light identification
+   │   - Artificial light detection
+   │   - Light property extraction
+   │
+   ├── Illumination Analysis
+   │   - Lux level calculation
+   │   - Light distribution mapping
+   │   - Glare detection
+   │
+   └── Daylight Simulation
+       - Sun position calculation
+       - Seasonal lighting changes
+       - Weather condition effects
+
+3. TECHNICAL REQUIREMENTS
+=======================
+A. Performance Targets
+   - Scene reconstruction: < 30 seconds
+   - Real-time rendering: 30+ FPS
+   - Lighting calculation: < 5 seconds
+
+B. Accuracy Requirements
+   - Geometry: ±2cm accuracy
+   - Lighting: ±5% accuracy
+   - Material properties: ±10% accuracy
+
+4. IMPLEMENTATION PHASES
+=====================
+Phase 1: Foundation Enhancement
+   - Integrate ML pipeline structure
+   - Add photo input processing
+   - Implement basic room reconstruction
+
+Phase 2: Lighting Analysis
+   - Develop light source detection
+   - Implement basic lighting calculations
+   - Add daylight analysis
+
+Phase 3: Advanced Features
+   - Material property extraction
+   - Advanced lighting simulation
+   - Energy efficiency analysis
+
+5. FILE FORMATS
+=============
+Input:
+   - Images: JPG, PNG, HDR
+   - 3D Models: GLB, GLTF , CAD , 3DS , blend
+   - Panoramas: 360° JPG/PNG
+
+Output:
+   - 3D Scene: GLB/GLTF
+   - Analysis: PDF, CSV
+   - Lighting Data: Custom binary format
+
+6. API STRUCTURE
+==============
+ TBD

@@ -7,7 +7,9 @@ target_link_libraries(ax_core_math
 PRIVATE
         ax_core_macro
         Boost::random
+        Boost::math
 PUBLIC
+        Boost::container_hash
         ax_core_device
         glm::glm
 
@@ -19,45 +21,16 @@ PUBLIC
     ${AXOMAE_CORELIB_ROOT}
 )
 
-
-
-function(precision_compile_flag precision)
-    set(FLAGS "${CMAKE_CXX_FLAGS}")
-    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        if(precision MATCHES "LOW")
-            set(FLAGS "${FLAGS} -fconstexpr-loop-limit=10000")
-        elseif (precision MATCHES "MED")
-            set(FLAGS "${FLAGS} -fconstexpr-loop-limit=500000")
-            set(FLAGS "${FLAGS} -fconstexpr-ops-limit=60000000")
-        else()
-            set(FLAGS "${FLAGS} -fconstexpr-loop-limit=1000000")
-            set(FLAGS "${FLAGS} -fconstexpr-ops-limit=600000000")
-        endif()
-    endif()
-
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        if(precision MATCHES "LOW")
-            set(FLAGS "${FLAGS} -fconstexpr-steps=10000")
-        elseif (precision MATCHES "MED")
-            set(FLAGS "${FLAGS} -fconstexpr-steps=500000")
-        else()
-            set(FLAGS "${FLAGS} -fconstexpr-steps=600000000")
-        endif()
-    endif()
-    set(CMAKE_CXX_FLAGS "${FLAGS}" PARENT_SCOPE)
-endfunction()
-
-
+set(PRECISION_LUT "")
 if(AXOMAE_LUT_HIGHP)
-    target_compile_definitions(ax_core_math PUBLIC AXOMAE_LUT_HIGHP)
-    precision_compile_flag(HIGH)
+    set(PRECISION_LUT 1000000)
 elseif (AXOMAE_LUT_MEDIUMP)
-    target_compile_definitions(ax_core_math PUBLIC AXOMAE_LUT_MEDIUMP)
-    precision_compile_flag(MED)
+    set(PRECISION_LUT 500000)
 else()
-    target_compile_definitions(ax_core_math PUBLIC AXOMAE_LUT_LOWP)
-    precision_compile_flag(LOW)
+  set(PRECISION_LUT 10000)
 endif()
+
+target_compile_definitions(ax_core_math PRIVATE PRECISION_LUT=${PRECISION_LUT})
 
 if(AXOMAE_USE_CUDA)
     autoload_build_utils()
@@ -68,3 +41,25 @@ if(AXOMAE_USE_CUDA)
     )
     register_device_compilation(gpu/math_random_gpu.cpp)
 endif()
+
+
+
+set(GEN_INCLUDE_DIR "${CMAKE_BINARY_DIR}/lib/lookup_tables/binary/")
+set(ACOS_TABLE_NAME "acos_table")
+
+file(MAKE_DIRECTORY ${GEN_INCLUDE_DIR})
+
+add_custom_target(axcustom_lut_generate ALL
+  COMMAND python3 ${PROJECT_SOURCE_DIR}/scripts/generate_luts.py ${PRECISION_LUT} ${ACOS_TABLE_NAME}
+  DEPENDS ${PROJECT_SOURCE_DIR}/scripts/generate_luts.py
+  WORKING_DIRECTORY ${GEN_INCLUDE_DIR}
+  COMMENT "Generating lookup tables."
+  VERBATIM
+)
+target_link_libraries(ax_core_math PRIVATE
+  ${GEN_INCLUDE_DIR}/${ACOS_TABLE_NAME}.o
+)
+
+add_dependencies(ax_core_math axcustom_lut_generate)
+
+

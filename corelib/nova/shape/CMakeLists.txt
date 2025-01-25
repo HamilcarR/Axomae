@@ -8,6 +8,7 @@ add_library(ax_core_nova_shape STATIC
         ShapeInterface.cpp
         nova_shape.cpp
         triangle_mesh_storage.cpp
+        mesh_transform_storage.cpp
 )
 
 target_link_libraries(ax_core_nova_shape PRIVATE
@@ -23,4 +24,11 @@ target_include_directories(ax_core_nova_shape PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/../
 )
 
-register_device_compilation(Box.cpp Triangle.cpp Sphere.cpp Square.cpp ShapeInterface.cpp triangle_mesh_storage.cpp)
+register_device_compilation(
+        Box.cpp
+        Triangle.cpp
+        Sphere.cpp
+        Square.cpp
+        ShapeInterface.cpp
+        triangle_mesh_storage.cpp
+        mesh_transform_storage.cpp)

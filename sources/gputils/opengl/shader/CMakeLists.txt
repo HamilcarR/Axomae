@@ -2,7 +2,6 @@
 set(GEN_INCLUDE_DIR "${CMAKE_BINARY_DIR}/lib/shader/include" )
 file(MAKE_DIRECTORY ${GEN_INCLUDE_DIR})
 
-#execute_process(COMMAND python3 ${PROJECT_SOURCE_DIR}/scripts/generate_shaders.py ${CMAKE_CURRENT_SOURCE_DIR}/glsl ${GEN_INCLUDE_DIR})
 file(GLOB_RECURSE GLSL_SRC
         "${CMAKE_CURRENT_SOURCE_DIR}/glsl/*.frag"
         "${CMAKE_CURRENT_SOURCE_DIR}/glsl/*.vert"
@@ -11,8 +10,8 @@ file(GLOB_RECURSE GLSL_SRC
 )
 add_custom_target(axcustom_glsl_generate ALL
         COMMAND python3 ${PROJECT_SOURCE_DIR}/scripts/generate_shaders.py ${CMAKE_CURRENT_SOURCE_DIR}/glsl ${GEN_INCLUDE_DIR}
-        DEPENDS ${GLSL_SRC}
-        COMMENT "Generating shaders as byte arrays"
+        DEPENDS ${GLSL_SRC} ${PROJECT_SOURCE_DIR}/scripts/generate_shaders.py
+        COMMENT "Generating shaders as byte arrays."
         VERBATIM
 )
 
