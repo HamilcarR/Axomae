@@ -1,6 +1,7 @@
 #include "../device_transfer_interface.h"
 #include "../device_utils.h"
 #include "CudaDevice.h"
+#include "internal/device/gpgpu/device_resource_data.h"
 #include <cuda_gl_interop.h>
 #include <driver_types.h>
 #include <vector>
@@ -62,6 +63,16 @@ namespace device::gpgpu {
 
   /*******************************************************************************************************************************************************************************/
   /** Generic buffers allocation and deallocation **/
+
+  GPU_query_result allocate_device_managed(std::size_t buffer_size_byte, bool global_access) {
+    if (!validate_gpu_state())
+      return ret_error();
+    GPU_query_result query_result;
+    query_result.error_status = DeviceError(
+        cudaMallocManaged(&query_result.device_ptr, buffer_size_byte, global_access ? cudaMemAttachGlobal : cudaMemAttachHost));
+    query_result.size = buffer_size_byte;
+    return query_result;
+  }
 
   GPU_query_result allocate_symbol(void **sym, std::size_t size_bytes) {
     if (!validate_gpu_state())
@@ -307,6 +318,30 @@ namespace device::gpgpu {
   /*******************************************************************************************************************************************************************************/
   /** Unified memory access */
 
+  class DeviceSharedBufferView::Impl {
+   public:
+    void *buffer{};
+    std::size_t size{};  // In bytes
+    bool is_pinned{};    // could use
+
+    Impl() = default;
+    Impl(void *buffer, std::size_t size) : buffer(buffer), size(size) {}
+  };
+
+  DeviceSharedBufferView::DeviceSharedBufferView() : pimpl(std::make_shared<Impl>()) {}
+  DeviceSharedBufferView::~DeviceSharedBufferView() = default;
+  DeviceSharedBufferView::DeviceSharedBufferView(DeviceSharedBufferView &&) noexcept = default;
+  DeviceSharedBufferView &DeviceSharedBufferView::operator=(DeviceSharedBufferView &&) noexcept = default;
+  std::size_t DeviceSharedBufferView::bufferSizeBytes() const { return pimpl->size; }
+  void *DeviceSharedBufferView::getCastData() const { return pimpl->buffer; }
+  void DeviceSharedBufferView::initBuffer(void *buffer, std::size_t size) { pimpl = std::make_shared<Impl>(buffer, size); }
+  bool DeviceSharedBufferView::isMapped() const { return pimpl->is_pinned; }
+
+  template<>
+  std::size_t DeviceSharedBufferView::size<void>() const {
+    return bufferSizeBytes();
+  }
+
   unsigned int get_cuda_host_register_flag(PIN_MODE mode) {
     switch (mode) {
       case PIN_MODE_DEFAULT:
@@ -322,6 +357,25 @@ namespace device::gpgpu {
       default:
         return cudaHostRegisterDefault;
     }
+  }
+
+  GPU_query_result pin_host_memory(DeviceSharedBufferView &buffer, PIN_MODE mode) {
+    GPU_query_result result;
+    result.error_status = DeviceError(cudaHostRegister(buffer.data<void>(), buffer.size<void>(), get_cuda_host_register_flag(mode)));
+    result.device_ptr = buffer.data<void>();
+    if (result.error_status.isValid())
+      buffer.pimpl->is_pinned = true;
+    return result;
+  }
+
+  GPU_query_result unpin_host_memory(DeviceSharedBufferView &buffer) {
+    GPU_query_result result;
+    ax_cuda::CudaDevice device;
+    result.error_status = DeviceError(cudaHostUnregister(buffer.data<void>()));
+    result.device_ptr = nullptr;
+    if (result.error_status.isValid())
+      buffer.pimpl->is_pinned = false;
+    return result;
   }
 
   GPU_query_result pin_host_memory(void *buffer, std::size_t size_bytes, PIN_MODE mode) {

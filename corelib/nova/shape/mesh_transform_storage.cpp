@@ -1,38 +1,64 @@
 #include "mesh_transform_storage.h"
 #include <internal/common/math/math_utils.h>
+#include <internal/debug/Logger.h>
 #include <internal/device/gpgpu/device_transfer_interface.h>
-#include <limits>
 namespace nova::shape::transform {
+
 #ifdef AXOMAE_USE_CUDA
   constexpr bool is_gpu_build = true;
 #else
   constexpr bool is_gpu_build = false;
 #endif
 
-  class Storage::GPUImpl {
-    using GPUSharedBuffer = device::gpgpu::DeviceSharedBufferView;
-    GPUSharedBuffer shared_buffer;
+  template<bool use_gpu>
+  class GPUPolicyCompileDispatcher;
 
-   public:
+  template<>
+  class GPUPolicyCompileDispatcher<true> {
+   private:
+    using GPUSharedBuffer = device::gpgpu::DeviceSharedBufferView;
+    std::unique_ptr<GPUSharedBuffer> shared_buffer;
+
+   protected:
+    GPUPolicyCompileDispatcher() { shared_buffer = std::make_unique<GPUSharedBuffer>(); }
+
     template<class T>
-    void addBuffer(axstd::span<T> &lockable_memory_area) {
-      if constexpr (is_gpu_build)
-        shared_buffer = GPUSharedBuffer(lockable_memory_area.data(), lockable_memory_area.size());
+    void addBuffer(const axstd::span<T> &lockable_memory_area) {
+      *shared_buffer = GPUSharedBuffer(lockable_memory_area.data(), lockable_memory_area.size());
     }
 
     void map() {
-      if constexpr (is_gpu_build) {
-        auto query_result = pin_host_memory(shared_buffer, device::gpgpu::PIN_MODE_RO);
-        DEVICE_ERROR_CHECK(query_result.error_status);
-      }
+      auto query_result = pin_host_memory(*shared_buffer, device::gpgpu::PIN_MODE_RO);
+      DEVICE_ERROR_CHECK(query_result.error_status);
     }
 
     void unmap() {
-      if constexpr (is_gpu_build) {
-        auto query_result = unpin_host_memory(shared_buffer);
-        DEVICE_ERROR_CHECK(query_result.error_status);
-      }
+      auto query_result = unpin_host_memory(*shared_buffer);
+      DEVICE_ERROR_CHECK(query_result.error_status);
     }
+  };
+
+  template<>
+  class GPUPolicyCompileDispatcher<false> {
+   protected:
+    template<class T>
+    void addBuffer(const axstd::span<T> &lockable_memory_area) {}
+
+    void map() {}
+
+    void unmap() {}
+  };
+
+  class Storage::GPUImpl : public GPUPolicyCompileDispatcher<is_gpu_build> {
+   public:
+    template<class T>
+    void addBuffer(const axstd::span<T> &lockable_memory_area) {
+      GPUPolicyCompileDispatcher<is_gpu_build>::addBuffer(lockable_memory_area);
+    }
+
+    void map() { GPUPolicyCompileDispatcher<is_gpu_build>::map(); }
+
+    void unmap() { GPUPolicyCompileDispatcher<is_gpu_build>::unmap(); }
   };
   /*******************************************************************************************************************************************/
   static void hash_matrix4x4(std::size_t &seed, const glm::mat4 &matrix) {

@@ -1,8 +1,9 @@
 #ifndef MESH_TRANSFORM_STORAGE_H
 #define MESH_TRANSFORM_STORAGE_H
 
+#include "device_host_common.h"
 #include <boost/functional/hash.hpp>
-#include <glm/glm.hpp>
+#include <internal/common/axstd/managed_buffer.h>
 #include <internal/common/axstd/span.h>
 #include <internal/macro/project_macros.h>
 
@@ -13,15 +14,6 @@ namespace nova::shape::transform {
   struct transform_hash_t {
     std::size_t hash;
     std::size_t transform_offset;
-  };
-
-  struct transform4x4_t {
-    glm::mat4 m;
-    glm::mat4 inv;                                                               // inverse
-    glm::mat4 t;                                                                 // transpose
-    glm::mat3 n;                                                                 // normal ( mat3(transpose(invert(m)) )
-    bool operator==(const transform4x4_t &other) const { return m == other.m; }  // no need to compare the others , waste of cycles.
-    static constexpr std::size_t padding() { return 57; }                        // how many elements in the record
   };
 
   std::size_t hash(const transform4x4_t &obj);

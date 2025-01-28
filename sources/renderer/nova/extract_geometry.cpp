@@ -7,7 +7,7 @@ namespace nova_baker_utils {
 #ifdef AXOMAE_USE_CUDA
   nova::shape::triangle::mesh_vbo_ids vbos_from_drawable(const Drawable &drawable) {
     namespace nst = nova::shape::triangle;
-    nst::mesh_vbo_ids vbos;
+    nst::mesh_vbo_ids vbos{};
     const PackedGLGeometryBuffer &pkd_geo = drawable.getMeshGLBuffers();
     vbos.vbo_positions = pkd_geo.getVertexBufferID().getID();
     vbos.vbo_normals = pkd_geo.getNormalBufferID().getID();

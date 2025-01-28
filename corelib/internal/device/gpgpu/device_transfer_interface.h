@@ -15,7 +15,7 @@ namespace device::gpgpu {
   /** Context Sharing **/
   void init_driver_API();
   void create_context(GPUContext &context);
-  void set_current_context(GPUContext& context);
+  void set_current_context(GPUContext &context);
   /*******************************************************************************************************************************************************************************/
   /** Device Synchronizations **/
   GPU_query_result synchronize_device();
@@ -28,7 +28,7 @@ namespace device::gpgpu {
   /** Generic buffers allocation and deallocation **/
 
   enum COPY_MODE { HOST_HOST = 0, HOST_DEVICE = 1, DEVICE_HOST = 2, DEVICE_DEVICE = 3 };
-
+  GPU_query_result allocate_device_managed(std::size_t buffer_size_bytes, bool global_access);
   GPU_query_result allocate_buffer(std::size_t buffer_size_bytes);
   GPU_query_result allocate_symbol(void **symbol, std::size_t buffer_size_bytes);
   GPU_query_result copy_buffer(const void *src, void *dest, std::size_t buffer_size_bytes, COPY_MODE copy_type);
@@ -53,6 +53,69 @@ namespace device::gpgpu {
 
   enum PIN_EXT { PIN_EXT_NOOP };
   enum PIN_MODE { PIN_MODE_DEFAULT = 0, PIN_MODE_PORTABLE = 1, PIN_MODE_MAPPED = 2, PIN_MODE_IO = 3, PIN_MODE_RO = 4 };
+
+  /************************************************************************************************************************************************************************************/
+  /**
+   * Representation of a buffer in memory. Can be a GPU memory or CPU memory buffer.
+   */
+  class DeviceSharedBufferView {
+    class Impl;
+    std::shared_ptr<Impl> pimpl;
+
+   public:
+    DeviceSharedBufferView();
+    /**
+     * Creates a GPUDeviceBuffer .
+     * @tparam T Type of the buffer's elements.
+     * @param buffer Buffer memory to reference.
+     * @param size Number of T elements.
+     */
+    template<class T>
+    DeviceSharedBufferView(T *buffer, unsigned size) {
+      initBuffer(buffer, size * sizeof(T));
+    }
+
+    ~DeviceSharedBufferView();
+    DeviceSharedBufferView(const DeviceSharedBufferView &) = delete;
+    DeviceSharedBufferView &operator=(const DeviceSharedBufferView &) = delete;
+    DeviceSharedBufferView(DeviceSharedBufferView &&) noexcept;
+    DeviceSharedBufferView &operator=(DeviceSharedBufferView &&) noexcept;
+
+    /**
+     * Returns size of buffer in number of elements.
+     * @tparam T Type of the element of the buffer.
+     * @return Total size of the underlying buffer in number of elements.
+     */
+    template<class T>
+    std::size_t size() const {
+      return bufferSizeBytes() / sizeof(T);
+    }
+
+    /**
+     * Returns an address to the underlying buffer and casts it to T
+     * @tparam T Type of the returned buffer.
+     * @return Address of the buffer.
+     */
+    template<class T>
+    T *data() const {
+      return static_cast<T *>(getCastData());
+    }
+
+    /**
+     * Checks if the buffer has been pinned.
+     */
+    bool isMapped() const;
+    friend GPU_query_result pin_host_memory(DeviceSharedBufferView &buffer, PIN_MODE mode);
+    friend GPU_query_result unpin_host_memory(DeviceSharedBufferView &buffer);
+
+   private:
+    void initBuffer(void *buffer, size_t size);
+    void *getCastData() const;
+    std::size_t bufferSizeBytes() const;
+  };
+
+  template<>
+  std::size_t DeviceSharedBufferView::size<void>() const;
 
   GPU_query_result pin_host_memory(void *buffer, std::size_t host_buffer_in_bytes, PIN_MODE mode);
   GPU_query_result unpin_host_memory(void *buffer);

@@ -17,7 +17,6 @@ namespace nova {
   };
 
   /* For AA */
-  class RayDifferential : public Ray {
-  };
+  class RayDifferential : public Ray {};
 }  // namespace nova
 #endif

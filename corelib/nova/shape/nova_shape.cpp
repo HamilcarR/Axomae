@@ -3,7 +3,9 @@
 
 namespace nova::shape {
 
-  void ShapeResourcesHolder::init() {
+  void ShapeResourcesHolder::init(const shape_init_record_t &startup_data) { mesh_transform_storage.init(startup_data.total_triangle_meshes); }
+
+  void ShapeResourcesHolder::lockResources() {
     triangle_mesh_storage.init();
     updateMeshBuffers();
   }
@@ -17,6 +19,6 @@ namespace nova::shape {
 
   void ShapeResourcesHolder::addTriangleMeshGPU(const triangle::mesh_vbo_ids &mesh_vbos) { triangle_mesh_storage.addGeometryGPU(mesh_vbos); }
 
-  void ShapeResourcesHolder::release() { triangle_mesh_storage.release(); }
+  void ShapeResourcesHolder::releaseResources() { triangle_mesh_storage.release(); }
 
 }  // namespace nova::shape
