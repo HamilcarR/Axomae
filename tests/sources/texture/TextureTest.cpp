@@ -8,7 +8,7 @@
       CubemapTexture, EnvironmentMap2DTexture, IrradianceTexture, BRDFLookupTexture, FrameBufferTexture, RoughnessTexture
 
 template<class HEAD, class... TAIL>
-constexpr void check_returned_types() {
+void check_returned_types() {
   if constexpr (sizeof...(TAIL) > 0) {
     U32TexData texdata{};
     std::unique_ptr<HEAD> instance = std::make_unique<PRVINTERFACE<HEAD, U32TexData *>>(&texdata);

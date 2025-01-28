@@ -26,7 +26,6 @@ markers=(".git/" ".clang-tidy" ".clang-format" "LICENSE" "README.md" ".gitmodule
 check_current_dir(){
   for marker in "${markers[@]}"; do 
     if [ ! -e $marker ]; then 
-      echo "$marker"
       printf "Not in project root.\nExecute this script from the project root dir.\n" ; 
       exit 1
     fi

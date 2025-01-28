@@ -4,6 +4,8 @@
 #include <boost/math/ccmath/ccmath.hpp>
 #include <internal/macro/project_macros.h>
 
+extern "C" const float _binary_acos_table_start[];
+
 constexpr float math::acos_approx(float x) {
   float negate = x < 0;
   x = boost::math::ccmath::abs(x);
@@ -23,15 +25,16 @@ namespace math::spherical {
   namespace acos {
 
     constexpr int lut_precision = PRECISION_LUT;
-    extern const uint8_t _binary_acos_table_start[];
+
     inline float lut(int pos) {
       AX_ASSERT_LT(pos, lut_precision);
-      return reinterpret_cast<const float *>(_binary_acos_table_start)[pos];
+      const float *table = _binary_acos_table_start;
+      return table[pos];
     }
 
   }  // namespace acos
 
-  inline float acos_lt(float a) {
+  float acos_lt(float a) {
     int scaled = std::clamp((int)((a + 1.f) * acos::lut_precision * 0.5f), 0, acos::lut_precision - 1);
     return acos::lut(scaled);
   }
