@@ -18,6 +18,7 @@ target_link_libraries(ax_core_nova_shape PRIVATE
         ax_core_memory
         ax_core_device
 )
+
 target_link_libraries(ax_core_nova PUBLIC ax_core_nova_shape)
 
 target_include_directories(ax_core_nova_shape PUBLIC

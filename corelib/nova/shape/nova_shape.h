@@ -2,7 +2,9 @@
 #define NOVA_SHAPE_H
 #include "ShapeInterface.h"
 #include "internal/memory/MemoryArena.h"
+#include "mesh_transform_storage.h"
 #include "triangle_mesh_storage.h"
+
 #include <memory>
 namespace nova {
   class Ray;
@@ -10,12 +12,15 @@ namespace nova {
 
 namespace nova::shape {
 
+  struct shape_init_record_t {
+    std::size_t total_triangle_meshes;
+  };
+
   class ShapeResourcesHolder {
-   private:
     /* Generic shape pointers*/
     std::vector<NovaShapeInterface> shapes;
-
     triangle::Storage triangle_mesh_storage;
+    transform::Storage mesh_transform_storage;
 
    public:
     CLASS_M(ShapeResourcesHolder)
@@ -38,10 +43,11 @@ namespace nova::shape {
     void clear() {
       shapes.clear();
       triangle_mesh_storage.clear();
+      mesh_transform_storage.clear();
     }
-
-    void init();
-    void release();
+    void init(const shape_init_record_t &init_data);
+    void lockResources();
+    void releaseResources();
     void updateMeshBuffers();
     const triangle::Storage &getTriangleMeshStorage() const { return triangle_mesh_storage; }
   };

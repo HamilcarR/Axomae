@@ -8,17 +8,11 @@ namespace nova::shape {
 
   /* We keep track of the mesh list in a static variable to fit multiple Triangle instances into a cache line. */
   static const axstd::span<Object3D> *triangle_mesh_list = nullptr;
-#ifdef AXOMAE_USE_CUDA
-  ax_device_managed axstd::span<Object3D> device_triangle_mesh_list;
-#endif
+  ax_device_managed axstd::span<const Object3D> device_triangle_mesh_list;
 
   ax_host_only void Triangle::updateCpuMeshList(const axstd::span<Object3D> *mesh_list) { triangle_mesh_list = mesh_list; }
 
-  ax_host_only void Triangle::updateGpuMeshList(const axstd::span<Object3D> *mesh_list) {
-#ifdef AXOMAE_USE_CUDA
-    device_triangle_mesh_list = *mesh_list;
-#endif
-  }
+  ax_host_only void Triangle::updateGpuMeshList(const axstd::span<Object3D> *mesh_list) { device_triangle_mesh_list = *mesh_list; }
 
   ax_device_callable const Object3D *Triangle::getMesh() const {
 #ifdef __CUDA_ARCH__
@@ -94,7 +88,7 @@ namespace nova::shape {
   /*
    * https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
    */
-  ax_device_callable bool Triangle::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const {
+  ax_device_callable bool Triangle::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options * /*user_options*/) const {
     using namespace math::geometry;
     glm::vec3 P = glm::cross(ray.direction, e2);
     const float det = glm::dot(P, e1);

@@ -358,7 +358,7 @@ namespace controller {
 
     if (use_gpu) {
       nova::NovaResourceManager *res_manager = render_scene_data.nova_resource_manager;
-      res_manager->getShapeData().init();
+      res_manager->getShapeData().lockResources();
       render_scene_data.nova_resource_manager->getShapeData().updateMeshBuffers();
       pin_storage(render_scene_data.nova_resource_manager->getShapeData(), render_scene_data.shared_caches);
       callback =
@@ -561,7 +561,7 @@ namespace controller {
     if (nova_resource_manager) {
       nova_resource_manager->getEngineData().is_rendering = false;
       /* Cleanup gpu resources */
-      nova_resource_manager->getShapeData().release();
+      nova_resource_manager->getShapeData().releaseResources();
     }
     if (global_application_config && global_application_config->getThreadPool()) {
       /* Empty scheduler list. */
