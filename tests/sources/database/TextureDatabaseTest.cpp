@@ -6,7 +6,7 @@ const int COUNT = 16;
 namespace texture_database_test {
 
   template<class HEAD, class... TAIL>
-  constexpr void addTexture(IResourceDB<int, GenericTexture> &database, U32TexData *data) {
+  void addTexture(IResourceDB<int, GenericTexture> &database, U32TexData *data) {
     math::random::CPUPseudoRandomGenerator generator;
     bool persistence = generator.randb();
     database::texture::store<HEAD>(database, persistence, data);

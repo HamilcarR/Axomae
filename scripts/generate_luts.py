@@ -13,9 +13,8 @@ def generate_acos(precision , path):
     for i in range(0 , precision):
         scaled = (i / precision) * 2 - 1 
         acos_table.append(math.acos(scaled))
-         
     file = open(path , "wb")
-    arr = array('d' , acos_table)
+    arr = array('f' , acos_table)
     file.write(arr)
     file.close()
     return path
@@ -29,10 +28,12 @@ subprocess.run([
     "-I", "binary",
     "-O", "elf64-x86-64",
     "-B", "i386:x86-64",
-    "--rename-section", ".data=.rodata,alloc,load,readonly,data,contents",
+    "--rename-section", ".data=.rodata",
     acos_filename,
     acos_filename + ".o"
 ])
+
+subprocess.run(["rm" , acos_filename])
 
 print(acos_filename)
 print(acos_filename + ".o")
