@@ -1,4 +1,5 @@
 #include "nova_shape.h"
+#include "shape_datastructures.h"
 #include <internal/device/gpgpu/device_transfer_interface.h>
 
 namespace nova::shape {
@@ -7,18 +8,30 @@ namespace nova::shape {
 
   void ShapeResourcesHolder::lockResources() {
     triangle_mesh_storage.init();
-    updateMeshBuffers();
+    mapBuffers();
   }
-  void ShapeResourcesHolder::updateMeshBuffers() {
-    Triangle::updateCpuMeshList(&triangle_mesh_storage.getCPUBuffersView());
+
+  void ShapeResourcesHolder::updateSharedBuffers() {
+    transform::mesh_transform_views_t transform_views = mesh_transform_storage.getTransformViews();
+    triangle::mesh_vertex_attrib_views_t geometry_triangle_views = triangle_mesh_storage.getGeometryViews();
+    shared_buffers.geometry = geometry_triangle_views;
+    shared_buffers.transforms = transform_views;
+    Triangle::updateSharedBuffers(shared_buffers);
+  }
+
+  void ShapeResourcesHolder::mapBuffers() {
+    updateSharedBuffers();
 #ifdef AXOMAE_USE_CUDA
     triangle_mesh_storage.mapBuffers();
-    Triangle::updateGpuMeshList(&triangle_mesh_storage.getGPUBuffersView());
 #endif
   }
 
   void ShapeResourcesHolder::addTriangleMeshGPU(const triangle::mesh_vbo_ids &mesh_vbos) { triangle_mesh_storage.addGeometryGPU(mesh_vbos); }
 
+  void ShapeResourcesHolder::addTriangleMesh(Object3D triangle_mesh, const glm::mat4 &transform) {
+    std::size_t mesh_index = triangle_mesh_storage.addGeometryCPU(triangle_mesh);
+    mesh_transform_storage.add(transform, mesh_index);
+  }
   void ShapeResourcesHolder::releaseResources() { triangle_mesh_storage.release(); }
 
 }  // namespace nova::shape

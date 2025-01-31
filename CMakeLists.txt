@@ -20,9 +20,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_PREFIX_PATH "" CACHE FILEPATH "")
 set(CMAKE_INCLUDE_PATH "" CACHE FILEPATH "")
 set(CMAKE_LIBRARY_PATH "" CACHE FILEPATH "")
-set(AXOMAE_USE_GOLD "ON" CACHE BOOL "Use GOLD linker")
-set(AXOMAE_USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
-set(AXOMAE_USE_LLD "OFF" CACHE BOOL "USE LLVM linker")
 option(AXOMAE_USE_SCCACHE "Use sccache for build optimization" OFF)
 if(AXOMAE_USE_SCCACHE)
     find_program(SCCACHE sccache)
@@ -33,20 +30,16 @@ if(AXOMAE_USE_SCCACHE)
     endif ()
 endif ()
 
-# CUDA Compilation
-option(AXOMAE_USE_CUDA "Use GPU when available" OFF)
-
 #****************************************************************************************************
 #custom project variables
 set(AXOMAE_STATS_TIMER "OFF" CACHE BOOL "Enable performance loggers . Note : Displays only in --verbose mode")
 option(AXOMAE_LUT_HIGHP "Enable high precision when computing lookup tables." OFF)
 option(AXOMAE_LUT_MEDIUMP "Enable medium precision when computing lookup tables." ON)
 option(AXOMAE_LUT_LOWP "Enable low precision when computing lookup tables." OFF)
-option(AXOMAE_BUILD_TESTS "Build unit tests." ON)
-option(AXOMAE_FROMSOURCE_QT_BUILD "Build QT from source." ON)
-
 #****************************************************************************************************
 # Dependencies
+option(AXOMAE_USE_EMBREE "Replace native BVH with Embree's partition" ON)
+option(AXOMAE_FROMSOURCE_QT_BUILD "Build QT from source." ON)
 if(AXOMAE_FROMSOURCE_QT_BUILD)
     include(cmake/BuildQt6.cmake)
 else()
@@ -56,6 +49,9 @@ else()
 endif()
 include(cmake/FindDependencies.cmake)
 
+
+# CUDA Compilation
+option(AXOMAE_USE_CUDA "Use GPU when available" OFF)
 if(NOT CUDAToolkit_FOUND)
     message(STATUS "Cuda toolkit not found. Setting AXOMAE_USE_CUDA to off.")
     set(AXOMAE_USE_CUDA "OFF" CACHE BOOL "Use GPU when available")
@@ -114,6 +110,9 @@ target_link_libraries(${PROJECT_NAME} PUBLIC compile_opts)
 #****************************************************************************************************
 # Link
 
+set(AXOMAE_USE_GOLD "ON" CACHE BOOL "Use GOLD linker")
+set(AXOMAE_USE_MOLD "OFF" CACHE BOOL "USE MOLD linker")
+set(AXOMAE_USE_LLD "OFF" CACHE BOOL "USE LLVM linker")
 
 if(AXOMAE_USE_GOLD)
     target_link_options(compile_opts INTERFACE -fuse-ld=gold)
@@ -149,6 +148,7 @@ endif()
 
 #****************************************************************************************************
 # Testing
+option(AXOMAE_BUILD_TESTS "Build unit tests." ON)
 if(AXOMAE_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)

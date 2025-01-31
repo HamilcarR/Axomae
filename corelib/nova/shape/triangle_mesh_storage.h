@@ -1,5 +1,6 @@
 #ifndef TRIANGLE_MESH_STORAGE_H
 #define TRIANGLE_MESH_STORAGE_H
+#include "shape/shape_datastructures.h"
 #include <internal/geometry/Object3D.h>
 
 #ifdef AXOMAE_USE_CUDA
@@ -44,7 +45,8 @@ namespace nova::shape::triangle {
     device_storage gpu_geometry;
 
    public:
-    void addGeometryCPU(const Object3D &geometry);
+    /* Returns index of the added mesh */
+    std::size_t addGeometryCPU(const Object3D &geometry);
     void addGeometryGPU(const mesh_vbo_ids &mesh_vbos);
     const axstd::span<Object3D> &getCPUBuffersView() const;
     const axstd::span<Object3D> &getGPUBuffersView() const;
@@ -52,6 +54,7 @@ namespace nova::shape::triangle {
     void mapBuffers();
     void init();
     void release();
+    mesh_vertex_attrib_views_t getGeometryViews() const;
   };
 }  // namespace nova::shape::triangle
 #endif

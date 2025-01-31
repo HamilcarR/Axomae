@@ -1,7 +1,8 @@
 add_library(ax_core_nova_aggregate STATIC
         bvh/Bvh.cpp
         bvh/BvhBuilder.cpp
-)
+        acceleration_interface.cpp
+      )
 
 
 target_link_libraries(ax_core_nova_aggregate PRIVATE
@@ -13,6 +14,9 @@ target_link_libraries(ax_core_nova_aggregate PRIVATE
         ax_core_memory
         ax_core_device
 )
+if(AXOMAE_USE_EMBREE)
+  target_link_libraries(ax_core_nova_aggregate PRIVATE embree )
+endif(AXOMAE_USE_EMBREE)
 
 target_link_libraries(ax_core_nova PUBLIC ax_core_nova_aggregate)
 

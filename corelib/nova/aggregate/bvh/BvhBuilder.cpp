@@ -1,10 +1,9 @@
 #include "BvhBuilder.h"
 
 #include "primitive/nova_primitive.h"
-
-#include "internal/common/exception/GenericException.h"
-
 #include <internal/common/axstd/span.h>
+#include <internal/common/exception/GenericException.h>
+#include <internal/geometry/BoundingBox.h>
 
 namespace exception {
   class BadSizeException : public GenericException {

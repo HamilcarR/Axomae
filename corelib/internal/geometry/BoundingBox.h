@@ -1,8 +1,8 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
 
-#include "internal/common/math/math_utils.h"
 #include <internal/common/axstd/span.h>
+#include <internal/common/math/math_utils.h>
 #include <internal/macro/project_macros.h>
 #include <vector>
 

@@ -9,7 +9,8 @@ add_library(ax_core_nova_shape STATIC
         nova_shape.cpp
         triangle_mesh_storage.cpp
         mesh_transform_storage.cpp
-)
+        shape_datastructures.cpp
+      )
 
 target_link_libraries(ax_core_nova_shape PRIVATE
         ax_core_geometry
@@ -32,4 +33,6 @@ register_device_compilation(
         Square.cpp
         ShapeInterface.cpp
         triangle_mesh_storage.cpp
-        mesh_transform_storage.cpp)
+        mesh_transform_storage.cpp
+        shape_datastructures.cpp
+      )

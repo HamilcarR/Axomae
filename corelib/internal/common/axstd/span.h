@@ -45,6 +45,13 @@ namespace axstd {
       return *this;
     }
 
+    template<class Container>
+    ax_device_callable constexpr span &operator=(const Container &container) noexcept {
+      static_assert(std::is_trivially_copyable_v<typename Container::pointer>, "Container must be trivially copyable");
+      ptr = container.data();
+      len = container.size();
+      return *this;
+    }
     ax_device_callable constexpr reference front() const noexcept { return *ptr; }
     ax_device_callable constexpr reference back() const noexcept { return *(ptr + len - 1); }
     ax_device_callable constexpr reference operator[](size_type index) const noexcept { return ptr[index]; }

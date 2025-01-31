@@ -7,7 +7,7 @@ import math
 from array import array
 import subprocess
 
-# Generates f:[-1 , 1] -> [0 , PI]
+# Generates arc-cosine table f:[-1 , 1] -> [0 , PI]
 def generate_acos(precision , path):
     acos_table = []
     for i in range(0 , precision):
@@ -19,21 +19,27 @@ def generate_acos(precision , path):
     file.close()
     return path
 
-PRECISION = sys.argv[1]
-ACOS_NAME = sys.argv[2]
 
-acos_filename = generate_acos(int(PRECISION) , ACOS_NAME)
-subprocess.run([
+def generate_object_file(filename):
+    subprocess.run([
     "objcopy",
     "-I", "binary",
     "-O", "elf64-x86-64",
     "-B", "i386:x86-64",
     "--rename-section", ".data=.rodata",
-    acos_filename,
-    acos_filename + ".o"
-])
+    filename,
+    filename + ".o"
+    ])
+    
+    subprocess.run(["rm" , filename])
 
-subprocess.run(["rm" , acos_filename])
 
-print(acos_filename)
-print(acos_filename + ".o")
+
+
+PRECISION = sys.argv[1]
+ACOS_NAME = sys.argv[2]
+
+acos_filename = generate_acos(int(PRECISION) , ACOS_NAME)
+generate_object_file(acos_filename)
+
+

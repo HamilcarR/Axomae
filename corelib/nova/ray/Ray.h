@@ -1,6 +1,6 @@
 #ifndef RAY_H
 #define RAY_H
-#include "internal/common/math/math_utils.h"
+#include <internal/common/math/math_utils.h>
 
 #include <internal/macro/project_macros.h>
 namespace nova {

@@ -3,9 +3,9 @@
 #include "ShapeInterface.h"
 #include "internal/memory/MemoryArena.h"
 #include "mesh_transform_storage.h"
+#include "shape/Triangle.h"
 #include "triangle_mesh_storage.h"
 
-#include <memory>
 namespace nova {
   class Ray;
 }
@@ -21,6 +21,7 @@ namespace nova::shape {
     std::vector<NovaShapeInterface> shapes;
     triangle::Storage triangle_mesh_storage;
     transform::Storage mesh_transform_storage;
+    mesh_shared_views_t shared_buffers;
 
    public:
     CLASS_M(ShapeResourcesHolder)
@@ -35,7 +36,7 @@ namespace nova::shape {
       return shapes.back();
     }
 
-    void addTriangleMesh(Object3D triangle_mesh) { triangle_mesh_storage.addGeometryCPU(triangle_mesh); }
+    void addTriangleMesh(Object3D triangle_mesh, const glm::mat4 &transform);
     void addTriangleMeshGPU(const triangle::mesh_vbo_ids &mesh_vbos);
     std::vector<NovaShapeInterface> &get_shapes() { return shapes; }
     ax_no_discard const std::vector<NovaShapeInterface> &get_shapes() const { return shapes; }
@@ -45,10 +46,12 @@ namespace nova::shape {
       triangle_mesh_storage.clear();
       mesh_transform_storage.clear();
     }
+
+    void updateSharedBuffers();
     void init(const shape_init_record_t &init_data);
     void lockResources();
     void releaseResources();
-    void updateMeshBuffers();
+    void mapBuffers();
     const triangle::Storage &getTriangleMeshStorage() const { return triangle_mesh_storage; }
   };
 

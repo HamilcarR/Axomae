@@ -63,7 +63,7 @@ namespace nova {
       random = random_sampler.sample(0, 1);
       nova::shape::Triangle tri;
 
-      const Object3D *mesh = tri.getMesh();
+      const Object3D *mesh = tri.getMesh().geometry;
       if (ax_device_linearRM3D_idx < mesh->uv.size())
         printf("warp id:%u ::: lane id:%u ::: i:%d  ::: value:%f\n",
                ax_device_warp_id,
