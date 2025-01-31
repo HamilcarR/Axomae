@@ -1,8 +1,12 @@
 #include "triangle_mesh_storage.h"
+#include "shape_datastructures.h"
 
 namespace nova::shape::triangle {
 
-  void Storage::addGeometryCPU(const Object3D &geometry) { cpu_geometry.geometry_storage.push_back(geometry); }
+  std::size_t Storage::addGeometryCPU(const Object3D &geometry) {
+    cpu_geometry.geometry_storage.push_back(geometry);
+    return cpu_geometry.geometry_storage.size() - 1;
+  }
 
   void Storage::addGeometryGPU(const mesh_vbo_ids &vbos) {
 #ifdef AXOMAE_USE_CUDA
@@ -64,7 +68,7 @@ namespace nova::shape::triangle {
 #endif
   }
 
-  void Storage::init() {
+  void Storage::init() {  // change name !!! leave init for mesh size storage init only ... rename to lock or something
 #ifdef AXOMAE_USE_CUDA
     for (auto &tracker : gpu_geometry.buffers_trackers) {
       map_gpu_resources(tracker);
@@ -89,6 +93,13 @@ namespace nova::shape::triangle {
     cpu_geometry.geometry_storage.clear();
     gpu_geometry.geometry_storage.clear();
     gpu_geometry.buffers_trackers.clear();
+  }
+
+  mesh_vertex_attrib_views_t Storage::getGeometryViews() const {
+    mesh_vertex_attrib_views_t views;
+    views.host_geometry_view = cpu_geometry.geometry_storage;
+    views.device_geometry_view = gpu_geometry.geometry_storage;
+    return views;
   }
 
 }  // namespace nova::shape::triangle

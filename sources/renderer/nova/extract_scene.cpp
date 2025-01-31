@@ -50,6 +50,13 @@ namespace nova_baker_utils {
     return meshes;
   }
 
+  static void initialize_resources_holders(nova::NovaResourceManager &manager, std::size_t meshes_number) {
+    auto &shape_reshdr = manager.getShapeData();
+    nova::shape::shape_init_record_t init_data{};
+    init_data.total_triangle_meshes = meshes_number;
+    shape_reshdr.init(init_data);
+  }
+
   bake_buffers_storage_t build_scene(const std::vector<drawable_original_transform> &drawables_orig_transfo, nova::NovaResourceManager &manager) {
     core::memory::ByteArena &memory_pool = manager.getMemoryPool();
     std::vector<Mesh *> meshes = retrieve_meshes_from_drawables(drawables_orig_transfo);
@@ -63,15 +70,17 @@ namespace nova_baker_utils {
     texture_buffers_t texture_buffers{};
     texture_buffers.image_alloc_buffer = axstd::span<nova::texturing::ImageTexture>(image_texture_buffer, PBR_PIPELINE_TEX_NUM * meshes.size());
     material_buffers_t material_buffers = allocate_materials_buffers(manager.getMemoryPool(), meshes.size());
-    std::size_t alloc_offset_primitives = 0, alloc_offset_materials = 0, alloc_offset_textures = 0;
-
+    initialize_resources_holders(manager, meshes.size());
+    std::size_t alloc_offset_primitives = 0, alloc_offset_materials = 0, alloc_offset_textures = 0, mesh_index = 0;
     for (const drawable_original_transform &dtf : drawables_orig_transfo) {
 
       nova::material::NovaMaterialInterface material = setup_material_data(
           material_buffers, texture_buffers, *dtf.mesh, manager, alloc_offset_textures, alloc_offset_materials);
 
-      setup_geometry_data(primitive_buffers, dtf, alloc_offset_primitives, material, manager);
+      setup_geometry_data(primitive_buffers, dtf, alloc_offset_primitives, material, manager, mesh_index);
+      mesh_index++;
     }
+    manager.getShapeData().updateSharedBuffers();
     bake_buffers_storage_t bake_buffers_storage{};
     bake_buffers_storage.material_buffers = material_buffers;
     bake_buffers_storage.primitive_buffers = primitive_buffers;

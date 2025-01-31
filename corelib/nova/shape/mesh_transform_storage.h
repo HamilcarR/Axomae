@@ -1,7 +1,7 @@
 #ifndef MESH_TRANSFORM_STORAGE_H
 #define MESH_TRANSFORM_STORAGE_H
 
-#include "device_host_common.h"
+#include "shape_datastructures.h"
 #include <boost/functional/hash.hpp>
 #include <internal/common/axstd/managed_buffer.h>
 #include <internal/common/axstd/span.h>
@@ -9,7 +9,6 @@
 
 /* Stores a unique transformation, for lower memory footprint . */
 namespace nova::shape::transform {
-  constexpr std::size_t INVALID_OFFSET = std::numeric_limits<std::size_t>::max();
 
   struct transform_hash_t {
     std::size_t hash;
@@ -26,12 +25,8 @@ namespace nova::shape::transform {
      * elements[0] , elements[1] , elements[2] , elements[3] are the first column of m.\n
      * elements[16] , ... , elements[19] are the first column of inv.\n
      */
-    std::vector<float> elements;
-
-    /**
-     * View on <code>elements</code> buffer.
-     */
-    axstd::span<float> elements_view;
+    // std::vector<float> elements;
+    axstd::managed_vector<float> elements;
   };
 
   struct transform_lookup_t {
@@ -39,12 +34,7 @@ namespace nova::shape::transform {
      * Keeps track of the transformation of each mesh using an offset on <code>matrix_elem_storage_t::elements</code> , ie \n
      * offsets[mesh_id] = mesh_id's transformation matrix offset.
      */
-    std::vector<std::size_t> offsets;
-
-    /**
-     * View on <code>offsets</code> buffer.
-     */
-    axstd::span<std::size_t> offsets_view;
+    axstd::managed_vector<std::size_t> offsets;
 
     /**
      * Stores every unique transformation hash as key , and the offset of the first element of m matrix in their transform4x4_t as value.
@@ -53,23 +43,15 @@ namespace nova::shape::transform {
   };
 
   class Storage {
-    class GPUImpl;
 
     matrix_elem_storage_t matrix_storage;
     transform_lookup_t transform_lookup;
-    std::unique_ptr<GPUImpl> device_memory_management;
     std::size_t total_meshes{};
     bool is_mapped{false};
-    bool using_gpu{false};
+    bool store_vram{false};
 
    public:
     explicit Storage(bool attempt_gpu_storage = true);
-    ~Storage();
-    Storage(const Storage &other) = delete;
-    Storage &operator=(const Storage &other) = delete;
-    Storage(Storage &&other) noexcept;
-    Storage &operator=(Storage &&other) noexcept;
-
     void init(std::size_t total_meshes);
     void add(const glm::mat4 &transform, uint32_t mesh_index);
     /* Will call updateViews() before mapping to update the different view buffers. */
@@ -86,8 +68,7 @@ namespace nova::shape::transform {
      */
     bool reconstructTransform4x4(transform4x4_t &ret_transform, std::size_t flat_matrix_buffer_offset) const;
 
-   private:
-    void updateViews();
+    mesh_transform_views_t getTransformViews() const;
   };
 }  // namespace nova::shape::transform
 

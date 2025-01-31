@@ -17,7 +17,9 @@ target_include_directories(ax_core_common
 PUBLIC
     ${AXOMAE_CORELIB_ROOT}
 )
-
+if(AXOMAE_USE_CUDA)
+  target_compile_definitions(ax_core_common PUBLIC AXOMAE_USE_CUDA)
+endif()
 add_subdirectory(math)
 add_subdirectory(exception)
 add_subdirectory(image)

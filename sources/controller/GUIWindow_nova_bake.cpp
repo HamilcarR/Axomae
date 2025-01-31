@@ -330,6 +330,7 @@ namespace controller {
     nova::gputils::unlock_host_memory(buffer_collection);
   }
 
+  /* TODO: Refactor , use managed memory */
   static void pin_storage(const nova::shape::ShapeResourcesHolder &shape_resources_holder, nova::device_shared_caches_t &buffer_collection) {
     const nova::shape::triangle::Storage &triangle_storage = shape_resources_holder.getTriangleMeshStorage();
     const axstd::span<Object3D> triangle_mesh_geometry_view = triangle_storage.getGPUBuffersView();
@@ -355,11 +356,10 @@ namespace controller {
      * so we need to initialize graphics resource handles before launching the baking worker thread , and release it in NovaStopBake().
      */
     DisplayManager3D &disp_manager = app_controller->getDisplayManager();
-
+    nova::NovaResourceManager *res_manager = render_scene_data.nova_resource_manager;
+    render_scene_data.nova_resource_manager->getShapeData().mapBuffers();
     if (use_gpu) {
-      nova::NovaResourceManager *res_manager = render_scene_data.nova_resource_manager;
       res_manager->getShapeData().lockResources();
-      render_scene_data.nova_resource_manager->getShapeData().updateMeshBuffers();
       pin_storage(render_scene_data.nova_resource_manager->getShapeData(), render_scene_data.shared_caches);
       callback =
           [](nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder, DisplayManager3D &disp_manager) {

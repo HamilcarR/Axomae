@@ -110,6 +110,7 @@ namespace device::gpgpu {
 
    private:
     void initBuffer(void *buffer, size_t size);
+    void initBuffer(const void *buffer, size_t size);
     void *getCastData() const;
     std::size_t bufferSizeBytes() const;
   };

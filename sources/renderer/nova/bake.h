@@ -37,7 +37,8 @@ namespace nova_baker_utils {
                            const drawable_original_transform &drawable,
                            std::size_t &alloc_offset_primitives,
                            nova::material::NovaMaterialInterface &material,
-                           nova::NovaResourceManager &manager);
+                           nova::NovaResourceManager &manager,
+                           std::size_t mesh_index);
 
   nova::material::NovaMaterialInterface setup_material_data(material_buffers_t &material_buffers,
                                                             texture_buffers_t &texture_buffers,

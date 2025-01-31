@@ -1,65 +1,9 @@
 #include "mesh_transform_storage.h"
+#include "shape_datastructures.h"
 #include <internal/common/math/math_utils.h>
 #include <internal/debug/Logger.h>
-#include <internal/device/gpgpu/device_transfer_interface.h>
 namespace nova::shape::transform {
 
-#ifdef AXOMAE_USE_CUDA
-  constexpr bool is_gpu_build = true;
-#else
-  constexpr bool is_gpu_build = false;
-#endif
-
-  template<bool use_gpu>
-  class GPUPolicyCompileDispatcher;
-
-  template<>
-  class GPUPolicyCompileDispatcher<true> {
-   private:
-    using GPUSharedBuffer = device::gpgpu::DeviceSharedBufferView;
-    std::unique_ptr<GPUSharedBuffer> shared_buffer;
-
-   protected:
-    GPUPolicyCompileDispatcher() { shared_buffer = std::make_unique<GPUSharedBuffer>(); }
-
-    template<class T>
-    void addBuffer(const axstd::span<T> &lockable_memory_area) {
-      *shared_buffer = GPUSharedBuffer(lockable_memory_area.data(), lockable_memory_area.size());
-    }
-
-    void map() {
-      auto query_result = pin_host_memory(*shared_buffer, device::gpgpu::PIN_MODE_RO);
-      DEVICE_ERROR_CHECK(query_result.error_status);
-    }
-
-    void unmap() {
-      auto query_result = unpin_host_memory(*shared_buffer);
-      DEVICE_ERROR_CHECK(query_result.error_status);
-    }
-  };
-
-  template<>
-  class GPUPolicyCompileDispatcher<false> {
-   protected:
-    template<class T>
-    void addBuffer(const axstd::span<T> &lockable_memory_area) {}
-
-    void map() {}
-
-    void unmap() {}
-  };
-
-  class Storage::GPUImpl : public GPUPolicyCompileDispatcher<is_gpu_build> {
-   public:
-    template<class T>
-    void addBuffer(const axstd::span<T> &lockable_memory_area) {
-      GPUPolicyCompileDispatcher<is_gpu_build>::addBuffer(lockable_memory_area);
-    }
-
-    void map() { GPUPolicyCompileDispatcher<is_gpu_build>::map(); }
-
-    void unmap() { GPUPolicyCompileDispatcher<is_gpu_build>::unmap(); }
-  };
   /*******************************************************************************************************************************************/
   static void hash_matrix4x4(std::size_t &seed, const glm::mat4 &matrix) {
     const float *f = glm::value_ptr(matrix);
@@ -74,18 +18,11 @@ namespace nova::shape::transform {
     return seed;
   }
 
-  Storage::Storage(bool use_gpu_) {
-    using_gpu = use_gpu_ && is_gpu_build;
-    device_memory_management = using_gpu ? std::make_unique<Storage::GPUImpl>() : nullptr;
-  }
-
-  Storage::~Storage() = default;
-  Storage &Storage::operator=(Storage &&other) noexcept = default;
-  Storage::Storage(Storage &&other) noexcept = default;
+  Storage::Storage(bool is_using_gpu) { store_vram = is_using_gpu && core::build::is_gpu_build; }
 
   void Storage::init(std::size_t total_meshe_size) { transform_lookup.offsets.resize(total_meshe_size); }
 
-  static std::size_t push_packed_matrix_components(const glm::mat4 &mat, std::vector<float> &matrices) {
+  static std::size_t push_packed_matrix_components(const glm::mat4 &mat, axstd::managed_vector<float> &matrices) {
     std::size_t old_max_offset = matrices.size();
     for (int i = 0; i < 4; i++) {
       matrices.push_back(mat[i].x);
@@ -96,7 +33,7 @@ namespace nova::shape::transform {
     return old_max_offset;
   }
 
-  static std::size_t push_packed_matrix_components(const glm::mat3 &mat, std::vector<float> &matrices) {
+  static std::size_t push_packed_matrix_components(const glm::mat3 &mat, axstd::managed_vector<float> &matrices) {
     std::size_t old_max_offset = matrices.size();
     for (int i = 0; i < 3; i++) {
       matrices.push_back(mat[i].x);
@@ -118,28 +55,24 @@ namespace nova::shape::transform {
   }
 
   std::size_t Storage::getTransformOffset(std::size_t mesh_index) const {
-    if (mesh_index >= transform_lookup.offsets.size())
-      return INVALID_OFFSET;
-    return transform_lookup.offsets[mesh_index];
+    mesh_transform_views_t mtv = getTransformViews();
+    AX_ASSERT_FALSE(mtv.mesh_offsets_to_matrix.empty());
+    return get_transform_offset(mesh_index, mtv);
   }
 
   bool Storage::reconstructTransform4x4(transform4x4_t &transform, std::size_t elements_offset) const {
-    if (elements_offset >= matrix_storage.elements.size()) {
+    mesh_transform_views_t mtv = getTransformViews();
+    int error = reconstruct_transform4x4(transform, elements_offset, mtv);
+    if (error == -1) {
       LOG("Invalid matrix element offset provided.", LogLevel::ERROR);
       return false;
     }
-    constexpr int padding = transform4x4_t::padding();
-    if (elements_offset % padding != 0) {
-      LOG("Offset doesn't respect transform4x4_t padding requirement (" + std::to_string(padding * sizeof(float)) + " Bytes , has " +
-              std::to_string(elements_offset * sizeof(float)) + " Bytes.",
+    if (error == 1) {
+      LOG("Offset doesn't respect transform4x4_t padding requirement (" + std::to_string(transform4x4_t::padding() * sizeof(float)) +
+              " Bytes , has " + std::to_string(elements_offset * sizeof(float)) + " Bytes.",
           LogLevel::ERROR);
       return false;
     }
-    auto &storage = matrix_storage.elements;
-    std::memcpy(glm::value_ptr(transform.m), &storage[elements_offset], 16 * sizeof(float));
-    std::memcpy(glm::value_ptr(transform.inv), &storage[elements_offset + 16], 16 * sizeof(float));
-    std::memcpy(glm::value_ptr(transform.t), &storage[elements_offset + 32], 16 * sizeof(float));
-    std::memcpy(glm::value_ptr(transform.n), &storage[elements_offset + 48], 9 * sizeof(float));
     return true;
   }
 
@@ -168,31 +101,23 @@ namespace nova::shape::transform {
     }
   }
 
-  void Storage::updateViews() {
-    if (is_mapped)
-      LOG("Transform views buffers changed while storage is still mapped.", LogLevel::WARNING);
-    matrix_storage.elements_view = axstd::span(matrix_storage.elements.data(), matrix_storage.elements.size());
-    transform_lookup.offsets_view = axstd::span(transform_lookup.offsets.data(), transform_lookup.offsets.size());
+  mesh_transform_views_t Storage::getTransformViews() const {
+    mesh_transform_views_t mtv;
+    mtv.matrix_components_view = matrix_storage.elements;
+    mtv.mesh_offsets_to_matrix = transform_lookup.offsets;
+    return mtv;
   }
 
   void Storage::map() {
-    updateViews();
-    device_memory_management->addBuffer(matrix_storage.elements_view);
-    device_memory_management->addBuffer(transform_lookup.offsets_view);
-    device_memory_management->map();
+    mesh_transform_views_t mtv = getTransformViews();
     is_mapped = true;
   }
 
-  void Storage::unmap() {
-    device_memory_management->unmap();
-    is_mapped = false;
-  }
+  void Storage::unmap() { is_mapped = false; }
 
   void Storage::clear() {
     matrix_storage.elements.clear();
     transform_lookup.offsets.clear();
-    matrix_storage.elements_view = axstd::span<float>();
-    transform_lookup.offsets_view = axstd::span<std::size_t>();
   }
 
 }  // namespace nova::shape::transform

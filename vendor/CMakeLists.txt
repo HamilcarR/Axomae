@@ -79,3 +79,22 @@ if(NOT SDL2_image_FOUND)
     add_subdirectory(SDL_image)
 endif()
 #########################################################################################
+# Embree
+
+
+if(AXOMAE_USE_EMBREE)
+  find_package(TBB REQUIRED)
+  find_package(embree 4)  
+  if(NOT embree_FOUND)
+    message(NOTICE "Embree not found on the system : Initializing Embree from sources.")
+    set(EMBREE_ZIP_MODE OFF) 
+    set(EMBREE_TUTORIALS OFF) 
+    set(EMBREE_TUTORIALS_GLFW OFF)
+    set(EMBREE_TESTS OFF)
+    add_subdirectory(embree) 
+  endif()
+endif(AXOMAE_USE_EMBREE)
+
+
+
+#########################################################################################
