@@ -1,6 +1,7 @@
 #ifndef SPAN_H
 #define SPAN_H
 
+#include "internal/macro/project_macros.h"
 #if __cplusplus < 202002L
 #  include <cstdlib>
 #  include <internal/device/gpgpu/device_utils.h>
@@ -54,7 +55,12 @@ namespace axstd {
     }
     ax_device_callable constexpr reference front() const noexcept { return *ptr; }
     ax_device_callable constexpr reference back() const noexcept { return *(ptr + len - 1); }
-    ax_device_callable constexpr reference operator[](size_type index) const noexcept { return ptr[index]; }
+    ax_device_callable constexpr reference operator[](size_type index) const noexcept {
+      AX_ASSERT_LT(index, len);
+      AX_ASSERT_NOTNULL(ptr);
+      AX_ASSERT_GT(len, 0);
+      return ptr[index];
+    }
     ax_device_callable constexpr pointer data() const noexcept { return ptr; }
     ax_device_callable constexpr size_type size() const noexcept { return len; }
     ax_device_callable constexpr size_type size_bytes() const noexcept { return sizeof(T) * len; }
