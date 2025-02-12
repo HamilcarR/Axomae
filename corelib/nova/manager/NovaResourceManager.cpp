@@ -1,6 +1,6 @@
 #include "NovaResourceManager.h"
-#include "internal/device/gpgpu/device_transfer_interface.h"
-
+#include "aggregate/acceleration_interface.h"
+#include <internal/device/gpgpu/device_transfer_interface.h>
 namespace nova {
 
   void NovaResourceManager::envmapSetData(float *raw_data, int width, int height, int channels) {
@@ -11,9 +11,7 @@ namespace nova {
     envmap_data.height = height;
     envmap_data.channels = channels;
   }
-
-  void NovaResourceManager::setAccelerationStructure(aggregate::Accelerator acceleration_structure) {
-    resources.scene_data.acceleration_data = std::move(acceleration_structure);
+  void NovaResourceManager::setManagedApiAccelerationStructure(aggregate::DefaultAccelerator &&acceleration_structure) {
+    resources.scene_data.api_accelerator = std::move(acceleration_structure);
   }
-
 }  // namespace nova

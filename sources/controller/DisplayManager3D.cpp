@@ -2,7 +2,9 @@
 
 #include "Config.h"
 #include "RenderPipeline.h"
+#include "aggregate/acceleration_interface.h"
 #include "nova/bake.h"
+#include "primitive/PrimitiveInterface.h"
 
 namespace exception {
   class SceneTreeInitializationException : public CatastrophicFailureException {
@@ -122,10 +124,13 @@ namespace controller {
     bake_buffers_storage = nova_baker_utils::build_scene(drawable_collection, *nova_resource_manager);
     realtime_viewer->doneCurrent();
     add_caches_addresses(shared_caches, bake_buffers_storage);
-    /* Build acceleration. */
-    nova::aggregate::Accelerator accelerator = nova_baker_utils::build_performance_acceleration_structure(
-        nova_resource_manager->getPrimitiveData().get_primitives());
-    nova_resource_manager->setAccelerationStructure(accelerator);
+    primitives_view_tn primitive_list_view = nova_resource_manager->getPrimitiveData().getView();
+    nova::shape::mesh_shared_views_t mesh_geometry = nova_resource_manager->getShapeData().getMeshSharedViews();
+    nova::aggregate::primitive_aggregate_data_s aggregate;
+    aggregate.primitive_list_view = primitive_list_view;
+    aggregate.mesh_geometry = mesh_geometry;
+    auto accelerator = nova_baker_utils::build_api_managed_acceleration_structure(aggregate);
+    nova_resource_manager->setManagedApiAccelerationStructure(std::move(accelerator));
 
     progress_manager.reset();
   }

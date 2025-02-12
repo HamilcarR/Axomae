@@ -1,13 +1,14 @@
 #ifndef NOVARESOURCEMANAGER_H
 #define NOVARESOURCEMANAGER_H
+#include "aggregate/acceleration_interface.h"
 #include "camera/nova_camera.h"
 #include "engine/nova_engine.h"
-#include "internal/macro/project_macros.h"
+#include "engine/nova_exception.h"
 #include "ray/Ray.h"
 #include "scene/nova_scene.h"
 #include "texturing/nova_texturing.h"
-
-#include <engine/nova_exception.h>
+#include <internal/macro/class_macros.h>
+#include <internal/macro/project_macros.h>
 
 namespace nova {
   class NovaResources {
@@ -16,7 +17,7 @@ namespace nova {
     scene::SceneResourcesHolder scene_data{};
 
    public:
-    CLASS_CM(NovaResources)
+    CLASS_M(NovaResources)
   };
 
   class NovaResourceManager {
@@ -42,7 +43,7 @@ namespace nova {
     GENERATE_GETTERS(camera::CameraResourcesHolder, CameraData, resources.scene_data.camera_data)
     GENERATE_GETTERS(primitive::PrimitivesResourcesHolder, PrimitiveData, resources.scene_data.primitive_data)
     GENERATE_GETTERS(shape::ShapeResourcesHolder, ShapeData, resources.scene_data.shape_data)
-    GENERATE_GETTERS(aggregate::Accelerator, AccelerationData, resources.scene_data.acceleration_data)
+    GENERATE_GETTERS(aggregate::DefaultAccelerator, APIManagedAccelerator, resources.scene_data.api_accelerator)
     GENERATE_GETTERS(scene::SceneTransformations, SceneTransformation, resources.scene_data.scene_transformations)
     GENERATE_GETTERS(core::memory::MemoryArena<>, MemoryPool, resource_mempool)
 
@@ -52,11 +53,11 @@ namespace nova {
       getTexturesData().clear();
       getShapeData().clear();
       getMaterialData().clear();
+      getAPIManagedAccelerator().cleanup();
     }
 
     /* Will take ownership of acceleration_structure */
-    void setAccelerationStructure(aggregate::Accelerator acceleration_structure);
-
+    void setManagedApiAccelerationStructure(aggregate::DefaultAccelerator &&acceleration_structure);
     /* Scene: Textures */
     void envmapSetData(float *raw_data, int width, int height, int channels);
   };

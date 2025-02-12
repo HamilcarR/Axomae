@@ -1,5 +1,6 @@
 #include "NovaMaterials.h"
 #include "internal/common/math/utils_3D.h"
+#include "internal/macro/project_macros.h"
 #include "ray/Ray.h"
 #include <sampler/Sampler.h>
 
@@ -68,8 +69,9 @@ namespace nova::material {
     }
   };
 
-  inline glm::vec3 compute_map_normal(const hit_data &hit_d, const TexturePackSampler &t_pack, const glm::mat3 &tbn) {
+  constexpr float INTERSECT_OFFSET = 1e-4f;
 
+  inline glm::vec3 compute_map_normal(const hit_data &hit_d, const TexturePackSampler &t_pack, const glm::mat3 &tbn) {
     const glm::vec3 map_normal = t_pack.normal(hit_d.u, hit_d.v, {}) * 2.f - 1.f;
     return glm::normalize(tbn * map_normal);
   }
@@ -88,7 +90,7 @@ namespace nova::material {
     const glm::mat3 tbn = math::geometry::construct_tbn(hit_d.normal, hit_d.tangent, hit_d.bitangent);
     glm::vec3 normal = compute_map_normal(hit_d, texture_pack_sampler, tbn);
     out.direction = hemi_sample(tbn, sampler);
-    out.origin = hit_d.position + normal * 1e-7f;
+    out.origin = hit_d.position + hit_d.normal * INTERSECT_OFFSET;
     texturing::texture_sample_data sample_data{hit_d.position};
     hit_d.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, sample_data);
     hit_d.normal = normal;
@@ -114,8 +116,9 @@ namespace nova::material {
     const glm::mat3 tbn = math::geometry::construct_tbn(hit_d.normal, hit_d.tangent, hit_d.bitangent);
     glm::vec3 normal = compute_map_normal(hit_d, texture_pack_sampler, tbn);
     glm::vec3 reflected = glm::reflect(in.direction, normal);
-    out.origin = hit_d.position;
+    out.origin = hit_d.position + hit_d.normal * INTERSECT_OFFSET;
     out.direction = glm::normalize(reflected + hemi_sample(tbn, sampler) * fuzz);
+    AX_ASSERT(!ISNAN(out.direction), "");
     texturing::texture_sample_data sample_data{hit_d.position};
     hit_d.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, {sample_data});
     hit_d.emissive = texture_pack_sampler.emissive(hit_d.u, hit_d.v, sample_data);

@@ -39,7 +39,7 @@ namespace nova::shape::transform {
     /**
      * Stores every unique transformation hash as key , and the offset of the first element of m matrix in their transform4x4_t as value.
      */
-    std::unordered_map<std::size_t, std::size_t> transfom_table;
+    std::unordered_map<std::size_t, std::size_t> transform_table;
   };
 
   class Storage {

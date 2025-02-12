@@ -4,7 +4,7 @@
 #include "Texture.h"
 #include "bake_render_data.h"
 #include "engine/nova_exception.h"
-#include "internal/common/axstd/span.h"
+#include <internal/common/axstd/span.h>
 
 class Camera;
 class TextureGroup;
@@ -47,8 +47,7 @@ namespace nova_baker_utils {
                                                             std::size_t &alloc_offset_textures,
                                                             std::size_t &alloc_offset_materials);
   bake_buffers_storage_t build_scene(const std::vector<drawable_original_transform> &drawables, nova::NovaResourceManager &manager);
-  nova::aggregate::Accelerator build_performance_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives);
-  nova::aggregate::Accelerator build_quality_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives);
+  nova::aggregate::DefaultAccelerator build_api_managed_acceleration_structure(nova::aggregate::primitive_aggregate_data_s primitive_geometry);
   primitive_buffers_t allocate_primitive_triangle_buffers(core::memory::ByteArena &memory_pool, std::size_t number_elements);
   material_buffers_t allocate_materials_buffers(core::memory::ByteArena &memory_pool, std::size_t number_elements);
 

@@ -44,7 +44,7 @@ namespace nova::shape::transform {
   }
 
   transform_hash_t Storage::getTransformOffset(const glm::mat4 &transform) const {
-    auto &transform_table = transform_lookup.transfom_table;
+    auto &transform_table = transform_lookup.transform_table;
     transform4x4_t temporary_transform;
     temporary_transform.m = transform;
     std::size_t h = hash(temporary_transform);
@@ -97,7 +97,7 @@ namespace nova::shape::transform {
       push_packed_matrix_components(matrices.t, matrix_storage.elements);
       push_packed_matrix_components(matrices.n, matrix_storage.elements);
       transform_lookup.offsets[mesh_index] = matrix_element_offset;
-      transform_lookup.transfom_table[transform_hash.hash] = matrix_element_offset;
+      transform_lookup.transform_table[transform_hash.hash] = matrix_element_offset;
     }
   }
 
@@ -118,6 +118,7 @@ namespace nova::shape::transform {
   void Storage::clear() {
     matrix_storage.elements.clear();
     transform_lookup.offsets.clear();
+    transform_lookup.transform_table.clear();
   }
 
 }  // namespace nova::shape::transform

@@ -6,8 +6,9 @@
 namespace nova {
   class Ray {
    public:
-    glm::vec3 origin;
-    glm::vec3 direction;
+    glm::vec3 origin{};
+    glm::vec3 direction{};
+    float tnear{0.000001f}, tfar{1e30f};
 
    public:
     CLASS_DCM(Ray)

@@ -1,6 +1,6 @@
 #ifndef NOVA_SCENE_H
 #define NOVA_SCENE_H
-#include "aggregate/nova_acceleration.h"
+#include "aggregate/acceleration_interface.h"
 #include "camera/nova_camera.h"
 #include "material/nova_material.h"
 #include "primitive/nova_primitive.h"
@@ -40,7 +40,7 @@ namespace nova::scene {
     camera::CameraResourcesHolder camera_data{};
     primitive::PrimitivesResourcesHolder primitive_data{};
     shape::ShapeResourcesHolder shape_data{};
-    aggregate::Accelerator acceleration_data{};
+    aggregate::DefaultAccelerator api_accelerator{};
     SceneTransformations scene_transformations{};
   };
 

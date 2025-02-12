@@ -2,10 +2,11 @@
 #include "MaterialInterface.h"
 #include "Mesh.h"
 #include "TextureGroup.h"
-#include "aggregate/nova_acceleration.h"
+#include "aggregate/acceleration_interface.h"
 #include "bake.h"
 #include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
+#include "primitive/PrimitiveInterface.h"
 #include "primitive/nova_primitive.h"
 #include "shape/nova_shape.h"
 #include <internal/common/axstd/span.h>
@@ -88,16 +89,10 @@ namespace nova_baker_utils {
     return bake_buffers_storage;
   }
 
-  nova::aggregate::Accelerator build_performance_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives) {
-    nova::aggregate::Accelerator accelerator{};
-    accelerator.buildBVH(primitives);
-    return accelerator;
-  }
-
-  nova::aggregate::Accelerator build_quality_acceleration_structure(const axstd::span<nova::primitive::NovaPrimitiveInterface> &primitives) {
-    nova::aggregate::Accelerator accelerator{};
-    accelerator.buildBVH(primitives);
-    return accelerator;
+  nova::aggregate::DefaultAccelerator build_api_managed_acceleration_structure(nova::aggregate::primitive_aggregate_data_s primitive_geometry) {
+    nova::aggregate::DefaultAccelerator acceleration;
+    acceleration.build(primitive_geometry);
+    return acceleration;
   }
 
 }  // namespace nova_baker_utils
