@@ -1,6 +1,5 @@
 #ifndef DISPLAYMANAGER3D_H
 #define DISPLAYMANAGER3D_H
-#include "aggregate/nova_acceleration.h"
 #include "nova/bake_render_data.h"
 #include "nova_gpu_utils.h"
 #include "ui_main_window.h"
@@ -24,10 +23,7 @@ namespace controller {
     nova_baker_utils::bake_buffers_storage_t bake_buffers_storage;
 
    public:
-    CLASS_CM(DisplayManager3D)
-
     void init(Ui::MainWindow &main_window_ui, ApplicationConfig *global_application_config, OperatorProgressStatus *progress_manager);
-
     ax_no_discard GLViewer *getRealtimeViewer() const { return realtime_viewer; };
     ax_no_discard GLViewer *getNovaViewer() const { return nova_viewer; };
     ax_no_discard SceneTree &getSceneTree() const;
@@ -52,5 +48,6 @@ namespace controller {
     void signal_switch_realtime_ctx();
     void signal_done_realtime_ctx();
   };
+
 }  // namespace controller
 #endif  // DISPLAYMANAGER3D_H

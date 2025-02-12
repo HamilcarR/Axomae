@@ -26,6 +26,13 @@ namespace nova::shape {
 #endif
   }
 
+  mesh_shared_views_t ShapeResourcesHolder::getMeshSharedViews() const {
+    mesh_shared_views_t shared_views;
+    shared_views.transforms = mesh_transform_storage.getTransformViews();
+    shared_views.geometry = triangle_mesh_storage.getGeometryViews();
+    return shared_views;
+  }
+
   void ShapeResourcesHolder::addTriangleMeshGPU(const triangle::mesh_vbo_ids &mesh_vbos) { triangle_mesh_storage.addGeometryGPU(mesh_vbos); }
 
   void ShapeResourcesHolder::addTriangleMesh(Object3D triangle_mesh, const glm::mat4 &transform) {

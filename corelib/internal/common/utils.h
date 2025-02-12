@@ -9,6 +9,12 @@ namespace core::build {
   constexpr bool is_gpu_build = false;
 #endif
 
+#ifdef AXOMAE_USE_EMBREE
+  constexpr bool is_embree_build = true;
+#else
+  constexpr bool is_embree_build = false;
+#endif
+
 }  // namespace core::build
 
 #endif

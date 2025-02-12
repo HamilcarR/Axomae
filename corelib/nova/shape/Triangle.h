@@ -9,10 +9,6 @@
 #include <internal/macro/project_macros.h>
 namespace nova::shape {
 
-  struct mesh_shared_views_t {
-    transform::mesh_transform_views_t transforms;
-    triangle::mesh_vertex_attrib_views_t geometry;
-  };
   struct mesh_properties_t {
     const Object3D *geometry;
     std::size_t transform_offset;

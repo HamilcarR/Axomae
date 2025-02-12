@@ -33,13 +33,6 @@ namespace nova::integrator {
     DIFFUSE = 1 << 12,
     EMISSIVE = 1 << 13,
   };
-  struct bvh_hit_data {
-    bool is_hit{false};
-    const primitive::NovaPrimitiveInterface *last_primit{nullptr};
-    hit_data hit_d;
-    float prim_min_t;
-    float prim_max_t;
-  };
 
   bvh_hit_data bvh_hit(const Ray &ray, nova_eng_internals &nova_internals);
 

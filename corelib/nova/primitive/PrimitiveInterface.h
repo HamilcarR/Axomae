@@ -19,4 +19,6 @@ namespace nova::primitive {
   using TYPELIST = NovaPrimitiveInterface::type_pack;
 }  // namespace nova::primitive
 
+using primitives_view_tn = axstd::span<nova::primitive::NovaPrimitiveInterface>;
+
 #endif  // PRIMITIVEINTERFACE_H

@@ -4,6 +4,7 @@
 #include "internal/memory/MemoryArena.h"
 #include "mesh_transform_storage.h"
 #include "shape/Triangle.h"
+#include "shape/shape_datastructures.h"
 #include "triangle_mesh_storage.h"
 
 namespace nova {
@@ -53,6 +54,7 @@ namespace nova::shape {
     void releaseResources();
     void mapBuffers();
     const triangle::Storage &getTriangleMeshStorage() const { return triangle_mesh_storage; }
+    mesh_shared_views_t getMeshSharedViews() const;
   };
 
 }  // namespace nova::shape

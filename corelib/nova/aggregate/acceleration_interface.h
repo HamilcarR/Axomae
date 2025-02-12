@@ -1,6 +1,8 @@
 #ifndef ACCELERATION_INTERFACE_H
 #define ACCELERATION_INTERFACE_H
 #include "primitive/PrimitiveInterface.h"
+#include <internal/common/utils.h>
+#include <type_traits>
 /* Abstracts Embree and Optix calls */
 
 struct bvh_hit_data {
@@ -9,15 +11,20 @@ struct bvh_hit_data {
   nova::hit_data hit_d;
   float prim_min_t{};
   float prim_max_t{};
+  const bool *is_rendering{nullptr};
 };
 
 namespace nova::aggregate {
 
   struct primitive_aggregate_data_s {
-    const primitives_view_tn *primitive_list_view;
-    const shape::mesh_shared_views_t *mesh_geometry;
+    primitives_view_tn primitive_list_view;
+    shape::mesh_shared_views_t mesh_geometry;
   };
 
+  struct EmbreeBuild {};
+  struct NativeBuild {};
+
+  template<class AccelerationBackend = std::conditional_t<core::build::is_embree_build, EmbreeBuild, NativeBuild>>
   class GenericAccelerator {
     class Impl;
     std::unique_ptr<Impl> pimpl;
@@ -36,6 +43,8 @@ namespace nova::aggregate {
     bool hit(const Ray &ray, bvh_hit_data &hit_data) const;
     void cleanup();
   };
+
+  using DefaultAccelerator = GenericAccelerator<>;
 
 }  // namespace nova::aggregate
 
