@@ -25,7 +25,7 @@ namespace nova {
     glm::vec3 tangent{};
     glm::vec3 bitangent{};
     glm::vec3 position{};
-    float u{}, v{}, t{};
+    float u{}, v{}, t{1e30f};
   };
 
   class Ray;

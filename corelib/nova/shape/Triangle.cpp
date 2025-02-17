@@ -19,18 +19,36 @@ namespace nova::shape {
     /* Returns all vertex attributes from a triangle in a mesh.
      * Attributes that don't exist are nullptr.
      */
-    ax_device_callable_inlined geometry::face_data_tri get_face(const nova::shape::mesh_properties_t &mesh_props, std::size_t triangle_id) {
+    ax_device_callable_inlined geometry::face_data_tri get_face(const Object3D *geometry, std::size_t triangle_id) {
       geometry::face_data_tri tri_primitive{};
-      const auto &indices = mesh_props.geometry->indices;
+      const auto &indices = geometry->indices;
       unsigned idx[3] = {indices[triangle_id], indices[triangle_id + 1], indices[triangle_id + 2]};
-      mesh_props.geometry->getTri(tri_primitive, idx);
+      geometry->getTri(tri_primitive, idx);
       return tri_primitive;
     }
+    ax_device_callable_inlined geometry::face_data_tri get_face(const Object3D *geometry,
+                                                                const transform::transform4x4_t &transform,
+                                                                std::size_t triangle_id) {
+      geometry::face_data_tri tri_primitive{};
+      const auto &indices = geometry->indices;
+      unsigned idx[3] = {indices[triangle_id], indices[triangle_id + 1], indices[triangle_id + 2]};
+      geometry->getTri(tri_primitive, idx);
+      tri_primitive.transform(transform.m, transform.n);
+      return tri_primitive;
+    }
+
   }  // namespace triangle
 
   ax_device_callable geometry::face_data_tri Triangle::getFace() const {
     mesh_properties_t properties = getMesh();
-    geometry::face_data_tri face = triangle::get_face(properties, triangle_id);
+    geometry::face_data_tri face = triangle::get_face(properties.geometry, triangle_id);
+    return face;
+  }
+
+  ax_device_callable geometry::face_data_tri Triangle::getTransformedFace() const {
+    mesh_properties_t properties = getMesh();
+    transform::transform4x4_t transform = getTransform();
+    geometry::face_data_tri face = triangle::get_face(properties.geometry, transform, triangle_id);
     return face;
   }
 
@@ -84,8 +102,13 @@ namespace nova::shape {
   }
 
   ax_device_callable geometry::BoundingBox Triangle::computeAABB() const {
-    geometry::face_data_tri face = getFace();
+    const geometry::face_data_tri face = getFace();
+    const transform::transform4x4_t transform = getTransform();
     vertices_attrb3d_t vertices = face.vertices();
+    vertices.v0 = transform.m * glm::vec4(vertices.v0, 1.f);
+    vertices.v1 = transform.m * glm::vec4(vertices.v1, 1.f);
+    vertices.v2 = transform.m * glm::vec4(vertices.v2, 1.f);
+
     glm::vec3 min = glm::min(vertices.v0, glm::min(vertices.v1, vertices.v2));
     glm::vec3 max = glm::max(vertices.v0, glm::max(vertices.v1, vertices.v2));
     return {min, max};
@@ -93,53 +116,53 @@ namespace nova::shape {
 
   ax_device_callable glm::vec3 Triangle::centroid() const {
     geometry::face_data_tri face = getFace();
-    return face.compute_center();
+    transform::transform4x4_t transform = getTransform();
+    return transform.m * glm::vec4(face.compute_center(), 1.f);
   }
 
   /*
    * https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
    */
-  ax_device_callable bool Triangle::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options * /*user_options*/) const {
+  ax_device_callable bool Triangle::hit(const Ray &in_ray, float tmin, float last_hit_tmax, hit_data &data, base_options * /*user_options*/) const {
     using namespace math::geometry;
-    mesh_properties_t mesh_props = getMesh();
-    transform::transform4x4_t transform = getTransform();
-    const glm::vec3 direction = transform.inv * glm::vec4(ray.direction, 0.f);
-    const glm::vec3 origin = transform.inv * glm::vec4(ray.origin, 1.f);
-    const Ray transformed_ray = Ray(origin, direction);
-    geometry::face_data_tri face = getFace();
-    vertices_attrb3d_t vertices = face.vertices();
-    edges_t edges = geometry::compute_edges(vertices);
-    vertices_attrb3d_t normals = face.normals();
-    vertices_attrb3d_t tangents = face.tangents();
-    vertices_attrb3d_t bitangents = face.bitangents();
-    vertices_attrb2d_t uvs = face.uvs();
+    const geometry::face_data_tri face = getFace();
+    const transform::transform4x4_t transform = getTransform();
+    const glm::vec3 origin = transform.inv * glm::vec4(in_ray.origin, 1.f);
+    const glm::vec3 direction = transform.inv * glm::vec4(in_ray.direction, 0.f);
+    const Ray ray = Ray(origin, direction);
+    const vertices_attrb3d_t vertices = face.vertices();
+    const edges_t edges = geometry::compute_edges(vertices);
+    const vertices_attrb3d_t normals = face.normals();
+    const vertices_attrb3d_t tangents = face.tangents();
+    const vertices_attrb3d_t bitangents = face.bitangents();
+    const vertices_attrb2d_t uvs = face.uvs();
 
-    glm::vec3 P = glm::cross(transformed_ray.direction, edges.e2);
+    const glm::vec3 P = glm::cross(ray.direction, edges.e2);
     const float det = glm::dot(P, edges.e1);
+
     /* backface cull */
     // if (det < epsilon && det > -epsilon)
     //  return false;
 
     const float inv_det = 1.f / det;
-    glm::vec3 T = transformed_ray.origin - vertices.v0;
+    const glm::vec3 T = ray.origin - vertices.v0;
     const float u = glm::dot(P, T) * inv_det;
     if (u < 0 || u > 1.f)
       return false;
 
-    glm::vec3 Q = glm::cross(T, edges.e1);
-    const float v = glm::dot(Q, transformed_ray.direction) * inv_det;
+    const glm::vec3 Q = glm::cross(T, edges.e1);
+    const float v = glm::dot(Q, ray.direction) * inv_det;
     if (v < 0.f || (u + v) > 1.f)
       return false;
 
     data.t = glm::dot(Q, edges.e2) * inv_det;
-    /* Early return in case this triangle is farther than the last intersected shape. */
-    if (data.t < tmin || data.t > tmax)
+    if (data.t < tmin || data.t > last_hit_tmax)  // Early return in case this triangle is farther than the last intersected shape.
       return false;
 
     const float w = 1 - (u + v);
     if (!hasValidNormals()) {
       data.normal = glm::cross(edges.e1, edges.e2);
-      if (glm::dot(data.normal, -transformed_ray.direction) < 0)
+      if (glm::dot(data.normal, -ray.direction) < 0)
         data.normal = -data.normal;
       data.normal = glm::normalize(data.normal);
     } else {
@@ -154,6 +177,11 @@ namespace nova::shape {
     data.bitangent = barycentric_lerp(bitangents.v0, bitangents.v1, bitangents.v2, w, u, v);
     AX_ASSERT_TRUE(hasValidBitangents());
     AX_ASSERT_TRUE(hasValidTangents());
+
+    data.position = transform.m * glm::vec4(ray.pointAt(data.t), 1.f);
+    data.normal = transform.n * glm::vec4(data.normal, 0.f);
+    data.tangent = transform.n * glm::vec4(data.normal, 0.f);
+    data.bitangent = transform.n * glm::vec4(data.normal, 0.f);
 
     return true;
   }

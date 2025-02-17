@@ -34,6 +34,46 @@ namespace geometry {
     float tan0[3], tan1[3], tan2[3];  // tangent
     float bit0[3], bit1[3], bit2[3];  // bitangents
 
+    /* n_transform is transpose(inverse(transform)) */
+    ax_device_callable_inlined void transform(const glm::mat4 &transform, const glm::mat3 &n_transform) {
+      auto transformVec = [&](float v[3]) {
+        glm::vec3 vec{v[0], v[1], v[2]};
+        vec = transform * glm::vec4(vec, 1.f);
+        v[0] = vec.x;
+        v[1] = vec.y;
+        v[2] = vec.z;
+      };
+
+      // Lambda for transforming directions (normals, tangents, bitangents) using the normal matrix.
+      auto transformDir = [&](float d[3]) {
+        glm::vec3 vec{d[0], d[1], d[2]};
+        vec = n_transform * vec;
+        d[0] = vec.x;
+        d[1] = vec.y;
+        d[2] = vec.z;
+      };
+
+      // Transform vertices.
+      transformVec(v0);
+      transformVec(v1);
+      transformVec(v2);
+
+      // Transform normals.
+      transformDir(n0);
+      transformDir(n1);
+      transformDir(n2);
+
+      // Transform tangents.
+      transformDir(tan0);
+      transformDir(tan1);
+      transformDir(tan2);
+
+      // Transform bitangents.
+      transformDir(bit0);
+      transformDir(bit1);
+      transformDir(bit2);
+    }
+
     ax_device_callable_inlined vertices_attrb3d_t vertices() const {
       return vertices_attrb3d_t{glm::vec3(v0[0], v0[1], v0[2]), glm::vec3(v1[0], v1[1], v1[2]), glm::vec3(v2[0], v2[1], v2[2])};
     }
@@ -56,6 +96,29 @@ namespace geometry {
 
     ax_device_callable_inlined vertices_attrb3d_t bitangents() const {
       return vertices_attrb3d_t{glm::vec3(bit0[0], bit0[1], bit0[2]), glm::vec3(bit1[0], bit1[1], bit1[2]), glm::vec3(bit2[0], bit2[1], bit2[2])};
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t vertices(const glm::mat4 &transform) const {
+      return vertices_attrb3d_t{transform * glm::vec4(v0[0], v0[1], v0[2], 1.f),
+                                transform * glm::vec4(v1[0], v1[1], v1[2], 1.f),
+                                transform * glm::vec4(v2[0], v2[1], v2[2], 1.f)};
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t normals(const glm::mat3 &transform) const {
+      return vertices_attrb3d_t{
+          transform * glm::vec3(n0[0], n0[1], n0[2]), transform * glm::vec3(n1[0], n1[1], n1[2]), transform * glm::vec3(n2[0], n2[1], n2[2])};
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t tangents(const glm::mat3 &transform) const {
+      return vertices_attrb3d_t{transform * glm::vec3(tan0[0], tan0[1], tan0[2]),
+                                transform * glm::vec3(tan1[0], tan1[1], tan1[2]),
+                                transform * glm::vec3(tan2[0], tan2[1], tan2[2])};
+    }
+
+    ax_device_callable_inlined vertices_attrb3d_t bitangents(const glm::mat3 &transform) const {
+      return vertices_attrb3d_t{transform * glm::vec3(bit0[0], bit0[1], bit0[2]),
+                                transform * glm::vec3(bit1[0], bit1[1], bit1[2]),
+                                transform * glm::vec3(bit2[0], bit2[1], bit2[2])};
     }
 
     ax_device_callable_inlined glm::vec3 compute_center() {
@@ -230,6 +293,7 @@ namespace geometry {
   }
 }  // namespace geometry
 
+// TODO: Triangle mesh , replace name
 class Object3D {
  public:
   axstd::span<float> vertices;
@@ -240,33 +304,35 @@ class Object3D {
   axstd::span<float> tangents;
   axstd::span<unsigned> indices;
 
+  constexpr static int face_stride = 3;
+
   ax_device_callable void getTri(geometry::face_data_tri &geom, const unsigned int idx[3]) const {
 
     for (int i = 0; i < 3; i++) {
       if (!vertices.empty()) {
-        geom.v0[i] = vertices[idx[0] * 3 + i];
-        geom.v1[i] = vertices[idx[1] * 3 + i];
-        geom.v2[i] = vertices[idx[2] * 3 + i];
+        geom.v0[i] = vertices[idx[0] * face_stride + i];
+        geom.v1[i] = vertices[idx[1] * face_stride + i];
+        geom.v2[i] = vertices[idx[2] * face_stride + i];
       }
       if (!normals.empty()) {
-        geom.n0[i] = normals[idx[0] * 3 + i];
-        geom.n1[i] = normals[idx[1] * 3 + i];
-        geom.n2[i] = normals[idx[2] * 3 + i];
+        geom.n0[i] = normals[idx[0] * face_stride + i];
+        geom.n1[i] = normals[idx[1] * face_stride + i];
+        geom.n2[i] = normals[idx[2] * face_stride + i];
       }
       if (!colors.empty()) {
-        geom.c0[i] = colors[idx[0] * 3 + i];
-        geom.c1[i] = colors[idx[1] * 3 + i];
-        geom.c2[i] = colors[idx[2] * 3 + i];
+        geom.c0[i] = colors[idx[0] * face_stride + i];
+        geom.c1[i] = colors[idx[1] * face_stride + i];
+        geom.c2[i] = colors[idx[2] * face_stride + i];
       }
       if (!tangents.empty()) {
-        geom.tan0[i] = tangents[idx[0] * 3 + i];
-        geom.tan1[i] = tangents[idx[1] * 3 + i];
-        geom.tan2[i] = tangents[idx[2] * 3 + i];
+        geom.tan0[i] = tangents[idx[0] * face_stride + i];
+        geom.tan1[i] = tangents[idx[1] * face_stride + i];
+        geom.tan2[i] = tangents[idx[2] * face_stride + i];
       }
       if (!bitangents.empty()) {
-        geom.bit0[i] = bitangents[idx[0] * 3 + i];
-        geom.bit1[i] = bitangents[idx[1] * 3 + i];
-        geom.bit2[i] = bitangents[idx[2] * 3 + i];
+        geom.bit0[i] = bitangents[idx[0] * face_stride + i];
+        geom.bit1[i] = bitangents[idx[1] * face_stride + i];
+        geom.bit2[i] = bitangents[idx[2] * face_stride + i];
       }
     }
     if (!uv.empty()) {
