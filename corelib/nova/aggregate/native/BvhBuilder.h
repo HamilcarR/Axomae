@@ -1,9 +1,8 @@
 #ifndef BVHBUILDER_H
 #define BVHBUILDER_H
-
-#include "primitive/nova_primitive.h"
+#include "aggregate/aggregate_datastructures.h"
+#include "primitive/PrimitiveInterface.h"
 #include <internal/common/axstd/span.h>
-#include <memory>
 #include <vector>
 namespace nova::aggregate {
   /* bvh node.*/
@@ -29,14 +28,18 @@ namespace nova::aggregate {
 
     };
 
+   private:
+    std::vector<std::size_t> primitive_transform_offset;
+
    public:
-    static Bvht_data build(const axstd::span<primitive::NovaPrimitiveInterface> &primitives,
-                           BUILD_TYPE build_option = PERFORMANCE,
-                           SEGMENTATION segmentation = SAH);
+    static Bvht_data build(const primitive_aggregate_data_s &scene, BUILD_TYPE build_option = PERFORMANCE, SEGMENTATION segmentation = SAH);
+    static Bvht_data buildTriangleBasedScene(const primitive_aggregate_data_s &scene,
+                                             BUILD_TYPE build_option = PERFORMANCE,
+                                             SEGMENTATION segmentation = SAH);
 
    private:
-    static void update_aabb(const axstd::span<primitive::NovaPrimitiveInterface> &primitives, int32_t node_id, Bvht_data &bvh_data);
-    static void subdivide(const axstd::span<primitive::NovaPrimitiveInterface> &primitives,
+    static void update_aabb(const primitives_view_tn &primitives, int32_t node_id, Bvht_data &bvh_data);
+    static void subdivide(const primitives_view_tn &primitives,
                           int32_t node_id,
                           int32_t &nodes_used,
                           BUILD_TYPE build_type,

@@ -1,6 +1,6 @@
 add_library(ax_core_nova_aggregate STATIC
-        native/Bvh.cpp
         native/BvhBuilder.cpp
+        native/native.cpp
 )
 
 

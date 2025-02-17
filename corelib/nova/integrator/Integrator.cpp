@@ -46,28 +46,14 @@ namespace nova::integrator {
 
   bvh_hit_data bvh_hit(const Ray &ray, nova_eng_internals &nova_internals) {
     const NovaResourceManager *nova_resources = nova_internals.resource_manager;
-    bvh_hit_data hit_ret;
-    const primitive::NovaPrimitiveInterface *last_primit = nullptr;
+    bvh_hit_data hit_ret{};
+    hit_ret.last_primit = nullptr;
+    hit_ret.is_rendering = &nova_internals.resource_manager->getEngineData().is_rendering;
     const aggregate::DefaultAccelerator &accel = nova_resources->getAPIManagedAccelerator();
     accel.hit(ray, hit_ret);
     return hit_ret;
   }
 
-  /*
-    bvh_hit_data bvh_hit(const Ray &ray, nova_eng_internals &nova_internals) {
-      const NovaResourceManager *nova_resources = nova_internals.resource_manager;
-      bvh_hit_data hit_ret;
-      const primitive::NovaPrimitiveInterface *last_primit = nullptr;
-      const aggregate::Bvhtl &bvh = nova_resources->getAccelerationData().accelerator;
-      aggregate::bvh_helper_struct bvh_hit{MAXFLOAT, nullptr, &nova_resources->getEngineData().is_rendering};
-      aggregate::base_options_bvh opts;
-      opts.data = bvh_hit;
-      hit_ret.is_hit = bvh.hit(ray, 0.0001f, MAXFLOAT, hit_ret.hit_d, &opts);
-      hit_ret.last_primit = opts.data.last_prim;
-      hit_ret.prim_min_t = opts.data.tmin;
-      return hit_ret;
-    }
-  */
   glm::vec4 PathIntegrator::Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const {
     const NovaResourceManager *nova_resources = nova_internals.resource_manager;
     bvh_hit_data hit = bvh_hit(ray, nova_internals);
