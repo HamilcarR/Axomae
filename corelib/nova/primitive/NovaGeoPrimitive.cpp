@@ -10,11 +10,7 @@ namespace nova::primitive {
       : material(material_), shape(shape_) {}
 
   bool NovaGeoPrimitive::hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const {
-    if (!shape.hit(r, tmin, tmax, data, user_options))
-      return false;
-    data.normal = glm::normalize(data.normal);
-    data.position = r.pointAt(data.t);
-    return true;
+    return shape.hit(r, tmin, tmax, data, user_options);
   }
 
   bool NovaGeoPrimitive::scatter(const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler) const {

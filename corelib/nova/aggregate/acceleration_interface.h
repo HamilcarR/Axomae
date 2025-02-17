@@ -1,25 +1,11 @@
 #ifndef ACCELERATION_INTERFACE_H
 #define ACCELERATION_INTERFACE_H
-#include "primitive/PrimitiveInterface.h"
+#include "aggregate_datastructures.h"
 #include <internal/common/utils.h>
 #include <type_traits>
 /* Abstracts Embree and Optix calls */
 
-struct bvh_hit_data {
-  bool is_hit{false};
-  const nova::primitive::NovaPrimitiveInterface *last_primit{nullptr};
-  nova::hit_data hit_d;
-  float prim_min_t{};
-  float prim_max_t{};
-  const bool *is_rendering{nullptr};
-};
-
 namespace nova::aggregate {
-
-  struct primitive_aggregate_data_s {
-    primitives_view_tn primitive_list_view;
-    shape::mesh_shared_views_t mesh_geometry;
-  };
 
   struct EmbreeBuild {};
   struct NativeBuild {};

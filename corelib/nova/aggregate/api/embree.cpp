@@ -1,4 +1,6 @@
 #include "acceleration_interface.h"
+#include "aggregate/AccelerationInternalsInterface.h"
+#include "aggregate_datastructures.h"
 #include "primitive/PrimitiveInterface.h"
 #include "ray/Hitable.h"
 #include "shape/shape_datastructures.h"
@@ -32,19 +34,50 @@ namespace nova::aggregate {
     LOG("Embree error : " + final_err, LogLevel::ERROR);
   }
 
+  inline const nova::primitive::NovaPrimitiveInterface *getPrimitiveFromGlobalOffset(std::size_t geometry_id,
+                                                                                     std::size_t primitive_id,
+                                                                                     const std::vector<std::size_t> &primitive_global_offset,
+                                                                                     const primitive_aggregate_data_s &scene) {
+    const primitives_view_tn &temp_prim_view = scene.primitive_list_view;
+    std::size_t primitive_offset = 0;
+    if (geometry_id == 0)
+      primitive_offset = primitive_id;
+    else
+      primitive_offset = primitive_global_offset[geometry_id - 1] + primitive_id;
+    std::size_t global_prim_id = primitive_offset;
+    return &temp_prim_view[global_prim_id];
+  }
+  /* Computes the global offset of primitives for each mesh.
+   * If mesh i contains X primitives , and mesh i - 1 contains Y primitives , then
+   * primitive_global_offset[i] = X + Y. Knowing this , we can access the global offset of the hit
+   * primitive doing : primitive_global_offset[geomID - 1] + primID
+   */
+  inline void setupGlobalOffsetArray(const primitive_aggregate_data_s &scene_geometry_data, std::vector<std::size_t> &primitive_global_offset) {
+    const auto &mesh_geometry = scene_geometry_data.mesh_geometry.geometry.host_geometry_view;
+    primitive_global_offset.resize(mesh_geometry.size());
+    for (int geometry_index = 0; geometry_index < mesh_geometry.size(); geometry_index++) {
+      const Object3D &mesh = mesh_geometry[geometry_index];
+      AX_ASSERT_EQ(mesh.face_stride, 3);  // Check that it's a triangle. Other primitives support need to be done later.
+      std::size_t triangles_number = mesh.indices.size() / mesh.face_stride - 1;
+      if (geometry_index == 0)
+        primitive_global_offset[geometry_index] = triangles_number;  // Stores the number of primitives for each geomID.
+      else
+        primitive_global_offset[geometry_index] = primitive_global_offset[geometry_index - 1] + triangles_number;
+    }
+  }
+
+#define acceleration_internal_interface \
+ protected \
+  AccelerationInternalsInterface<GenericAccelerator<EmbreeBuild>::Impl>
+
   template<>
-  class GenericAccelerator<EmbreeBuild>::Impl {
+  class GenericAccelerator<EmbreeBuild>::Impl : acceleration_internal_interface {
     RTCDevice device;
     RTCScene root_scene{};
     RTCScene instanced_scene{};
     error_data_t error_status{};
     /*contains meshes geometry , transformations , and the list of primitives abstractions to return when ray hits.*/
     primitive_aggregate_data_s scene_geometry_data{};
-    /* Computes the global offset of primitives for each mesh.
-     * If mesh i contains X primitives , and mesh i - 1 contains Y primitives , then
-     * primitive_global_offset[i] = X + Y. Knowing this , we can access the global offset of the hit
-     * primitive doing : primitive_global_offset[geomID - 1] + primID
-     */
     std::vector<std::size_t> primitive_global_offset;
     bool has_valid_tangents{false};
     bool has_valid_bitangents{false};
@@ -122,12 +155,12 @@ namespace nova::aggregate {
       return transform;
     }
 
-    void setupTransformedMeshes(primitive_aggregate_data_s primitive_aggregate) {
+    void build(primitive_aggregate_data_s primitive_aggregate) {
       root_scene = createScene();
       instanced_scene = createScene();
       scene_geometry_data = primitive_aggregate;
+      setupGlobalOffsetArray(scene_geometry_data, primitive_global_offset);
       const shape::mesh_shared_views_t &mesh_geometry = scene_geometry_data.mesh_geometry;
-      primitive_global_offset.resize(mesh_geometry.geometry.host_geometry_view.size());
       for (int mesh_index = 0; mesh_index < mesh_geometry.geometry.host_geometry_view.size(); mesh_index++) {
         const Object3D &mesh = mesh_geometry.geometry.host_geometry_view[mesh_index];
         std::size_t transform_offset = mesh_geometry.transforms.mesh_offsets_to_matrix[mesh_index];
@@ -137,11 +170,6 @@ namespace nova::aggregate {
         error_status.transform_offset = transform_offset;
         error_status.mesh_index = mesh_index;
         unsigned geomID = setupTransformedMesh(mesh, transform);
-        std::size_t triangles_number = mesh.indices.size() / 3 - 1;
-        if (geomID == 0)
-          primitive_global_offset[geomID] = triangles_number;  // Stores the number of primitives for each geomID.
-        else
-          primitive_global_offset[geomID] = primitive_global_offset[geomID - 1] + triangles_number;
       }
       commit(root_scene);
     }
@@ -187,25 +215,14 @@ namespace nova::aggregate {
       return hit;
     }
 
-    const nova::primitive::NovaPrimitiveInterface *getHitPrimitiveFromOffset(const RTCRayHit &result) {
-      const primitives_view_tn &temp_prim_view = scene_geometry_data.primitive_list_view;
-      std::size_t primitive_offset = 0;
-      if (result.hit.geomID == 0)
-        primitive_offset = result.hit.primID;
-      else
-        primitive_offset = primitive_global_offset[result.hit.geomID - 1] + result.hit.primID;
-      std::size_t global_prim_id = primitive_offset;
-      return &temp_prim_view[global_prim_id];
-    }
-
-    inline shape::transform::transform4x4_t getMeshTransform(unsigned geomID) {
+    inline shape::transform::transform4x4_t getMeshTransform(unsigned geomID) const {
       shape::transform::transform4x4_t transform{};
       std::size_t transform_offset = scene_geometry_data.mesh_geometry.transforms.mesh_offsets_to_matrix[geomID];
       shape::transform::reconstruct_transform4x4(transform, transform_offset, scene_geometry_data.mesh_geometry.transforms);
       return transform;
     }
 
-    bool intersect(const Ray &ray, bvh_hit_data &hit_return_data) {
+    bool intersect(const Ray &ray, bvh_hit_data &hit_return_data) const {
       RTCRayHit result = apiRay(ray);
       RTCRayQueryContext context{};
       rtcInitRayQueryContext(&context);
@@ -221,7 +238,8 @@ namespace nova::aggregate {
         hit_return_data.prim_max_t = ray.tfar;
         hit_return_data.hit_d.t = result.ray.tfar;
         hit_return_data.hit_d.position = ray.pointAt(result.ray.tfar);
-        hit_return_data.last_primit = getHitPrimitiveFromOffset(result);
+        hit_return_data.last_primit = getPrimitiveFromGlobalOffset(
+            result.hit.geomID, result.hit.primID, primitive_global_offset, scene_geometry_data);
         float normals[3]{}, tangents[3]{}, bitangents[3]{}, uv[2]{};
         RTCGeometry this_geometry = rtcGetGeometry(instanced_scene, result.hit.geomID);
         rtcInterpolate0(this_geometry, result.hit.primID, result.hit.u, result.hit.v, RTC_BUFFER_TYPE_VERTEX_ATTRIBUTE, 0, normals, 3);
@@ -254,7 +272,7 @@ namespace nova::aggregate {
   GenericAccelerator<EmbreeBuild> &GenericAccelerator<EmbreeBuild>::operator=(GenericAccelerator &&) noexcept = default;
   template<>
   void GenericAccelerator<EmbreeBuild>::build(primitive_aggregate_data_s meshes) {
-    pimpl->setupTransformedMeshes(meshes);
+    pimpl->build(meshes);
   }
   template<>
   bool GenericAccelerator<EmbreeBuild>::hit(const Ray &ray, bvh_hit_data &hit_data) const {
