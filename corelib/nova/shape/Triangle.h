@@ -40,6 +40,7 @@ namespace nova::shape {
 
    private:
     ax_device_callable geometry::face_data_tri getFace() const;
+    ax_device_callable geometry::face_data_tri getTransformedFace() const;
   };
 }  // namespace nova::shape
 
