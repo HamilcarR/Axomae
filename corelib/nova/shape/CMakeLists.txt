@@ -10,6 +10,7 @@ add_library(ax_core_nova_shape STATIC
         triangle_mesh_storage.cpp
         mesh_transform_storage.cpp
         shape_datastructures.cpp
+        MeshContext.cpp
       )
 
 target_link_libraries(ax_core_nova_shape PRIVATE

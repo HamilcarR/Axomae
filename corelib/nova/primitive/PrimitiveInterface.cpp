@@ -3,8 +3,8 @@
 
 using namespace nova::primitive;
 
-bool NovaPrimitiveInterface::hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const {
-  auto disp = [&](auto prim) { return prim->hit(r, tmin, tmax, data, user_options); };
+bool NovaPrimitiveInterface::hit(const Ray &r, float tmin, float tmax, hit_data &data, const shape::MeshCtx &geometry) const {
+  auto disp = [&](auto prim) { return prim->hit(r, tmin, tmax, data, geometry); };
   return dispatch(disp);
 }
 
@@ -13,12 +13,12 @@ bool NovaPrimitiveInterface::scatter(const Ray &in, Ray &out, hit_data &data, sa
   return dispatch(disp);
 }
 
-glm::vec3 NovaPrimitiveInterface::centroid() const {
-  auto disp = [&](auto prim) { return prim->centroid(); };
+glm::vec3 NovaPrimitiveInterface::centroid(const shape::MeshCtx &geometry) const {
+  auto disp = [&](auto prim) { return prim->centroid(geometry); };
   return dispatch(disp);
 }
 
-geometry::BoundingBox NovaPrimitiveInterface::computeAABB() const {
-  auto disp = [&](auto prim) { return prim->computeAABB(); };
+geometry::BoundingBox NovaPrimitiveInterface::computeAABB(const shape::MeshCtx &geometry) const {
+  auto disp = [&](auto prim) { return prim->computeAABB(geometry); };
   return dispatch(disp);
 }

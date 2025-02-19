@@ -1,4 +1,5 @@
 #include "Triangle.h"
+#include "MeshContext.h"
 #include "ray/Ray.h"
 #include "shape_datastructures.h"
 #include <internal/common/math/utils_3D.h>
@@ -8,11 +9,6 @@
 #include <internal/macro/project_macros.h>
 
 namespace nova::shape {
-
-  namespace internals {
-    /* We keep track of the mesh list in a static variable to fit multiple Triangle instances into a cache line. */
-    static ax_device_managed nova::shape::mesh_shared_views_t geometry_views;
-  }  // namespace internals
 
   namespace triangle {
 
@@ -39,40 +35,20 @@ namespace nova::shape {
 
   }  // namespace triangle
 
-  ax_device_callable geometry::face_data_tri Triangle::getFace() const {
-    mesh_properties_t properties = getMesh();
-    geometry::face_data_tri face = triangle::get_face(properties.geometry, triangle_id);
+  ax_device_callable geometry::face_data_tri Triangle::getFace(const MeshCtx &geometry) const {
+    const Object3D &obj3d = geometry.getTriMesh(mesh_id);
+    geometry::face_data_tri face = triangle::get_face(&obj3d, triangle_id);
     return face;
   }
 
-  ax_device_callable geometry::face_data_tri Triangle::getTransformedFace() const {
-    mesh_properties_t properties = getMesh();
-    transform::transform4x4_t transform = getTransform();
-    geometry::face_data_tri face = triangle::get_face(properties.geometry, transform, triangle_id);
+  ax_device_callable geometry::face_data_tri Triangle::getTransformedFace(const MeshCtx &geometry) const {
+    const Object3D &obj3d = geometry.getTriMesh(mesh_id);
+    transform::transform4x4_t transform = geometry.getTriMeshTransform(mesh_id);
+    geometry::face_data_tri face = triangle::get_face(&obj3d, transform, triangle_id);
     return face;
   }
 
-  ax_device_callable transform::transform4x4_t Triangle::getTransform() const {
-    mesh_properties_t mesh_properties = getMesh();
-    transform::transform4x4_t transform{};
-    int err = transform::reconstruct_transform4x4(transform, mesh_properties.transform_offset, internals::geometry_views.transforms);
-    AX_ASSERT(err == 0, "Problem reconstructing the transformation matrix.");
-    return transform;
-  }
-
-  ax_host_only void Triangle::updateSharedBuffers(const mesh_shared_views_t &geo) { internals::geometry_views = geo; }
-
-  ax_device_callable mesh_properties_t Triangle::getMesh() const {
-    mesh_properties_t prop{};
-    prop.transform_offset = transform::get_transform_offset(mesh_id, internals::geometry_views.transforms);
-#ifdef __CUDA_ARCH__
-    prop.geometry = &(internals::geometry_views.geometry.device_geometry_view)[mesh_id];
-    return prop;
-#else
-    prop.geometry = &(internals::geometry_views.geometry.host_geometry_view)[mesh_id];
-    return prop;
-#endif
-  }
+  ax_device_callable transform::transform4x4_t Triangle::getTransform(const MeshCtx &geometry) const { return geometry.getTriMeshTransform(mesh_id); }
 
   ax_device_callable Triangle::Triangle(std::size_t mesh_id_, std::size_t triangle_id_) {
     AX_ASSERT_LT(mesh_id, uint32_t(-1));
@@ -81,29 +57,29 @@ namespace nova::shape {
     triangle_id = triangle_id_;
   }
 
-  ax_device_callable bool Triangle::hasValidTangents() const {
-    geometry::face_data_tri face = getFace();
+  ax_device_callable bool Triangle::hasValidTangents(const MeshCtx &geometry) const {
+    geometry::face_data_tri face = getFace(geometry);
     return face.hasValidTangents();
   }
 
-  ax_device_callable bool Triangle::hasValidBitangents() const {
-    geometry::face_data_tri face = getFace();
+  ax_device_callable bool Triangle::hasValidBitangents(const MeshCtx &geometry) const {
+    geometry::face_data_tri face = getFace(geometry);
     return face.hasValidBitangents();
   }
 
-  ax_device_callable bool Triangle::hasValidNormals() const {
-    geometry::face_data_tri face = getFace();
+  ax_device_callable bool Triangle::hasValidNormals(const MeshCtx &geometry) const {
+    geometry::face_data_tri face = getFace(geometry);
     return face.hasValidNormals();
   }
 
-  ax_device_callable ax_no_discard bool Triangle::hasValidUvs() const {
-    geometry::face_data_tri face = getFace();
+  ax_device_callable ax_no_discard bool Triangle::hasValidUvs(const MeshCtx &geometry) const {
+    geometry::face_data_tri face = getFace(geometry);
     return face.hasValidUvs();
   }
 
-  ax_device_callable geometry::BoundingBox Triangle::computeAABB() const {
-    const geometry::face_data_tri face = getFace();
-    const transform::transform4x4_t transform = getTransform();
+  ax_device_callable geometry::BoundingBox Triangle::computeAABB(const MeshCtx &geometry) const {
+    const geometry::face_data_tri face = getFace(geometry);
+    const transform::transform4x4_t transform = getTransform(geometry);
     vertices_attrb3d_t vertices = face.vertices();
     vertices.v0 = transform.m * glm::vec4(vertices.v0, 1.f);
     vertices.v1 = transform.m * glm::vec4(vertices.v1, 1.f);
@@ -114,19 +90,19 @@ namespace nova::shape {
     return {min, max};
   }
 
-  ax_device_callable glm::vec3 Triangle::centroid() const {
-    geometry::face_data_tri face = getFace();
-    transform::transform4x4_t transform = getTransform();
+  ax_device_callable glm::vec3 Triangle::centroid(const MeshCtx &geometry) const {
+    geometry::face_data_tri face = getFace(geometry);
+    transform::transform4x4_t transform = getTransform(geometry);
     return transform.m * glm::vec4(face.compute_center(), 1.f);
   }
 
   /*
    * https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
    */
-  ax_device_callable bool Triangle::hit(const Ray &in_ray, float tmin, float last_hit_tmax, hit_data &data, base_options * /*user_options*/) const {
+  ax_device_callable bool Triangle::hit(const Ray &in_ray, float tmin, float last_hit_tmax, hit_data &data, const MeshCtx &geometry) const {
     using namespace math::geometry;
-    const geometry::face_data_tri face = getFace();
-    const transform::transform4x4_t transform = getTransform();
+    const geometry::face_data_tri face = getFace(geometry);
+    const transform::transform4x4_t transform = getTransform(geometry);
     const glm::vec3 origin = transform.inv * glm::vec4(in_ray.origin, 1.f);
     const glm::vec3 direction = transform.inv * glm::vec4(in_ray.direction, 0.f);
     const Ray ray = Ray(origin, direction);
@@ -160,7 +136,7 @@ namespace nova::shape {
       return false;
 
     const float w = 1 - (u + v);
-    if (!hasValidNormals()) {
+    if (!hasValidNormals(geometry)) {
       data.normal = glm::cross(edges.e1, edges.e2);
       if (glm::dot(data.normal, -ray.direction) < 0)
         data.normal = -data.normal;
@@ -169,14 +145,14 @@ namespace nova::shape {
       /* Returns barycentric interpolated normal at intersection t.  */
       data.normal = glm::normalize(barycentric_lerp(normals.v0, normals.v1, normals.v2, w, u, v));
     }
-    if (hasValidUvs()) {
+    if (hasValidUvs(geometry)) {
       data.v = barycentric_lerp(uvs.v0.s, uvs.v1.s, uvs.v2.s, w, u, v);
       data.u = barycentric_lerp(uvs.v0.t, uvs.v1.t, uvs.v2.t, w, u, v);
     }
     data.tangent = barycentric_lerp(tangents.v0, tangents.v1, tangents.v2, w, u, v);
     data.bitangent = barycentric_lerp(bitangents.v0, bitangents.v1, bitangents.v2, w, u, v);
-    AX_ASSERT_TRUE(hasValidBitangents());
-    AX_ASSERT_TRUE(hasValidTangents());
+    AX_ASSERT_TRUE(hasValidBitangents(geometry));
+    AX_ASSERT_TRUE(hasValidTangents(geometry));
 
     data.position = transform.m * glm::vec4(ray.pointAt(data.t), 1.f);
     data.normal = transform.n * glm::vec4(data.normal, 0.f);

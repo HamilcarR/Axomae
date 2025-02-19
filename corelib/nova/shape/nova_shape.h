@@ -1,11 +1,11 @@
 #ifndef NOVA_SHAPE_H
 #define NOVA_SHAPE_H
 #include "ShapeInterface.h"
-#include "internal/memory/MemoryArena.h"
 #include "mesh_transform_storage.h"
 #include "shape/Triangle.h"
 #include "shape/shape_datastructures.h"
 #include "triangle_mesh_storage.h"
+#include <internal/memory/MemoryArena.h>
 
 namespace nova {
   class Ray;

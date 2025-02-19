@@ -16,6 +16,7 @@ namespace nova::aggregate {
   template<>
   class GenericAccelerator<NativeBuild>::Impl : acceleration_internal_interface {
     Bvht_data bvh;
+    shape::MeshCtx geometry_context;
     primitive_aggregate_data_s scene;
     BvhtlBuilder::BUILD_TYPE build_type;
     BvhtlBuilder::SEGMENTATION segmentation;
@@ -35,6 +36,7 @@ namespace nova::aggregate {
       AX_ASSERT_FALSE(scene_.primitive_list_view.empty());
       scene = scene_;
       bvh = BvhtlBuilder::buildTriangleBasedScene(scene, build_type, segmentation);
+      geometry_context = shape::MeshCtx(scene.mesh_geometry);
     }
 
     bool intersect(const Ray &r, bvh_hit_data &data) const { return iter_traverse(r, data); }
@@ -99,7 +101,7 @@ namespace nova::aggregate {
           int32_t p_idx = bvh.prim_idx[primitive_offset];
           AX_ASSERT_LT(p_idx, scene.primitive_list_view.size());
           const primitive::NovaPrimitiveInterface *prim = &(scene.primitive_list_view)[p_idx];
-          if (!prim->hit(r, r.tnear, hit_result.hit_d.t, hit_result.hit_d, nullptr))
+          if (!prim->hit(r, r.tnear, hit_result.hit_d.t, hit_result.hit_d, geometry_context))
             continue;
           hit_result.is_hit = true;
           if (hit_result.hit_d.t <= tmax) {
