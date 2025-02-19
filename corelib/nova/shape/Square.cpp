@@ -1,4 +1,5 @@
 #include "Square.h"
+#include "MeshContext.h"
 #include "ray/Ray.h"
 
 namespace nova::shape {
@@ -10,7 +11,7 @@ namespace nova::shape {
     center = (side_h + side_w) * 0.5f;
   }
 
-  bool Square::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const {
+  bool Square::hit(const Ray &ray, float tmin, float tmax, hit_data &data, const MeshCtx & /*geometry*/) const {
     glm::vec3 n = normal;
     if (glm::dot(ray.origin - origin, n) < 0)
       n = -n;
@@ -32,5 +33,5 @@ namespace nova::shape {
       return true;
     return false;
   }
-  geometry::BoundingBox Square::computeAABB() const { return {origin, origin + side_w + side_h}; }
+  geometry::BoundingBox Square::computeAABB(const MeshCtx & /*geometry*/) const { return {origin, origin + side_w + side_h}; }
 }  // namespace nova::shape

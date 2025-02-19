@@ -2,6 +2,7 @@
 #define BVHBUILDER_H
 #include "aggregate/aggregate_datastructures.h"
 #include "primitive/PrimitiveInterface.h"
+#include "shape/MeshContext.h"
 #include <internal/common/axstd/span.h>
 #include <vector>
 namespace nova::aggregate {
@@ -38,8 +39,9 @@ namespace nova::aggregate {
                                              SEGMENTATION segmentation = SAH);
 
    private:
-    static void update_aabb(const primitives_view_tn &primitives, int32_t node_id, Bvht_data &bvh_data);
-    static void subdivide(const primitives_view_tn &primitives,
+    static void update_aabb(const shape::MeshCtx &geometry, const primitives_view_tn &primitives, int32_t node_id, Bvht_data &bvh_data);
+    static void subdivide(const shape::MeshCtx &geometry,
+                          const primitives_view_tn &primitives,
                           int32_t node_id,
                           int32_t &nodes_used,
                           BUILD_TYPE build_type,

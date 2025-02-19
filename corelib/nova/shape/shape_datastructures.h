@@ -37,6 +37,9 @@ namespace nova::shape {
     struct mesh_transform_views_t {
       axstd::span<const float> matrix_components_view{};
       axstd::span<const std::size_t> mesh_offsets_to_matrix{};
+      /* Note in case we want to add more shapes indices : Provide an offset for each indices array :
+       * triangle indices offset , sphere indices offset , etc , and access matrix_components_view using that offset.
+       */
     };
 
     ax_device_callable std::size_t get_transform_offset(std::size_t mesh_index, const mesh_transform_views_t &transform_views);
@@ -55,6 +58,7 @@ namespace nova::shape {
   struct mesh_shared_views_t {
     transform::mesh_transform_views_t transforms;
     triangle::mesh_vertex_attrib_views_t geometry;
+    /* Add more attrib views for each kind of geometry here. */
   };
 
 }  // namespace nova::shape

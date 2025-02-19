@@ -1,5 +1,6 @@
 #include "BvhBuilder.h"
 #include "primitive/PrimitiveInterface.h"
+#include "shape/MeshContext.h"
 #include <internal/common/axstd/span.h>
 #include <internal/common/exception/GenericException.h>
 #include <internal/geometry/BoundingBox.h>
@@ -12,27 +13,6 @@ namespace exception {
 }  // namespace exception
 
 namespace nova::aggregate {
-
-  Bvht_data BvhtlBuilder::build(const primitive_aggregate_data_s &scene, BUILD_TYPE type, SEGMENTATION segmentation) {
-    const primitives_view_tn &primitives = scene.primitive_list_view;
-    Bvht_data bvh_data;
-    const std::size_t prim_size = primitives.size();
-    if (prim_size == 0)
-      throw ::exception::BadSizeException("Primitives list is empty.");
-    /* max nodes for a btree is 2N-1*/
-    bvh_data.l_tree.resize(2 * prim_size - 1);
-    bvh_data.prim_idx.reserve(primitives.size());
-    for (int i = 0; i < primitives.size(); i++)
-      bvh_data.prim_idx.push_back(i);
-    Bvhnl &root = bvh_data.l_tree[0];
-    root.left = 0;
-    AX_ASSERT_LT(prim_size, INT32_MAX);
-    root.primitive_count = (int32_t)prim_size;
-    update_aabb(primitives, 0, bvh_data);
-    int32_t node_count = 1;
-    subdivide(primitives, 0, node_count, type, segmentation, bvh_data);
-    return bvh_data;
-  }
 
   Bvht_data BvhtlBuilder::buildTriangleBasedScene(const primitive_aggregate_data_s &scene, BUILD_TYPE type, SEGMENTATION segmentation) {
     const primitives_view_tn &primitives = scene.primitive_list_view;
@@ -49,13 +29,14 @@ namespace nova::aggregate {
     root.left = 0;
     AX_ASSERT_LT(prim_size, INT32_MAX);
     root.primitive_count = (int32_t)prim_size;
-    update_aabb(primitives, 0, bvh_data);
+    shape::MeshCtx geometry = shape::MeshCtx(scene.mesh_geometry);
+    update_aabb(geometry, primitives, 0, bvh_data);
     int32_t node_count = 1;
-    subdivide(primitives, 0, node_count, type, segmentation, bvh_data);
+    subdivide(geometry, primitives, 0, node_count, type, segmentation, bvh_data);
     return bvh_data;
   }
 
-  void BvhtlBuilder::update_aabb(const primitives_view_tn &primitives, int32_t node_id, Bvht_data &bvh_data) {
+  void BvhtlBuilder::update_aabb(const shape::MeshCtx &geometry, const primitives_view_tn &primitives, int32_t node_id, Bvht_data &bvh_data) {
     AX_ASSERT_FALSE(primitives.empty());
     AX_ASSERT_LT(node_id, bvh_data.l_tree.size());
 
@@ -66,7 +47,7 @@ namespace nova::aggregate {
       int32_t idx = bvh_data.prim_idx[i + offset];
       AX_ASSERT_LT(idx, primitives.size());
       AX_ASSERT_NOTNULL(primitives[idx].get());
-      geometry::BoundingBox current = primitives[idx].computeAABB();
+      geometry::BoundingBox current = primitives[idx].computeAABB(geometry);
       node_box = node_box + current;
 
       node.min[0] = node_box.getMinCoords().x;
@@ -92,7 +73,8 @@ namespace nova::aggregate {
     return axis;
   }
 
-  static float eval_sah(const Bvht_data &tree, const primitives_view_tn &primitives, const Bvhnl &node, int axis, float candidate_pos) {
+  static float eval_sah(
+      const shape::MeshCtx &geometry, const Bvht_data &tree, const primitives_view_tn &primitives, const Bvhnl &node, int axis, float candidate_pos) {
     AX_ASSERT_LT(axis, 3);
     AX_ASSERT_GE(axis, 0);
     geometry::BoundingBox aabb_left, aabb_right;
@@ -103,9 +85,9 @@ namespace nova::aggregate {
       const int32_t p_idx = tree.prim_idx[offset];
       AX_ASSERT_LT(p_idx, primitives.size());
       const nova::primitive::NovaPrimitiveInterface primitive = primitives[p_idx];
-      const glm::vec3 centroid_vec = primitive.centroid();
+      const glm::vec3 centroid_vec = primitive.centroid(geometry);
       const float *centroid_ptr = glm::value_ptr(centroid_vec);
-      const geometry::BoundingBox prim_aabb = primitive.computeAABB();
+      const geometry::BoundingBox prim_aabb = primitive.computeAABB(geometry);
       if (centroid_ptr[axis] < candidate_pos) {
         prim_left_count++;
         aabb_left = aabb_left + prim_aabb;
@@ -130,7 +112,8 @@ namespace nova::aggregate {
     return 4;
   }
 
-  static int axis_subdiv_sah(const Bvht_data &bvh_tree_data,
+  static int axis_subdiv_sah(const shape::MeshCtx &geometry,
+                             const Bvht_data &bvh_tree_data,
                              const primitives_view_tn &primitives,
                              int32_t node_id,
                              float &best_coast_r,
@@ -152,7 +135,7 @@ namespace nova::aggregate {
       float segment_size = aabb_axis_dist / (float)SEGMENT_COUNT;
       for (int i = 0; i < SEGMENT_COUNT; i++) {
         float candidate = segment_size * i + bound_min;
-        const float cost = eval_sah(bvh_tree_data, primitives, node, axis, candidate);
+        const float cost = eval_sah(geometry, bvh_tree_data, primitives, node, axis, candidate);
         if (cost < best_cost) {
           best_cost = cost;
           best_axis = axis;
@@ -165,8 +148,12 @@ namespace nova::aggregate {
     return best_axis;
   }
 
-  static int32_t create_nodes(
-      const primitives_view_tn &primitives, std::vector<int32_t> &prim_idx, Bvhnl &node, const float split_axis[3], int axis) {
+  static int32_t create_nodes(const shape::MeshCtx &geometry,
+                              const primitives_view_tn &primitives,
+                              std::vector<int32_t> &prim_idx,
+                              Bvhnl &node,
+                              const float split_axis[3],
+                              int axis) {
 
     int32_t i = node.left;
     int32_t j = i + node.primitive_count - 1;
@@ -176,7 +163,7 @@ namespace nova::aggregate {
       int32_t p_idx = prim_idx[i];
       AX_ASSERT_LT(p_idx, primitives.size());
       const nova::primitive::NovaPrimitiveInterface primitive = primitives[p_idx];
-      const glm::vec3 primitive_centroid = primitive.centroid();
+      const glm::vec3 primitive_centroid = primitive.centroid(geometry);
       float centroid = axis == 0 ? primitive_centroid.x : axis == 1 ? primitive_centroid.y : primitive_centroid.z;
       if (centroid < split_axis[axis])
         i++;
@@ -186,8 +173,13 @@ namespace nova::aggregate {
     return i;
   }
 
-  void BvhtlBuilder::subdivide(
-      const primitives_view_tn &primitives, int32_t node_id, int32_t &nodes_used, BUILD_TYPE build_type, SEGMENTATION seg, Bvht_data &bvh_data) {
+  void BvhtlBuilder::subdivide(const shape::MeshCtx &geometry,
+                               const primitives_view_tn &primitives,
+                               int32_t node_id,
+                               int32_t &nodes_used,
+                               BUILD_TYPE build_type,
+                               SEGMENTATION seg,
+                               Bvht_data &bvh_data) {
     Bvhnl &node = bvh_data.l_tree[node_id];
     float split_axis[3] = {0};
     float best_cost = 0;
@@ -198,7 +190,7 @@ namespace nova::aggregate {
       axis = axis_subdiv(bvh_data.l_tree, node_id, split_axis);
     else
       /* SAH */
-      axis = axis_subdiv_sah(bvh_data, primitives, node_id, best_cost, split_axis, build_type);
+      axis = axis_subdiv_sah(geometry, bvh_data, primitives, node_id, best_cost, split_axis, build_type);
 
     geometry::BoundingBox node_bbox(node.min, node.max);
     const float node_bbox_area = node_bbox.area();
@@ -206,7 +198,7 @@ namespace nova::aggregate {
     if (best_cost >= cost)
       return;
     /* Sort the index array for each primitive at the left of the split_axis*/
-    int i = create_nodes(primitives, bvh_data.prim_idx, node, split_axis, axis);
+    int i = create_nodes(geometry, primitives, bvh_data.prim_idx, node, split_axis, axis);
 
     int left_count = i - node.left;
     if (left_count == 0 || left_count == node.primitive_count)
@@ -226,9 +218,9 @@ namespace nova::aggregate {
     AX_ASSERT_GE(left.primitive_count, 0);
     node.primitive_count = 0;
     node.left = left_idx;
-    update_aabb(primitives, left_idx, bvh_data);
-    update_aabb(primitives, right_idx, bvh_data);
-    subdivide(primitives, left_idx, nodes_used, build_type, seg, bvh_data);
-    subdivide(primitives, right_idx, nodes_used, build_type, seg, bvh_data);
+    update_aabb(geometry, primitives, left_idx, bvh_data);
+    update_aabb(geometry, primitives, right_idx, bvh_data);
+    subdivide(geometry, primitives, left_idx, nodes_used, build_type, seg, bvh_data);
+    subdivide(geometry, primitives, right_idx, nodes_used, build_type, seg, bvh_data);
   }
 }  // namespace nova::aggregate

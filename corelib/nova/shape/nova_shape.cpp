@@ -16,7 +16,6 @@ namespace nova::shape {
     triangle::mesh_vertex_attrib_views_t geometry_triangle_views = triangle_mesh_storage.getGeometryViews();
     shared_buffers.geometry = geometry_triangle_views;
     shared_buffers.transforms = transform_views;
-    Triangle::updateSharedBuffers(shared_buffers);
   }
 
   void ShapeResourcesHolder::mapBuffers() {

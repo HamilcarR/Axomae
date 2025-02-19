@@ -1,9 +1,10 @@
 
 #include "Box.h"
+#include "MeshContext.h"
 #include "ray/Ray.h"
 namespace nova::shape {
   Box::Box(const glm::vec3 &min_coords, const glm::vec3 &max_coords) : aabb(min_coords, max_coords) {}
-  Box::Box(const float *vertices , std::size_t size) : aabb(vertices , size) {}
+  Box::Box(const float *vertices, std::size_t size) : aabb(vertices, size) {}
   Box::Box(const std::vector<float> &vertices) : aabb(vertices) {}
   Box::Box(const geometry::BoundingBox &aabb_) : aabb(aabb_) {}
 
@@ -65,7 +66,7 @@ namespace nova::shape {
     return true;
   }
 
-  bool Box::hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const {
+  bool Box::hit(const Ray &ray, float tmin, float tmax, hit_data &data, const MeshCtx & /*geometry*/) const {
     const glm::vec3 x_axis = glm::vec3(1, 0, 0);
     const glm::vec3 y_axis = glm::vec3(0, 1, 0);
     const glm::vec3 z_axis = glm::vec3(0, 0, 1);

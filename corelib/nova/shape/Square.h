@@ -1,8 +1,8 @@
 #ifndef PLANE_H
 #define PLANE_H
-#include "internal/common/math/math_utils.h"
-#include "internal/geometry/BoundingBox.h"
 #include "ray/Hitable.h"
+#include "shape/MeshContext.h"
+#include <internal/geometry/BoundingBox.h>
 
 namespace nova::shape {
   class Square {
@@ -23,9 +23,9 @@ namespace nova::shape {
      **/
     ax_device_callable Square(const glm::vec3 &origin_, const glm::vec3 &side_w_, const glm::vec3 &side_h_);
 
-    ax_device_callable bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, base_options *user_options) const;
-    ax_device_callable ax_no_discard glm::vec3 centroid() const { return center; }
-    ax_device_callable ax_no_discard geometry::BoundingBox computeAABB() const;
+    ax_device_callable bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, const MeshCtx &geometry) const;
+    ax_device_callable ax_no_discard glm::vec3 centroid(const MeshCtx &geometry) const { return center; }
+    ax_device_callable ax_no_discard geometry::BoundingBox computeAABB(const MeshCtx &geometry) const;
   };
 }  // namespace nova::shape
 
