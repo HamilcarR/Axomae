@@ -4,9 +4,9 @@ using namespace geometry;
 
 ax_device_callable glm::vec3 calculateCenter(glm::vec3 min_coords, glm::vec3 max_coords) {
   glm::vec3 center{0.f};
-  center.x = (max_coords.x + min_coords.x) / 2;
-  center.y = (max_coords.y + min_coords.y) / 2;
-  center.z = (max_coords.z + min_coords.z) / 2;
+  center.x = (max_coords.x + min_coords.x) * 0.5f;
+  center.y = (max_coords.y + min_coords.y) * 0.5f;
+  center.z = (max_coords.z + min_coords.z) * 0.5f;
   return center;
 }
 
