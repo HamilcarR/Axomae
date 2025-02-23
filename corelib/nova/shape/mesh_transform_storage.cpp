@@ -1,4 +1,5 @@
 #include "mesh_transform_storage.h"
+#include "internal/common/math/utils_3D.h"
 #include "shape_datastructures.h"
 #include <internal/common/math/math_utils.h>
 #include <internal/debug/Logger.h>
@@ -90,7 +91,7 @@ namespace nova::shape::transform {
       matrices.m = transform;
       matrices.inv = glm::inverse(matrices.m);
       matrices.t = glm::transpose(matrices.m);
-      matrices.n = glm::mat3(glm::transpose(matrices.inv));
+      matrices.n = math::geometry::compute_normal_mat(matrices.m);
 
       std::size_t matrix_element_offset = push_packed_matrix_components(matrices.m, matrix_storage.elements);
       push_packed_matrix_components(matrices.inv, matrix_storage.elements);
