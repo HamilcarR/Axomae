@@ -10,11 +10,15 @@
 #include <internal/memory/tag_ptr.h>
 
 namespace nova::shape {
+
+  /* All methods return world space positions. */
   class NovaShapeInterface : public core::tag_ptr<Triangle, Sphere, Square, Box> {
    public:
     using tag_ptr::tag_ptr;
+
     ax_device_callable ax_no_discard glm::vec3 centroid(const MeshCtx &geometry) const;
     ax_device_callable ax_no_discard geometry::BoundingBox computeAABB(const MeshCtx &geometry) const;
+    /* Takes a world space ray , and fills data with world space positions , normals etc. */
     ax_device_callable ax_no_discard bool hit(const Ray &r, float tmin, float tmax, hit_data &data, const MeshCtx &geometry) const;
   };
 

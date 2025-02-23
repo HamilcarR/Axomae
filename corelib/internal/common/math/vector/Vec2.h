@@ -1,8 +1,8 @@
 #ifndef VEC2_H
 #define VEC2_H
-#include "internal/macro/project_macros.h"
 #include <cmath>
 #include <cstdlib>
+#include <internal/macro/project_macros.h>
 #include <ostream>
 namespace math::geometry {
   template<class T>
@@ -26,7 +26,7 @@ namespace math::geometry {
     ax_no_discard inline Vec2 operator*(const Y &arg) const;
     ax_no_discard inline Vec2 operator/(const Vec2 &arg) const;
     ax_no_discard inline bool operator==(const Vec2 &arg) const;
-
+    ax_no_discard inline std::string toString() const;
     friend std::ostream &operator<<(std::ostream &os, const Vec2 &p) {
       os << "(" << p.x << "," << p.y << ")";
       return os;
@@ -95,5 +95,11 @@ namespace math::geometry {
   float Vec2<T>::dot(const Vec2 &arg) const {
     return arg.x * x + arg.y * y;
   }
+
+  template<class T>
+  std::string Vec2<T>::toString() const {
+    return std::string("X: ") + std::to_string(x) + std::string(" Y: ") + std::to_string(y);
+  }
+
 }  // namespace math::geometry
 #endif  // Vec2_H

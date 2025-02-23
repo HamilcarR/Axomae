@@ -101,11 +101,11 @@ namespace nova::shape {
    */
   ax_device_callable bool Triangle::hit(const Ray &in_ray, float tmin, float last_hit_tmax, hit_data &data, const MeshCtx &geometry) const {
     using namespace math::geometry;
-    const geometry::face_data_tri face = getFace(geometry);
     const transform::transform4x4_t transform = getTransform(geometry);
     const glm::vec3 origin = transform.inv * glm::vec4(in_ray.origin, 1.f);
     const glm::vec3 direction = transform.inv * glm::vec4(in_ray.direction, 0.f);
     const Ray ray = Ray(origin, direction);
+    const geometry::face_data_tri face = getFace(geometry);
     const vertices_attrb3d_t vertices = face.vertices();
     const edges_t edges = geometry::compute_edges(vertices);
     const vertices_attrb3d_t normals = face.normals();
@@ -115,11 +115,6 @@ namespace nova::shape {
 
     const glm::vec3 P = glm::cross(ray.direction, edges.e2);
     const float det = glm::dot(P, edges.e1);
-
-    /* backface cull */
-    // if (det < epsilon && det > -epsilon)
-    //  return false;
-
     const float inv_det = 1.f / det;
     const glm::vec3 T = ray.origin - vertices.v0;
     const float u = glm::dot(P, T) * inv_det;
@@ -131,33 +126,36 @@ namespace nova::shape {
     if (v < 0.f || (u + v) > 1.f)
       return false;
 
-    data.t = glm::dot(Q, edges.e2) * inv_det;
-    if (data.t < tmin || data.t > last_hit_tmax)  // Early return in case this triangle is farther than the last intersected shape.
+    float t = glm::dot(Q, edges.e2) * inv_det;
+    if (t < tmin || t > last_hit_tmax)  // Early return in case this triangle is farther than the last intersected shape.
       return false;
 
+    data.t = t;
+    data.position = transform.m * glm::vec4(ray.pointAt(data.t), 1.f);
+
     const float w = 1 - (u + v);
+    /* Computes the normals if there aren't any in the vertex attribute buffer. */
     if (!hasValidNormals(geometry)) {
-      data.normal = glm::cross(edges.e1, edges.e2);
-      if (glm::dot(data.normal, -ray.direction) < 0)
-        data.normal = -data.normal;
-      data.normal = glm::normalize(data.normal);
+      glm::vec3 computed_normal = glm::cross(edges.e1, edges.e2);
+      /* Checks if the eye is on the same hemisphere as the normal. If not , we invert the normal. */
+      data.normal = glm::dot(data.normal, -ray.direction) < 0 ? -computed_normal : computed_normal;
     } else {
       /* Returns barycentric interpolated normal at intersection t.  */
-      data.normal = glm::normalize(barycentric_lerp(normals.v0, normals.v1, normals.v2, w, u, v));
+      data.normal = barycentric_lerp(normals.v0, normals.v1, normals.v2, w, u, v);
     }
+    data.normal = glm::normalize(transform.n * data.normal);
+
     if (hasValidUvs(geometry)) {
       data.v = barycentric_lerp(uvs.v0.s, uvs.v1.s, uvs.v2.s, w, u, v);
       data.u = barycentric_lerp(uvs.v0.t, uvs.v1.t, uvs.v2.t, w, u, v);
     }
     data.tangent = barycentric_lerp(tangents.v0, tangents.v1, tangents.v2, w, u, v);
     data.bitangent = barycentric_lerp(bitangents.v0, bitangents.v1, bitangents.v2, w, u, v);
+    data.tangent = glm::normalize(transform.n * data.tangent);
+    data.bitangent = glm::normalize(transform.n * data.bitangent);
+
     AX_ASSERT_TRUE(hasValidBitangents(geometry));
     AX_ASSERT_TRUE(hasValidTangents(geometry));
-
-    data.position = transform.m * glm::vec4(ray.pointAt(data.t), 1.f);
-    data.normal = transform.n * glm::vec4(data.normal, 0.f);
-    data.tangent = transform.n * glm::vec4(data.normal, 0.f);
-    data.bitangent = transform.n * glm::vec4(data.normal, 0.f);
 
     return true;
   }
