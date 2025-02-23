@@ -24,6 +24,8 @@ namespace axstd {
     using reference = T &;
     using const_pointer = const T *;
     using const_reference = const T &;
+    using iterator = pointer;
+    using const_iterator = const_pointer;
 
    private:
     pointer ptr{};
@@ -86,6 +88,13 @@ namespace axstd {
     }
 
     ax_device_callable constexpr span last(size_type count) const noexcept { return span(ptr + count, len - count); }
+
+    ax_device_callable constexpr iterator begin() noexcept { return ptr; }
+    ax_device_callable constexpr iterator end() noexcept { return ptr + len; }
+    ax_device_callable constexpr const_iterator begin() const noexcept { return ptr; }
+    ax_device_callable constexpr const_iterator end() const noexcept { return ptr + len; }
+    ax_device_callable constexpr const_iterator cbegin() const noexcept { return ptr; }
+    ax_device_callable constexpr const_iterator cend() const noexcept { return ptr + len; }
   };
 }  // namespace axstd
 #else
