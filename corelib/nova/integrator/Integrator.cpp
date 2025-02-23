@@ -63,9 +63,9 @@ namespace nova::integrator {
         return glm::vec4(0.f);
       glm::vec4 color = hit.hit_d.attenuation;
       glm::vec4 emit = hit.hit_d.emissive;
-      // Here in case the value returned by the subsequent call to Li() is a NaN or Inf, we invalidate the color of the pixel alltogether and set it
-      // to zero. This helps keep a more uniform and precise value as the next sampling pass will be joined to the current pass and set a valid value
-      // to the pixel.
+      /* Here in case the value returned by the subsequent call to Li() is a NaN or Inf, we invalidate the color of the pixel alltogether and set it
+      * to zero. This helps keep a more uniform and precise value as the next sampling pass will be joined to the current pass and set a valid value
+       to the pixel.*/
       return DENAN(10.f * emit + color * Li(out, nova_internals, depth - 1, sampler));
     }
     glm::vec3 sample_vector = ray.direction;

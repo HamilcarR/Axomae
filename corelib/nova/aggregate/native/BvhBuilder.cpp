@@ -15,8 +15,26 @@ namespace exception {
 
 namespace nova::aggregate {
 
-  BvhtlBuilder::cached_primitive_data_s BvhtlBuilder::precompute_cached_prim_data(const shape::MeshCtx &geometry,
-                                                                                  const primitive_aggregate_data_s &scene) {
+  struct cached_primitive_data_s {
+    std::vector<geometry::BoundingBox> aabbs;
+    std::vector<glm::vec3> centroids;
+  };
+
+  struct geometric_data_s {
+    const cached_primitive_data_s *precomputed_cache;
+    const shape::MeshCtx *geometry;
+    const primitives_view_tn *primitives;
+  };
+
+  static void update_aabb(const geometric_data_s &scene, int32_t node_id, Bvht_data &bvh_data);
+  static void subdivide(const geometric_data_s &scene,
+                        int32_t node_id,
+                        int32_t &nodes_used,
+                        BvhtlBuilder::BUILD_TYPE build_type,
+                        BvhtlBuilder::SEGMENTATION seg,
+                        Bvht_data &bvh_data);
+
+  cached_primitive_data_s precompute_cached_prim_data(const shape::MeshCtx &geometry, const primitive_aggregate_data_s &scene) {
     cached_primitive_data_s cache;
     cache.aabbs.reserve(scene.primitive_list_view.size());
     cache.centroids.reserve(scene.primitive_list_view.size());
@@ -55,7 +73,8 @@ namespace nova::aggregate {
     return bvh_data;
   }
 
-  void BvhtlBuilder::update_aabb(const BvhtlBuilder::geometric_data_s &scene, int32_t node_id, Bvht_data &bvh_data) {
+  /* Makes a union between two AABBs , merging them , creating a new bounding box with the highests coordinates and lowests.*/
+  void update_aabb(const geometric_data_s &scene, int32_t node_id, Bvht_data &bvh_data) {
     AX_ASSERT_FALSE(scene.primitives->empty());
     AX_ASSERT_LT(node_id, bvh_data.l_tree.size());
 
@@ -92,7 +111,7 @@ namespace nova::aggregate {
     return axis;
   }
 
-  float BvhtlBuilder::eval_sah(const BvhtlBuilder::geometric_data_s &scene, const Bvht_data &tree, const Bvhnl &node, int axis, float candidate_pos) {
+  float eval_sah(const geometric_data_s &scene, const Bvht_data &tree, const Bvhnl &node, int axis, float candidate_pos) {
     AX_ASSERT_LT(axis, 3);
     AX_ASSERT_GE(axis, 0);
     geometry::BoundingBox aabb_left, aabb_right;
@@ -102,7 +121,7 @@ namespace nova::aggregate {
       AX_ASSERT_LT(offset, tree.prim_idx.size());
       const int32_t p_idx = tree.prim_idx[offset];
       AX_ASSERT_LT(p_idx, scene.primitives->size());
-      const glm::vec3 centroid_vec = scene.precomputed_cache->centroids[p_idx];  // primitive.centroid(geometry);
+      const glm::vec3 centroid_vec = scene.precomputed_cache->centroids[p_idx];
       const float *centroid_ptr = glm::value_ptr(centroid_vec);
       const geometry::BoundingBox prim_aabb = scene.precomputed_cache->aabbs[p_idx];
       if (centroid_ptr[axis] < candidate_pos) {
@@ -129,12 +148,12 @@ namespace nova::aggregate {
     return 4;
   }
 
-  int BvhtlBuilder::axis_subdiv_sah(const BvhtlBuilder::geometric_data_s &scene,
-                                    const Bvht_data &bvh_tree_data,
-                                    int32_t node_id,
-                                    float &best_coast_r,
-                                    float subdivided_axis[3],
-                                    BvhtlBuilder::BUILD_TYPE build_type) {
+  int axis_subdiv_sah(const geometric_data_s &scene,
+                      const Bvht_data &bvh_tree_data,
+                      int32_t node_id,
+                      float &best_coast_r,
+                      float subdivided_axis[3],
+                      BvhtlBuilder::BUILD_TYPE build_type) {
 
     const unsigned SEGMENT_COUNT = get_centroid_seg_number(build_type);
     int best_axis = 0;
@@ -164,8 +183,7 @@ namespace nova::aggregate {
     return best_axis;
   }
 
-  int32_t BvhtlBuilder::create_nodes(
-      const BvhtlBuilder::geometric_data_s &scene, std::vector<int32_t> &prim_idx, Bvhnl &node, const float split_axis[3], int axis) {
+  int32_t create_nodes(const geometric_data_s &scene, std::vector<int32_t> &prim_idx, Bvhnl &node, const float split_axis[3], int axis) {
 
     int32_t i = node.left;
     int32_t j = i + node.primitive_count - 1;
@@ -184,19 +202,19 @@ namespace nova::aggregate {
     return i;
   }
 
-  void BvhtlBuilder::subdivide(const BvhtlBuilder::geometric_data_s &scene,
-                               int32_t node_id,
-                               int32_t &nodes_used,
-                               BUILD_TYPE build_type,
-                               SEGMENTATION seg,
-                               Bvht_data &bvh_data) {
+  void subdivide(const geometric_data_s &scene,
+                 int32_t node_id,
+                 int32_t &nodes_used,
+                 BvhtlBuilder::BUILD_TYPE build_type,
+                 BvhtlBuilder::SEGMENTATION seg,
+                 Bvht_data &bvh_data) {
     Bvhnl &node = bvh_data.l_tree[node_id];
     float split_axis[3] = {0};
     float best_cost = 0;
 
     int axis = -1;
     /* Retrieves longest axis */
-    if (seg != SAH)
+    if (seg != BvhtlBuilder::SAH)
       axis = axis_subdiv(bvh_data.l_tree, node_id, split_axis);
     else
       /* SAH */
