@@ -5,6 +5,8 @@
 #include <internal/common/exception/GenericException.h>
 #include <internal/geometry/BoundingBox.h>
 
+// TODO : Create two caches for computeAABB() and centroid() functions and precompute them.
+
 namespace exception {
   class BadSizeException : public GenericException {
    public:
