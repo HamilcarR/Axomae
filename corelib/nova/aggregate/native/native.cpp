@@ -55,7 +55,7 @@ namespace nova::aggregate {
     }
 
     bool iter_traverse(const Ray &r, bvh_hit_data &hit_result) const {
-      float tmax = 1e30f;
+      float tmax = MAXFLOAT;
       const Bvhnl *iterator_node = &bvh.l_tree[0];
       AX_ASSERT_NOTNULL(iterator_node);
       hit_result.is_hit = false;
