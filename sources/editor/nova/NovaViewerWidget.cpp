@@ -1,7 +1,7 @@
 #include "NovaViewerWidget.h"
 #include "GLViewer.h"
-#include "nova/NovaRenderer.h"
 #include "metadata/RgbDisplayerLabel.h"
+#include "nova/NovaRenderer.h"
 
 #include <QGridLayout>
 
@@ -35,5 +35,5 @@ void NovaViewerWidget::mouseMoveEvent(QMouseEvent *event) {
   QPoint p = this->mapFromGlobal(QCursor::pos());
   image::Rgb framebuffer_color_pixel = viewer->getFramebufferColor(p.x(), p.y());
   const float rgb[4] = {framebuffer_color_pixel.red, framebuffer_color_pixel.green, framebuffer_color_pixel.blue, 1.f};
-  rgb_label->updateLabel(rgb, true);
+  rgb_label->updateLabel(rgb, p.x(), p.y(), true);
 }

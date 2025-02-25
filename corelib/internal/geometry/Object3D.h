@@ -296,13 +296,13 @@ namespace geometry {
 // TODO: Triangle mesh , replace name
 class Object3D {
  public:
-  axstd::span<float> vertices;
-  axstd::span<float> uv;
-  axstd::span<float> colors;
-  axstd::span<float> normals;
-  axstd::span<float> bitangents;
-  axstd::span<float> tangents;
-  axstd::span<unsigned> indices;
+  axstd::span<float> vertices{};
+  axstd::span<float> uv{};
+  axstd::span<float> colors{};
+  axstd::span<float> normals{};
+  axstd::span<float> bitangents{};
+  axstd::span<float> tangents{};
+  axstd::span<unsigned> indices{};
 
   constexpr static int face_stride = 3;
 
@@ -342,6 +342,14 @@ class Object3D {
         geom.uv2[i] = uv[idx[2] * 2 + i];
       }
     }
+  }
+
+  ax_device_callable geometry::face_data_tri getFace(std::size_t triangle_id) const {
+    geometry::face_data_tri tri_primitive{};
+    AX_ASSERT_FALSE(indices.empty());
+    unsigned idx[3] = {indices[triangle_id], indices[triangle_id + 1], indices[triangle_id + 2]};
+    getTri(tri_primitive, idx);
+    return tri_primitive;
   }
 };
 
