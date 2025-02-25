@@ -2,9 +2,9 @@
 #define TEXTUREVIEWERWIDGET_H
 #include "ContextMenuWidget.h"
 #include "Image.h"
-#include "internal/common/image/Rgb.h"
 #include "metadata/RgbDisplayerLabel.h"
 #include "ui_texture_viewer.h"
+#include <internal/common/image/Rgb.h>
 
 #include <QImage>
 #include <QMainWindow>

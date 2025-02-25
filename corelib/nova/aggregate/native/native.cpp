@@ -101,7 +101,7 @@ namespace nova::aggregate {
           int32_t p_idx = bvh.prim_idx[primitive_offset];
           AX_ASSERT_LT(p_idx, scene.primitive_list_view.size());
           const primitive::NovaPrimitiveInterface *prim = &(scene.primitive_list_view)[p_idx];
-          if (!prim->hit(r, r.tnear, hit_result.hit_d.t, hit_result.hit_d, geometry_context))
+          if (!prim->hit(r, r.tnear, tmax, hit_result.hit_d, geometry_context))
             continue;
           hit_result.is_hit = true;
           if (hit_result.hit_d.t <= tmax) {

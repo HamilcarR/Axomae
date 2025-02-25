@@ -1,6 +1,6 @@
 #include "RgbDisplayerLabel.h"
 
-#include "internal/common/image/image_utils.h"
+#include <internal/common/image/image_utils.h>
 
 #include <QPainter>
 namespace editor {
@@ -16,10 +16,11 @@ namespace editor {
     text_painter.setFont(font);
     text_painter.fillRect(0, height() - 12, width(), 12, QColor(100, 100, 100, 200));
     text_painter.setPen(QColor(10, 10, 10, 225));
-
-    text_painter.drawText(0, this->height() - 1, current_pixel_display_info.rgb_display_text.c_str());
+    std::string label_text = current_pixel_display_info.rgb_display_text + " " + current_pixel_display_info.pixel_position.toString();
+    text_painter.drawText(0, this->height() - 1, label_text.c_str());
     QFontMetrics metrics(font);
-    int width_text = metrics.size(Qt::TextSingleLine, QString(current_pixel_display_info.rgb_display_text.c_str())).width();
+    int width_text = metrics.size(Qt::TextSingleLine, QString(label_text.c_str())).width();
+
     QPainter color_painter(this);
     QColor pixel_color_mouse;
     pixel_color_mouse.setRed((int)current_pixel_display_info.texture_color_value.red);
@@ -29,9 +30,9 @@ namespace editor {
     color_painter.fillRect(width_text + 1, height() - 12, COLOR_DISPLAYER_SIZE, 12, pixel_color_mouse);
   }
 
-  void RgbDisplayerLabel::updateLabel(const float rgb[4], bool normalize) {
+  void RgbDisplayerLabel::updateLabel(const float rgb[4], uint32_t px, uint32_t py, bool normalize) {
     current_pixel_display_info.texture_color_value = {rgb[0], rgb[1], rgb[2], rgb[3]};
-
+    current_pixel_display_info.pixel_position = {px, py};
     current_pixel_display_info.rgb_display_text = current_pixel_display_info.texture_color_value.to_string();
     current_pixel_display_info.texture_color_value.red = std::clamp(
         hdr_utils::color_correction(current_pixel_display_info.texture_color_value.red) * 255, 0.f, 255.f);
@@ -43,11 +44,10 @@ namespace editor {
     update();
   }
 
-  void RgbDisplayerLabel::updateLabel(const uint8_t rgb[4]) {
+  void RgbDisplayerLabel::updateLabel(const uint8_t rgb[4], uint32_t px, uint32_t py) {
     current_pixel_display_info.texture_color_value = {(float)rgb[0], (float)rgb[1], (float)rgb[2], (float)rgb[3]};
-
+    current_pixel_display_info.pixel_position = {px, py};
     current_pixel_display_info.rgb_display_text = current_pixel_display_info.texture_color_value.to_stringi();
-
     update();
   }
 
