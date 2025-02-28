@@ -6,7 +6,7 @@
 
 namespace nova::shape {
 
-  ax_device_inlined const Object3D &get_mesh(std::size_t index, const mesh_shared_views_t &geometry_views) {
+  ax_device_callable_inlined const Object3D &get_mesh(std::size_t index, const mesh_shared_views_t &geometry_views) {
 #ifndef __CUDA_ARCH__
     const auto &mesh_array = geometry_views.geometry.host_geometry_view;
 #else

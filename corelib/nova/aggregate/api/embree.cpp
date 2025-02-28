@@ -1,6 +1,7 @@
 #include "acceleration_interface.h"
 #include "aggregate/AccelerationInternalsInterface.h"
 #include "aggregate_datastructures.h"
+#include "glm/gtc/type_ptr.hpp"
 #include "primitive/PrimitiveInterface.h"
 #include "ray/Hitable.h"
 #include "shape/shape_datastructures.h"
@@ -11,6 +12,7 @@
 #include <embree4/rtcore_geometry.h>
 #include <embree4/rtcore_ray.h>
 #include <embree4/rtcore_scene.h>
+#include <internal/common/math/math_includes.h>
 #include <internal/common/math/utils_3D.h>
 #include <internal/debug/Logger.h>
 #include <internal/geometry/Object3D.h>
@@ -24,8 +26,11 @@ namespace nova::aggregate {
   void embree_error_callback(void *userPtr, RTCError error, const char *str) {
     std::string error_string = std::string("Encountered Embree error: ") + std::to_string(error) + "  " + str;
     error_data_t *error_status = static_cast<error_data_t *>(userPtr);
-    std::string primitive_err_string = std::string("Mesh index: ") + std::to_string(error_status->mesh_index) +
-                                       std::string(" and transform offset : ") + std::to_string(error_status->transform_offset);
+    std::string primitive_err_string = "";
+    if (error_status) {
+      primitive_err_string = std::string("Mesh index: ") + std::to_string(error_status->mesh_index) + std::string(" and transform offset : ") +
+                             std::to_string(error_status->transform_offset);
+    }
     std::string final_err = error_string + "\n" + primitive_err_string;
     if (error == RTC_ERROR_UNKNOWN) {
       LOG("Fatal error :" + final_err, LogLevel::CRITICAL);
@@ -44,8 +49,7 @@ namespace nova::aggregate {
       primitive_offset = primitive_id;
     else
       primitive_offset = primitive_global_offset[geometry_id - 1] + primitive_id;
-    std::size_t global_prim_id = primitive_offset;
-    return &temp_prim_view[global_prim_id];
+    return &temp_prim_view[primitive_offset];
   }
   /* Computes the global offset of primitives for each mesh.
    * If mesh i contains X primitives , and mesh i - 1 contains Y primitives , then
@@ -58,12 +62,35 @@ namespace nova::aggregate {
     for (int geometry_index = 0; geometry_index < mesh_geometry.size(); geometry_index++) {
       const Object3D &mesh = mesh_geometry[geometry_index];
       AX_ASSERT_EQ(mesh.face_stride, 3);  // Check that it's a triangle. Other primitives support need to be done later.
-      std::size_t triangles_number = mesh.indices.size() / mesh.face_stride - 1;
+      std::size_t primitive_count = mesh.indices.size() / mesh.face_stride;
       if (geometry_index == 0)
-        primitive_global_offset[geometry_index] = triangles_number;  // Stores the number of primitives for each geomID.
+        primitive_global_offset[geometry_index] = primitive_count;  // Stores the number of primitives for each geomID.
       else
-        primitive_global_offset[geometry_index] = primitive_global_offset[geometry_index - 1] + triangles_number;
+        primitive_global_offset[geometry_index] = primitive_global_offset[geometry_index - 1] + primitive_count;
     }
+  }
+
+  template<class T>
+  void validate3(const T *value) {
+    AX_ASSERT_NOTNULL(value);
+    AX_ASSERT(!ISNAN(value[0]) && !ISNAN(value[1]) && !ISNAN(value[2]), "");
+  }
+
+  template<class T>
+  void validate2(const T *value) {
+    AX_ASSERT_NOTNULL(value);
+    AX_ASSERT(!ISNAN(value[0]) && !ISNAN(value[1]), "");
+  }
+
+  template<class T>
+  void validate1(T value) {
+    AX_ASSERT(!ISNAN(value), "");
+  }
+
+  template<class T>
+  void assert_not_zero(T value[3]) {
+    AX_ASSERT_NOTNULL(value);
+    AX_ASSERT(value[0] != 0 || value[1] != 0 || value[2] != 0, "");
   }
 
 #define acceleration_internal_interface \
@@ -72,22 +99,24 @@ namespace nova::aggregate {
 
   template<>
   class GenericAccelerator<EmbreeBuild>::Impl : acceleration_internal_interface {
+
+    struct user_geometry_structure_s {
+      std::size_t transform_offset;
+      std::size_t mesh_index;
+    };
+
     RTCDevice device;
     RTCScene root_scene{};
-    RTCScene instanced_scene{};
-    error_data_t error_status{};
+    std::vector<RTCScene> mesh_scenes{};  // Keep references to subscenes for lookup in interpolation method.
     /*contains meshes geometry , transformations , and the list of primitives abstractions to return when ray hits.*/
     primitive_aggregate_data_s scene_geometry_data{};
     std::vector<std::size_t> primitive_global_offset;
-    bool has_valid_tangents{false};
-    bool has_valid_bitangents{false};
-    bool has_valid_normals{false};
-    bool has_valid_uvs{false};
+    std::vector<user_geometry_structure_s> user_geometry;
 
    public:
     Impl() {
       device = rtcNewDevice(nullptr);
-      rtcSetDeviceErrorFunction(device, embree_error_callback, &error_status);
+      rtcSetDeviceErrorFunction(device, embree_error_callback, nullptr);
     }
 
     ~Impl() {
@@ -102,26 +131,85 @@ namespace nova::aggregate {
     Impl &operator=(const Impl &) = default;
     Impl &operator=(Impl &&) noexcept = default;
 
+    void build(primitive_aggregate_data_s primitive_aggregate) {
+      root_scene = rtcNewScene(device);
+      scene_geometry_data = primitive_aggregate;
+      const shape::mesh_shared_views_t &mesh_geometry = scene_geometry_data.mesh_geometry;
+      const std::size_t mesh_number = mesh_geometry.geometry.host_geometry_view.size();
+
+      initializeApplicationStructures(mesh_number);
+
+      for (int mesh_index = 0; mesh_index < mesh_number; mesh_index++) {
+        const Object3D &current_mesh = mesh_geometry.geometry.host_geometry_view[mesh_index];
+        std::size_t transform_offset = mesh_geometry.transforms.mesh_offsets_to_matrix[mesh_index];
+
+        shape::transform::transform4x4_t transform = getTransform(mesh_index);
+
+        RTCGeometry inst_geometry = addInstancedTriangleMesh(current_mesh, transform, mesh_index);
+
+        user_geometry_structure_s user_data{};
+        user_data.mesh_index = mesh_index;
+        user_data.transform_offset = transform_offset;
+        user_geometry[mesh_index] = user_data;
+        rtcSetGeometryUserData(inst_geometry, &user_geometry[mesh_index]);
+
+        rtcReleaseGeometry(inst_geometry);
+      }
+    }
+
+    bool intersect(const Ray &ray, bvh_hit_data &hit_return_data) const {
+      RTCRayHit result = apiRay(ray);
+      RTCRayQueryContext context{};
+      rtcInitRayQueryContext(&context);
+      RTCIntersectArguments intersect_args{};
+      rtcInitIntersectArguments(&intersect_args);
+      intersect_args.context = &context;
+      rtcIntersect1(root_scene, &result, &intersect_args);
+
+      if (result.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
+        fillHitStructure(ray, result, hit_return_data);
+#ifndef NDEBUG
+        validate(hit_return_data);
+#endif
+        return true;
+      } else {
+        hit_return_data.is_hit = false;
+        return false;
+      }
+    }
+
     void cleanup() {
-      if (instanced_scene)
-        rtcReleaseScene(instanced_scene);
+      primitive_global_offset.clear();
+      user_geometry.clear();
+
+      for (auto &e : mesh_scenes)
+        if (e)
+          rtcReleaseScene(e);
+      mesh_scenes.clear();
+
       if (root_scene)
         rtcReleaseScene(root_scene);
-      instanced_scene = nullptr;
       root_scene = nullptr;
     }
 
-    RTCGeometry createTriangleGeometry() { return rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE); }
-    RTCGeometry createInstanceGeometry() { return rtcNewGeometry(device, RTC_GEOMETRY_TYPE_INSTANCE); }
-    RTCScene createScene() { return rtcNewScene(device); }
-    void commit(RTCGeometry &mesh) { rtcCommitGeometry(mesh); }
-    void commit(RTCScene &scene) { rtcCommitScene(scene); }
-    unsigned attach(RTCScene &scene, RTCGeometry &mesh) { return rtcAttachGeometry(scene, mesh); }
-    void release(RTCGeometry &mesh) { rtcReleaseGeometry(mesh); }
-    void allocateAttribSlots(RTCGeometry &geom, int max_slots) { rtcSetGeometryVertexAttributeCount(geom, max_slots); }
+   private:
+    inline shape::transform::transform4x4_t getTransform(std::size_t mesh_index) {
+      const shape::mesh_shared_views_t &mesh_geometry = scene_geometry_data.mesh_geometry;
+      std::size_t transform_offset = mesh_geometry.transforms.mesh_offsets_to_matrix[mesh_index];
+      shape::transform::transform4x4_t transform{};
+      int err = shape::transform::reconstruct_transform4x4(transform, transform_offset, mesh_geometry.transforms);
+      AX_ASSERT_EQ(err, 0);
+      return transform;
+    }
+
+    void initializeApplicationStructures(std::size_t mesh_number) {
+      user_geometry.resize(mesh_number);
+      mesh_scenes.resize(mesh_number);
+      setupGlobalOffsetArray(scene_geometry_data, primitive_global_offset);
+    }
 
     void initializeGeometry(RTCGeometry &geom, const Object3D &mesh) {
-      allocateAttribSlots(geom, 4);
+      rtcSetGeometryVertexAttributeCount(geom, 4);
       rtcSetSharedGeometryBuffer(
           geom, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3, mesh.vertices.data(), 0, 3 * sizeof(float), mesh.vertices.size() / 3);
       rtcSetSharedGeometryBuffer(
@@ -136,61 +224,24 @@ namespace nova::aggregate {
           geom, RTC_BUFFER_TYPE_VERTEX_ATTRIBUTE, 3, RTC_FORMAT_FLOAT2, mesh.uv.data(), 0, 2 * sizeof(float), mesh.uv.size() / 2);
     }
 
-    void setInstancedScene(RTCGeometry &instance, RTCScene &scene, unsigned timestep = 1) {
-      rtcSetGeometryInstancedScene(instance, scene);
-      rtcSetGeometryTimeStepCount(instance, timestep);
-    }
-
-    /* Data format is column major.*/
-    void setGeometryTransform4x4(const RTCGeometry &geom, const float *transform) {
-      rtcSetGeometryTransform(geom, 0, RTC_FORMAT_FLOAT4X4_COLUMN_MAJOR, transform);
-    }
-
-    shape::transform::transform4x4_t getTransform(std::size_t mesh_index) {
-      const shape::mesh_shared_views_t &mesh_geometry = scene_geometry_data.mesh_geometry;
-      std::size_t transform_offset = mesh_geometry.transforms.mesh_offsets_to_matrix[mesh_index];
-      shape::transform::transform4x4_t transform{};
-      int err = shape::transform::reconstruct_transform4x4(transform, transform_offset, mesh_geometry.transforms);
-      AX_ASSERT_EQ(err, 0);
-      return transform;
-    }
-
-    void build(primitive_aggregate_data_s primitive_aggregate) {
-      root_scene = createScene();
-      instanced_scene = createScene();
-      scene_geometry_data = primitive_aggregate;
-      setupGlobalOffsetArray(scene_geometry_data, primitive_global_offset);
-      const shape::mesh_shared_views_t &mesh_geometry = scene_geometry_data.mesh_geometry;
-      for (int mesh_index = 0; mesh_index < mesh_geometry.geometry.host_geometry_view.size(); mesh_index++) {
-        const Object3D &mesh = mesh_geometry.geometry.host_geometry_view[mesh_index];
-        std::size_t transform_offset = mesh_geometry.transforms.mesh_offsets_to_matrix[mesh_index];
-        shape::transform::transform4x4_t transform{};
-        int err = shape::transform::reconstruct_transform4x4(transform, transform_offset, mesh_geometry.transforms);
-        AX_ASSERT_EQ(err, 0);
-        error_status.transform_offset = transform_offset;
-        error_status.mesh_index = mesh_index;
-        unsigned geomID = setupTransformedMesh(mesh, transform);
-      }
-      commit(root_scene);
-    }
-
-    unsigned setupTransformedMesh(const Object3D &mesh_geometry, const shape::transform::transform4x4_t &transform) {
-      RTCGeometry geometry = createTriangleGeometry();
-
-      unsigned geomID = 0;
+    RTCGeometry addInstancedTriangleMesh(const Object3D &mesh_geometry, const shape::transform::transform4x4_t &transform, std::size_t mesh_index) {
+      RTCGeometry geometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
       initializeGeometry(geometry, mesh_geometry);
-      commit(geometry);
-      attach(instanced_scene, geometry);
-      release(geometry);
-      commit(instanced_scene);
+      RTCScene sub_scene = rtcNewScene(device);
+      rtcCommitGeometry(geometry);
+      rtcAttachGeometryByID(sub_scene, geometry, mesh_index);
+      rtcReleaseGeometry(geometry);
+      rtcCommitScene(sub_scene);
       /* Transformations. */
-      RTCGeometry instance = createInstanceGeometry();
-      setInstancedScene(instance, instanced_scene);
-      setGeometryTransform4x4(instance, glm::value_ptr(transform.m));
-      commit(instance);
-      geomID = attach(root_scene, instance);
-      release(instance);
-      return geomID;
+      RTCGeometry instance_geometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_INSTANCE);
+      rtcSetGeometryInstancedScene(instance_geometry, sub_scene);
+      rtcSetGeometryTimeStepCount(instance_geometry, 1);
+      rtcSetGeometryTransform(instance_geometry, 0, RTC_FORMAT_FLOAT4X4_COLUMN_MAJOR, glm::value_ptr(transform.m));
+      rtcCommitGeometry(instance_geometry);
+      rtcAttachGeometry(root_scene, instance_geometry);
+      rtcCommitScene(root_scene);
+      mesh_scenes[mesh_index] = sub_scene;
+      return instance_geometry;
     }
 
     static RTCRayHit apiRay(const Ray &ray) {
@@ -222,42 +273,50 @@ namespace nova::aggregate {
       return transform;
     }
 
-    bool intersect(const Ray &ray, bvh_hit_data &hit_return_data) const {
-      RTCRayHit result = apiRay(ray);
-      RTCRayQueryContext context{};
-      rtcInitRayQueryContext(&context);
-      RTCIntersectArguments intersect_args{};
-      rtcInitIntersectArguments(&intersect_args);
-      intersect_args.context = &context;
-      rtcIntersect1(root_scene, &result, &intersect_args);
+    void interpolate(const RTCRayHit &result, float normals[3], float tangents[3], float bitangents[3], float uv[2]) const {
+      RTCGeometry this_geometry = rtcGetGeometry(mesh_scenes[result.hit.geomID], result.hit.instID[0]);
+      AX_ASSERT_NOTNULL(this_geometry);
+      rtcInterpolate0(this_geometry, result.hit.primID, result.hit.u, result.hit.v, RTC_BUFFER_TYPE_VERTEX_ATTRIBUTE, 0, normals, 3);
+      rtcInterpolate0(this_geometry, result.hit.primID, result.hit.u, result.hit.v, RTC_BUFFER_TYPE_VERTEX_ATTRIBUTE, 1, tangents, 3);
+      rtcInterpolate0(this_geometry, result.hit.primID, result.hit.u, result.hit.v, RTC_BUFFER_TYPE_VERTEX_ATTRIBUTE, 2, bitangents, 3);
+      rtcInterpolate0(this_geometry, result.hit.primID, result.hit.u, result.hit.v, RTC_BUFFER_TYPE_VERTEX_ATTRIBUTE, 3, uv, 2);
+#ifndef NDEBUG
+      assert_not_zero(normals);
+      assert_not_zero(tangents);
+      assert_not_zero(bitangents);
+#endif
+    }
 
-      if (result.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
-        hit_return_data.is_hit = true;
-        /* hit distance t is registered in tfar for embree.*/
-        hit_return_data.prim_min_t = result.ray.tfar;
-        hit_return_data.prim_max_t = ray.tfar;
-        hit_return_data.hit_d.t = result.ray.tfar;
-        hit_return_data.hit_d.position = ray.pointAt(result.ray.tfar);
-        hit_return_data.last_primit = getPrimitiveFromGlobalOffset(
-            result.hit.geomID, result.hit.primID, primitive_global_offset, scene_geometry_data);
-        float normals[3]{}, tangents[3]{}, bitangents[3]{}, uv[2]{};
-        RTCGeometry this_geometry = rtcGetGeometry(instanced_scene, result.hit.geomID);
-        rtcInterpolate0(this_geometry, result.hit.primID, result.hit.u, result.hit.v, RTC_BUFFER_TYPE_VERTEX_ATTRIBUTE, 0, normals, 3);
-        rtcInterpolate0(this_geometry, result.hit.primID, result.hit.u, result.hit.v, RTC_BUFFER_TYPE_VERTEX_ATTRIBUTE, 1, tangents, 3);
-        rtcInterpolate0(this_geometry, result.hit.primID, result.hit.u, result.hit.v, RTC_BUFFER_TYPE_VERTEX_ATTRIBUTE, 2, bitangents, 3);
-        rtcInterpolate0(this_geometry, result.hit.primID, result.hit.u, result.hit.v, RTC_BUFFER_TYPE_VERTEX_ATTRIBUTE, 3, uv, 2);
-        auto transform = getMeshTransform(result.hit.geomID);
-        hit_return_data.hit_d.u = std::fabs(uv[1]);
-        hit_return_data.hit_d.v = std::fabs(uv[0]);
-        hit_return_data.hit_d.normal = glm::normalize(transform.n * glm::vec3(normals[0], normals[1], normals[2]));
-        hit_return_data.hit_d.tangent = glm::normalize(transform.n * glm::vec3(tangents[0], tangents[1], tangents[2]));
-        hit_return_data.hit_d.bitangent = glm::normalize(transform.n * glm::vec3(bitangents[0], bitangents[1], bitangents[2]));
+    void validate(const bvh_hit_data &hit_return_data) const {
+      auto hit_d = hit_return_data.hit_d;
+      validate3(glm::value_ptr(hit_d.normal));
+      validate3(glm::value_ptr(hit_d.bitangent));
+      validate3(glm::value_ptr(hit_d.tangent));
+      validate3(glm::value_ptr(hit_d.position));
+      validate1(hit_d.t);
+      validate1(hit_d.u);
+      validate1(hit_d.v);
+    }
 
-        return true;
-      } else {
-        hit_return_data.is_hit = false;
-        return false;
-      }
+    void fillHitStructure(const Ray &ray, const RTCRayHit &result, bvh_hit_data &hit_return_data) const {
+      hit_return_data.is_hit = true;
+      /* hit distance t is registered in tfar for embree.*/
+      hit_return_data.prim_min_t = result.ray.tfar;
+      hit_return_data.prim_max_t = ray.tfar;
+      hit_return_data.hit_d.t = result.ray.tfar;
+      hit_return_data.hit_d.position = ray.pointAt(result.ray.tfar);
+
+      auto *user_g = static_cast<const user_geometry_structure_s *>(rtcGetGeometryUserDataFromScene(root_scene, result.hit.geomID));
+      auto transform = getMeshTransform(user_g->mesh_index);
+
+      hit_return_data.last_primit = getPrimitiveFromGlobalOffset(result.hit.geomID, result.hit.primID, primitive_global_offset, scene_geometry_data);
+      float normals[3]{}, tangents[3]{}, bitangents[3]{}, uv[2]{};
+      interpolate(result, normals, tangents, bitangents, uv);
+      hit_return_data.hit_d.u = uv[1];
+      hit_return_data.hit_d.v = uv[0];
+      hit_return_data.hit_d.normal = glm::normalize(transform.n * glm::vec3(normals[0], normals[1], normals[2]));
+      hit_return_data.hit_d.tangent = glm::normalize(transform.n * glm::vec3(tangents[0], tangents[1], tangents[2]));
+      hit_return_data.hit_d.bitangent = glm::normalize(transform.n * glm::vec3(bitangents[0], bitangents[1], bitangents[2]));
     }
   };
 

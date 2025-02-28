@@ -36,4 +36,5 @@ register_device_compilation(
         triangle_mesh_storage.cpp
         mesh_transform_storage.cpp
         shape_datastructures.cpp
+        MeshContext.cpp
       )
