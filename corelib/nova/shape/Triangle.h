@@ -1,10 +1,10 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 #include "MeshContext.h"
-#include "internal/device/gpgpu/device_utils.h"
 #include "ray/Hitable.h"
 #include "shape_datastructures.h"
 #include <internal/common/math/math_utils.h>
+#include <internal/device/gpgpu/device_utils.h>
 #include <internal/geometry/BoundingBox.h>
 #include <internal/geometry/Object3D.h>
 #include <internal/macro/project_macros.h>

@@ -40,8 +40,8 @@ nova::aggregate::primitive_aggregate_data_s PrimitiveAggregateBuilder::generateA
 }
 
 /**********************************************************************************************************************************************************************************/
-static nova::aggregate::GenericAccelerator<nova::aggregate::NativeBuild> build_acceleration_structure(PrimitiveAggregateBuilder &builder) {
-  nova::aggregate::GenericAccelerator<nova::aggregate::NativeBuild> bvh;
+static nova::aggregate::DefaultAccelerator build_acceleration_structure(PrimitiveAggregateBuilder &builder) {
+  nova::aggregate::DefaultAccelerator bvh;
   bvh.build(builder.generateAggregate());
   return bvh;
 }
