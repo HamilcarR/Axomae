@@ -2,7 +2,6 @@
 
 namespace nova::texturing {
 
-
   glm::vec4 NovaTextureInterface::sample(float u, float v, const texture_sample_data &sample_data) const {
     auto disp = [&](auto texture) { return texture->sample(u, v, sample_data); };
     return dispatch(disp);
@@ -19,8 +18,8 @@ namespace nova::texturing {
   }
 
   glm::vec4 ImageTexture::sample(float u, float v, const texture_sample_data & /*sample_data*/) const {
-    unsigned i = math::texture::uvToPixel(u, width - 1);
-    unsigned j = math::texture::uvToPixel(v, height - 1);
+    unsigned i = math::texture::uvToPixel(fabs(u), width - 1);
+    unsigned j = math::texture::uvToPixel(fabs(v), height - 1);
     unsigned idx = (i * height + j);
 
     union FORMAT {
