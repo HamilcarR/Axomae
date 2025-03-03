@@ -29,7 +29,7 @@ namespace nova::gpu {
       DEVICE_ERROR_CHECK(device::gpgpu::interop_register_glbuffer(vbo_id, gpgpu_api_handle, access_mode).error_status);
     }
 
-    bool isValid() const { return !device_buffer.empty() && gpgpu_api_handle.isRegistered() && vbo_id != 0; }
+    ax_no_discard bool isValid() const { return !device_buffer.empty() && gpgpu_api_handle.isRegistered() && vbo_id != 0; }
 
     ~DeviceBufferTracker() {
       if (isValid())

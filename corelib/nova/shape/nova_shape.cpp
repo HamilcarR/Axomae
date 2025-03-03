@@ -32,10 +32,10 @@ namespace nova::shape {
     return shared_views;
   }
 
-  void ShapeResourcesHolder::addTriangleMeshGPU(const triangle::mesh_vbo_ids &mesh_vbos) { triangle_mesh_storage.addGeometryGPU(mesh_vbos); }
+  void ShapeResourcesHolder::addTriangleMeshGPU(const triangle::mesh_vbo_ids &mesh_vbos) { triangle_mesh_storage.addGeometry(mesh_vbos); }
 
   void ShapeResourcesHolder::addTriangleMesh(Object3D triangle_mesh, const glm::mat4 &transform) {
-    std::size_t mesh_index = triangle_mesh_storage.addGeometryCPU(triangle_mesh);
+    std::size_t mesh_index = triangle_mesh_storage.addGeometry(triangle_mesh);
     mesh_transform_storage.add(transform, mesh_index);
   }
   void ShapeResourcesHolder::releaseResources() { triangle_mesh_storage.release(); }
