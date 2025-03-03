@@ -3,12 +3,12 @@
 
 namespace nova::shape::triangle {
 
-  std::size_t Storage::addGeometryCPU(const Object3D &geometry) {
+  std::size_t Storage::addGeometry(const Object3D &geometry) {
     cpu_geometry.geometry_storage.push_back(geometry);
     return cpu_geometry.geometry_storage.size() - 1;
   }
 
-  void Storage::addGeometryGPU(const mesh_vbo_ids &vbos) {
+  std::size_t Storage::addGeometry(const mesh_vbo_ids &vbos) {
 #ifdef AXOMAE_USE_CUDA
     mesh_device_buffers device_buffers;
     device_buffers.positions = gpu::DeviceBufferTracker<float>(vbos.vbo_positions, device::gpgpu::READ_ONLY);
@@ -17,6 +17,7 @@ namespace nova::shape::triangle {
     device_buffers.normals = gpu::DeviceBufferTracker<float>(vbos.vbo_normals, device::gpgpu::READ_ONLY);
     device_buffers.indices = gpu::DeviceBufferTracker<unsigned>(vbos.vbo_indices, device::gpgpu::READ_ONLY);
     gpu_geometry.buffers_trackers.push_back(std::move(device_buffers));
+    return gpu_geometry.buffers_trackers.size() - 1;
 #endif
   }
 

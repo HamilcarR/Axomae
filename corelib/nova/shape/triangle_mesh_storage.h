@@ -45,9 +45,16 @@ namespace nova::shape::triangle {
     device_storage gpu_geometry;
 
    public:
-    /* Returns index of the added mesh */
-    std::size_t addGeometryCPU(const Object3D &geometry);
-    void addGeometryGPU(const mesh_vbo_ids &mesh_vbos);
+    /**
+     *@brief Adds a Mesh whose geometry representation resides on CPU.
+     *@returns Returns its index.
+     */
+    std::size_t addGeometry(const Object3D &geometry);
+    /**
+     * @brief Adds a mesh whose geometry representation resides on GPU and is already registered with valid VBOs for each vertex attribute arrays.
+     * @returns Returns its index.
+     */
+    std::size_t addGeometry(const mesh_vbo_ids &mesh_vbos);
     const axstd::span<Object3D> &getCPUBuffersView() const;
     const axstd::span<Object3D> &getGPUBuffersView() const;
     void clear();

@@ -357,7 +357,6 @@ namespace controller {
      */
     DisplayManager3D &disp_manager = app_controller->getDisplayManager();
     nova::NovaResourceManager *res_manager = render_scene_data.nova_resource_manager;
-    render_scene_data.nova_resource_manager->getShapeData().mapBuffers();
     if (use_gpu) {
       res_manager->getShapeData().lockResources();
       pin_storage(render_scene_data.nova_resource_manager->getShapeData(), render_scene_data.shared_caches);
@@ -368,6 +367,7 @@ namespace controller {
             disp_manager.resumeRenderers();
           };
     } else {
+      res_manager->getShapeData().updateSharedBuffers();
       callback =
           [](nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder, DisplayManager3D &disp_manager) {
             disp_manager.haltRenderers();
