@@ -25,7 +25,6 @@ namespace nova::shape::transform {
      * elements[0] , elements[1] , elements[2] , elements[3] are the first column of m.\n
      * elements[16] , ... , elements[19] are the first column of inv.\n
      */
-    // std::vector<float> elements;
     axstd::managed_vector<float> elements;
   };
 

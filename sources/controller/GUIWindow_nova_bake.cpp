@@ -330,13 +330,6 @@ namespace controller {
     nova::gputils::unlock_host_memory(buffer_collection);
   }
 
-  /* TODO: Refactor , use managed memory */
-  static void pin_storage(const nova::shape::ShapeResourcesHolder &shape_resources_holder, nova::device_shared_caches_t &buffer_collection) {
-    const nova::shape::triangle::Storage &triangle_storage = shape_resources_holder.getTriangleMeshStorage();
-    const axstd::span<Object3D> triangle_mesh_geometry_view = triangle_storage.getGPUBuffersView();
-    buffer_collection.convert_and_add_to_cache(triangle_mesh_geometry_view);
-  }
-
   using render_callback_f = std::function<void(nova_baker_utils::render_scene_context &, image::ImageHolder<float> &, DisplayManager3D &)>;
 
   static void start_baking(nova_baker_utils::render_scene_context &render_scene_data,
@@ -359,7 +352,6 @@ namespace controller {
     nova::NovaResourceManager *res_manager = render_scene_data.nova_resource_manager;
     if (use_gpu) {
       res_manager->getShapeData().lockResources();
-      pin_storage(render_scene_data.nova_resource_manager->getShapeData(), render_scene_data.shared_caches);
       callback =
           [](nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder, DisplayManager3D &disp_manager) {
             disp_manager.haltRenderers();

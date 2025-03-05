@@ -23,15 +23,13 @@ namespace nova_baker_utils {
     std::size_t mesh_index;
     std::size_t triangle_index;
   };
-  static void store_primitive(const Object3D &geometry,
-                              std::size_t alloc_offset_primitives,
+  static void store_primitive(std::size_t alloc_offset_primitives,
                               primitive_buffers_t &p_buffers,
                               const nova::material::NovaMaterialInterface &mat,
                               nova::NovaResourceManager &manager,
                               const triangle_mesh_properties_t &m_indices) {
     nova::shape::ShapeResourcesHolder &res_holder = manager.getShapeData();
-    auto tri = res_holder.add_shape<nova::shape::Triangle>(
-        p_buffers.triangle_alloc_buffer.data(), alloc_offset_primitives, m_indices.mesh_index, m_indices.triangle_index);
+    auto tri = res_holder.addShape<nova::shape::Triangle>(m_indices.mesh_index, m_indices.triangle_index);
     manager.getPrimitiveData().add_primitive<nova::primitive::NovaGeoPrimitive>(
         p_buffers.geo_primitive_alloc_buffer.data(), alloc_offset_primitives, tri, mat);
   }
@@ -50,14 +48,14 @@ namespace nova_baker_utils {
       triangle_mesh_properties_t m_indices{};
       m_indices.mesh_index = mesh_index;
       m_indices.triangle_index = triangle_index;
-      store_primitive(geometry, alloc_offset_primitives, geometry_buffers, material, manager, m_indices);
+      store_primitive(alloc_offset_primitives, geometry_buffers, material, manager, m_indices);
       alloc_offset_primitives++;
     }
     nova::shape::ShapeResourcesHolder &res_holder = manager.getShapeData();
     res_holder.addTriangleMesh(geometry, final_transfo);
 #ifdef AXOMAE_USE_CUDA
     auto vbo_pack = vbos_from_drawable(*drawable);
-    res_holder.addTriangleMeshGPU(vbo_pack);
+    res_holder.addTriangleMesh(vbo_pack);
 #endif
   }
 

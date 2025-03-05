@@ -3,13 +3,8 @@
 
 namespace nova::shape::triangle {
 
-  std::size_t Storage::addGeometry(const Object3D &geometry) {
-    cpu_geometry.geometry_storage.push_back(geometry);
-    return cpu_geometry.geometry_storage.size() - 1;
-  }
-
-  std::size_t Storage::addGeometry(const mesh_vbo_ids &vbos) {
 #ifdef AXOMAE_USE_CUDA
+  std::size_t Storage::addGeometry(const mesh_vbo_ids &vbos) {
     mesh_device_buffers device_buffers;
     device_buffers.positions = gpu::DeviceBufferTracker<float>(vbos.vbo_positions, device::gpgpu::READ_ONLY);
     device_buffers.uv = gpu::DeviceBufferTracker<float>(vbos.vbo_uv, device::gpgpu::READ_ONLY);
@@ -18,10 +13,8 @@ namespace nova::shape::triangle {
     device_buffers.indices = gpu::DeviceBufferTracker<unsigned>(vbos.vbo_indices, device::gpgpu::READ_ONLY);
     gpu_geometry.buffers_trackers.push_back(std::move(device_buffers));
     return gpu_geometry.buffers_trackers.size() - 1;
-#endif
   }
 
-#ifdef AXOMAE_USE_CUDA
   inline void map_gpu_resources(mesh_device_buffers &dev_buffers) {
     dev_buffers.positions.mapResource();
     dev_buffers.uv.mapResource();
@@ -38,7 +31,7 @@ namespace nova::shape::triangle {
     dev_buffers.indices.mapBuffer();
   }
 
-  static Object3D create_gpu_obj3d(mesh_device_buffers &dev_buffers) {
+  inline Object3D create_gpu_obj3d(mesh_device_buffers &dev_buffers) {
     Object3D geometry;
     geometry.vertices = dev_buffers.positions.getDeviceBuffer();
     geometry.indices = dev_buffers.indices.getDeviceBuffer();
@@ -55,35 +48,41 @@ namespace nova::shape::triangle {
     dev_buffers.normals.unmapResource();
     dev_buffers.indices.unmapResource();
   }
-#endif
 
   void Storage::mapBuffers() {
     cpu_geometry.geometry_view = axstd::span(cpu_geometry.geometry_storage.data(), cpu_geometry.geometry_storage.size());
-#ifdef AXOMAE_USE_CUDA
     gpu_geometry.geometry_storage.clear();
     for (auto &tracker : gpu_geometry.buffers_trackers) {
       map_buffers(tracker);
       gpu_geometry.geometry_storage.push_back(create_gpu_obj3d(tracker));
     }
     gpu_geometry.geometry_view = axstd::span(gpu_geometry.geometry_storage.data(), gpu_geometry.geometry_storage.size());
-#endif
   }
 
-  void Storage::init() {  // change name !!! leave init for mesh size storage init only ... rename to lock or something
-#ifdef AXOMAE_USE_CUDA
+  void Storage::mapResrc() {
     for (auto &tracker : gpu_geometry.buffers_trackers) {
       map_gpu_resources(tracker);
     }
-
-#endif
   }
 
   void Storage::release() {
-#ifdef AXOMAE_USE_CUDA
     for (auto &tracker : gpu_geometry.buffers_trackers) {
       unmap_gpu_resources(tracker);
     }
+  }
+
+#else
+
+  std::size_t Storage::addGeometry(const mesh_vbo_ids &vbos) {}
+  void Storage::mapBuffers() { cpu_geometry.geometry_view = axstd::span(cpu_geometry.geometry_storage.data(), cpu_geometry.geometry_storage.size()); }
+  void Storage::mapResrc() {}
+  void Storage::release() {}
+
 #endif
+
+  std::size_t Storage::addGeometry(const Object3D &geometry) {
+    cpu_geometry.geometry_storage.push_back(geometry);
+    return cpu_geometry.geometry_storage.size() - 1;
   }
 
   const axstd::span<Object3D> &Storage::getCPUBuffersView() const { return cpu_geometry.geometry_view; }
