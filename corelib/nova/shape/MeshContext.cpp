@@ -10,7 +10,7 @@ namespace nova::shape {
 #ifndef __CUDA_ARCH__
     const auto &mesh_array = geometry_views.geometry.host_geometry_view;
 #else
-    const auto &mesh_array = geometry_views.geometry.device_geometry_view;  // TODO: Change after implementing managed vectors
+    const auto &mesh_array = geometry_views.geometry.device_geometry_view;
 #endif
     AX_ASSERT_LT(index, mesh_array.size());
     return mesh_array[index];

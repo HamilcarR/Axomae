@@ -1,6 +1,8 @@
 #ifndef TRIANGLE_MESH_STORAGE_H
 #define TRIANGLE_MESH_STORAGE_H
 #include "shape/shape_datastructures.h"
+
+#include <internal/common/axstd/managed_buffer.h>
 #include <internal/geometry/Object3D.h>
 
 #ifdef AXOMAE_USE_CUDA
@@ -9,13 +11,11 @@
 namespace nova::shape::triangle {
 
   struct mesh_vbo_ids {
-#ifdef AXOMAE_USE_CUDA
     uint32_t vbo_positions;
     uint32_t vbo_uv;
     uint32_t vbo_tangents;
     uint32_t vbo_normals;
     uint32_t vbo_indices;
-#endif
   };
 
   struct mesh_device_buffers {
@@ -30,7 +30,7 @@ namespace nova::shape::triangle {
 
   struct device_storage {
     std::vector<mesh_device_buffers> buffers_trackers;
-    std::vector<Object3D> geometry_storage;
+    axstd::managed_vector<Object3D> geometry_storage;
     axstd::span<Object3D> geometry_view;
   };
 
@@ -59,7 +59,7 @@ namespace nova::shape::triangle {
     const axstd::span<Object3D> &getGPUBuffersView() const;
     void clear();
     void mapBuffers();
-    void init();
+    void mapResrc();
     void release();
     mesh_vertex_attrib_views_t getGeometryViews() const;
   };

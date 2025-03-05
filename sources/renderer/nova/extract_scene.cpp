@@ -25,11 +25,9 @@ namespace nova_baker_utils {
   }
 
   primitive_buffers_t allocate_primitive_triangle_buffers(core::memory::ByteArena &memory_pool, std::size_t primitive_number) {
-    auto *triangle_buffer = memory_pool.construct<nova::shape::Triangle>(primitive_number, false, "Triangle buffer");
     auto *primitive_buffer = memory_pool.construct<nova::primitive::NovaGeoPrimitive>(primitive_number, false, "Primitive buffer");
     primitive_buffers_t geometry_buffers{};
     geometry_buffers.geo_primitive_alloc_buffer = axstd::span<nova::primitive::NovaGeoPrimitive>(primitive_buffer, primitive_number);
-    geometry_buffers.triangle_alloc_buffer = axstd::span<nova::shape::Triangle>(triangle_buffer, primitive_number);
     return geometry_buffers;
   }
 
@@ -51,10 +49,11 @@ namespace nova_baker_utils {
     return meshes;
   }
 
-  static void initialize_resources_holders(nova::NovaResourceManager &manager, std::size_t meshes_number) {
+  static void initialize_resources_holders(nova::NovaResourceManager &manager, std::size_t triangle_mesh_number, std::size_t triangle_number) {
     auto &shape_reshdr = manager.getShapeData();
     nova::shape::shape_init_record_t init_data{};
-    init_data.total_triangle_meshes = meshes_number;
+    init_data.total_triangle_meshes = triangle_mesh_number;
+    init_data.total_triangles = triangle_number;
     shape_reshdr.init(init_data);
   }
 
@@ -71,7 +70,7 @@ namespace nova_baker_utils {
     texture_buffers_t texture_buffers{};
     texture_buffers.image_alloc_buffer = axstd::span<nova::texturing::ImageTexture>(image_texture_buffer, PBR_PIPELINE_TEX_NUM * meshes.size());
     material_buffers_t material_buffers = allocate_materials_buffers(manager.getMemoryPool(), meshes.size());
-    initialize_resources_holders(manager, meshes.size());
+    initialize_resources_holders(manager, meshes.size(), primitive_number);
     std::size_t alloc_offset_primitives = 0, alloc_offset_materials = 0, alloc_offset_textures = 0, mesh_index = 0;
     for (const drawable_original_transform &dtf : drawables_orig_transfo) {
 

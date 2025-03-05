@@ -65,8 +65,6 @@ namespace controller {
     shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.material_buffers.diffuse_alloc_buffer));
     shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.material_buffers.conductor_alloc_buffer));
     shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.material_buffers.dielectric_alloc_buffer));
-    /* Register shapes */
-    shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.primitive_buffers.triangle_alloc_buffer));
     /*Register primitives */
     shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.primitive_buffers.geo_primitive_alloc_buffer));
   }

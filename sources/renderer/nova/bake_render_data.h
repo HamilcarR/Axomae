@@ -24,7 +24,6 @@ namespace nova_baker_utils {
   };
 
   struct primitive_buffers_t {
-    axstd::span<nova::shape::Triangle> triangle_alloc_buffer;
     axstd::span<nova::primitive::NovaGeoPrimitive> geo_primitive_alloc_buffer;
   };
 
