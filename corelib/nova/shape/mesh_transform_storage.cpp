@@ -19,9 +19,9 @@ namespace nova::shape::transform {
     return seed;
   }
 
-  Storage::Storage(bool is_using_gpu) { store_vram = is_using_gpu && core::build::is_gpu_build; }
+  TransformStorage::TransformStorage(bool is_using_gpu) { store_vram = is_using_gpu && core::build::is_gpu_build; }
 
-  void Storage::init(std::size_t total_meshe_size) { transform_lookup.offsets.resize(total_meshe_size); }
+  void TransformStorage::init(std::size_t total_meshe_size) { transform_lookup.offsets.resize(total_meshe_size); }
 
   static std::size_t push_packed_matrix_components(const glm::mat4 &mat, axstd::managed_vector<float> &matrices) {
     std::size_t old_max_offset = matrices.size();
@@ -44,7 +44,7 @@ namespace nova::shape::transform {
     return old_max_offset;
   }
 
-  transform_hash_t Storage::getTransformOffset(const glm::mat4 &transform) const {
+  transform_hash_t TransformStorage::getTransformOffset(const glm::mat4 &transform) const {
     auto &transform_table = transform_lookup.transform_table;
     transform4x4_t temporary_transform;
     temporary_transform.m = transform;
@@ -55,13 +55,13 @@ namespace nova::shape::transform {
     return {h, INVALID_OFFSET};
   }
 
-  std::size_t Storage::getTransformOffset(std::size_t mesh_index) const {
+  std::size_t TransformStorage::getTransformOffset(std::size_t mesh_index) const {
     mesh_transform_views_t mtv = getTransformViews();
     AX_ASSERT_FALSE(mtv.mesh_offsets_to_matrix.empty());
     return get_transform_offset(mesh_index, mtv);
   }
 
-  bool Storage::reconstructTransform4x4(transform4x4_t &transform, std::size_t elements_offset) const {
+  bool TransformStorage::reconstructTransform4x4(transform4x4_t &transform, std::size_t elements_offset) const {
     mesh_transform_views_t mtv = getTransformViews();
     int error = reconstruct_transform4x4(transform, elements_offset, mtv);
     if (error == -1) {
@@ -77,7 +77,7 @@ namespace nova::shape::transform {
     return true;
   }
 
-  void Storage::add(const glm::mat4 &transform, uint32_t mesh_index) {
+  void TransformStorage::add(const glm::mat4 &transform, uint32_t mesh_index) {
     AX_ASSERT_TRUE(!transform_lookup.offsets.empty());
     if (transform_lookup.offsets.empty()) {
       LOG("Storage not initialized.", LogLevel::ERROR);
@@ -102,21 +102,21 @@ namespace nova::shape::transform {
     }
   }
 
-  mesh_transform_views_t Storage::getTransformViews() const {
+  mesh_transform_views_t TransformStorage::getTransformViews() const {
     mesh_transform_views_t mtv;
     mtv.matrix_components_view = matrix_storage.elements;
     mtv.mesh_offsets_to_matrix = transform_lookup.offsets;
     return mtv;
   }
 
-  void Storage::map() {
+  void TransformStorage::map() {
     mesh_transform_views_t mtv = getTransformViews();
     is_mapped = true;
   }
 
-  void Storage::unmap() { is_mapped = false; }
+  void TransformStorage::unmap() { is_mapped = false; }
 
-  void Storage::clear() {
+  void TransformStorage::clear() {
     matrix_storage.elements.clear();
     transform_lookup.offsets.clear();
     transform_lookup.transform_table.clear();

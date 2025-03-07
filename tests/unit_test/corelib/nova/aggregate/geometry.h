@@ -16,7 +16,7 @@ class PrimitiveAggregateBuilder {
   std::vector<nova::shape::Triangle> triangles_collection;
   std::vector<Object3D> mesh_list;
   /* May have a little bit of coupling , but it's way easier to represent transformations and their relations to meshes using Storage.*/
-  nova::shape::transform::Storage transform_storage;
+  nova::shape::transform::TransformStorage transform_storage;
 
  public:
   explicit PrimitiveAggregateBuilder(const glm::mat4 &transform);

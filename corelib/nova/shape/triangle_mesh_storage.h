@@ -39,7 +39,7 @@ namespace nova::shape::triangle {
     axstd::span<Object3D> geometry_view;
   };
 
-  class Storage {
+  class GeometryReferenceStorage {
    private:
     host_storage cpu_geometry;
     device_storage gpu_geometry;
