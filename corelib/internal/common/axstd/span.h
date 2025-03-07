@@ -36,12 +36,12 @@ namespace axstd {
     ax_device_callable constexpr span(pointer data_, size_type size_) noexcept : ptr(data_), len(size_) {}
 
     template<class Container>
-    ax_device_callable constexpr span(Container &container) noexcept : ptr(container.data()), len(container.size()) {
+    constexpr span(Container &container) noexcept : ptr(container.data()), len(container.size()) {
       static_assert(std::is_trivially_copyable_v<typename Container::pointer>, "Container must be trivially copyable");
     }
 
     template<class Container>
-    ax_device_callable constexpr span &operator=(Container &container) noexcept {
+    constexpr span &operator=(Container &container) noexcept {
       static_assert(std::is_trivially_copyable_v<typename Container::pointer>, "Container must be trivially copyable");
       ptr = container.data();
       len = container.size();
@@ -49,7 +49,7 @@ namespace axstd {
     }
 
     template<class Container>
-    ax_device_callable constexpr span &operator=(const Container &container) noexcept {
+    constexpr span &operator=(const Container &container) noexcept {
       static_assert(std::is_trivially_copyable_v<typename Container::pointer>, "Container must be trivially copyable");
       ptr = container.data();
       len = container.size();
