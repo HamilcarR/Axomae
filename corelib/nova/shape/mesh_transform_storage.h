@@ -41,7 +41,7 @@ namespace nova::shape::transform {
     std::unordered_map<std::size_t, std::size_t> transform_table;
   };
 
-  class Storage {
+  class TransformStorage {
 
     matrix_elem_storage_t matrix_storage;
     transform_lookup_t transform_lookup;
@@ -50,7 +50,7 @@ namespace nova::shape::transform {
     bool store_vram{false};
 
    public:
-    explicit Storage(bool attempt_gpu_storage = true);
+    explicit TransformStorage(bool attempt_gpu_storage = true);
     void init(std::size_t total_meshes);
     void add(const glm::mat4 &transform, uint32_t mesh_index);
     /* Will call updateViews() before mapping to update the different view buffers. */

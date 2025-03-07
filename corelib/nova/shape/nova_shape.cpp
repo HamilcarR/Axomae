@@ -14,18 +14,7 @@ namespace nova::shape {
     mapBuffers();
   }
 
-  void ShapeResourcesHolder::updateSharedBuffers() {
-    transform::mesh_transform_views_t transform_views = transform_storage.getTransformViews();
-    triangle::mesh_vertex_attrib_views_t geometry_triangle_views = triangle_mesh_storage.getGeometryViews();
-    shared_buffers.set(transform_views, geometry_triangle_views);
-  }
-
-  void ShapeResourcesHolder::mapBuffers() {
-    updateSharedBuffers();
-#ifdef AXOMAE_USE_CUDA
-    triangle_mesh_storage.mapBuffers();
-#endif
-  }
+  void ShapeResourcesHolder::mapBuffers() { triangle_mesh_storage.mapBuffers(); }
 
   MeshBundleViews ShapeResourcesHolder::getMeshSharedViews() const {
     MeshBundleViews shared_views = MeshBundleViews(transform_storage.getTransformViews(), triangle_mesh_storage.getGeometryViews());

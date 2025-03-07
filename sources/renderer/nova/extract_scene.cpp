@@ -80,7 +80,6 @@ namespace nova_baker_utils {
       setup_geometry_data(primitive_buffers, dtf, alloc_offset_primitives, material, manager, mesh_index);
       mesh_index++;
     }
-    manager.getShapeData().updateSharedBuffers();
     bake_buffers_storage_t bake_buffers_storage{};
     bake_buffers_storage.material_buffers = material_buffers;
     bake_buffers_storage.primitive_buffers = primitive_buffers;

@@ -359,7 +359,6 @@ namespace controller {
             disp_manager.resumeRenderers();
           };
     } else {
-      res_manager->getShapeData().updateSharedBuffers();
       callback =
           [](nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder, DisplayManager3D &disp_manager) {
             disp_manager.haltRenderers();

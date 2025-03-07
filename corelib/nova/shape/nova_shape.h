@@ -60,11 +60,9 @@ namespace nova::shape {
   };
 
   class ShapeResourcesHolder {
-    /* Generic shape pointers*/
-    ShapeStorage storage;
-    MeshBundleViews shared_buffers;
-    triangle::Storage triangle_mesh_storage;
-    transform::Storage transform_storage;
+    ShapeStorage storage;                                     /* Stores the shape objects collections */
+    triangle::GeometryReferenceStorage triangle_mesh_storage; /* Stores the collection of Object3D representing the meshes. */
+    transform::TransformStorage transform_storage;            /* Stores the transformations for each mesh. */
 
    public:
     CLASS_M(ShapeResourcesHolder)
@@ -85,12 +83,11 @@ namespace nova::shape {
       transform_storage.clear();
     }
 
-    void updateSharedBuffers();
     void init(const shape_init_record_t &init_data);
     void lockResources();
     void releaseResources();
     void mapBuffers();
-    const triangle::Storage &getTriangleMeshStorage() const { return triangle_mesh_storage; }
+    const triangle::GeometryReferenceStorage &getTriangleMeshStorage() const { return triangle_mesh_storage; }
     MeshBundleViews getMeshSharedViews() const;
   };
 
