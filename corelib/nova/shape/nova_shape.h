@@ -62,7 +62,7 @@ namespace nova::shape {
   class ShapeResourcesHolder {
     /* Generic shape pointers*/
     ShapeStorage storage;
-    mesh_shared_views_t shared_buffers;
+    MeshBundleViews shared_buffers;
     triangle::Storage triangle_mesh_storage;
     transform::Storage transform_storage;
 
@@ -91,7 +91,7 @@ namespace nova::shape {
     void releaseResources();
     void mapBuffers();
     const triangle::Storage &getTriangleMeshStorage() const { return triangle_mesh_storage; }
-    mesh_shared_views_t getMeshSharedViews() const;
+    MeshBundleViews getMeshSharedViews() const;
   };
 
 }  // namespace nova::shape

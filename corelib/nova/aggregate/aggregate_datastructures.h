@@ -16,7 +16,7 @@ namespace nova::aggregate {
 
   struct primitive_aggregate_data_s {
     primitives_view_tn primitive_list_view;
-    shape::mesh_shared_views_t mesh_geometry;
+    shape::MeshBundleViews mesh_geometry;
   };
 
 }  // namespace nova::aggregate

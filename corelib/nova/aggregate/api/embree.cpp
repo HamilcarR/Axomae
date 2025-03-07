@@ -57,7 +57,7 @@ namespace nova::aggregate {
    * primitive doing : primitive_global_offset[geomID - 1] + primID
    */
   inline void setupGlobalOffsetArray(const primitive_aggregate_data_s &scene_geometry_data, std::vector<std::size_t> &primitive_global_offset) {
-    const auto &mesh_geometry = scene_geometry_data.mesh_geometry.geometry.host_geometry_view;
+    const auto &mesh_geometry = scene_geometry_data.mesh_geometry.getTriangleGeometryViews().host_geometry_view;
     primitive_global_offset.resize(mesh_geometry.size());
     for (int geometry_index = 0; geometry_index < mesh_geometry.size(); geometry_index++) {
       const Object3D &mesh = mesh_geometry[geometry_index];
@@ -134,16 +134,16 @@ namespace nova::aggregate {
     void build(primitive_aggregate_data_s primitive_aggregate) {
       root_scene = rtcNewScene(device);
       scene_geometry_data = primitive_aggregate;
-      const shape::mesh_shared_views_t &mesh_geometry = scene_geometry_data.mesh_geometry;
-      const std::size_t mesh_number = mesh_geometry.geometry.host_geometry_view.size();
+      const shape::MeshBundleViews &mesh_geometry = scene_geometry_data.mesh_geometry;
+      const std::size_t mesh_number = mesh_geometry.getTriangleGeometryViews().host_geometry_view.size();
 
       initializeApplicationStructures(mesh_number);
 
       for (int mesh_index = 0; mesh_index < mesh_number; mesh_index++) {
-        const Object3D &current_mesh = mesh_geometry.geometry.host_geometry_view[mesh_index];
-        std::size_t transform_offset = mesh_geometry.transforms.mesh_offsets_to_matrix[mesh_index];
+        const Object3D &current_mesh = mesh_geometry.getTriangleGeometryViews().host_geometry_view[mesh_index];
+        std::size_t transform_offset = mesh_geometry.getTransformOffset(mesh_index);
 
-        shape::transform::transform4x4_t transform = getTransform(mesh_index);
+        shape::transform::transform4x4_t transform = mesh_geometry.reconstructTransform4x4(mesh_index);
 
         RTCGeometry inst_geometry = addInstancedTriangleMesh(current_mesh, transform, mesh_index);
 
@@ -193,15 +193,6 @@ namespace nova::aggregate {
     }
 
    private:
-    inline shape::transform::transform4x4_t getTransform(std::size_t mesh_index) {
-      const shape::mesh_shared_views_t &mesh_geometry = scene_geometry_data.mesh_geometry;
-      std::size_t transform_offset = mesh_geometry.transforms.mesh_offsets_to_matrix[mesh_index];
-      shape::transform::transform4x4_t transform{};
-      int err = shape::transform::reconstruct_transform4x4(transform, transform_offset, mesh_geometry.transforms);
-      AX_ASSERT_EQ(err, 0);
-      return transform;
-    }
-
     void initializeApplicationStructures(std::size_t mesh_number) {
       user_geometry.resize(mesh_number);
       mesh_scenes.resize(mesh_number);
@@ -266,13 +257,6 @@ namespace nova::aggregate {
       return hit;
     }
 
-    inline shape::transform::transform4x4_t getMeshTransform(unsigned geomID) const {
-      shape::transform::transform4x4_t transform{};
-      std::size_t transform_offset = scene_geometry_data.mesh_geometry.transforms.mesh_offsets_to_matrix[geomID];
-      shape::transform::reconstruct_transform4x4(transform, transform_offset, scene_geometry_data.mesh_geometry.transforms);
-      return transform;
-    }
-
     void interpolate(const RTCRayHit &result, float normals[3], float tangents[3], float bitangents[3], float uv[2]) const {
       RTCGeometry this_geometry = rtcGetGeometry(mesh_scenes[result.hit.geomID], result.hit.instID[0]);
       AX_ASSERT_NOTNULL(this_geometry);
@@ -307,7 +291,7 @@ namespace nova::aggregate {
       hit_return_data.hit_d.position = ray.pointAt(result.ray.tfar);
 
       auto *user_g = static_cast<const user_geometry_structure_s *>(rtcGetGeometryUserDataFromScene(root_scene, result.hit.geomID));
-      auto transform = getMeshTransform(user_g->mesh_index);
+      auto transform = scene_geometry_data.mesh_geometry.reconstructTransform4x4(user_g->mesh_index);
 
       hit_return_data.last_primit = getPrimitiveFromGlobalOffset(result.hit.geomID, result.hit.primID, primitive_global_offset, scene_geometry_data);
       float normals[3]{}, tangents[3]{}, bitangents[3]{}, uv[2]{};
@@ -324,7 +308,7 @@ namespace nova::aggregate {
   template<>
   GenericAccelerator<EmbreeBuild>::GenericAccelerator() : pimpl(std::make_unique<Impl>()) {}
   template<>
-  GenericAccelerator<EmbreeBuild>::~GenericAccelerator() {}
+  GenericAccelerator<EmbreeBuild>::~GenericAccelerator() = default;
   template<>
   GenericAccelerator<EmbreeBuild>::GenericAccelerator(GenericAccelerator &&) noexcept = default;
   template<>

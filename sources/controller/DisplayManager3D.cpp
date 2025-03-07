@@ -123,7 +123,7 @@ namespace controller {
     realtime_viewer->doneCurrent();
     add_caches_addresses(shared_caches, bake_buffers_storage);
     primitives_view_tn primitive_list_view = nova_resource_manager->getPrimitiveData().getView();
-    nova::shape::mesh_shared_views_t mesh_geometry = nova_resource_manager->getShapeData().getMeshSharedViews();
+    nova::shape::MeshBundleViews mesh_geometry = nova_resource_manager->getShapeData().getMeshSharedViews();
     nova::aggregate::primitive_aggregate_data_s aggregate;
     aggregate.primitive_list_view = primitive_list_view;
     aggregate.mesh_geometry = mesh_geometry;
