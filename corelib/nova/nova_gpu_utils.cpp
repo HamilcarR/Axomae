@@ -36,7 +36,7 @@ namespace nova::gputils {
 
   void initialize_gpu_structures(const domain2d &domain, gpu_util_structures_t &gpu_structures) {
     kernel_argpack_t argpack;
-    argpack.block_size = {AX_GPU_WARP_SIZE, AX_GPU_WARP_SIZE};
+    argpack.block_size = {AX_GPU_WARP_SIZE / 2, AX_GPU_WARP_SIZE / 2};
     unsigned block_x = std::ceil((domain.x + argpack.block_size.x - 1) / argpack.block_size.x);
     unsigned block_y = std::ceil((domain.y + argpack.block_size.y - 1) / argpack.block_size.y);
     argpack.num_blocks = {block_x, block_y};
