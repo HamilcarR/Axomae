@@ -34,8 +34,7 @@ PrimitiveAggregateBuilder::PrimitiveAggregateBuilder(const glm::mat4 &transform)
 nova::aggregate::primitive_aggregate_data_s PrimitiveAggregateBuilder::generateAggregate() {
   nova::aggregate::primitive_aggregate_data_s aggregate{};
   aggregate.primitive_list_view = {primitives_collection};
-  aggregate.mesh_geometry.transforms = transform_storage.getTransformViews();
-  aggregate.mesh_geometry.geometry.host_geometry_view = {mesh_list};
+  aggregate.mesh_geometry = nova::shape::MeshBundleViews(transform_storage.getTransformViews(), {mesh_list, mesh_list});
   return aggregate;
 }
 

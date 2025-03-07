@@ -17,8 +17,7 @@ namespace nova::shape {
   void ShapeResourcesHolder::updateSharedBuffers() {
     transform::mesh_transform_views_t transform_views = transform_storage.getTransformViews();
     triangle::mesh_vertex_attrib_views_t geometry_triangle_views = triangle_mesh_storage.getGeometryViews();
-    shared_buffers.geometry = geometry_triangle_views;
-    shared_buffers.transforms = transform_views;
+    shared_buffers.set(transform_views, geometry_triangle_views);
   }
 
   void ShapeResourcesHolder::mapBuffers() {
@@ -28,10 +27,8 @@ namespace nova::shape {
 #endif
   }
 
-  mesh_shared_views_t ShapeResourcesHolder::getMeshSharedViews() const {
-    mesh_shared_views_t shared_views;
-    shared_views.transforms = transform_storage.getTransformViews();
-    shared_views.geometry = triangle_mesh_storage.getGeometryViews();
+  MeshBundleViews ShapeResourcesHolder::getMeshSharedViews() const {
+    MeshBundleViews shared_views = MeshBundleViews(transform_storage.getTransformViews(), triangle_mesh_storage.getGeometryViews());
     return shared_views;
   }
 

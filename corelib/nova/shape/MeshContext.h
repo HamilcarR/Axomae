@@ -10,12 +10,12 @@ namespace nova::shape {
    * Passed to intersection routines to retrieve mesh and transformation data.
    */
   class MeshCtx {
-    mesh_shared_views_t geometry_views;
+    MeshBundleViews geometry_views;
 
    public:
     CLASS_DCM(MeshCtx)
 
-    ax_device_callable MeshCtx(const mesh_shared_views_t &geometry);
+    ax_device_callable MeshCtx(const MeshBundleViews &geometry);
 
     /**
      * @brief: Retrieves a triangle based mesh from a mesh_index.
@@ -26,6 +26,8 @@ namespace nova::shape {
      * @brief: Retrieves the transformation of a triangle based mesh.
      */
     ax_device_callable transform::transform4x4_t getTriMeshTransform(std::size_t mesh_index) const;
+
+    ax_device_callable const MeshBundleViews &getGeometryViews() const { return geometry_views; }
   };
 
 }  // namespace nova::shape

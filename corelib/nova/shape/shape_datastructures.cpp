@@ -30,4 +30,27 @@ namespace nova::shape {
     }
   }  // namespace transform
 
+  ax_device_callable MeshBundleViews::MeshBundleViews(const transform::mesh_transform_views_t &t_view,
+                                                      const triangle::mesh_vertex_attrib_views_t &geom)
+      : transforms(t_view), geometry(geom) {}
+
+  void MeshBundleViews::set(const transform::mesh_transform_views_t &t, const triangle::mesh_vertex_attrib_views_t &g) {
+    transforms = t;
+    geometry = g;
+  }
+
+  ax_device_callable transform::transform4x4_t MeshBundleViews::reconstructTransform4x4(std::size_t mesh_index) const {
+    AX_ASSERT_LT(mesh_index, transforms.mesh_offsets_to_matrix.size());
+    std::size_t transform_offset = transform::get_transform_offset(mesh_index, transforms);
+    AX_ASSERT_NEQ(transform_offset, transform::INVALID_OFFSET);
+    transform::transform4x4_t returned_transform4x4{};
+    int err = transform::reconstruct_transform4x4(returned_transform4x4, transform_offset, transforms);
+    AX_ASSERT(err == 0, "Error reconstructing transformation matrix");
+    return returned_transform4x4;
+  }
+
+  ax_device_callable std::size_t MeshBundleViews::getTransformOffset(std::size_t mesh_index) const {
+    return transform::get_transform_offset(mesh_index, transforms);
+  }
+
 }  // namespace nova::shape
