@@ -74,14 +74,16 @@ namespace nova::shape {
       return storage.add(tshape);
     }
 
-    void addTriangleMesh(Object3D triangle_mesh, const glm::mat4 &transform);
-    void addTriangleMesh(const triangle::mesh_vbo_ids &mesh_vbos);
+    template<class T>
+    std::size_t addTriangleMesh(const T &triangle_mesh);
 
     void clear() {
       storage.clear();
       triangle_mesh_storage.clear();
       transform_storage.clear();
     }
+
+    void addTransform(const glm::mat4 &transform, std::size_t mesh_index);
 
     void init(const shape_init_record_t &init_data);
     void lockResources();
@@ -90,6 +92,12 @@ namespace nova::shape {
     const triangle::GeometryReferenceStorage &getTriangleMeshStorage() const { return triangle_mesh_storage; }
     MeshBundleViews getMeshSharedViews() const;
   };
+
+  template<class T>
+  std::size_t ShapeResourcesHolder::addTriangleMesh(const T &triangle_mesh) {
+    std::size_t mesh_index = triangle_mesh_storage.addGeometry(triangle_mesh);
+    return mesh_index;
+  }
 
 }  // namespace nova::shape
 

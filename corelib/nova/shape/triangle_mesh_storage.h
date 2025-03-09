@@ -8,6 +8,12 @@
 #ifdef AXOMAE_USE_CUDA
 #  include "gpu/mesh_device_resources.h"
 #endif
+
+namespace nova::gpu {
+  template<class T>
+  class DeviceBufferTracker;
+}
+
 namespace nova::shape::triangle {
 
   struct mesh_vbo_ids {
@@ -18,14 +24,21 @@ namespace nova::shape::triangle {
     uint32_t vbo_indices;
   };
 
+  class DummyBufferTracker {
+   public:
+    DummyBufferTracker() = default;
+    DummyBufferTracker(uint32_t, device::gpgpu::ACCESS_TYPE) {}
+  };
+
+  template<class T, bool using_gpu = core::build::is_gpu_build>
+  using DeviceBuffer = std::conditional_t<using_gpu, gpu::DeviceBufferTracker<T>, DummyBufferTracker>;
+
   struct mesh_device_buffers {
-#ifdef AXOMAE_USE_CUDA
-    gpu::DeviceBufferTracker<float> positions;
-    gpu::DeviceBufferTracker<float> uv;
-    gpu::DeviceBufferTracker<float> tangents;
-    gpu::DeviceBufferTracker<float> normals;
-    gpu::DeviceBufferTracker<unsigned> indices;
-#endif
+    DeviceBuffer<float> positions;
+    DeviceBuffer<float> uv;
+    DeviceBuffer<float> tangents;
+    DeviceBuffer<float> normals;
+    DeviceBuffer<unsigned> indices;
   };
 
   struct device_storage {
@@ -38,8 +51,16 @@ namespace nova::shape::triangle {
     std::vector<Object3D> geometry_storage;
     axstd::span<Object3D> geometry_view;
   };
+  /************************************************************************************************************************/
 
-  class GeometryReferenceStorage {
+  class HostPolicy {};
+
+  class DevicePolicy {};
+
+  /************************************************************************************************************************/
+
+  template<class StoragePolicy = std::conditional_t<core::build::is_gpu_build, DevicePolicy, HostPolicy>>
+  class DispatchedGeometryReferenceStorage : public StoragePolicy {
    private:
     host_storage cpu_geometry;
     device_storage gpu_geometry;
@@ -50,18 +71,25 @@ namespace nova::shape::triangle {
      *@returns Returns its index.
      */
     std::size_t addGeometry(const Object3D &geometry);
-    /**
-     * @brief Adds a mesh whose geometry representation resides on GPU and is already registered with valid VBOs for each vertex attribute arrays.
-     * @returns Returns its index.
-     */
-    std::size_t addGeometry(const mesh_vbo_ids &mesh_vbos);
     const axstd::span<Object3D> &getCPUBuffersView() const;
-    const axstd::span<Object3D> &getGPUBuffersView() const;
+
+    void allocate(std::size_t num_meshes);
     void clear();
     void mapBuffers();
     void mapResrc();
     void release();
+
+    /**
+     * @brief Adds a mesh whose geometry representation resides on GPU and is already registered with valid VBOs for each vertex attribute arrays.
+     * This is for preventing duplication of geometry data if there's a GL context already working.
+     * @returns Returns its index if application is compiled with gpgpu context .
+     */
+    std::size_t addGeometry(const mesh_vbo_ids &mesh_vbos);
+    const axstd::span<Object3D> &getGPUBuffersView() const;
+
     mesh_vertex_attrib_views_t getGeometryViews() const;
   };
+
+  using GeometryReferenceStorage = DispatchedGeometryReferenceStorage<>;
 }  // namespace nova::shape::triangle
 #endif
