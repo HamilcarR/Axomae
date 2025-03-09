@@ -1,5 +1,4 @@
 #include "NovaTextureInterface.h"
-
 namespace nova::texturing {
 
   glm::vec4 NovaTextureInterface::sample(float u, float v, const texture_sample_data &sample_data) const {
@@ -17,10 +16,19 @@ namespace nova::texturing {
     is_rgba = isrgba;
   }
 
+  /* Should be replaced with a solution that handles out of range UV mapping. */
+  ax_device_callable_inlined unsigned uv2index(float t, int dim) {
+    float a = AX_GPU_ABS(t);
+    float rem = a - AX_GPU_FLOORF(a);
+    unsigned i = math::texture::uvToPixel(rem, dim - 1);
+    return i;
+  }
+
   glm::vec4 ImageTexture::sample(float u, float v, const texture_sample_data & /*sample_data*/) const {
-    unsigned i = math::texture::uvToPixel(fabs(u), width - 1);
-    unsigned j = math::texture::uvToPixel(fabs(v), height - 1);
+    unsigned i = uv2index(u, width);
+    unsigned j = uv2index(v, height);
     unsigned idx = (i * height + j);
+    AX_ASSERT_LT(idx, width * height);
 
     union FORMAT {
       uint32_t rgba;

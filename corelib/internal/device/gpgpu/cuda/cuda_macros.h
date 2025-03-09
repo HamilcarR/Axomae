@@ -37,6 +37,8 @@ constexpr unsigned AX_GPU_MAX_BLOCKS = 65535;
 #define AX_GPU_FASTSQRT(value) __fsqrt_rn(value)
 #define AX_GPU_FASTPOW(x, y) __powf((x), (y))
 #define AX_GPU_FASTTANH(value) tanhf(value)
+#define AX_GPU_FLOORF(val) floorf(val)
+#define AX_GPU_ABS(val) abs(val)
 
 /* Atomic operations */
 #define AX_GPU_ATOMICADD(address, val) atomicAdd(address, val)
