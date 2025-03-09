@@ -5,19 +5,20 @@
 #include "primitive/nova_primitive.h"
 #include "shape/nova_shape.h"
 namespace nova_baker_utils {
-#ifdef AXOMAE_USE_CUDA
+
   nova::shape::triangle::mesh_vbo_ids vbos_from_drawable(const Drawable &drawable) {
     namespace nst = nova::shape::triangle;
     nst::mesh_vbo_ids vbos{};
-    const PackedGLGeometryBuffer &pkd_geo = drawable.getMeshGLBuffers();
-    vbos.vbo_positions = pkd_geo.getVertexBufferID().getID();
-    vbos.vbo_normals = pkd_geo.getNormalBufferID().getID();
-    vbos.vbo_uv = pkd_geo.getUVBufferID().getID();
-    vbos.vbo_tangents = pkd_geo.getTangentxBufferID().getID();
-    vbos.vbo_indices = pkd_geo.getIndexBufferID().getID();
+    if constexpr (core::build::is_gpu_build) {
+      const PackedGLGeometryBuffer &pkd_geo = drawable.getMeshGLBuffers();
+      vbos.vbo_positions = pkd_geo.getVertexBufferID().getID();
+      vbos.vbo_normals = pkd_geo.getNormalBufferID().getID();
+      vbos.vbo_uv = pkd_geo.getUVBufferID().getID();
+      vbos.vbo_tangents = pkd_geo.getTangentxBufferID().getID();
+      vbos.vbo_indices = pkd_geo.getIndexBufferID().getID();
+    }
     return vbos;
   }
-#endif
 
   struct triangle_mesh_properties_t {
     std::size_t mesh_index;
@@ -52,11 +53,11 @@ namespace nova_baker_utils {
       alloc_offset_primitives++;
     }
     nova::shape::ShapeResourcesHolder &res_holder = manager.getShapeData();
-    res_holder.addTriangleMesh(geometry, final_transfo);
-#ifdef AXOMAE_USE_CUDA
-    auto vbo_pack = vbos_from_drawable(*drawable);
-    res_holder.addTriangleMesh(vbo_pack);
-#endif
+    std::size_t stored_mesh_index = res_holder.addTriangleMesh(geometry);
+    res_holder.addTransform(final_transfo, stored_mesh_index);
+    if constexpr (core::build::is_gpu_build) {
+      auto vbo_pack = vbos_from_drawable(*drawable);
+      res_holder.addTriangleMesh(vbo_pack);
+    }
   }
-
 }  // namespace nova_baker_utils

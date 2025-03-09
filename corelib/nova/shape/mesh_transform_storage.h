@@ -7,7 +7,12 @@
 #include <internal/common/axstd/span.h>
 #include <internal/macro/project_macros.h>
 
-/* Stores a unique transformation, for lower memory footprint . */
+/**
+ * Implementation of a fast matrix lookup, storage, and reconstruction.
+ * The goal of this interface is to provide a way to couple a given id with a matrix... the id is a mesh index of some random collection for ex.
+ * The transformation matrix (4x4), its inverse, its transpose, and its normal 3x3 matrix are then computed and laid linearly in a cache.
+ * We can then retrieve an id's transformation by reconstructing it from its linear representation.
+ */
 namespace nova::shape::transform {
 
   struct transform_hash_t {

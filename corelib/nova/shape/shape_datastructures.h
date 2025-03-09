@@ -14,7 +14,6 @@ namespace nova::shape {
   }  // namespace triangle
 
   namespace transform {
-
     constexpr std::size_t INVALID_OFFSET = std::numeric_limits<std::size_t>::max();
 
     struct transform4x4_t {
@@ -58,29 +57,6 @@ namespace nova::shape {
                                                     const mesh_transform_views_t &transform_views);
 
   }  // namespace transform
-
-  class MeshBundleViews {
-    transform::mesh_transform_views_t transforms{};
-    triangle::mesh_vertex_attrib_views_t geometry{};
-    /* Add more attrib views for each kind of geometry. */
-
-   public:
-    CLASS_DCM(MeshBundleViews)
-
-    ax_device_callable MeshBundleViews(const transform::mesh_transform_views_t &transform_views,
-                                       const triangle::mesh_vertex_attrib_views_t &geometry);
-
-    ax_device_callable void set(const transform::mesh_transform_views_t &transforms, const triangle::mesh_vertex_attrib_views_t &geometry);
-
-    /**
-     * See comment for reconstruct_transform4x4()
-     */
-    ax_device_callable transform::transform4x4_t reconstructTransform4x4(std::size_t mesh_index) const;
-    ax_device_callable std::size_t getTransformOffset(std::size_t mesh_index) const;
-    ax_device_callable const triangle::mesh_vertex_attrib_views_t &getTriangleGeometryViews() const { return geometry; }
-    ax_device_callable const transform::mesh_transform_views_t &getTransforms() const { return transforms; }
-    ax_device_callable Object3D getTriangleMesh(std::size_t mesh_id) const;
-  };
 
 }  // namespace nova::shape
 #endif

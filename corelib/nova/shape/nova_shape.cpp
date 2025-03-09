@@ -6,6 +6,7 @@ namespace nova::shape {
 
   void ShapeResourcesHolder::init(const shape_init_record_t &startup_data) {
     transform_storage.init(startup_data.total_triangle_meshes);
+    triangle_mesh_storage.allocate(startup_data.total_triangle_meshes);
     storage.allocTriangles(startup_data.total_triangles);
   }
 
@@ -21,12 +22,8 @@ namespace nova::shape {
     return shared_views;
   }
 
-  void ShapeResourcesHolder::addTriangleMesh(const triangle::mesh_vbo_ids &mesh_vbos) { triangle_mesh_storage.addGeometry(mesh_vbos); }
+  void ShapeResourcesHolder::addTransform(const glm::mat4 &transform, std::size_t mesh_index) { transform_storage.add(transform, mesh_index); }
 
-  void ShapeResourcesHolder::addTriangleMesh(Object3D triangle_mesh, const glm::mat4 &transform) {
-    std::size_t mesh_index = triangle_mesh_storage.addGeometry(triangle_mesh);
-    transform_storage.add(transform, mesh_index);
-  }
   void ShapeResourcesHolder::releaseResources() { triangle_mesh_storage.release(); }
 
 }  // namespace nova::shape
