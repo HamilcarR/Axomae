@@ -22,24 +22,6 @@ constexpr unsigned AX_GPU_MAX_BLOCKS = 65535;
 #define ax_device_lane_id (ax_device_linearCM3D_idx % AX_GPU_WARP_SIZE)
 #define ax_device_warp_id (ax_device_linearCM3D_idx / AX_GPU_WARP_SIZE)
 
-/* Synchronization */
-#define ax_gpu_syncthread __syncthreads()
-#define ax_gpu_syncwarp __syncwarp()
-#define ax_gpu_memfence __threadfence()
-#define ax_gpu_memfence_block __threadfence_block()
-#define ax_gpu_memfence_system __threadfence_system()
-
-/* Math operations */
-#define AX_GPU_FASTCOS(value) __cosf(value)
-#define AX_GPU_FASTSIN(value) __sinf(value)
-#define AX_GPU_FASTEXP(value) __expf(value)
-#define AX_GPU_FASTLOG(value) __logf(value)
-#define AX_GPU_FASTSQRT(value) __fsqrt_rn(value)
-#define AX_GPU_FASTPOW(x, y) __powf((x), (y))
-#define AX_GPU_FASTTANH(value) tanhf(value)
-#define AX_GPU_FLOORF(val) floorf(val)
-#define AX_GPU_ABS(val) abs(val)
-
 /* Atomic operations */
 #define AX_GPU_ATOMICADD(address, val) atomicAdd(address, val)
 #define AX_GPU_ATOMICSUB(address, val) atomicSub(address, val)
