@@ -2,15 +2,15 @@
 #include "GPUIntegrator.cuh"
 #include "Integrator.h"
 #include "engine/nova_exception.h"
-#include "internal/common/math/math_texturing.h"
-#include "internal/debug/Logger.h"
-#include "internal/device/gpgpu/cuda/CudaDevice.h"
-#include "internal/device/gpgpu/device_transfer_interface.h"
-#include "internal/device/gpgpu/device_utils.h"
-#include "internal/device/gpgpu/kernel_launch_interface.h"
 #include "manager/NovaResourceManager.h"
 #include <curand_kernel.h>
 #include <internal/common/math/gpu/math_random_gpu.h>
+#include <internal/common/math/math_texturing.h>
+#include <internal/debug/Logger.h>
+#include <internal/device/gpgpu/cuda/CudaDevice.h>
+#include <internal/device/gpgpu/device_transfer_interface.h>
+#include <internal/device/gpgpu/device_utils.h>
+#include <internal/device/gpgpu/kernel_launch_interface.h>
 
 /* Serves only as a baseline for performance to compare against */
 
@@ -24,6 +24,14 @@ namespace nova {
       float *render_target;
       unsigned width;
       unsigned height;
+    };
+
+    struct kernel_arguments_s {
+      cudaTextureObject_t host_texture;
+      utils::gpu_random_generator_t generator;
+      int i_width;
+      int i_height;
+      nova::shape::MeshCtx ctx;
     };
 
     ax_device_only void shade(render_buffer_t &render_buffer, float u, float v, glm::vec4 color) {
@@ -50,30 +58,21 @@ namespace nova {
       render_buffer.render_target[offset + 3] = color.a;
     }
 
-    ax_kernel void test_func(
-        render_buffer_t render_buffer, cudaTextureObject_t host_texture, int i_width, int i_height, utils::gpu_random_generator_t generator) {
+    ax_kernel void test_func(render_buffer_t render_buffer, kernel_arguments_s args) {
       unsigned int x = ax_device_thread_idx_x;
       unsigned int y = ax_device_thread_idx_y;
       if (!AX_GPU_IN_BOUNDS_2D(x, y, render_buffer.width, render_buffer.height))
         return;
-      sampler::SobolSampler sobol_sampler = sampler::SobolSampler(generator.sobol);
-      sampler::RandomSampler random_sampler = sampler::RandomSampler(generator.xorshift);
-      glm::vec3 sobol{}, random{};
-      sobol = sobol_sampler.sample(0, 1);
-      random = random_sampler.sample(0, 1);
-      nova::shape::Triangle tri;
+      auto ctx = args.ctx;
+      shape::Triangle triangle = shape::Triangle(0, 0);
+      const Ray ray = Ray({0, 0, -1});
+      hit_data hit{};
+      bool b = triangle.hit(ray, 0.f, 1e30f, hit, args.ctx);
 
-      const Object3D *mesh = tri.getMesh().geometry;
-      if (ax_device_linearRM3D_idx < mesh->uv.size())
-        printf("warp id:%u ::: lane id:%u ::: i:%d  ::: value:%f\n",
-               ax_device_warp_id,
-               ax_device_lane_id,
-               ax_device_linearRM3D_idx,
-               mesh->uv[ax_device_linearRM3D_idx]);
       float u = (float)math::texture::pixelToUv(x, render_buffer.width - 1);
       float v = (float)math::texture::pixelToUv(y, render_buffer.height - 1);
-      float4 tex = tex2D<float4>(host_texture, u, v);
-      shade(render_buffer, sobol.y, sobol.z, glm::vec4(tex.x, tex.y, tex.z, 1.f));
+      float4 tex = tex2D<float4>(args.host_texture, u, v);
+      shade(render_buffer, x, y, glm::vec4(tex.x, tex.y, tex.z, 1.f));
     }
   }  // namespace gpu
 
@@ -116,14 +115,13 @@ namespace nova {
     resrc::GPU_query_result draw_buffer = resrc::allocate_buffer(screen_size);  // TODO: Bottleneck. Generate only 1 buffer for the whole app life
     DEVICE_ERROR_CHECK(draw_buffer.error_status);
     gpu::render_buffer_t render_buffer{static_cast<float *>(draw_buffer.device_ptr), screen_width, screen_height};
-
-    exec_kernel(gpu_structures.threads_distribution,
-                gpu::test_func,
-                render_buffer,
-                std::any_cast<cudaTextureObject_t>(texture_resrc.texture_object),
-                image_texture.width,
-                image_texture.height,
-                gpu_structures.random_generator);
+    gpu::kernel_arguments_s arguments;
+    arguments.host_texture = std::any_cast<cudaTextureObject_t>(texture_resrc.texture_object);
+    arguments.i_width = image_texture.width;
+    arguments.i_height = image_texture.height;
+    arguments.generator = gpu_structures.random_generator;
+    arguments.ctx = nova::shape::MeshCtx(nova_internals.resource_manager->getShapeData().getMeshSharedViews());
+    exec_kernel(gpu_structures.threads_distribution, gpu::test_func, render_buffer, arguments);
     DEVICE_ERROR_CHECK(resrc::copy_buffer(draw_buffer.device_ptr, buffers->partial_buffer, screen_size, resrc::DEVICE_HOST).error_status);
     resrc::synchronize_device();
     DEVICE_ERROR_CHECK(resrc::deallocate_buffer(draw_buffer.device_ptr).error_status);

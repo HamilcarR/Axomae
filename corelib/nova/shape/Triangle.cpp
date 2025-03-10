@@ -108,13 +108,10 @@ namespace nova::shape {
     const geometry::face_data_tri face = getFace(geometry);
     const vertices_attrb3d_t vertices = face.vertices();
     const edges_t edges = geometry::compute_edges(vertices);
-    const vertices_attrb3d_t normals = face.normals();
-    const vertices_attrb3d_t tangents = face.tangents();
-    const vertices_attrb3d_t bitangents = face.bitangents();
-    const vertices_attrb2d_t uvs = face.uvs();
 
     const glm::vec3 P = glm::cross(ray.direction, edges.e2);
     const float det = glm::dot(P, edges.e1);
+    AX_ASSERT_NEQ(det, 0.f);
     const float inv_det = 1.f / det;
     const glm::vec3 T = ray.origin - vertices.v0;
     const float u = glm::dot(P, T) * inv_det;
@@ -132,7 +129,6 @@ namespace nova::shape {
 
     data.t = t;
     data.position = transform.m * glm::vec4(ray.pointAt(data.t), 1.f);
-
     const float w = 1 - (u + v);
     /* Computes the normals if there aren't any in the vertex attribute buffer. */
     if (!hasValidNormals(geometry)) {
@@ -140,15 +136,21 @@ namespace nova::shape {
       /* Checks if the eye is on the same hemisphere as the normal. If not , we invert the normal. */
       data.normal = glm::dot(data.normal, -ray.direction) < 0 ? -computed_normal : computed_normal;
     } else {
+      const vertices_attrb3d_t normals = face.normals();
       /* Returns barycentric interpolated normal at intersection t.  */
       data.normal = barycentric_lerp(normals.v0, normals.v1, normals.v2, w, u, v);
     }
     data.normal = glm::normalize(transform.n * data.normal);
 
     if (hasValidUvs(geometry)) {
+      const vertices_attrb2d_t uvs = face.uvs();
       data.v = barycentric_lerp(uvs.v0.s, uvs.v1.s, uvs.v2.s, w, u, v);
       data.u = barycentric_lerp(uvs.v0.t, uvs.v1.t, uvs.v2.t, w, u, v);
     }
+
+    const vertices_attrb3d_t tangents = face.tangents();
+    const vertices_attrb3d_t bitangents = face.bitangents();
+
     data.tangent = barycentric_lerp(tangents.v0, tangents.v1, tangents.v2, w, u, v);
     data.bitangent = barycentric_lerp(bitangents.v0, bitangents.v1, bitangents.v2, w, u, v);
     data.tangent = glm::normalize(transform.n * data.tangent);

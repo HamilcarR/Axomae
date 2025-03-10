@@ -54,16 +54,14 @@ namespace nova::shape::triangle {
   /************************************************************************************************************************/
 
   class HostPolicy {};
-
   class DevicePolicy {};
-
-  /************************************************************************************************************************/
 
   template<class StoragePolicy = std::conditional_t<core::build::is_gpu_build, DevicePolicy, HostPolicy>>
   class DispatchedGeometryReferenceStorage : public StoragePolicy {
    private:
     host_storage cpu_geometry;
     device_storage gpu_geometry;
+    std::size_t container_capacity{};
 
    public:
     /**
@@ -72,7 +70,7 @@ namespace nova::shape::triangle {
      */
     std::size_t addGeometry(const Object3D &geometry);
     const axstd::span<Object3D> &getCPUBuffersView() const;
-
+    std::size_t size() const { return container_capacity; }
     void allocate(std::size_t num_meshes);
     void clear();
     void mapBuffers();

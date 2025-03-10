@@ -57,7 +57,7 @@ namespace nova::aggregate {
    * primitive doing : primitive_global_offset[geomID - 1] + primID
    */
   inline void setupGlobalOffsetArray(const primitive_aggregate_data_s &scene_geometry_data, std::vector<std::size_t> &primitive_global_offset) {
-    const auto &mesh_geometry = scene_geometry_data.mesh_geometry.getTriangleGeometryViews().host_geometry_view;
+    const auto &mesh_geometry = scene_geometry_data.mesh_geometry.getTriangleGeometryViews();
     primitive_global_offset.resize(mesh_geometry.size());
     for (int geometry_index = 0; geometry_index < mesh_geometry.size(); geometry_index++) {
       const Object3D &mesh = mesh_geometry[geometry_index];
@@ -135,12 +135,12 @@ namespace nova::aggregate {
       root_scene = rtcNewScene(device);
       scene_geometry_data = primitive_aggregate;
       const shape::MeshBundleViews &mesh_geometry = scene_geometry_data.mesh_geometry;
-      const std::size_t mesh_number = mesh_geometry.getTriangleGeometryViews().host_geometry_view.size();
+      const std::size_t mesh_number = mesh_geometry.getTriangleGeometryViews().size();
 
       initializeApplicationStructures(mesh_number);
 
       for (int mesh_index = 0; mesh_index < mesh_number; mesh_index++) {
-        const Object3D &current_mesh = mesh_geometry.getTriangleGeometryViews().host_geometry_view[mesh_index];
+        const Object3D &current_mesh = mesh_geometry.getTriangleMesh(mesh_index);
         std::size_t transform_offset = mesh_geometry.getTransformOffset(mesh_index);
 
         shape::transform::transform4x4_t transform = mesh_geometry.reconstructTransform4x4(mesh_index);

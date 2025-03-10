@@ -19,7 +19,12 @@ namespace nova::shape {
     std::size_t total_triangles;
   };
 
-  /* Make sure to pre allocate the shapes structures beforehand to avoid vector reallocation and dangling pointer.*/
+  /************************************************************************************************************************/
+  // Make sure to pre allocate the shapes structures beforehand to avoid vector reallocation and dangling pointer.
+  /**
+   * @brief Stores shapes representations. Allocation strategy is done according to the build type,
+   * if built with GPU support , we let the gpu allocates memory for shapes and their interface.
+   */
   class ShapeStorage {
     axstd::managed_vector<NovaShapeInterface> shapes{};
     axstd::managed_vector<Triangle> triangles{};
@@ -59,10 +64,38 @@ namespace nova::shape {
     }
   };
 
-  class ShapeResourcesHolder {
-    ShapeStorage storage;                                     /* Stores the shape objects collections */
+  /************************************************************************************************************************/
+  /**
+   * @brief Helps providing a uniform indexing system with each shapes collections.
+   */
+  class MeshStorageIndexer {
     triangle::GeometryReferenceStorage triangle_mesh_storage; /* Stores the collection of Object3D representing the meshes. */
-    transform::TransformStorage transform_storage;            /* Stores the transformations for each mesh. */
+    std::size_t TRIANGLE_MESH_PADDING{};
+    /* To add the other shapes, for ex :
+     * sphere::GeometryReferenceStorage sph_mesh_storage;
+     * std::size_t SPH_MESH_PADDING = TRIANGLE_MESH_PADDING + sph_mesh_storage.size()
+     * etc. */
+
+   public:
+    CLASS_DCM(MeshStorageIndexer)
+
+    void allocate(const shape_init_record_t &shape_infos);
+    const triangle::GeometryReferenceStorage &getTriangleMesh() const { return triangle_mesh_storage; }
+    void clear();
+    void mapResources();
+    void mapBuffers();
+    void release();
+    std::size_t addTriangleMesh(const triangle::mesh_vbo_ids &vbos);
+    std::size_t addTriangleMesh(const Object3D &geometry);
+    triangle::mesh_vertex_attrib_views_t getTriangleMeshViews() const { return triangle_mesh_storage.getGeometryViews(); }
+  };
+
+  /************************************************************************************************************************/
+
+  class ShapeResourcesHolder {
+    ShapeStorage storage; /* Stores the shape objects collections */
+    MeshStorageIndexer mesh_indexer;
+    transform::TransformStorage transform_storage; /* Stores the transformations for each mesh. */
 
    public:
     CLASS_M(ShapeResourcesHolder)
@@ -79,7 +112,7 @@ namespace nova::shape {
 
     void clear() {
       storage.clear();
-      triangle_mesh_storage.clear();
+      mesh_indexer.clear();
       transform_storage.clear();
     }
 
@@ -89,13 +122,13 @@ namespace nova::shape {
     void lockResources();
     void releaseResources();
     void mapBuffers();
-    const triangle::GeometryReferenceStorage &getTriangleMeshStorage() const { return triangle_mesh_storage; }
+    const triangle::GeometryReferenceStorage &getTriangleMeshStorage() const { return mesh_indexer.getTriangleMesh(); }
     MeshBundleViews getMeshSharedViews() const;
   };
 
   template<class T>
   std::size_t ShapeResourcesHolder::addTriangleMesh(const T &triangle_mesh) {
-    std::size_t mesh_index = triangle_mesh_storage.addGeometry(triangle_mesh);
+    std::size_t mesh_index = mesh_indexer.addTriangleMesh(triangle_mesh);
     return mesh_index;
   }
 
