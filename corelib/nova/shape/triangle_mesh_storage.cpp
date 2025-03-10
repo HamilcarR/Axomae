@@ -54,6 +54,7 @@ namespace nova::shape::triangle {
   void DispatchedGeometryReferenceStorage<DevicePolicy>::allocate(std::size_t num_meshes) {
     gpu_geometry.buffers_trackers.reserve(num_meshes);
     cpu_geometry.geometry_storage.reserve(num_meshes);
+    container_capacity = num_meshes;
   }
 
   template<>
@@ -114,6 +115,12 @@ namespace nova::shape::triangle {
   }
 
   /***************************************************************************************************************/
+
+  template<>
+  void DispatchedGeometryReferenceStorage<HostPolicy>::allocate(std::size_t num_meshes) {
+    cpu_geometry.geometry_storage.reserve(num_meshes);
+    container_capacity = num_meshes;
+  }
 
   template<>
   void DispatchedGeometryReferenceStorage<HostPolicy>::mapResrc() {}

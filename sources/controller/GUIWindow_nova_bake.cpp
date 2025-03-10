@@ -349,9 +349,10 @@ namespace controller {
      * so we need to initialize graphics resource handles before launching the baking worker thread , and release it in NovaStopBake().
      */
     DisplayManager3D &disp_manager = app_controller->getDisplayManager();
-    nova::NovaResourceManager *res_manager = render_scene_data.nova_resource_manager;
     if (use_gpu) {
-      res_manager->getShapeData().lockResources();
+      nova::shape::ShapeResourcesHolder &shape_manager = render_scene_data.nova_resource_manager->getShapeData();
+      shape_manager.lockResources();
+      shape_manager.mapBuffers();
       callback =
           [](nova_baker_utils::render_scene_context &render_scene_data, image::ImageHolder<float> &image_holder, DisplayManager3D &disp_manager) {
             disp_manager.haltRenderers();

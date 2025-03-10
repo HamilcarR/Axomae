@@ -8,6 +8,14 @@ CompileFlags:
     - -rdc=true
     - --forward-unknown-to-host-compiler
     - -fno-gpu-rdc
+    - -G
+    - -Xcompiler=-fPIC
+    - --generate-code=*
+    - --expt-relaxed-constexpr
+    - --compiler-bindir
+    - --options-file
+    - -forward-unknown-to-host-compiler
+
 
 SemanticTokens:
   DisabledKinds: [InactiveCode]

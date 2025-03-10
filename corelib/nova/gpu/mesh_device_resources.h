@@ -8,8 +8,8 @@
 
 namespace nova::gpu {
 
-  /** Represents a buffer located in gpu memory .
-   * @tparam T type of the buffer's elements.
+  /**
+   * Represents a buffer located in gpu memory , shared between a cuda context and opengl.
    */
   template<class T>
   class DeviceBufferTracker {
