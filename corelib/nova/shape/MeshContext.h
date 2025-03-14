@@ -7,7 +7,7 @@ namespace nova::shape {
 
   class MeshBundleViews {
     transform::mesh_transform_views_t transforms{};
-    triangle::mesh_vertex_attrib_views_t geometry{};
+    triangle::mesh_vertex_attrib_views_t triangle_mesh_geometry{};
     /* To add more shapes here we can :
      * 1) Implement a new storage class in that shape's namespace. (Will need a little refactor for cache optimization first)
      * 2) Retrieve its views on its geometry representation.
@@ -27,9 +27,11 @@ namespace nova::shape {
      */
     ax_device_callable transform::transform4x4_t reconstructTransform4x4(std::size_t mesh_index) const;
     ax_device_callable std::size_t getTransformOffset(std::size_t mesh_index) const;
-    ax_device_callable const triangle::mesh_vertex_attrib_views_t &getTriangleGeometryViews() const { return geometry; }
+    ax_device_callable const axstd::span<const Object3D> &getTriangleGeometryViews() const;
     ax_device_callable const transform::mesh_transform_views_t &getTransforms() const { return transforms; }
-    ax_device_callable Object3D getTriangleMesh(std::size_t mesh_id) const;
+    ax_device_callable const Object3D &getTriangleMesh(std::size_t mesh_id) const;
+    ax_device_callable std::size_t triMeshCount() const;
+    ax_device_callable std::size_t triangleCount(std::size_t mesh_index) const;
   };
 
   /**
