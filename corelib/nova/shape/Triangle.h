@@ -25,6 +25,9 @@ namespace nova::shape {
 
    public:
     CLASS_DCM(Triangle)
+    /* triangle_id is the first index of a face in an index array. Must be divisible by 3.
+     * ex : triangle n°3 is index[3 * 3] , index[3 * 4] , index[3 * 5].
+     */
     ax_device_callable Triangle(std::size_t mesh_id, std::size_t triangle_id);
     ax_device_callable transform::transform4x4_t getTransform(const MeshCtx &mesh_geometry) const;
     ax_device_callable bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, const MeshCtx &mesh_geometry) const;
@@ -34,6 +37,7 @@ namespace nova::shape {
     ax_device_callable ax_no_discard bool hasValidBitangents(const MeshCtx &mesh_geometry) const;
     ax_device_callable ax_no_discard bool hasValidNormals(const MeshCtx &mesh_geometry) const;
     ax_device_callable ax_no_discard bool hasValidUvs(const MeshCtx &mesh_geometry) const;
+    ax_device_callable ax_no_discard bool isDegenerate(const MeshCtx &mesh_geometry) const;
 
    private:
     ax_device_callable geometry::face_data_tri getFace(const MeshCtx &mesh_geometry) const;

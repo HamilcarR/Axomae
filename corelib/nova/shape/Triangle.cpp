@@ -96,11 +96,20 @@ namespace nova::shape {
     return transform.m * glm::vec4(face.compute_center(), 1.f);
   }
 
+  ax_device_callable bool Triangle::isDegenerate(const MeshCtx &mesh_geometry) const {
+    const Object3D &obj3d = mesh_geometry.getTriMesh(mesh_id);
+    const auto &indices = obj3d.indices;
+    return indices[triangle_id] == indices[triangle_id + 1] || indices[triangle_id + 2] == indices[triangle_id + 1] ||
+           indices[triangle_id + 2] == indices[triangle_id];
+  }
+
   /*
    * https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
    */
   ax_device_callable bool Triangle::hit(const Ray &in_ray, float tmin, float last_hit_tmax, hit_data &data, const MeshCtx &geometry) const {
     using namespace math::geometry;
+    if (isDegenerate(geometry))
+      return false;
     const transform::transform4x4_t transform = getTransform(geometry);
     const glm::vec3 origin = transform.inv * glm::vec4(in_ray.origin, 1.f);
     const glm::vec3 direction = transform.inv * glm::vec4(in_ray.direction, 0.f);
@@ -111,8 +120,9 @@ namespace nova::shape {
 
     const glm::vec3 P = glm::cross(ray.direction, edges.e2);
     const float det = glm::dot(P, edges.e1);
-    AX_ASSERT_NEQ(det, 0.f);
     const float inv_det = 1.f / det;
+    if (det == 0.f)
+      return false;
     const glm::vec3 T = ray.origin - vertices.v0;
     const float u = glm::dot(P, T) * inv_det;
     if (u < 0 || u > 1.f)
@@ -149,14 +159,16 @@ namespace nova::shape {
     }
 
     const vertices_attrb3d_t tangents = face.tangents();
-    const vertices_attrb3d_t bitangents = face.bitangents();
-
     data.tangent = barycentric_lerp(tangents.v0, tangents.v1, tangents.v2, w, u, v);
-    data.bitangent = barycentric_lerp(bitangents.v0, bitangents.v1, bitangents.v2, w, u, v);
     data.tangent = glm::normalize(transform.n * data.tangent);
-    data.bitangent = glm::normalize(transform.n * data.bitangent);
 
-    AX_ASSERT_TRUE(hasValidBitangents(geometry));
+    const vertices_attrb3d_t bitangents = face.bitangents();
+    if (!hasValidBitangents(geometry)) {
+      data.bitangent = glm::normalize(transform.n * glm::cross(data.normal, data.tangent));
+    } else {
+      data.bitangent = barycentric_lerp(bitangents.v0, bitangents.v1, bitangents.v2, w, u, v);
+      data.bitangent = glm::normalize(transform.n * data.bitangent);
+    }
     AX_ASSERT_TRUE(hasValidTangents(geometry));
 
     return true;

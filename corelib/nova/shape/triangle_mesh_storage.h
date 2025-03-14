@@ -44,12 +44,12 @@ namespace nova::shape::triangle {
   struct device_storage {
     std::vector<mesh_device_buffers> buffers_trackers;
     axstd::managed_vector<Object3D> geometry_storage;
-    axstd::span<Object3D> geometry_view;
+    IdxMeshesView geometry_view;
   };
 
   struct host_storage {
     std::vector<Object3D> geometry_storage;
-    axstd::span<Object3D> geometry_view;
+    IdxMeshesView geometry_view;
   };
   /************************************************************************************************************************/
 
@@ -69,7 +69,7 @@ namespace nova::shape::triangle {
      *@returns Returns its index.
      */
     std::size_t addGeometry(const Object3D &geometry);
-    const axstd::span<Object3D> &getCPUBuffersView() const;
+    const IdxMeshesView &getCPUBuffersView() const;
     std::size_t size() const { return container_capacity; }
     void allocate(std::size_t num_meshes);
     void clear();
@@ -83,7 +83,7 @@ namespace nova::shape::triangle {
      * @returns Returns its index if application is compiled with gpgpu context .
      */
     std::size_t addGeometry(const mesh_vbo_ids &mesh_vbos);
-    const axstd::span<Object3D> &getGPUBuffersView() const;
+    const IdxMeshesView &getGPUBuffersView() const;
 
     mesh_vertex_attrib_views_t getGeometryViews() const;
   };
