@@ -33,7 +33,7 @@ TEST(Storage, getTransformOffset) {
   transform::TransformStorage storage = transform::TransformStorage();
   glm::mat4 m = gen_rand_mat4(gen);
   glm::mat4 copy = m;
-  storage.init(5);
+  storage.allocate(5);
   storage.add(m, 0);
   storage.add(m, 1);
   ASSERT_EQ(storage.getTransformOffset(m).transform_offset, storage.getTransformOffset(0));
@@ -53,7 +53,7 @@ TEST(matrix_element_storage_t, reconstruct_transform4x4_t) {
   std::vector<glm::mat4> transforms;
   transforms.reserve(100);
   transform::TransformStorage storage = transform::TransformStorage();
-  storage.init(100);
+  storage.allocate(100);
   for (int i = 0; i < 100; i++) {
     transforms.emplace_back(gen_rand_mat4(gen));
     storage.add(transforms.back(), i);
