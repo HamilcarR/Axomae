@@ -11,7 +11,7 @@
 #include <internal/device/gpgpu/device_transfer_interface.h>
 #include <internal/device/gpgpu/device_utils.h>
 #include <internal/device/gpgpu/kernel_launch_interface.h>
-
+#include <internal/geometry/Object3D.h>
 /* Serves only as a baseline for performance to compare against */
 
 namespace resrc = device::gpgpu;
@@ -26,12 +26,12 @@ namespace nova {
       unsigned height;
     };
 
-    struct kernel_arguments_s {
+    struct integrator_args_s {
       cudaTextureObject_t host_texture;
       utils::gpu_random_generator_t generator;
       int i_width;
       int i_height;
-      nova::shape::MeshCtx ctx;
+      nova::shape::MeshCtx geometry_context;
     };
 
     ax_device_only void shade(render_buffer_t &render_buffer, float u, float v, glm::vec4 color) {
@@ -58,16 +58,20 @@ namespace nova {
       render_buffer.render_target[offset + 3] = color.a;
     }
 
-    ax_kernel void test_func(render_buffer_t render_buffer, kernel_arguments_s args) {
+    ax_kernel void test_func(render_buffer_t render_buffer, integrator_args_s args) {
       unsigned int x = ax_device_thread_idx_x;
       unsigned int y = ax_device_thread_idx_y;
       if (!AX_GPU_IN_BOUNDS_2D(x, y, render_buffer.width, render_buffer.height))
         return;
-      auto ctx = args.ctx;
-      shape::Triangle triangle = shape::Triangle(0, 0);
-      const Ray ray = Ray({0, 0, -1});
-      hit_data hit{};
-      bool b = triangle.hit(ray, 0.f, 1e30f, hit, args.ctx);
+
+      const nova::shape::MeshCtx ctx = args.geometry_context;
+      const nova::shape::MeshBundleViews views = ctx.getGeometryViews();
+      if (x < views.triMeshCount() && y * 3 < views.triangleCount(x)) {
+        shape::Triangle triangle = shape::Triangle(x, y * 3);
+        const Ray ray = Ray({0, 0, -1});
+        hit_data hit{};
+        bool b = triangle.hit(ray, 0.f, 1e30f, hit, args.geometry_context);
+      }
 
       float u = (float)math::texture::pixelToUv(x, render_buffer.width - 1);
       float v = (float)math::texture::pixelToUv(y, render_buffer.height - 1);
@@ -115,12 +119,13 @@ namespace nova {
     resrc::GPU_query_result draw_buffer = resrc::allocate_buffer(screen_size);  // TODO: Bottleneck. Generate only 1 buffer for the whole app life
     DEVICE_ERROR_CHECK(draw_buffer.error_status);
     gpu::render_buffer_t render_buffer{static_cast<float *>(draw_buffer.device_ptr), screen_width, screen_height};
-    gpu::kernel_arguments_s arguments;
+    gpu::integrator_args_s arguments;
     arguments.host_texture = std::any_cast<cudaTextureObject_t>(texture_resrc.texture_object);
     arguments.i_width = image_texture.width;
     arguments.i_height = image_texture.height;
     arguments.generator = gpu_structures.random_generator;
-    arguments.ctx = nova::shape::MeshCtx(nova_internals.resource_manager->getShapeData().getMeshSharedViews());
+    arguments.geometry_context = nova::shape::MeshCtx(nova_internals.resource_manager->getShapeData().getMeshSharedViews());
+
     exec_kernel(gpu_structures.threads_distribution, gpu::test_func, render_buffer, arguments);
     DEVICE_ERROR_CHECK(resrc::copy_buffer(draw_buffer.device_ptr, buffers->partial_buffer, screen_size, resrc::DEVICE_HOST).error_status);
     resrc::synchronize_device();

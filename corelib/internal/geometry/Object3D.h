@@ -353,4 +353,7 @@ class Object3D {
   }
 };
 
+using ConstIdxMeshesView = axstd::span<const Object3D>;
+using IdxMeshesView = axstd::span<Object3D>;
+
 #endif

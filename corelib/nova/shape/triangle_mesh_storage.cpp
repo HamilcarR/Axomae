@@ -70,7 +70,7 @@ namespace nova::shape::triangle {
   }
 
   template<>
-  const axstd::span<Object3D> &DispatchedGeometryReferenceStorage<DevicePolicy>::getGPUBuffersView() const {
+  const IdxMeshesView &DispatchedGeometryReferenceStorage<DevicePolicy>::getGPUBuffersView() const {
     return gpu_geometry.geometry_view;
   }
 
@@ -148,7 +148,7 @@ namespace nova::shape::triangle {
   }
 
   template<>
-  const axstd::span<Object3D> &DispatchedGeometryReferenceStorage<HostPolicy>::getGPUBuffersView() const {
+  const IdxMeshesView &DispatchedGeometryReferenceStorage<HostPolicy>::getGPUBuffersView() const {
     return gpu_geometry.geometry_view;
   }
 
@@ -158,7 +158,7 @@ namespace nova::shape::triangle {
   }
 
   template<>
-  const axstd::span<Object3D> &DispatchedGeometryReferenceStorage<>::getCPUBuffersView() const {
+  const IdxMeshesView &DispatchedGeometryReferenceStorage<>::getCPUBuffersView() const {
     return cpu_geometry.geometry_view;
   }
 
