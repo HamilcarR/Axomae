@@ -8,11 +8,40 @@ namespace nova::shape {
 
   ax_device_callable MeshBundleViews::MeshBundleViews(const transform::mesh_transform_views_t &t_view,
                                                       const triangle::mesh_vertex_attrib_views_t &geom)
-      : transforms(t_view), geometry(geom) {}
+      : transforms(t_view), triangle_mesh_geometry(geom) {}
 
-  void MeshBundleViews::set(const transform::mesh_transform_views_t &t, const triangle::mesh_vertex_attrib_views_t &g) {
+  ax_device_callable void MeshBundleViews::set(const transform::mesh_transform_views_t &t, const triangle::mesh_vertex_attrib_views_t &g) {
     transforms = t;
-    geometry = g;
+    triangle_mesh_geometry = g;
+  }
+
+  ax_device_callable std::size_t MeshBundleViews::triangleCount(std::size_t mesh_index) const {
+    auto triangle_views = getTriangleGeometryViews();
+    AX_ASSERT(!triangle_views.empty(), "");
+    AX_ASSERT_LT(mesh_index, triangle_views.size());
+    const Object3D &obj = triangle_views[mesh_index];
+    AX_ASSERT(!obj.indices.empty(), "");
+    return obj.indices.size() / 3;
+  }
+
+  ax_device_callable std::size_t MeshBundleViews::triMeshCount() const {
+    auto triangle_views = getTriangleGeometryViews();
+    AX_ASSERT(!triangle_views.empty(), "");
+    return triangle_views.size();
+  }
+
+  ax_device_callable const axstd::span<const Object3D> &MeshBundleViews::getTriangleGeometryViews() const {
+#ifdef __CUDA_ARCH__
+    return triangle_mesh_geometry.device_geometry_view;
+#else
+    return triangle_mesh_geometry.host_geometry_view;
+#endif
+  }
+
+  ax_device_callable const Object3D &MeshBundleViews::getTriangleMesh(std::size_t mesh_id) const {
+    auto triangle_views = getTriangleGeometryViews();
+    AX_ASSERT_LT(mesh_id, triangle_views.size());
+    return triangle_views[mesh_id];
   }
 
   ax_device_callable transform::transform4x4_t MeshBundleViews::reconstructTransform4x4(std::size_t mesh_index) const {
@@ -28,20 +57,11 @@ namespace nova::shape {
   ax_device_callable std::size_t MeshBundleViews::getTransformOffset(std::size_t mesh_index) const {
     return transform::get_transform_offset(mesh_index, transforms);
   }
-
-  ax_device_callable_inlined const Object3D &get_triangle_mesh(std::size_t index, const MeshBundleViews &geometry_views) {
-#ifndef __CUDA_ARCH__
-    const auto &mesh_array = geometry_views.getTriangleGeometryViews().host_geometry_view;
-#else
-    const auto &mesh_array = geometry_views.getTriangleGeometryViews().device_geometry_view;
-#endif
-    AX_ASSERT_LT(index, mesh_array.size());
-    return mesh_array[index];
-  }
+  /**************************************************************************************************************************/
 
   ax_device_callable MeshCtx::MeshCtx(const MeshBundleViews &geo) : geometry_views(geo) {}
 
-  ax_device_callable const Object3D &MeshCtx::getTriMesh(std::size_t index) const { return get_triangle_mesh(index, geometry_views); }
+  ax_device_callable const Object3D &MeshCtx::getTriMesh(std::size_t index) const { return geometry_views.getTriangleMesh(index); }
 
   ax_device_callable transform::transform4x4_t MeshCtx::getTriMeshTransform(std::size_t mesh_index) const {
     return geometry_views.reconstructTransform4x4(mesh_index);
