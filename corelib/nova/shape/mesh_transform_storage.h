@@ -56,7 +56,7 @@ namespace nova::shape::transform {
 
    public:
     explicit TransformStorage(bool attempt_gpu_storage = true);
-    void init(std::size_t total_meshes);
+    void allocate(std::size_t total_meshes);
     void add(const glm::mat4 &transform, uint32_t mesh_index);
     /* Will call updateViews() before mapping to update the different view buffers. */
     void map();

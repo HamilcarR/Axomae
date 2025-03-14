@@ -21,7 +21,7 @@ namespace nova::shape {
 
   /************************************************************************************************************************/
   void ShapeResourcesHolder::init(const shape_init_record_t &startup_data) {
-    transform_storage.init(startup_data.total_triangle_meshes);
+    transform_storage.allocate(startup_data.total_triangle_meshes);
     mesh_indexer.allocate(startup_data);
     storage.allocTriangles(startup_data.total_triangles);
   }

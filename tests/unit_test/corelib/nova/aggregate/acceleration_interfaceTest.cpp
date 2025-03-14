@@ -27,7 +27,7 @@ PrimitiveAggregateBuilder::PrimitiveAggregateBuilder(const glm::mat4 &transform)
     primitives_collection.push_back(&geometric_primitives.back());
   }
   mesh_list.push_back(mesh);
-  transform_storage.init(1);  // We work with one mesh for now , pointing to offset 0 of the transform array
+  transform_storage.allocate(1);  // We work with one mesh for now , pointing to offset 0 of the transform array
   transform_storage.add(transform, 0);
 }
 

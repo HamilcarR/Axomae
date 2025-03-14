@@ -21,7 +21,7 @@ namespace nova::shape::transform {
 
   TransformStorage::TransformStorage(bool is_using_gpu) { store_vram = is_using_gpu && core::build::is_gpu_build; }
 
-  void TransformStorage::init(std::size_t total_meshe_size) { transform_lookup.offsets.resize(total_meshe_size); }
+  void TransformStorage::allocate(std::size_t total_meshe_size) { transform_lookup.offsets.resize(total_meshe_size); }
 
   static std::size_t push_packed_matrix_components(const glm::mat4 &mat, axstd::managed_vector<float> &matrices) {
     std::size_t old_max_offset = matrices.size();
