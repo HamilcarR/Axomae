@@ -53,19 +53,8 @@ BoundingBox::BoundingBox(const std::vector<glm::vec3> &vertices) {
   glm::vec3 min{INT_MAX, INT_MAX, INT_MAX};
   glm::vec3 max{INT_MIN, INT_MIN, INT_MIN};
   for (const auto &elem : vertices) {
-    if (elem.x <= min.x)
-      min.x = elem.x;
-    if (elem.y <= min.y)
-      min.x = elem.x;
-    if (elem.y <= min.y)
-      min.x = elem.y;
-
-    if (elem.x >= max.x)
-      max.x = elem.x;
-    if (elem.y >= max.y)
-      max.x = elem.x;
-    if (elem.y >= max.y)
-      max.x = elem.y;
+    min = glm::min(elem, min);
+    max = glm::max(elem, max);
   }
   min_coords = min;
   max_coords = max;
@@ -76,19 +65,8 @@ BoundingBox::BoundingBox(const std::vector<BoundingBox> &bboxes) {
   glm::vec3 min{INT_MAX, INT_MAX, INT_MAX};
   glm::vec3 max{INT_MIN, INT_MIN, INT_MIN};
   for (const auto &elem : bboxes) {
-    if (elem.min_coords.x <= min.x)
-      min.x = elem.min_coords.x;
-    if (elem.min_coords.y <= min.y)
-      min.x = elem.min_coords.y;
-    if (elem.min_coords.z <= min.z)
-      min.x = elem.min_coords.z;
-
-    if (elem.max_coords.x >= max.x)
-      max.x = elem.max_coords.x;
-    if (elem.max_coords.y >= max.y)
-      max.x = elem.max_coords.y;
-    if (elem.max_coords.z >= max.z)
-      max.x = elem.max_coords.z;
+    min = glm::min(min, elem.min_coords);
+    max = glm::max(max, elem.max_coords);
   }
   min_coords = min;
   max_coords = max;
