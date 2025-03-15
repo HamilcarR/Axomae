@@ -29,6 +29,7 @@ namespace nova::shape {
     ax_device_callable ax_no_discard const glm::vec3 &getPosition() const { return aabb.getPosition(); }
     ax_device_callable ax_no_discard geometry::BoundingBox computeAABB(const MeshCtx & /*mesh_geometry*/) const { return aabb; }
     ax_device_callable ax_no_discard geometry::BoundingBox computeAABB() const { return aabb; }
+    ax_device_callable ax_no_discard float area(const MeshCtx &) const { return 2.f * aabb.halfArea(); }
   };
 }  // namespace nova::shape
 

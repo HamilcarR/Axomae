@@ -55,7 +55,13 @@ namespace geometry {
      */
     ax_device_callable ax_no_discard bool intersect(const glm::vec3 &ray_dir, const glm::vec3 &origin) const;
     ax_device_callable ax_no_discard float intersect(const glm::vec3 &ray_dir, const glm::vec3 &origin, float dist_min) const;
-    ax_device_callable ax_no_discard float area() const;
+    /** Since this method is used for SAH , for which formula is : \n
+     * C = Ct + Cn(Ap.Cnl/Anl + Ap.Cnr/Anr) .\n
+     * We just compute half the area A of a box since Ap / Anx = 2(halfArea of parent) / 2(halfArea of child node) = (halfArea parent) / (halfArea
+     * child node).\n
+     * For a normal surface area , just multiply by 2.
+     */
+    ax_device_callable ax_no_discard float halfArea() const;
   };
 
   class AABBInterface {

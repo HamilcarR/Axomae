@@ -132,7 +132,7 @@ namespace nova::aggregate {
         aabb_right = aabb_right + prim_aabb;
       }
     }
-    const float cost = aabb_left.area() * (float)prim_left_count + aabb_right.area() * (float)prim_right_count;
+    const float cost = aabb_left.halfArea() * (float)prim_left_count + aabb_right.halfArea() * (float)prim_right_count;
     return cost > 0.f ? cost : INT_MAX;
   }
 
@@ -221,7 +221,7 @@ namespace nova::aggregate {
       axis = axis_subdiv_sah(scene, bvh_data, node_id, best_cost, split_axis, build_type);
 
     geometry::BoundingBox node_bbox(node.min, node.max);
-    const float node_bbox_area = node_bbox.area();
+    const float node_bbox_area = node_bbox.halfArea();
     const float cost = node_bbox_area * (float)node.primitive_count;
     if (best_cost >= cost)
       return;

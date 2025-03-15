@@ -31,13 +31,14 @@ namespace nova::shape {
     ax_device_callable Triangle(std::size_t mesh_id, std::size_t triangle_id);
     ax_device_callable transform::transform4x4_t getTransform(const MeshCtx &mesh_geometry) const;
     ax_device_callable bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, const MeshCtx &mesh_geometry) const;
-    ax_device_callable ax_no_discard geometry::BoundingBox computeAABB(const MeshCtx &mesh_geometry) const;
-    ax_device_callable ax_no_discard glm::vec3 centroid(const MeshCtx &mesh_geometry) const;
-    ax_device_callable ax_no_discard bool hasValidTangents(const MeshCtx &mesh_geometry) const;
-    ax_device_callable ax_no_discard bool hasValidBitangents(const MeshCtx &mesh_geometry) const;
-    ax_device_callable ax_no_discard bool hasValidNormals(const MeshCtx &mesh_geometry) const;
-    ax_device_callable ax_no_discard bool hasValidUvs(const MeshCtx &mesh_geometry) const;
-    ax_device_callable ax_no_discard bool isDegenerate(const MeshCtx &mesh_geometry) const;
+    ax_device_callable geometry::BoundingBox computeAABB(const MeshCtx &mesh_geometry) const;
+    ax_device_callable glm::vec3 centroid(const MeshCtx &mesh_geometry) const;
+    ax_device_callable bool hasValidTangents(const MeshCtx &mesh_geometry) const;
+    ax_device_callable bool hasValidBitangents(const MeshCtx &mesh_geometry) const;
+    ax_device_callable bool hasValidNormals(const MeshCtx &mesh_geometry) const;
+    ax_device_callable bool hasValidUvs(const MeshCtx &mesh_geometry) const;
+    ax_device_callable bool isDegenerate(const MeshCtx &mesh_geometry) const;
+    ax_device_callable float area(const MeshCtx &mesh_geometry) const;
 
    private:
     ax_device_callable geometry::face_data_tri getFace(const MeshCtx &mesh_geometry) const;
