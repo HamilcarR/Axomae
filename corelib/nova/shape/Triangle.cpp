@@ -103,6 +103,15 @@ namespace nova::shape {
            indices[triangle_id + 2] == indices[triangle_id];
   }
 
+  ax_device_callable float Triangle::area(const MeshCtx &mesh_geometry) const {
+    const geometry::face_data_tri face = getFace(mesh_geometry);
+    const transform::transform4x4_t transform = getTransform(mesh_geometry);
+    const vertices_attrb3d_t vertices = face.vertices();
+    glm::vec3 b = vertices.v2 - vertices.v1;
+    glm::vec3 s = vertices.v0 - vertices.v1;
+    return 0.5f * glm::length(glm::cross(b, s));
+  }
+
   /*
    * https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
    */

@@ -34,44 +34,44 @@ namespace geometry {
     float tan0[3], tan1[3], tan2[3];  // tangent
     float bit0[3], bit1[3], bit2[3];  // bitangents
 
-    /* n_transform is transpose(inverse(transform)) */
-    ax_device_callable_inlined void transform(const glm::mat4 &transform, const glm::mat3 &n_transform) {
-      auto transformVec = [&](float v[3]) {
-        glm::vec3 vec{v[0], v[1], v[2]};
-        vec = transform * glm::vec4(vec, 1.f);
-        v[0] = vec.x;
-        v[1] = vec.y;
-        v[2] = vec.z;
-      };
+    ax_device_callable static void transform(const glm::mat4 &transform, float v[3]) {
+      glm::vec3 vect{v[0], v[1], v[2]};
+      vect = transform * glm::vec4(vect, 1.f);
+      v[0] = vect.x;
+      v[1] = vect.y;
+      v[2] = vect.z;
+    }
 
-      // Lambda for transforming directions (normals, tangents, bitangents) using the normal matrix.
-      auto transformDir = [&](float d[3]) {
-        glm::vec3 vec{d[0], d[1], d[2]};
-        vec = n_transform * vec;
-        d[0] = vec.x;
-        d[1] = vec.y;
-        d[2] = vec.z;
-      };
+    ax_device_callable static void transform(const glm::mat3 &transform, float v[3]) {
+      glm::vec3 vect{v[0], v[1], v[2]};
+      vect = transform * vect;
+      v[0] = vect.x;
+      v[1] = vect.y;
+      v[2] = vect.z;
+    }
+
+    /* n_transform is transpose(inverse(transform)) */
+    ax_device_callable_inlined void transform(const glm::mat4 &t, const glm::mat3 &n) {
 
       // Transform vertices.
-      transformVec(v0);
-      transformVec(v1);
-      transformVec(v2);
+      transform(t, v0);
+      transform(t, v1);
+      transform(t, v2);
 
       // Transform normals.
-      transformDir(n0);
-      transformDir(n1);
-      transformDir(n2);
+      transform(n, n0);
+      transform(n, n1);
+      transform(n, n2);
 
       // Transform tangents.
-      transformDir(tan0);
-      transformDir(tan1);
-      transformDir(tan2);
+      transform(n, tan0);
+      transform(n, tan1);
+      transform(n, tan2);
 
       // Transform bitangents.
-      transformDir(bit0);
-      transformDir(bit1);
-      transformDir(bit2);
+      transform(n, bit0);
+      transform(n, bit1);
+      transform(n, bit2);
     }
 
     ax_device_callable_inlined vertices_attrb3d_t vertices() const {

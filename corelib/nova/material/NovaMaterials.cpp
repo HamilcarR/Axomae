@@ -152,7 +152,7 @@ namespace nova::material {
     r0 *= r0;
     return r0 + (1 - r0) * std::pow((1 - cosine), 5);
   }
-
+  // TODO: out ray sometimes becomes NAN on dielectrics
   bool NovaDielectricMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const {
     TexturePackSampler texture_pack_sampler(t_pack);
     const glm::mat3 tbn = math::geometry::construct_tbn(hit_d.normal, hit_d.tangent, hit_d.bitangent);
@@ -184,6 +184,7 @@ namespace nova::material {
       out.direction = glm::normalize(reflected);
     else
       out.direction = glm::normalize(refracted);
+    AX_ASSERT(!ISNAN(out.direction), "");
     return true;
   }
 }  // namespace nova::material

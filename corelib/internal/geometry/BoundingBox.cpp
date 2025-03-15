@@ -159,7 +159,7 @@ float BoundingBox::intersect(const glm::vec3 &ray_direction, const glm::vec3 &ra
   return MAXFLOAT;
 }
 
-float BoundingBox::area() const {
+float BoundingBox::halfArea() const {
   const glm::vec3 lwh = max_coords - min_coords;
   return lwh.x * lwh.y + lwh.y * lwh.z + lwh.z * lwh.x;
 }
