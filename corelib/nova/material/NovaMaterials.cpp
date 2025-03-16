@@ -140,7 +140,7 @@ namespace nova::material {
     glm::vec3 inc = glm::normalize(v);
     float dt = glm::dot(inc, n);
     float discriminant = 1.f - eta * eta * (1 - dt * dt);
-    if (discriminant > 0) {
+    if (discriminant > 1e-4f) {
       refracted = glm::refract(v, n, eta);
       return true;
     }
@@ -152,14 +152,14 @@ namespace nova::material {
     r0 *= r0;
     return r0 + (1 - r0) * std::pow((1 - cosine), 5);
   }
-  // TODO: out ray sometimes becomes NAN on dielectrics
+
   bool NovaDielectricMaterial::scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler) const {
     TexturePackSampler texture_pack_sampler(t_pack);
     const glm::mat3 tbn = math::geometry::construct_tbn(hit_d.normal, hit_d.tangent, hit_d.bitangent);
-    hit_d.normal = compute_map_normal(hit_d, texture_pack_sampler, tbn);
-    glm::vec3 normal = hit_d.normal;
+    glm::vec3 perturbed_normal = compute_map_normal(hit_d, texture_pack_sampler, tbn);
+    glm::vec3 original_perturbed_normal = perturbed_normal;
     glm::vec3 direction = glm::normalize(in.direction);
-    const glm::vec3 reflected = glm::reflect(direction, hit_d.normal);
+    const glm::vec3 reflected = glm::reflect(direction, perturbed_normal);
     out.origin = hit_d.position;
     texturing::texture_sample_data sample_data{hit_d.position};
     hit_d.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, sample_data);
@@ -167,15 +167,15 @@ namespace nova::material {
     float index = eta;
     float reflect_prob = 0.f;
     float cosine = 0.f;
-    if (glm::dot(direction, hit_d.normal) > 0) {
-      normal = -normal;
-      cosine = glm::dot(direction, hit_d.normal) * eta / glm::length(direction);
+    if (glm::dot(direction, perturbed_normal) > 0) {
+      original_perturbed_normal = -original_perturbed_normal;
+      cosine = glm::dot(direction, perturbed_normal) * eta / glm::length(direction);
     } else {
       index = 1.f / eta;
-      cosine = -glm::dot(direction, hit_d.normal) / glm::length(direction);
+      cosine = -glm::dot(direction, perturbed_normal) / glm::length(direction);
     }
     glm::vec3 refracted;
-    if (refract(direction, normal, index, refracted))
+    if (refract(direction, original_perturbed_normal, index, refracted))
       reflect_prob = schlick(cosine, eta);
     else
       reflect_prob = 1.f;
@@ -184,6 +184,7 @@ namespace nova::material {
       out.direction = glm::normalize(reflected);
     else
       out.direction = glm::normalize(refracted);
+    hit_d.normal = perturbed_normal;
     AX_ASSERT(!ISNAN(out.direction), "");
     return true;
   }
