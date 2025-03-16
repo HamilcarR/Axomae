@@ -30,16 +30,16 @@ class Mesh : public SceneTreeNode, public MeshInterface {
   enum RASTERMODE : GLenum { POINT = GL_POINT, LINE = GL_LINE, FILL = GL_FILL };
 
  protected:
-  Object3D geometry;
-  std::unique_ptr<GLMaterial> material;
-  bool mesh_initialized;
+  Object3D geometry{};
+  std::unique_ptr<GLMaterial> material{};
+  bool mesh_initialized{false};
   Mesh *cubemap_reference{};
   Camera *camera{};
   glm::mat4 modelview_matrix{};
-  bool face_culling_enabled;
-  bool depth_mask_enabled;
-  bool is_drawn;
-  Shader *shader_program;
+  bool face_culling_enabled{false};
+  bool depth_mask_enabled{false};
+  bool is_drawn{false};
+  Shader *shader_program{};
   RASTERMODE polygon_mode;
 
  public:
@@ -86,8 +86,8 @@ class Mesh : public SceneTreeNode, public MeshInterface {
 /*****************************************************************************************************************/
 
 class CubeMesh : public Mesh {
-private:
-    std::vector<float> vertices = {-1, -1, -1,  // 0
+ private:
+  std::vector<float> vertices = {-1, -1, -1,  // 0
                                  1,  -1, -1,  // 1
                                  -1, 1,  -1,  // 2
                                  1,  1,  -1,  // 3
@@ -96,7 +96,7 @@ private:
                                  -1, 1,  1,   // 6
                                  1,  1,  1};  // 7
 
-   std::vector<unsigned int> indices = {0, 1, 2,  // Front face
+  std::vector<unsigned int> indices = {0, 1, 2,  // Front face
                                        1, 3, 2,  //
                                        5, 4, 6,  // Back face
                                        6, 7, 5,  //
@@ -132,10 +132,11 @@ class CubeMapMesh : public CubeMesh {
 
 /*****************************************************************************************************************/
 class QuadMesh : public Mesh {
-private:
+ private:
   std::vector<float> vertices = {-1.0f, -1.0f, 0.f, -1.0f, 1.0f, 0.f, 1.0f, 1.0f, 0.f, 1.0f, -1.0f, 0.f};
   std::vector<unsigned> indices = {2, 1, 0, 3, 2, 0};
   std::vector<float> textures = {0, 0, 0, 1, 1, 1, 1, 0};
+
  public:
   explicit QuadMesh(SceneTreeNode *parent = nullptr);
   void preRenderSetup() override;
@@ -160,6 +161,8 @@ class FrameBufferMesh : public QuadMesh {
 class BoundingBoxMesh : public Mesh {
  protected:
   geometry::BoundingBox bounding_box;
+  std::vector<float> vertices;
+  std::vector<unsigned> indices;
 
  public:
   explicit BoundingBoxMesh(SceneTreeNode *parent = nullptr);
