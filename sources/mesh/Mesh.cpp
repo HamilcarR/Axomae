@@ -147,10 +147,10 @@ void Mesh::setDepthFunc(DEPTHFUNC func) { ax_glDepthFunc(func); }
 
 /*****************************************************************************************************************/
 CubeMesh::CubeMesh(SceneTreeNode *parent) : Mesh(parent) {
-  geometry.indices = axstd::span<unsigned>(indices.data(), indices.size());
-  geometry.vertices = axstd::span<float>(vertices.data(),vertices.size());
-  geometry.uv = axstd::span<float>(textures.data(), textures.size());
-  geometry.colors = axstd::span<float>(colors.data(), colors.size());
+  geometry.indices = axstd::span(indices.data(), indices.size());
+  geometry.vertices = axstd::span(vertices.data(), vertices.size());
+  geometry.uv = axstd::span(textures.data(), textures.size());
+  geometry.colors = axstd::span(colors.data(), colors.size());
   local_transformation = glm::mat4(1.f);
   name = "Generic-Cube";
 }
@@ -193,9 +193,9 @@ glm::mat4 CubeMapMesh::computeFinalTransformation() {
 }
 /*****************************************************************************************************************/
 QuadMesh::QuadMesh(SceneTreeNode *parent) : Mesh(parent) {
-  geometry.indices = axstd::span<unsigned>(indices.data(),indices.size());
-  geometry.vertices = axstd::span<float>(vertices.data(),vertices.size());
-  geometry.uv = axstd::span<float>(textures.data(),textures.size());
+  geometry.indices = axstd::span(indices.data(), indices.size());
+  geometry.vertices = axstd::span(vertices.data(), vertices.size());
+  geometry.uv = axstd::span(textures.data(), textures.size());
   local_transformation = glm::mat4(1.f);
   name = "Quad";
 }
@@ -238,12 +238,14 @@ BoundingBoxMesh::BoundingBoxMesh(SceneTreeNode *parent) : Mesh(parent) {}
 BoundingBoxMesh::BoundingBoxMesh(Mesh *m, Shader *s) : BoundingBoxMesh(m) {
   shader_program = s;
   name = std::string("Boundingbox-") + m->getMeshName();
-  const axstd::span<float> &vertices = m->getGeometry().vertices;
-  bounding_box = geometry::BoundingBox(vertices);
+  const axstd::span<float> &vertex_geometry = m->getGeometry().vertices;
+  bounding_box = geometry::BoundingBox(vertex_geometry);
   material->setShaderPointer(s);
   std::pair<std::vector<float>, std::vector<unsigned>> geom = bounding_box.getVertexArray();
-  geometry.vertices = geom.first;
-  geometry.indices = geom.second;
+  vertices = geom.first;
+  indices = geom.second;
+  geometry.vertices = vertices;
+  geometry.indices = indices;
 }
 
 BoundingBoxMesh::BoundingBoxMesh(Mesh *m, const geometry::BoundingBox &bbox, Shader *s) : BoundingBoxMesh(m) {
@@ -252,8 +254,10 @@ BoundingBoxMesh::BoundingBoxMesh(Mesh *m, const geometry::BoundingBox &bbox, Sha
   bounding_box = bbox;
   material->setShaderPointer(s);
   std::pair<std::vector<float>, std::vector<unsigned>> geom = bounding_box.getVertexArray();
-  geometry.vertices = geom.first;
-  geometry.indices = geom.second;
+  vertices = geom.first;
+  indices = geom.second;
+  geometry.vertices = vertices;
+  geometry.indices = indices;
 }
 
 void BoundingBoxMesh::preRenderSetup() {
