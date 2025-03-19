@@ -60,11 +60,13 @@ namespace nova_baker_utils {
     engine_resources_holder.integrator_flag = engine_opts.engine_type_flag;
   }
 
-  void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureRawData &texture_raw_data) {
-    texture_raw_data.raw_data = envmap.hdr_envmap->data.data();
-    texture_raw_data.channels = envmap.hdr_envmap->metadata.channels;
-    texture_raw_data.width = envmap.hdr_envmap->metadata.width;
-    texture_raw_data.height = envmap.hdr_envmap->metadata.height;
+  void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureResourcesHolder &resrc) {
+    float *raw_data = envmap.hdr_envmap->data.data();
+    int channels = envmap.hdr_envmap->metadata.channels;
+    int width = envmap.hdr_envmap->metadata.width;
+    int height = envmap.hdr_envmap->metadata.height;
+
+    resrc.setupEnvmap(raw_data, width, height, channels);
   }
 
   void initialize_nova_manager(const engine_data &engine_opts, nova::NovaResourceManager &manager) {
@@ -78,7 +80,7 @@ namespace nova_baker_utils {
     initialize_engine_opts(engine_opts, engine_resources_holder);
 
     /* Environment map */
-    initialize_environment_texture(engine_opts.envmap, manager.getEnvmapData());
+    initialize_environment_texture(engine_opts.envmap, manager.getTexturesData());
   }
 
   void bake_scene(render_scene_context &rendering_data) {

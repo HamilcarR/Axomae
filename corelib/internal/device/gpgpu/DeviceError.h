@@ -23,7 +23,7 @@ class DeviceError {
   cudaError_t id;
 
  public:
-  explicit DeviceError(cudaError_t error);
+  DeviceError(cudaError_t error);
   ax_no_discard cudaError_t getId() const { return id; }
 #endif
  public:

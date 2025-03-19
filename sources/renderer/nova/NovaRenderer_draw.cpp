@@ -29,7 +29,7 @@ void NovaRenderer::populateNovaSceneResources() {
   /*Setup envmap */
   image::ImageHolder<float> *current_envmap = envmap_manager->currentMutableEnvmapMetadata();
   nova_baker_utils::scene_envmap env{current_envmap};
-  nova_baker_utils::initialize_environment_texture(env, nova_resource_manager->getEnvmapData());
+  nova_baker_utils::initialize_environment_texture(env, nova_resource_manager->getTexturesData());
 }
 
 void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int channels) {

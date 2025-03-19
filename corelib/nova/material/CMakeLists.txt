@@ -19,4 +19,6 @@ target_include_directories(ax_core_nova_material PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/../
 )
 
-#register_device_compilation(NovaMaterials.cpp)
+register_device_compilation(
+  NovaMaterials.cpp 
+)

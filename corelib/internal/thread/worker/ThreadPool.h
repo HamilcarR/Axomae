@@ -19,15 +19,15 @@ namespace threading {
   };
 
   class ThreadPool {
-   public:
-    int busy_threads;
+    using active_working_threads_t = std::unordered_map<std::thread::id, std::string>;
 
-   private:
-    mutable std::mutex mutex;
+    int busy_threads;
+    mutable std::mutex mutex;  // TODO : wtf ???
     std::condition_variable condition_variable;
     std::vector<std::thread> threads;
     bool shutdown_requested{false};
     std::deque<Task> queue;
+    active_working_threads_t current_thread_tasks;
 
    public:
     explicit ThreadPool(const int size) : busy_threads(size), threads(std::vector<std::thread>(size)) {
@@ -52,13 +52,12 @@ namespace threading {
 
     void fence(const std::string &tag) {
       std::unique_lock lock(mutex);
-      condition_variable.wait(lock, [this, tag] { return busy_threads == 0 && tasksFinished(tag); });
+      condition_variable.wait(lock, [this, tag] { return tasksFinished(tag); });
     }
 
     // Waits until threads finish their current task and shutdowns the pool
     void Shutdown() {
       {
-
         emptyQueue(ALL_TASK);
         std::lock_guard<std::mutex> lock(mutex);
         shutdown_requested = true;
@@ -110,13 +109,15 @@ namespace threading {
         if (elem.context_name == tag)
           return false;
       }
+      /* If queue is empty, we check remaining tasks living IN the threads. */
+      for (const auto &elem : current_thread_tasks)
+        if (elem.second == tag)
+          return false;
       return true;
     }
 
    private:
     class ThreadWorker {
-
-     private:
       ThreadPool *thread_pool;
 
      public:
@@ -131,12 +132,14 @@ namespace threading {
           thread_pool->busy_threads++;
 
           if (!this->thread_pool->queue.empty()) {
-            auto func = thread_pool->queue.front().function;
+            Task task = thread_pool->queue.front();
+            auto func = task.function;
             thread_pool->queue.pop_front();
-
+            thread_pool->current_thread_tasks[std::this_thread::get_id()] = task.context_name;
             lock.unlock();
             func();
             lock.lock();
+            thread_pool->current_thread_tasks.erase(std::this_thread::get_id());
           }
         }
       }

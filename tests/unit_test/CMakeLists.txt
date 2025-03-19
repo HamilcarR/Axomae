@@ -20,6 +20,7 @@ target_link_libraries(Axomae_test
         ax_material
         ax_controller
         ax_core
+        ax_core_nova
         PRIVATE
         compile_opts
 )

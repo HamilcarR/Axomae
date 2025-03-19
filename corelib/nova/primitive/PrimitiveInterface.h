@@ -11,7 +11,8 @@ namespace nova::primitive {
    public:
     using tag_ptr::tag_ptr;
     ax_device_callable ax_no_discard bool hit(const Ray &r, float tmin, float tmax, hit_data &data, const shape::MeshCtx &geometry) const;
-    ax_device_callable ax_no_discard bool scatter(const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler) const;
+    ax_device_callable ax_no_discard bool scatter(
+        const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler, material::shading_data_s &material_opts) const;
     ax_device_callable ax_no_discard glm::vec3 centroid(const shape::MeshCtx &geometry) const;
     ax_device_callable ax_no_discard geometry::BoundingBox computeAABB(const shape::MeshCtx &geometry) const;
   };

@@ -1,13 +1,15 @@
 #ifndef TRIANGLE_MESH_STORAGE_H
 #define TRIANGLE_MESH_STORAGE_H
+#include "interfaces/DeviceReferenceStorageInterface.h"
 #include "shape/shape_datastructures.h"
-
 #include <internal/common/axstd/managed_buffer.h>
 #include <internal/geometry/Object3D.h>
 
 #ifdef AXOMAE_USE_CUDA
 #  include "gpu/mesh_device_resources.h"
 #endif
+using ConstIdxMeshesView = axstd::span<const Object3D>;
+using IdxMeshesView = axstd::span<Object3D>;
 
 namespace nova::gpu {
   template<class T>
@@ -17,7 +19,7 @@ namespace nova::gpu {
 namespace nova::shape::triangle {
 
   struct mesh_vbo_ids {
-    uint32_t vbo_positions;
+    uint32_t vbo_positions;  // TODO: GLuint
     uint32_t vbo_uv;
     uint32_t vbo_tangents;
     uint32_t vbo_normals;
@@ -57,20 +59,19 @@ namespace nova::shape::triangle {
   class DevicePolicy {};
 
   template<class StoragePolicy = std::conditional_t<core::build::is_gpu_build, DevicePolicy, HostPolicy>>
-  class DispatchedGeometryReferenceStorage : public StoragePolicy {
-   private:
+  class DispatchedGeometryReferenceStorage : public StoragePolicy, public DeviceReferenceStorageInterface {
     host_storage cpu_geometry;
     device_storage gpu_geometry;
     std::size_t container_capacity{};
 
    public:
     const IdxMeshesView &getCPUBuffersView() const;
-    std::size_t size() const { return container_capacity; }
-    void allocate(std::size_t num_meshes);
-    void clear();
-    void mapBuffers();
-    void mapResrc();
-    void release();
+    std::size_t size() const override { return container_capacity; }
+    void allocate(std::size_t num_meshes) override;
+    void clear() override;
+    void mapBuffers() override;
+    void mapResources() override;
+    void release() override;
 
     /**
      * @brief Adds a mesh whose geometry representation resides on GPU and is already registered with valid VBOs for each vertex attribute arrays.

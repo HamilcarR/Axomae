@@ -32,9 +32,7 @@ namespace nova::scene {
     CLASS_CM(SceneTransformations)
   };
 
-  // TODO : use memory pool
   struct SceneResourcesHolder {
-    texturing::TextureRawData envmap_data{};
     texturing::TextureResourcesHolder textures_data{};
     material::MaterialResourcesHolder materials_data{};
     camera::CameraResourcesHolder camera_data{};

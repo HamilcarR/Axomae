@@ -40,16 +40,10 @@ namespace nova_baker_utils {
                            nova::NovaResourceManager &manager,
                            std::size_t mesh_index);
 
-  nova::material::NovaMaterialInterface setup_material_data(material_buffers_t &material_buffers,
-                                                            texture_buffers_t &texture_buffers,
-                                                            const Drawable &drawable,
-                                                            nova::NovaResourceManager &manager,
-                                                            std::size_t &alloc_offset_textures,
-                                                            std::size_t &alloc_offset_materials);
-  bake_buffers_storage_t build_scene(const std::vector<drawable_original_transform> &drawables, nova::NovaResourceManager &manager);
+  nova::material::NovaMaterialInterface setup_material_data(const Drawable &drawable, nova::NovaResourceManager &manager);
+  void build_scene(const std::vector<drawable_original_transform> &drawables, nova::NovaResourceManager &manager);
   nova::aggregate::DefaultAccelerator build_api_managed_acceleration_structure(nova::aggregate::primitive_aggregate_data_s primitive_geometry);
   primitive_buffers_t allocate_primitive_triangle_buffers(core::memory::ByteArena &memory_pool, std::size_t number_elements);
-  material_buffers_t allocate_materials_buffers(core::memory::ByteArena &memory_pool, std::size_t number_elements);
 
   /* Takes an initialized NovaResourceManager.*/
   void bake_scene(render_scene_context &rendering_data);
@@ -60,7 +54,7 @@ namespace nova_baker_utils {
                              nova::scene::SceneTransformations &scene_transform,
                              nova::camera::CameraResourcesHolder &camera_resources_holder);
   void initialize_engine_opts(const engine_data &engine_opts, nova::engine::EngineResourcesHolder &engine_resources_holder);
-  void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureRawData &texture_raw_data);
+  void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureResourcesHolder &texture_holder);
   void cancel_render(engine_data &data);
   std::unique_ptr<NovaRenderEngineInterface> create_engine(const engine_data &engine_type);
   void synchronize_render_threads(render_scene_context &scene_data, const std::string &tag);

@@ -33,7 +33,12 @@ namespace nova::integrator {
     bvh_hit_data hit = bvh_hit(ray, nova_internals);
     if (hit.is_hit) {
       Ray out{};
-      if (!hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, sampler) || depth < 0)
+      material::shading_data_s shading{};
+      texturing::TextureCtx texture_context = nova_internals.resource_manager->getTexturesData().getTextureBundleViews();
+      texturing::texture_data_aggregate_s aggregate;
+      aggregate.texture_ctx = &texture_context;
+      shading.texture_aggregate = &aggregate;
+      if (!hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, sampler, shading) || depth < 0)
         return glm::vec4(0.f);
       glm::vec4 emit = hit.hit_d.emissive;
       return emit;

@@ -57,18 +57,6 @@ namespace controller {
     return {buffer_in_bytes, size_in_bytes};
   }
 
-  static void add_caches_addresses(nova::device_shared_caches_t &shared_caches,
-                                   const nova_baker_utils::bake_buffers_storage_t &bake_buffers_storage) {
-    /* Register textures */
-    shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.texture_buffers.image_alloc_buffer));
-    /* Register materials */
-    shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.material_buffers.diffuse_alloc_buffer));
-    shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.material_buffers.conductor_alloc_buffer));
-    shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.material_buffers.dielectric_alloc_buffer));
-    /*Register primitives */
-    shared_caches.addSharedCacheAddress(convert_to_byte_span(bake_buffers_storage.primitive_buffers.geo_primitive_alloc_buffer));
-  }
-
   static void notify_simple_progress(const char *str, IProgressManager &progress_manager) {
     progress_manager.initProgress(str, 100.f);
     progress_manager.setCurrent(90);
@@ -119,9 +107,8 @@ namespace controller {
     const Scene &realtime_scene = realtime_renderer.getScene();
     auto drawable_collection = retrieve_scene_main_drawables(realtime_scene.getDrawables(), original_transforms);
     realtime_viewer->makeCurrent();
-    bake_buffers_storage = nova_baker_utils::build_scene(drawable_collection, *nova_resource_manager);
+    nova_baker_utils::build_scene(drawable_collection, *nova_resource_manager);
     realtime_viewer->doneCurrent();
-    add_caches_addresses(shared_caches, bake_buffers_storage);
     primitives_view_tn primitive_list_view = nova_resource_manager->getPrimitiveData().getView();
     nova::shape::MeshBundleViews mesh_geometry = nova_resource_manager->getShapeData().getMeshSharedViews();
     nova::aggregate::primitive_aggregate_data_s aggregate;

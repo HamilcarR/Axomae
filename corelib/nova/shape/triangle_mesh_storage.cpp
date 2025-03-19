@@ -86,7 +86,7 @@ namespace nova::shape::triangle {
   }
 
   template<>
-  void DispatchedGeometryReferenceStorage<DevicePolicy>::mapResrc() {
+  void DispatchedGeometryReferenceStorage<DevicePolicy>::mapResources() {
     for (auto &tracker : gpu_geometry.buffers_trackers) {
       map_gpu_resources(tracker);
     }
@@ -123,7 +123,7 @@ namespace nova::shape::triangle {
   }
 
   template<>
-  void DispatchedGeometryReferenceStorage<HostPolicy>::mapResrc() {}
+  void DispatchedGeometryReferenceStorage<HostPolicy>::mapResources() {}
 
   template<>
   void DispatchedGeometryReferenceStorage<HostPolicy>::release() {}

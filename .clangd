@@ -19,3 +19,8 @@ CompileFlags:
 
 SemanticTokens:
   DisabledKinds: [InactiveCode]
+
+
+Index:
+  Background: Build
+  StandardLibrary: Yes

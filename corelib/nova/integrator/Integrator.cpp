@@ -57,19 +57,26 @@ namespace nova::integrator {
   glm::vec4 PathIntegrator::Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const {
     const NovaResourceManager *nova_resources = nova_internals.resource_manager;
     bvh_hit_data hit = bvh_hit(ray, nova_internals);
+    texturing::TextureCtx texture_context = texturing::TextureCtx(nova_internals.resource_manager->getTexturesData().getTextureBundleViews());
+    texturing::texture_data_aggregate_s texture_sampling_data{};
+    texture_sampling_data.texture_ctx = &texture_context;
     if (hit.is_hit) {
       Ray out{};
-      if (depth < 0 || !hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, sampler))
+      material::shading_data_s shading{};
+      shading.texture_aggregate = &texture_sampling_data;
+      if (depth < 0 || !hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, sampler, shading))
         return glm::vec4(0.f);
       glm::vec4 color = hit.hit_d.attenuation;
       glm::vec4 emit = hit.hit_d.emissive;
-      /* Here in case the value returned by the subsequent call to Li() is a NaN or Inf, we invalidate the color of the pixel alltogether and set it
+      /* Here in case the value returned by the subsequent call to Li() is a NaN or Inf, we invalidate the color of the pixel altogether and set it
       * to zero. This helps keep a more uniform and precise value as the next sampling pass will be joined to the current pass and set a valid value
        to the pixel.*/
       return DENAN(10.f * emit + color * Li(out, nova_internals, depth - 1, sampler));
     }
     glm::vec3 sample_vector = ray.direction;
-    return {sample_cubemap(sample_vector, &nova_resources->getEnvmapData()), 1.f};
+    const auto &envmap = nova_resources->getTexturesData().getEnvmap();
+    texture_sampling_data.geometric_data.sampling_vector = sample_vector;
+    return envmap.sample(0, 0, texture_sampling_data);
   }
 
 }  // namespace nova::integrator
