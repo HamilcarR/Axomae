@@ -8,8 +8,9 @@ bool NovaPrimitiveInterface::hit(const Ray &r, float tmin, float tmax, hit_data 
   return dispatch(disp);
 }
 
-bool NovaPrimitiveInterface::scatter(const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler) const {
-  auto disp = [&](auto prim) { return prim->scatter(in, out, data, sampler); };
+bool NovaPrimitiveInterface::scatter(
+    const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler, material::shading_data_s &mat_ctx) const {
+  auto disp = [&](auto prim) { return prim->scatter(in, out, data, sampler, mat_ctx); };
   return dispatch(disp);
 }
 

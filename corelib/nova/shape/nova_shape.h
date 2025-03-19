@@ -14,7 +14,7 @@ namespace nova {
 
 namespace nova::shape {
 
-  struct shape_init_record_t {
+  struct shape_init_record_s {
     std::size_t total_triangle_meshes;
     std::size_t total_triangles;
   };
@@ -33,10 +33,10 @@ namespace nova::shape {
     axstd::managed_vector<Square> squares{};
 
    public:
-    NovaShapeInterface add(const Triangle &triangle) { return appendShape(triangle, triangles); }
-    NovaShapeInterface add(const Sphere &sphere) { return appendShape(sphere, spheres); }
-    NovaShapeInterface add(const Box &box) { return appendShape(box, boxes); }
-    NovaShapeInterface add(const Square &square) { return appendShape(square, squares); }
+    NovaShapeInterface add(const Triangle &triangle) { return append(triangle, triangles); }
+    NovaShapeInterface add(const Sphere &sphere) { return append(sphere, spheres); }
+    NovaShapeInterface add(const Box &box) { return append(box, boxes); }
+    NovaShapeInterface add(const Square &square) { return append(square, squares); }
 
     void allocTriangles(std::size_t total_triangle_shapes) { triangles.reserve(total_triangle_shapes); }
     void allocSpheres(std::size_t total_spheres) { spheres.reserve(total_spheres); }
@@ -53,10 +53,8 @@ namespace nova::shape {
 
    private:
     template<class T>
-    NovaShapeInterface appendShape(const T &shape, axstd::managed_vector<T> &shape_vector) {
-      AX_ASSERT_GT(shape_vector.capacity(), 0);
-      AX_ASSERT_LE(shape_vector.size(), shape_vector.capacity());
-
+    NovaShapeInterface append(const T &shape, axstd::managed_vector<T> &shape_vector) {
+      AX_ASSERT_GE(shape_vector.capacity(), shape_vector.size() + 1);
       shape_vector.push_back(shape);
       NovaShapeInterface shape_ptr = &shape_vector.back();
       shapes.push_back(shape_ptr);
@@ -79,7 +77,7 @@ namespace nova::shape {
    public:
     CLASS_DCM(MeshStorageIndexer)
 
-    void allocate(const shape_init_record_t &shape_infos);
+    void allocate(const shape_init_record_s &shape_infos);
     const triangle::GeometryReferenceStorage &getTriangleMesh() const { return triangle_mesh_storage; }
     void clear();
     void mapResources();
@@ -118,7 +116,7 @@ namespace nova::shape {
 
     void addTransform(const glm::mat4 &transform, std::size_t mesh_index);
 
-    void init(const shape_init_record_t &init_data);
+    void init(const shape_init_record_s &init_data);
     void lockResources();
     void releaseResources();
     void mapBuffers();

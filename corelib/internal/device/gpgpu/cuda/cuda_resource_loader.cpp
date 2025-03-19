@@ -1,9 +1,11 @@
+// clang-format off
+#include <internal/device/rendering/opengl/gl_headers.h>
+// clang-format on
 #include "../device_transfer_interface.h"
 #include "../device_utils.h"
 #include "CudaDevice.h"
-#include "internal/device/gpgpu/device_resource_data.h"
+#include "private/utils.h"
 #include <cuda_gl_interop.h>
-#include <driver_types.h>
 #include <vector>
 
 namespace device::gpgpu {
@@ -31,7 +33,10 @@ namespace device::gpgpu {
 
   void init_driver_API() { AX_ASSERT_EQ(cuInit(0), CUDA_SUCCESS); }
   void create_context(GPUContext &context) { AX_ASSERT_EQ(cuCtxCreate(&context.pimpl->context, CU_CTX_SCHED_AUTO, 0), CUDA_SUCCESS); }
-  void set_current_context(GPUContext &context) { AX_ASSERT_EQ(cuCtxSetCurrent(context.pimpl->context), CUDA_SUCCESS); }
+  void get_current_context(GPUContext &context) { AX_ASSERT_EQ(cuCtxGetCurrent(&context.pimpl->context), CUDA_SUCCESS); }
+  void set_current_context(const GPUContext &context) { AX_ASSERT_EQ(cuCtxSetCurrent(context.pimpl->context), CUDA_SUCCESS); }
+  void pop_context(GPUContext &context) { AX_ASSERT_EQ(cuCtxPopCurrent(&context.pimpl->context), CUDA_SUCCESS); }
+  void push_context(GPUContext &context) { AX_ASSERT_EQ(cuCtxPushCurrent(context.pimpl->context), CUDA_SUCCESS); }
 
   /*******************************************************************************************************************************************************************************/
   /** Device Synchronizations **/
@@ -93,7 +98,7 @@ namespace device::gpgpu {
     return gpu_resource;
   }
 
-  inline cudaMemcpyKind get_kind(COPY_MODE copy_type) {
+  cudaMemcpyKind get_kind(COPY_MODE copy_type) {
     switch (copy_type) {
       case HOST_HOST:
         return cudaMemcpyHostToHost;
@@ -124,6 +129,17 @@ namespace device::gpgpu {
     return gpu_resource;
   }
 
+  GPU_query_result async_copy_buffer(const void *src, void *dest, std::size_t buffer_size, COPY_MODE copy_type) {
+    cudaMemcpyKind kind = get_kind(copy_type);
+    DeviceError error = cudaMemcpyAsync(dest, src, buffer_size, kind);
+    DEVICE_ERROR_CHECK(error);
+    GPU_query_result result;
+    result.error_status = error;
+    result.device_ptr = dest;
+    result.size = buffer_size;
+    return result;
+  }
+
   GPU_query_result copy_to_symbol(const void *src, void *symbol, std::size_t buffer_size_bytes, COPY_MODE copy_type) {
     if (!validate_gpu_state())
       return ret_error();
@@ -148,7 +164,7 @@ namespace device::gpgpu {
   /*******************************************************************************************************************************************************************************/
   /** Textures **/
 
-  static int get_channels_num(const channel_format &desc) {
+  int get_channels_num(const channel_format &desc) {
     int i = 0;
     i += desc.bits_size_x ? 1 : 0;
     i += desc.bits_size_y ? 1 : 0;
@@ -157,7 +173,7 @@ namespace device::gpgpu {
     return i;
   }
 
-  static std::size_t texture_type_size(const channel_format &desc) {
+  std::size_t texture_type_size(const channel_format &desc) {
     switch (desc.format_type) {
       case FLOAT:
         return sizeof(float);
@@ -166,7 +182,7 @@ namespace device::gpgpu {
     }
   }
 
-  static cudaResourceType get_resource_type(const resource_descriptor &desc) {
+  cudaResourceType get_resource_type(const resource_descriptor &desc) {
     switch (desc.type) {
       case RESOURCE_ARRAY:
         return cudaResourceTypeArray;
@@ -182,7 +198,7 @@ namespace device::gpgpu {
     }
   }
 
-  static cudaTextureAddressMode get_address_mode(ADDRESS_MODE adrs_mode) {
+  cudaTextureAddressMode get_address_mode(ADDRESS_MODE adrs_mode) {
     switch (adrs_mode) {
       case ADDRESS_WRAP:
         return cudaAddressModeWrap;
@@ -198,13 +214,13 @@ namespace device::gpgpu {
     }
   }
 
-  static void set_address_mode(cudaTextureAddressMode address_mode[3], const texture_descriptor &desc) {
+  void set_address_mode(cudaTextureAddressMode address_mode[3], const texture_descriptor &desc) {
     address_mode[0] = get_address_mode(desc.address_mode[0]);
     address_mode[1] = get_address_mode(desc.address_mode[1]);
     address_mode[2] = get_address_mode(desc.address_mode[2]);
   }
 
-  static cudaTextureFilterMode get_filter_mode(const texture_descriptor &texture_descriptor) {
+  cudaTextureFilterMode get_filter_mode(const texture_descriptor &texture_descriptor) {
     switch (texture_descriptor.filter_mode) {
       case FILTER_POINT:
         return cudaFilterModePoint;
@@ -216,7 +232,7 @@ namespace device::gpgpu {
     }
   }
 
-  static cudaTextureReadMode get_read_mode(const texture_descriptor &texture_descriptor) {
+  cudaTextureReadMode get_read_mode(const texture_descriptor &texture_descriptor) {
     switch (texture_descriptor.read_mode) {
       case READ_ELEMENT_TYPE:
         return cudaReadModeElementType;
@@ -228,7 +244,7 @@ namespace device::gpgpu {
     }
   }
 
-  static void set_resource_struct(const resource_descriptor &desc, cudaResourceDesc &cuda_desc) {
+  void set_resource_struct(const resource_descriptor &desc, cudaResourceDesc &cuda_desc) {
     switch (desc.type) {
       case RESOURCE_ARRAY:
         cuda_desc.res.array.array = static_cast<cudaArray_t>(desc.resource_buffer_descriptors.res.array.array);
@@ -253,7 +269,7 @@ namespace device::gpgpu {
     cuda_device_params.setTextureDesc(cuda_texture_descriptor);
   }
 
-  static cudaChannelFormatKind convert_type(FORMAT_TYPE type) {
+  cudaChannelFormatKind convert_type(FORMAT_TYPE type) {
     switch (type) {
       case FLOAT:
         return cudaChannelFormatKindFloat;
@@ -418,10 +434,25 @@ namespace device::gpgpu {
   GPUGraphicsResrcHandle::GPUGraphicsResrcHandle(GPUGraphicsResrcHandle &&) noexcept = default;
   GPUGraphicsResrcHandle &GPUGraphicsResrcHandle::operator=(GPUGraphicsResrcHandle &&) noexcept = default;
 
-  bool GPUGraphicsResrcHandle::isMapped() const { return pimpl->is_mapped; }
-  bool GPUGraphicsResrcHandle::isRegistered() const { return pimpl->is_registered; }
+  bool GPUGraphicsResrcHandle::isMapped() const { return pimpl && pimpl->is_mapped; }
+  bool GPUGraphicsResrcHandle::isRegistered() const { return pimpl && pimpl->is_registered; }
 
-  static cudaGraphicsRegisterFlags get_interop_read_flag(ACCESS_TYPE access_type) {
+  class GPUArray::Impl {
+   public:
+    cudaArray_t array{};
+
+    Impl() = default;
+    explicit Impl(cudaArray_t array_) : array(array_) {};
+  };
+
+  cudaArray_t &retrieve_internal(const GPUArray &array) { return array.pimpl->array; }
+
+  GPUArray::GPUArray() : pimpl(std::make_unique<Impl>()) {}
+  GPUArray::~GPUArray() = default;
+  GPUArray::GPUArray(GPUArray &&) noexcept = default;
+  GPUArray &GPUArray::operator=(GPUArray &&) noexcept = default;
+
+  cudaGraphicsRegisterFlags get_interop_read_flag(ACCESS_TYPE access_type) {
     switch (access_type) {
       case READ_WRITE:
         return cudaGraphicsRegisterFlagsNone;
@@ -477,6 +508,12 @@ namespace device::gpgpu {
       if (result.error_status.isValid())
         gpu_resources_array[i].pimpl->is_mapped = false;
     ;
+    return result;
+  }
+
+  GPU_query_result interop_get_mapped_array(GPUArray &texture, GPUGraphicsResrcHandle &gpu_graphics_resource, unsigned idx, unsigned mip) {
+    GPU_query_result result{};
+    result.error_status = DeviceError(cudaGraphicsSubResourceGetMappedArray(&texture.pimpl->array, gpu_graphics_resource.pimpl->handle, idx, mip));
     return result;
   }
 

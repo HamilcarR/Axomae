@@ -37,7 +37,6 @@ namespace nova {
 
     GENERATE_GETTERS(engine::EngineResourcesHolder, EngineData, resources.renderer_data)
     GENERATE_GETTERS(scene::SceneResourcesHolder, SceneData, resources.scene_data)
-    GENERATE_GETTERS(texturing::TextureRawData, EnvmapData, resources.scene_data.envmap_data)
     GENERATE_GETTERS(texturing::TextureResourcesHolder, TexturesData, resources.scene_data.textures_data)
     GENERATE_GETTERS(material::MaterialResourcesHolder, MaterialData, resources.scene_data.materials_data)
     GENERATE_GETTERS(camera::CameraResourcesHolder, CameraData, resources.scene_data.camera_data)
@@ -58,8 +57,6 @@ namespace nova {
 
     /* Will take ownership of acceleration_structure */
     void setManagedApiAccelerationStructure(aggregate::DefaultAccelerator &&acceleration_structure);
-    /* Scene: Textures */
-    void envmapSetData(float *raw_data, int width, int height, int channels);
   };
 }  // namespace nova
 

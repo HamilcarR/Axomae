@@ -1,7 +1,6 @@
 #ifndef DEVICE_RESOURCE_DESCRIPTORS_H
 #define DEVICE_RESOURCE_DESCRIPTORS_H
 
-#include <any>
 #include <memory>
 
 namespace device::gpgpu {
@@ -95,6 +94,21 @@ namespace device::gpgpu {
     GPUContext &operator=(const GPUContext &) = delete;
     GPUContext(GPUContext &&) noexcept;
     GPUContext &operator=(GPUContext &&) noexcept;
+  };
+
+  /************************************************************************************************************************************************************************************/
+  class GPUArray {
+    class Impl;
+
+   public:
+    std::unique_ptr<Impl> pimpl;
+
+    GPUArray();
+    ~GPUArray();
+    GPUArray(const GPUArray &) = delete;
+    GPUArray &operator=(const GPUArray &) = delete;
+    GPUArray(GPUArray &&) noexcept;
+    GPUArray &operator=(GPUArray &&) noexcept;
   };
 
 }  // namespace device::gpgpu

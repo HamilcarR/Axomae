@@ -4,7 +4,9 @@
 #include "device_resource_data.h"
 #include "device_resource_descriptors.h"
 #include "device_texture_descriptors.h"
-#include <internal/device/rendering/opengl/gl_headers.h>
+
+using GLuint = unsigned int;
+using GLenum = unsigned int;
 
 /* Interface to load various resources to gpu in an agnostic way. */
 namespace device::gpgpu {
@@ -15,7 +17,13 @@ namespace device::gpgpu {
   /** Context Sharing **/
   void init_driver_API();
   void create_context(GPUContext &context);
-  void set_current_context(GPUContext &context);
+  /** Sets 'context' as the current gpu context.*/
+  void set_current_context(const GPUContext &context);
+  /** Registers the current gpu context inside the opaque type 'context'.*/
+  void get_current_context(GPUContext &context);
+  void pop_context(GPUContext &context);
+  void push_context(GPUContext &context);
+
   /*******************************************************************************************************************************************************************************/
   /** Device Synchronizations **/
   GPU_query_result synchronize_device();
@@ -32,6 +40,7 @@ namespace device::gpgpu {
   GPU_query_result allocate_buffer(std::size_t buffer_size_bytes);
   GPU_query_result allocate_symbol(void **symbol, std::size_t buffer_size_bytes);
   GPU_query_result copy_buffer(const void *src, void *dest, std::size_t buffer_size_bytes, COPY_MODE copy_type);
+  GPU_query_result async_copy_buffer(const void *src, void *dest, std::size_t buffer_size, COPY_MODE copy_type);
   GPU_query_result copy_to_symbol(const void *src, void *dest, std::size_t buffer_size_bytes, COPY_MODE copy_type);
   GPU_query_result deallocate_buffer(void *device_ptr);
 
@@ -130,6 +139,10 @@ namespace device::gpgpu {
    */
   GPU_query_result interop_register_glbuffer(GLuint vbo_id, GPUGraphicsResrcHandle &resource_handle, ACCESS_TYPE access_type);
   GPU_query_result interop_register_glimage(GLuint tex_id, GLenum target, GPUGraphicsResrcHandle &resource_handle, ACCESS_TYPE access_type);
+  GPU_query_result interop_get_mapped_array(GPUArray &returned_texture,
+                                            GPUGraphicsResrcHandle &gpu_graphics_resource,
+                                            unsigned array_index,
+                                            unsigned mipmap);
   GPU_query_result interop_unregister_resrc(GPUGraphicsResrcHandle &gpu_graphics_resource);
   GPU_query_result interop_map_resrc(int count, GPUGraphicsResrcHandle *gpu_resources_array, GPUStream &stream);
   GPU_query_result interop_unmap_resrc(int count, GPUGraphicsResrcHandle *gpu_resources_array, GPUStream &stream);

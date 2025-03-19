@@ -35,7 +35,7 @@
 #  define ax_device_callable
 #  define ax_device_shared
 #  define ax_device_only
-#  define ax_device_inlined
+#  define ax_device_inlined inline
 #  define ax_device_callable_inlined inline
 #  define ax_device_const
 #  define ax_device_managed
@@ -58,7 +58,7 @@
 #  define AX_GPU_FASTPOW(x, y) powf((x), (y))
 #  define AX_GPU_FASTTANH(value) tanhf(value)
 #  define AX_GPU_FLOORF(val) floorf(val)
-#  define AX_GPU_ABS(val) abs(val)
+#  define AX_GPU_ABS(val) fabsf(val)
 
 #endif
 #endif  // DEVICE_UTILS_H

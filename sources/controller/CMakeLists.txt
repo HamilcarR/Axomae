@@ -3,7 +3,7 @@ add_library(ax_controller STATIC
     OperatorProgressStatus.cpp
     GUIWindow.cpp
     GUIWindow_slots.cpp
-    GUIWindow_nova_bake.cpp
+    Controller_nova_bake.cpp
     WorkspaceTracker.cpp
     ExceptionHandlerUI.cpp
     cmd/API.cpp

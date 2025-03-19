@@ -40,7 +40,7 @@ add_subdirectory(manager)
 add_subdirectory(spectrum)
 
 if(AXOMAE_USE_CUDA)
-    add_subdirectory(gpu)
     set_source_files_properties(DrawEngine_GPU.cpp PROPERTIES LANGUAGE CUDA)
     target_compile_definitions(ax_core_nova PRIVATE AXOMAE_USE_CUDA)
+    target_sources(ax_core_nova PUBLIC gpu/DeviceImageTracker.cpp)
 endif()

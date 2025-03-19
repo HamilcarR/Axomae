@@ -1,16 +1,12 @@
 #include "Drawable.h"
-#include "MaterialInterface.h"
 #include "Mesh.h"
-#include "TextureGroup.h"
 #include "aggregate/acceleration_interface.h"
 #include "bake.h"
 #include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
 #include "primitive/PrimitiveInterface.h"
-#include "primitive/nova_primitive.h"
 #include "shape/nova_shape.h"
 #include <internal/common/axstd/span.h>
-#include <internal/macro/project_macros.h>
 
 namespace nova_baker_utils {
 
@@ -49,42 +45,59 @@ namespace nova_baker_utils {
     return meshes;
   }
 
-  static void initialize_resources_holders(nova::NovaResourceManager &manager, std::size_t triangle_mesh_number, std::size_t triangle_number) {
+  struct resource_holders_inits_s {
+    std::size_t triangle_mesh_number;
+    std::size_t triangle_number;
+    std::size_t dielectrics_number;
+    std::size_t diffuse_number;
+    std::size_t conductors_number;
+    std::size_t image_texture_number;
+    std::size_t constant_texture_number;
+  };
+
+  static void initialize_resources_holders(nova::NovaResourceManager &manager, const resource_holders_inits_s &resrc) {
     auto &shape_reshdr = manager.getShapeData();
-    nova::shape::shape_init_record_t init_data{};
-    init_data.total_triangle_meshes = triangle_mesh_number;
-    init_data.total_triangles = triangle_number;
-    shape_reshdr.init(init_data);
+    nova::shape::shape_init_record_s shape_init_data{};
+    shape_init_data.total_triangle_meshes = resrc.triangle_mesh_number;
+    shape_init_data.total_triangles = resrc.triangle_number;
+    shape_reshdr.init(shape_init_data);
+
+    nova::material::material_init_record_s material_init_data{};
+    material_init_data.conductors_size = resrc.conductors_number;
+    material_init_data.dielectrics_size = resrc.dielectrics_number;
+    material_init_data.diffuse_size = resrc.diffuse_number;
+    auto &material_resrc = manager.getMaterialData();
+    material_resrc.init(material_init_data);
+
+    nova::texturing::texture_init_record_s texture_init_data{};
+    texture_init_data.constant_texture_size = resrc.constant_texture_number;
+    texture_init_data.image_texture_size = resrc.image_texture_number;
+    auto &texture_resrc = manager.getTexturesData();
+    texture_resrc.init(texture_init_data);
   }
 
-  bake_buffers_storage_t build_scene(const std::vector<drawable_original_transform> &drawables_orig_transfo, nova::NovaResourceManager &manager) {
+  void build_scene(const std::vector<drawable_original_transform> &drawables_orig_transfo, nova::NovaResourceManager &manager) {
     core::memory::ByteArena &memory_pool = manager.getMemoryPool();
     std::vector<Mesh *> meshes = retrieve_meshes_from_drawables(drawables_orig_transfo);
     /* Allocate for triangles */
     std::size_t primitive_number = compute_primitive_number(meshes);
     primitive_buffers_t primitive_buffers = allocate_primitive_triangle_buffers(memory_pool, primitive_number);
 
-    /* Allocate one singular contiguous buffer of ImageTexture objects*/
-    auto *image_texture_buffer = reinterpret_cast<nova::texturing::ImageTexture *>(
-        memory_pool.allocate(PBR_PIPELINE_TEX_NUM * meshes.size() * sizeof(nova::texturing::ImageTexture), "ImageTexture buffer"));
-    texture_buffers_t texture_buffers{};
-    texture_buffers.image_alloc_buffer = axstd::span<nova::texturing::ImageTexture>(image_texture_buffer, PBR_PIPELINE_TEX_NUM * meshes.size());
-    material_buffers_t material_buffers = allocate_materials_buffers(manager.getMemoryPool(), meshes.size());
-    initialize_resources_holders(manager, meshes.size(), primitive_number);
-    std::size_t alloc_offset_primitives = 0, alloc_offset_materials = 0, alloc_offset_textures = 0, mesh_index = 0;
+    resource_holders_inits_s resrc{};
+    resrc.triangle_mesh_number = meshes.size();
+    resrc.triangle_number = primitive_number;
+    resrc.conductors_number = meshes.size();
+    resrc.diffuse_number = meshes.size();
+    resrc.dielectrics_number = meshes.size();
+    resrc.image_texture_number = meshes.size() * PBR_PIPELINE_TEX_NUM;
+    initialize_resources_holders(manager, resrc);
+
+    std::size_t alloc_offset_primitives = 0, mesh_index = 0;
     for (const drawable_original_transform &dtf : drawables_orig_transfo) {
-
-      nova::material::NovaMaterialInterface material = setup_material_data(
-          material_buffers, texture_buffers, *dtf.mesh, manager, alloc_offset_textures, alloc_offset_materials);
-
+      nova::material::NovaMaterialInterface material = setup_material_data(*dtf.mesh, manager);
       setup_geometry_data(primitive_buffers, dtf, alloc_offset_primitives, material, manager, mesh_index);
       mesh_index++;
     }
-    bake_buffers_storage_t bake_buffers_storage{};
-    bake_buffers_storage.material_buffers = material_buffers;
-    bake_buffers_storage.primitive_buffers = primitive_buffers;
-    bake_buffers_storage.texture_buffers = texture_buffers;
-    return bake_buffers_storage;
   }
 
   nova::aggregate::DefaultAccelerator build_api_managed_acceleration_structure(nova::aggregate::primitive_aggregate_data_s primitive_geometry) {

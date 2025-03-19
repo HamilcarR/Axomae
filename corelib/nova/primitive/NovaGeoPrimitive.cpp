@@ -12,8 +12,9 @@ namespace nova::primitive {
     return shape.hit(r, tmin, tmax, data, geometry);
   }
 
-  bool NovaGeoPrimitive::scatter(const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler) const {
-    return material.scatter(in, out, data, sampler);
+  bool NovaGeoPrimitive::scatter(
+      const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler, material::shading_data_s &material_ctx) const {
+    return material.scatter(in, out, data, sampler, material_ctx);
   }
 
   glm::vec3 NovaGeoPrimitive::centroid(const shape::MeshCtx &geometry) const { return shape.centroid(geometry); }
