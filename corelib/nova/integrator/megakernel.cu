@@ -29,6 +29,7 @@ namespace nova {
       nova::shape::MeshCtx geometry_context;
       texturing::TextureCtx texture_context;
       axstd::span<const nova::material::NovaMaterialInterface> materials;
+      axstd::span<const primitive::NovaPrimitiveInterface> primitives;
     };
 
     ax_device_only void shade(render_buffer_t &render_buffer, float u, float v, glm::vec4 color) {
@@ -75,7 +76,8 @@ namespace nova {
       texturing::texture_data_aggregate_s texture_data_aggregate;
       texture_data_aggregate.texture_ctx = &args.texture_context;
       shading_data.texture_aggregate = &texture_data_aggregate;
-      mat.scatter(in, out, hit_d, sampler_interface, shading_data);
+      auto prim = args.primitives[0];
+      bool b = prim.scatter(in, out, hit_d, sampler_interface, shading_data);
       shade(render_buffer, x, y, glm::vec4(1.f));
     }
   }  // namespace gpu
@@ -102,6 +104,7 @@ namespace nova {
     arguments.generator = gpu_structures.random_generator;
     arguments.geometry_context = nova::shape::MeshCtx(nova_internals.resource_manager->getShapeData().getMeshSharedViews());
     arguments.materials = resource_manager->getMaterialData().getMaterialView();
+    arguments.primitives = resource_manager->getPrimitiveData().getPrimitiveView();
     arguments.texture_context = resource_manager->getTexturesData().getTextureBundleViews();
     exec_kernel(gpu_structures.threads_distribution, gpu::test_func, render_buffer, arguments);
     DEVICE_ERROR_CHECK(resrc::copy_buffer(draw_buffer.device_ptr, buffers->partial_buffer, screen_size, resrc::DEVICE_HOST).error_status);

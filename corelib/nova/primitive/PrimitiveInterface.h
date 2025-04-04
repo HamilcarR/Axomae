@@ -21,5 +21,6 @@ namespace nova::primitive {
 }  // namespace nova::primitive
 
 using primitives_view_tn = axstd::span<nova::primitive::NovaPrimitiveInterface>;
+using CstPrimitivesView = axstd::span<const nova::primitive::NovaPrimitiveInterface>;
 
 #endif  // PRIMITIVEINTERFACE_H

@@ -3,6 +3,7 @@ autoload_build_utils()
 add_library(ax_core_nova_primitive STATIC
         NovaGeoPrimitive.cpp
         PrimitiveInterface.cpp
+        nova_primitive.cpp
 )
 
 

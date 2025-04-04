@@ -24,20 +24,15 @@ namespace nova_baker_utils {
     std::size_t mesh_index;
     std::size_t triangle_index;
   };
-  static void store_primitive(std::size_t alloc_offset_primitives,
-                              primitive_buffers_t &p_buffers,
-                              const nova::material::NovaMaterialInterface &mat,
+  static void store_primitive(const nova::material::NovaMaterialInterface &mat,
                               nova::NovaResourceManager &manager,
                               const triangle_mesh_properties_t &m_indices) {
     nova::shape::ShapeResourcesHolder &res_holder = manager.getShapeData();
     auto tri = res_holder.addShape<nova::shape::Triangle>(m_indices.mesh_index, m_indices.triangle_index);
-    manager.getPrimitiveData().add_primitive<nova::primitive::NovaGeoPrimitive>(
-        p_buffers.geo_primitive_alloc_buffer.data(), alloc_offset_primitives, tri, mat);
+    manager.getPrimitiveData().addPrimitive<nova::primitive::NovaGeoPrimitive>(tri, mat);
   }
 
-  void setup_geometry_data(primitive_buffers_t &geometry_buffers,
-                           const drawable_original_transform &drawable_transform,
-                           std::size_t &alloc_offset_primitives,
+  void setup_geometry_data(const drawable_original_transform &drawable_transform,
                            nova::material::NovaMaterialInterface &material,
                            nova::NovaResourceManager &manager,
                            std::size_t mesh_index) {
@@ -49,8 +44,7 @@ namespace nova_baker_utils {
       triangle_mesh_properties_t m_indices{};
       m_indices.mesh_index = mesh_index;
       m_indices.triangle_index = triangle_index;
-      store_primitive(alloc_offset_primitives, geometry_buffers, material, manager, m_indices);
-      alloc_offset_primitives++;
+      store_primitive(material, manager, m_indices);
     }
     nova::shape::ShapeResourcesHolder &res_holder = manager.getShapeData();
     std::size_t stored_mesh_index = res_holder.addTriangleMesh(geometry);

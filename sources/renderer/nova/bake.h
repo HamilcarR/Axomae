@@ -33,9 +33,7 @@ namespace image {
 }
 namespace nova_baker_utils {
 
-  void setup_geometry_data(primitive_buffers_t &geometry_buffers,
-                           const drawable_original_transform &drawable,
-                           std::size_t &alloc_offset_primitives,
+  void setup_geometry_data(const drawable_original_transform &drawable,
                            nova::material::NovaMaterialInterface &material,
                            nova::NovaResourceManager &manager,
                            std::size_t mesh_index);

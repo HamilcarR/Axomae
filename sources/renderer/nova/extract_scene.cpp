@@ -48,19 +48,27 @@ namespace nova_baker_utils {
   struct resource_holders_inits_s {
     std::size_t triangle_mesh_number;
     std::size_t triangle_number;
+
     std::size_t dielectrics_number;
     std::size_t diffuse_number;
     std::size_t conductors_number;
+
     std::size_t image_texture_number;
     std::size_t constant_texture_number;
   };
 
   static void initialize_resources_holders(nova::NovaResourceManager &manager, const resource_holders_inits_s &resrc) {
-    auto &shape_reshdr = manager.getShapeData();
     nova::shape::shape_init_record_s shape_init_data{};
     shape_init_data.total_triangle_meshes = resrc.triangle_mesh_number;
     shape_init_data.total_triangles = resrc.triangle_number;
+    auto &shape_reshdr = manager.getShapeData();
     shape_reshdr.init(shape_init_data);
+
+    nova::primitive::primitive_init_record_s primitive_init_data{};
+    primitive_init_data.geometric_primitive_count = resrc.triangle_number;
+    primitive_init_data.total_primitive_count = primitive_init_data.geometric_primitive_count;
+    auto &primitive_reshdr = manager.getPrimitiveData();
+    primitive_reshdr.init(primitive_init_data);
 
     nova::material::material_init_record_s material_init_data{};
     material_init_data.conductors_size = resrc.conductors_number;
@@ -92,10 +100,10 @@ namespace nova_baker_utils {
     resrc.image_texture_number = meshes.size() * PBR_PIPELINE_TEX_NUM;
     initialize_resources_holders(manager, resrc);
 
-    std::size_t alloc_offset_primitives = 0, mesh_index = 0;
+    std::size_t mesh_index = 0;
     for (const drawable_original_transform &dtf : drawables_orig_transfo) {
       nova::material::NovaMaterialInterface material = setup_material_data(*dtf.mesh, manager);
-      setup_geometry_data(primitive_buffers, dtf, alloc_offset_primitives, material, manager, mesh_index);
+      setup_geometry_data(dtf, material, manager, mesh_index);
       mesh_index++;
     }
   }
