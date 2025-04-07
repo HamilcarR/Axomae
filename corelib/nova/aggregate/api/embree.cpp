@@ -95,10 +95,10 @@ namespace nova::aggregate {
 
 #define acceleration_internal_interface \
  protected \
-  AccelerationInternalsInterface<GenericAccelerator<EmbreeBuild>::Impl>
+  AccelerationInternalsInterface<GenericHostAccelerator<EmbreeBuild>::Impl>
 
   template<>
-  class GenericAccelerator<EmbreeBuild>::Impl : acceleration_internal_interface {
+  class GenericHostAccelerator<EmbreeBuild>::Impl : acceleration_internal_interface {
 
     struct user_geometry_structure_s {
       std::size_t transform_offset;
@@ -306,23 +306,23 @@ namespace nova::aggregate {
 
   /****************************************************************************************************************************************************************************/
   template<>
-  GenericAccelerator<EmbreeBuild>::GenericAccelerator() : pimpl(std::make_unique<Impl>()) {}
+  GenericHostAccelerator<EmbreeBuild>::GenericHostAccelerator() : pimpl(std::make_unique<Impl>()) {}
   template<>
-  GenericAccelerator<EmbreeBuild>::~GenericAccelerator() = default;
+  GenericHostAccelerator<EmbreeBuild>::~GenericHostAccelerator() = default;
   template<>
-  GenericAccelerator<EmbreeBuild>::GenericAccelerator(GenericAccelerator &&) noexcept = default;
+  GenericHostAccelerator<EmbreeBuild>::GenericHostAccelerator(GenericHostAccelerator &&) noexcept = default;
   template<>
-  GenericAccelerator<EmbreeBuild> &GenericAccelerator<EmbreeBuild>::operator=(GenericAccelerator &&) noexcept = default;
+  GenericHostAccelerator<EmbreeBuild> &GenericHostAccelerator<EmbreeBuild>::operator=(GenericHostAccelerator &&) noexcept = default;
   template<>
-  void GenericAccelerator<EmbreeBuild>::build(primitive_aggregate_data_s meshes) {
+  void GenericHostAccelerator<EmbreeBuild>::build(primitive_aggregate_data_s meshes) {
     pimpl->build(meshes);
   }
   template<>
-  bool GenericAccelerator<EmbreeBuild>::hit(const Ray &ray, bvh_hit_data &hit_data) const {
+  bool GenericHostAccelerator<EmbreeBuild>::hit(const Ray &ray, bvh_hit_data &hit_data) const {
     return pimpl->intersect(ray, hit_data);
   }
   template<>
-  void GenericAccelerator<EmbreeBuild>::cleanup() {
+  void GenericHostAccelerator<EmbreeBuild>::cleanup() {
     pimpl->cleanup();
   }
 

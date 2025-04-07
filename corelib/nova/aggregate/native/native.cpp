@@ -8,13 +8,13 @@ namespace nova::aggregate {
 
 #define acceleration_internal_interface \
  protected \
-  AccelerationInternalsInterface<GenericAccelerator<NativeBuild>::Impl>
+  AccelerationInternalsInterface<GenericHostAccelerator<NativeBuild>::Impl>
 
   namespace prim = nova::primitive;
   using primitive_ptr = prim::NovaPrimitiveInterface;
 
   template<>
-  class GenericAccelerator<NativeBuild>::Impl : acceleration_internal_interface {
+  class GenericHostAccelerator<NativeBuild>::Impl : acceleration_internal_interface {
     Bvht_data bvh;
     shape::MeshCtx geometry_context;
     primitive_aggregate_data_s scene;
@@ -118,23 +118,23 @@ namespace nova::aggregate {
   /****************************************************************************************************************************************************************************/
 
   template<>
-  GenericAccelerator<NativeBuild>::GenericAccelerator() : pimpl(std::make_unique<Impl>()) {}
+  GenericHostAccelerator<NativeBuild>::GenericHostAccelerator() : pimpl(std::make_unique<Impl>()) {}
   template<>
-  GenericAccelerator<NativeBuild>::~GenericAccelerator() {}
+  GenericHostAccelerator<NativeBuild>::~GenericHostAccelerator() {}
   template<>
-  GenericAccelerator<NativeBuild>::GenericAccelerator(GenericAccelerator &&) noexcept = default;
+  GenericHostAccelerator<NativeBuild>::GenericHostAccelerator(GenericHostAccelerator &&) noexcept = default;
   template<>
-  GenericAccelerator<NativeBuild> &GenericAccelerator<NativeBuild>::operator=(GenericAccelerator &&) noexcept = default;
+  GenericHostAccelerator<NativeBuild> &GenericHostAccelerator<NativeBuild>::operator=(GenericHostAccelerator &&) noexcept = default;
   template<>
-  void GenericAccelerator<NativeBuild>::build(primitive_aggregate_data_s meshes) {
+  void GenericHostAccelerator<NativeBuild>::build(primitive_aggregate_data_s meshes) {
     pimpl->build(meshes);
   }
   template<>
-  bool GenericAccelerator<NativeBuild>::hit(const Ray &ray, bvh_hit_data &hit_data) const {
+  bool GenericHostAccelerator<NativeBuild>::hit(const Ray &ray, bvh_hit_data &hit_data) const {
     return pimpl->intersect(ray, hit_data);
   }
   template<>
-  void GenericAccelerator<NativeBuild>::cleanup() {
+  void GenericHostAccelerator<NativeBuild>::cleanup() {
     pimpl->cleanup();
   }
 
