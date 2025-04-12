@@ -1,3 +1,4 @@
+set(VENDOR_PATH ${CMAKE_CURRENT_SOURCE_DIR}/ PARENT_SCOPE)
 #########################################################################################
 # Assimp
 if(NOT Assimp_FOUND)
@@ -80,7 +81,6 @@ if(NOT SDL2_image_FOUND)
 endif()
 #########################################################################################
 # Embree
-
 
 if(AXOMAE_USE_EMBREE)
   find_package(TBB REQUIRED)
