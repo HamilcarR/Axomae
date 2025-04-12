@@ -8,9 +8,10 @@ target_link_libraries(ax_core_nova_manager PRIVATE
         ax_core_geometry
         ax_core_math
         ax_core_macro
-        ax_core_nova_sampler
         ax_core_memory
         ax_core_device
+        ax_core_nova_sampler
+        ax_core_nova_aggregate
 )
 
 target_link_libraries(ax_core_nova PUBLIC ax_core_nova_manager)

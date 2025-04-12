@@ -114,4 +114,11 @@ namespace nova_baker_utils {
     return acceleration;
   }
 
+  std::unique_ptr<nova::aggregate::DeviceAcceleratorInterface> build_device_managed_acceleration_structure(
+      nova::aggregate::primitive_aggregate_data_s primitive_geometry) {
+    auto device_builder = nova::aggregate::DeviceAcceleratorInterface::make();
+    device_builder->build(primitive_geometry);
+    return device_builder;
+  };
+
 }  // namespace nova_baker_utils

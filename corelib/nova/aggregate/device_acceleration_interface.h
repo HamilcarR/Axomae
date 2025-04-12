@@ -13,20 +13,14 @@ namespace nova::aggregate {
     ax_device_only virtual bool hit(const Ray &ray, bvh_hit_data &hit_data) = 0;
   };
 
-#ifdef AXOMAE_USE_CUDA
-#  include <optix_host.h>
-  using AcceleratorHandle = OptixTraversableHandle;
-
-  class OptixIntersector : public DeviceIntersectorInterface {
+  using AcceleratorHandle = unsigned long long;
+  class DeviceIntersector : public DeviceIntersectorInterface {
     AcceleratorHandle accelerator;
 
    public:
-    ax_device_only OptixIntersector(AcceleratorHandle handle_id);
+    ax_device_only DeviceIntersector(AcceleratorHandle handle_id);
     ax_device_only bool hit(const Ray &ray, bvh_hit_data &hit_data) override;
   };
-#else
-  using AcceleratorHandler = unsigned long long;
-#endif
 
   /**
    * Abstraction of a generic gpu AS builder.
@@ -38,7 +32,7 @@ namespace nova::aggregate {
     virtual AcceleratorHandle build(primitive_aggregate_data_s primitive_data_list) = 0;
     virtual void cleanup() = 0;
     /**
-     * Uses current backend to return an opaque AS builder.
+     * Uses currently built backend to return an opaque AS builder.
      */
     static std::unique_ptr<DeviceAcceleratorInterface> make();  // Independently implemented in api/devaccel_factory.cpp
   };

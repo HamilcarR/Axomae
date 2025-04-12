@@ -41,6 +41,8 @@ namespace nova_baker_utils {
   nova::material::NovaMaterialInterface setup_material_data(const Drawable &drawable, nova::NovaResourceManager &manager);
   void build_scene(const std::vector<drawable_original_transform> &drawables, nova::NovaResourceManager &manager);
   nova::aggregate::DefaultAccelerator build_api_managed_acceleration_structure(nova::aggregate::primitive_aggregate_data_s primitive_geometry);
+  std::unique_ptr<nova::aggregate::DeviceAcceleratorInterface> build_device_managed_acceleration_structure(
+      nova::aggregate::primitive_aggregate_data_s primitive_geometry);
   primitive_buffers_t allocate_primitive_triangle_buffers(core::memory::ByteArena &memory_pool, std::size_t number_elements);
 
   /* Takes an initialized NovaResourceManager.*/

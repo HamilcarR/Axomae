@@ -116,7 +116,10 @@ namespace controller {
     aggregate.mesh_geometry = mesh_geometry;
     auto accelerator = nova_baker_utils::build_api_managed_acceleration_structure(aggregate);
     nova_resource_manager->setManagedApiAccelerationStructure(std::move(accelerator));
-
+#ifdef AXOMAE_USE_CUDA
+    auto device_accelerator = nova_baker_utils::build_device_managed_acceleration_structure(aggregate);
+    nova_resource_manager->setManagedGpuAccelerationStructure(std::move(device_accelerator));
+#endif
     progress_manager.reset();
   }
 

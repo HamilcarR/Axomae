@@ -1,7 +1,7 @@
 #include "../device_acceleration_interface.h"
 
 #ifdef AXOMAE_USE_CUDA
-#  include "optix_includes.h"
+#  include "optix/internal.h"
 #endif
 
 namespace nova::aggregate {

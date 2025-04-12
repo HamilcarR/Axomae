@@ -11,6 +11,7 @@
 #include <internal/macro/project_macros.h>
 
 namespace nova {
+
   class NovaResources {
    public:
     engine::EngineResourcesHolder renderer_data{};
@@ -19,6 +20,10 @@ namespace nova {
    public:
     CLASS_M(NovaResources)
   };
+
+  namespace aggregate {
+    class DeviceAcceleratorInterface;
+  }
 
   class NovaResourceManager {
    private:
@@ -29,11 +34,12 @@ namespace nova {
 
    public:
     NovaResourceManager() = default;
-    ~NovaResourceManager() = default;
+    ~NovaResourceManager();
+    NovaResourceManager(NovaResourceManager &&) noexcept;
+    NovaResourceManager &operator=(NovaResourceManager &&) noexcept;
+
     NovaResourceManager(const NovaResourceManager &) = delete;
-    NovaResourceManager(NovaResourceManager &&) noexcept = default;
     NovaResourceManager &operator=(const NovaResourceManager &) = delete;
-    NovaResourceManager &operator=(NovaResourceManager &&) noexcept = default;
 
     GENERATE_GETTERS(engine::EngineResourcesHolder, EngineData, resources.renderer_data)
     GENERATE_GETTERS(scene::SceneResourcesHolder, SceneData, resources.scene_data)
@@ -57,6 +63,7 @@ namespace nova {
 
     /* Will take ownership of acceleration_structure */
     void setManagedApiAccelerationStructure(aggregate::DefaultAccelerator &&acceleration_structure);
+    void setManagedGpuAccelerationStructure(std::unique_ptr<aggregate::DeviceAcceleratorInterface> acceleration_structure);
   };
 }  // namespace nova
 

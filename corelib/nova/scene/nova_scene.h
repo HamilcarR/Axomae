@@ -1,12 +1,14 @@
 #ifndef NOVA_SCENE_H
 #define NOVA_SCENE_H
 #include "aggregate/acceleration_interface.h"
+#include "aggregate/device_acceleration_interface.h"
 #include "camera/nova_camera.h"
 #include "material/nova_material.h"
 #include "primitive/nova_primitive.h"
 #include "shape/nova_shape.h"
 #include "texturing/nova_texturing.h"
 #include <memory>
+
 namespace nova::scene {
   class SceneTransformations {
    public:
@@ -39,6 +41,7 @@ namespace nova::scene {
     primitive::PrimitivesResourcesHolder primitive_data{};
     shape::ShapeResourcesHolder shape_data{};
     aggregate::DefaultAccelerator api_accelerator{};
+    std::unique_ptr<aggregate::DeviceAcceleratorInterface> device_accelerator;
     SceneTransformations scene_transformations{};
   };
 

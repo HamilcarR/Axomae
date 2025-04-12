@@ -67,7 +67,15 @@ if (AXOMAE_USE_CUDA AND CUDAToolkit_FOUND)
     enable_language(CUDA) 
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr -std=c++17 -G")
     set(CUDA_GENERATED_OUTPUT_DIR ${CMAKE_BINARY_DIR}/cuda_generated)
+    # Optix
+    set(OPTIX_INCLUDE_PATH "" CACHE INTERNAL "")
+    set(OPTIX_LIB "" CACHE FILEPATH "Provide liboptix.so" )
+
 endif ()
+
+
+
+
 
 # UI files path
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${AXOMAE_UI_LOCATION})
@@ -81,9 +89,6 @@ set(STB_INCLUDE_PATH "" CACHE INTERNAL "")
 # GLM
 set(GLM_INCLUDE_PATH "" CACHE INTERNAL "")
 
-# Optix
-set(OPTIX_INCLUDE_PATH "" CACHE INTERNAL "")
-
 # Boost
 set(BOOST_INCLUDE_PATH "" CACHE INTERNAL "")
 
@@ -92,6 +97,9 @@ set(OPENEXR_INCLUDE_PATH "" CACHE INTERNAL "")
 
 # GTest
 set(GTEST_INCLUDE_PATH "" CACHE INTERNAL "")
+
+# For libraries without build system
+set(VENDOR_PATH "" CACHE INTERNAL "")
 
 add_subdirectory(vendor)
 #****************************************************************************************************

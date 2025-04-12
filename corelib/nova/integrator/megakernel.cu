@@ -1,6 +1,7 @@
 #include "DrawEngine.h"
 #include "GPUIntegrator.cuh"
 #include "Integrator.h"
+#include "aggregate/device_acceleration_interface.h"
 #include "engine/nova_exception.h"
 #include "manager/NovaResourceManager.h"
 #include <curand_kernel.h>
@@ -10,6 +11,7 @@
 #include <internal/device/gpgpu/device_transfer_interface.h>
 #include <internal/device/gpgpu/device_utils.h>
 #include <internal/device/gpgpu/kernel_launch_interface.h>
+
 /* Serves only as a baseline for performance to compare against */
 
 namespace resrc = device::gpgpu;
@@ -30,6 +32,7 @@ namespace nova {
       texturing::TextureCtx texture_context;
       axstd::span<const nova::material::NovaMaterialInterface> materials;
       axstd::span<const primitive::NovaPrimitiveInterface> primitives;
+      aggregate::AcceleratorHandle optix_traversable_handle;
     };
 
     ax_device_only void shade(render_buffer_t &render_buffer, float u, float v, glm::vec4 color) {
@@ -59,25 +62,13 @@ namespace nova {
     ax_kernel void test_func(render_buffer_t render_buffer, integrator_args_s args) {
       unsigned int x = ax_device_thread_idx_x;
       unsigned int y = ax_device_thread_idx_y;
+
       if (!AX_GPU_IN_BOUNDS_2D(x, y, render_buffer.width, render_buffer.height))
         return;
-
+      aggregate::DeviceIntersector intersector(args.optix_traversable_handle);
       float u = (float)math::texture::pixelToUv(x, render_buffer.width - 1);
       float v = (float)math::texture::pixelToUv(y, render_buffer.height - 1);
-      auto mat = args.materials[0];
-      Ray in;
-      in.origin = {0, 0, 0};
-      in.direction = {0, -1, 0};
-      Ray out;
-      hit_data hit_d;
-      auto sampler = sampler::SobolSampler(args.generator.sobol);
-      sampler::SamplerInterface sampler_interface = &sampler;
-      material::shading_data_s shading_data;
-      texturing::texture_data_aggregate_s texture_data_aggregate;
-      texture_data_aggregate.texture_ctx = &args.texture_context;
-      shading_data.texture_aggregate = &texture_data_aggregate;
-      auto prim = args.primitives[0];
-      bool b = prim.scatter(in, out, hit_d, sampler_interface, shading_data);
+
       shade(render_buffer, x, y, glm::vec4(1.f));
     }
   }  // namespace gpu
