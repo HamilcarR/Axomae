@@ -102,9 +102,9 @@ namespace controller {
 
     /* buffers*/
     image::ThumbnailImageHolder<float> &image_holder = nova_baking_structure.bake_buffers.image_holder;
-    std::vector<float> &partial = nova_baking_structure.bake_buffers.partial;
-    std::vector<float> &accumulator = nova_baking_structure.bake_buffers.accumulator;
-    std::vector<float> &depth = nova_baking_structure.bake_buffers.depth;
+    auto &partial = nova_baking_structure.bake_buffers.partial;
+    auto &accumulator = nova_baking_structure.bake_buffers.accumulator;
+    auto &depth = nova_baking_structure.bake_buffers.depth;
     const int COLOR_CHANS = 4;
     const int DEPTH_CHANS = 2;
     size_t color_buffer_size = render_options.width * render_options.height * COLOR_CHANS;

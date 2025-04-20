@@ -79,9 +79,9 @@ namespace nova_baker_utils {
 
   struct bake_temp_buffers {
     image::ThumbnailImageHolder<float> image_holder;
-    std::vector<float> accumulator;
-    std::vector<float> partial;
-    std::vector<float> depth;
+    axstd::managed_vector<float> accumulator;
+    axstd::managed_vector<float> partial;
+    axstd::managed_vector<float> depth;
   };
 
   class WorkerRetAction {
