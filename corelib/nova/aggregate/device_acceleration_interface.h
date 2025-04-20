@@ -4,26 +4,18 @@
 namespace nova::aggregate {
 
   /**
-   * Used as a wrapper around a gpu traversable AS handler.
-   * Always runs on device.
+   * Used as a wrapper around a gpu traversable GAS handler.
    */
   class DeviceIntersectorInterface {
    public:
-    ax_device_only virtual ~DeviceIntersectorInterface() = default;
-    ax_device_only virtual bool hit(const Ray &ray, bvh_hit_data &hit_data) = 0;
+    virtual ~DeviceIntersectorInterface() = default;
+    virtual bool hit(const Ray &ray, bvh_hit_data &hit_data) = 0;
   };
 
   using AcceleratorHandle = unsigned long long;
-  class DeviceIntersector : public DeviceIntersectorInterface {
-    AcceleratorHandle accelerator;
-
-   public:
-    ax_device_only DeviceIntersector(AcceleratorHandle handle_id);
-    ax_device_only bool hit(const Ray &ray, bvh_hit_data &hit_data) override;
-  };
 
   /**
-   * Abstraction of a generic gpu AS builder.
+   * Abstraction of a generic gpu GAS builder.
    * Always runs on host.
    */
   class DeviceAcceleratorInterface {
@@ -31,10 +23,20 @@ namespace nova::aggregate {
     virtual ~DeviceAcceleratorInterface() = default;
     virtual AcceleratorHandle build(primitive_aggregate_data_s primitive_data_list) = 0;
     virtual void cleanup() = 0;
+    virtual unsigned getMaxRecursiveDepth() const = 0;
+
     /**
-     * Uses currently built backend to return an opaque AS builder.
+     * Uses currently built backend to return an opaque GAS builder.
      */
     static std::unique_ptr<DeviceAcceleratorInterface> make();  // Independently implemented in api/devaccel_factory.cpp
+  };
+
+  class DeviceIntersector : public DeviceIntersectorInterface {
+    AcceleratorHandle accelerator;
+
+   public:
+    DeviceIntersector(AcceleratorHandle handle_id);
+    bool hit(const Ray &ray, bvh_hit_data &hit_data) override;
   };
 
 }  // namespace nova::aggregate

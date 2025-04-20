@@ -52,6 +52,7 @@ include(cmake/FindDependencies.cmake)
 
 # CUDA Compilation
 option(AXOMAE_USE_CUDA "Use GPU when available" OFF)
+option(AXOMAE_USE_OPTIX "Use Optix acceleration structures (Needs AXOMAE_USE_CUDA)" ON)
 if(NOT CUDAToolkit_FOUND)
     message(STATUS "Cuda toolkit not found. Setting AXOMAE_USE_CUDA to off.")
     set(AXOMAE_USE_CUDA "OFF" CACHE BOOL "Use GPU when available")

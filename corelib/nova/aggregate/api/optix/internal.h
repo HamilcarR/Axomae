@@ -19,7 +19,7 @@
 
 namespace nova::aggregate {
 
-  struct device_geometry_s {
+  struct device_buffers_s {
     void *d_vertices{};
     void *d_indices{};
     void *d_transform{};
@@ -35,22 +35,33 @@ namespace nova::aggregate {
     void *program_miss;
   };
 
-  struct device_pointers_s {
-    device_geometry_s geometry;
+  struct device_allocs_s {
+    device_buffers_s geometry;
     device_program_s program{};
   };
 
+  struct allocations_tracker_s {
+    std::vector<void *> d_buffers;
+  };
+
   // Use the make() method of DeviceAcceleratorInterface to generate an instance of BackendOptix.
-  class BackendOptix : public DeviceAcceleratorInterface {
+  class BackendOptix final : public DeviceAcceleratorInterface {
     OptixDeviceContext context;
+    allocations_tracker_s sbt_allocs, pipeline_allocs, module_allocs;
+    OptixShaderBindingTable intersect_sbt, randomhit_sbt, miss_sbt;
+    OptixPipeline pipeline;
+    void *d_outbuffer{};
 
    public:
     BackendOptix();
+    ~BackendOptix() override;
+    BackendOptix(const BackendOptix &) = default;
+    BackendOptix(BackendOptix &&) noexcept = default;
+    BackendOptix &operator=(const BackendOptix &) = default;
+    BackendOptix &operator=(BackendOptix &&) noexcept = default;
     AcceleratorHandle build(primitive_aggregate_data_s primitive_data_list) override;
     void cleanup() override;
-    std::vector<OptixBuildInput> generateTrimeshBInputs(const primitive_aggregate_data_s &primitive_data_list);
-    OptixProgramGroup createProgramGroup();
-    OptixShaderBindingTable generateSbt(device_program_s &pointers);
+    unsigned getMaxRecursiveDepth() const override;
   };
 
 }  // namespace nova::aggregate

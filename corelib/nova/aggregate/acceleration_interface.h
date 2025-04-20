@@ -3,7 +3,7 @@
 #include "aggregate_datastructures.h"
 #include <internal/common/utils.h>
 
-/* Abstracts Embree and Optix calls */
+/* Abstracts CPU acceleration structures calls.  */
 
 namespace nova::aggregate {
 

@@ -20,52 +20,12 @@ namespace utils = nova::gputils;
 namespace nova {
   namespace gpu {
 
-    struct render_buffer_t {
-      float *render_target;
-      unsigned width;
-      unsigned height;
-    };
-
-    struct integrator_args_s {
-      utils::gpu_random_generator_t generator;
-      nova::shape::MeshCtx geometry_context;
-      texturing::TextureCtx texture_context;
-      axstd::span<const nova::material::NovaMaterialInterface> materials;
-      axstd::span<const primitive::NovaPrimitiveInterface> primitives;
-      aggregate::AcceleratorHandle optix_traversable_handle;
-    };
-
-    ax_device_only void shade(render_buffer_t &render_buffer, float u, float v, glm::vec4 color) {
-      unsigned px = math::texture::uvToPixel(u, render_buffer.width);
-      unsigned py = math::texture::uvToPixel(v, render_buffer.height);
-      unsigned offset = (py * render_buffer.width + px) * 4;
-      render_buffer.render_target[offset] = color.r;
-      render_buffer.render_target[offset + 1] = color.g;
-      render_buffer.render_target[offset + 2] = color.b;
-      render_buffer.render_target[offset + 3] = color.a;
-    }
-    ax_device_only void shade(render_buffer_t &render_buffer, unsigned x, unsigned y, glm::vec4 color) {
-      unsigned offset = (y * render_buffer.width + x) * 4;
-      render_buffer.render_target[offset] = color.r;
-      render_buffer.render_target[offset + 1] = color.g;
-      render_buffer.render_target[offset + 2] = color.b;
-      render_buffer.render_target[offset + 3] = color.a;
-    }
-
-    ax_device_only void shade(render_buffer_t &render_buffer, unsigned offset, glm::vec4 color) {
-      render_buffer.render_target[offset] = color.r;
-      render_buffer.render_target[offset + 1] = color.g;
-      render_buffer.render_target[offset + 2] = color.b;
-      render_buffer.render_target[offset + 3] = color.a;
-    }
-
     ax_kernel void test_func(render_buffer_t render_buffer, integrator_args_s args) {
       unsigned int x = ax_device_thread_idx_x;
       unsigned int y = ax_device_thread_idx_y;
 
       if (!AX_GPU_IN_BOUNDS_2D(x, y, render_buffer.width, render_buffer.height))
         return;
-      aggregate::DeviceIntersector intersector(args.optix_traversable_handle);
       float u = (float)math::texture::pixelToUv(x, render_buffer.width - 1);
       float v = (float)math::texture::pixelToUv(y, render_buffer.height - 1);
 

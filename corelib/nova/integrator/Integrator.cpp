@@ -49,7 +49,7 @@ namespace nova::integrator {
     bvh_hit_data hit_ret{};
     hit_ret.last_primit = nullptr;
     hit_ret.is_rendering = &nova_internals.resource_manager->getEngineData().is_rendering;
-    const aggregate::DefaultAccelerator &accel = nova_resources->getAPIManagedAccelerator();
+    const aggregate::DefaultAccelerator &accel = nova_resources->getCpuManagedAccelerator();
     accel.hit(ray, hit_ret);
     return hit_ret;
   }
