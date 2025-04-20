@@ -41,28 +41,43 @@ namespace nova {
     NovaResourceManager(const NovaResourceManager &) = delete;
     NovaResourceManager &operator=(const NovaResourceManager &) = delete;
 
-    GENERATE_GETTERS(engine::EngineResourcesHolder, EngineData, resources.renderer_data)
-    GENERATE_GETTERS(scene::SceneResourcesHolder, SceneData, resources.scene_data)
-    GENERATE_GETTERS(texturing::TextureResourcesHolder, TexturesData, resources.scene_data.textures_data)
-    GENERATE_GETTERS(material::MaterialResourcesHolder, MaterialData, resources.scene_data.materials_data)
-    GENERATE_GETTERS(camera::CameraResourcesHolder, CameraData, resources.scene_data.camera_data)
-    GENERATE_GETTERS(primitive::PrimitivesResourcesHolder, PrimitiveData, resources.scene_data.primitive_data)
-    GENERATE_GETTERS(shape::ShapeResourcesHolder, ShapeData, resources.scene_data.shape_data)
-    GENERATE_GETTERS(aggregate::DefaultAccelerator, APIManagedAccelerator, resources.scene_data.api_accelerator)
-    GENERATE_GETTERS(scene::SceneTransformations, SceneTransformation, resources.scene_data.scene_transformations)
-    GENERATE_GETTERS(core::memory::MemoryArena<>, MemoryPool, resource_mempool)
+    engine::EngineResourcesHolder &getEngineData() { return resources.renderer_data; }
+    const engine::EngineResourcesHolder &getEngineData() const { return resources.renderer_data; }
 
-    void clearResources() {
-      resource_mempool.reset();
-      getPrimitiveData().clear();
-      getTexturesData().clear();
-      getShapeData().clear();
-      getMaterialData().clear();
-      getAPIManagedAccelerator().cleanup();
-    }
+    scene ::SceneResourcesHolder &getSceneData() { return resources.scene_data; }
+    const scene ::SceneResourcesHolder &getSceneData() const { return resources.scene_data; }
+
+    texturing ::TextureResourcesHolder &getTexturesData() { return resources.scene_data.textures_data; }
+    const texturing ::TextureResourcesHolder &getTexturesData() const { return resources.scene_data.textures_data; }
+
+    material ::MaterialResourcesHolder &getMaterialData() { return resources.scene_data.materials_data; }
+    const material ::MaterialResourcesHolder &getMaterialData() const { return resources.scene_data.materials_data; }
+
+    camera ::CameraResourcesHolder &getCameraData() { return resources.scene_data.camera_data; }
+    const camera ::CameraResourcesHolder &getCameraData() const { return resources.scene_data.camera_data; }
+
+    primitive ::PrimitivesResourcesHolder &getPrimitiveData() { return resources.scene_data.primitive_data; }
+    const primitive ::PrimitivesResourcesHolder &getPrimitiveData() const { return resources.scene_data.primitive_data; }
+
+    shape ::ShapeResourcesHolder &getShapeData() { return resources.scene_data.shape_data; }
+    const shape ::ShapeResourcesHolder &getShapeData() const { return resources.scene_data.shape_data; }
+
+    aggregate ::DefaultAccelerator &getCpuManagedAccelerator() { return resources.scene_data.api_accelerator; }
+    const aggregate ::DefaultAccelerator &getCpuManagedAccelerator() const { return resources.scene_data.api_accelerator; }
+
+    aggregate ::DeviceAcceleratorInterface *getGpuManagedAccelerator() { return resources.scene_data.device_accelerator.get(); }
+    const aggregate ::DeviceAcceleratorInterface *getGpuManagedAccelerator() const { return resources.scene_data.device_accelerator.get(); }
+
+    scene ::SceneTransformations &getSceneTransformation() { return resources.scene_data.scene_transformations; }
+    const scene ::SceneTransformations &getSceneTransformation() const { return resources.scene_data.scene_transformations; }
+
+    core ::memory ::MemoryArena<> &getMemoryPool() { return resource_mempool; }
+    const core ::memory ::MemoryArena<> &getMemoryPool() const { return resource_mempool; }
+
+    void clearResources();
 
     /* Will take ownership of acceleration_structure */
-    void setManagedApiAccelerationStructure(aggregate::DefaultAccelerator &&acceleration_structure);
+    void setManagedCpuAccelerationStructure(aggregate::DefaultAccelerator &&acceleration_structure);
     void setManagedGpuAccelerationStructure(std::unique_ptr<aggregate::DeviceAcceleratorInterface> acceleration_structure);
   };
 }  // namespace nova
