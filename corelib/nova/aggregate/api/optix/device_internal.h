@@ -4,18 +4,13 @@
 #include "shape/ShapeInterface.h"
 #include "texturing/TextureContext.h"
 
+#include "engine/datastructures.h"
 #include <nova_gpu_utils.h>
 #include <optix_types.h>
 
 /* Structures living in gpu memory. */
 
-struct render_buffer_t {
-  float *render_target;
-  unsigned width;
-  unsigned height;
-};
-
-struct integrator_args_s {
+struct _integrator_args_s_ {
   nova::gputils::gpu_random_generator_t generator;
   nova::shape::MeshCtx geometry_context;
   nova::texturing::TextureCtx texture_context;
@@ -24,6 +19,9 @@ struct integrator_args_s {
   OptixTraversableHandle optix_traversable_handle;
 };
 
-struct _device_params_s_ {};
+struct _device_params_s_ {
+  _integrator_args_s_ integrator_arguments;
+  nova::HdrBufferStruct render_buffer;
+};
 
 #endif
