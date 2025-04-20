@@ -32,7 +32,7 @@ At the same time, the application is intended to be interactive , and customizab
 * Qt6(Axomae can also build Qt from source , see [Installation](#Installation) for details)
 * OpenGL
 * Glew
-* Cuda(Optional)
+* Cuda 12.x + Optix > 8.0.x (Optional)
 * Any Linux distribution
 
 ## Installation
