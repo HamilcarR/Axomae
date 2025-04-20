@@ -10,6 +10,7 @@ class DeviceError;
       gpgpu_err_log((ans), __FILE__, __LINE__); \
     }
 void gpgpu_err_log(const DeviceError &err, const char *file, int line, bool abort = false);
+void gpgpu_err_log(cudaError_t err, const char *file, int line, bool abort = false);
 
 #else
 #  define DEVICE_ERROR_CHECK(ans)
