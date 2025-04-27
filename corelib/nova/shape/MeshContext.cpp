@@ -30,14 +30,6 @@ namespace nova::shape {
     return triangle_views.size();
   }
 
-  ax_device_callable const axstd::span<const Object3D> &MeshBundleViews::getTriangleGeometryViews() const {
-#ifdef __CUDA_ARCH__
-    return triangle_mesh_geometry.device_geometry_view;
-#else
-    return triangle_mesh_geometry.host_geometry_view;
-#endif
-  }
-
   ax_device_callable const Object3D &MeshBundleViews::getTriangleMesh(std::size_t mesh_id) const {
     auto triangle_views = getTriangleGeometryViews();
     AX_ASSERT_LT(mesh_id, triangle_views.size());

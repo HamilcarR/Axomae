@@ -1,15 +1,15 @@
 #include "aggregate_datastructures.h"
-#include "glm/gtc/type_ptr.hpp"
+#include "gpu/optix_params.h"
 #include "internal.h"
-#include "optix_types.h"
 #include "shape/MeshContext.h"
 #include "shape/shape_datastructures.h"
 #include <cstring>
+#include <cuda.h>
 #include <cuda_runtime_api.h>
 #include <driver_types.h>
+#include <glm/gtc/type_ptr.hpp>
 #include <internal/debug/Logger.h>
 #include <internal/device/gpgpu/DeviceError.h>
-#include <internal/device/gpgpu/cuda/cuda_macros.h>
 #include <internal/device/gpgpu/device_transfer_interface.h>
 #include <internal/macro/project_macros.h>
 #include <optix.h>
@@ -17,53 +17,58 @@
 #include <optix_host.h>
 #include <optix_stack_size.h>
 #include <optix_stubs.h>
+#include <optix_types.h>
+#include <string>
 
 constexpr std::size_t LOGSIZE = 4096;
 constexpr std::size_t MAX_REC_DEPTH = 8;
 
 static_assert(ISTYPE(OptixTraversableHandle, unsigned long long), "OptixTraversableHandle type implementation changed.");
 
-void callback_error_log(unsigned level, const char *tag, const char *message, void *cbdata) {
+void optix_callback_log(unsigned level, const char *tag, const char *message, void *cbdata) {
   LOG("Optix log: TAG:" + std::string(tag) + ", MESSAGE:" + std::string(message) + " LEVEL:" + std::to_string(level), LogLevel::INFO);
 }
 
-static void device_dealloc(const nova::aggregate::allocations_tracker_s &allocations) {
+/* Free the memory on device, and clear the underlying d_buffers collection. */
+static void device_dealloc(nova::aggregate::allocations_tracker_s &allocations) {
   for (void *ptr : allocations.d_buffers) {
     DEVICE_ERROR_CHECK(cudaFree(ptr));
   }
+  allocations.d_buffers.clear();
 }
 
-struct __align__(OPTIX_SBT_RECORD_ALIGNMENT) raygen_record_s {
+struct raygen_record_s {
   __align__(OPTIX_SBT_RECORD_ALIGNMENT) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
 };
 
-struct __align__(OPTIX_SBT_RECORD_ALIGNMENT) miss_record_s {
+struct misshit_record_s {
   __align__(OPTIX_SBT_RECORD_ALIGNMENT) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
 };
 
-struct __align__(OPTIX_SBT_RECORD_ALIGNMENT) randomhit_record_s {
+struct hit_record_s {
   __align__(OPTIX_SBT_RECORD_ALIGNMENT) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
 };
 
 namespace nova::aggregate {
 
-  unsigned BackendOptix::getMaxRecursiveDepth() const { return MAX_REC_DEPTH; }
+  unsigned OptixAccelerator::getMaxRecursiveDepth() const { return MAX_REC_DEPTH; }
 
-  BackendOptix::~BackendOptix() {
-    BackendOptix::cleanup();
-    optixDeviceContextDestroy(context);
-  }
-
-  BackendOptix::BackendOptix() : context(nullptr) {
-    device::gpgpu::init_driver_API();
+  OptixAccelerator::OptixAccelerator() {
+    AX_ASSERT_EQ(cuCtxGetCurrent(&cuctx), CUDA_SUCCESS);
+    DEVICE_ERROR_CHECK(cudaFree(0));
     OPTIX_ERR_CHECK(optixInit());
     OptixDeviceContextOptions options = {};
 #ifndef NDEBUG
     options.logCallbackLevel = 4;
     options.validationMode = OPTIX_DEVICE_CONTEXT_VALIDATION_MODE_ALL;
 #endif
-    options.logCallbackFunction = callback_error_log;
-    OPTIX_ERR_CHECK(optixDeviceContextCreate(0, nullptr, &context));
+    options.logCallbackFunction = optix_callback_log;
+    OPTIX_ERR_CHECK(optixDeviceContextCreate(cuctx, &options, &context));
+  }
+
+  OptixAccelerator::~OptixAccelerator() {
+    OptixAccelerator::cleanup();
+    OPTIX_ERR_CHECK(optixDeviceContextDestroy(context));
   }
 
   static void copy2device(const axstd::span<float> &vertices_array,
@@ -121,7 +126,7 @@ namespace nova::aggregate {
     OptixProgramGroupOptions options = {};
     OptixProgramGroup programGroups = nullptr;
     char logString[LOGSIZE];
-    std::size_t logStringSize = 0;
+    std::size_t logStringSize = LOGSIZE;
     OPTIX_ERR_CHECK(optixProgramGroupCreate(context, &programDescriptions, 1, &options, logString, &logStringSize, &programGroups));
     LOGS(logString);
     return programGroups;
@@ -140,43 +145,32 @@ namespace nova::aggregate {
     OptixProgramGroupOptions options = {};
     OptixProgramGroup programGroups = nullptr;
     char logString[LOGSIZE];
-    std::size_t logStringSize = 0;
+    std::size_t logStringSize = LOGSIZE;
     OPTIX_ERR_CHECK(optixProgramGroupCreate(context, &programDescriptions, 1, &options, logString, &logStringSize, &programGroups));
     LOGS(logString);
     return programGroups;
   }
 
-  static OptixProgramGroup create_closest_pg(OptixDeviceContext context,
-                                             const char *entry_name,
-                                             OptixModule module,
-                                             allocations_tracker_s & /*device_allocations*/) {
-    LOGS("Creating Optix closesthit program...");
-    OptixProgramGroupDesc programDescriptions = {};
-    programDescriptions.kind = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
-    programDescriptions.hitgroup.moduleCH = module;
-    programDescriptions.hitgroup.entryFunctionNameCH = entry_name;
-    OptixProgramGroupOptions options = {};
-    OptixProgramGroup programGroups = nullptr;
-    char logString[LOGSIZE];
-    std::size_t logStringSize = 0;
-    OPTIX_ERR_CHECK(optixProgramGroupCreate(context, &programDescriptions, 1, &options, logString, &logStringSize, &programGroups));
-    LOGS(logString);
-    return programGroups;
-  }
-
-  static OptixProgramGroup create_any_pg(OptixDeviceContext context,
-                                         const char *entry_name,
-                                         OptixModule module,
+  static OptixProgramGroup create_hit_pg(OptixDeviceContext context,
+                                         const char *anyhit_entry,
+                                         const char *closesthit_entry,
+                                         OptixModule anyhit_module,
+                                         OptixModule closesthit_module,
                                          allocations_tracker_s & /*device_allocations*/) {
     LOGS("Creating Optix anyhit program...");
     OptixProgramGroupDesc programDescriptions = {};
     programDescriptions.kind = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
-    programDescriptions.hitgroup.moduleAH = module;
-    programDescriptions.hitgroup.entryFunctionNameAH = entry_name;
+
+    programDescriptions.hitgroup.moduleAH = anyhit_module;
+    programDescriptions.hitgroup.entryFunctionNameAH = anyhit_entry;
+
+    programDescriptions.hitgroup.moduleCH = closesthit_module;
+    programDescriptions.hitgroup.entryFunctionNameCH = closesthit_entry;
+
     OptixProgramGroupOptions options = {};
     OptixProgramGroup programGroups = nullptr;
     char logString[LOGSIZE];
-    std::size_t logStringSize = 0;
+    std::size_t logStringSize = LOGSIZE;
     OPTIX_ERR_CHECK(optixProgramGroupCreate(context, &programDescriptions, 1, &options, logString, &logStringSize, &programGroups));
     LOGS(logString);
     return programGroups;
@@ -195,7 +189,7 @@ namespace nova::aggregate {
     opts.numAttributeValues = 0;
     opts.usesMotionBlur = false;
     opts.usesPrimitiveTypeFlags = 0;
-    opts.pipelineLaunchParamsVariableName = "params";
+    opts.pipelineLaunchParamsVariableName = "parameters";
     return opts;
   }
 
@@ -216,9 +210,10 @@ namespace nova::aggregate {
       OPTIX_ERR_CHECK(optixUtilAccumulateStackSizes(programGroups[i], &stackSizes, pipeline));
 
     unsigned directCallableStackSizeFromState = 0, directCallableStackSizeFromTraversal = 0, continuationStackSize = 0;
-    optixUtilComputeStackSizes(
-        &stackSizes, MAX_REC_DEPTH, 0, 0, &directCallableStackSizeFromTraversal, &directCallableStackSizeFromState, &continuationStackSize);
-    optixPipelineSetStackSize(pipeline, directCallableStackSizeFromTraversal, directCallableStackSizeFromState, continuationStackSize, 1);
+    OPTIX_ERR_CHECK(optixUtilComputeStackSizes(
+        &stackSizes, MAX_REC_DEPTH, 0, 0, &directCallableStackSizeFromTraversal, &directCallableStackSizeFromState, &continuationStackSize));
+    OPTIX_ERR_CHECK(
+        optixPipelineSetStackSize(pipeline, directCallableStackSizeFromTraversal, directCallableStackSizeFromState, continuationStackSize, 1));
   }
 
   static OptixPipeline create_pipeline(OptixDeviceContext context,
@@ -230,7 +225,7 @@ namespace nova::aggregate {
     LOGS("Creating Optix pipeline...");
     OptixPipeline pipeline = nullptr;
     char logString[LOGSIZE] = {'\0'};
-    std::size_t logStringSize = 0;
+    std::size_t logStringSize = LOGSIZE;
     OPTIX_ERR_CHECK(optixPipelineCreate(
         context, pipelineCompileOptions, pipelineLinkOptions, programGroups, numProgramGroups, logString, &logStringSize, &pipeline));
     LOGS(logString);
@@ -257,9 +252,6 @@ namespace nova::aggregate {
     module_compile_options.optLevel = OPTIX_COMPILE_OPTIMIZATION_LEVEL_3;
     module_compile_options.debugLevel = OPTIX_COMPILE_DEBUG_LEVEL_MINIMAL;
 #endif
-    module_compile_options.maxRegisterCount = 0;
-    module_compile_options.payloadTypes = 0;
-    module_compile_options.numPayloadTypes = 0;
 
     OPTIX_ERR_CHECK(
         optixModuleCreate(context, &module_compile_options, pipelineCompileOptions, ptx, ptx_size, log_buffer, &log_buffer_size, &module));
@@ -270,34 +262,40 @@ namespace nova::aggregate {
 
   /*********************************************************************************************************************************************************/
   /* Shader Binding table */
-  static OptixShaderBindingTable create_sbt(OptixProgramGroup program,
-                                            const raygen_record_s &raygen_record,
-                                            const miss_record_s &miss_record,
-                                            const randomhit_record_s &randomhit_record,
+  static OptixShaderBindingTable create_sbt(OptixProgramGroup raygen,
+                                            OptixProgramGroup miss,
+                                            OptixProgramGroup hit,
+                                            raygen_record_s &raygen_record,
+                                            misshit_record_s &misshit_record,
+                                            hit_record_s &hit_record,
                                             allocations_tracker_s &sbt_device_allocs) {
     LOGS("Creating Optix shader binding table...");
     OptixShaderBindingTable sbt = {};
+
+    OPTIX_ERR_CHECK(optixSbtRecordPackHeader(raygen, &raygen_record));
     void *d_raygen = {};
     DEVICE_ERROR_CHECK(cudaMalloc(&d_raygen, sizeof(raygen_record_s)));
     DEVICE_ERROR_CHECK(cudaMemcpy(d_raygen, &raygen_record, sizeof(raygen_record_s), cudaMemcpyHostToDevice));
     sbt_device_allocs.d_buffers.push_back(d_raygen);
     sbt.raygenRecord = reinterpret_cast<CUdeviceptr>(d_raygen);
 
+    OPTIX_ERR_CHECK(optixSbtRecordPackHeader(miss, &misshit_record));
     void *d_miss = {};
-    DEVICE_ERROR_CHECK(cudaMalloc(&d_miss, sizeof(miss_record_s)));
-    DEVICE_ERROR_CHECK(cudaMemcpy(d_miss, &miss_record, sizeof(miss_record_s), cudaMemcpyHostToDevice));
+    DEVICE_ERROR_CHECK(cudaMalloc(&d_miss, sizeof(misshit_record_s)));
+    DEVICE_ERROR_CHECK(cudaMemcpy(d_miss, &misshit_record, sizeof(misshit_record_s), cudaMemcpyHostToDevice));
     sbt_device_allocs.d_buffers.push_back(d_miss);
     sbt.missRecordBase = reinterpret_cast<CUdeviceptr>(d_miss);
     sbt.missRecordCount = 1;
-    sbt.missRecordStrideInBytes = sizeof(miss_record_s);
+    sbt.missRecordStrideInBytes = sizeof(misshit_record_s);
 
-    void *d_random = {};
-    DEVICE_ERROR_CHECK(cudaMalloc(&d_random, sizeof(randomhit_record_s)));
-    DEVICE_ERROR_CHECK(cudaMemcpy(d_random, &randomhit_record, sizeof(randomhit_record_s), cudaMemcpyHostToDevice));
-    sbt_device_allocs.d_buffers.push_back(d_random);
-    sbt.hitgroupRecordBase = reinterpret_cast<CUdeviceptr>(d_random);
+    OPTIX_ERR_CHECK(optixSbtRecordPackHeader(hit, &hit_record));
+    void *d_hit = {};
+    DEVICE_ERROR_CHECK(cudaMalloc(&d_hit, sizeof(hit_record_s)));
+    DEVICE_ERROR_CHECK(cudaMemcpy(d_hit, &hit_record, sizeof(hit_record_s), cudaMemcpyHostToDevice));
+    sbt_device_allocs.d_buffers.push_back(d_hit);
+    sbt.hitgroupRecordBase = reinterpret_cast<CUdeviceptr>(d_hit);
     sbt.hitgroupRecordCount = 1;
-    sbt.hitgroupRecordStrideInBytes = sizeof(randomhit_record_s);
+    sbt.hitgroupRecordStrideInBytes = sizeof(hit_record_s);
 
     return sbt;
   }
@@ -370,8 +368,7 @@ namespace nova::aggregate {
 
     void *d_tmp = nullptr;
     DEVICE_ERROR_CHECK(cudaMalloc(&d_tmp, buffer_sizes.tempSizeInBytes));
-    DEVICE_ERROR_CHECK(cudaMalloc(&d_outbuffer, buffer_sizes.outputSizeInBytes));
-
+    DEVICE_ERROR_CHECK(cudaMalloc(d_outbuffer, buffer_sizes.outputSizeInBytes));
     OptixTraversableHandle handle{};
     OPTIX_ERR_CHECK(optixAccelBuild(context,
                                     0,
@@ -380,7 +377,7 @@ namespace nova::aggregate {
                                     build_inputs.size(),
                                     reinterpret_cast<CUdeviceptr>(d_tmp),
                                     buffer_sizes.tempSizeInBytes,
-                                    reinterpret_cast<CUdeviceptr>(d_outbuffer),
+                                    reinterpret_cast<CUdeviceptr>(*d_outbuffer),
                                     buffer_sizes.outputSizeInBytes,
                                     &handle,
                                     nullptr,
@@ -390,32 +387,89 @@ namespace nova::aggregate {
     LOGS("Optix GAS built.");
     return handle;
   }
-
-  extern "C" const char PTX_EMBEDDED[];
-
-  OptixTraversableHandle BackendOptix::build(primitive_aggregate_data_s primitive_data_list) {
-    OptixTraversableHandle gas = build_triangle_gas(context, primitive_data_list, &d_outbuffer);
+  extern "C" {
+  extern const unsigned char PTX_EMBEDDED[];
+  extern uint32_t PTX_EMBEDDEDLength;
+  }
+  void OptixAccelerator::build(primitive_aggregate_data_s primitive_data_list) {
+    handle = build_triangle_gas(context, primitive_data_list, &d_outbuffer);
 
     OptixPipelineCompileOptions pipelineCompileOptions = create_pipeline_compile_options();
     OptixPipelineLinkOptions pipelineLinkOptions = create_pipeline_link_options();
-    std::size_t ptx_size = 0;
-    OptixModule module = create_optix_module(context, &pipelineCompileOptions, PTX_EMBEDDED, strlen(PTX_EMBEDDED), module_allocs);
+    module = create_optix_module(context, &pipelineCompileOptions, reinterpret_cast<const char *>(PTX_EMBEDDED), PTX_EMBEDDEDLength, module_allocs);
+
     const char *raygen_ptx_entry = "__raygen__main";
     OptixProgramGroup raygen = create_raygen_pg(context, raygen_ptx_entry, module, pipeline_allocs);
     const char *miss_ptx_entry = "__miss__sample_envmap";
     OptixProgramGroup miss = create_miss_pg(context, miss_ptx_entry, module, pipeline_allocs);
     const char *any_ptx_entry = "__anyhit__random_intersect";
-    OptixProgramGroup any = create_any_pg(context, any_ptx_entry, module, pipeline_allocs);
     const char *closest_ptx_entry = "__closesthit__minimum_intersect";
-    OptixProgramGroup closest = create_closest_pg(context, closest_ptx_entry, module, pipeline_allocs);
-    return gas;
+    OptixProgramGroup hitgroup = create_hit_pg(context, any_ptx_entry, closest_ptx_entry, module, module, pipeline_allocs);
+
+    programs[0] = raygen;
+    programs[1] = miss;
+    programs[2] = hitgroup;
+    pipeline = create_pipeline(context, programs, &pipelineCompileOptions, &pipelineLinkOptions, NUM_PROGRAMS, pipeline_allocs);
+
+    raygen_record_s raygen_rcd{};
+    misshit_record_s miss_rcd{};
+    hit_record_s hit_rcd{};
+
+    intersect_sbt = create_sbt(raygen, miss, hitgroup, raygen_rcd, miss_rcd, hit_rcd, sbt_allocs);
+
+    DEVICE_ERROR_CHECK(cudaMalloc(&d_params_buffer, sizeof(optix_traversal_param_s)));
   }
 
-  void BackendOptix::cleanup() {
-    if (!d_outbuffer)
-      return;
-    DEVICE_ERROR_CHECK(cudaFree(d_outbuffer));
-    d_outbuffer = nullptr;
+  std::unique_ptr<DeviceIntersectorInterface> OptixAccelerator::getIntersectorObject() const {
+    return std::make_unique<OptixIntersector>(handle, pipeline, nullptr, &intersect_sbt, reinterpret_cast<CUdeviceptr>(d_params_buffer));
+  }
+
+  void OptixAccelerator::copyParamsToDevice(const device_traversal_param_s &params) const {
+    AX_ASSERT_NOTNULL(d_params_buffer);
+    optix_traversal_param_s o_params;
+    o_params.handle = handle;
+    o_params.d_params = params;
+    DEVICE_ERROR_CHECK(cudaMemcpy(reinterpret_cast<void *>(d_params_buffer), &o_params, sizeof(optix_traversal_param_s), cudaMemcpyHostToDevice));
+  }
+
+  void OptixAccelerator::cleanup() {
+    if (pipeline) {
+      OPTIX_ERR_CHECK(optixPipelineDestroy(pipeline));
+      pipeline = {};
+      LOG("Optix pipeline destroyed.", LogLevel::INFO);
+    }
+    if (module) {
+      OPTIX_ERR_CHECK(optixModuleDestroy(module));
+      module = {};
+      LOG("Optix module destroyed.", LogLevel::INFO);
+    }
+    for (int i = 0; i < NUM_PROGRAMS; i++)
+      if (programs[i]) {
+        OPTIX_ERR_CHECK(optixProgramGroupDestroy(programs[i]));
+        programs[i] = {};
+        LOG("Optix program n°" + std::to_string(i) + " destroyed.", LogLevel::INFO);
+      }
+
+    if (d_outbuffer) {
+      DEVICE_ERROR_CHECK(cudaFree(d_outbuffer));
+      d_outbuffer = nullptr;
+      LOG("Optix output device buffer freed.", LogLevel::INFO);
+    }
+
+    if (d_params_buffer) {
+      DEVICE_ERROR_CHECK(cudaFree(reinterpret_cast<void *>(d_params_buffer)));
+      LOG("Optix parameters device buffer freed.", LogLevel::INFO);
+      d_params_buffer = nullptr;
+    }
+
+    LOG("Deallocating Optix shader table device buffers.", LogLevel::INFO);
+    device_dealloc(sbt_allocs);
+    LOG("Deallocating Optix pipeline device buffers.", LogLevel::INFO);
+    device_dealloc(pipeline_allocs);
+    LOG("Deallocating Optix module device buffers.", LogLevel::INFO);
+    device_dealloc(module_allocs);
+
+    LOG("Done cleaning up Optix structures.", LogLevel::INFO);
   }
 
 }  // namespace nova::aggregate

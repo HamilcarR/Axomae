@@ -6,8 +6,8 @@
 #include "NovaRenderer.h"
 #include "bake.h"
 #include "integrator/Integrator.h"
-#include "internal/device/rendering/opengl/GLMutablePixelBufferObject.h"
 #include "manager/NovaResourceManager.h"
+#include <internal/device/rendering/opengl/GLMutablePixelBufferObject.h>
 
 static constexpr int MAX_RECUR_DEPTH = 20;
 static constexpr int MAX_SAMPLES = 10000;
@@ -93,7 +93,7 @@ void NovaRenderer::draw() {
   engine_render_buffers.accumulator_buffer = accumulated_render_buffer.data();
   engine_render_buffers.partial_buffer = partial_render_buffer.data();
   engine_render_buffers.depth_buffer = depth_buffer.data();
-  engine_render_buffers.byte_size_buffers = screen_size.height * screen_size.width * sizeof(float) * 4;
+  engine_render_buffers.byte_size_color_buffers = screen_size.height * screen_size.width * sizeof(float) * 4;
 
   populateNovaSceneResources();
   if (needRedraw) {

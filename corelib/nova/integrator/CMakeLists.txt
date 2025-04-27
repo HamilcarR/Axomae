@@ -6,7 +6,6 @@ add_library(ax_core_nova_integrator STATIC
         EmissiveIntegrator.h
 )
 
-
 target_link_libraries(ax_core_nova_integrator PRIVATE
         ax_core_geometry
         ax_core_math
@@ -17,6 +16,7 @@ target_link_libraries(ax_core_nova_integrator PRIVATE
         ax_core_nova_texturing
         ax_core_nova_primitive
         ax_core_nova_aggregate
+        ax_core_nova_manager
         ax_core_memory
         ax_core_device
 )
@@ -30,8 +30,9 @@ PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../../
 )
 
-
 if(AXOMAE_USE_CUDA)
-    target_compile_definitions(ax_core_nova_integrator PUBLIC AXOMAE_USE_CUDA)
-    target_sources(ax_core_nova_integrator PRIVATE megakernel.cu)
-endif ()
+    if(AXOMAE_USE_OPTIX)
+        target_sources(ax_core_nova_integrator PRIVATE cuda/job_dispatch.cpp)
+        set(CUDA_OPTIX_PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/cuda/integrator_optix.cu PARENT_SCOPE)
+    endif()
+endif()

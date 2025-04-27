@@ -59,6 +59,15 @@ if(NOT CUDAToolkit_FOUND)
 endif()
 if (AXOMAE_USE_CUDA AND CUDAToolkit_FOUND)
     message(STATUS "Found CUDA toolkit.")
+    find_program(BIN2C 
+          NAMES bin2c 
+          PATHS ${CMAKE_CUDA_COMPILER}
+    )
+    if(NOT BIN2C)
+      message(FATAL_ERROR "bin2c not found on the system.")
+    endif()
+    message(STATUS "bin2c found.")
+
     option(AXOMAE_CUDA_ALLOW_UNSUPPORTED_HOST_CC "Allow the compilation with a non supported host compiler" OFF)
     if(AXOMAE_CUDA_ALLOW_UNSUPPORTED_HOST_CC)
         set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --allow-unsupported-compiler")
@@ -70,8 +79,6 @@ if (AXOMAE_USE_CUDA AND CUDAToolkit_FOUND)
     set(CUDA_GENERATED_OUTPUT_DIR ${CMAKE_BINARY_DIR}/cuda_generated)
     # Optix
     set(OPTIX_INCLUDE_PATH "" CACHE INTERNAL "")
-    set(OPTIX_LIB "" CACHE FILEPATH "Provide liboptix.so" )
-
 endif ()
 
 

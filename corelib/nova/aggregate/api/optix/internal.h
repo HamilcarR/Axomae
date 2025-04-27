@@ -2,8 +2,9 @@
 #define OPTIX_INTERNAL_H
 #include "aggregate/device_acceleration_interface.h"
 #include "aggregate_datastructures.h"
-#include "optix_types.h"
+#include "gpu/nova_gpu.h"
 #include <optix_host.h>
+#include <optix_types.h>
 
 //
 // Internal header file. Don't include from outside the api/ folder.
@@ -44,24 +45,43 @@ namespace nova::aggregate {
     std::vector<void *> d_buffers;
   };
 
-  // Use the make() method of DeviceAcceleratorInterface to generate an instance of BackendOptix.
-  class BackendOptix final : public DeviceAcceleratorInterface {
-    OptixDeviceContext context;
-    allocations_tracker_s sbt_allocs, pipeline_allocs, module_allocs;
-    OptixShaderBindingTable intersect_sbt, randomhit_sbt, miss_sbt;
-    OptixPipeline pipeline;
-    void *d_outbuffer{};
+  class OptixAccelerator : public DeviceAcceleratorInterface {
+    OptixDeviceContext context{};
+    CUcontext cuctx{};
+    allocations_tracker_s sbt_allocs{}, pipeline_allocs{}, module_allocs{};
+    OptixShaderBindingTable intersect_sbt{};
+    OptixProgramGroup programs[16]{};
+    static constexpr int NUM_PROGRAMS = 3;
+    OptixPipeline pipeline{};
+    OptixTraversableHandle handle{};
+    OptixModule module{};
+    void *d_outbuffer{}, *d_params_buffer{};
 
    public:
-    BackendOptix();
-    ~BackendOptix() override;
-    BackendOptix(const BackendOptix &) = default;
-    BackendOptix(BackendOptix &&) noexcept = default;
-    BackendOptix &operator=(const BackendOptix &) = default;
-    BackendOptix &operator=(BackendOptix &&) noexcept = default;
-    AcceleratorHandle build(primitive_aggregate_data_s primitive_data_list) override;
+    OptixAccelerator();
+    ~OptixAccelerator() override;
+    OptixAccelerator(const OptixAccelerator &) = default;
+    OptixAccelerator(OptixAccelerator &&) noexcept = default;
+    OptixAccelerator &operator=(const OptixAccelerator &) = default;
+    OptixAccelerator &operator=(OptixAccelerator &&) noexcept = default;
+    void build(primitive_aggregate_data_s primitive_data_list) override;
+    void copyParamsToDevice(const device_traversal_param_s &params) const override;
     void cleanup() override;
     unsigned getMaxRecursiveDepth() const override;
+    std::unique_ptr<DeviceIntersectorInterface> getIntersectorObject() const override;
+  };
+
+  class OptixIntersector final : public DeviceIntersectorInterface {
+    OptixTraversableHandle accelerator{};
+    OptixPipeline pipeline{};
+    CUstream stream{};
+    const OptixShaderBindingTable *sbt{};
+    CUdeviceptr params_buffer;
+
+   public:
+    OptixIntersector(
+        OptixTraversableHandle handle_id, OptixPipeline pipeline, CUstream stream, const OptixShaderBindingTable *sbt, CUdeviceptr params_buffer);
+    void traverse(const device_traversal_param_s &params) const override;
   };
 
 }  // namespace nova::aggregate

@@ -5,6 +5,7 @@
 #include "WorkspaceTracker.h"
 #include "engine/nova_exception.h"
 #include "integrator/Integrator.h"
+#include "manager/ManagerInternalStructs.h"
 #include "manager/NovaResourceManager.h"
 #include "nova/bake.h"
 #include <QFileDialog>
@@ -129,6 +130,8 @@ namespace controller {
     buffers->partial_buffer = partial.data();
     buffers->accumulator_buffer = accumulator.data();
     buffers->depth_buffer = depth.data();
+    buffers->byte_size_color_buffers = color_buffer_size * sizeof(float);
+    buffers->byte_size_depth_buffers = depth_buffer_size * sizeof(float);
     buffers->channels = COLOR_CHANS;
     return buffers;
   }
@@ -316,20 +319,53 @@ namespace controller {
     void cleanup() override { LOG("Finishing GPU Worker", LogLevel::INFO); }
   };
 
+  static nova::device_traversal_param_s fill_params(const nova::HdrBufferStruct &render_buffers,
+                                                    unsigned grid_width,
+                                                    unsigned grid_height,
+                                                    unsigned grid_depth,
+                                                    const nova::NovaResourceManager *resrc_manager,
+                                                    const nova::gputils::gpu_util_structures_t &gpu_utils) {
+
+    nova::device_traversal_param_s params;
+    params.device_random_generators.sobol = gpu_utils.random_generator.sobol;
+    params.render_buffers = render_buffers;
+    params.material_view = resrc_manager->getMaterialData().getMaterialView();
+    params.mesh_bundle_views = resrc_manager->getShapeData().getMeshSharedViews();
+    params.primitives_view = resrc_manager->getPrimitiveData().getPrimitiveView();
+    params.texture_bundle_views = resrc_manager->getTexturesData().getTextureBundleViews();
+
+    params.width = grid_width;
+    params.height = grid_height;
+    params.depth = grid_depth;
+
+    return params;
+  }
+
   static std::unique_ptr<nova_baker_utils::WorkerRetAction> do_progressive_render_gpu(nova_baker_utils::render_scene_context &render_scene_data,
                                                                                       image::ImageHolder<float> &image_holder,
                                                                                       device::gpgpu::GPUContext &&gpu_context) {
 
-    int sample_increment = 1;
     nova::gputils::domain2d domain{(unsigned)render_scene_data.width, (unsigned)render_scene_data.height};
     nova::gputils::initialize_gpu_structures(domain, render_scene_data.gpu_util_structures);
+
     nova::device_shared_caches_t &buffer_collection = render_scene_data.shared_caches;
     nova::gputils::lock_host_memory_default(buffer_collection);
+
     progressive_render_metadata metadata = create_render_metadata(render_scene_data);
+
+    nova::device_traversal_param_s traversal_parameters = fill_params(*render_scene_data.buffers,
+                                                                      render_scene_data.width,
+                                                                      render_scene_data.height,
+                                                                      1,
+                                                                      render_scene_data.nova_resource_manager,
+                                                                      render_scene_data.gpu_util_structures);
+
+    render_scene_data.nova_resource_manager->registerDeviceParameters(traversal_parameters);
 
     auto act = std::make_unique<GPUWorkerRetAction<device::gpgpu::GPUContext>>(std::move(gpu_context));
     act->pushContext();
 
+    int sample_increment = 1;
     while (sample_increment < metadata.serie_max && is_rendering(render_scene_data)) {
       render_scene_data.nova_resource_manager->getEngineData().sample_increment = sample_increment;
       int new_depth = render_scene_data.nova_resource_manager->getEngineData().max_depth < metadata.max_depth ?
@@ -337,7 +373,10 @@ namespace controller {
                           metadata.max_depth;
       render_scene_data.nova_resource_manager->getEngineData().max_depth = new_depth;
       try {
-        bake_scene_gpu(render_scene_data, render_scene_data.gpu_util_structures);
+        nova::nova_eng_internals internals;
+        internals.resource_manager = render_scene_data.nova_resource_manager;
+        internals.exception_manager = render_scene_data.nova_exception_manager.get();
+        nova::gpu_draw(traversal_parameters, internals);
       } catch (const exception::GenericException &e) {
         ExceptionInfoBoxHandler::handle(e);
         nova::gputils::unlock_host_memory(buffer_collection);

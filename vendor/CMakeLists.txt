@@ -34,8 +34,10 @@ message(NOTICE "Initializing GLM build from sources.")
 add_subdirectory(glm EXCLUDE_FROM_ALL)
 
 #########################################################################################
-# Optix
-set(OPTIX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Optix PARENT_SCOPE)
+# Optix8 is present by default in vendor
+if(OPTIX_INCLUDE_PATH STREQUAL "" )
+  set(OPTIX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Optix PARENT_SCOPE)
+endif()
 #########################################################################################
 # STB
 set(STB_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/stb PARENT_SCOPE)

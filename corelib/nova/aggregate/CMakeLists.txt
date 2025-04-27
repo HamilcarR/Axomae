@@ -26,7 +26,6 @@ endif(AXOMAE_USE_EMBREE)
 
 if(AXOMAE_USE_CUDA)
   autoload_build_utils()
- 
   if(AXOMAE_USE_OPTIX)
     add_subdirectory(api/optix)
   endif()

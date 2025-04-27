@@ -23,7 +23,7 @@ namespace nova::aggregate {
   struct geometric_data_s {
     const cached_primitive_data_s *precomputed_cache;
     const shape::MeshCtx *geometry;
-    const primitives_view_tn *primitives;
+    const primitive::primitives_view_tn *primitives;
   };
 
   static void update_aabb(const geometric_data_s &scene, int32_t node_id, Bvht_data &bvh_data);
@@ -46,7 +46,7 @@ namespace nova::aggregate {
   }
 
   Bvht_data BvhtlBuilder::buildTriangleBasedScene(const primitive_aggregate_data_s &scene, BUILD_TYPE type, SEGMENTATION segmentation) {
-    const primitives_view_tn &primitives = scene.primitive_list_view;
+    const primitive::primitives_view_tn &primitives = scene.primitive_list_view;
     Bvht_data bvh_data;
     const std::size_t prim_size = primitives.size();
     if (prim_size == 0)

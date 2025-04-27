@@ -1,3 +1,4 @@
+set(AXOMAE_NOVA_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(ax_core_nova STATIC
         DrawEngine.cpp
@@ -25,6 +26,22 @@ PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+
+if(AXOMAE_USE_CUDA)
+    set_source_files_properties(DrawEngine_GPU.cpp PROPERTIES LANGUAGE CUDA) #TODO : probably useless
+    target_compile_definitions(ax_core_nova PRIVATE AXOMAE_USE_CUDA)
+    target_sources(ax_core_nova
+            PUBLIC
+            gpu/DeviceImageTracker.cpp
+    )
+    if(AXOMAE_USE_OPTIX)
+        target_compile_definitions(ax_core_nova PRIVATE AXOMAE_USE_OPTIX)
+        target_include_directories(ax_core_nova PUBLIC ${OPTIX_INCLUDE_PATH})
+        set(CUDA_OPTIX_PROGRAMS "")
+    endif()
+endif()
+
+
 add_subdirectory(texturing)
 add_subdirectory(shape)
 add_subdirectory(scene)
@@ -32,15 +49,10 @@ add_subdirectory(engine)
 add_subdirectory(ray)
 add_subdirectory(primitive)
 add_subdirectory(material)
-add_subdirectory(integrator)
 add_subdirectory(camera)
-add_subdirectory(aggregate)
 add_subdirectory(sampler)
 add_subdirectory(manager)
 add_subdirectory(spectrum)
+add_subdirectory(integrator)
+add_subdirectory(aggregate)
 
-if(AXOMAE_USE_CUDA)
-    set_source_files_properties(DrawEngine_GPU.cpp PROPERTIES LANGUAGE CUDA)
-    target_compile_definitions(ax_core_nova PRIVATE AXOMAE_USE_CUDA)
-    target_sources(ax_core_nova PUBLIC gpu/DeviceImageTracker.cpp)
-endif()

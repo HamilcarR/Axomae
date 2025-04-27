@@ -17,6 +17,11 @@ namespace nova {
     resources.scene_data.device_accelerator = std::move(acceleration_structure);
   }
 
+  void NovaResourceManager::registerDeviceParameters(const device_traversal_param_s &params) const {
+    if (getGpuManagedAccelerator())
+      getGpuManagedAccelerator()->copyParamsToDevice(params);
+  }
+
   void NovaResourceManager::clearResources() {
     resource_mempool.reset();
     getPrimitiveData().clear();

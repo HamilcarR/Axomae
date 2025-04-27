@@ -15,7 +15,7 @@ struct bvh_hit_data {
 namespace nova::aggregate {
 
   struct primitive_aggregate_data_s {
-    primitives_view_tn primitive_list_view;
+    primitive::primitives_view_tn primitive_list_view;
     shape::MeshBundleViews mesh_geometry;
   };
 

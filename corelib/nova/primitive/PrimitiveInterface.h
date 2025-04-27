@@ -18,9 +18,10 @@ namespace nova::primitive {
   };
 
   using TYPELIST = NovaPrimitiveInterface::type_pack;
-}  // namespace nova::primitive
 
-using primitives_view_tn = axstd::span<nova::primitive::NovaPrimitiveInterface>;
-using CstPrimitivesView = axstd::span<const nova::primitive::NovaPrimitiveInterface>;
+  using primitives_view_tn = axstd::span<NovaPrimitiveInterface>;
+  using CstPrimitivesView = axstd::span<const NovaPrimitiveInterface>;
+
+}  // namespace nova::primitive
 
 #endif  // PRIMITIVEINTERFACE_H

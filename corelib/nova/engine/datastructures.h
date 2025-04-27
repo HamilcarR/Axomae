@@ -1,14 +1,25 @@
 #ifndef DATASTRUCTURES_H
 #define DATASTRUCTURES_H
+#include "material/NovaMaterials.h"
+#include "primitive/PrimitiveInterface.h"
+#include "shape/ShapeInterface.h"
+#include "texturing/TextureContext.h"
+#include <cstddef>
 namespace nova {
-   template<class T>
+
+  /** Must point to a valid managed buffer */
+  template<class T>
   struct RenderBuffers {
     T *accumulator_buffer;
     T *partial_buffer;
-    size_t byte_size_buffers{};
-    int channels{};
     T *depth_buffer;
+    size_t color_buffers_pitch{};
+    size_t depth_buffers_pitch{};
+    size_t byte_size_color_buffers{};
+    size_t byte_size_depth_buffers{};
+    int channels{};
   };
   using HdrBufferStruct = RenderBuffers<float>;
-}
-#endif //DATASTRUCTURES_H
+
+}  // namespace nova
+#endif  // DATASTRUCTURES_H

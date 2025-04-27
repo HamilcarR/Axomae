@@ -43,7 +43,7 @@ namespace nova::aggregate {
                                                                                      std::size_t primitive_id,
                                                                                      const std::vector<std::size_t> &primitive_global_offset,
                                                                                      const primitive_aggregate_data_s &scene) {
-    const primitives_view_tn &temp_prim_view = scene.primitive_list_view;
+    const primitive::primitives_view_tn &temp_prim_view = scene.primitive_list_view;
     std::size_t primitive_offset = 0;
     if (geometry_id == 0)
       primitive_offset = primitive_id;

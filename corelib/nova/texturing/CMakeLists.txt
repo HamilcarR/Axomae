@@ -2,9 +2,7 @@ autoload_build_utils()
 
 add_library(ax_core_nova_texturing STATIC
         nova_texturing.cpp
-        NovaTexture.cpp
         texture_interop_storage.cpp
-        TextureContext.cpp
 )
 target_link_libraries(ax_core_nova_texturing PRIVATE
     ax_core_macro

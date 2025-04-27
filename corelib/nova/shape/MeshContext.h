@@ -27,7 +27,15 @@ namespace nova::shape {
      */
     ax_device_callable transform::transform4x4_t reconstructTransform4x4(std::size_t mesh_index) const;
     ax_device_callable std::size_t getTransformOffset(std::size_t mesh_index) const;
-    ax_device_callable const axstd::span<const Object3D> &getTriangleGeometryViews() const;
+
+    ax_device_callable const axstd::span<const Object3D> &getTriangleGeometryViews() const {
+#ifdef __CUDA_ARCH__
+      return triangle_mesh_geometry.device_geometry_view;
+#else
+      return triangle_mesh_geometry.host_geometry_view;
+#endif
+    }
+
     ax_device_callable const transform::mesh_transform_views_t &getTransforms() const { return transforms; }
     ax_device_callable const Object3D &getTriangleMesh(std::size_t mesh_id) const;
     ax_device_callable std::size_t triMeshCount() const;

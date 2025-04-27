@@ -109,7 +109,7 @@ namespace controller {
     realtime_viewer->makeCurrent();
     nova_baker_utils::build_scene(drawable_collection, *nova_resource_manager);
     realtime_viewer->doneCurrent();
-    primitives_view_tn primitive_list_view = nova_resource_manager->getPrimitiveData().getPrimitiveView();
+    nova::primitive::primitives_view_tn primitive_list_view = nova_resource_manager->getPrimitiveData().getPrimitiveView();
     nova::shape::MeshBundleViews mesh_geometry = nova_resource_manager->getShapeData().getMeshSharedViews();
     nova::aggregate::primitive_aggregate_data_s aggregate;
     aggregate.primitive_list_view = primitive_list_view;
