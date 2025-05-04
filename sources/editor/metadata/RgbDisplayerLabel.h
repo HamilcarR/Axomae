@@ -11,6 +11,7 @@ namespace editor {
       image::Rgb texture_color_value;
       std::string rgb_display_text;
       Vec2ui pixel_position;
+      Vec2f pixel_uv;
     };
 
    private:
@@ -19,8 +20,8 @@ namespace editor {
 
    public:
     explicit RgbDisplayerLabel(QWidget *parent = nullptr);
-    void updateLabel(const float rgb[4], uint32_t pixel_x, uint32_t pixel_y, bool normalize = false);
-    void updateLabel(const uint8_t rgb[4], uint32_t pixel_x, uint32_t pixel_y);
+    void updateLabel(const float rgb[4], uint32_t pixel_x, uint32_t pixel_y, unsigned image_width, unsigned image_height, bool normalize = false);
+    void updateLabel(const uint8_t rgb[4], uint32_t pixel_x, uint32_t pixel_y, unsigned image_width, unsigned image_height);
 
    protected:
     void paintEvent(QPaintEvent *event) override;

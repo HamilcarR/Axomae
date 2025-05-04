@@ -2,8 +2,8 @@
 #include "Config.h"
 #include "GUIWindow.h"
 #include "event/EventController.h"
-#include "internal/common/image/image_utils.h"
 #include <QTimer>
+#include <internal/common/image/image_utils.h>
 
 static QPoint mapToImage(int image_width, int image_height, const QPoint &pos, int width, int height) {
   // Calculate the mapped position based on the image size and label size
@@ -56,7 +56,7 @@ void TextureViewerWidget::mouseMoveEvent(QMouseEvent *event) {
       uint8_t b_ = raw_display_data[index + 2];
       uint8_t a_ = 255;
       const uint8_t rgb[4] = {r_, g_, b_, a_};
-      label->updateLabel(rgb, p.x(), p.y());
+      label->updateLabel(rgb, p.x(), p.y(), width(), height());
     }
   }
   widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_MOVE;
@@ -107,7 +107,7 @@ void HdrTextureViewerWidget::mouseMoveEvent(QMouseEvent *event) {
       float b_ = raw_hdr_data[index + 2];
       float a_ = 1.f;
       const float rgb[4] = {r_, g_, b_, a_};
-      label->updateLabel(rgb, p.x(), p.y(), false);
+      label->updateLabel(rgb, p.x(), p.y(), width(), height(), false);
     }
   }
   widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_MOVE;
@@ -153,7 +153,7 @@ void HdrRenderViewerWidget::mouseMoveEvent(QMouseEvent *event) {
       float b_ = target_buffer->data[index + 2];
       float a_ = 1.f;
       const float rgb[4] = {r_, g_, b_, a_};
-      label->updateLabel(rgb, p.x(), p.y(), false);
+      label->updateLabel(rgb, p.x(), p.y(), width(), height(), false);
     }
   }
   widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_MOVE;
