@@ -3,12 +3,14 @@
 #include <array>
 #include <cmath>
 #include <cstdlib>
+#include <internal/device/gpgpu/device_utils.h>
+
 /**
  * trig functions optimization / approximations
  */
 
 namespace math {
-  inline float horner_approx(float x) {
+  ax_device_callable_inlined float horner_approx(float x) {
     float a1 = 0.99997726f;
     float a3 = -0.33262347f;
     float a5 = 0.19354346f;
@@ -19,7 +21,7 @@ namespace math {
     return x * (a1 + x_sq * (a3 + x_sq * (a5 + x_sq * (a7 + x_sq * (a9 + x_sq * a11)))));
   }
 
-  inline float atan2_approx(const float ys, const float xs) {
+  ax_device_callable_inlined float atan2_approx(const float ys, const float xs) {
     const float PI = M_PI;
     const float PI_2 = M_PI_2;
     float y = ys;
@@ -35,6 +37,23 @@ namespace math {
       res = -PI + res;
     }
     return res;
+  }
+
+  // Handbook of Mathematical Functions
+  // M. Abramowitz and I.A. Stegun, Ed.
+  ax_device_callable_inlined float acos_as_approx(float x) {
+    float negate = float(x < 0);
+    x = abs(x);
+    float ret = -0.0187293;
+    ret = ret * x;
+    ret = ret + 0.0742610;
+    ret = ret * x;
+    ret = ret - 0.2121144;
+    ret = ret * x;
+    ret = ret + 1.5707288;
+    ret = ret * sqrt(1.0 - x);
+    ret = ret - 2 * negate * ret;
+    return negate * 3.14159265358979 + ret;
   }
 
   constexpr float acos_approx(float x);
