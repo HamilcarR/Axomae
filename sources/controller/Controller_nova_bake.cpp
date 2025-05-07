@@ -333,7 +333,8 @@ namespace controller {
     params.mesh_bundle_views = resrc_manager->getShapeData().getMeshSharedViews();
     params.primitives_view = resrc_manager->getPrimitiveData().getPrimitiveView();
     params.texture_bundle_views = resrc_manager->getTexturesData().getTextureBundleViews();
-
+    params.environment_map = resrc_manager->getTexturesData().getEnvmap();
+    params.camera = resrc_manager->getCameraData();
     params.width = grid_width;
     params.height = grid_height;
     params.depth = grid_depth;
@@ -366,32 +367,32 @@ namespace controller {
     act->pushContext();
 
     int sample_increment = 1;
-    while (sample_increment < metadata.serie_max && is_rendering(render_scene_data)) {
-      render_scene_data.nova_resource_manager->getEngineData().sample_increment = sample_increment;
-      int new_depth = render_scene_data.nova_resource_manager->getEngineData().max_depth < metadata.max_depth ?
-                          render_scene_data.nova_resource_manager->getEngineData().max_depth + 1 :
-                          metadata.max_depth;
-      render_scene_data.nova_resource_manager->getEngineData().max_depth = new_depth;
-      try {
-        nova::nova_eng_internals internals;
-        internals.resource_manager = render_scene_data.nova_resource_manager;
-        internals.exception_manager = render_scene_data.nova_exception_manager.get();
-        nova::gpu_draw(traversal_parameters, internals);
-      } catch (const exception::GenericException &e) {
-        ExceptionInfoBoxHandler::handle(e);
-        nova::gputils::unlock_host_memory(buffer_collection);
-        act->popContext();
-        return act;
-      }
-
-      if (on_exception_shutdown(*render_scene_data.nova_exception_manager)) {
-        nova::gputils::unlock_host_memory(buffer_collection);
-        act->popContext();
-        return act;
-      }
-      color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)sample_increment);
-      sample_increment++;
+    //    while (sample_increment < metadata.serie_max && is_rendering(render_scene_data)) {
+    render_scene_data.nova_resource_manager->getEngineData().sample_increment = sample_increment;
+    int new_depth = render_scene_data.nova_resource_manager->getEngineData().max_depth < metadata.max_depth ?
+                        render_scene_data.nova_resource_manager->getEngineData().max_depth + 1 :
+                        metadata.max_depth;
+    render_scene_data.nova_resource_manager->getEngineData().max_depth = new_depth;
+    try {
+      nova::nova_eng_internals internals;
+      internals.resource_manager = render_scene_data.nova_resource_manager;
+      internals.exception_manager = render_scene_data.nova_exception_manager.get();
+      nova::gpu_draw(traversal_parameters, internals);
+    } catch (const exception::GenericException &e) {
+      ExceptionInfoBoxHandler::handle(e);
+      nova::gputils::unlock_host_memory(buffer_collection);
+      act->popContext();
+      return act;
     }
+
+    if (on_exception_shutdown(*render_scene_data.nova_exception_manager)) {
+      nova::gputils::unlock_host_memory(buffer_collection);
+      act->popContext();
+      return act;
+    }
+    color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)sample_increment);
+    sample_increment++;
+    //  }
     nova::gputils::unlock_host_memory(buffer_collection);
     act->popContext();
     return act;

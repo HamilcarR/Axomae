@@ -1,7 +1,7 @@
 #ifndef NOVA_CAMERA_H
 #define NOVA_CAMERA_H
-#include "internal/common/math/math_utils.h"
-#include "internal/macro/project_macros.h"
+#include <internal/common/math/math_utils.h>
+#include <internal/macro/project_macros.h>
 namespace nova::camera {
   class CameraResourcesHolder {
    public:

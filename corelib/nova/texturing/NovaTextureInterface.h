@@ -82,7 +82,7 @@ namespace nova::texturing {
   /* returns uv in [0 , 1] interval*/
   ax_device_callable_inlined float normalize_uv(float uv) {
     if (uv < 0) {
-      float float_part = std::ceil(uv) - uv;
+      float float_part = AX_GPU_CEIL(uv) - uv;
       return 1.f - float_part;
     }
     return uv;
@@ -104,10 +104,10 @@ namespace nova::texturing {
     /* Pass the direction vector for sampling inside sample_data.
      * parameters u,v are not used here. */
     ax_device_callable glm::vec4 sample(float /*u*/, float /*v*/, const texture_data_aggregate_s &data) const {
-      glm::vec3 sample_vector = data.geometric_data.sampling_vector;
-      glm::vec3 normalized = glm::normalize(sample_vector);
-      std::swap(normalized.y, normalized.z);
-      normalized.z = -normalized.z;
+      glm::vec3 normalized = glm::normalize(data.geometric_data.sampling_vector);
+      const auto temp = normalized.y;
+      normalized.y = normalized.z;
+      normalized.z = -temp;
       const glm::vec2 sph = math::spherical::cartesianToSpherical(normalized);
       const glm::vec2 uv = math::spherical::sphericalToUv(sph);
       const float u = normalize_uv(uv.x);
@@ -118,6 +118,7 @@ namespace nova::texturing {
 
       int index = (y * width + x) * channels;
       AX_ASSERT_LT(index + 2, width * height * channels);
+      AX_ASSERT_NOTNULL(image_buffer);
       return {image_buffer[index], image_buffer[index + 1], image_buffer[index + 2], 1.f};
     }
 

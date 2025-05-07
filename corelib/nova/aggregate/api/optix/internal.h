@@ -48,13 +48,21 @@ namespace nova::aggregate {
   class OptixAccelerator : public DeviceAcceleratorInterface {
     OptixDeviceContext context{};
     CUcontext cuctx{};
-    allocations_tracker_s sbt_allocs{}, pipeline_allocs{}, module_allocs{};
-    OptixShaderBindingTable intersect_sbt{};
-    OptixProgramGroup programs[16]{};
-    static constexpr int NUM_PROGRAMS = 3;
-    OptixPipeline pipeline{};
-    OptixTraversableHandle handle{};
+
     OptixModule module{};
+    allocations_tracker_s module_allocs{};
+
+    OptixShaderBindingTable intersect_sbt{};
+    allocations_tracker_s sbt_allocs{};
+
+    static constexpr int NUM_PROGRAMS = 4;
+    OptixProgramGroup programs[16]{};
+
+    OptixPipeline pipeline{};
+    allocations_tracker_s pipeline_allocs{};
+
+    OptixTraversableHandle handle{};
+
     void *d_outbuffer{}, *d_params_buffer{};
 
    public:
