@@ -25,6 +25,7 @@ class TextureCtxBuilder {
     tex.width = w;
     tex.height = h;
     tex.channels = chan;
+    tex.is_rgba = false;
     textures.push_back(tex);
   }
 
@@ -90,7 +91,6 @@ TEST(NovaDiffuseMaterialTest, scatter_direction) {
 
 TEST(NovaDiffuseMaterialTest, sample_normal) {
   const uint32_t buffer[4] = {RED, GREEN, BLUE, BLUE};
-
   nova::texturing::ImageTexture img(0);
   TextureCtxBuilder ctxBuilder;
   ctxBuilder.addTexture(buffer, 2, 2, 4);

@@ -1,6 +1,7 @@
 #include "Drawable.h"
 #include "Mesh.h"
 #include "bake.h"
+#include "extract_scene_internal.h"
 #include "nova/bake_render_data.h"
 #include "primitive/nova_primitive.h"
 #include "shape/nova_shape.h"

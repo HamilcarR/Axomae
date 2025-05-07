@@ -23,8 +23,8 @@ namespace math::spherical {
 
   template<class T>
   ax_device_callable glm::dvec2 sphericalToUv(const T &phi, const T &theta) {
-    const T u = phi / (2 * PI);
-    const T v = theta / PI;
+    const T u = phi * INV_2PI;
+    const T v = theta * INV_PI;
     return {u, v};
   }
 

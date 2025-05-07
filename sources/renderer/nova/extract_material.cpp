@@ -2,11 +2,13 @@
 #include "MaterialInterface.h"
 #include "Mesh.h"
 #include "bake.h"
+#include "extract_scene_internal.h"
 #include "material/nova_material.h"
+#include "texturing/NovaTextureInterface.h"
 #include "texturing/nova_texturing.h"
 #include <internal/common/exception/GenericException.h>
+#include <internal/macro/project_macros.h>
 
-// TODO : this could be replaced with cuda<->opengl interop
 namespace exception {
   class InvalidTexTypeConversionException : public CatastrophicFailureException {
    public:
@@ -15,13 +17,29 @@ namespace exception {
 }  // namespace exception
 
 namespace nova_baker_utils {
+
+  void extract_envmap(const EnvmapTextureManager &envmap_manager, nova::NovaResourceManager &nova_manager) {
+    const int envmap_id = envmap_manager.currentEquirect2D();
+    const image::ImageHolder<float> *envmap_texture = envmap_manager.currentMutableEnvmapMetadata();
+    AX_ASSERT_NOTNULL(envmap_texture);
+    const float *buffer_ptr = envmap_texture->data.data();
+    unsigned w = envmap_texture->metadata.width;
+    unsigned h = envmap_texture->metadata.height;
+    unsigned channels = envmap_texture->metadata.channels;
+    nova::texturing::TextureResourcesHolder &texture_manager = nova_manager.getTexturesData();
+    std::size_t texture_index = texture_manager.addTexture(buffer_ptr, (int)w, (int)h, (int)channels, envmap_id);
+    nova::texturing::NovaTextureInterface ret = texture_manager.addNovaTexture<nova::texturing::EnvmapTexture>(texture_index);
+    if (!ret.get<nova::texturing::EnvmapTexture>())
+      throw exception::InvalidTexTypeConversionException();
+  }
+
   nova::texturing::ImageTexture *extract_texture(const TextureGroup &tgroup, nova::NovaResourceManager &manager, GenericTexture::TYPE type) {
     const GenericTexture *gltexture = tgroup.getTexturePointer(type);
     if (!gltexture) {
       LOG("Texture lookup in Nova scene initialization has returned null for texture type: " + std::string(type2str(type)), LogLevel::INFO);
       return nullptr;
     }
-    const auto *buffer_ptr = gltexture->getData();
+    const uint32_t *buffer_ptr = gltexture->getData();
     int w = (int)gltexture->getWidth();
     int h = (int)gltexture->getHeight();
     nova::texturing::TextureResourcesHolder &texture_manager = manager.getTexturesData();
@@ -30,7 +48,6 @@ namespace nova_baker_utils {
     auto *image_tex = ret.get<nova::texturing::ImageTexture>();
     if (!image_tex)
       throw exception::InvalidTexTypeConversionException();
-
     return image_tex;
   }
 

@@ -21,6 +21,7 @@ namespace nova::texturing {
     int width;
     int height;
     int channels;
+    bool is_rgba{false};  // RGBA or BGRA
   };
 }  // namespace nova::texturing
 

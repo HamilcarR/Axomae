@@ -3,7 +3,8 @@
 #include "ImageDatabase.h"
 #include "RenderPipeline.h"
 #include "ResourceDatabaseManager.h"
-#include "internal/common/Observer.h"
+#include <internal/common/Observer.h>
+#include <internal/common/axstd/span.h>
 
 namespace texture::envmap {
   /*This structure packs all 3 cubemaps IDs used in IBL*/
@@ -56,7 +57,7 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
  private:
   ResourceDatabaseManager *resource_database;
   /* Different instances of the manager need to keep track of each others envmap generations*/
-  static std::vector<texture::envmap::EnvmapTextureGroup> bakes_id;
+  static std::vector<texture::envmap::EnvmapTextureGroup> bakes_id;  // TODO: Abominable, refactor ASAP.
   texture::envmap::EnvmapTextureGroup current{};
   texture::envmap::EnvmapBakingConfig config{};
   unsigned current_counter{0};
@@ -86,8 +87,10 @@ class EnvmapTextureManager final : private ISubscriber<database::event::ImageUpd
   ax_no_discard int currentPrefilterId() const { return current.prefiltered_id; }
   ax_no_discard int currentIrradianceId() const { return current.irradiance_id; }
   ax_no_discard int currentLutId() const { return current.lut_id; }
+  ax_no_discard int currentEquirect2D() const { return current.equirect_id; }
   ax_no_discard const image::ImageHolder<float> *currentEnvmapMetadata() const { return current.metadata; }
   ax_no_discard image::ImageHolder<float> *currentMutableEnvmapMetadata() const { return current.metadata; }
+  axstd::span<const texture::envmap::EnvmapTextureGroup> getBakesViews() const { return bakes_id; }
   void next();
   void previous();
   void updateCurrent(int index);

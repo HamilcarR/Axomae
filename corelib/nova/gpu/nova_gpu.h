@@ -15,6 +15,8 @@ namespace nova {
     texturing::TextureBundleViews texture_bundle_views;
     primitive::CstPrimitivesView primitives_view;
     material::CstNovaMatIntfView material_view;
+    texturing::EnvmapTexture environment_map;
+    camera::CameraResourcesHolder camera;
     device_random_generators_s device_random_generators;
     unsigned width, height, depth;
   };

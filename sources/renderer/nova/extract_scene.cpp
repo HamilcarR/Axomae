@@ -1,10 +1,11 @@
 #include "Drawable.h"
+#include "EnvmapTextureManager.h"
 #include "Mesh.h"
 #include "aggregate/acceleration_interface.h"
 #include "bake.h"
+#include "extract_scene_internal.h"
 #include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
-#include "primitive/PrimitiveInterface.h"
 #include "shape/nova_shape.h"
 #include <internal/common/axstd/span.h>
 
@@ -55,6 +56,7 @@ namespace nova_baker_utils {
 
     std::size_t image_texture_number;
     std::size_t constant_texture_number;
+    std::size_t hdr_texture_number;
   };
 
   static void initialize_resources_holders(nova::NovaResourceManager &manager, const resource_holders_inits_s &resrc) {
@@ -78,8 +80,8 @@ namespace nova_baker_utils {
     material_resrc.init(material_init_data);
 
     nova::texturing::texture_init_record_s texture_init_data{};
-    texture_init_data.constant_texture_size = resrc.constant_texture_number;
-    texture_init_data.image_texture_size = resrc.image_texture_number;
+    texture_init_data.total_constant_textures = resrc.constant_texture_number;
+    texture_init_data.total_image_textures = resrc.image_texture_number;
     auto &texture_resrc = manager.getTexturesData();
     texture_resrc.init(texture_init_data);
   }
@@ -98,6 +100,7 @@ namespace nova_baker_utils {
     resrc.diffuse_number = meshes.size();
     resrc.dielectrics_number = meshes.size();
     resrc.image_texture_number = meshes.size() * PBR_PIPELINE_TEX_NUM;
+    resrc.hdr_texture_number = 1;  // At least 1 for Environment map.
     initialize_resources_holders(manager, resrc);
 
     std::size_t mesh_index = 0;

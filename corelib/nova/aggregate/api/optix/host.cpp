@@ -49,6 +49,10 @@ struct hit_record_s {
   __align__(OPTIX_SBT_RECORD_ALIGNMENT) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
 };
 
+struct exception_record_s {
+  __align__(OPTIX_SBT_RECORD_ALIGNMENT) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
+};
+
 namespace nova::aggregate {
 
   unsigned OptixAccelerator::getMaxRecursiveDepth() const { return MAX_REC_DEPTH; }
@@ -176,6 +180,25 @@ namespace nova::aggregate {
     return programGroups;
   }
 
+  static OptixProgramGroup create_exception_pg(OptixDeviceContext context,
+                                               const char *entry_name,
+                                               OptixModule module,
+                                               allocations_tracker_s & /*device_allocations*/) {
+
+    LOGS("Creating Optix exception program...");
+    OptixProgramGroupDesc programDescriptions = {};
+    programDescriptions.kind = OPTIX_PROGRAM_GROUP_KIND_EXCEPTION;
+    programDescriptions.exception.module = module;
+    programDescriptions.exception.entryFunctionName = entry_name;
+    OptixProgramGroupOptions options = {};
+    OptixProgramGroup programGroups = nullptr;
+    char logString[LOGSIZE];
+    std::size_t logStringSize = LOGSIZE;
+    OPTIX_ERR_CHECK(optixProgramGroupCreate(context, &programDescriptions, 1, &options, logString, &logStringSize, &programGroups));
+    LOGS(logString);
+    return programGroups;
+  }
+
   /*********************************************************************************************************************************************************/
   /* Pipeline */
 
@@ -185,7 +208,7 @@ namespace nova::aggregate {
     opts.exceptionFlags = OPTIX_EXCEPTION_FLAG_STACK_OVERFLOW | OPTIX_EXCEPTION_FLAG_TRACE_DEPTH;
 #endif
     opts.traversableGraphFlags = OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_SINGLE_GAS;
-    opts.numPayloadValues = 3;
+    opts.numPayloadValues = 0;
     opts.numAttributeValues = 0;
     opts.usesMotionBlur = false;
     opts.usesPrimitiveTypeFlags = 0;
@@ -265,9 +288,11 @@ namespace nova::aggregate {
   static OptixShaderBindingTable create_sbt(OptixProgramGroup raygen,
                                             OptixProgramGroup miss,
                                             OptixProgramGroup hit,
+                                            OptixProgramGroup exception,
                                             raygen_record_s &raygen_record,
                                             misshit_record_s &misshit_record,
                                             hit_record_s &hit_record,
+                                            exception_record_s &exception_record,
                                             allocations_tracker_s &sbt_device_allocs) {
     LOGS("Creating Optix shader binding table...");
     OptixShaderBindingTable sbt = {};
@@ -296,6 +321,13 @@ namespace nova::aggregate {
     sbt.hitgroupRecordBase = reinterpret_cast<CUdeviceptr>(d_hit);
     sbt.hitgroupRecordCount = 1;
     sbt.hitgroupRecordStrideInBytes = sizeof(hit_record_s);
+
+    OPTIX_ERR_CHECK(optixSbtRecordPackHeader(exception, &exception_record));
+    void *d_exception = {};
+    DEVICE_ERROR_CHECK(cudaMalloc(&d_exception, sizeof(exception_record_s)));
+    DEVICE_ERROR_CHECK(cudaMemcpy(d_exception, &exception_record, sizeof(exception_record_s), cudaMemcpyHostToDevice));
+    sbt_device_allocs.d_buffers.push_back(d_exception);
+    sbt.exceptionRecord = reinterpret_cast<CUdeviceptr>(d_exception);
 
     return sbt;
   }
@@ -405,17 +437,20 @@ namespace nova::aggregate {
     const char *any_ptx_entry = "__anyhit__random_intersect";
     const char *closest_ptx_entry = "__closesthit__minimum_intersect";
     OptixProgramGroup hitgroup = create_hit_pg(context, any_ptx_entry, closest_ptx_entry, module, module, pipeline_allocs);
+    const char *exception_ptx_entry = "__exception__exception_handler";
+    OptixProgramGroup exception = create_exception_pg(context, exception_ptx_entry, module, pipeline_allocs);
 
     programs[0] = raygen;
     programs[1] = miss;
     programs[2] = hitgroup;
+    programs[3] = exception;
     pipeline = create_pipeline(context, programs, &pipelineCompileOptions, &pipelineLinkOptions, NUM_PROGRAMS, pipeline_allocs);
 
     raygen_record_s raygen_rcd{};
     misshit_record_s miss_rcd{};
     hit_record_s hit_rcd{};
-
-    intersect_sbt = create_sbt(raygen, miss, hitgroup, raygen_rcd, miss_rcd, hit_rcd, sbt_allocs);
+    exception_record_s ex_rcd{};
+    intersect_sbt = create_sbt(raygen, miss, hitgroup, exception, raygen_rcd, miss_rcd, hit_rcd, ex_rcd, sbt_allocs);
 
     DEVICE_ERROR_CHECK(cudaMalloc(&d_params_buffer, sizeof(optix_traversal_param_s)));
   }

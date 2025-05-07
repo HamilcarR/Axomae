@@ -2,10 +2,12 @@
 #include "DrawEngine.h"
 #include "Image.h"
 #include "bake.h"
-#include "internal/common/exception/GenericException.h"
-#include "internal/thread/worker/ThreadPool.h"
 #include "manager/NovaResourceManager.h"
+#include "nova/bake_render_data.h"
 #include "nova_gpu_utils.h"
+#include "texturing/nova_texturing.h"
+#include <internal/common/exception/GenericException.h>
+#include <internal/thread/worker/ThreadPool.h>
 
 namespace exception {
   class NullMeshListException : public GenericException {
@@ -60,27 +62,25 @@ namespace nova_baker_utils {
     engine_resources_holder.integrator_flag = engine_opts.engine_type_flag;
   }
 
-  void initialize_environment_texture(const scene_envmap &envmap, nova::texturing::TextureResourcesHolder &resrc) {
-    float *raw_data = envmap.hdr_envmap->data.data();
-    int channels = envmap.hdr_envmap->metadata.channels;
-    int width = envmap.hdr_envmap->metadata.width;
-    int height = envmap.hdr_envmap->metadata.height;
-
-    resrc.setupEnvmap(raw_data, width, height, channels);
+  void initialize_environment_maps(const std::vector<envmap_data_s> &envmaps, nova::texturing::TextureResourcesHolder &texture_resources_holder) {
+    texture_resources_holder.reallocEnvmaps(envmaps.size());
+    for (const auto &element : envmaps) {
+      texture_resources_holder.addTexture(element.raw_data, element.width, element.height, element.channels, element.equirect_glID);
+    }
   }
 
   void initialize_nova_manager(const engine_data &engine_opts, nova::NovaResourceManager &manager) {
-    /* Initialize every matrix of the scene , and camera structures*/
+    /* Initialize every matrix of the scene, and camera structures.*/
     nova::camera::CameraResourcesHolder &camera_resources_holder = manager.getCameraData();
     nova::scene::SceneTransformations &scene_transformations = manager.getSceneTransformation();
     initialize_scene_data(engine_opts.camera, engine_opts.scene, scene_transformations, camera_resources_holder);
 
-    /* Initialize engine options */
+    /* Initialize engine options.*/
     nova::engine::EngineResourcesHolder &engine_resources_holder = manager.getEngineData();
     initialize_engine_opts(engine_opts, engine_resources_holder);
 
-    /* Environment map */
-    initialize_environment_texture(engine_opts.envmap, manager.getTexturesData());
+    /* Initialize environment maps.*/
+    initialize_environment_maps(engine_opts.environment_maps, manager.getTexturesData());
   }
 
   void bake_scene(render_scene_context &rendering_data) {

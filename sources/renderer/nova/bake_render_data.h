@@ -54,20 +54,24 @@ namespace nova_baker_utils {
     float far, near, fov;
   };
 
+  struct envmap_data_s {
+    GLuint equirect_glID;
+    float *raw_data;
+    int width;
+    int height;
+    int channels;
+  };
+
   struct scene_transform_data {
     glm::mat4 root_transformation;
     glm::mat4 root_translation;
     glm::mat4 root_rotation;
   };
 
-  struct scene_envmap {
-    image::ImageHolder<float> *hdr_envmap;
-  };
-
   struct engine_data {
+    std::vector<envmap_data_s> environment_maps;
     camera_data camera;
     scene_transform_data scene;
-    scene_envmap envmap;
     const std::vector<Mesh *> *mesh_list;
     int samples_max, samples_increment, aa_samples;
     int depth_max;

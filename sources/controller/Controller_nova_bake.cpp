@@ -1,13 +1,16 @@
 #include "Config.h"
+#include "EnvmapTextureManager.h"
 #include "ExceptionHandlerUI.h"
 #include "GUIWindow.h"
 #include "TextureViewerWidget.h"
 #include "WorkspaceTracker.h"
 #include "engine/nova_exception.h"
 #include "integrator/Integrator.h"
+#include "internal/macro/project_macros.h"
 #include "manager/ManagerInternalStructs.h"
 #include "manager/NovaResourceManager.h"
 #include "nova/bake.h"
+#include "nova/bake_render_data.h"
 #include <QFileDialog>
 #include <future>
 #include <internal/common/exception/GenericException.h>
@@ -45,7 +48,7 @@ namespace controller {
     bool use_gpu;
   };
 
-  static void setup_camera(nova_baker_utils::engine_data &engine_data, const Camera &renderer_camera, float render_width, float render_height) {
+  static void setup_camera(nova_baker_utils::engine_data &engine_data, const Camera &renderer_camera, int render_width, int render_height) {
     /* Camera */
     nova_baker_utils::camera_data camera_data{};
     const float fov_deg = renderer_camera.getFov();
@@ -76,15 +79,6 @@ namespace controller {
     engine_data.scene = scene_transfo;
   }
 
-  static void setup_environment_map(nova_baker_utils::engine_data &engine_data, const RendererInterface &renderer) {
-    /* Environment map */
-    nova_baker_utils::scene_envmap envmap{};
-    image::ImageHolder<float> *env = renderer.getCurrentEnvmapId().currentMutableEnvmapMetadata();
-    envmap.hdr_envmap = env;
-
-    engine_data.envmap = envmap;
-  }
-
   static void setup_engine(nova_baker_utils::engine_data &engine_data,
                            const ui_render_options &engine_options,
                            const engine_misc_options &misc_options) {
@@ -96,6 +90,37 @@ namespace controller {
     engine_data.engine_type_flag = misc_options.engine_type_flag;
     engine_data.flip_v = misc_options.flip_v;
     engine_data.threadpool_tag = NOVABAKE_POOL_TAG;
+  }
+
+  /* Retrieve all envmaps registered.*/
+  static void setup_envmaps(const EnvmapTextureManager &envmap_manager, nova_baker_utils::engine_data &engine_data) {
+    axstd::span<const texture::envmap::EnvmapTextureGroup> baked_envmaps = envmap_manager.getBakesViews();
+    std::vector<nova_baker_utils::envmap_data_s> envmap_data_collection;
+    for (const auto &envmap : baked_envmaps) {
+      nova_baker_utils::envmap_data_s data{};
+      data.equirect_glID = envmap.equirect_id;
+      AX_ASSERT_NOTNULL(envmap.metadata);
+      data.width = envmap.metadata->metadata.width;
+      data.height = envmap.metadata->metadata.height;
+      data.raw_data = envmap.metadata->data.data();
+      data.channels = envmap.metadata->metadata.channels;
+      envmap_data_collection.push_back(data);
+    }
+    engine_data.environment_maps = envmap_data_collection;
+  }
+
+  nova_baker_utils::engine_data generate_engine_data(const std::vector<Mesh *> &mesh_collection,
+                                                     const ui_render_options &render_options,
+                                                     const engine_misc_options &misc_options,
+                                                     const Camera &renderer_camera,
+                                                     const RendererInterface &renderer) {
+    nova_baker_utils::engine_data engine_data{};
+    engine_data.mesh_list = &mesh_collection;
+    setup_engine(engine_data, render_options, misc_options);
+    setup_camera(engine_data, renderer_camera, render_options.width, render_options.height);
+    setup_scene_transformation(engine_data, renderer_camera);
+    setup_envmaps(renderer.getCurrentEnvmapId(), engine_data);
+    return engine_data;
   }
 
   std::unique_ptr<nova::HdrBufferStruct> allocate_buffers(nova_baker_utils::NovaBakingStructure &nova_baking_structure,
@@ -134,20 +159,6 @@ namespace controller {
     buffers->byte_size_depth_buffers = depth_buffer_size * sizeof(float);
     buffers->channels = COLOR_CHANS;
     return buffers;
-  }
-
-  nova_baker_utils::engine_data generate_engine_data(const std::vector<Mesh *> &mesh_collection,
-                                                     const ui_render_options &render_options,
-                                                     const engine_misc_options &misc_options,
-                                                     const Camera &renderer_camera,
-                                                     const RendererInterface &renderer) {
-    nova_baker_utils::engine_data engine_data{};
-    engine_data.mesh_list = &mesh_collection;
-    setup_engine(engine_data, render_options, misc_options);
-    setup_camera(engine_data, renderer_camera, render_options.width, render_options.height);
-    setup_scene_transformation(engine_data, renderer_camera);
-    setup_environment_map(engine_data, renderer);
-    return engine_data;
   }
 
   static void setup_render_scene_data(const ui_render_options &render_options,
@@ -333,7 +344,8 @@ namespace controller {
     params.mesh_bundle_views = resrc_manager->getShapeData().getMeshSharedViews();
     params.primitives_view = resrc_manager->getPrimitiveData().getPrimitiveView();
     params.texture_bundle_views = resrc_manager->getTexturesData().getTextureBundleViews();
-
+    params.environment_map = resrc_manager->getTexturesData().getEnvmap();
+    params.camera = resrc_manager->getCameraData();
     params.width = grid_width;
     params.height = grid_height;
     params.depth = grid_depth;
@@ -366,32 +378,32 @@ namespace controller {
     act->pushContext();
 
     int sample_increment = 1;
-    while (sample_increment < metadata.serie_max && is_rendering(render_scene_data)) {
-      render_scene_data.nova_resource_manager->getEngineData().sample_increment = sample_increment;
-      int new_depth = render_scene_data.nova_resource_manager->getEngineData().max_depth < metadata.max_depth ?
-                          render_scene_data.nova_resource_manager->getEngineData().max_depth + 1 :
-                          metadata.max_depth;
-      render_scene_data.nova_resource_manager->getEngineData().max_depth = new_depth;
-      try {
-        nova::nova_eng_internals internals;
-        internals.resource_manager = render_scene_data.nova_resource_manager;
-        internals.exception_manager = render_scene_data.nova_exception_manager.get();
-        nova::gpu_draw(traversal_parameters, internals);
-      } catch (const exception::GenericException &e) {
-        ExceptionInfoBoxHandler::handle(e);
-        nova::gputils::unlock_host_memory(buffer_collection);
-        act->popContext();
-        return act;
-      }
-
-      if (on_exception_shutdown(*render_scene_data.nova_exception_manager)) {
-        nova::gputils::unlock_host_memory(buffer_collection);
-        act->popContext();
-        return act;
-      }
-      color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)sample_increment);
-      sample_increment++;
+    //    while (sample_increment < metadata.serie_max && is_rendering(render_scene_data)) {
+    render_scene_data.nova_resource_manager->getEngineData().sample_increment = sample_increment;
+    int new_depth = render_scene_data.nova_resource_manager->getEngineData().max_depth < metadata.max_depth ?
+                        render_scene_data.nova_resource_manager->getEngineData().max_depth + 1 :
+                        metadata.max_depth;
+    render_scene_data.nova_resource_manager->getEngineData().max_depth = new_depth;
+    try {
+      nova::nova_eng_internals internals;
+      internals.resource_manager = render_scene_data.nova_resource_manager;
+      internals.exception_manager = render_scene_data.nova_exception_manager.get();
+      nova::gpu_draw(traversal_parameters, internals);
+    } catch (const exception::GenericException &e) {
+      ExceptionInfoBoxHandler::handle(e);
+      nova::gputils::unlock_host_memory(buffer_collection);
+      act->popContext();
+      return act;
     }
+
+    if (on_exception_shutdown(*render_scene_data.nova_exception_manager)) {
+      nova::gputils::unlock_host_memory(buffer_collection);
+      act->popContext();
+      return act;
+    }
+    color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)sample_increment);
+    sample_increment++;
+    //  }
     nova::gputils::unlock_host_memory(buffer_collection);
     act->popContext();
     return act;

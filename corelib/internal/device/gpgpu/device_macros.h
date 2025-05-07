@@ -30,7 +30,7 @@
 #  define AX_GPU_FASTTANH(value) tanhf(value)
 #  define AX_GPU_FLOORF(val) floorf(val)
 #  define AX_GPU_ABS(val) abs(val)
-
+#  define AX_GPU_CEIL(val) ceil(val)
 #else
 #  define ax_device_callable
 #  define ax_device_shared
@@ -60,7 +60,7 @@
 #  define AX_GPU_FASTTANH(value) tanhf(value)
 #  define AX_GPU_FLOORF(val) floorf(val)
 #  define AX_GPU_ABS(val) fabsf(val)
-
+#  define AX_GPU_CEIL(val) ceil(val)
 #endif
 
 #endif
