@@ -30,10 +30,6 @@ PUBLIC
 if(AXOMAE_USE_CUDA)
     set_source_files_properties(DrawEngine_GPU.cpp PROPERTIES LANGUAGE CUDA) #TODO : probably useless
     target_compile_definitions(ax_core_nova PRIVATE AXOMAE_USE_CUDA)
-    target_sources(ax_core_nova
-            PUBLIC
-            gpu/DeviceImageTracker.cpp
-    )
     if(AXOMAE_USE_OPTIX)
         target_compile_definitions(ax_core_nova PRIVATE AXOMAE_USE_OPTIX)
         target_include_directories(ax_core_nova PUBLIC ${OPTIX_INCLUDE_PATH})

@@ -31,33 +31,23 @@ namespace nova::texturing {
     int getChannelsU32(std::size_t index) const { return getU32(index).channels; }
     int getChannelsF32(std::size_t index) const { return getF32(index).channels; }
 
-    ax_device_callable const U32Texture &getU32(std::size_t index) const {
-#ifndef __CUDA_ARCH__
-      return u32_textures.u32_host[index];
-#else
-      return u32_textures.u32_device[index];
-#endif
-    }
+    ax_device_callable const U32Texture &getU32(std::size_t index) const { return u32_textures.u32_managed[index]; }
 
     ax_device_callable TextureBundleViews(const u32tex_shared_views_s &utex, const f32tex_shared_views_s &ftex)
         : u32_textures(utex), f32_textures(ftex) {}
 
     ax_device_callable TextureBundleViews(const u32tex_shared_views_s &utex) : u32_textures(utex) {}
 
-    ax_device_callable const F32Texture &getF32(std::size_t index) const {
-#ifndef __CUDA_ARCH__
-      return f32_textures.f32_host[index];
-#else
-      return f32_textures.f32_device[index];
-#endif
-    }
+    ax_device_callable TextureBundleViews(const f32tex_shared_views_s &ftex) : f32_textures(ftex) {}
+
+    ax_device_callable const F32Texture &getF32(std::size_t index) const { return f32_textures.f32_managed[index]; }
   };
 
   /* Should be replaced with a solution that handles out of range UV mapping. */
   ax_device_callable_inlined unsigned uv2index(float t, int dim) {
     float a = AX_GPU_ABS(t);
     float rem = a - AX_GPU_FLOORF(a);
-    unsigned i = math::texture::uvToPixel(rem, dim - 1);
+    unsigned i = math::texture::uvToPixel(rem, dim);
     return i;
   }
 
@@ -124,8 +114,8 @@ namespace nova::texturing {
       }
       const int width = u32width(texture_index);
       const int height = u32height(texture_index);
-      unsigned i = uv2index(u, width);
-      unsigned j = uv2index(v, height);
+      unsigned i = uv2index(u, width - 1);
+      unsigned j = uv2index(v, height - 1);
       unsigned idx = (i * height + j);
       AX_ASSERT_LT(idx, width * height);
       return u32texture(texture_index).raw_data[idx];
@@ -142,16 +132,17 @@ namespace nova::texturing {
           rgba[1] = pixel.y;
           rgba[2] = pixel.z;
           rgba[3] = pixel.w;
+          return;
 #endif
           //  Other backend texture sampling methods need to be implemented here.
         }
       }
       const int width = f32width(texture_index);
       const int height = f32height(texture_index);
-      unsigned i = uv2index(u, width);
-      unsigned j = uv2index(v, height);
+      unsigned i = uv2index(u, width - 1);
+      unsigned j = uv2index(v, height - 1);
       const int channels = f32channels(texture_index);
-      unsigned idx = (i * height + j) * channels;
+      unsigned idx = (j * width + i) * channels;
       AX_ASSERT_LT(idx + channels - 1, width * height * channels);
       for (int i = 0; i < channels; i++)
         rgba[i] = f32texture(texture_index).raw_data[idx + i];

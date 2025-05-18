@@ -107,20 +107,15 @@ namespace nova::texturing {
       glm::vec3 normalized = glm::normalize(data.geometric_data.sampling_vector);
       const auto temp = normalized.y;
       normalized.y = normalized.z;
-      normalized.z = -temp;
+      normalized.z = temp;
       const glm::vec2 sph = math::spherical::cartesianToSpherical(normalized);
       const glm::vec2 uv = math::spherical::sphericalToUv(sph);
       const float u = normalize_uv(uv.x);
       const float v = normalize_uv(uv.y);
       const TextureCtx *texture_ctx = data.texture_ctx;
       AX_ASSERT_NOTNULL(texture_ctx);
-      const int width = texture_ctx->f32width(texture_index);
-      const int height = texture_ctx->f32height(texture_index);
-      const int x = (int)math::texture::uvToPixel(u, width - 1);
-      const int y = (int)math::texture::uvToPixel(1 - v, height - 1);
-      const int channels = texture_ctx->f32channels(texture_index);
       float pixel[4] = {};
-      texture_ctx->f32pixel(texture_index, u, 1 - v, pixel);
+      texture_ctx->f32pixel(texture_index, u, v, pixel);
       return {pixel[0], pixel[1], pixel[2], pixel[3]};
     }
   };

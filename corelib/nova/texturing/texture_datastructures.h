@@ -37,13 +37,11 @@ using IntopImgTexView = axstd::span<const device::gpgpu::APITextureHandle>;
 
 namespace nova::texturing {
   struct u32tex_shared_views_s {
-    CstU32ImgTexView u32_host;
-    CstU32ImgTexView u32_device;
+    CstU32ImgTexView u32_managed;
     IntopImgTexView interop_handles;
   };
   struct f32tex_shared_views_s {
-    CstF32ImgTexView f32_host;
-    CstF32ImgTexView f32_device;
+    CstF32ImgTexView f32_managed;
     IntopImgTexView interop_handles;
   };
 }  // namespace nova::texturing

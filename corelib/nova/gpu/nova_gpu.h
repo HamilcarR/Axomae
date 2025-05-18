@@ -1,6 +1,7 @@
 #ifndef NOVA_GPU_H
 #define NOVA_GPU_H
 #include "engine/datastructures.h"
+#include <internal/common/math/gpu/math_random_gpu.h>
 
 namespace nova {
 
@@ -15,7 +16,7 @@ namespace nova {
     texturing::TextureBundleViews texture_bundle_views;
     primitive::CstPrimitivesView primitives_view;
     material::CstNovaMatIntfView material_view;
-    texturing::EnvmapTexture environment_map;
+    texturing::NovaTextureInterface environment_map;
     camera::CameraResourcesHolder camera;
     device_random_generators_s device_random_generators;
     unsigned width, height, depth;
