@@ -63,6 +63,7 @@ class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
   ax_no_discard image::Rgb getFramebufferColor(int x, int y) const;
   void closeEvent(QCloseEvent *event) override;
   void prepareRendererSceneChange();
+  void signalEnvmapChange();
   template<RENDERER_CALLBACK_ENUM callback_id, class... Args>
   void rendererCallback(Args &&...args);
 

@@ -8,6 +8,7 @@
 #include "integrator/Integrator.h"
 #include "manager/NovaResourceManager.h"
 #include <internal/device/rendering/opengl/GLMutablePixelBufferObject.h>
+#include <internal/macro/project_macros.h>
 
 static constexpr int MAX_RECUR_DEPTH = 20;
 static constexpr int MAX_SAMPLES = 10000;
@@ -25,9 +26,12 @@ bool NovaRenderer::prep_draw() {
   return true;
 }
 
+/* Does nothing for now.*/
 void NovaRenderer::populateNovaSceneResources() {
-  /*Setup envmap */
-  image::ImageHolder<float> *current_envmap = envmap_manager->currentMutableEnvmapMetadata();
+  if (!envmap_manager || !nova_resource_manager)
+    return;
+  std::size_t id = envmap_manager->getEnvmapID();
+  nova_resource_manager->getTexturesData().setEnvmapId(id);
 }
 
 void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int channels) {

@@ -454,6 +454,7 @@ namespace controller {
       LOG(e.what(), LogLevel::ERROR);
       return false;
     }
+    display_manager.onEnvmapChange();
     return true;
   }
 

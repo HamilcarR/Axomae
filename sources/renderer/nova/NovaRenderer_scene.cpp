@@ -1,10 +1,10 @@
 #include "ExceptionHandlerUI.h"
 #include "NovaRenderer.h"
 #include "bake.h"
-#include "internal/common/exception/GenericException.h"
-#include "internal/debug/Logger.h"
-#include "internal/geometry/Object3D.h"
 #include "manager/NovaResourceManager.h"
+#include <internal/common/exception/GenericException.h>
+#include <internal/debug/Logger.h>
+#include <internal/geometry/Object3D.h>
 
 void NovaRenderer::setNewScene(const SceneChangeData &new_scene) {
   nova_resource_manager = new_scene.nova_resource_manager;

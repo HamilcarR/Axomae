@@ -5,6 +5,7 @@
 #include "manager/NovaResourceManager.h"
 #include "nova/bake_render_data.h"
 #include "nova_gpu_utils.h"
+#include "texturing/NovaTextureInterface.h"
 #include "texturing/nova_texturing.h"
 #include <internal/common/exception/GenericException.h>
 #include <internal/thread/worker/ThreadPool.h>
@@ -62,10 +63,13 @@ namespace nova_baker_utils {
     engine_resources_holder.integrator_flag = engine_opts.engine_type_flag;
   }
 
-  void initialize_environment_maps(const std::vector<envmap_data_s> &envmaps, nova::texturing::TextureResourcesHolder &texture_resources_holder) {
-    texture_resources_holder.reallocEnvmaps(envmaps.size());
-    for (const auto &element : envmaps) {
-      texture_resources_holder.addTexture(element.raw_data, element.width, element.height, element.channels, element.equirect_glID);
+  void initialize_environment_maps(const envmap_data_s &envmaps, nova::texturing::TextureResourcesHolder &texture_resources_holder) {
+    texture_resources_holder.allocateEnvironmentMaps(envmaps.env_textures.size());
+    texture_resources_holder.setEnvmapId(envmaps.current_envmap_id);
+    for (const auto &element : envmaps.env_textures) {
+      std::size_t index = texture_resources_holder.addTexture(
+          element.raw_data, element.width, element.height, element.channels, element.equirect_glID);
+      texture_resources_holder.addNovaTexture<nova::texturing::EnvmapTexture>(index);
     }
   }
 

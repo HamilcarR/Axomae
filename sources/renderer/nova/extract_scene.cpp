@@ -6,6 +6,7 @@
 #include "extract_scene_internal.h"
 #include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
+#include "nova/bake_render_data.h"
 #include "shape/nova_shape.h"
 #include <internal/common/axstd/span.h>
 
@@ -83,7 +84,29 @@ namespace nova_baker_utils {
     texture_init_data.total_constant_textures = resrc.constant_texture_number;
     texture_init_data.total_image_textures = resrc.image_texture_number;
     auto &texture_resrc = manager.getTexturesData();
-    texture_resrc.init(texture_init_data);
+    texture_resrc.allocateMeshTextures(texture_init_data);
+  }
+
+  void setup_envmaps(const EnvmapTextureManager &envmap_manager, nova_baker_utils::envmap_data_s &envmap_data) {
+    axstd::span<const texture::envmap::EnvmapTextureGroup> baked_envmaps = envmap_manager.getBakesViews();
+    nova_baker_utils::envmap_data_s envmap_infos;
+    std::vector<nova_baker_utils::envmap_memory_s> &envmap_data_collection = envmap_infos.env_textures;
+    unsigned current_envmap_id = 0;
+    auto gl_equi2D_id = envmap_manager.getCurrentEnvmapGroup().equirect_gl_id;
+    for (const auto &envmap : baked_envmaps) {
+      nova_baker_utils::envmap_memory_s data{};
+      data.equirect_glID = envmap.equirect_gl_id;
+      if (data.equirect_glID == gl_equi2D_id)
+        envmap_infos.current_envmap_id = current_envmap_id;
+      AX_ASSERT_NOTNULL(envmap.metadata);
+      data.width = envmap.metadata->metadata.width;
+      data.height = envmap.metadata->metadata.height;
+      data.raw_data = envmap.metadata->data.data();
+      data.channels = envmap.metadata->metadata.channels;
+      envmap_data_collection.push_back(data);
+      current_envmap_id++;
+    }
+    envmap_data = envmap_infos;
   }
 
   void build_scene(const std::vector<drawable_original_transform> &drawables_orig_transfo, nova::NovaResourceManager &manager) {

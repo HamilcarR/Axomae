@@ -9,10 +9,10 @@
 #include "Scene.h"
 #include "TextureProcessing.h"
 #include "event/EventController.h"
-#include "internal/device/rendering/opengl/GLMutablePixelBufferObject.h"
 #include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
 #include "primitive/NovaGeoPrimitive.h"
+#include <internal/device/rendering/opengl/GLMutablePixelBufferObject.h>
 #include <unistd.h>
 
 static std::mutex mutex;
@@ -71,6 +71,17 @@ void NovaRenderer::setProgressStatus(const std::string &status) {
   gl_widget->notifyProgress();
 }
 void NovaRenderer::onHideEvent() { onClose(); }
+
+void NovaRenderer::onShowEvent() {}
+
+void NovaRenderer::updateEnvmap() {
+  if (!envmap_manager || !nova_resource_manager)
+    return;
+  resetToBaseState();
+  nova_baker_utils::envmap_data_s envmap_data;
+  nova_baker_utils::setup_envmaps(*envmap_manager, envmap_data);
+  nova_baker_utils::initialize_environment_maps(envmap_data, nova_resource_manager->getTexturesData());
+}
 
 void NovaRenderer::displayProgress(float current, float target) {
   if (current > target)

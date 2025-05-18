@@ -88,6 +88,8 @@ class Renderer final : public IRenderer {
   void setViewerWidget(GLViewer *widget) override;
   void prepSceneChange() override;
   void onHideEvent() override;
+  void onShowEvent() override;
+  void updateEnvmap() override;
 };
 
 #endif

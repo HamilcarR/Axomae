@@ -43,12 +43,20 @@ namespace controller {
     nova_viewer->setApplicationConfig(global_application_config);
 
     nova_resource_manager = std::make_unique<nova::NovaResourceManager>();
+    SceneChangeData scene_data;
+    scene_data.nova_resource_manager = nova_resource_manager.get();
+    nova_viewer->setNewScene(scene_data);
     connect_slots();
   }
   void DisplayManager3D::makeCtxRealtime() { emit signal_switch_realtime_ctx(); }
+
   void DisplayManager3D::doneCtxRealtime() { emit signal_done_realtime_ctx(); }
+
   void DisplayManager3D::haltRenderers() { emit signal_halt_renderers(); }
+
   void DisplayManager3D::resumeRenderers() { emit signal_resume_renderers(); }
+
+  void DisplayManager3D::onEnvmapChange() { nova_viewer->signalEnvmapChange(); }
 
   template<class T>
   axstd::span<uint8_t> convert_to_byte_span(const axstd::span<T> &to_convert) {
@@ -120,6 +128,10 @@ namespace controller {
     auto device_accelerator = nova_baker_utils::build_device_managed_acceleration_structure(aggregate);
     nova_resource_manager->setManagedGpuAccelerationStructure(std::move(device_accelerator));
 #endif
+
+    notify_simple_progress("Updating environment maps", progress_manager);
+    nova_viewer->signalEnvmapChange();
+
     progress_manager.reset();
   }
 

@@ -46,6 +46,9 @@ namespace nova_baker_utils {
                              nova::scene::SceneTransformations &scene_transform,
                              nova::camera::CameraResourcesHolder &camera_resources_holder);
   void initialize_engine_opts(const engine_data &engine_opts, nova::engine::EngineResourcesHolder &engine_resources_holder);
+  void initialize_environment_maps(const envmap_data_s &envmaps, nova::texturing::TextureResourcesHolder &texture_resources_holder);
+  /* Retrieve all envmaps registered.*/
+  void setup_envmaps(const EnvmapTextureManager &envmap_manager, nova_baker_utils::envmap_data_s &envmap_data);
   void cancel_render(engine_data &data);
   std::unique_ptr<NovaRenderEngineInterface> create_engine(const engine_data &engine_type);
   void synchronize_render_threads(render_scene_context &scene_data, const std::string &tag);

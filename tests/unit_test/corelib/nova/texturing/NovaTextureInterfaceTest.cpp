@@ -1,17 +1,15 @@
-#include "Image.h"
-#include "ImageImporter.h"
-#include "Loader.h"
-#include "Metadata.h"
+#include "texturing/NovaTextureInterface.h"
 #include "Test.h"
 #include "texturing/TextureContext.h"
 #include "texturing/texture_datastructures.h"
+#include "utils/disk_io_utils.h"
 #include <gtest/gtest.h>
+#include <internal/common/math/math_random.h>
 #include <internal/common/math/math_spherical.h>
 #include <internal/common/math/math_texturing.h>
 
-#include "texturing/NovaTextureInterface.h"
-
 namespace nvt = nova::texturing;
+
 class TextureCtxFake : public nvt::TextureCtx {
  public:
   TextureCtxFake(const nvt::TextureBundleViews &bundle) : TextureCtx(bundle) {}
@@ -81,7 +79,8 @@ class FTextureBuilderStub {
   }
 
  public:
-  constexpr static std::size_t SIZE = 256 * 256 * 3;
+  constexpr static unsigned CHANNELS = 3;
+  constexpr static std::size_t SIZE = 256 * 256 * CHANNELS;
   constexpr static std::size_t WIDTH = 256;
   constexpr static std::size_t HEIGHT = 256;
 
@@ -90,25 +89,16 @@ class FTextureBuilderStub {
     texture.resize(SIZE);
     for (int j = 0; j < HEIGHT; j++)
       for (int i = 0; i < WIDTH; i++) {
-        std::size_t idx = (j * WIDTH + i);
+        std::size_t idx = (j * WIDTH + i) * CHANNELS;
         double u = math::texture::pixelToUv(i, WIDTH - 1);
         double v = math::texture::pixelToUv(j, HEIGHT - 1);
         glm::vec2 sph = math::spherical::uvToSpherical({u, v});
-        glm::vec3 cart = math::spherical::sphericalToCartesian(sph);
+        glm::vec3 cart = glm::normalize(math::spherical::sphericalToCartesian(sph));
+
         putColor(cart.r, cart.g, cart.b, idx);
       }
 
-    image::Metadata metadata;
-    metadata.channels = 3;
-    metadata.width = WIDTH;
-    metadata.height = HEIGHT;
-    metadata.name = "envmaptest";
-    metadata.format = "hdr";
-    metadata.color_corrected = true;
-    metadata.is_hdr = true;
-    image::ImageHolder<float> image(texture, metadata);
-    IO::Loader loader(nullptr);
-    loader.writeHdr("/tmp/envmaptest", image);
+    write_texture_on_disk("/tmp/envmaptest", texture, WIDTH, HEIGHT, 3, "hdr", true, true);
   }
 
   F32Texture getF32() const {
@@ -129,10 +119,14 @@ TEST(EnvmapTextureTest, sample) {
   aggregate.texture_ctx = &ctx;
 
   nvt::EnvmapTexture envmap(0);
-  glm::vec3 sample_vector = {0.f, 1.f, 0.f};
-  aggregate.geometric_data.sampling_vector = sample_vector;
-  glm::vec4 pixel = envmap.sample(0, 0, aggregate);
-  ASSERT_EQ(pixel.r, sample_vector.r);
-  ASSERT_EQ(pixel.g, sample_vector.g);
-  ASSERT_EQ(pixel.b, sample_vector.b);
+  auto random = math::random::CPUPseudoRandomGenerator(0xDEADBEEF);
+  for (int i = 0; i < 100; i++) {
+    glm::vec3 sample_vector = random.nrand3f(0.f, 1.f);
+    aggregate.geometric_data.sampling_vector = sample_vector;
+    glm::vec4 pixel = envmap.sample(0, 0, aggregate);
+    sample_vector = glm::normalize(sample_vector);
+    EXPECT_LT(std::fabs(pixel.r - sample_vector.r), 1e-1) << "i" << i;
+    EXPECT_LT(std::fabs(pixel.g - sample_vector.g), 1e-1) << "i" << i;
+    EXPECT_LT(std::fabs(pixel.b - sample_vector.b), 1e-1) << "i" << i;
+  }
 }

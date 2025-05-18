@@ -92,23 +92,6 @@ namespace controller {
     engine_data.threadpool_tag = NOVABAKE_POOL_TAG;
   }
 
-  /* Retrieve all envmaps registered.*/
-  static void setup_envmaps(const EnvmapTextureManager &envmap_manager, nova_baker_utils::engine_data &engine_data) {
-    axstd::span<const texture::envmap::EnvmapTextureGroup> baked_envmaps = envmap_manager.getBakesViews();
-    std::vector<nova_baker_utils::envmap_data_s> envmap_data_collection;
-    for (const auto &envmap : baked_envmaps) {
-      nova_baker_utils::envmap_data_s data{};
-      data.equirect_glID = envmap.equirect_id;
-      AX_ASSERT_NOTNULL(envmap.metadata);
-      data.width = envmap.metadata->metadata.width;
-      data.height = envmap.metadata->metadata.height;
-      data.raw_data = envmap.metadata->data.data();
-      data.channels = envmap.metadata->metadata.channels;
-      envmap_data_collection.push_back(data);
-    }
-    engine_data.environment_maps = envmap_data_collection;
-  }
-
   nova_baker_utils::engine_data generate_engine_data(const std::vector<Mesh *> &mesh_collection,
                                                      const ui_render_options &render_options,
                                                      const engine_misc_options &misc_options,
@@ -119,7 +102,7 @@ namespace controller {
     setup_engine(engine_data, render_options, misc_options);
     setup_camera(engine_data, renderer_camera, render_options.width, render_options.height);
     setup_scene_transformation(engine_data, renderer_camera);
-    setup_envmaps(renderer.getCurrentEnvmapId(), engine_data);
+    setup_envmaps(renderer.getCurrentEnvmapId(), engine_data.environment_maps);
     return engine_data;
   }
 
@@ -344,7 +327,7 @@ namespace controller {
     params.mesh_bundle_views = resrc_manager->getShapeData().getMeshSharedViews();
     params.primitives_view = resrc_manager->getPrimitiveData().getPrimitiveView();
     params.texture_bundle_views = resrc_manager->getTexturesData().getTextureBundleViews();
-    params.environment_map = resrc_manager->getTexturesData().getEnvmap();
+    params.environment_map = resrc_manager->getTexturesData().getCurrentEnvmap();
     params.camera = resrc_manager->getCameraData();
     params.width = grid_width;
     params.height = grid_height;

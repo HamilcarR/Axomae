@@ -54,12 +54,17 @@ namespace nova_baker_utils {
     float far, near, fov;
   };
 
-  struct envmap_data_s {
+  struct envmap_memory_s {
     GLuint equirect_glID;
     float *raw_data;
     int width;
     int height;
     int channels;
+  };
+
+  struct envmap_data_s {
+    std::vector<envmap_memory_s> env_textures;
+    unsigned current_envmap_id;
   };
 
   struct scene_transform_data {
@@ -69,7 +74,7 @@ namespace nova_baker_utils {
   };
 
   struct engine_data {
-    std::vector<envmap_data_s> environment_maps;
+    envmap_data_s environment_maps;
     camera_data camera;
     scene_transform_data scene;
     const std::vector<Mesh *> *mesh_list;
