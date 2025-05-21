@@ -107,6 +107,8 @@ class FTextureBuilderStub {
     tex.height = HEIGHT;
     tex.channels = 3;
     tex.raw_data = texture;
+    tex.invert_u = false;
+    tex.invert_v = false;
     return tex;
   }
 };
@@ -119,7 +121,7 @@ TEST(EnvmapTextureTest, sample) {
   aggregate.texture_ctx = &ctx;
 
   nvt::EnvmapTexture envmap(0);
-  auto random = math::random::CPUPseudoRandomGenerator(0xDEADBEEF);
+  auto random = math::random::CPUPseudoRandomGenerator(0xDEADBEEF);  // We keep random generation deterministic
   for (int i = 0; i < 100; i++) {
     glm::vec3 sample_vector = random.nrand3f(0.f, 1.f);
     aggregate.geometric_data.sampling_vector = sample_vector;

@@ -90,8 +90,10 @@ namespace nova::texturing {
      * Returns the ID of the registered texture in its array.
      */
     template<class T>
-    std::size_t addTexture(const T *data, int width, int height, int channels, GLuint tex_id = 0) {
+    std::size_t addTexture(const T *data, int width, int height, int channels, bool inverted_u = false, bool inverted_v = false, GLuint tex_id = 0) {
       TextureRawData<T> texture_raw_data;
+      texture_raw_data.invert_u = inverted_u;
+      texture_raw_data.invert_v = inverted_v;
       texture_raw_data.is_rgba = false;  // just letting this here for now, will replace with better memory format system.
       texture_raw_data.width = width;
       texture_raw_data.height = height;

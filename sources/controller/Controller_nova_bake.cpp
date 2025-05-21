@@ -505,18 +505,16 @@ namespace controller {
                               nova_baking_structure,
                               thread_pool);
       start_baking(nova_baking_structure.render_context, this, nova_baking_structure.bake_buffers.image_holder, misc_options.use_gpu);
-      ignore_skybox(renderer, false);
     } catch (const exception::CatastrophicFailureException &e) {
-      ignore_skybox(renderer, false);
       LOG(e.what(), LogLevel::CRITICAL);
       cleanupNova();
       ExceptionInfoBoxHandler::handle(exception::CRITICAL_TXT, exception::CRITICAL);
     } catch (const std::exception &e) {
-      ignore_skybox(renderer, false);
       LOG(e.what(), LogLevel::CRITICAL);
       cleanupNova();
       ExceptionInfoBoxHandler::handle(exception::CRITICAL_TXT, exception::CRITICAL);
     }
+    ignore_skybox(renderer, false);
   }
 
   struct ui_inputs {

@@ -100,6 +100,26 @@ namespace nova::texturing {
       return tex.is_rgba;
     }
 
+    ax_device_callable_inlined bool F32IsUInverted(std::size_t index) const {
+      const F32Texture tex = bundle.getF32(index);
+      return tex.invert_u;
+    }
+
+    ax_device_callable_inlined bool F32IsVInverted(std::size_t index) const {
+      const F32Texture tex = bundle.getF32(index);
+      return tex.invert_v;
+    }
+
+    ax_device_callable_inlined bool U32IsUInverted(std::size_t index) const {
+      const U32Texture tex = bundle.getU32(index);
+      return tex.invert_u;
+    }
+
+    ax_device_callable_inlined bool U32IsVInverted(std::size_t index) const {
+      const U32Texture tex = bundle.getU32(index);
+      return tex.invert_v;
+    }
+
     /* Outputs pixel in BGRA format. */
     ax_device_callable uint32_t u32pixel(std::size_t texture_index, float u, float v) const {
       if constexpr (core::build::is_gpu_build) {
@@ -114,6 +134,8 @@ namespace nova::texturing {
       }
       const int width = u32width(texture_index);
       const int height = u32height(texture_index);
+      u = U32IsUInverted(texture_index) ? 1 - u : u;
+      v = U32IsVInverted(texture_index) ? 1 - v : v;
       unsigned i = uv2index(u, width - 1);
       unsigned j = uv2index(v, height - 1);
       unsigned idx = (i * height + j);
@@ -139,6 +161,8 @@ namespace nova::texturing {
       }
       const int width = f32width(texture_index);
       const int height = f32height(texture_index);
+      u = F32IsUInverted(texture_index) ? 1 - u : u;
+      v = F32IsVInverted(texture_index) ? 1 - v : v;
       unsigned i = uv2index(u, width - 1);
       unsigned j = uv2index(v, height - 1);
       const int channels = f32channels(texture_index);

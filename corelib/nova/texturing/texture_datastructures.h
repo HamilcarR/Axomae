@@ -22,6 +22,8 @@ namespace nova::texturing {
     int height;
     int channels;
     bool is_rgba{false};  // RGBA or BGRA
+    bool invert_u{false};
+    bool invert_v{false};
   };
 }  // namespace nova::texturing
 

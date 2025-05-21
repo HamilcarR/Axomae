@@ -18,21 +18,6 @@ namespace exception {
 
 namespace nova_baker_utils {
 
-  void extract_envmap(const EnvmapTextureManager &envmap_manager, nova::NovaResourceManager &nova_manager) {
-    const int envmap_id = envmap_manager.currentEquirect2D();
-    const image::ImageHolder<float> *envmap_texture = envmap_manager.currentMutableEnvmapMetadata();
-    AX_ASSERT_NOTNULL(envmap_texture);
-    const float *buffer_ptr = envmap_texture->data.data();
-    unsigned w = envmap_texture->metadata.width;
-    unsigned h = envmap_texture->metadata.height;
-    unsigned channels = envmap_texture->metadata.channels;
-    nova::texturing::TextureResourcesHolder &texture_manager = nova_manager.getTexturesData();
-    std::size_t texture_index = texture_manager.addTexture(buffer_ptr, (int)w, (int)h, (int)channels, envmap_id);
-    nova::texturing::NovaTextureInterface ret = texture_manager.addNovaTexture<nova::texturing::EnvmapTexture>(texture_index);
-    if (!ret.get<nova::texturing::EnvmapTexture>())
-      throw exception::InvalidTexTypeConversionException();
-  }
-
   nova::texturing::ImageTexture *extract_texture(const TextureGroup &tgroup, nova::NovaResourceManager &manager, GenericTexture::TYPE type) {
     const GenericTexture *gltexture = tgroup.getTexturePointer(type);
     if (!gltexture) {
@@ -43,7 +28,7 @@ namespace nova_baker_utils {
     int w = (int)gltexture->getWidth();
     int h = (int)gltexture->getHeight();
     nova::texturing::TextureResourcesHolder &texture_manager = manager.getTexturesData();
-    std::size_t texture_index = texture_manager.addTexture(buffer_ptr, w, h, 4, gltexture->getSamplerID());
+    std::size_t texture_index = texture_manager.addTexture(buffer_ptr, w, h, 4, false, false, gltexture->getSamplerID());
     auto ret = texture_manager.addNovaTexture<nova::texturing::ImageTexture>(texture_index);
     auto *image_tex = ret.get<nova::texturing::ImageTexture>();
     if (!image_tex)

@@ -22,32 +22,60 @@ namespace nova_baker_utils {
                              nova::scene::SceneTransformations &nova_scene_transformations,
                              nova::camera::CameraResourcesHolder &nova_camera_structure) {
 
-    /* Camera data*/
-    nova_camera_structure.up_vector = scene_camera.up_vector;
-    nova_camera_structure.P = scene_camera.projection;
-    nova_camera_structure.inv_P = glm::inverse(scene_camera.projection);
-    nova_camera_structure.V = scene_camera.view;
-    nova_camera_structure.inv_V = glm::inverse(nova_camera_structure.V);
-    nova_camera_structure.position = scene_camera.position;
-    nova_camera_structure.direction = scene_camera.direction;
-    nova_camera_structure.far = scene_camera.far;
-    nova_camera_structure.near = scene_camera.near;
-    nova_camera_structure.screen_width = scene_camera.width;
-    nova_camera_structure.screen_height = scene_camera.height;
-    nova_camera_structure.fov = scene_camera.fov;
+    /* Camera data */
+    glm::vec3 up_vector = scene_camera.up_vector;
+    glm::mat4 P = scene_camera.projection;
+    glm::mat4 inv_P = glm::inverse(P);
+    // this syncs the view from nova to the Realtime renderer.
+    glm::mat4 V = glm::rotate(scene_camera.view, glm::radians(90.f), glm::vec3(-1.f, 0.f, 0.f));
+    glm::mat4 inv_V = glm::inverse(V);
+    glm::vec3 position = scene_camera.position;
+    glm::vec3 direction = scene_camera.direction;
+    float far_clip = scene_camera.far;
+    float near_clip = scene_camera.near;
+    int screen_width = scene_camera.width;
+    int screen_height = scene_camera.height;
+    float fov = scene_camera.fov;
+
+    nova_camera_structure.up_vector = up_vector;
+    nova_camera_structure.P = P;
+    nova_camera_structure.inv_P = inv_P;
+    nova_camera_structure.V = V;
+    nova_camera_structure.inv_V = inv_V;
+    nova_camera_structure.position = position;
+    nova_camera_structure.direction = direction;
+    nova_camera_structure.far = far_clip;
+    nova_camera_structure.near = near_clip;
+    nova_camera_structure.screen_width = screen_width;
+    nova_camera_structure.screen_height = screen_height;
+    nova_camera_structure.fov = fov;
 
     /* Scene root transformations */
-    nova_scene_transformations.T = scene_data.root_translation;
-    nova_scene_transformations.inv_T = glm::inverse(scene_data.root_translation);
-    nova_scene_transformations.R = scene_data.root_rotation;
-    nova_scene_transformations.inv_R = glm::inverse(scene_data.root_rotation);
-    nova_scene_transformations.M = scene_data.root_transformation;
-    nova_scene_transformations.inv_M = glm::inverse(scene_data.root_transformation);
-    nova_scene_transformations.PVM = scene_camera.projection * scene_camera.view * scene_data.root_transformation;
-    nova_scene_transformations.inv_PVM = glm::inverse(nova_scene_transformations.PVM);
-    nova_scene_transformations.VM = nova_camera_structure.V * nova_scene_transformations.M;
-    nova_scene_transformations.inv_VM = glm::inverse(nova_scene_transformations.VM);
-    nova_scene_transformations.N = glm::mat3(glm::transpose(nova_scene_transformations.inv_M));
+    glm::mat4 T = scene_data.root_translation;
+    glm::mat4 inv_T = glm::inverse(T);
+    glm::mat4 R = scene_data.root_rotation;
+    glm::mat4 inv_R = glm::inverse(R);
+    glm::mat4 inv_VR = inv_V * inv_R;
+    glm::mat4 M = scene_data.root_transformation;
+    glm::mat4 inv_M = glm::inverse(M);
+    glm::mat4 PVM = P * V * M;
+    glm::mat4 inv_PVM = glm::inverse(PVM);
+    glm::mat4 VM = V * M;
+    glm::mat4 inv_VM = glm::inverse(VM);
+    glm::mat3 N = glm::mat3(glm::transpose(inv_M));
+
+    nova_scene_transformations.T = T;
+    nova_scene_transformations.inv_T = inv_T;
+    nova_scene_transformations.R = R;
+    nova_scene_transformations.inv_R = inv_R;
+    nova_scene_transformations.M = M;
+    nova_scene_transformations.inv_M = inv_M;
+    nova_scene_transformations.PVM = PVM;
+    nova_scene_transformations.inv_PVM = inv_PVM;
+    nova_scene_transformations.VM = VM;
+    nova_scene_transformations.inv_VM = inv_VM;
+    nova_scene_transformations.N = N;
+    nova_scene_transformations.inv_VR = inv_VR;
   }
 
   void initialize_engine_opts(const engine_data &engine_opts, nova::engine::EngineResourcesHolder &engine_resources_holder) {
@@ -68,7 +96,7 @@ namespace nova_baker_utils {
     texture_resources_holder.setEnvmapId(envmaps.current_envmap_id);
     for (const auto &element : envmaps.env_textures) {
       std::size_t index = texture_resources_holder.addTexture(
-          element.raw_data, element.width, element.height, element.channels, element.equirect_glID);
+          element.raw_data, element.width, element.height, element.channels, true, false, element.equirect_glID);
       texture_resources_holder.addNovaTexture<nova::texturing::EnvmapTexture>(index);
     }
   }

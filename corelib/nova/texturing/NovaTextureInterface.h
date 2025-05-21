@@ -105,9 +105,6 @@ namespace nova::texturing {
     ax_device_callable glm::vec4 sample(float /*u*/, float /*v*/, const texture_data_aggregate_s &data) const {
       /* Compute UV coordinates from the cartesian sampling vector. */
       glm::vec3 normalized = glm::normalize(data.geometric_data.sampling_vector);
-      const auto temp = normalized.y;
-      normalized.y = normalized.z;
-      normalized.z = temp;
       const glm::vec2 sph = math::spherical::cartesianToSpherical(normalized);
       const glm::vec2 uv = math::spherical::sphericalToUv(sph);
       const float u = normalize_uv(uv.x);

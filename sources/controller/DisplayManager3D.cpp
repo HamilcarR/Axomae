@@ -76,10 +76,20 @@ namespace controller {
     glm::mat4 original_transfo;
   };
 
+  /* Rotates the entire scene 90° counter clock wise on the X axis.
+   * This is done because Nova does spherical envmapping and doesn't transform sampling vectors.
+   * IE, it just syncs the orientation of the scene in the realtime viewer, and the orientation of the scene in Nova.
+   * There's also a correction of the view matrix in nova_baker_utils::initialize_scene_data().
+   */
+  static glm::mat4 transform_swizzle(const Mesh *elem) {
+    return glm::rotate(glm::mat4(1.f), glm::radians(90.f), glm::vec3(1.f, 0.f, 0.f)) * elem->getAccumulatedModelMatrix() *
+           elem->getLocalModelMatrix();
+  }
+
   static std::vector<mesh_transform_t> retrieve_original_mesh_transform(const SceneChangeData &scene_change) {
     std::vector<mesh_transform_t> mesh_transf;
     for (Mesh *elem : scene_change.mesh_list) {
-      mesh_transf.push_back({elem, elem->computeFinalTransformation()});
+      mesh_transf.push_back({elem, transform_swizzle(elem)});
     }
     return mesh_transf;
   }
