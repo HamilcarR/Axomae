@@ -74,7 +74,7 @@ namespace nova::integrator {
       return DENAN(10.f * emit + color * Li(out, nova_internals, depth - 1, sampler));
     }
     glm::vec3 sample_vector = ray.direction;
-    const auto &envmap = nova_resources->getTexturesData().getEnvmap();
+    const auto &envmap = nova_resources->getTexturesData().getCurrentEnvmap();
     texture_sampling_data.geometric_data.sampling_vector = sample_vector;
     return envmap.sample(0, 0, texture_sampling_data);
   }

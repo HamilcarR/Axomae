@@ -1,13 +1,16 @@
 #include "Config.h"
+#include "EnvmapTextureManager.h"
 #include "ExceptionHandlerUI.h"
 #include "GUIWindow.h"
 #include "TextureViewerWidget.h"
 #include "WorkspaceTracker.h"
 #include "engine/nova_exception.h"
 #include "integrator/Integrator.h"
+#include "internal/macro/project_macros.h"
 #include "manager/ManagerInternalStructs.h"
 #include "manager/NovaResourceManager.h"
 #include "nova/bake.h"
+#include "nova/bake_render_data.h"
 #include <QFileDialog>
 #include <future>
 #include <internal/common/exception/GenericException.h>
@@ -45,7 +48,7 @@ namespace controller {
     bool use_gpu;
   };
 
-  static void setup_camera(nova_baker_utils::engine_data &engine_data, const Camera &renderer_camera, float render_width, float render_height) {
+  static void setup_camera(nova_baker_utils::engine_data &engine_data, const Camera &renderer_camera, int render_width, int render_height) {
     /* Camera */
     nova_baker_utils::camera_data camera_data{};
     const float fov_deg = renderer_camera.getFov();
@@ -76,15 +79,6 @@ namespace controller {
     engine_data.scene = scene_transfo;
   }
 
-  static void setup_environment_map(nova_baker_utils::engine_data &engine_data, const RendererInterface &renderer) {
-    /* Environment map */
-    nova_baker_utils::scene_envmap envmap{};
-    image::ImageHolder<float> *env = renderer.getCurrentEnvmapId().currentMutableEnvmapMetadata();
-    envmap.hdr_envmap = env;
-
-    engine_data.envmap = envmap;
-  }
-
   static void setup_engine(nova_baker_utils::engine_data &engine_data,
                            const ui_render_options &engine_options,
                            const engine_misc_options &misc_options) {
@@ -96,6 +90,20 @@ namespace controller {
     engine_data.engine_type_flag = misc_options.engine_type_flag;
     engine_data.flip_v = misc_options.flip_v;
     engine_data.threadpool_tag = NOVABAKE_POOL_TAG;
+  }
+
+  nova_baker_utils::engine_data generate_engine_data(const std::vector<Mesh *> &mesh_collection,
+                                                     const ui_render_options &render_options,
+                                                     const engine_misc_options &misc_options,
+                                                     const Camera &renderer_camera,
+                                                     const RendererInterface &renderer) {
+    nova_baker_utils::engine_data engine_data{};
+    engine_data.mesh_list = &mesh_collection;
+    setup_engine(engine_data, render_options, misc_options);
+    setup_camera(engine_data, renderer_camera, render_options.width, render_options.height);
+    setup_scene_transformation(engine_data, renderer_camera);
+    setup_envmaps(renderer.getCurrentEnvmapId(), engine_data.environment_maps);
+    return engine_data;
   }
 
   std::unique_ptr<nova::HdrBufferStruct> allocate_buffers(nova_baker_utils::NovaBakingStructure &nova_baking_structure,
@@ -134,20 +142,6 @@ namespace controller {
     buffers->byte_size_depth_buffers = depth_buffer_size * sizeof(float);
     buffers->channels = COLOR_CHANS;
     return buffers;
-  }
-
-  nova_baker_utils::engine_data generate_engine_data(const std::vector<Mesh *> &mesh_collection,
-                                                     const ui_render_options &render_options,
-                                                     const engine_misc_options &misc_options,
-                                                     const Camera &renderer_camera,
-                                                     const RendererInterface &renderer) {
-    nova_baker_utils::engine_data engine_data{};
-    engine_data.mesh_list = &mesh_collection;
-    setup_engine(engine_data, render_options, misc_options);
-    setup_camera(engine_data, renderer_camera, render_options.width, render_options.height);
-    setup_scene_transformation(engine_data, renderer_camera);
-    setup_environment_map(engine_data, renderer);
-    return engine_data;
   }
 
   static void setup_render_scene_data(const ui_render_options &render_options,
@@ -333,7 +327,7 @@ namespace controller {
     params.mesh_bundle_views = resrc_manager->getShapeData().getMeshSharedViews();
     params.primitives_view = resrc_manager->getPrimitiveData().getPrimitiveView();
     params.texture_bundle_views = resrc_manager->getTexturesData().getTextureBundleViews();
-    params.environment_map = resrc_manager->getTexturesData().getEnvmap();
+    params.environment_map = resrc_manager->getTexturesData().getCurrentEnvmap();
     params.camera = resrc_manager->getCameraData();
     params.width = grid_width;
     params.height = grid_height;
@@ -511,18 +505,16 @@ namespace controller {
                               nova_baking_structure,
                               thread_pool);
       start_baking(nova_baking_structure.render_context, this, nova_baking_structure.bake_buffers.image_holder, misc_options.use_gpu);
-      ignore_skybox(renderer, false);
     } catch (const exception::CatastrophicFailureException &e) {
-      ignore_skybox(renderer, false);
       LOG(e.what(), LogLevel::CRITICAL);
       cleanupNova();
       ExceptionInfoBoxHandler::handle(exception::CRITICAL_TXT, exception::CRITICAL);
     } catch (const std::exception &e) {
-      ignore_skybox(renderer, false);
       LOG(e.what(), LogLevel::CRITICAL);
       cleanupNova();
       ExceptionInfoBoxHandler::handle(exception::CRITICAL_TXT, exception::CRITICAL);
     }
+    ignore_skybox(renderer, false);
   }
 
   struct ui_inputs {

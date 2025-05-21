@@ -33,6 +33,8 @@ void GLViewer::syncRenderer() {
   doneCurrent();
 }
 
+void GLViewer::signalEnvmapChange() { renderer->updateEnvmap(); }
+
 void GLViewer::haltRender() { is_rendering = false; }
 
 void GLViewer::resumeRender() { is_rendering = true; }
@@ -170,7 +172,11 @@ void GLViewer::wheelEvent(QWheelEvent *event) {
   widget_input_events->flag &= ~EventManager::EVENT_MOUSE_WHEEL;
   update();
 }
-void GLViewer::showEvent(QShowEvent *event) { QOpenGLWidget::showEvent(event); }
+void GLViewer::showEvent(QShowEvent *event) {
+  QOpenGLWidget::showEvent(event);
+  renderer->onShowEvent();
+}
+
 void GLViewer::hideEvent(QHideEvent *event) {
   QOpenGLWidget::hideEvent(event);
   renderer->onHideEvent();

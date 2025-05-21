@@ -3,5 +3,6 @@
 
 #include <ctime>
 #include <gtest/gtest.h>
+#define DISK_WRITE 0
 
 #endif

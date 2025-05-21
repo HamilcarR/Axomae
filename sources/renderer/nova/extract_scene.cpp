@@ -1,10 +1,12 @@
 #include "Drawable.h"
+#include "EnvmapTextureManager.h"
 #include "Mesh.h"
 #include "aggregate/acceleration_interface.h"
 #include "bake.h"
+#include "extract_scene_internal.h"
 #include "manager/NovaResourceManager.h"
 #include "material/nova_material.h"
-#include "primitive/PrimitiveInterface.h"
+#include "nova/bake_render_data.h"
 #include "shape/nova_shape.h"
 #include <internal/common/axstd/span.h>
 
@@ -55,6 +57,7 @@ namespace nova_baker_utils {
 
     std::size_t image_texture_number;
     std::size_t constant_texture_number;
+    std::size_t hdr_texture_number;
   };
 
   static void initialize_resources_holders(nova::NovaResourceManager &manager, const resource_holders_inits_s &resrc) {
@@ -78,10 +81,32 @@ namespace nova_baker_utils {
     material_resrc.init(material_init_data);
 
     nova::texturing::texture_init_record_s texture_init_data{};
-    texture_init_data.constant_texture_size = resrc.constant_texture_number;
-    texture_init_data.image_texture_size = resrc.image_texture_number;
+    texture_init_data.total_constant_textures = resrc.constant_texture_number;
+    texture_init_data.total_image_textures = resrc.image_texture_number;
     auto &texture_resrc = manager.getTexturesData();
-    texture_resrc.init(texture_init_data);
+    texture_resrc.allocateMeshTextures(texture_init_data);
+  }
+
+  void setup_envmaps(const EnvmapTextureManager &envmap_manager, nova_baker_utils::envmap_data_s &envmap_data) {
+    axstd::span<const texture::envmap::EnvmapTextureGroup> baked_envmaps = envmap_manager.getBakesViews();
+    nova_baker_utils::envmap_data_s envmap_infos;
+    std::vector<nova_baker_utils::envmap_memory_s> &envmap_data_collection = envmap_infos.env_textures;
+    unsigned current_envmap_id = 0;
+    auto gl_equi2D_id = envmap_manager.getCurrentEnvmapGroup().equirect_gl_id;
+    for (const auto &envmap : baked_envmaps) {
+      nova_baker_utils::envmap_memory_s data{};
+      data.equirect_glID = envmap.equirect_gl_id;
+      if (data.equirect_glID == gl_equi2D_id)
+        envmap_infos.current_envmap_id = current_envmap_id;
+      AX_ASSERT_NOTNULL(envmap.metadata);
+      data.width = envmap.metadata->metadata.width;
+      data.height = envmap.metadata->metadata.height;
+      data.raw_data = envmap.metadata->data.data();
+      data.channels = envmap.metadata->metadata.channels;
+      envmap_data_collection.push_back(data);
+      current_envmap_id++;
+    }
+    envmap_data = envmap_infos;
   }
 
   void build_scene(const std::vector<drawable_original_transform> &drawables_orig_transfo, nova::NovaResourceManager &manager) {
@@ -98,6 +123,7 @@ namespace nova_baker_utils {
     resrc.diffuse_number = meshes.size();
     resrc.dielectrics_number = meshes.size();
     resrc.image_texture_number = meshes.size() * PBR_PIPELINE_TEX_NUM;
+    resrc.hdr_texture_number = 1;  // At least 1 for Environment map.
     initialize_resources_holders(manager, resrc);
 
     std::size_t mesh_index = 0;

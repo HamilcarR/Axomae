@@ -6,34 +6,52 @@
 #include <internal/common/axstd/managed_buffer.h>
 #include <internal/common/math/math_utils.h>
 #include <internal/common/type_list.h>
+#include <internal/common/utils.h>
 #include <internal/macro/project_macros.h>
 
 namespace nova::texturing {
 
   struct texture_init_record_s {
-    std::size_t constant_texture_size;
-    std::size_t image_texture_size;
+    std::size_t total_constant_textures;
+    std::size_t total_image_textures;
   };
 
   class TextureStorage {
     axstd::managed_vector<NovaTextureInterface> textures;
     axstd::managed_vector<ConstantTexture> constant_textures;
     axstd::managed_vector<ImageTexture> image_textures;
+    axstd::managed_vector<EnvmapTexture> envmap_textures;  // Used for environment map blending.
 
    public:
     CLASS_CM(TextureStorage)
 
-    NovaTextureInterface add(const ImageTexture &image_tex) { return append(image_tex, image_textures); }
     NovaTextureInterface add(const ConstantTexture &constant_tex) { return append(constant_tex, constant_textures); }
+    void allocConstant(std::size_t total_cste_tex);
+    bool isConstantEmpty() const { return constant_textures.empty(); }
+    bool isConstantInit() const { return constant_textures.capacity() > 0; }
+    std::size_t sizeConstant() const { return constant_textures.size(); }
+    CstTexCollection constants() const;
+    void clearConstant();
 
-    void allocConstant(std::size_t total_cste_tex) { constant_textures.reserve(total_cste_tex); }
-    void allocImage(std::size_t total_cste_tex) { image_textures.reserve(total_cste_tex); }
+    NovaTextureInterface add(const ImageTexture &image_tex) { return append(image_tex, image_textures); }
+    void allocImage(std::size_t total_img_tex);
+    bool isImageEmpty() const { return image_textures.empty(); }
+    bool isImageInit() const { return image_textures.capacity() > 0; }
+    std::size_t sizeImage() const { return image_textures.size(); }
+    ImgTexCollection images() const;
+    void clearImage();
 
-    void clear() {
-      textures.clear();
-      constant_textures.clear();
-      image_textures.clear();
-    }
+    NovaTextureInterface add(const EnvmapTexture &envmap_tex) { return append(envmap_tex, envmap_textures); }
+    void allocEnvmap(std::size_t total_env_tex);
+    bool isEnvmapEmpty() const { return envmap_textures.empty(); }
+    bool isEnvmapInit() const { return envmap_textures.capacity() > 0; }
+    std::size_t sizeEnvmap() const { return envmap_textures.size(); }
+    EnvMapCollection envmaps() const;
+    void clearEnvmap();
+
+    IntfTexCollection pointers() const;
+
+    void clear();
 
    private:
     template<class T>
@@ -49,12 +67,13 @@ namespace nova::texturing {
   class TextureResourcesHolder {
     TextureStorage texture_storage;
     DefaultTextureReferencesStorage texture_raw_data_storage;
-    EnvmapTexture environment_texture;
+    unsigned current_environmentmap_index{0};
 
    public:
     CLASS_CM(TextureResourcesHolder)
 
-    void init(const texture_init_record_s &init_data);
+    void allocateMeshTextures(const texture_init_record_s &init_data);
+    void allocateEnvironmentMaps(std::size_t num_envmaps);
     void lockResources();
     void releaseResources();
     void mapBuffers();
@@ -66,33 +85,35 @@ namespace nova::texturing {
       return texture_storage.add(tex);
     }
 
-    /* tex_id will not be taken into account if not a gpgpu build.*/
+    /* Registers the data of a texture inside one of the u32 or f32 views.
+     * tex_id will not be taken into account if not a gpgpu build.
+     * Returns the ID of the registered texture in its array.
+     */
     template<class T>
-    std::size_t addTexture(const T *data, int width, int height, int channels, GLuint tex_id) {
+    std::size_t addTexture(const T *data, int width, int height, int channels, bool inverted_u = false, bool inverted_v = false, GLuint tex_id = 0) {
       TextureRawData<T> texture_raw_data;
+      texture_raw_data.invert_u = inverted_u;
+      texture_raw_data.invert_v = inverted_v;
+      texture_raw_data.is_rgba = false;  // just letting this here for now, will replace with better memory format system.
       texture_raw_data.width = width;
       texture_raw_data.height = height;
       texture_raw_data.channels = channels;
       texture_raw_data.raw_data = axstd::span<const T>(data, width * height * channels);
-#ifdef AXOMAE_USE_CUDA
-      return texture_raw_data_storage.add(texture_raw_data, tex_id);
-#else
-      return texture_raw_data_storage.add(texture_raw_data);
-#endif
+      if constexpr (core::build::is_gpu_build)
+        return texture_raw_data_storage.add(texture_raw_data, tex_id);
+      else
+        return texture_raw_data_storage.add(texture_raw_data);
     }
 
     void clear() {
       texture_storage.clear();
       texture_raw_data_storage.clear();
-      environment_texture = {};
-    }
-
-    void setupEnvmap(const float *buffer_image, int width, int height, int channels) {
-      environment_texture = EnvmapTexture(buffer_image, width, height, channels);
     }
 
     TextureBundleViews getTextureBundleViews() const;
-    EnvmapTexture getEnvmap() const { return environment_texture; }
+    NovaTextureInterface getEnvmap(unsigned index) const;
+    NovaTextureInterface getCurrentEnvmap() const;
+    void setEnvmapId(unsigned id) { current_environmentmap_index = id; }
   };
 
 }  // namespace nova::texturing

@@ -21,6 +21,7 @@ namespace nova::scene {
     /* Primary scene rotation*/
     glm::mat4 R;
     glm::mat4 inv_R;
+    glm::mat4 inv_VR;
     /* Primary scene translation*/
     glm::mat4 T;
     glm::mat4 inv_T;

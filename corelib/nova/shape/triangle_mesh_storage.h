@@ -67,7 +67,7 @@ namespace nova::shape::triangle {
    public:
     const IdxMeshesView &getCPUBuffersView() const;
     std::size_t size() const override { return container_capacity; }
-    void allocate(std::size_t num_meshes) override;
+    void allocate(std::size_t num_meshes);
     void clear() override;
     void mapBuffers() override;
     void mapResources() override;

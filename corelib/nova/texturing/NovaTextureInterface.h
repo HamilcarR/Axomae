@@ -47,7 +47,7 @@ namespace nova::texturing {
       uint8_t g;
       uint8_t b;
       uint8_t a;
-      bool is_rgba = sample_data.texture_ctx->isRgba();
+      bool is_rgba = sample_data.texture_ctx->u32IsRGBA(texture_index);
 
       if (is_rgba) {
         r = pixel.r;
@@ -60,7 +60,7 @@ namespace nova::texturing {
         b = pixel.r;
         a = pixel.a;
       }
-      int channels = 4;  // sample_data.texture_ctx->u32channels(texture_index);
+      int channels = sample_data.texture_ctx->u32channels(texture_index);
       switch (channels) {
         case 1:
           return {r, 0, 0, 1.f};
@@ -94,41 +94,26 @@ namespace nova::texturing {
   }
 
   class EnvmapTexture {
-    const float *image_buffer{};
-    int width{}, height{}, channels{};
+    std::size_t texture_index{0};
 
    public:
     ax_device_callable EnvmapTexture() = default;
-    ax_device_callable EnvmapTexture(const float *buf, int w, int h, int channels) : image_buffer(buf), width(w), height(h), channels(channels) {}
+    ax_device_callable EnvmapTexture(std::size_t id_) : texture_index(id_) {}
 
     /* Pass the direction vector for sampling inside sample_data.
      * parameters u,v are not used here. */
     ax_device_callable glm::vec4 sample(float /*u*/, float /*v*/, const texture_data_aggregate_s &data) const {
+      /* Compute UV coordinates from the cartesian sampling vector. */
       glm::vec3 normalized = glm::normalize(data.geometric_data.sampling_vector);
-      const auto temp = normalized.y;
-      normalized.y = normalized.z;
-      normalized.z = -temp;
       const glm::vec2 sph = math::spherical::cartesianToSpherical(normalized);
       const glm::vec2 uv = math::spherical::sphericalToUv(sph);
       const float u = normalize_uv(uv.x);
       const float v = normalize_uv(uv.y);
-
-      const int x = (int)math::texture::uvToPixel(u, width - 1);
-      const int y = (int)math::texture::uvToPixel(1 - v, height - 1);
-
-      int index = (y * width + x) * channels;
-      AX_ASSERT_LT(index + 2, width * height * channels);
-      AX_ASSERT_NOTNULL(image_buffer);
-      return {image_buffer[index], image_buffer[index + 1], image_buffer[index + 2], 1.f};
-    }
-
-    ax_device_callable F32Texture getRawData() const {
-      F32Texture data{};
-      data.width = width;
-      data.height = height;
-      data.channels = channels;
-      data.raw_data = axstd::span(image_buffer, width * height * channels);
-      return data;
+      const TextureCtx *texture_ctx = data.texture_ctx;
+      AX_ASSERT_NOTNULL(texture_ctx);
+      float pixel[4] = {};
+      texture_ctx->f32pixel(texture_index, u, v, pixel);
+      return {pixel[0], pixel[1], pixel[2], pixel[3]};
     }
   };
 
@@ -144,5 +129,10 @@ namespace nova::texturing {
   using TYPELIST = core::type_list<ConstantTexture, ImageTexture, EnvmapTexture>;
 
 }  // namespace nova::texturing
+
+using EnvMapCollection = axstd::span<const nova::texturing::EnvmapTexture>;
+using ImgTexCollection = axstd::span<const nova::texturing::ImageTexture>;
+using CstTexCollection = axstd::span<const nova::texturing::ConstantTexture>;
+using IntfTexCollection = axstd::span<const nova::texturing::NovaTextureInterface>;
 
 #endif  // NOVATEXTUREINTERFACE_H

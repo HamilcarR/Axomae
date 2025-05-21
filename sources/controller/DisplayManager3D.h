@@ -36,6 +36,7 @@ namespace controller {
     void resumeRenderers();
     void makeCtxRealtime();
     void doneCtxRealtime();
+    void onEnvmapChange();
 
    private:
     void connect_slots();
