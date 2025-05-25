@@ -26,7 +26,6 @@ bool NovaRenderer::prep_draw() {
   return true;
 }
 
-/* Does nothing for now.*/
 void NovaRenderer::populateNovaSceneResources() {
   if (!envmap_manager || !nova_resource_manager)
     return;

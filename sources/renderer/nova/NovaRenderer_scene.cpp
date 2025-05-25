@@ -18,7 +18,6 @@ void NovaRenderer::prepSceneChange() {
     return;
   nova_resource_manager->getEngineData().is_rendering = false;
   emptyScheduler();
-  nova_resource_manager->clearResources();
 }
 
 Scene &NovaRenderer::getScene() const { return *scene; }

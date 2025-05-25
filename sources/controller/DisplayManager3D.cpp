@@ -113,7 +113,7 @@ namespace controller {
     scene_data.nova_resource_manager = nova_resource_manager.get();
     IProgressManager progress_manager;
     progress_manager.setProgressManager(progress_status);
-    nova_resource_manager->clearResources();
+
     std::vector<mesh_transform_t> original_transforms = retrieve_original_mesh_transform(scene_data);
     notify_simple_progress("Initializing Nova , building BVH and allocating shared GPU caches", progress_manager);
 
@@ -139,13 +139,12 @@ namespace controller {
     nova_resource_manager->setManagedGpuAccelerationStructure(std::move(device_accelerator));
 #endif
 
-    notify_simple_progress("Updating environment maps", progress_manager);
-    nova_viewer->signalEnvmapChange();
-
     progress_manager.reset();
   }
 
   void DisplayManager3D::prepareSceneChange() {
+    nova_resource_manager->clearResources();
+    nova_viewer->signalEnvmapChange();
     realtime_viewer->prepareRendererSceneChange();
     nova_viewer->prepareRendererSceneChange();
   }

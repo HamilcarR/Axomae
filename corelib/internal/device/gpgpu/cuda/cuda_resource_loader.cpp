@@ -489,8 +489,10 @@ namespace device::gpgpu {
     GPU_query_result result;
     std::vector<cudaGraphicsResource_t> resources;
     resources.reserve(count);
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) {
+      AX_ASSERT_NOTNULL(gpu_resources_array[i].pimpl->handle);
       resources.push_back(gpu_resources_array[i].pimpl->handle);
+    }
     result.error_status = DeviceError(cudaGraphicsMapResources(count, resources.data(), stream.pimpl->stream));
     for (int i = 0; i < count; i++)
       gpu_resources_array[i].pimpl->is_mapped = result.error_status.isValid();

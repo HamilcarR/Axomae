@@ -20,14 +20,14 @@ namespace nova::texturing {
   template<class T = device::gpgpu::GPUTexture, bool using_gpu = core::build::is_gpu_build>
   using DeviceBuffer = std::conditional_t<using_gpu, gpu::DeviceImageTracker<T>, DummyBufferTracker>;
 
-  constexpr std::size_t INVALID_INDEX = std::size_t(-1);
-
   /*
    * Since removing an element from storages can change the indices of the other textures of that collection,
    * We simply register the indices of textures marked as unused so that the next add operation could register in that free index spot.
    */
   template<class T>
   class IdRemovalTracker {
+    static constexpr std::size_t INVALID_INDEX = std::size_t(-1);
+
    protected:
     std::vector<std::size_t> empty_ids{};
 

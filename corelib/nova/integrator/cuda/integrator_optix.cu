@@ -56,7 +56,6 @@ extern "C" ax_kernel void __raygen__main() {
   math::camera::camera_ray c_ray = math::camera::ray_inv_mat(ndc.x, ndc.y, params.camera.inv_P, params.camera.inv_V);
   float3 origin = {c_ray.near.x, c_ray.near.y, c_ray.near.z};
   float3 direction = {c_ray.far.x, c_ray.far.y, c_ray.far.z};
-  unsigned p0, p1, p2, p3, p4, p5, p6, p7;
   optixTrace(0, origin, direction, 0.001f, 1e30f, OptixVisibilityMask(1), 0, OPTIX_RAY_FLAG_NONE, 0, 0, 0);
 }
 extern "C" ax_kernel void __miss__sample_envmap() {
@@ -71,10 +70,11 @@ extern "C" ax_kernel void __miss__sample_envmap() {
   rb.width = params.width;
   rb.height = params.height;
   nova::texturing::texture_data_aggregate_s data = {};
-  float3 dir = {0.f, 1.f, 0.f};
-  data.geometric_data.sampling_vector = {dir.x, dir.y, dir.z};
-  glm::vec4 pixel = params.environment_map.sample(u, v, data);
-  shade(rb, u, v, glm::vec4(1.f));
+  nova::texturing::TextureCtx texture_ctx(params.texture_bundle_views, true);
+  data.texture_ctx = &texture_ctx;
+  nova::texturing::ImageTexture img(1);
+  glm::vec4 pixel = img.sample(u, v, data);
+  shade(rb, u, v, pixel);
 }
 extern "C" ax_kernel void __anyhit__random_intersect() {}
 extern "C" ax_kernel void __closesthit__minimum_intersect() {}

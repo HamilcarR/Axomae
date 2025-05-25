@@ -5,7 +5,7 @@
 
 namespace nova::gpu {
   template<class T>
-  class DeviceImageTracker final : public DeviceMemoryTracker {
+  class DeviceImageTracker : public DeviceMemoryTracker {
    public:
     using handle_type = device::gpgpu::GPUGraphicsResrcHandle;
     using stream_type = device::gpgpu::GPUStream;
@@ -52,7 +52,7 @@ namespace nova::gpu {
       auto query_result = device::gpgpu::interop_get_mapped_array(gpu_array, gpgpu_api_handle, 0, 0);
       DEVICE_ERROR_CHECK(query_result.error_status);
       if (query_result.error_status.isValid()) {
-        gpu_texture = device::gpgpu::GPUTexture(std::move(gpu_array), texture_descriptor);
+        gpu_texture = gpu_texture_type(std::move(gpu_array), texture_descriptor);
       }
     }
   };

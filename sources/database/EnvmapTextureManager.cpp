@@ -63,7 +63,7 @@ static void createBlack(HdrImageDatabase &database) {
   metadata.name = "Black.hdr";
   metadata.width = 256;
   metadata.height = 256;
-  metadata.channels = 3;
+  metadata.channels = 4;
   metadata.color_corrected = true;
   metadata.is_hdr = true;
   std::vector<float> image_data(metadata.width * metadata.height * metadata.channels, 0.f);
@@ -156,7 +156,7 @@ void EnvmapTextureManager::addToCollection(int index) {
   texgroup.metadata = raw_image_data;
   TextureData envmap = texture_metadata(raw_image_data);
 
-  auto query_equirect = database::texture::store<EnvironmentMap2DTexture>(*texture_database, false, &envmap);
+  auto query_equirect = database::texture::store<EnvironmentMap2DTexture>(*texture_database, true, &envmap);
   AX_ASSERT_NOTNULL(query_equirect.object);
 
   if (!cuda_process) {
@@ -190,7 +190,7 @@ void EnvmapTextureManager::addToCollection(int index) {
 
   texgroup.equirect_id = index;
   texgroup.equirect_gl_id = query_equirect.object->getSamplerID();
-
+  texture_database->setPersistence(texgroup.equirect_id);
   bakes_id.push_back(texgroup);
 }
 
