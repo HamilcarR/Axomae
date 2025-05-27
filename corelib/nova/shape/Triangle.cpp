@@ -163,8 +163,8 @@ namespace nova::shape {
 
     if (hasValidUvs(geometry)) {
       const vertices_attrb2d_t uvs = face.uvs();
-      data.v = barycentric_lerp(uvs.v0.s, uvs.v1.s, uvs.v2.s, w, u, v);
-      data.u = barycentric_lerp(uvs.v0.t, uvs.v1.t, uvs.v2.t, w, u, v);
+      data.u = barycentric_lerp(uvs.v0.s, uvs.v1.s, uvs.v2.s, w, u, v);
+      data.v = barycentric_lerp(uvs.v0.t, uvs.v1.t, uvs.v2.t, w, u, v);
     }
 
     const vertices_attrb3d_t tangents = face.tangents();

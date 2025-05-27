@@ -50,10 +50,10 @@ namespace nova::integrator {
       buffers->partial_buffer[pixel_offset + 3] = color.a;
     }
 
-    ax_no_discard unsigned generateImageOffset(const Tile &tile, bool axis_inverted, int x, int y) const {
+    ax_no_discard unsigned generateImageOffset(const Tile &tile, bool axis_inverted, int x, int y, unsigned channels = 4) const {
       if (axis_inverted)
-        return (y * tile.image_total_width + x) * 4;
-      return ((tile.image_total_height - 1 - y) * tile.image_total_width + x) * 4;
+        return ((tile.image_total_height - 1 - y) * tile.image_total_width + x) * channels;
+      return (y * tile.image_total_width + x) * channels;
     }
 
    public:
@@ -89,6 +89,7 @@ namespace nova::integrator {
           unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().vertical_invert, x, y);
 
           glm::vec4 rgb{};
+
           const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
           for (int i = 0; i < tile.sample_per_tile; i++) {
             if (!nova_resource_manager->getEngineData().is_rendering)

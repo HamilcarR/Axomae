@@ -296,8 +296,8 @@ namespace nova::aggregate {
       hit_return_data.last_primit = getPrimitiveFromGlobalOffset(result.hit.geomID, result.hit.primID, primitive_global_offset, scene_geometry_data);
       float normals[3]{}, tangents[3]{}, bitangents[3]{}, uv[2]{};
       interpolate(result, normals, tangents, bitangents, uv);
-      hit_return_data.hit_d.u = uv[1];
-      hit_return_data.hit_d.v = uv[0];
+      hit_return_data.hit_d.u = uv[0];
+      hit_return_data.hit_d.v = uv[1];
       hit_return_data.hit_d.normal = glm::normalize(transform.n * glm::vec3(normals[0], normals[1], normals[2]));
       hit_return_data.hit_d.tangent = glm::normalize(transform.n * glm::vec3(tangents[0], tangents[1], tangents[2]));
       hit_return_data.hit_d.bitangent = glm::normalize(transform.n * glm::vec3(bitangents[0], bitangents[1], bitangents[2]));
