@@ -28,7 +28,6 @@
 #  define AX_GPU_FASTSQRT(value) __fsqrt_rn(value)
 #  define AX_GPU_FASTPOW(x, y) __powf((x), (y))
 #  define AX_GPU_FASTTANH(value) tanhf(value)
-#  define AX_GPU_FLOORF(val) floorf(val)
 #  define AX_GPU_ABS(val) abs(val)
 #  define AX_GPU_CEIL(val) ceil(val)
 #else
@@ -58,9 +57,10 @@
 #  define AX_GPU_FASTSQRT(value) sqrtf(value)
 #  define AX_GPU_FASTPOW(x, y) powf((x), (y))
 #  define AX_GPU_FASTTANH(value) tanhf(value)
-#  define AX_GPU_FLOORF(val) floorf(val)
 #  define AX_GPU_ABS(val) fabsf(val)
 #  define AX_GPU_CEIL(val) ceil(val)
 #endif
+
+#define AX_GPU_FLOORF(val) floorf(val)
 
 #endif

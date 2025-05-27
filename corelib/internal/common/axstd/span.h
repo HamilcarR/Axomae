@@ -1,18 +1,17 @@
 #ifndef SPAN_H
 #define SPAN_H
 
-#include "internal/macro/project_macros.h"
+#include <internal/macro/project_macros.h>
 #if __cplusplus < 202002L
 #  include <cstdlib>
 #  include <internal/device/gpgpu/device_utils.h>
 #  include <type_traits>
 namespace axstd {
 
-  /* Implementation of a span :
-   * The main goal is to provide a usable collection on GPU for C++ versions < 20 and usage in CUDA.
-   * Previous implementation using boost is not compatible with CUDA as well.
+  /*
+   * Provides a view on a single region of memory.
+   * Can be used on GPU memory.
    */
-
   template<class T>
   class span {
    public:
@@ -28,7 +27,9 @@ namespace axstd {
     using const_iterator = const_pointer;
 
    private:
+    /* Beginning address of the span.*/
     pointer ptr{};
+    /* Number of elements in the span.*/
     size_type len{0};
 
    public:

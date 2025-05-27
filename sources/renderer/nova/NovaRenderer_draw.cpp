@@ -7,6 +7,7 @@
 #include "bake.h"
 #include "integrator/Integrator.h"
 #include "manager/NovaResourceManager.h"
+#include <cstring>
 #include <internal/device/rendering/opengl/GLMutablePixelBufferObject.h>
 #include <internal/macro/project_macros.h>
 
@@ -35,17 +36,14 @@ void NovaRenderer::populateNovaSceneResources() {
 
 void NovaRenderer::copyBufferToPbo(float *pbo_map, int width, int height, int channels) {
   float max = 0.f;
-  for (int i = 0; i < height; i++)
-    for (int j = 0; j < width * channels; j++) {
-      int inv_idx = (height - 1 - i) * width * channels + j;
-      int idx = i * width * channels + j;
-      const float old = accumulated_render_buffer[inv_idx] / (current_frame + 1);
-      const float new_ = partial_render_buffer[inv_idx];
-      const float pix = old + 0.8f * (new_ - old);
-      final_render_buffer[idx] = pix;
-      pbo_map[idx] = pix;
-      max = std::max(max, pix);
-    }
+  for (std::size_t idx = 0; idx < height * width * channels; idx++) {
+    const float old = accumulated_render_buffer[idx] / (float)(current_frame + 1);
+    const float new_ = partial_render_buffer[idx];
+    const float pix = old + 0.8f * (new_ - old);
+    final_render_buffer[idx] = pix;
+    pbo_map[idx] = pix;
+    max = std::max(max, pix);
+  }
 }
 
 void NovaRenderer::initializeEngine() {

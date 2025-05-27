@@ -32,7 +32,7 @@
 
 #define AX_ASSERT_NOTNULL(expr) assert(expr)
 
-#define AX_ASSERT_FALSE(expr) assert(!expr)
+#define AX_ASSERT_FALSE(expr) assert(!(expr))
 
 #define AX_ASSERT_TRUE(expr) assert(expr)
 
