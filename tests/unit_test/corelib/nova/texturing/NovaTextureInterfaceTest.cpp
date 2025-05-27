@@ -47,7 +47,7 @@ class SharedFloatTexturesStub {
 static nvt::TextureCtx create_aggregate(const std::array<F32Texture, 1> &array) {
 
   nvt::f32tex_shared_views_s shared_views;
-  shared_views.f32_managed = array;
+  shared_views.managed_tex_view = array;
   nvt::TextureBundleViews bundle(shared_views);
   nvt::TextureCtx ctx(bundle);
   return ctx;

@@ -209,7 +209,7 @@ namespace nova::texturing {
   u32tex_shared_views_s TextureReferencesStorage<DevicePolicy>::getU32TexturesViews() const {
     u32tex_shared_views_s views;
     views.interop_handles = gpu_storage->u32Handles();
-    views.u32_managed = cpu_storage.rgba_textures;
+    views.managed_tex_view = cpu_storage.rgba_textures;
     return views;
   }
 
@@ -217,7 +217,7 @@ namespace nova::texturing {
   f32tex_shared_views_s TextureReferencesStorage<DevicePolicy>::getF32TexturesViews() const {
     f32tex_shared_views_s views;
     views.interop_handles = gpu_storage->f32Handles();
-    views.f32_managed = cpu_storage.frgba_textures;
+    views.managed_tex_view = cpu_storage.frgba_textures;
     return views;
   }
 
@@ -258,14 +258,14 @@ namespace nova::texturing {
   template<>
   u32tex_shared_views_s TextureReferencesStorage<HostPolicy>::getU32TexturesViews() const {
     u32tex_shared_views_s views;
-    views.u32_managed = cpu_storage.rgba_textures;
+    views.managed_tex_view = cpu_storage.rgba_textures;
     return views;
   }
 
   template<>
   f32tex_shared_views_s TextureReferencesStorage<HostPolicy>::getF32TexturesViews() const {
     f32tex_shared_views_s views;
-    views.f32_managed = cpu_storage.frgba_textures;
+    views.managed_tex_view = cpu_storage.frgba_textures;
     return views;
   }
 

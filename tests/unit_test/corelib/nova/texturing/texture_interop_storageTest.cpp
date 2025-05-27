@@ -211,13 +211,13 @@ class TextureReferenceStorageTest : public nvt::TextureReferencesStorage<nvt::De
   TextureReferenceStorageTest(std::unique_ptr<nvt::DeviceStorageInterface> dep) : TextureReferencesStorage(std::move(dep)) {}
 };
 
-static void test_empty_u32_views(const nvt::u32tex_shared_views_s &u32texview) { ASSERT_TRUE(u32texview.u32_managed.empty()); }
+static void test_empty_u32_views(const nvt::u32tex_shared_views_s &u32texview) { ASSERT_TRUE(u32texview.managed_tex_view.empty()); }
 
-static void test_empty_f32_views(const nvt::f32tex_shared_views_s &f32texview) { ASSERT_TRUE(f32texview.f32_managed.empty()); }
+static void test_empty_f32_views(const nvt::f32tex_shared_views_s &f32texview) { ASSERT_TRUE(f32texview.managed_tex_view.empty()); }
 
-static void test_notempty_u32_views(const nvt::u32tex_shared_views_s &u32texview) { ASSERT_FALSE(u32texview.u32_managed.empty()); }
+static void test_notempty_u32_views(const nvt::u32tex_shared_views_s &u32texview) { ASSERT_FALSE(u32texview.managed_tex_view.empty()); }
 
-static void test_notempty_f32_views(const nvt::f32tex_shared_views_s &f32texview) { ASSERT_FALSE(f32texview.f32_managed.empty()); }
+static void test_notempty_f32_views(const nvt::f32tex_shared_views_s &f32texview) { ASSERT_FALSE(f32texview.managed_tex_view.empty()); }
 
 static void test_notempty_u32_handle(const nvt::u32tex_shared_views_s &u32texview) { ASSERT_FALSE(u32texview.interop_handles.empty()); }
 

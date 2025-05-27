@@ -30,7 +30,7 @@ class TextureCtxBuilder {
   }
 
   nova::texturing::TextureCtx getTextureContext() {
-    u32_views.u32_managed = textures;
+    u32_views.managed_tex_view = textures;
     bundle = nova::texturing::TextureBundleViews(u32_views);
     nova::texturing::TextureCtx ctx(bundle, false);
     return ctx;

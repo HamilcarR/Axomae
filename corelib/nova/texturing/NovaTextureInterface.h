@@ -9,6 +9,15 @@
 #include <internal/memory/tag_ptr.h>
 namespace nova::texturing {
 
+  /* returns uv in [0 , 1] interval*/
+  ax_device_callable_inlined float normalize_uv(float uv) {
+    if (uv < 0) {
+      float float_part = AX_GPU_CEIL(uv) - uv;
+      return 1.f - float_part;
+    }
+    return uv;
+  }
+
   class ConstantTexture;
   class ImageTexture;
   class EnvmapTexture;
@@ -31,6 +40,9 @@ namespace nova::texturing {
     ax_device_callable ImageTexture(std::size_t index) : texture_index(index) {}
 
     ax_device_callable glm::vec4 sample(float u, float v, const texture_data_aggregate_s &sample_data) const {
+      u = normalize_uv(u);
+      v = normalize_uv(v);
+
       union FORMAT {
         uint32_t rgba;
         struct {
@@ -79,15 +91,6 @@ namespace nova::texturing {
     }
   };
 
-  /* returns uv in [0 , 1] interval*/
-  ax_device_callable_inlined float normalize_uv(float uv) {
-    if (uv < 0) {
-      float float_part = AX_GPU_CEIL(uv) - uv;
-      return 1.f - float_part;
-    }
-    return uv;
-  }
-
   ax_device_callable_inlined glm::vec3 sample_cubemap_plane(const glm::vec3 &sample_vector, const glm::vec3 &up_vector) {
     const glm::vec3 same_plane_vector = glm::dot(sample_vector, up_vector) * sample_vector;
     return same_plane_vector;
@@ -111,9 +114,7 @@ namespace nova::texturing {
       const float v = normalize_uv(uv.y);
       const TextureCtx *texture_ctx = data.texture_ctx;
       AX_ASSERT_NOTNULL(texture_ctx);
-      float pixel[4] = {};
-      texture_ctx->f32pixel(texture_index, u, v, pixel);
-      return {pixel[0], pixel[1], pixel[2], pixel[3]};
+      return texture_ctx->f32pixel(texture_index, u, v);
     }
   };
 
