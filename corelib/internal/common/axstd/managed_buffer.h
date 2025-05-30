@@ -8,6 +8,7 @@
 #include <internal/device/gpgpu/device_transfer_interface.h>
 #include <internal/macro/project_macros.h>
 #include <new>
+#include <type_traits>
 #include <vector>
 namespace axstd {
 
@@ -73,8 +74,20 @@ namespace axstd {
     return false;
   }
 
+  /*
+   * A custom vector using a UnifiedMemoryAllocator, and allocates memory either through a regular allocator, or through GPU managed memory.
+   */
   template<class T>
-  using managed_vector = std::vector<T, UnifiedMemoryAllocator<T>>;
+  class managed_vector : public std::vector<T, UnifiedMemoryAllocator<T>> {
+    using BASE = std::vector<T, UnifiedMemoryAllocator<T>>;
+
+   public:
+    using BASE::BASE;
+
+    template<class U>
+    managed_vector(const U &other) : BASE(other.begin(), other.end()) {}
+  };
+
   template<class T>
   using device_managed_vector = std::vector<T, UnifiedMemoryAllocator<T, true>>;
 }  // namespace axstd
