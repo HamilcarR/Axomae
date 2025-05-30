@@ -6,7 +6,7 @@
 
 namespace nvt = nova::texturing;
 
-class TestImageTexture : public nvt::ImageTexture {};
+class TestImageTexture : public nvt::ImageTexture<uint32_t> {};
 class TestConstantTexture : public nvt::ConstantTexture {};
 class TestEnvmapTexture : public nvt::EnvmapTexture {};
 

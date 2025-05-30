@@ -43,7 +43,7 @@ static void init_tbn(nova::hit_data &hit_data) {
   hit_data.bitangent = {0.f, 0.f, 1.f};
 }
 
-static nova::material::texture_pack setup_tpack(const nova::texturing::ImageTexture *img) {
+static nova::material::texture_pack setup_tpack(const nova::texturing::ImageTexture<uint32_t> *img) {
   nova::material::texture_pack tpack{};
   tpack.albedo = img;
   tpack.normalmap = img;
@@ -57,7 +57,7 @@ static nova::material::texture_pack setup_tpack(const nova::texturing::ImageText
 TEST(NovaDiffuseMaterialTest, scatter_direction) {
   math::random::CPUPseudoRandomGenerator generator;
   const uint32_t buffer[4] = {RED, GREEN, BLUE, BLUE};
-  nova::texturing::ImageTexture img(0);
+  nova::texturing::ImageTexture<uint32_t> img(0);
   TextureCtxBuilder ctxBuilder;
   ctxBuilder.addTexture(buffer, 2, 2, 4);
   auto ctx = ctxBuilder.getTextureContext();
@@ -91,7 +91,7 @@ TEST(NovaDiffuseMaterialTest, scatter_direction) {
 
 TEST(NovaDiffuseMaterialTest, sample_normal) {
   const uint32_t buffer[4] = {RED, GREEN, BLUE, BLUE};
-  nova::texturing::ImageTexture img(0);
+  nova::texturing::ImageTexture<uint32_t> img(0);
   TextureCtxBuilder ctxBuilder;
   ctxBuilder.addTexture(buffer, 2, 2, 4);
   auto ctx = ctxBuilder.getTextureContext();

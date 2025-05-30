@@ -65,8 +65,9 @@ void TextureViewerWidget::mouseMoveEvent(QMouseEvent *event) {
 /************************************************************************************************************************************************************/
 
 HdrTextureViewerWidget::HdrTextureViewerWidget(const image::ImageHolder<float> &tex, QWidget *parent)
-    : TextureViewerWidget(parent), raw_hdr_data(tex.data) {
-  raw_display_data = hdr_utils::hdr2image(tex.data, tex.metadata.width, tex.metadata.height, tex.metadata.channels, !tex.metadata.color_corrected);
+    : TextureViewerWidget(parent), raw_hdr_data(tex.data().begin(), tex.data().end()) {
+  raw_display_data = hdr_utils::hdr2image(
+      axstd::span<const float>(raw_hdr_data), tex.metadata.width, tex.metadata.height, tex.metadata.channels, !tex.metadata.color_corrected);
   window.setupUi(this);
   metadata.width = tex.metadata.width;
   metadata.height = tex.metadata.height;
@@ -82,7 +83,7 @@ HdrTextureViewerWidget::HdrTextureViewerWidget(const image::ImageHolder<float> &
 HdrTextureViewerWidget::~HdrTextureViewerWidget() = default;
 
 void HdrTextureViewerWidget::display(const std::vector<float> &img, int width, int height, int channels, bool color_corrected) {
-  raw_display_data = hdr_utils::hdr2image(img, width, height, channels, !color_corrected);
+  raw_display_data = hdr_utils::hdr2image(axstd::span<const float>(img), width, height, channels, !color_corrected);
   if (channels == 3)
     image = std::make_unique<QImage>(raw_display_data.data(), width, height, QImage::Format_RGB888);
   else if (channels == 4)
@@ -147,10 +148,10 @@ void HdrRenderViewerWidget::mouseMoveEvent(QMouseEvent *event) {
   if (p.x() < width() && p.y() < height() && p.x() >= 0 && p.y() >= 0) {
     p = mapToImage(static_cast<int>(target_buffer->metadata.width), static_cast<int>(target_buffer->metadata.height), p, width(), height());
     unsigned int index = (p.y() * target_buffer->metadata.width + p.x()) * target_buffer->metadata.channels;
-    if (!target_buffer->data.empty()) {
-      float r_ = target_buffer->data[index];
-      float g_ = target_buffer->data[index + 1];
-      float b_ = target_buffer->data[index + 2];
+    if (!target_buffer->data().empty()) {
+      float r_ = target_buffer->data()[index];
+      float g_ = target_buffer->data()[index + 1];
+      float b_ = target_buffer->data()[index + 2];
       float a_ = 1.f;
       const float rgb[4] = {r_, g_, b_, a_};
       label->updateLabel(rgb, p.x(), p.y(), width(), height(), false);
@@ -185,9 +186,9 @@ void HdrRenderViewerWidget::closeEvent(QCloseEvent *event) {
 }
 
 void HdrRenderViewerWidget::updateImage() {
-  AX_ASSERT_EQ(target_buffer->data.size(), target_buffer->metadata.width * target_buffer->metadata.height * target_buffer->metadata.channels);
+  AX_ASSERT_EQ(target_buffer->data().size(), target_buffer->metadata.width * target_buffer->metadata.height * target_buffer->metadata.channels);
 
-  std::vector<uint8_t> normalized = hdr_utils::hdr2image(target_buffer->data,
+  std::vector<uint8_t> normalized = hdr_utils::hdr2image(axstd::span<const float>(target_buffer->data().data(), target_buffer->data().size()),
                                                          target_buffer->metadata.width,
                                                          target_buffer->metadata.height,
                                                          target_buffer->metadata.channels,

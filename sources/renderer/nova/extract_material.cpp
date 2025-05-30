@@ -18,7 +18,9 @@ namespace exception {
 
 namespace nova_baker_utils {
 
-  nova::texturing::ImageTexture *extract_texture(const TextureGroup &tgroup, nova::NovaResourceManager &manager, GenericTexture::TYPE type) {
+  nova::texturing::ImageTexture<uint32_t> *extract_texture(const TextureGroup &tgroup,
+                                                           nova::NovaResourceManager &manager,
+                                                           GenericTexture::TYPE type) {
     const GenericTexture *gltexture = tgroup.getTexturePointer(type);
     if (!gltexture) {
       LOG("Texture lookup in Nova scene initialization has returned null for texture type: " + std::string(type2str(type)), LogLevel::INFO);
@@ -29,8 +31,8 @@ namespace nova_baker_utils {
     int h = (int)gltexture->getHeight();
     nova::texturing::TextureResourcesHolder &texture_manager = manager.getTexturesData();
     std::size_t texture_index = texture_manager.addTexture(buffer_ptr, w, h, 4, false, false, gltexture->getSamplerID());
-    auto ret = texture_manager.addNovaTexture<nova::texturing::ImageTexture>(texture_index);
-    auto *image_tex = ret.get<nova::texturing::ImageTexture>();
+    auto ret = texture_manager.addNovaTexture<nova::texturing::ImageTexture<uint32_t>>(texture_index);
+    auto *image_tex = ret.get<nova::texturing::ImageTexture<uint32_t>>();
     if (!image_tex)
       throw exception::InvalidTexTypeConversionException();
     return image_tex;

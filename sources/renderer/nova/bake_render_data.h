@@ -20,7 +20,7 @@ namespace nova_baker_utils {
   };
 
   struct texture_buffers_t {
-    axstd::span<nova::texturing::ImageTexture> image_alloc_buffer;
+    axstd::span<nova::texturing::ImageTexture<uint32_t>> image_alloc_buffer;
   };
 
   struct primitive_buffers_t {

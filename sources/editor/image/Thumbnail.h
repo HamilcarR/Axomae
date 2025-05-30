@@ -20,8 +20,8 @@ class Thumbnail : public controller::IProgressManager {
   Thumbnail(const Thumbnail &copy) = delete;
   Thumbnail &operator=(Thumbnail &&move) noexcept;
   Thumbnail(Thumbnail &&move) noexcept;
-  Thumbnail(std::vector<uint8_t> &rgb, const image::Metadata &metadata, controller::ProgressStatus *status = nullptr);
-  Thumbnail(std::vector<float> &rgb, const image::Metadata &metadata, controller::ProgressStatus *status = nullptr);
+  Thumbnail(const std::vector<uint8_t> &rgb, const image::Metadata &metadata, controller::ProgressStatus *status = nullptr);
+  Thumbnail(const std::vector<float> &rgb, const image::Metadata &metadata, controller::ProgressStatus *status = nullptr);
   ax_no_discard const QPixmap &getIcon();
 };
 

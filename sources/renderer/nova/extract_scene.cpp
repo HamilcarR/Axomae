@@ -101,7 +101,7 @@ namespace nova_baker_utils {
       AX_ASSERT_NOTNULL(envmap.metadata);
       data.width = envmap.metadata->metadata.width;
       data.height = envmap.metadata->metadata.height;
-      data.raw_data = envmap.metadata->data.data();
+      data.raw_data = envmap.metadata->data().data();
       data.channels = envmap.metadata->metadata.channels;
       envmap_data_collection.push_back(data);
       current_envmap_id++;

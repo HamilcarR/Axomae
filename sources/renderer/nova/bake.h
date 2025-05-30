@@ -15,9 +15,7 @@ namespace nova {
   namespace material {
     class NovaMaterialInterface;
   }
-  namespace texturing {
-    class ImageTexture;
-  }
+
 }  // namespace nova
 
 namespace geometry {

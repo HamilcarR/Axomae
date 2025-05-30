@@ -118,7 +118,7 @@ namespace controller {
     const int DEPTH_CHANS = 2;
     size_t color_buffer_size = render_options.width * render_options.height * COLOR_CHANS;
     size_t depth_buffer_size = render_options.width * render_options.height * DEPTH_CHANS;
-    image_holder.data.resize(color_buffer_size);
+    image_holder.data().resize(color_buffer_size);
     partial.resize(color_buffer_size);
     accumulator.resize(color_buffer_size);
     depth.reserve(depth_buffer_size);  // only 2 channel needed one for min distance , one for max , initialized at max/min distance.
@@ -232,7 +232,7 @@ namespace controller {
       float accumulated = buffers->accumulator_buffer[i] / (current_sample_num + 1);
       float partial = buffers->partial_buffer[i];
       float interpolated = accumulated + 0.5f * (partial - accumulated);
-      image_holder.data[i] = interpolated;
+      image_holder.data()[i] = interpolated;
     }
   }
 

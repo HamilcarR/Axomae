@@ -142,7 +142,7 @@ void NovaRenderer::getScreenPixelColor(int x, int y, float r_screen_pixel_color[
 
 ax_no_discard image::ImageHolder<float> NovaRenderer::getSnapshotFloat(int width, int height) const {
   image::ImageHolder<float> img;
-  img.data.resize(width * height * 4);
+  img.data().resize(width * height * 4);
   img.metadata.channels = 4;
   img.metadata.color_corrected = true;
   img.metadata.format = "hdr";
@@ -151,7 +151,7 @@ ax_no_discard image::ImageHolder<float> NovaRenderer::getSnapshotFloat(int width
   img.metadata.is_hdr = true;
   TextureOperations<float> op(final_render_buffer, screen_size.width, screen_size.height, 4);
   auto apply_color_correct = [](const float &channel_component) { return channel_component; };
-  op.processTexture(img.data.data(), width, height, apply_color_correct);
+  op.processTexture(img.data().data(), width, height, apply_color_correct);
   return img;
 }
 ax_no_discard image::ImageHolder<uint8_t> NovaRenderer::getSnapshotUint8(int width, int height) const { AX_UNREACHABLE; }

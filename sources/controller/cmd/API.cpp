@@ -3,6 +3,7 @@
 #include "TextureProcessing.h"
 #include "TextureViewerWidget.h"
 #include "constants.h"
+#include "internal/common/axstd/span.h"
 #include "internal/common/exception/GenericException.h"
 
 namespace controller::cmd {
@@ -44,7 +45,8 @@ namespace controller::cmd {
     IO::Loader loader(nullptr);
     try {
       image::ImageHolder<float> data = loader.loadHdrEnvmap(envmap.path_input.c_str(), false);
-      TextureOperations<float> process_texture(data.data, data.metadata.width, data.metadata.height, data.metadata.channels);
+      axstd::span<const float> texture_view(data.data().data(), data.data().size());  // Yes I know . No I won't change.
+      TextureOperations<float> process_texture(texture_view, data.metadata.width, data.metadata.height, data.metadata.channels);
       image::ImageHolder<float> texture;
       if (envmap.baketype == "irradiance") {
         texture = process_texture.computeDiffuseIrradiance(envmap.width_output, envmap.height_output, envmap.samples, (config.flag & CONF_USE_CUDA));

@@ -70,7 +70,7 @@ TEST(TexturingTest, WrapPixelCoords) {
 TEST(TexturingTest, discreteSample) {
   TextureBuilder<float> builder(16, 16, false, 1.f);
   std::vector<float> texture_data_raw = builder.getData().data;
-  TextureOperations process(texture_data_raw, builder.getData().width, builder.getData().height);
+  TextureOperations<float> process(texture_data_raw, builder.getData().width, builder.getData().height);
   for (unsigned i = 0; i < builder.width; i++)
     for (unsigned j = 0; j < builder.height; j++) {
       glm::vec3 compared = glm::abs(process.discreteSample(i, j) - glm::vec3(1.f));
