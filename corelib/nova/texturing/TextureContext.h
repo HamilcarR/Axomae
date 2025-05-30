@@ -173,8 +173,10 @@ namespace nova::texturing {
       unsigned idx = (j * width + i) * channels;
       AX_ASSERT_LT(idx + channels - 1, width * height * channels);
       glm::vec4 rgba;
-      for (int i = 0; i < channels; i++)
-        rgba[i] = f32texture(texture_index).raw_data[idx + i];
+      F32Texture sampled_texture = f32texture(texture_index);
+      for (int p = 0; p < channels; p++)
+        rgba[p] = sampled_texture.raw_data[idx + p];
+
       return rgba;
     }
   };

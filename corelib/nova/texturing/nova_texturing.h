@@ -19,7 +19,7 @@ namespace nova::texturing {
   class TextureStorage {
     axstd::managed_vector<NovaTextureInterface> textures;
     axstd::managed_vector<ConstantTexture> constant_textures;
-    axstd::managed_vector<ImageTexture> image_textures;
+    axstd::managed_vector<ImageTexture<uint32_t>> image_textures;
     axstd::managed_vector<EnvmapTexture> envmap_textures;  // Used for environment map blending.
 
    public:
@@ -33,7 +33,7 @@ namespace nova::texturing {
     CstTexCollection constants() const;
     void clearConstant();
 
-    NovaTextureInterface add(const ImageTexture &image_tex) { return append(image_tex, image_textures); }
+    NovaTextureInterface add(const ImageTexture<uint32_t> &image_tex) { return append(image_tex, image_textures); }
     void allocImage(std::size_t total_img_tex);
     bool isImageEmpty() const { return image_textures.empty(); }
     bool isImageInit() const { return image_textures.capacity() > 0; }
@@ -94,7 +94,7 @@ namespace nova::texturing {
       TextureRawData<T> texture_raw_data;
       texture_raw_data.invert_u = inverted_u;
       texture_raw_data.invert_v = inverted_v;
-      texture_raw_data.is_rgba = false;  // just letting this here for now, will replace with better memory format system.
+      texture_raw_data.is_rgba = false;
       texture_raw_data.width = width;
       texture_raw_data.height = height;
       texture_raw_data.channels = channels;

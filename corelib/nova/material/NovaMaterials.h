@@ -12,6 +12,7 @@ namespace nova {
     class SamplerInterface;
   }
   namespace texturing {
+    template<class T>
     class ImageTexture;
     struct texture_data_aggregate_s;
   }  // namespace texturing
@@ -19,14 +20,14 @@ namespace nova {
 
 namespace nova::material {
   struct texture_pack {
-    const texturing::ImageTexture *albedo;
-    const texturing::ImageTexture *metallic;
-    const texturing::ImageTexture *roughness;
-    const texturing::ImageTexture *ao;
-    const texturing::ImageTexture *normalmap;
-    const texturing::ImageTexture *emissive;
-    const texturing::ImageTexture *specular;
-    const texturing::ImageTexture *opacity;
+    const texturing::ImageTexture<uint32_t> *albedo;
+    const texturing::ImageTexture<uint32_t> *metallic;
+    const texturing::ImageTexture<uint32_t> *roughness;
+    const texturing::ImageTexture<uint32_t> *ao;
+    const texturing::ImageTexture<uint32_t> *normalmap;
+    const texturing::ImageTexture<uint32_t> *emissive;
+    const texturing::ImageTexture<uint32_t> *specular;
+    const texturing::ImageTexture<uint32_t> *opacity;
     CLASS_DCM(texture_pack)
   };
 

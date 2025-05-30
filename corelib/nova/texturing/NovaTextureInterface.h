@@ -18,10 +18,6 @@ namespace nova::texturing {
     return uv;
   }
 
-  class ConstantTexture;
-  class ImageTexture;
-  class EnvmapTexture;
-
   class ConstantTexture {
     glm::vec4 albedo{};
 
@@ -31,7 +27,30 @@ namespace nova::texturing {
     ax_device_callable glm::vec4 sample(float /*u*/, float /*v*/, const texture_data_aggregate_s & /*sample_data*/) const { return albedo; }
   };
 
-  class ImageTexture {
+  template<class T>
+  class ImageTexture;
+
+  template<>
+  class ImageTexture<float> {
+    std::size_t texture_index{0};
+
+   public:
+    ax_device_callable ImageTexture() = default;
+
+    ax_device_callable ImageTexture(std::size_t index) : texture_index(index) {}
+
+    ax_device_callable glm::vec4 sample(float u, float v, const texture_data_aggregate_s &sample_data) const {
+      u = normalize_uv(u);
+      v = normalize_uv(v);
+
+      return sample_data.texture_ctx->f32pixel(texture_index, u, v);
+    }
+
+    std::size_t getTextureIndex() const { return texture_index; }
+  };
+
+  template<>
+  class ImageTexture<uint32_t> {
     std::size_t texture_index{0};
 
    public:
@@ -89,6 +108,8 @@ namespace nova::texturing {
       AX_UNREACHABLE
       return glm::vec4(0);
     }
+
+    std::size_t getTextureIndex() const { return texture_index; }
   };
 
   ax_device_callable_inlined glm::vec3 sample_cubemap_plane(const glm::vec3 &sample_vector, const glm::vec3 &up_vector) {
@@ -116,9 +137,11 @@ namespace nova::texturing {
       AX_ASSERT_NOTNULL(texture_ctx);
       return texture_ctx->f32pixel(texture_index, u, v);
     }
+
+    std::size_t getTextureIndex() const { return texture_index; }
   };
 
-  class NovaTextureInterface : public core::tag_ptr<ConstantTexture, ImageTexture, EnvmapTexture> {
+  class NovaTextureInterface : public core::tag_ptr<ConstantTexture, ImageTexture<uint32_t>, ImageTexture<float>, EnvmapTexture> {
    public:
     using tag_ptr::tag_ptr;
     ax_device_callable glm::vec4 sample(float u, float v, const texture_data_aggregate_s &sample_data) const {
@@ -127,12 +150,13 @@ namespace nova::texturing {
     }
   };
 
-  using TYPELIST = core::type_list<ConstantTexture, ImageTexture, EnvmapTexture>;
+  using TYPELIST = core::type_list<ConstantTexture, ImageTexture<uint32_t>, ImageTexture<float>, EnvmapTexture>;
 
 }  // namespace nova::texturing
 
 using EnvMapCollection = axstd::span<const nova::texturing::EnvmapTexture>;
-using ImgTexCollection = axstd::span<const nova::texturing::ImageTexture>;
+using ImgTexCollection = axstd::span<const nova::texturing::ImageTexture<uint32_t>>;
+using ImgF32TexCollection = axstd::span<const nova::texturing::ImageTexture<float>>;
 using CstTexCollection = axstd::span<const nova::texturing::ConstantTexture>;
 using IntfTexCollection = axstd::span<const nova::texturing::NovaTextureInterface>;
 

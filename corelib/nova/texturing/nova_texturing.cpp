@@ -59,7 +59,15 @@ namespace nova::texturing {
     texture_storage.allocImage(init_data.total_image_textures);
   }
 
-  void TextureResourcesHolder::allocateEnvironmentMaps(std::size_t num_envmaps) { texture_storage.allocEnvmap(num_envmaps); }
+  void TextureResourcesHolder::allocateEnvironmentMaps(std::size_t num_envmaps) {
+    EnvMapCollection envmaps = texture_storage.envmaps();
+    for (const EnvmapTexture &elem : envmaps) {
+      std::size_t texture_index = elem.getTextureIndex();
+      texture_raw_data_storage.removeF32(texture_index);
+    }
+    texture_storage.clearEnvmap();
+    texture_storage.allocEnvmap(num_envmaps);
+  }
 
   NovaTextureInterface TextureResourcesHolder::getEnvmap(unsigned index) const {
     EnvMapCollection envmaps = texture_storage.envmaps();

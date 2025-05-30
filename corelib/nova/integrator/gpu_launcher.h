@@ -14,6 +14,9 @@ namespace nova {
   };
 
   void device_start_integrator(const device_traversal_param_s &traversal_parameters, nova_eng_internals &nova_internals);
+  /* Utils function for executing a few tests since code provided to Optix is undebuggable.*/
+  void device_test_integrator(const device_traversal_param_s &traversal_parameters, nova_eng_internals &nova_internals);
+
 }  // namespace nova
 
 #endif

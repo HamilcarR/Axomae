@@ -58,6 +58,11 @@ extern "C" ax_kernel void __raygen__main() {
   float3 direction = {c_ray.far.x, c_ray.far.y, c_ray.far.z};
   optixTrace(0, origin, direction, 0.001f, 1e30f, OptixVisibilityMask(1), 0, OPTIX_RAY_FLAG_NONE, 0, 0, 0);
 }
+template<class T>
+ax_device_force_inlined float int2float(T value) {
+  return math::texture::rgb_uint2float(value);
+}
+
 extern "C" ax_kernel void __miss__sample_envmap() {
 
   nova::device_traversal_param_s params = get_params();
@@ -70,11 +75,11 @@ extern "C" ax_kernel void __miss__sample_envmap() {
   rb.width = params.width;
   rb.height = params.height;
   nova::texturing::texture_data_aggregate_s data = {};
-  nova::texturing::TextureCtx texture_ctx(params.texture_bundle_views, true);
+  nova::texturing::TextureCtx texture_ctx(params.texture_bundle_views, false);
   data.texture_ctx = &texture_ctx;
-  nova::texturing::ImageTexture img(1);
+  nova::texturing::ImageTexture<float> img(2);
   glm::vec4 pixel = img.sample(u, v, data);
-  shade(rb, u, v, pixel);
+  shade(rb, u, v, {int2float(pixel.r), int2float(pixel.g), int2float(pixel.b), 1.f});
 }
 extern "C" ax_kernel void __anyhit__random_intersect() {}
 extern "C" ax_kernel void __closesthit__minimum_intersect() {}

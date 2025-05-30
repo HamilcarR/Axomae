@@ -31,8 +31,10 @@ PRIVATE
 )
 
 if(AXOMAE_USE_CUDA)
-    if(AXOMAE_USE_OPTIX)
-        target_sources(ax_core_nova_integrator PRIVATE cuda/job_dispatch.cpp)
-        set(CUDA_OPTIX_PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/cuda/integrator_optix.cu PARENT_SCOPE)
-    endif()
+  if(AXOMAE_USE_OPTIX)
+      set(CUDA_OPTIX_PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/cuda/integrator_optix.cu PARENT_SCOPE)  
+  endif()
+  target_sources(ax_core_nova_integrator PRIVATE 
+          cuda/test.cu
+          cuda/job_dispatch.cpp)
 endif()

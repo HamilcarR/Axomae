@@ -13,6 +13,7 @@ namespace nova {
   void gpu_draw(const device_traversal_param_s &traversal_params, nova_eng_internals &internals) {
 #if defined(AXOMAE_USE_CUDA)
     device_start_integrator(traversal_params, internals);
+    // device_test_integrator(traversal_params, internals);
 #else
     LOG("Application built without CUDA. Enable AXOMAE_USE_CUDA in build if GPU is compatible.", LogLevel::ERROR);
 #endif
