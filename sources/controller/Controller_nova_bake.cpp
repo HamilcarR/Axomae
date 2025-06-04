@@ -328,6 +328,7 @@ namespace controller {
     params.primitives_view = resrc_manager->getPrimitiveData().getPrimitiveView();
     params.texture_bundle_views = resrc_manager->getTexturesData().getTextureBundleViews();
     params.environment_map = resrc_manager->getTexturesData().getCurrentEnvmap();
+    params.current_envmap_index = resrc_manager->getTexturesData().getEnvmapId();
     params.camera = resrc_manager->getCameraData();
     params.width = grid_width;
     params.height = grid_height;

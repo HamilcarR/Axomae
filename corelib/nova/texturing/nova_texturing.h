@@ -114,6 +114,7 @@ namespace nova::texturing {
     NovaTextureInterface getEnvmap(unsigned index) const;
     NovaTextureInterface getCurrentEnvmap() const;
     void setEnvmapId(unsigned id) { current_environmentmap_index = id; }
+    unsigned getEnvmapId() const { return current_environmentmap_index; }
   };
 
 }  // namespace nova::texturing
