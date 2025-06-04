@@ -1,4 +1,5 @@
 #include "aggregate_datastructures.h"
+#include "glm/matrix.hpp"
 #include "gpu/optix_params.h"
 #include "internal.h"
 #include "shape/MeshContext.h"
@@ -75,6 +76,7 @@ namespace nova::aggregate {
     OPTIX_ERR_CHECK(optixDeviceContextDestroy(context));
   }
 
+  /* Allocates memory on gpu and copy vertices, indices, and transform matrices to it. */
   static void copy2device(const axstd::span<float> &vertices_array,
                           const axstd::span<unsigned> &indices_array,
                           const float transform_rm[12],  // Reads only 12 elements, no need for the perspective vector here.
@@ -205,7 +207,7 @@ namespace nova::aggregate {
   static OptixPipelineCompileOptions create_pipeline_compile_options() {
     OptixPipelineCompileOptions opts = {};
 #ifndef NDEBUG
-    opts.exceptionFlags = OPTIX_EXCEPTION_FLAG_STACK_OVERFLOW | OPTIX_EXCEPTION_FLAG_TRACE_DEPTH;
+    opts.exceptionFlags = OPTIX_EXCEPTION_FLAG_STACK_OVERFLOW | OPTIX_EXCEPTION_FLAG_TRACE_DEPTH | OPTIX_EXCEPTION_FLAG_USER;
 #endif
     opts.traversableGraphFlags = OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_SINGLE_GAS;
     opts.numPayloadValues = 0;
@@ -336,7 +338,7 @@ namespace nova::aggregate {
   static const unsigned flags[] = {OPTIX_GEOMETRY_FLAG_DISABLE_TRIANGLE_FACE_CULLING};  // Needed for dielectrics materials , we don't want any
                                                                                         // triangle culled because of it's orientation .
 
-  static OptixBuildInput create_trimesh_build_input(device_buffers_s &geometry) {
+  static OptixBuildInput create_trimesh_build_input(device_buffers_s &geometry, std::size_t prim_offset) {
     OptixBuildInput input = {};
     input.type = OPTIX_BUILD_INPUT_TYPE_TRIANGLES;
     OptixBuildInputTriangleArray &build_input_tri = input.triangleArray;
@@ -344,28 +346,32 @@ namespace nova::aggregate {
     // optix shenanigans: Assume CUdeviceptr and void* are interchangeable.
     build_input_tri.vertexBuffers = reinterpret_cast<const CUdeviceptr *>(&geometry.d_vertices);
     build_input_tri.numVertices = geometry.vertices_size / 3;
-    build_input_tri.vertexStrideInBytes = sizeof(float3);
+    build_input_tri.vertexStrideInBytes = 3 * sizeof(float);
     build_input_tri.vertexFormat = OPTIX_VERTEX_FORMAT_FLOAT3;
 
     build_input_tri.indexBuffer = reinterpret_cast<CUdeviceptr>(geometry.d_indices);
     build_input_tri.numIndexTriplets = geometry.indices_size / 3;
-    build_input_tri.indexStrideInBytes = sizeof(uint3);
+    build_input_tri.indexStrideInBytes = 3 * sizeof(unsigned int);
     build_input_tri.indexFormat = OPTIX_INDICES_FORMAT_UNSIGNED_INT3;
 
     build_input_tri.preTransform = reinterpret_cast<CUdeviceptr>(geometry.d_transform);
     build_input_tri.transformFormat = OPTIX_TRANSFORM_FORMAT_MATRIX_FLOAT12;
 
+    build_input_tri.primitiveIndexOffset = prim_offset;
     build_input_tri.numSbtRecords = 1;
     build_input_tri.flags = flags;
+
     return input;
   }
 
   static std::vector<OptixBuildInput> generate_trimesh_build_inputs(const primitive_aggregate_data_s &primitive_data_list,
+                                                                    device_allocs_s &device_pointers,
                                                                     allocations_tracker_s &device_allocations) {
 
     std::vector<OptixBuildInput> inputs;
     const shape::MeshBundleViews &mesh_bundle = primitive_data_list.mesh_geometry;
     std::size_t total_triangle_meshes = mesh_bundle.triMeshCount();
+    std::size_t primitive_offset = 0;
     for (std::size_t mesh_index = 0; mesh_index < total_triangle_meshes; mesh_index++) {
 
       const Object3D &current_triangle_mesh = mesh_bundle.getTriangleMesh(mesh_index);
@@ -375,9 +381,11 @@ namespace nova::aggregate {
       // Optix expects matrices to be represented in row major, so we use the cached transpose transform
       const glm::mat4 &transform_rm = mesh_bundle.reconstructTransform4x4(mesh_index).t;
       const float *flat_transform = glm::value_ptr(transform_rm);
-      device_allocs_s device_pointers;
+
       copy2device(vertices_array, indices_array, flat_transform, device_pointers.geometry, device_allocations);
-      OptixBuildInput input = create_trimesh_build_input(device_pointers.geometry);
+
+      OptixBuildInput input = create_trimesh_build_input(device_pointers.geometry, primitive_offset);
+      primitive_offset += indices_array.size() / 3;
       inputs.push_back(input);
     }
     return inputs;
@@ -386,14 +394,17 @@ namespace nova::aggregate {
   static OptixTraversableHandle build_triangle_gas(OptixDeviceContext context,
                                                    const primitive_aggregate_data_s &primitive_data_list,
                                                    void **d_outbuffer) {
+
     LOGS("Start building Optix GAS.");
+    allocations_tracker_s allocations;
+    device_allocs_s device_pointers;
+    std::vector<OptixBuildInput> build_inputs = generate_trimesh_build_inputs(primitive_data_list, device_pointers, allocations);
+
     OptixAccelBuildOptions options = {};
     // TODO: BVH compression
     options.buildFlags = OPTIX_BUILD_FLAG_NONE;
     options.operation = OPTIX_BUILD_OPERATION_BUILD;
-    options.motionOptions.numKeys = 0;
-    allocations_tracker_s allocations;
-    std::vector<OptixBuildInput> build_inputs = generate_trimesh_build_inputs(primitive_data_list, allocations);
+    options.motionOptions.numKeys = 1;
 
     OptixAccelBufferSizes buffer_sizes = {};
     OPTIX_ERR_CHECK(optixAccelComputeMemoryUsage(context, &options, build_inputs.data(), build_inputs.size(), &buffer_sizes));
@@ -414,9 +425,14 @@ namespace nova::aggregate {
                                     &handle,
                                     nullptr,
                                     0));
+
+    DEVICE_ERROR_CHECK(cudaStreamSynchronize(0));
+    AX_ASSERT(handle != 0, "Traversable handle is null!");
     allocations.d_buffers.push_back(d_tmp);
     device_dealloc(allocations);
+
     LOGS("Optix GAS built.");
+
     return handle;
   }
   extern "C" {
