@@ -21,9 +21,6 @@ namespace nova::camera {
     glm::vec3 position;
     glm::vec3 up_vector;
     glm::vec3 direction;
-
-   public:
-    CLASS_CM(CameraResourcesHolder)
   };
 }  // namespace nova::camera
 #endif  // NOVA_CAMERA_H

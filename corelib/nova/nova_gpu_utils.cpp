@@ -1,7 +1,7 @@
 #include "nova_gpu_utils.h"
-#include "internal/device/gpgpu/device_transfer_interface.h"
-#include "internal/device/gpgpu/device_utils.h"
-#include "internal/memory/MemoryArena.h"
+#include <internal/device/gpgpu/device_transfer_interface.h>
+#include <internal/device/gpgpu/device_utils.h>
+#include <internal/memory/MemoryArena.h>
 
 namespace resrc = device::gpgpu;
 namespace nova::gputils {
