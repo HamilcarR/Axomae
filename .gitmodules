@@ -7,14 +7,13 @@
 [submodule "vendor/glm"]
 	path = vendor/glm
 	url = https://github.com/g-truc/glm
-  branch = v1.0.1
   ignore = all
   fetchRecurseSubmodules = true
 
 [submodule "vendor/boost"]
 	path = vendor/boost
 	url = https://github.com/boostorg/boost
-  branch = boost-1.86.0
+  branch = master 
   ignore = all
   fetchRecurseSubmodules = true
 
@@ -84,6 +83,6 @@
 [submodule "vendor/embree"]
 	path = vendor/embree
   url = https://github.com/RenderKit/embree
-  branch = v4.4.3
+  branch = v4.3.3
   ignore = all
-  fetchRecurseSubmodules = false
+  fetchRecurseSubmodules = true 
