@@ -1,5 +1,5 @@
 
-add_library(ax_core_cuda
+add_library(ax_core_cuda STATIC
         cuda_utils.cpp
         CudaDevice.cpp
         CudaParams.cpp

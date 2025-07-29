@@ -1,6 +1,6 @@
 autoload_build_utils()
 
-add_library(ax_core_geometry
+add_library(ax_core_geometry STATIC
         BoundingBox.cpp
         Object3D.cpp
 )

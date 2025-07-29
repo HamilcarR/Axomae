@@ -1,4 +1,4 @@
-add_library(ax_core_debug
+add_library(ax_core_debug STATIC
     Logger.cpp
     PerformanceLogger.cpp
 )

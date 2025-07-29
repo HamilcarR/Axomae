@@ -10,7 +10,7 @@ git submodule sync --recursive
 
 # Initialize dependencies that also need their submodules downloaded as well
 for dependency in assimp embree boost glm googletest imath libdeflate openexr SDL SDL_image stb zlib; do
-  git submodule update --init --remote --recursive vendor/$dependency
+  git submodule update --init --recursive vendor/$dependency
 done
 
 git submodule update --init vendor/qt

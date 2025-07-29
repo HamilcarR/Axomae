@@ -1,4 +1,4 @@
-add_library(ax_core_opengl
+add_library(ax_core_opengl STATIC
         GLRenderBuffer.cpp
         GLMutablePixelBufferObject.cpp
         GLFrameBuffer.cpp

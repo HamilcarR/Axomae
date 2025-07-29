@@ -57,6 +57,7 @@ if(NOT CUDAToolkit_FOUND)
     message(STATUS "Cuda toolkit not found. Setting AXOMAE_USE_CUDA to off.")
     set(AXOMAE_USE_CUDA "OFF" CACHE BOOL "Use GPU when available")
 endif()
+
 if (AXOMAE_USE_CUDA AND CUDAToolkit_FOUND)
     message(STATUS "Found CUDA toolkit.")
     find_program(BIN2C 
@@ -81,8 +82,6 @@ if (AXOMAE_USE_CUDA AND CUDAToolkit_FOUND)
       set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --compiler-bindir ${CMAKE_CXX_COMPILER} --expt-relaxed-constexpr -std=c++17")
     endif()
     set(CUDA_GENERATED_OUTPUT_DIR ${CMAKE_BINARY_DIR}/cuda_generated)
-    # Optix
-    set(OPTIX_INCLUDE_PATH "" CACHE INTERNAL "")
 endif ()
 
 
@@ -109,6 +108,9 @@ set(OPENEXR_INCLUDE_PATH "" CACHE INTERNAL "")
 
 # GTest
 set(GTEST_INCLUDE_PATH "" CACHE INTERNAL "")
+
+# Optix 
+set(OPTIX_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/vendor/Optix/include" CACHE INTERNAL "")
 
 # For libraries without build system
 set(VENDOR_PATH "" CACHE INTERNAL "")
