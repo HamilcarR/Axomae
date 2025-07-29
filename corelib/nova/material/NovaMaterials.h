@@ -119,7 +119,7 @@ namespace nova::material {
     ax_device_callable_inlined float schlick(float cosine, float eta) const {
       float r0 = (1 - eta) / (1 + eta);
       r0 *= r0;
-      return r0 + (1 - r0) * std::powf((1 - cosine), 5);
+      return r0 + (1 - r0) * AX_GPU_FASTPOW((1.f - cosine), 5.f);
     }
 
    public:

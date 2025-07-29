@@ -13,6 +13,21 @@
 #  define ax_host_only __host__
 #  define ax_kernel __global__
 
+#else
+#  define ax_device_callable
+#  define ax_device_shared
+#  define ax_device_only
+#  define ax_device_inlined inline
+#  define ax_device_callable_inlined ax_device_inlined
+#  define ax_device_force_inlined inline
+#  define ax_device_const
+#  define ax_device_managed
+#  define ax_host_only
+#  define ax_kernel
+
+#endif
+
+#ifdef __CUDA_ARCH__
 /* Synchronization */
 #  define ax_gpu_syncthread __syncthreads()
 #  define ax_gpu_syncwarp __syncwarp()
@@ -30,17 +45,8 @@
 #  define AX_GPU_FASTTANH(value) tanhf(value)
 #  define AX_GPU_ABS(val) abs(val)
 #  define AX_GPU_CEIL(val) ceil(val)
+
 #else
-#  define ax_device_callable
-#  define ax_device_shared
-#  define ax_device_only
-#  define ax_device_inlined inline
-#  define ax_device_callable_inlined ax_device_inlined
-#  define ax_device_force_inlined inline
-#  define ax_device_const
-#  define ax_device_managed
-#  define ax_host_only
-#  define ax_kernel
 
 /* Synchronization */
 #  define ax_gpu_syncthread
@@ -59,8 +65,7 @@
 #  define AX_GPU_FASTTANH(value) tanhf(value)
 #  define AX_GPU_ABS(val) fabsf(val)
 #  define AX_GPU_CEIL(val) ceil(val)
+
 #endif
-
 #define AX_GPU_FLOORF(val) floorf(val)
-
 #endif
