@@ -26,6 +26,10 @@ jobs:
     - name: Install libxext-dev
       run: |
         sudo apt-get install -y libxext-dev
+    
+    - name: Install Numpy
+      run: |
+        sudo apt-get install -y python3-numpy 
 
     - name: Install Axomae dependencies
       run: |
