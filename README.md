@@ -12,7 +12,6 @@
 * [Installation](#Installation)
 * [Documentation](#Documentation)
 
-## Introduction
 
 ## Introduction
 
