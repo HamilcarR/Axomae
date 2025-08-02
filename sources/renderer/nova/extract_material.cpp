@@ -3,11 +3,9 @@
 #include "Mesh.h"
 #include "bake.h"
 #include "extract_scene_internal.h"
-#include "material/nova_material.h"
-#include "texturing/NovaTextureInterface.h"
-#include "texturing/nova_texturing.h"
 #include <internal/common/exception/GenericException.h>
 #include <internal/macro/project_macros.h>
+#include <nova/NovaAPI.h>
 
 namespace exception {
   class InvalidTexTypeConversionException : public CatastrophicFailureException {

@@ -1,14 +1,10 @@
 #include "Camera.h"
-#include "DrawEngine.h"
 #include "Image.h"
 #include "bake.h"
-#include "manager/NovaResourceManager.h"
 #include "nova/bake_render_data.h"
-#include "nova_gpu_utils.h"
-#include "texturing/NovaTextureInterface.h"
-#include "texturing/nova_texturing.h"
 #include <internal/common/exception/GenericException.h>
 #include <internal/thread/worker/ThreadPool.h>
+#include <nova/NovaAPI.h>
 
 namespace exception {
   class NullMeshListException : public GenericException {

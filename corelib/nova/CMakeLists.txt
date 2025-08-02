@@ -1,9 +1,9 @@
 set(AXOMAE_NOVA_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(ax_core_nova STATIC
-        DrawEngine.cpp
-        DrawEngine_GPU.cpp
-        nova_gpu_utils.cpp
+        utils/DrawEngine.cpp
+        utils/DrawEngine_GPU.cpp
+        utils/nova_gpu_utils.cpp
         
         texturing/nova_texturing.cpp 
         texturing/texture_interop_storage.cpp
@@ -53,7 +53,6 @@ target_include_directories(ax_core_nova
 )
 
 if(AXOMAE_USE_CUDA)
-    set_source_files_properties(DrawEngine_GPU.cpp PROPERTIES LANGUAGE CUDA) #TODO : probably useless
     target_compile_definitions(ax_core_nova PRIVATE AXOMAE_USE_CUDA)
     if(AXOMAE_USE_OPTIX)
         target_compile_definitions(ax_core_nova PRIVATE AXOMAE_USE_OPTIX)

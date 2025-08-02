@@ -2,17 +2,14 @@
 #include "ArcballCamera.h"
 #include "CameraFrameBuffer.h"
 #include "Config.h"
-#include "DrawEngine.h"
 #include "EnvmapTextureManager.h"
 #include "GLViewer.h"
 #include "RenderPipeline.h"
 #include "Scene.h"
 #include "TextureProcessing.h"
 #include "event/EventController.h"
-#include "manager/NovaResourceManager.h"
-#include "material/nova_material.h"
-#include "primitive/NovaGeoPrimitive.h"
 #include <internal/device/rendering/opengl/GLMutablePixelBufferObject.h>
+#include <nova/NovaAPI.h>
 #include <unistd.h>
 
 static std::mutex mutex;
