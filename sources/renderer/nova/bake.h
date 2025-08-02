@@ -1,9 +1,9 @@
 #ifndef NOVABAKE_H
 #define NOVABAKE_H
-#include "NovaInterface.h"
 #include "bake_render_data.h"
-#include "engine/nova_exception.h"
 #include <internal/common/axstd/span.h>
+#include <nova/NovaAPI.h>
+
 class Camera;
 class TextureGroup;
 class Drawable;

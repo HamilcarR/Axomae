@@ -1,10 +1,10 @@
 #include "DrawEngine.h"
 #include "engine/nova_engine.h"
 #include "integrator/Integrator.h"
-#include "internal/common/exception/GenericException.h"
-#include "internal/debug/Logger.h"
-#include "internal/thread/worker/ThreadPool.h"
 #include "manager/NovaResourceManager.h"
+#include <internal/common/exception/GenericException.h>
+#include <internal/debug/Logger.h>
+#include <internal/thread/worker/ThreadPool.h>
 
 namespace exception {
   class InvalidThreadpoolStateException final : public GenericException {

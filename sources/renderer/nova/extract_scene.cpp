@@ -1,14 +1,11 @@
 #include "Drawable.h"
 #include "EnvmapTextureManager.h"
 #include "Mesh.h"
-#include "aggregate/acceleration_interface.h"
 #include "bake.h"
 #include "extract_scene_internal.h"
-#include "manager/NovaResourceManager.h"
-#include "material/nova_material.h"
 #include "nova/bake_render_data.h"
-#include "shape/nova_shape.h"
 #include <internal/common/axstd/span.h>
+#include <nova/NovaAPI.h>
 
 namespace nova_baker_utils {
 

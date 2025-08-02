@@ -1,9 +1,8 @@
-#include "AccelerationInternalsInterface.h"
+#include "../AccelerationInternalsInterface.h"
+#include "../acceleration_interface.h"
 #include "BvhBuilder.h"
-#include "acceleration_interface.h"
 #include "primitive/PrimitiveInterface.h"
 #include "ray/Hitable.h"
-#include <cmath>
 namespace nova::aggregate {
 
 #define acceleration_internal_interface \

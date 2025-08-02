@@ -2,7 +2,6 @@
 #include "Test.h"
 #include "texturing/NovaTextureInterface.h"
 #include <algorithm>
-#include <gtest/gtest.h>
 
 namespace nvt = nova::texturing;
 

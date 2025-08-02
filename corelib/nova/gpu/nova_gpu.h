@@ -1,6 +1,11 @@
 #ifndef NOVA_GPU_H
 #define NOVA_GPU_H
+#include "camera/nova_camera.h"
 #include "engine/datastructures.h"
+#include "material/NovaMaterials.h"
+#include "primitive/PrimitiveInterface.h"
+#include "shape/MeshContext.h"
+#include "texturing/TextureContext.h"
 #include <internal/common/math/gpu/math_random_gpu.h>
 
 namespace nova {

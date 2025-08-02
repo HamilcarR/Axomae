@@ -1,7 +1,7 @@
 #ifndef OPTIX_INTERNAL_H
 #define OPTIX_INTERNAL_H
-#include "aggregate/device_acceleration_interface.h"
-#include "aggregate_datastructures.h"
+#include "../../aggregate_datastructures.h"
+#include "../../device_acceleration_interface.h"
 #include "gpu/nova_gpu.h"
 #include <optix_host.h>
 #include <optix_types.h>

@@ -2,7 +2,6 @@
 #define NOVARENDERER_H
 
 #include "LightingDatabase.h"
-#include "NovaInterface.h"
 #include "RendererInterface.h"
 #include "bake_render_data.h"
 

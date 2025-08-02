@@ -3,9 +3,7 @@
 #include "aggregate/acceleration_interface.h"
 #include "camera/nova_camera.h"
 #include "engine/nova_engine.h"
-#include "engine/nova_exception.h"
 #include "gpu/nova_gpu.h"
-#include "ray/Ray.h"
 #include "scene/nova_scene.h"
 #include "texturing/nova_texturing.h"
 #include <internal/macro/class_macros.h>

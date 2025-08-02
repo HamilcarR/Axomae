@@ -20,11 +20,6 @@ set_target_properties(ax_ptx_compile PROPERTIES
           ax_core_thread
           ax_core_memory
           ax_core_device
-          ax_core_nova_sampler
-          ax_core_nova_texturing
-          ax_core_nova_primitive
-          ax_core_nova_shape
-          ax_core_nova_material
   )
 
 set(OUTPUT_PTX ${CMAKE_BINARY_DIR}/lib/ptx/integrator_optix)
@@ -50,14 +45,14 @@ add_dependencies(ax_ptx_generate ax_ptx_compile)
 
 add_library(ax_ptx_embedded_lib STATIC ${AX_PTX_INTEGRATOR})
 add_dependencies(ax_ptx_embedded_lib ax_ptx_generate)        
-target_link_libraries(ax_core_nova_aggregate PRIVATE ax_ptx_embedded_lib)
+target_link_libraries(ax_core_nova PRIVATE ax_ptx_embedded_lib)
 
-target_sources(ax_core_nova_aggregate PRIVATE
+target_sources(ax_core_nova PRIVATE
           host.cpp
           device.cpp
 )
 
-target_include_directories(ax_core_nova_aggregate PRIVATE ${OPTIX_INCLUDE_PATH}) 
-target_compile_definitions(ax_core_nova_aggregate PUBLIC AXOMAE_USE_OPTIX)
+target_include_directories(ax_core_nova PRIVATE ${OPTIX_INCLUDE_PATH}) 
+
 
 
