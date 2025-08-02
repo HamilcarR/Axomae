@@ -1,6 +1,6 @@
 #ifndef BVHBUILDER_H
 #define BVHBUILDER_H
-#include "aggregate/aggregate_datastructures.h"
+#include "../aggregate_datastructures.h"
 #include "primitive/PrimitiveInterface.h"
 #include "shape/MeshContext.h"
 #include <internal/common/axstd/span.h>

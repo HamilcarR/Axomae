@@ -1,9 +1,5 @@
 #ifndef NOVA_ENGINE_H
 #define NOVA_ENGINE_H
-#include "datastructures.h"
-#include "gpu/nova_gpu.h"
-#include "utils/nova_utils.h"
-#include <atomic>
 #include <internal/macro/project_macros.h>
 #include <string>
 namespace nova {

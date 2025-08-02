@@ -1,6 +1,6 @@
 #include "EmissiveIntegrator.h"
-#include "internal/common/math/math_random.h"
 #include "sampler/Sampler.h"
+#include <internal/common/math/math_random.h>
 
 namespace nova::integrator {
   void EmissiveIntegrator::render(RenderBuffers<float> *buffers, Tile &tile, nova_eng_internals &nova_internals) const {

@@ -1,6 +1,6 @@
-#include "acceleration_interface.h"
+#include "../../acceleration_interface.h"
+#include "../../aggregate_datastructures.h"
 #include "aggregate/AccelerationInternalsInterface.h"
-#include "aggregate_datastructures.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "primitive/PrimitiveInterface.h"
 #include "ray/Hitable.h"

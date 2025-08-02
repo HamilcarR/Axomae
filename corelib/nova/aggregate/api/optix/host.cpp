@@ -1,4 +1,4 @@
-#include "aggregate_datastructures.h"
+#include "../../aggregate_datastructures.h"
 #include "glm/matrix.hpp"
 #include "gpu/optix_params.h"
 #include "internal.h"

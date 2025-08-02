@@ -1,6 +1,6 @@
 #ifndef NOVAEXCEPTIONMANAGER_H
 #define NOVAEXCEPTIONMANAGER_H
-#include <engine/nova_exception.h>
+#include "engine/nova_exception.h"
 
 namespace nova {
   class NovaExceptionManager {

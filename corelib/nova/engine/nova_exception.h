@@ -1,9 +1,9 @@
 #ifndef EXCEPTION_H
 #define EXCEPTION_H
-#include "internal/device/gpgpu/device_utils.h"
-#include "internal/macro/class_macros.h"
 #include <atomic>
 #include <cstdint>
+#include <internal/device/gpgpu/device_utils.h>
+#include <internal/macro/class_macros.h>
 
 #include <internal/macro/project_macros.h>
 #include <vector>

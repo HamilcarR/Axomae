@@ -1,9 +1,11 @@
 #ifndef NOVA_DRAW_ENGINE_H
 #define NOVA_DRAW_ENGINE_H
 #include "NovaInterface.h"
-#include "nova_gpu_utils.h"
+#include "engine/datastructures.h"
+#include <internal/macro/class_macros.h>
 
 #include <future>
+#include <vector>
 
 namespace threading {
   class ThreadPool;

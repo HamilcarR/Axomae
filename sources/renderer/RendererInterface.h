@@ -3,8 +3,8 @@
 #include "Image.h"
 #include "RendererCallbacks.h"
 #include "event/EventInterface.h"
-#include "manager/NovaResourceManager.h"
 #include "nova/bake.h"
+#include <nova/manager/NovaResourceManager.h>
 class Scene;
 class SceneTree;
 class RenderPipeline;

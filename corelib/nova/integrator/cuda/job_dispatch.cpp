@@ -1,5 +1,6 @@
 #include "integrator/gpu_launcher.h"
 #include "manager/ManagerInternalStructs.h"
+#include "manager/NovaResourceManager.h"
 
 namespace nova {
 

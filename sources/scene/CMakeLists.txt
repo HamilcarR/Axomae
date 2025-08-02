@@ -15,8 +15,6 @@ PRIVATE
         ax_opengl
         ax_renderer
         ax_controller
-PUBLIC
-        ax_core_nova_shape
 
 
 

@@ -1,11 +1,5 @@
 #ifndef DATASTRUCTURES_H
 #define DATASTRUCTURES_H
-#include "camera/nova_camera.h"
-#include "material/NovaMaterials.h"
-#include "primitive/PrimitiveInterface.h"
-#include "shape/ShapeInterface.h"
-#include "texturing/NovaTextureInterface.h"
-#include "texturing/TextureContext.h"
 #include <cstddef>
 namespace nova {
 

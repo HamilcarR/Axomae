@@ -1,9 +1,15 @@
 #ifndef BAKERENDERDATA_H
 #define BAKERENDERDATA_H
-#include "DrawEngine.h"
 #include "Image.h"
-#include "manager/NovaResourceManager.h"
 #include <QWidget>
+#include <internal/common/math/utils_3D.h>
+#include <nova/DrawEngine.h>
+#include <nova/manager/NovaExceptionManager.h>
+#include <nova/manager/NovaResourceManager.h>
+#include <nova/material/NovaMaterials.h>
+#include <nova/nova_gpu_utils.h>
+#include <nova/primitive/NovaGeoPrimitive.h>
+#include <nova/texturing/NovaTextureInterface.h>
 
 class Mesh;
 class Drawable;

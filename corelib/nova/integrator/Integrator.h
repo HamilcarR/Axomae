@@ -1,6 +1,11 @@
 #ifndef INTEGRATOR_H
 #define INTEGRATOR_H
+#include "aggregate/aggregate_datastructures.h"
+#include "engine/datastructures.h"
 #include "manager/ManagerInternalStructs.h"
+#include "manager/NovaExceptionManager.h"
+#include "manager/NovaResourceManager.h"
+#include "utils/nova_utils.h"
 #include <internal/common/math/math_camera.h>
 #include <internal/common/math/math_utils.h>
 #include <internal/macro/project_macros.h>
@@ -9,8 +14,6 @@ namespace nova {
   class Ray;
   struct Tile;
   class NovaResourceManager;
-  template<class T>
-  struct RenderBuffers;
 }  // namespace nova
 
 namespace nova::integrator {
