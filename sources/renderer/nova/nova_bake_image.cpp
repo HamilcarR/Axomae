@@ -4,7 +4,7 @@
 #include "nova/bake_render_data.h"
 #include <internal/common/exception/GenericException.h>
 #include <internal/thread/worker/ThreadPool.h>
-#include <nova/NovaAPI.h>
+#include <nova/api.h>
 
 namespace exception {
   class NullMeshListException : public GenericException {

@@ -5,7 +5,7 @@
 #include "extract_scene_internal.h"
 #include "nova/bake_render_data.h"
 #include <internal/common/axstd/span.h>
-#include <nova/NovaAPI.h>
+#include <nova/api.h>
 
 namespace nova_baker_utils {
 

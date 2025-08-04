@@ -19,6 +19,7 @@
 #include <internal/macro/exception_macros.h>
 #include <qwidget.h>
 #include <string>
+#include <thread>
 
 namespace exception {
   GENERIC_EXCEPT_DEFINE(InValidCameraException, "No valid camera present in the scene , or the camera hasn't been initialized.", WARNING)
@@ -385,6 +386,8 @@ namespace controller {
         internals.resource_manager = render_scene_data.nova_resource_manager;
         internals.exception_manager = render_scene_data.nova_exception_manager.get();
         nova::gpu_draw(traversal_parameters, internals);
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(60));  // TODO : temporary . Replace by an opengl viewer + interop for in-device texture display.
         update_display(display_widget);
       } catch (const exception::GenericException &e) {
         ExceptionInfoBoxHandler::handle(e);

@@ -5,7 +5,7 @@
 #include "extract_scene_internal.h"
 #include <internal/common/exception/GenericException.h>
 #include <internal/macro/project_macros.h>
-#include <nova/NovaAPI.h>
+#include <nova/api.h>
 
 namespace exception {
   class InvalidTexTypeConversionException : public CatastrophicFailureException {
