@@ -2,7 +2,7 @@
 #define DISPLAYMANAGER3D_H
 #include "nova/bake_render_data.h"
 #include "ui_main_window.h"
-#include <nova/NovaAPI.h>
+#include <nova/api.h>
 
 class ApplicationConfig;
 

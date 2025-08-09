@@ -1,0 +1,13 @@
+#ifndef API_COMMON_H
+#define API_COMMON_H
+#include <memory>
+
+namespace nova {
+  enum ERROR_STATE {
+    SUCCESS,
+    INVALID_ENGINE_STATE,
+    INVALID_BUFFER_STATE,
+    INVALID_CHANNEL_DESCRIPTOR,
+  };
+}
+#endif

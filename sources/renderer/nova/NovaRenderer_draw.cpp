@@ -7,7 +7,7 @@
 #include <cstring>
 #include <internal/device/rendering/opengl/GLMutablePixelBufferObject.h>
 #include <internal/macro/project_macros.h>
-#include <nova/NovaAPI.h>
+#include <nova/api.h>
 
 static constexpr int MAX_RECUR_DEPTH = 20;
 static constexpr int MAX_SAMPLES = 10000;
