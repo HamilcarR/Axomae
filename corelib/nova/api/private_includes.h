@@ -3,10 +3,15 @@
 #include "../api.h"
 #include "api_common.h"
 #include "api_scene.h"
+#include "engine/datastructures.h"
+#include "manager/NovaResourceManager.h"
+#include "material/NovaMaterials.h"
+#include <internal/common/axstd/managed_buffer.h>
 #include <internal/geometry/Object3D.h>
 
+constexpr int PBR_TEXTURE_PACK_SIZE = 8;
 namespace nova {
-  class NvTexture : public NvAbstractTexture {
+  class NvTexture final : public NvAbstractTexture {
    public:
     enum DATATYPE { F_ARRAY, I_ARRAY, SINGLE_COL };
 
@@ -15,8 +20,8 @@ namespace nova {
       const float *f_buffer;
       const uint32_t *ui_buffer;
       float color[4];
-    } memory;
-    DATATYPE type;
+    } memory{};
+    DATATYPE type{};
     unsigned width{0};
     unsigned height{9};
     unsigned channel{0};
@@ -47,12 +52,10 @@ namespace nova {
     bool getInvertX() const { return invert_x; }
 
     template<class T>
-    const T *getData() const {
-      return &memory;
-    }
+    const T *getData() const;
   };
 
-  class NvMaterial : public NvAbstractMaterial {
+  class NvMaterial final : public NvAbstractMaterial {
     NvTexture albedo;
     NvTexture normal;
     NvTexture metallic;
@@ -102,7 +105,7 @@ namespace nova {
     uint32_t vbo_indices;
   };
 
-  class NvTriMesh : public NvAbstractTriMesh {
+  class NvTriMesh final : public NvAbstractTriMesh {
     Object3D attributes;
     float transform[16]{};
     trimesh_vbo_interop_s vbo_interop{};
@@ -119,7 +122,6 @@ namespace nova {
     ERROR_STATE registerBufferUVs(float *uv, size_t num) override;
     ERROR_STATE registerBufferIndices(unsigned *indices, size_t num) override;
     ERROR_STATE registerTransform(const float transform[16]) override;
-
     ERROR_STATE registerInteropVertices(uint32_t vbo_id) override;
     ERROR_STATE registerInteropNormals(uint32_t vbo_id) override;
     ERROR_STATE registerInteropTangents(uint32_t vbo_id) override;
@@ -127,6 +129,23 @@ namespace nova {
     ERROR_STATE registerInteropColors(uint32_t vbo_id) override;
     ERROR_STATE registerInteropUVs(uint32_t vbo_id) override;
     ERROR_STATE registerInteropIndices(uint32_t vbo_id) override;
+
+    axstd::span<float> getVertices() const override { return attributes.vertices; }
+    axstd::span<float> getNormals() const override { return attributes.normals; }
+    axstd::span<float> getTangents() const override { return attributes.tangents; }
+    axstd::span<float> getBitangents() const override { return attributes.bitangents; }
+    axstd::span<float> getColors() const override { return attributes.colors; }
+    axstd::span<float> getUVs() const override { return attributes.uv; }
+    axstd::span<unsigned> getIndices() const override { return attributes.indices; }
+    uint32_t getInteropVertices() const override { return vbo_interop.vbo_vertices; }
+    uint32_t getInteropNormals() const override { return vbo_interop.vbo_normals; }
+    uint32_t getInteropTangents() const override { return vbo_interop.vbo_tangents; }
+    uint32_t getInteropBitangents() const override { return vbo_interop.vbo_bitangents; }
+    uint32_t getInteropColors() const override { return vbo_interop.vbo_colors; }
+    uint32_t getInteropUVs() const override { return vbo_interop.vbo_uvs; }
+    uint32_t getInteropIndices() const override { return vbo_interop.vbo_indices; }
+
+    void getTransform(float transform[16]) const override;
   };
 
   struct trimesh_object_s {
@@ -134,11 +153,59 @@ namespace nova {
     std::unique_ptr<NvMaterial> mesh_material;
   };
 
-  class NvScene : public NvAbstractScene {
+  class NvScene final : public NvAbstractScene {
     std::vector<trimesh_object_s> trimesh_group;
+    std::vector<NvTexture> envmaps;
 
    public:
     ERROR_STATE addMesh(const NvAbstractTriMesh &mesh, const NvAbstractMaterial &material) override;
+    ERROR_STATE addEnvmap(const NvAbstractTexture &envmap_texture) override;
+    axstd::span<const trimesh_object_s> getTrimeshArray() const;
   };
+
+  struct HostStoredRenderableBuffers {
+    axstd::managed_vector<float> partial_buffer;
+    axstd::managed_vector<float> accumulator_buffer;
+    axstd::managed_vector<float> depth_buffer;
+    axstd::managed_vector<float> normal_buffer;
+    unsigned width{}, height{};
+    static constexpr unsigned CHANNELS_COLOR = 4;
+    static constexpr unsigned CHANNELS_DEPTH = 1;
+    static constexpr unsigned CHANNELS_NORMALS = 3;
+  };
+
+  class NvRenderBuffer : public RenderBuffer {
+    std::unique_ptr<HostStoredRenderableBuffers> render_buffers;
+
+   public:
+    ERROR_STATE createRenderBuffer(unsigned width, unsigned height) override;
+    HdrBufferStruct getRenderBuffers() const override;
+  };
+
+  class NvEngineInstance : public EngineInstance {
+    NovaResourceManager manager;
+    RenderBufferPtr render_buffer;
+    bool uses_interops{false};
+    bool uses_gpu{false};
+    bool scene_built{false};
+
+   public:
+    ERROR_STATE buildScene(const NvAbstractScene &scene) override;
+    ERROR_STATE setRenderBuffers(RenderBufferPtr buffers) override;
+    ERROR_STATE buildAcceleration() override;
+    ERROR_STATE useInterops(bool use) override;
+    ERROR_STATE useGpu(bool use) override;
+    ERROR_STATE cleanup() override;
+  };
+
+  Object3D to_obj3d(const NvTriMesh &trimesh);
+  material::NovaMaterialInterface setup_material_data(const NvAbstractMesh &mesh, const NvMaterial &material, NovaResourceManager &manager);
+  void setup_geometry_data(const NvAbstractTriMesh &mesh,
+                           const float final_transform[16],
+                           material::NovaMaterialInterface &material,
+                           NovaResourceManager &manager,
+                           std::size_t mesh_index,
+                           bool uses_interops);
+
 }  // namespace nova
 #endif

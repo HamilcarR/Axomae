@@ -1,7 +1,7 @@
 set(AXOMAE_NOVA_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(ax_core_nova STATIC
-        api/api.cpp
+        api/engine.cpp
         api/geometry.cpp
         api/material.cpp 
         api/scene.cpp 

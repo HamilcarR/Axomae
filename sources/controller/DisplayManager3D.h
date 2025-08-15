@@ -19,8 +19,7 @@ namespace controller {
     GLViewer *nova_viewer{};
     std::unique_ptr<nova::NovaResourceManager> nova_resource_manager{};
     nova::device_shared_caches_t shared_caches;
-    nova_baker_utils::bake_buffers_storage_t bake_buffers_storage;
-    // TODO : add EnvmapManager instance here ?
+    //  TODO : add EnvmapManager instance here ?
    public:
     void init(Ui::MainWindow &main_window_ui, ApplicationConfig *global_application_config, OperatorProgressStatus *progress_manager);
     ax_no_discard GLViewer *getRealtimeViewer() const { return realtime_viewer; };
