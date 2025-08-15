@@ -60,5 +60,15 @@ namespace nova {
     return SUCCESS;
   }
 
+  template<>
+  const uint32_t *NvTexture::getData<uint32_t>() const {
+    return memory.ui_buffer;
+  }
+
+  template<>
+  const float *NvTexture::getData<float>() const {
+    return memory.f_buffer;
+  }
+
   std::unique_ptr<NvAbstractTexture> create_texture() { return std::make_unique<NvTexture>(); }
 }  // namespace nova

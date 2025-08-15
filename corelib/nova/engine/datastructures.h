@@ -9,8 +9,10 @@ namespace nova {
     T *accumulator_buffer;
     T *partial_buffer;
     T *depth_buffer;
+    T *normal_buffer;
     size_t color_buffers_pitch{};
     size_t depth_buffers_pitch{};
+    size_t normal_buffers_pitch{};
     size_t byte_size_color_buffers{};
     size_t byte_size_depth_buffers{};
     int channels{};
