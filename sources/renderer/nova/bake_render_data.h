@@ -27,12 +27,6 @@ namespace nova_baker_utils {
     axstd::span<nova::primitive::NovaGeoPrimitive> geo_primitive_alloc_buffer;
   };
 
-  struct bake_buffers_storage_t {
-    material_buffers_t material_buffers;
-    texture_buffers_t texture_buffers;
-    primitive_buffers_t primitive_buffers;
-  };
-
   struct render_scene_context {
     std::unique_ptr<nova::HdrBufferStruct> buffers;
     int width, height;

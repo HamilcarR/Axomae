@@ -19,13 +19,6 @@ namespace nova_baker_utils {
     return acc;
   }
 
-  primitive_buffers_t allocate_primitive_triangle_buffers(core::memory::ByteArena &memory_pool, std::size_t primitive_number) {
-    auto *primitive_buffer = memory_pool.construct<nova::primitive::NovaGeoPrimitive>(primitive_number, false, "Primitive buffer");
-    primitive_buffers_t geometry_buffers{};
-    geometry_buffers.geo_primitive_alloc_buffer = axstd::span<nova::primitive::NovaGeoPrimitive>(primitive_buffer, primitive_number);
-    return geometry_buffers;
-  }
-
   /**
    * Each mesh has PBR_PIPELINE_TEX_NUM number of textures
    */
@@ -111,7 +104,6 @@ namespace nova_baker_utils {
     std::vector<Mesh *> meshes = retrieve_meshes_from_drawables(drawables_orig_transfo);
     /* Allocate for triangles */
     std::size_t primitive_number = compute_primitive_number(meshes);
-    primitive_buffers_t primitive_buffers = allocate_primitive_triangle_buffers(memory_pool, primitive_number);
 
     resource_holders_inits_s resrc{};
     resrc.triangle_mesh_number = meshes.size();
