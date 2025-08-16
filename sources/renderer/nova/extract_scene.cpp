@@ -100,7 +100,6 @@ namespace nova_baker_utils {
   }
 
   void build_scene(const std::vector<drawable_original_transform> &drawables_orig_transfo, nova::NovaResourceManager &manager) {
-    core::memory::ByteArena &memory_pool = manager.getMemoryPool();
     std::vector<Mesh *> meshes = retrieve_meshes_from_drawables(drawables_orig_transfo);
     /* Allocate for triangles */
     std::size_t primitive_number = compute_primitive_number(meshes);
