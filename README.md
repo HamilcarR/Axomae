@@ -3,8 +3,6 @@
 ![Build](https://github.com/HamilcarR/Axomae/actions/workflows/cmake-single-platform.yml/badge.svg)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/HamilcarR/Axomae)
 
-![final](Documentation/Screenshots/final.jpeg)
-
 # Table Of Contents:
 * [Introduction](#Introduction)
 * [Features](#Features)
@@ -22,26 +20,27 @@ At the same time, the application is intended to be interactive , and customizab
 
 ## Features
 
-* Nova: A multi-thread path-tracer , currently implemented to be scalable and distributed on GPU. Nova can be used as an offline renderer, or a pseudo-realtime , more interactive viewer. 
-* UV-editor
+* Nova: A multi-thread/GPU parallelized path tracing engine. Nova can be used as an offline renderer, or a pseudo-realtime , more interactive viewer. 
+* PBR rasterizer 3D viewer. 
+* UV viewer.
 * (Old feature) A normal map generation tool : Will probably be scrapped for an entirely new material generation pipeline. 
 * .hdr texture viewer.
-* PBR rasterizer 3D viewer. 
+* Irradiance baking.
 
 ## Screenshots
 
-Here are some examples of what Axomae can render:
+Here are some examples of what Axomae can currently render:
 
-### Path Tracer (Nova) Renders
+### Nova Engine
 
 <p align="center">
-  <img src="Documentation/Screenshots/4k_chess_more_samples.jpeg" width="45%" alt="4K Chess Scene" />
+  <img src="Documentation/Screenshots/final.jpeg" width="45%" alt="4K Chess Scene" />
   <img src="Documentation/Screenshots/bathroom.png" width="45%" alt="Bathroom Scene" />
 </p>
 
 *High-quality path-traced scenes: Chess scene at 4K resolution and realistic bathroom interior*
 
-### Realtime Viewer Renders
+### PBR viewers
 
 <p align="center">
   <img src="Documentation/Screenshots/viewer_boombox.png" width="30%" alt="Viewer Boombox" />
