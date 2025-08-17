@@ -1,7 +1,9 @@
+#include "api_common.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "private_includes.h"
+#include <typeinfo>
 namespace nova {
-  std::unique_ptr<NvAbstractTriMesh> nv_create_trimesh() { return std::make_unique<NvTriMesh>(); }
+  std::unique_ptr<TriMesh> nv_create_trimesh() { return std::make_unique<NvTriMesh>(); }
 
   ERROR_STATE NvTriMesh::registerBufferVertices(float *vertices, size_t num) {
     if (!vertices || num == 0)
@@ -52,8 +54,8 @@ namespace nova {
     return SUCCESS;
   }
 
-  ERROR_STATE NvTriMesh::registerTransform(const float transform[16]) {
-    std::memcpy(this->transform, transform, sizeof(float) * 16);
+  ERROR_STATE NvTriMesh::registerTransform(const Transform &tra) {
+    transform = tra;
     return SUCCESS;
   }
 
@@ -92,12 +94,9 @@ namespace nova {
     return SUCCESS;
   }
 
-  void NvTriMesh::getTransform(float transform_r[16]) const {
-    for (int i = 0; i < 16; i++)
-      transform_r[i] = transform[i];
-  }
+  const Transform &NvTriMesh::getTransform() const { return transform; }
 
-  Object3D to_obj3d(const NvAbstractTriMesh &trimesh) {
+  Object3D to_obj3d(const TriMesh &trimesh) {
     Object3D obj3d;
     obj3d.vertices = trimesh.getVertices();
     obj3d.indices = trimesh.getIndices();
@@ -121,7 +120,7 @@ namespace nova {
     manager.getPrimitiveData().addPrimitive<nova::primitive::NovaGeoPrimitive>(tri, mat);
   }
 
-  static shape::triangle::mesh_vbo_ids create_vbo_pack(const NvAbstractTriMesh &mesh) {
+  static shape::triangle::mesh_vbo_ids create_vbo_pack(const TriMesh &mesh) {
     shape::triangle::mesh_vbo_ids vbo_pack{};
     vbo_pack.vbo_positions = mesh.getInteropVertices();
     vbo_pack.vbo_indices = mesh.getInteropIndices();
@@ -139,7 +138,7 @@ namespace nova {
     return final_transform;
   }
 
-  void setup_geometry_data(const NvAbstractTriMesh &mesh,
+  void setup_geometry_data(const TriMesh &mesh,
                            const float final_transform[16],
                            material::NovaMaterialInterface &material,
                            NovaResourceManager &manager,

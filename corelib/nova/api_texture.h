@@ -5,9 +5,9 @@
 #include <internal/device/gpgpu/device_transfer_interface.h>
 #include <memory>
 namespace nova {
-  class NvAbstractTexture {
+  class Texture {
    public:
-    virtual ~NvAbstractTexture() = default;
+    virtual ~Texture() = default;
     virtual ERROR_STATE setData(const uint32_t *buffer) = 0;
     virtual ERROR_STATE setData(const float *buffer) = 0;
     virtual ERROR_STATE setWidth(unsigned w) = 0;
@@ -18,7 +18,7 @@ namespace nova {
     virtual ERROR_STATE invertX() = 0;
   };
 
-  inline std::unique_ptr<NvAbstractTexture> create_texture();
+  inline std::unique_ptr<Texture> create_texture();
 }  // namespace nova
 
 #endif

@@ -19,9 +19,9 @@
 namespace nova {
 
   class RenderBuffer;
-  class EngineInstance;
+  class Engine;
   using RenderBufferPtr = std::unique_ptr<RenderBuffer>;
-  using EngineInstancePtr = std::unique_ptr<EngineInstance>;
+  using EngineInstancePtr = std::unique_ptr<Engine>;
 
   /**
    * @brief Abstract interface for a render buffer.
@@ -58,9 +58,9 @@ namespace nova {
    * including scene setup, acceleration structure building, render buffer management,
    * and resource cleanup.
    */
-  class EngineInstance {
+  class Engine {
    public:
-    virtual ~EngineInstance() = default;
+    virtual ~Engine() = default;
     /**
      * @brief Builds the scene from the given abstract scene.
      *
@@ -70,7 +70,7 @@ namespace nova {
      *   - INVALID_SCENE_TYPE: The provided scene is not of a supported type.
      *   - OUT_OF_MEMORY: Failed to allocate memory for scene resources.
      */
-    virtual ERROR_STATE buildScene(const NvAbstractScene &scene) = 0;
+    virtual ERROR_STATE buildScene(const Scene &scene) = 0;
 
     /**
      * @brief Builds the acceleration structure (e.g., BVH) for the current scene.

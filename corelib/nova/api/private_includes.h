@@ -3,15 +3,48 @@
 #include "../api.h"
 #include "api_common.h"
 #include "api_scene.h"
+#include "api_transform.h"
+#include "camera/nova_camera.h"
 #include "engine/datastructures.h"
 #include "manager/NovaResourceManager.h"
 #include "material/NovaMaterials.h"
+#include "scene/nova_scene.h"
 #include <internal/common/axstd/managed_buffer.h>
+#include <internal/common/math/utils_3D.h>
 #include <internal/geometry/Object3D.h>
 
 constexpr int PBR_TEXTURE_PACK_SIZE = 8;
 namespace nova {
-  class NvTexture final : public NvAbstractTexture {
+
+  class NvTransform final : public Transform {
+    glm::mat4 transform;
+
+   public:
+    NvTransform();
+    NvTransform(const Transform &transform);
+    NvTransform &operator=(const Transform &transform);
+    void setTransformMatrix(const float transform[16]) override;
+    void rotateQuat(float x, float y, float z, float w) override;
+    void rotateEuler(float angle, float x, float y, float z) override;
+    void reset() override;
+    void getTransformMatrix(float transform[16]) const override;
+    void translate(float x, float y, float z) override;
+    void scale(float scale) override;
+    void scale(float x, float y, float z) override;
+
+    void setTranslation(float x, float y, float z) override;
+    void getTranslation(float translation[3]) const override;
+    void setScale(float x, float y, float z) override;
+    void getScale(float scale[3]) const override;
+    void getRotation(float rotation[4]) const override;
+    void setRotation(const float rotation[4]) override;
+    void multiply(const Transform &other) override;
+    void getInverse(float inverse[16]) const override;
+    void transpose(float result[16]) const override;
+    void transposeInverse(float result[9]) const override;
+  };
+
+  class NvTexture final : public Texture {
    public:
     enum DATATYPE { F_ARRAY, I_ARRAY, SINGLE_COL };
 
@@ -31,8 +64,8 @@ namespace nova {
 
    public:
     NvTexture() = default;
-    NvTexture(const NvAbstractTexture &other);
-    NvTexture &operator=(const NvAbstractTexture &other);
+    NvTexture(const Texture &other);
+    NvTexture &operator=(const Texture &other);
 
     ERROR_STATE setData(const uint32_t *buffer) override;
     ERROR_STATE setData(const float *buffer) override;
@@ -55,7 +88,7 @@ namespace nova {
     const T *getData() const;
   };
 
-  class NvMaterial final : public NvAbstractMaterial {
+  class NvMaterial final : public Material {
     NvTexture albedo;
     NvTexture normal;
     NvTexture metallic;
@@ -69,17 +102,17 @@ namespace nova {
 
    public:
     NvMaterial() = default;
-    NvMaterial(const NvAbstractMaterial &other);
-    NvMaterial &operator=(const NvAbstractMaterial &other);
+    NvMaterial(const Material &other);
+    NvMaterial &operator=(const Material &other);
 
-    ERROR_STATE registerAlbedo(const NvAbstractTexture &texture) override;
-    ERROR_STATE registerNormal(const NvAbstractTexture &texture) override;
-    ERROR_STATE registerMetallic(const NvAbstractTexture &texture) override;
-    ERROR_STATE registerEmissive(const NvAbstractTexture &texture) override;
-    ERROR_STATE registerRoughness(const NvAbstractTexture &texture) override;
-    ERROR_STATE registerOpacity(const NvAbstractTexture &texture) override;
-    ERROR_STATE registerSpecular(const NvAbstractTexture &texture) override;
-    ERROR_STATE registerAmbientOcclusion(const NvAbstractTexture &texture) override;
+    ERROR_STATE registerAlbedo(const Texture &texture) override;
+    ERROR_STATE registerNormal(const Texture &texture) override;
+    ERROR_STATE registerMetallic(const Texture &texture) override;
+    ERROR_STATE registerEmissive(const Texture &texture) override;
+    ERROR_STATE registerRoughness(const Texture &texture) override;
+    ERROR_STATE registerOpacity(const Texture &texture) override;
+    ERROR_STATE registerSpecular(const Texture &texture) override;
+    ERROR_STATE registerAmbientOcclusion(const Texture &texture) override;
     ERROR_STATE setRefractCoeff(float eta) override;
     ERROR_STATE setReflectFuzz(float fuzz) override;
 
@@ -105,15 +138,15 @@ namespace nova {
     uint32_t vbo_indices;
   };
 
-  class NvTriMesh final : public NvAbstractTriMesh {
+  class NvTriMesh final : public TriMesh {
     Object3D attributes;
-    float transform[16]{};
+    NvTransform transform;
     trimesh_vbo_interop_s vbo_interop{};
 
    public:
     NvTriMesh() = default;
-    NvTriMesh(const NvAbstractTriMesh &other);
-    NvTriMesh &operator=(const NvAbstractTriMesh &other);
+    NvTriMesh(const TriMesh &other);
+    NvTriMesh &operator=(const TriMesh &other);
     ERROR_STATE registerBufferVertices(float *vertices, size_t num) override;
     ERROR_STATE registerBufferNormals(float *normals, size_t num) override;
     ERROR_STATE registerBufferTangents(float *tangents, size_t num) override;
@@ -121,7 +154,7 @@ namespace nova {
     ERROR_STATE registerBufferColors(float *colors, size_t num) override;
     ERROR_STATE registerBufferUVs(float *uv, size_t num) override;
     ERROR_STATE registerBufferIndices(unsigned *indices, size_t num) override;
-    ERROR_STATE registerTransform(const float transform[16]) override;
+    ERROR_STATE registerTransform(const Transform &transform) override;
     ERROR_STATE registerInteropVertices(uint32_t vbo_id) override;
     ERROR_STATE registerInteropNormals(uint32_t vbo_id) override;
     ERROR_STATE registerInteropTangents(uint32_t vbo_id) override;
@@ -145,7 +178,7 @@ namespace nova {
     uint32_t getInteropUVs() const override { return vbo_interop.vbo_uvs; }
     uint32_t getInteropIndices() const override { return vbo_interop.vbo_indices; }
 
-    void getTransform(float transform[16]) const override;
+    const Transform &getTransform() const override;
   };
 
   struct trimesh_object_s {
@@ -153,13 +186,20 @@ namespace nova {
     std::unique_ptr<NvMaterial> mesh_material;
   };
 
-  class NvScene final : public NvAbstractScene {
+  class NvCamera final : public Camera {
+    camera::CameraResourcesHolder camera;
+  };
+
+  class NvScene final : public Scene {
     std::vector<trimesh_object_s> trimesh_group;
     std::vector<NvTexture> envmaps;
+    std::vector<NvCamera> cameras;
 
    public:
-    ERROR_STATE addMesh(const NvAbstractTriMesh &mesh, const NvAbstractMaterial &material) override;
-    ERROR_STATE addEnvmap(const NvAbstractTexture &envmap_texture) override;
+    ERROR_STATE addMesh(const TriMesh &mesh, const Material &material) override;
+    ERROR_STATE addEnvmap(const Texture &envmap_texture) override;
+    ERROR_STATE addCamera(const Camera &camera) override;
+    ERROR_STATE addRootTransform(const float transform[16]) override;
     axstd::span<const trimesh_object_s> getTrimeshArray() const;
   };
 
@@ -182,7 +222,7 @@ namespace nova {
     HdrBufferStruct getRenderBuffers() const override;
   };
 
-  class NvEngineInstance : public EngineInstance {
+  class NvEngineInstance : public Engine {
     NovaResourceManager manager;
     RenderBufferPtr render_buffer;
     bool uses_interops{false};
@@ -190,7 +230,7 @@ namespace nova {
     bool scene_built{false};
 
    public:
-    ERROR_STATE buildScene(const NvAbstractScene &scene) override;
+    ERROR_STATE buildScene(const Scene &scene) override;
     ERROR_STATE setRenderBuffers(RenderBufferPtr buffers) override;
     ERROR_STATE buildAcceleration() override;
     ERROR_STATE useInterops(bool use) override;
@@ -199,8 +239,8 @@ namespace nova {
   };
 
   Object3D to_obj3d(const NvTriMesh &trimesh);
-  material::NovaMaterialInterface setup_material_data(const NvAbstractMesh &mesh, const NvMaterial &material, NovaResourceManager &manager);
-  void setup_geometry_data(const NvAbstractTriMesh &mesh,
+  material::NovaMaterialInterface setup_material_data(const AbstractMesh &mesh, const NvMaterial &material, NovaResourceManager &manager);
+  void setup_geometry_data(const TriMesh &mesh,
                            const float final_transform[16],
                            material::NovaMaterialInterface &material,
                            NovaResourceManager &manager,
