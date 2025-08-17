@@ -10,29 +10,16 @@
 #include <memory>
 
 namespace nova::scene {
-  class SceneTransformations {
-   public:
-    /* View x Scene Transfo */
-    glm::mat4 VM;
-    glm::mat4 inv_VM;
-    /* Projection * View * Scene Transfo*/
-    glm::mat4 PVM;
-    glm::mat4 inv_PVM;
+  struct SceneTransformations {
     /* Primary scene rotation*/
     glm::mat4 R;
     glm::mat4 inv_R;
-    glm::mat4 inv_VR;
     /* Primary scene translation*/
     glm::mat4 T;
     glm::mat4 inv_T;
     /* Primary scene transformation  (R x T)*/
     glm::mat4 M;
     glm::mat4 inv_M;
-    /* Normal matrix */
-    glm::mat3 N;
-
-   public:
-    CLASS_CM(SceneTransformations)
   };
 
   struct SceneResourcesHolder {

@@ -45,33 +45,6 @@ namespace nova_baker_utils {
     nova_camera_structure.screen_width = screen_width;
     nova_camera_structure.screen_height = screen_height;
     nova_camera_structure.fov = fov;
-
-    /* Scene root transformations */
-    glm::mat4 T = scene_data.root_translation;
-    glm::mat4 inv_T = glm::inverse(T);
-    glm::mat4 R = scene_data.root_rotation;
-    glm::mat4 inv_R = glm::inverse(R);
-    glm::mat4 inv_VR = inv_V * inv_R;
-    glm::mat4 M = scene_data.root_transformation;
-    glm::mat4 inv_M = glm::inverse(M);
-    glm::mat4 PVM = P * V * M;
-    glm::mat4 inv_PVM = glm::inverse(PVM);
-    glm::mat4 VM = V * M;
-    glm::mat4 inv_VM = glm::inverse(VM);
-    glm::mat3 N = glm::mat3(glm::transpose(inv_M));
-
-    nova_scene_transformations.T = T;
-    nova_scene_transformations.inv_T = inv_T;
-    nova_scene_transformations.R = R;
-    nova_scene_transformations.inv_R = inv_R;
-    nova_scene_transformations.M = M;
-    nova_scene_transformations.inv_M = inv_M;
-    nova_scene_transformations.PVM = PVM;
-    nova_scene_transformations.inv_PVM = inv_PVM;
-    nova_scene_transformations.VM = VM;
-    nova_scene_transformations.inv_VM = inv_VM;
-    nova_scene_transformations.N = N;
-    nova_scene_transformations.inv_VR = inv_VR;
   }
 
   void initialize_engine_opts(const engine_data &engine_opts, nova::engine::EngineResourcesHolder &engine_resources_holder) {
