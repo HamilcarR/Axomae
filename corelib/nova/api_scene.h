@@ -3,22 +3,24 @@
 #include "api_common.h"
 
 namespace nova {
-  class NvAbstractTriMesh;
-  class NvAbstractMaterial;
-  class NvAbstractTexture;
+  class TriMesh;
+  class Material;
+  class Texture;
   class Camera;
 
   /**
    * @brief Opaque handle to the scene management class.
    * Stores internally the scene elements added.
    */
-  class NvAbstractScene {
+  class Scene {
    public:
-    virtual ~NvAbstractScene() = default;
-    virtual ERROR_STATE addMesh(const NvAbstractTriMesh &mesh, const NvAbstractMaterial &material) = 0;
-    virtual ERROR_STATE addEnvmap(const NvAbstractTexture &envmap_texture) = 0;
+    virtual ~Scene() = default;
+    virtual ERROR_STATE addMesh(const TriMesh &mesh, const Material &material) = 0;
+    virtual ERROR_STATE addEnvmap(const Texture &envmap_texture) = 0;
+    virtual ERROR_STATE addCamera(const Camera &camera) = 0;
+    virtual ERROR_STATE addRootTransform(const float transform[16]) = 0;
   };
 
-  std::unique_ptr<NvAbstractScene> create_scene();
+  std::unique_ptr<Scene> create_scene();
 }  // namespace nova
 #endif

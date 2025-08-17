@@ -3,9 +3,9 @@
 #include "private_includes.h"
 #include <memory>
 namespace nova {
-  NvTexture::NvTexture(const NvAbstractTexture &other) { *this = *dynamic_cast<const NvTexture *>(&other); }
+  NvTexture::NvTexture(const Texture &other) { *this = *dynamic_cast<const NvTexture *>(&other); }
 
-  NvTexture &NvTexture::operator=(const NvAbstractTexture &other) {
+  NvTexture &NvTexture::operator=(const Texture &other) {
     if (&other == this)
       return *this;
     *this = *dynamic_cast<const NvTexture *>(&other);
@@ -70,5 +70,5 @@ namespace nova {
     return memory.f_buffer;
   }
 
-  std::unique_ptr<NvAbstractTexture> create_texture() { return std::make_unique<NvTexture>(); }
+  std::unique_ptr<Texture> create_texture() { return std::make_unique<NvTexture>(); }
 }  // namespace nova

@@ -4,19 +4,22 @@
 #include <cstdint>
 #include <internal/common/axstd/span.h>
 namespace nova {
-  class NvAbstractMesh {
+
+  class Transform;
+
+  class AbstractMesh {
    public:
-    virtual ~NvAbstractMesh() = default;
+    virtual ~AbstractMesh() = default;
     /**
      * @brief
      * Registers the transformation matrix of a mesh.
      * Format is in column major.
      */
-    virtual ERROR_STATE registerTransform(const float transform[16]) = 0;
-    virtual void getTransform(float transform[16]) const = 0;
+    virtual ERROR_STATE registerTransform(const Transform &) = 0;
+    virtual const Transform &getTransform() const = 0;
   };
 
-  class NvAbstractTriMesh : public NvAbstractMesh {
+  class TriMesh : public AbstractMesh {
    public:
     virtual ERROR_STATE registerBufferVertices(float *vert, size_t num) = 0;
     virtual ERROR_STATE registerBufferNormals(float *normals, size_t num) = 0;
@@ -50,7 +53,7 @@ namespace nova {
     virtual uint32_t getInteropIndices() const = 0;
   };
 
-  std::unique_ptr<NvAbstractTriMesh> create_trimesh();
+  std::unique_ptr<TriMesh> create_trimesh();
 
 }  // namespace nova
 

@@ -118,7 +118,7 @@ namespace nova {
     return final_transform;
   }
 
-  ERROR_STATE NvEngineInstance::buildScene(const NvAbstractScene &scene) {
+  ERROR_STATE NvEngineInstance::buildScene(const Scene &scene) {
     try {
       const NvScene &nv_scene = dynamic_cast<const NvScene &>(scene);
       std::size_t number_primitives = compute_primitive_number(nv_scene);
@@ -136,12 +136,13 @@ namespace nova {
       initialize_resources_holders(manager, resrc);
       std::size_t mesh_index = 0;
       for (const auto &elem : nv_scene.getTrimeshArray()) {
-        const NvAbstractTriMesh &geometry = *elem.mesh_geometry.get();  // TODO: Other types of meshes for later
+        const TriMesh &geometry = *elem.mesh_geometry.get();  // TODO: Other types of meshes for later
         const NvMaterial &material = *elem.mesh_material.get();
         material::NovaMaterialInterface material_interface = setup_material_data(geometry, material, manager);
-        float transform[16]{};
-        geometry.getTransform(transform);
-        setup_geometry_data(geometry, transform, material_interface, manager, mesh_index++, uses_interops);
+        const Transform &transform = geometry.getTransform();
+        float array[16]{};
+        transform.getTransformMatrix(array);
+        setup_geometry_data(geometry, array, material_interface, manager, mesh_index++, uses_interops);
       }
 
     } catch (std::bad_cast &e) {

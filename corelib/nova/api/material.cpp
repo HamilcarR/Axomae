@@ -3,51 +3,51 @@
 #include "texturing/NovaTextureInterface.h"
 #include "texturing/nova_texturing.h"
 namespace nova {
-  NvMaterial::NvMaterial(const NvAbstractMaterial &other) { *this = *dynamic_cast<const NvMaterial *>(&other); }
+  NvMaterial::NvMaterial(const Material &other) { *this = *dynamic_cast<const NvMaterial *>(&other); }
 
-  NvMaterial &NvMaterial::operator=(const NvAbstractMaterial &other) {
+  NvMaterial &NvMaterial::operator=(const Material &other) {
     if (this == &other)
       return *this;
     *this = *dynamic_cast<const NvMaterial *>(&other);
     return *this;
   }
 
-  ERROR_STATE NvMaterial::registerAlbedo(const NvAbstractTexture &texture) {
+  ERROR_STATE NvMaterial::registerAlbedo(const Texture &texture) {
     albedo = texture;
     return SUCCESS;
   }
 
-  ERROR_STATE NvMaterial::registerNormal(const NvAbstractTexture &texture) {
+  ERROR_STATE NvMaterial::registerNormal(const Texture &texture) {
     normal = texture;
     return SUCCESS;
   }
 
-  ERROR_STATE NvMaterial::registerMetallic(const NvAbstractTexture &texture) {
+  ERROR_STATE NvMaterial::registerMetallic(const Texture &texture) {
     metallic = texture;
     return SUCCESS;
   }
 
-  ERROR_STATE NvMaterial::registerEmissive(const NvAbstractTexture &texture) {
+  ERROR_STATE NvMaterial::registerEmissive(const Texture &texture) {
     emissive = texture;
     return SUCCESS;
   }
 
-  ERROR_STATE NvMaterial::registerRoughness(const NvAbstractTexture &texture) {
+  ERROR_STATE NvMaterial::registerRoughness(const Texture &texture) {
     roughness = texture;
     return SUCCESS;
   }
 
-  ERROR_STATE NvMaterial::registerOpacity(const NvAbstractTexture &texture) {
+  ERROR_STATE NvMaterial::registerOpacity(const Texture &texture) {
     opacity = texture;
     return SUCCESS;
   }
 
-  ERROR_STATE NvMaterial::registerSpecular(const NvAbstractTexture &texture) {
+  ERROR_STATE NvMaterial::registerSpecular(const Texture &texture) {
     specular = texture;
     return SUCCESS;
   }
 
-  ERROR_STATE NvMaterial::registerAmbientOcclusion(const NvAbstractTexture &texture) {
+  ERROR_STATE NvMaterial::registerAmbientOcclusion(const Texture &texture) {
     ao = texture;
     return SUCCESS;
   }
@@ -62,7 +62,7 @@ namespace nova {
     return SUCCESS;
   }
 
-  std::unique_ptr<NvAbstractMaterial> create_material() { return std::make_unique<NvMaterial>(); }
+  std::unique_ptr<Material> create_material() { return std::make_unique<NvMaterial>(); }
 
   static texturing::NovaTextureInterface build_img_texture(const NvTexture &texture, NovaResourceManager &manager) {
     texturing::TextureResourcesHolder &texture_manager = manager.getTexturesData();
@@ -95,7 +95,7 @@ namespace nova {
     return mat_ptr;
   }
 
-  material::NovaMaterialInterface setup_material_data(const NvAbstractMesh &mesh, const NvMaterial &material, NovaResourceManager &manager) {
+  material::NovaMaterialInterface setup_material_data(const AbstractMesh &mesh, const NvMaterial &material, NovaResourceManager &manager) {
     material::texture_pack tpack;
     tpack.albedo = build_img_texture(material.getAlbedo(), manager);
     tpack.metallic = build_img_texture(material.getMetallic(), manager);

@@ -6,6 +6,8 @@ add_library(ax_core_nova STATIC
         api/material.cpp 
         api/scene.cpp 
         api/texture.cpp
+        api/camera.cpp
+        api/transform.cpp
 
         utils/DrawEngine.cpp
         utils/DrawEngine_GPU.cpp
@@ -20,8 +22,6 @@ add_library(ax_core_nova STATIC
         shape/nova_shape.cpp
         shape/triangle_mesh_storage.cpp
         shape/mesh_transform_storage.cpp
-
-        scene/nova_scene.cpp
 
         engine/nova_engine.cpp 
         engine/nova_exception.cpp

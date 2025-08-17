@@ -4,24 +4,24 @@
 
 namespace nova {
 
-  class NvAbstractTexture;
+  class Texture;
 
-  class NvAbstractMaterial {
+  class Material {
    public:
-    virtual ~NvAbstractMaterial() = default;
-    virtual ERROR_STATE registerAlbedo(const NvAbstractTexture &texture) = 0;
-    virtual ERROR_STATE registerNormal(const NvAbstractTexture &texture) = 0;
-    virtual ERROR_STATE registerMetallic(const NvAbstractTexture &texture) = 0;
-    virtual ERROR_STATE registerEmissive(const NvAbstractTexture &texture) = 0;
-    virtual ERROR_STATE registerRoughness(const NvAbstractTexture &texture) = 0;
-    virtual ERROR_STATE registerOpacity(const NvAbstractTexture &texture) = 0;
-    virtual ERROR_STATE registerSpecular(const NvAbstractTexture &texture) = 0;
-    virtual ERROR_STATE registerAmbientOcclusion(const NvAbstractTexture &texture) = 0;
+    virtual ~Material() = default;
+    virtual ERROR_STATE registerAlbedo(const Texture &texture) = 0;
+    virtual ERROR_STATE registerNormal(const Texture &texture) = 0;
+    virtual ERROR_STATE registerMetallic(const Texture &texture) = 0;
+    virtual ERROR_STATE registerEmissive(const Texture &texture) = 0;
+    virtual ERROR_STATE registerRoughness(const Texture &texture) = 0;
+    virtual ERROR_STATE registerOpacity(const Texture &texture) = 0;
+    virtual ERROR_STATE registerSpecular(const Texture &texture) = 0;
+    virtual ERROR_STATE registerAmbientOcclusion(const Texture &texture) = 0;
     virtual ERROR_STATE setRefractCoeff(float eta) = 0;
     virtual ERROR_STATE setReflectFuzz(float fuzz) = 0;
   };
 
-  std::unique_ptr<NvAbstractMaterial> create_material();
+  std::unique_ptr<Material> create_material();
 
 }  // namespace nova
 
