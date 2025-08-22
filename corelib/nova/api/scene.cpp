@@ -10,14 +10,20 @@ namespace nova {
     return SUCCESS;
   }
 
-  ERROR_STATE NvScene::addEnvmap(const Texture &envmap_texture) {
+  unsigned NvScene::addEnvmap(const Texture &envmap_texture) {
     envmaps.push_back(envmap_texture);
-    return SUCCESS;
+    return envmaps.size() - 1;
   }
 
-  ERROR_STATE NvScene::addCamera(const Camera &camera) {}
+  unsigned NvScene::addCamera(const Camera &camera) {
+    cameras.push_back(camera);
+    return cameras.size() - 1;
+  }
 
-  ERROR_STATE NvScene::addRootTransform(const float transform[16]) {}
+  ERROR_STATE NvScene::setRootTransform(const Transform &t) {
+    transform = t;
+    return SUCCESS;
+  }
 
   axstd::span<const trimesh_object_s> NvScene::getTrimeshArray() const { return trimesh_group; }
 

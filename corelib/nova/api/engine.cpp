@@ -1,5 +1,6 @@
 #include "aggregate/acceleration_interface.h"
 #include "aggregate/aggregate_datastructures.h"
+#include "api.h"
 #include "api_common.h"
 #include "engine/datastructures.h"
 #include "internal/common/utils.h"
@@ -12,6 +13,82 @@
 
 namespace nova {
 
+  NvRenderOptions::NvRenderOptions(const RenderOptions &other) {
+    aa_samples = other.getAliasingSamples();
+    max_depth = other.getMaxDepth();
+    max_samples = other.getMaxSamples();
+    samples_increment = other.getSamplesIncrement();
+    tile_dimension_width = other.getTileDimensionWidth();
+    tile_dimension_height = other.getTileDimensionHeight();
+    flip_v = other.isFlippedV();
+    integrator_flag = other.getIntegratorFlag();
+  }
+
+  NvRenderOptions &NvRenderOptions::operator=(const RenderOptions &other) {
+    if (&other == this)
+      return *this;
+    aa_samples = other.getAliasingSamples();
+    max_depth = other.getMaxDepth();
+    max_samples = other.getMaxSamples();
+    samples_increment = other.getSamplesIncrement();
+    tile_dimension_width = other.getTileDimensionWidth();
+    tile_dimension_height = other.getTileDimensionHeight();
+    flip_v = other.isFlippedV();
+    integrator_flag = other.getIntegratorFlag();
+    return *this;
+  }
+
+  void NvRenderOptions::setAliasingSamples(unsigned s) { aa_samples = s; }
+
+  void NvRenderOptions::setMaxDepth(unsigned depth) { max_depth = depth; }
+
+  void NvRenderOptions::setMaxSamples(unsigned samples) { max_samples = samples; }
+
+  void NvRenderOptions::setSamplesIncrement(unsigned inc) { samples_increment = inc; }
+
+  void NvRenderOptions::setTileDimension(unsigned width, unsigned height) {
+    tile_dimension_width = width;
+    tile_dimension_height = height;
+  }
+
+  void NvRenderOptions::flipV() { flip_v ^= flip_v; }
+
+  bool NvRenderOptions::isFlippedV() const { return flip_v; }
+
+  unsigned NvRenderOptions::getAliasingSamples() const { return aa_samples; }
+
+  unsigned NvRenderOptions::getSamplesIncrement() const { return samples_increment; }
+
+  unsigned NvRenderOptions::getMaxDepth() const { return max_depth; }
+
+  unsigned NvRenderOptions::getMaxSamples() const { return max_samples; }
+
+  unsigned NvRenderOptions::getTileDimensionWidth() const { return tile_dimension_width; }
+
+  unsigned NvRenderOptions::getTileDimensionHeight() const { return tile_dimension_height; }
+
+  static ERROR_STATE check_valid_integrator_flags(int type) {
+    int num_integrators = 0;
+
+    /* Checks if user has chosen only one integrator ... cannot run Path + Metropolis at the same time for ex. */
+    for (int i = 0; i <= 7; i++) {
+      if ((type & (1 << i)) != 0)
+        num_integrators++;
+    }
+    if (num_integrators >= 2)
+      return MULTIPLE_INTEGRATORS_NOT_SUPPORTED;
+    return SUCCESS;
+  }
+
+  ERROR_STATE NvRenderOptions::setIntegratorFlag(int type) {
+    ERROR_STATE err{};
+    if ((err = check_valid_integrator_flags(type)) == SUCCESS)
+      integrator_flag = type;
+    return err;
+  }
+
+  int NvRenderOptions::getIntegratorFlag() const { return integrator_flag; }
+
   ERROR_STATE NvRenderBuffer::createRenderBuffer(unsigned width, unsigned height) {
     render_buffers = std::make_unique<HostStoredRenderableBuffers>();
     render_buffers->width = width;
@@ -23,6 +100,17 @@ namespace nova {
       render_buffers->normal_buffer.resize(width * height * HostStoredRenderableBuffers::CHANNELS_NORMALS);
     } catch (...) {
       return OUT_OF_MEMORY;
+    }
+    return SUCCESS;
+  }
+
+  NvEngineInstance::NvEngineInstance() { render_options = std::make_unique<NvRenderOptions>(); }
+
+  ERROR_STATE NvEngineInstance::setThreadSize(unsigned threads) {
+    try {
+      threadpool = std::make_unique<threading::ThreadPool>(threads);
+    } catch (...) {
+      return THREADPOOL_CREATION_ERROR;
     }
     return SUCCESS;
   }
@@ -218,4 +306,45 @@ namespace nova {
     render_buffer = std::move(buffers);
     return SUCCESS;
   }
+
+  void NvEngineInstance::stopRender() { manager.getEngineData().is_rendering = false; }
+
+  void NvEngineInstance::startRender() { manager.getEngineData().is_rendering = true; }
+
+  ERROR_STATE NvEngineInstance::setRenderOptions(const RenderOptions &opts) {
+    manager.getEngineData().aliasing_samples = opts.getAliasingSamples();
+    manager.getEngineData().max_depth = opts.getMaxDepth();
+    manager.getEngineData().sample_increment = opts.getSamplesIncrement();
+    manager.getEngineData().vertical_invert = opts.isFlippedV();
+    manager.getEngineData().tiles_width = opts.getTileDimensionWidth();
+    manager.getEngineData().tiles_height = opts.getTileDimensionHeight();
+    manager.getEngineData().integrator_flag = opts.getIntegratorFlag();
+    AX_ASSERT_NOTNULL(renedr_options);
+    *render_options = opts;
+    return SUCCESS;
+  }
+
+  const RenderOptions &NvEngineInstance::getRenderOptions() const { return *render_options; }
+
+  static const char *const _NOVA_HOST_TAG = "_NOVA_HOST_TAG";
+  static const char *const _NOVA_DEV_TAG = "_NOVA_DEV_TAG";
+  ERROR_STATE NvEngineInstance::synchronizeHost() {
+    if (!threadpool)
+      return THREADPOOL_NOT_INITIALIZED;
+    threadpool->fence(_NOVA_HOST_TAG);
+    return SUCCESS;
+  }
+
+  ERROR_STATE NvEngineInstance::synchronizeDevice() {
+    if (!threadpool)
+      return THREADPOOL_NOT_INITIALIZED;
+    threadpool->fence(_NOVA_DEV_TAG);
+    return SUCCESS;
+  }
+
+  RenderBufferPtr create_render_buffer() { return std::make_unique<NvRenderBuffer>(); }
+
+  EngineInstancePtr create_engine() { return std::make_unique<NvEngineInstance>(); }
+
+  RenderOptionsPtr create_render_options() { return std::make_unique<NvRenderOptions>(); }
 }  // namespace nova
