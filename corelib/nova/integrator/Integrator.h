@@ -1,6 +1,7 @@
 #ifndef INTEGRATOR_H
 #define INTEGRATOR_H
 #include "aggregate/aggregate_datastructures.h"
+#include "api_common.h"
 #include "engine/datastructures.h"
 #include "manager/ManagerInternalStructs.h"
 #include "manager/NovaExceptionManager.h"
@@ -9,7 +10,6 @@
 #include <internal/common/math/math_camera.h>
 #include <internal/common/math/math_utils.h>
 #include <internal/macro/project_macros.h>
-
 namespace nova {
   class Ray;
   struct Tile;
@@ -17,25 +17,6 @@ namespace nova {
 }  // namespace nova
 
 namespace nova::integrator {
-
-  enum TYPE : int {
-    PATH = 1 << 0,
-    BIPATH = 1 << 1,
-    SPECTRAL = 1 << 2,
-    METROPOLIS = 1 << 3,
-    PHOTON = 1 << 4,
-    MARCHING = 1 << 5,
-    HYBRID = 1 << 6,
-    VOXEL = 1 << 7,
-
-    /* utility render */
-    COMBINED = 1 << 8,
-    NORMAL = 1 << 9,
-    DEPTH = 1 << 10,
-    SPECULAR = 1 << 11,
-    DIFFUSE = 1 << 12,
-    EMISSIVE = 1 << 13,
-  };
 
   bvh_hit_data bvh_hit(const Ray &ray, nova_eng_internals &nova_internals);
   void integrator_dispatch(RenderBuffers<float> *buffers, Tile &tile, nova::nova_eng_internals &nova_internals);

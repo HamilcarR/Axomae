@@ -7,7 +7,7 @@ namespace nova {
   class Material;
   class Texture;
   class Camera;
-
+  class Transform;
   /**
    * @brief Opaque handle to the scene management class.
    * Stores internally the scene elements added.
@@ -16,9 +16,17 @@ namespace nova {
    public:
     virtual ~Scene() = default;
     virtual ERROR_STATE addMesh(const TriMesh &mesh, const Material &material) = 0;
-    virtual ERROR_STATE addEnvmap(const Texture &envmap_texture) = 0;
-    virtual ERROR_STATE addCamera(const Camera &camera) = 0;
-    virtual ERROR_STATE addRootTransform(const float transform[16]) = 0;
+    /**
+     * @brief Adds an HDR environment map to the internal collection of textures.
+     * @return ID of the added texture.
+     */
+    virtual unsigned addEnvmap(const Texture &envmap_texture) = 0;
+    virtual ERROR_STATE setRootTransform(const Transform &transform) = 0;
+    /**
+     * @brief
+     * @return ID of camera
+     */
+    virtual unsigned addCamera(const Camera &camera) = 0;
   };
 
   std::unique_ptr<Scene> create_scene();

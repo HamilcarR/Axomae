@@ -20,8 +20,97 @@ namespace nova {
 
   class RenderBuffer;
   class Engine;
+  class RenderOptions;
   using RenderBufferPtr = std::unique_ptr<RenderBuffer>;
   using EngineInstancePtr = std::unique_ptr<Engine>;
+  using RenderOptionsPtr = std::unique_ptr<RenderOptions>;
+  /**
+   * @brief Encapsulates all the configurable parameters for rendering scenes in the Nova engine.
+   * Allows users to fine-tune rendering behavior.
+   */
+  class RenderOptions {
+
+   public:
+    virtual ~RenderOptions() = default;
+
+    /**
+     * Sets the number of samples used for aliasing reduction.
+     * @param s Number of aliasing samples.
+     */
+    virtual void setAliasingSamples(unsigned s) = 0;
+
+    /**
+     * Gets the current number of aliasing samples.
+     * @return Number of aliasing samples.
+     */
+    virtual unsigned getAliasingSamples() const = 0;
+
+    /**
+     * Sets the maximum depth for ray tracing.
+     * @param depth Maximum depth value.
+     */
+    virtual void setMaxDepth(unsigned depth) = 0;
+
+    /**
+     * Gets the current maximum ray tracing depth.
+     * @return Maximum depth value.
+     */
+    virtual unsigned getMaxDepth() const = 0;
+
+    /**
+     * Sets the maximum number of samples per pixel.
+     * @param samples Maximum sample count.
+     */
+    virtual void setMaxSamples(unsigned samples) = 0;
+
+    /**
+     * Gets the current maximum sample count per pixel.
+     * @return Maximum sample count.
+     */
+    virtual unsigned getMaxSamples() const = 0;
+
+    /**
+     &nbsp;Sets the increment for sample count during progressive rendering.
+     * @param inc Sample increment value.
+     */
+    virtual void setSamplesIncrement(unsigned inc) = 0;
+
+    /**
+     * Gets the current sample increment value.
+     * @return Sample increment.
+     */
+    virtual unsigned getSamplesIncrement() const = 0;
+
+    /**
+     * Sets the dimensions of rendering tiles (width and height).
+     * @param width Tile width.
+     * @param height Tile height.
+     */
+    virtual void setTileDimension(unsigned width, unsigned height) = 0;
+
+    /**
+     * Gets the width of the rendering tile.
+     * @return Tile width.
+     */
+    virtual unsigned getTileDimensionWidth() const = 0;
+
+    /**
+     * Gets the height of the rendering tile.
+     * @return Tile height.
+     */
+    virtual unsigned getTileDimensionHeight() const = 0;
+
+    virtual ERROR_STATE setIntegratorFlag(int flag) = 0;
+
+    virtual int getIntegratorFlag() const = 0;
+
+    /**
+     * Flips the vertical axis of the output image (useful for certain display setups).
+     */
+    virtual void flipV() = 0;
+
+    virtual bool isFlippedV() const = 0;
+  };
 
   /**
    * @brief Abstract interface for a render buffer.
@@ -104,6 +193,13 @@ namespace nova {
     virtual ERROR_STATE setRenderBuffers(RenderBufferPtr render_buffer) = 0;
 
     /**
+     * @brief Returns an allocated pointer to an image of the engine's options
+     *
+     * @return RenderOptionsPtr
+     */
+    virtual const RenderOptions &getRenderOptions() const = 0;
+
+    /**
      * @brief Enables or disables GPU usage for rendering.
      *
      * @param use True to use GPU, false to use CPU.
@@ -120,10 +216,23 @@ namespace nova {
      *   - SUCCESS: Cleanup successful.
      */
     virtual ERROR_STATE cleanup() = 0;
+
+    virtual ERROR_STATE setRenderOptions(const RenderOptions &opts) = 0;
+
+    virtual void stopRender() = 0;
+
+    virtual void startRender() = 0;
+
+    virtual ERROR_STATE synchronizeHost() = 0;
+
+    virtual ERROR_STATE synchronizeDevice() = 0;
+
+    virtual ERROR_STATE setThreadSize(unsigned threads) = 0;
   };
 
   RenderBufferPtr create_render_buffer();
   EngineInstancePtr create_engine();
+  RenderOptionsPtr create_render_options();
   void errlog(int error, char log_buffer_r[128]);
 
 }  // namespace nova
