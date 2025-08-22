@@ -34,7 +34,6 @@ namespace exception {
 }  // namespace exception
 
 const char *const NOVABAKE_POOL_TAG = "_NOVABAKE_POOL_TAG_";
-const char *const NOVABAKE_GPU_POOL_TAG = "NOVABAKE_GPU_POOL_TAG_";
 /**************************************************************************************************************/
 namespace controller {
   /* To read options from the UI and transmit them to the bakery*/
