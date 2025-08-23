@@ -1,74 +1,113 @@
-#include "../api.h"
-#include "api_common.h"
 #include "private_includes.h"
 #include <memory>
 namespace nova {
-  NvTexture::NvTexture(const Texture &other) { *this = *dynamic_cast<const NvTexture *>(&other); }
 
-  NvTexture &NvTexture::operator=(const Texture &other) {
-    if (&other == this)
+  class NvTexture final : public Texture {
+   private:
+    union {
+      const float *f_buffer;
+      const uint32_t *ui_buffer;
+    } memory{};
+    texture::FORMAT type{};
+    unsigned width{0};
+    unsigned height{0};
+    unsigned channel{0};
+    GLuint interop_id{0};
+    bool invert_y{false};
+    bool invert_x{false};
+
+   public:
+    NvTexture() = default;
+
+    NvTexture(const Texture &other) {
+      width = other.getWidth();
+      height = other.getHeight();
+      channel = other.getChannels();
+      interop_id = other.getInteropID();
+      invert_y = other.getInvertY();
+      invert_x = other.getInvertX();
+      type = other.getFormat();
+      memory.ui_buffer = static_cast<const uint32_t *>(other.getTextureBuffer());
+    }
+
+    NvTexture &operator=(const Texture &other) {
+      if (this == &other)
+        return *this;
+      width = other.getWidth();
+      height = other.getHeight();
+      channel = other.getChannels();
+      interop_id = other.getInteropID();
+      invert_y = other.getInvertY();
+      invert_x = other.getInvertX();
+      type = other.getFormat();
+      memory.ui_buffer = static_cast<const uint32_t *>(other.getTextureBuffer());
       return *this;
-    *this = *dynamic_cast<const NvTexture *>(&other);
-    return *this;
-  }
+    }
 
-  ERROR_STATE NvTexture::setData(const uint32_t *buffer) {
-    if (!buffer)
-      return INVALID_BUFFER_STATE;
-    memory.ui_buffer = buffer;
-    type = I_ARRAY;
-    return SUCCESS;
-  }
+    ERROR_STATE setData(const uint32_t *buffer) override {
+      if (!buffer)
+        return INVALID_BUFFER_STATE;
+      memory.ui_buffer = buffer;
+      type = texture::UINT8X4;
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvTexture::setData(const float *buffer) {
-    if (!buffer)
-      return INVALID_BUFFER_STATE;
-    memory.f_buffer = buffer;
-    type = F_ARRAY;
-    return SUCCESS;
-  }
+    ERROR_STATE setData(const float *buffer) override {
+      if (!buffer)
+        return INVALID_BUFFER_STATE;
+      memory.f_buffer = buffer;
+      type = texture::FLOATX4;
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvTexture::setWidth(unsigned w) {
-    width = w;
-    return SUCCESS;
-  }
+    ERROR_STATE setWidth(unsigned w) override {
+      width = w;
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvTexture::setHeight(unsigned h) {
-    height = h;
-    return SUCCESS;
-  }
+    ERROR_STATE setHeight(unsigned h) override {
+      height = h;
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvTexture::setChannels(unsigned c) {
-    if (c < 1 || c > 4)
-      return INVALID_CHANNEL_DESCRIPTOR;
-    channel = c;
-    return SUCCESS;
-  }
+    ERROR_STATE setChannels(unsigned c) override {
+      if (c < 1 || c > 4)
+        return INVALID_CHANNEL_DESCRIPTOR;
+      channel = c;
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvTexture::setInteropID(GLuint texture_id) {
-    interop_id = texture_id;
-    return SUCCESS;
-  }
+    ERROR_STATE setInteropID(GLuint texture_id) override {
+      interop_id = texture_id;
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvTexture::invertY() {
-    invert_y ^= true;
-    return SUCCESS;
-  }
+    ERROR_STATE invertY() override {
+      invert_y ^= true;
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvTexture::invertX() {
-    invert_x ^= true;
-    return SUCCESS;
-  }
+    ERROR_STATE invertX() override {
+      invert_x ^= true;
+      return SUCCESS;
+    }
 
-  template<>
-  const uint32_t *NvTexture::getData<uint32_t>() const {
-    return memory.ui_buffer;
-  }
+    const void *getTextureBuffer() const override { return memory.f_buffer; }
 
-  template<>
-  const float *NvTexture::getData<float>() const {
-    return memory.f_buffer;
-  }
+    texture::FORMAT getFormat() const override { return type; }
 
-  std::unique_ptr<Texture> create_texture() { return std::make_unique<NvTexture>(); }
+    unsigned getWidth() const override { return width; }
+
+    unsigned getHeight() const override { return height; }
+
+    unsigned getChannels() const override { return channel; }
+
+    GLuint getInteropID() const override { return interop_id; }
+
+    bool getInvertY() const override { return invert_y; }
+
+    bool getInvertX() const override { return invert_x; }
+  };
+
+  TexturePtr create_texture() { return std::make_unique<NvTexture>(); }
 }  // namespace nova

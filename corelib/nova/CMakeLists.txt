@@ -8,6 +8,8 @@ add_library(ax_core_nova STATIC
         api/texture.cpp
         api/camera.cpp
         api/transform.cpp
+        api/renderbuffer.cpp 
+        api/renderoption.cpp
 
         utils/DrawEngine.cpp
         utils/DrawEngine_GPU.cpp

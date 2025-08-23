@@ -5,12 +5,18 @@
 namespace nova {
   /**
    * @brief Abstract interface for 3D transformations
-   *
    * This interface provides methods for manipulating 3D transformations.
    */
   class Transform {
    public:
     virtual ~Transform() = default;
+
+    /**
+     * @brief Makes a clone Transform.
+     *
+     * @param other Transform to be cloned into this instance.
+     */
+    virtual void clone(const Transform &other) = 0;
 
     /**
      * @brief Set the transformation matrix from a 16-element float array
@@ -135,22 +141,24 @@ namespace nova {
      *
      * @param inverse Output array to store the inverse transformation matrix [16 floats]
      */
-    virtual void getInverse(float inverse[16]) const = 0;
-    
+    virtual void invert(float inverse[16]) const = 0;
+
     /**
      * @brief Get the transpose of the current transformation matrix
-     * 
+     *
      * @param result Output array to store the transposed transformation matrix [16 floats]
      */
     virtual void transpose(float result[16]) const = 0;
-    
+
     /**
      * @brief Get the transpose of the inverse transformation matrix (useful for normal transformations)
-     * 
+     *
      * @param result Output array to store the transposed inverse matrix [9 floats for 3x3 matrix]
      */
-    virtual void transposeInverse(float result[9]) const = 0;
+    virtual void transposeInvert(float result[9]) const = 0;
   };
+
+  TransformPtr create_transform();
 
 }  // namespace nova
 

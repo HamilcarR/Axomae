@@ -1,22 +1,24 @@
 #ifndef API_COMMON_H
 #define API_COMMON_H
+#include "api_datastructures.h"
+#include <internal/common/axstd/span.h>
 #include <memory>
 namespace nova {
   enum ERROR_STATE {
     SUCCESS,
-
     INVALID_ENGINE_STATE,
     INVALID_BUFFER_STATE,
     INVALID_CHANNEL_DESCRIPTOR,
     INVALID_SCENE_TYPE,
     INVALID_TRANSFORM_TYPE,
+
     SCENE_NOT_PROCESSED,
     NOT_GPU_BUILD,
     OUT_OF_MEMORY,
     MULTIPLE_INTEGRATORS_NOT_SUPPORTED,
     THREADPOOL_CREATION_ERROR,
     THREADPOOL_NOT_INITIALIZED,
-
+    INVALID_ARGUMENT,
   };
 
   namespace integrator {
@@ -30,7 +32,7 @@ namespace nova {
       HYBRID = 1 << 6,
       VOXEL = 1 << 7,
 
-      /* utility render */
+      /* Render passes. */
       COMBINED = 1 << 8,
       NORMAL = 1 << 9,
       DEPTH = 1 << 10,
@@ -40,6 +42,44 @@ namespace nova {
     };
 
   }
+
+  namespace texture {
+    enum FORMAT {
+      UINT8X4,
+      FLOATX4,
+    };
+
+  }
+
+  namespace mesh {
+    // Only triangle is supported for now.
+    enum TYPE { TRIANGLE, SPHERE, BOX, NURB };
+
+  }  // namespace mesh
+
+  class Camera;
+  class Scene;
+  class Transform;
+  class Engine;
+  class Trimesh;
+  class Material;
+  class Texture;
+  class RenderBuffer;
+  class RenderOptions;
+
+  using RenderBufferPtr = std::unique_ptr<RenderBuffer>;
+  using EnginePtr = std::unique_ptr<Engine>;
+  using RenderOptionsPtr = std::unique_ptr<RenderOptions>;
+  using TransformPtr = std::unique_ptr<Transform>;
+  using TexturePtr = std::unique_ptr<Texture>;
+  using ScenePtr = std::unique_ptr<Scene>;
+  using TrimeshPtr = std::unique_ptr<Trimesh>;
+  using CameraPtr = std::unique_ptr<Camera>;
+  using MaterialPtr = std::unique_ptr<Material>;
+  using CsteTriMeshCollection = axstd::span<const TrimeshPtr>;
+  using CsteCameraCollection = axstd::span<const CameraPtr>;
+  using CsteMaterialCollection = axstd::span<const MaterialPtr>;
+  using CsteTextureCollection = axstd::span<const TexturePtr>;
 
 }  // namespace nova
 #endif
