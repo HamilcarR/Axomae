@@ -1,74 +1,128 @@
+#include "api_common.h"
 #include "manager/NovaResourceManager.h"
 #include "private_includes.h"
 #include "texturing/NovaTextureInterface.h"
 #include "texturing/nova_texturing.h"
 namespace nova {
-  NvMaterial::NvMaterial(const Material &other) { *this = *dynamic_cast<const NvMaterial *>(&other); }
 
-  NvMaterial &NvMaterial::operator=(const Material &other) {
-    if (this == &other)
-      return *this;
-    *this = *dynamic_cast<const NvMaterial *>(&other);
-    return *this;
-  }
+  class NvMaterial final : public Material {
+    TexturePtr albedo;
+    TexturePtr normal;
+    TexturePtr metallic;
+    TexturePtr emissive;
+    TexturePtr roughness;
+    TexturePtr opacity;
+    TexturePtr specular;
+    TexturePtr ao;
+    float refract_coeff{1.0f};
+    float reflect_fuzz{0.0f};
 
-  ERROR_STATE NvMaterial::registerAlbedo(const Texture &texture) {
-    albedo = texture;
-    return SUCCESS;
-  }
+   public:
+    ERROR_STATE registerAlbedo(TexturePtr texture) override {
+      albedo = std::move(texture);
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvMaterial::registerNormal(const Texture &texture) {
-    normal = texture;
-    return SUCCESS;
-  }
+    ERROR_STATE registerNormal(TexturePtr texture) override {
+      normal = std::move(texture);
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvMaterial::registerMetallic(const Texture &texture) {
-    metallic = texture;
-    return SUCCESS;
-  }
+    ERROR_STATE registerMetallic(TexturePtr texture) override {
+      metallic = std::move(texture);
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvMaterial::registerEmissive(const Texture &texture) {
-    emissive = texture;
-    return SUCCESS;
-  }
+    ERROR_STATE registerEmissive(TexturePtr texture) override {
+      emissive = std::move(texture);
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvMaterial::registerRoughness(const Texture &texture) {
-    roughness = texture;
-    return SUCCESS;
-  }
+    ERROR_STATE registerRoughness(TexturePtr texture) override {
+      roughness = std::move(texture);
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvMaterial::registerOpacity(const Texture &texture) {
-    opacity = texture;
-    return SUCCESS;
-  }
+    ERROR_STATE registerOpacity(TexturePtr texture) override {
+      opacity = std::move(texture);
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvMaterial::registerSpecular(const Texture &texture) {
-    specular = texture;
-    return SUCCESS;
-  }
+    ERROR_STATE registerSpecular(TexturePtr texture) override {
+      specular = std::move(texture);
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvMaterial::registerAmbientOcclusion(const Texture &texture) {
-    ao = texture;
-    return SUCCESS;
-  }
+    ERROR_STATE registerAmbientOcclusion(TexturePtr texture) override {
+      ao = std::move(texture);
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvMaterial::setRefractCoeff(float eta) {
-    refract_coeff = eta;
-    return SUCCESS;
-  }
+    ERROR_STATE setRefractCoeff(float eta) override {
+      refract_coeff = eta;
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvMaterial::setReflectFuzz(float fuzz) {
-    reflect_fuzz = fuzz;
-    return SUCCESS;
-  }
+    ERROR_STATE setReflectFuzz(float fuzz) override {
+      reflect_fuzz = fuzz;
+      return SUCCESS;
+    }
+
+    Texture *getAlbedo() override { return albedo.get(); }
+
+    const Texture *getAlbedo() const override { return albedo.get(); }
+
+    Texture *getNormal() override { return normal.get(); }
+
+    const Texture *getNormal() const override { return normal.get(); }
+
+    Texture *getMetallic() override { return metallic.get(); }
+
+    const Texture *getMetallic() const override { return metallic.get(); }
+
+    Texture *getEmissive() override { return emissive.get(); }
+
+    const Texture *getEmissive() const override { return emissive.get(); }
+
+    Texture *getRoughness() override { return roughness.get(); }
+
+    const Texture *getRoughness() const override { return roughness.get(); }
+
+    Texture *getOpacity() override { return opacity.get(); }
+
+    const Texture *getOpacity() const override { return opacity.get(); }
+
+    Texture *getSpecular() override { return specular.get(); }
+
+    const Texture *getSpecular() const override { return specular.get(); }
+
+    Texture *getAmbientOcclusion() override { return ao.get(); }
+
+    const Texture *getAmbientOcclusion() const override { return ao.get(); }
+
+    float getRefractCoeff() const override { return refract_coeff; }
+
+    float getReflectFuzz() const override { return reflect_fuzz; }
+  };
 
   std::unique_ptr<Material> create_material() { return std::make_unique<NvMaterial>(); }
 
-  static texturing::NovaTextureInterface build_img_texture(const NvTexture &texture, NovaResourceManager &manager) {
+  static texturing::NovaTextureInterface build_img_texture(const Texture *texture, NovaResourceManager &manager) {
+    if (!texture)
+      return nullptr;
     texturing::TextureResourcesHolder &texture_manager = manager.getTexturesData();
-    AX_ASSERT_EQ(texture.getDataType(), NvTexture::I_ARRAY);
-    std::size_t texture_index = texture_manager.addTexture(
-        texture.getData<uint32_t>(), texture.getWidth(), texture.getHeight(), texture.getChannels());
+    AX_ASSERT_EQ(texture->getFormat(), texture::UINT8X4);
+    std::size_t texture_index = 0;
+    switch (texture->getFormat()) {
+      case texture::FLOATX4:
+        texture_index = texture_manager.addTexture(
+            static_cast<const float *>(texture->getTextureBuffer()), texture->getWidth(), texture->getHeight(), texture->getChannels());
+        break;
+      case texture::UINT8X4:
+        texture_index = texture_manager.addTexture(
+            static_cast<const uint32_t *>(texture->getTextureBuffer()), texture->getWidth(), texture->getHeight(), texture->getChannels());
+        break;
+    }
     return texture_manager.addNovaTexture<texturing::ImageTexture<uint32_t>>(texture_index);
   }
 
@@ -95,7 +149,7 @@ namespace nova {
     return mat_ptr;
   }
 
-  material::NovaMaterialInterface setup_material_data(const AbstractMesh &mesh, const NvMaterial &material, NovaResourceManager &manager) {
+  material::NovaMaterialInterface setup_material_data(const AbstractMesh &mesh, const Material &material, NovaResourceManager &manager) {
     material::texture_pack tpack;
     tpack.albedo = build_img_texture(material.getAlbedo(), manager);
     tpack.metallic = build_img_texture(material.getMetallic(), manager);

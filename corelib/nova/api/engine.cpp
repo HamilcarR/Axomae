@@ -1,216 +1,174 @@
 #include "aggregate/acceleration_interface.h"
 #include "aggregate/aggregate_datastructures.h"
-#include "api.h"
 #include "api_common.h"
-#include "engine/datastructures.h"
-#include "internal/common/utils.h"
+#include "api_renderoptions.h"
+#include "engine/nova_engine.h"
+#include "internal/thread/worker/ThreadPool.h"
+#include "manager/NovaExceptionManager.h"
+#include "manager/NovaResourceManager.h"
 #include "primitive/PrimitiveInterface.h"
 #include "private_includes.h"
 #include "shape/MeshContext.h"
+#include "texturing/NovaTextureInterface.h"
+#include "texturing/nova_texturing.h"
+#include <internal/common/utils.h>
+#include <internal/geometry/Object3D.h>
 #include <internal/macro/project_macros.h>
 #include <memory>
-#include <typeinfo>
 
+using RenderEngineInterfacePtr = std::unique_ptr<NovaRenderEngineInterface>;
+using EngineExceptionManagerPtr = std::unique_ptr<nova::NovaExceptionManager>;
+using ThreadpoolPtr = std::unique_ptr<threading::ThreadPool>;
+
+static const char *const _NOVA_HOST_TAG = "_NOVA_HOST_TAG";
 namespace nova {
+  class NvEngineInstance : public Engine {
+    NovaResourceManager manager;
+    ThreadpoolPtr threadpool;
+    EngineExceptionManagerPtr engine_exception_manager;
+    RenderBufferPtr render_buffer;
+    RenderOptionsPtr render_options;  // is synced with the manager's data.
+    RenderEngineInterfacePtr render_engine;
+    ScenePtr scene;
+    bool scene_built{false};
 
-  NvRenderOptions::NvRenderOptions(const RenderOptions &other) {
-    aa_samples = other.getAliasingSamples();
-    max_depth = other.getMaxDepth();
-    max_samples = other.getMaxSamples();
-    samples_increment = other.getSamplesIncrement();
-    tile_dimension_width = other.getTileDimensionWidth();
-    tile_dimension_height = other.getTileDimensionHeight();
-    flip_v = other.isFlippedV();
-    integrator_flag = other.getIntegratorFlag();
-  }
+   public:
+    NvEngineInstance() {
+      render_options = create_renderoptions();
+      render_buffer = create_renderbuffer();
+      scene = create_scene();
 
-  NvRenderOptions &NvRenderOptions::operator=(const RenderOptions &other) {
-    if (&other == this)
-      return *this;
-    aa_samples = other.getAliasingSamples();
-    max_depth = other.getMaxDepth();
-    max_samples = other.getMaxSamples();
-    samples_increment = other.getSamplesIncrement();
-    tile_dimension_width = other.getTileDimensionWidth();
-    tile_dimension_height = other.getTileDimensionHeight();
-    flip_v = other.isFlippedV();
-    integrator_flag = other.getIntegratorFlag();
-    return *this;
-  }
-
-  void NvRenderOptions::setAliasingSamples(unsigned s) { aa_samples = s; }
-
-  void NvRenderOptions::setMaxDepth(unsigned depth) { max_depth = depth; }
-
-  void NvRenderOptions::setMaxSamples(unsigned samples) { max_samples = samples; }
-
-  void NvRenderOptions::setSamplesIncrement(unsigned inc) { samples_increment = inc; }
-
-  void NvRenderOptions::setTileDimension(unsigned width, unsigned height) {
-    tile_dimension_width = width;
-    tile_dimension_height = height;
-  }
-
-  void NvRenderOptions::flipV() { flip_v ^= flip_v; }
-
-  bool NvRenderOptions::isFlippedV() const { return flip_v; }
-
-  unsigned NvRenderOptions::getAliasingSamples() const { return aa_samples; }
-
-  unsigned NvRenderOptions::getSamplesIncrement() const { return samples_increment; }
-
-  unsigned NvRenderOptions::getMaxDepth() const { return max_depth; }
-
-  unsigned NvRenderOptions::getMaxSamples() const { return max_samples; }
-
-  unsigned NvRenderOptions::getTileDimensionWidth() const { return tile_dimension_width; }
-
-  unsigned NvRenderOptions::getTileDimensionHeight() const { return tile_dimension_height; }
-
-  static ERROR_STATE check_valid_integrator_flags(int type) {
-    int num_integrators = 0;
-
-    /* Checks if user has chosen only one integrator ... cannot run Path + Metropolis at the same time for ex. */
-    for (int i = 0; i <= 7; i++) {
-      if ((type & (1 << i)) != 0)
-        num_integrators++;
-    }
-    if (num_integrators >= 2)
-      return MULTIPLE_INTEGRATORS_NOT_SUPPORTED;
-    return SUCCESS;
-  }
-
-  ERROR_STATE NvRenderOptions::setIntegratorFlag(int type) {
-    ERROR_STATE err{};
-    if ((err = check_valid_integrator_flags(type)) == SUCCESS)
-      integrator_flag = type;
-    return err;
-  }
-
-  int NvRenderOptions::getIntegratorFlag() const { return integrator_flag; }
-
-  ERROR_STATE NvRenderBuffer::createRenderBuffer(unsigned width, unsigned height) {
-    render_buffers = std::make_unique<HostStoredRenderableBuffers>();
-    render_buffers->width = width;
-    render_buffers->height = height;
-    try {
-      render_buffers->partial_buffer.resize(width * height * HostStoredRenderableBuffers::CHANNELS_COLOR);
-      render_buffers->accumulator_buffer.resize(width * height * HostStoredRenderableBuffers::CHANNELS_COLOR);
-      render_buffers->depth_buffer.resize(width * height * HostStoredRenderableBuffers::CHANNELS_DEPTH);
-      render_buffers->normal_buffer.resize(width * height * HostStoredRenderableBuffers::CHANNELS_NORMALS);
-    } catch (...) {
-      return OUT_OF_MEMORY;
-    }
-    return SUCCESS;
-  }
-
-  NvEngineInstance::NvEngineInstance() { render_options = std::make_unique<NvRenderOptions>(); }
-
-  ERROR_STATE NvEngineInstance::setThreadSize(unsigned threads) {
-    try {
-      threadpool = std::make_unique<threading::ThreadPool>(threads);
-    } catch (...) {
-      return THREADPOOL_CREATION_ERROR;
-    }
-    return SUCCESS;
-  }
-
-  HdrBufferStruct NvRenderBuffer::getRenderBuffers() const {
-    HdrBufferStruct buffers;
-    buffers.accumulator_buffer = render_buffers->accumulator_buffer.data();
-    buffers.partial_buffer = render_buffers->partial_buffer.data();
-    buffers.normal_buffer = render_buffers->normal_buffer.data();
-    buffers.depth_buffer = render_buffers->depth_buffer.data();
-    buffers.channels = render_buffers->CHANNELS_COLOR;
-    buffers.byte_size_color_buffers = render_buffers->width * render_buffers->height * render_buffers->CHANNELS_COLOR * sizeof(float);
-    buffers.color_buffers_pitch = render_buffers->width * render_buffers->CHANNELS_COLOR * sizeof(float);
-    buffers.depth_buffers_pitch = render_buffers->width * render_buffers->CHANNELS_DEPTH * sizeof(float);
-    buffers.normal_buffers_pitch = render_buffers->width * render_buffers->CHANNELS_NORMALS * sizeof(float);
-    return buffers;
-  }
-
-  struct resource_holders_inits_s {
-    std::size_t triangle_mesh_number;
-    std::size_t triangle_number;
-
-    std::size_t dielectrics_number;
-    std::size_t diffuse_number;
-    std::size_t conductors_number;
-
-    std::size_t image_texture_number;
-    std::size_t constant_texture_number;
-    std::size_t hdr_texture_number;
-  };
-
-  static void initialize_resources_holders(nova::NovaResourceManager &manager, const resource_holders_inits_s &resrc) {
-    nova::shape::shape_init_record_s shape_init_data{};
-    shape_init_data.total_triangle_meshes = resrc.triangle_mesh_number;
-    shape_init_data.total_triangles = resrc.triangle_number;
-    auto &shape_reshdr = manager.getShapeData();
-    shape_reshdr.init(shape_init_data);
-
-    nova::primitive::primitive_init_record_s primitive_init_data{};
-    primitive_init_data.geometric_primitive_count = resrc.triangle_number;
-    primitive_init_data.total_primitive_count = primitive_init_data.geometric_primitive_count;
-    auto &primitive_reshdr = manager.getPrimitiveData();
-    primitive_reshdr.init(primitive_init_data);
-
-    nova::material::material_init_record_s material_init_data{};
-    material_init_data.conductors_size = resrc.conductors_number;
-    material_init_data.dielectrics_size = resrc.dielectrics_number;
-    material_init_data.diffuse_size = resrc.diffuse_number;
-    auto &material_resrc = manager.getMaterialData();
-    material_resrc.init(material_init_data);
-
-    nova::texturing::texture_init_record_s texture_init_data{};
-    texture_init_data.total_constant_textures = resrc.constant_texture_number;
-    texture_init_data.total_image_textures = resrc.image_texture_number;
-    auto &texture_resrc = manager.getTexturesData();
-    texture_resrc.allocateMeshTextures(texture_init_data);
-  }
-
-  struct triangle_mesh_properties_t {
-    std::size_t mesh_index;
-    std::size_t triangle_index;
-  };
-  static void store_primitive(const nova::material::NovaMaterialInterface &mat,
-                              nova::NovaResourceManager &manager,
-                              const triangle_mesh_properties_t &m_indices) {
-    nova::shape::ShapeResourcesHolder &res_holder = manager.getShapeData();
-    auto tri = res_holder.addShape<nova::shape::Triangle>(m_indices.mesh_index, m_indices.triangle_index);
-    manager.getPrimitiveData().addPrimitive<nova::primitive::NovaGeoPrimitive>(tri, mat);
-  }
-
-  static std::size_t compute_primitive_number(const NvScene &scene) {
-    std::size_t acc = 0;
-    /*** Computes the number of triangle primitives in the whole scene. ***/
-    auto trimesh_collection = scene.getTrimeshArray();
-    const int trimesh_index_padding = 3;
-    for (const auto &elem : trimesh_collection) {
-      const Object3D &mesh_geometry = to_obj3d(*elem.mesh_geometry);
-      AX_ASSERT_NOTNULL(elem.mesh_geometry);
-      for (std::size_t i = 0; i < mesh_geometry.indices.size(); i += trimesh_index_padding)
-        acc++;
+      engine_exception_manager = std::make_unique<NovaExceptionManager>();
+      render_engine = std::make_unique<NovaRenderEngineLR>();
     }
 
-    /** Additional types of meshes here : */
-
-    return acc;
-  }
-
-  static glm::mat4 convert_transform(const float transform[16]) {
-    glm::mat4 final_transform;
-    for (int i = 0; i < 16; i++) {
-      glm::value_ptr(final_transform)[i] = transform[i];
+    ERROR_STATE setThreadSize(unsigned threads) override {
+      try {
+        threadpool = std::make_unique<threading::ThreadPool>(threads);
+      } catch (...) {
+        return THREADPOOL_CREATION_ERROR;
+      }
+      return SUCCESS;
     }
-    return final_transform;
-  }
+    struct resource_holders_inits_s {
+      std::size_t triangle_mesh_number;
+      std::size_t triangle_number;
 
-  ERROR_STATE NvEngineInstance::buildScene(const Scene &scene) {
-    try {
-      const NvScene &nv_scene = dynamic_cast<const NvScene &>(scene);
-      std::size_t number_primitives = compute_primitive_number(nv_scene);
-      std::size_t number_trimesh = nv_scene.getTrimeshArray().size();
+      std::size_t dielectrics_number;
+      std::size_t diffuse_number;
+      std::size_t conductors_number;
+
+      std::size_t image_texture_number;
+      std::size_t constant_texture_number;
+      std::size_t hdr_texture_number;
+    };
+
+    static void initialize_resources_holders(nova::NovaResourceManager &manager, const resource_holders_inits_s &resrc) {
+      nova::shape::shape_init_record_s shape_init_data{};
+      shape_init_data.total_triangle_meshes = resrc.triangle_mesh_number;
+      shape_init_data.total_triangles = resrc.triangle_number;
+      auto &shape_reshdr = manager.getShapeData();
+      shape_reshdr.init(shape_init_data);
+
+      nova::primitive::primitive_init_record_s primitive_init_data{};
+      primitive_init_data.geometric_primitive_count = resrc.triangle_number;
+      primitive_init_data.total_primitive_count = primitive_init_data.geometric_primitive_count;
+      auto &primitive_reshdr = manager.getPrimitiveData();
+      primitive_reshdr.init(primitive_init_data);
+
+      nova::material::material_init_record_s material_init_data{};
+      material_init_data.conductors_size = resrc.conductors_number;
+      material_init_data.dielectrics_size = resrc.dielectrics_number;
+      material_init_data.diffuse_size = resrc.diffuse_number;
+      auto &material_resrc = manager.getMaterialData();
+      material_resrc.init(material_init_data);
+
+      nova::texturing::texture_init_record_s texture_init_data{};
+      texture_init_data.total_constant_textures = resrc.constant_texture_number;
+      texture_init_data.total_image_textures = resrc.image_texture_number;
+      auto &texture_resrc = manager.getTexturesData();
+      texture_resrc.allocateMeshTextures(texture_init_data);
+    }
+
+    static shape::triangle::mesh_vbo_ids create_vbo_pack(const Trimesh &mesh) {
+      shape::triangle::mesh_vbo_ids vbo_pack{};
+      vbo_pack.vbo_positions = mesh.getInteropVertices();
+      vbo_pack.vbo_indices = mesh.getInteropIndices();
+      vbo_pack.vbo_normals = mesh.getInteropNormals();
+      vbo_pack.vbo_uv = mesh.getInteropUVs();
+      vbo_pack.vbo_tangents = mesh.getInteropTangents();
+      return vbo_pack;
+    }
+
+    struct triangle_mesh_properties_t {
+      std::size_t mesh_index;
+      std::size_t triangle_index;
+    };
+
+    static glm::mat4 convert_transform(const float transform[16]) {
+      glm::mat4 final_transform;
+      for (int i = 0; i < 16; i++)
+        glm::value_ptr(final_transform)[i] = transform[i];
+      return final_transform;
+    }
+
+    static void add_trimesh_geometry(const Trimesh &mesh, const glm::mat4 &final_transform, NovaResourceManager &manager, bool use_interops) {
+      nova::shape::ShapeResourcesHolder &res_holder = manager.getShapeData();
+      const Object3D &geometry = to_obj3d(mesh);
+      std::size_t stored_mesh_index = res_holder.addTriangleMesh(geometry);
+
+      res_holder.addTransform(final_transform, stored_mesh_index);
+      if (core::build::is_gpu_build && use_interops) {
+        shape::triangle::mesh_vbo_ids vbo_pack = create_vbo_pack(mesh);
+        res_holder.addTriangleMesh(vbo_pack);
+      }
+    }
+
+    static void setup_trimesh(const Trimesh &mesh, const Material &material, NovaResourceManager &manager, bool uses_interops, size_t mesh_index) {
+      const Object3D &geometry = to_obj3d(mesh);
+
+      float transform_array[16] = {};
+      const Transform &transform = mesh.getTransform();
+      transform.getTransformMatrix(transform_array);
+      const glm::mat4 transform_matrix = convert_transform(transform_array);
+
+      add_trimesh_geometry(mesh, transform_matrix, manager, uses_interops);
+
+      material::NovaMaterialInterface material_interface = setup_material_data(mesh, material, manager);
+      for (std::size_t triangle_index = 0; triangle_index < geometry.indices.size(); triangle_index += Object3D::face_stride) {
+        nova::shape::ShapeResourcesHolder &res_holder = manager.getShapeData();
+        auto triangle = res_holder.addShape<nova::shape::Triangle>(mesh_index, triangle_index);
+        manager.getPrimitiveData().addPrimitive<nova::primitive::NovaGeoPrimitive>(triangle, material_interface);
+      }
+    }
+
+    static void setup_triangle_meshes(const Scene &scene, NovaResourceManager &manager, bool uses_interops) {
+      std::size_t mesh_index = 0;
+      for (size_t i = 0; i < scene.getMeshesNum(mesh::TRIANGLE); i++) {
+        const Trimesh &geometry = *scene.getTriangleMeshCollection()[i];
+        const Material &material = *scene.getMaterialCollection(mesh::TRIANGLE)[i];
+        setup_trimesh(geometry, material, manager, uses_interops, mesh_index++);
+      }
+    }
+
+    static void setup_meshes(const Scene &scene, NovaResourceManager &manager, bool uses_interops) {
+      setup_triangle_meshes(scene, manager, uses_interops);
+    }
+
+    ERROR_STATE setScene(ScenePtr ptr) override {
+      if (!ptr)
+        return INVALID_ARGUMENT;
+      scene = std::move(ptr);
+      return SUCCESS;
+    }
+
+    const Scene *getScene() const override { return scene.get(); }
+
+    Scene *getScene() override { return scene.get(); }
+
+    ERROR_STATE buildScene() override {
+      std::size_t number_primitives = scene->getPrimitivesNum(mesh::TRIANGLE);
+      std::size_t number_trimesh = scene->getMeshesNum(mesh::TRIANGLE);
       std::size_t total_mesh_number = number_trimesh;
 
       resource_holders_inits_s resrc{};
@@ -222,129 +180,146 @@ namespace nova {
       resrc.image_texture_number = total_mesh_number * PBR_TEXTURE_PACK_SIZE;
       resrc.hdr_texture_number = 1;  // At least 1 for Environment map.
       initialize_resources_holders(manager, resrc);
-      std::size_t mesh_index = 0;
-      for (const auto &elem : nv_scene.getTrimeshArray()) {
-        const TriMesh &geometry = *elem.mesh_geometry.get();  // TODO: Other types of meshes for later
-        const NvMaterial &material = *elem.mesh_material.get();
-        material::NovaMaterialInterface material_interface = setup_material_data(geometry, material, manager);
-        const Transform &transform = geometry.getTransform();
-        float array[16]{};
-        transform.getTransformMatrix(array);
-        setup_geometry_data(geometry, array, material_interface, manager, mesh_index++, uses_interops);
+      setup_meshes(*scene, manager, render_options->isUsingInterops());
+
+      scene_built = true;
+      return SUCCESS;
+    }
+
+    static aggregate::DefaultAccelerator build_cpu_managed_accelerator(const aggregate::primitive_aggregate_data_s &primitive_geometry) {
+      aggregate::DefaultAccelerator accelerator;
+      accelerator.build(primitive_geometry);
+      return accelerator;
+    }
+
+    static std::unique_ptr<aggregate::DeviceAcceleratorInterface> build_device_accelerator(
+        const aggregate::primitive_aggregate_data_s &primitive_geometry) {
+      auto device_builder = aggregate::DeviceAcceleratorInterface::make();
+      device_builder->build(primitive_geometry);
+      return device_builder;
+    }
+
+    ERROR_STATE buildAcceleration() override {
+      if (!scene_built)
+        return SCENE_NOT_PROCESSED;
+      primitive::primitives_view_tn primitive_list_view = manager.getPrimitiveData().getPrimitiveView();
+      shape::MeshBundleViews mesh_geoemtry = manager.getShapeData().getMeshSharedViews();
+      aggregate::primitive_aggregate_data_s aggregate;
+      aggregate.primitive_list_view = primitive_list_view;
+      aggregate.mesh_geometry = mesh_geoemtry;
+
+      auto accelerator = build_cpu_managed_accelerator(aggregate);
+      manager.setManagedCpuAccelerationStructure(std::move(accelerator));
+
+      if (core::build::is_gpu_build) {
+        auto device_accelerator = build_device_accelerator(aggregate);
+        manager.setManagedGpuAccelerationStructure(std::move(device_accelerator));
       }
 
-    } catch (std::bad_cast &e) {
-      return INVALID_SCENE_TYPE;
-    }
-    scene_built = true;
-    return SUCCESS;
-  }
-
-  ERROR_STATE NvEngineInstance::useInterops(bool value) {
-    if (!core::build::is_gpu_build) {
-      uses_interops = false;
-      return NOT_GPU_BUILD;
-    }
-    uses_interops = value;
-    return SUCCESS;
-  }
-
-  ERROR_STATE NvEngineInstance::useGpu(bool gpu) {
-    if (!core::build::is_gpu_build) {
-      uses_gpu = false;
-      return NOT_GPU_BUILD;
-    }
-    uses_gpu = gpu;
-    return SUCCESS;
-  }
-
-  static aggregate::DefaultAccelerator build_cpu_managed_accelerator(const aggregate::primitive_aggregate_data_s &primitive_geometry) {
-    aggregate::DefaultAccelerator accelerator;
-    accelerator.build(primitive_geometry);
-    return accelerator;
-  }
-
-  static std::unique_ptr<aggregate::DeviceAcceleratorInterface> build_device_accelerator(
-      const aggregate::primitive_aggregate_data_s &primitive_geometry) {
-    auto device_builder = aggregate::DeviceAcceleratorInterface::make();
-    device_builder->build(primitive_geometry);
-    return device_builder;
-  }
-
-  ERROR_STATE NvEngineInstance::buildAcceleration() {
-    if (!scene_built)
-      return SCENE_NOT_PROCESSED;
-    primitive::primitives_view_tn primitive_list_view = manager.getPrimitiveData().getPrimitiveView();
-    shape::MeshBundleViews mesh_geoemtry = manager.getShapeData().getMeshSharedViews();
-    aggregate::primitive_aggregate_data_s aggregate;
-    aggregate.primitive_list_view = primitive_list_view;
-    aggregate.mesh_geometry = mesh_geoemtry;
-
-    auto accelerator = build_cpu_managed_accelerator(aggregate);
-    manager.setManagedCpuAccelerationStructure(std::move(accelerator));
-
-    if (core::build::is_gpu_build) {
-      auto device_accelerator = build_device_accelerator(aggregate);
-      manager.setManagedGpuAccelerationStructure(std::move(device_accelerator));
+      return SUCCESS;
     }
 
-    return SUCCESS;
-  }
+    ERROR_STATE cleanup() override {
+      manager.clearResources();
+      scene_built = false;
+      if (!render_buffer)
+        return INVALID_BUFFER_STATE;
+      render_buffer->resetBuffers();
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvEngineInstance::cleanup() {
-    manager.clearResources();
-    uses_interops = false;
-    uses_gpu = false;
-    scene_built = false;
+    ERROR_STATE setRenderBuffers(RenderBufferPtr buffers) override {
+      if (!buffers)
+        return INVALID_BUFFER_STATE;
+      render_buffer = std::move(buffers);
+      return SUCCESS;
+    }
 
-    return SUCCESS;
-  }
+    ERROR_STATE stopRender() override {
+      manager.getEngineData().is_rendering = false;
+      if (!render_options->isUsingGpu()) {
+        if (!threadpool)
+          return THREADPOOL_NOT_INITIALIZED;
+        /* Empty scheduler list. */
+        threadpool->emptyQueue(_NOVA_HOST_TAG);
+        /* Synchronize the threads. */
+        threadpool->fence(_NOVA_HOST_TAG);
+      }
+      /* Cleanup gpu resources */
+      manager.getShapeData().releaseResources();
+      manager.getTexturesData().releaseResources();
 
-  ERROR_STATE NvEngineInstance::setRenderBuffers(RenderBufferPtr buffers) {
-    if (!buffers)
-      return INVALID_BUFFER_STATE;
-    render_buffer = std::move(buffers);
-    return SUCCESS;
-  }
+      return SUCCESS;
+    }
 
-  void NvEngineInstance::stopRender() { manager.getEngineData().is_rendering = false; }
+    static void setup_engine_data(engine::EngineResourcesHolder &resrc, const RenderOptions &render_options) {
+      resrc.aliasing_samples = render_options.getAliasingSamples();
+      resrc.max_depth = render_options.getMaxDepth();
+      resrc.sample_increment = render_options.getSamplesIncrement();
+      resrc.vertical_invert = render_options.isFlippedV();
+      resrc.tiles_width = render_options.getTileDimensionWidth();
+      resrc.tiles_height = render_options.getTileDimensionHeight();
+      resrc.integrator_flag = render_options.getIntegratorFlag();
+    }
 
-  void NvEngineInstance::startRender() { manager.getEngineData().is_rendering = true; }
+    static void allocate_environment_maps(texturing::TextureResourcesHolder &resrc, const nova::Scene &scene) {
+      resrc.allocateEnvironmentMaps(scene.getEnvmapCollection().size());
+      resrc.setEnvmapId(scene.getCurrentEnvmapId());
+      for (const TexturePtr &texture : scene.getEnvmapCollection()) {
+        AX_ASSERT_EQ(texture->getFormat(), texture::FLOATX4);
+        std::size_t index = resrc.addTexture(
+            static_cast<const float *>(texture->getTextureBuffer()), texture->getWidth(), texture->getHeight(), texture->getChannels());
+        resrc.addNovaTexture<texturing::EnvmapTexture>(index);
+      }
+    }
 
-  ERROR_STATE NvEngineInstance::setRenderOptions(const RenderOptions &opts) {
-    manager.getEngineData().aliasing_samples = opts.getAliasingSamples();
-    manager.getEngineData().max_depth = opts.getMaxDepth();
-    manager.getEngineData().sample_increment = opts.getSamplesIncrement();
-    manager.getEngineData().vertical_invert = opts.isFlippedV();
-    manager.getEngineData().tiles_width = opts.getTileDimensionWidth();
-    manager.getEngineData().tiles_height = opts.getTileDimensionHeight();
-    manager.getEngineData().integrator_flag = opts.getIntegratorFlag();
-    AX_ASSERT_NOTNULL(renedr_options);
-    *render_options = opts;
-    return SUCCESS;
-  }
+    ERROR_STATE prepareRender() override {
+      texturing::TextureResourcesHolder &textures_manager = manager.getTexturesData();
+      shape::ShapeResourcesHolder &shape_manager = manager.getShapeData();
+      engine::EngineResourcesHolder &opts_manager = manager.getEngineData();
+      setup_engine_data(opts_manager, *render_options);
+      allocate_environment_maps(textures_manager, *scene);
+      if (render_options->isUsingGpu()) {
+        shape_manager.lockResources();
+        shape_manager.mapBuffers();
+        textures_manager.lockResources();
+        textures_manager.mapBuffers();
+      }
+      return SUCCESS;
+    }
 
-  const RenderOptions &NvEngineInstance::getRenderOptions() const { return *render_options; }
+    ERROR_STATE startRender(HdrBufferStruct *buffers) override { return INVALID_ARGUMENT; }
 
-  static const char *const _NOVA_HOST_TAG = "_NOVA_HOST_TAG";
-  static const char *const _NOVA_DEV_TAG = "_NOVA_DEV_TAG";
-  ERROR_STATE NvEngineInstance::synchronizeHost() {
-    if (!threadpool)
-      return THREADPOOL_NOT_INITIALIZED;
-    threadpool->fence(_NOVA_HOST_TAG);
-    return SUCCESS;
-  }
+    ERROR_STATE startRender() override {
+      manager.getEngineData().is_rendering = true;
+      return SUCCESS;
+    }
 
-  ERROR_STATE NvEngineInstance::synchronizeDevice() {
-    if (!threadpool)
-      return THREADPOOL_NOT_INITIALIZED;
-    threadpool->fence(_NOVA_DEV_TAG);
-    return SUCCESS;
-  }
+    ERROR_STATE setRenderOptions(RenderOptionsPtr opts) override {
+      if (!opts)
+        return INVALID_ARGUMENT;
+      render_options = std::move(opts);
+      return SUCCESS;
+    }
 
-  RenderBufferPtr create_render_buffer() { return std::make_unique<NvRenderBuffer>(); }
+    const RenderOptions *getRenderOptions() const override { return render_options.get(); }
 
-  EngineInstancePtr create_engine() { return std::make_unique<NvEngineInstance>(); }
+    RenderOptions *getRenderOptions() override { return render_options.get(); }
 
-  RenderOptionsPtr create_render_options() { return std::make_unique<NvRenderOptions>(); }
+    const RenderBuffer *getRenderBuffers() const override { return render_buffer.get(); }
+
+    RenderBuffer *getRenderBuffers() override { return render_buffer.get(); }
+
+    ERROR_STATE synchronize() override {
+      if (!threadpool)
+        return THREADPOOL_NOT_INITIALIZED;
+      threadpool->fence(_NOVA_HOST_TAG);
+      return SUCCESS;
+    }
+
+    NovaResourceManager &getResrcManager() override { return manager; }
+  };
+
+  EnginePtr create_engine() { return std::make_unique<NvEngineInstance>(); }
+
 }  // namespace nova

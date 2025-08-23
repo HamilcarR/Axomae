@@ -354,9 +354,6 @@ namespace controller {
     nova::gputils::domain2d domain{(unsigned)render_scene_data.width, (unsigned)render_scene_data.height};
     nova::gputils::initialize_gpu_structures(domain, render_scene_data.gpu_util_structures);
 
-    nova::device_shared_caches_t &buffer_collection = render_scene_data.shared_caches;
-    nova::gputils::lock_host_memory_default(buffer_collection);
-
     progressive_render_metadata metadata = create_render_metadata(render_scene_data);
 
     auto act = std::make_unique<GPUWorkerRetAction<device::gpgpu::GPUContext>>(std::move(gpu_context));
@@ -390,20 +387,17 @@ namespace controller {
         update_display(display_widget);
       } catch (const exception::GenericException &e) {
         ExceptionInfoBoxHandler::handle(e);
-        nova::gputils::unlock_host_memory(buffer_collection);
         act->popContext();
         return act;
       }
 
       if (on_exception_shutdown(*render_scene_data.nova_exception_manager)) {
-        nova::gputils::unlock_host_memory(buffer_collection);
         act->popContext();
         return act;
       }
       color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)sample_index);
       sample_index++;
     }
-    nova::gputils::unlock_host_memory(buffer_collection);
     act->popContext();
     return act;
   }

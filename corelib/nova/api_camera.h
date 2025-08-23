@@ -32,6 +32,8 @@ namespace nova {
     virtual float getFov() const = 0;
   };
 
+  CameraPtr create_camera();
+
 }  // namespace nova
 
 #endif
