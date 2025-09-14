@@ -33,8 +33,8 @@ namespace device::gpgpu {
 
   void init_driver_API() { AX_ASSERT_EQ(cuInit(0), CUDA_SUCCESS); }
   void create_context(GPUContext &context) { AX_ASSERT_EQ(cuCtxCreate(&context.pimpl->context, CU_CTX_SCHED_AUTO, 0), CUDA_SUCCESS); }
-  void get_current_context(GPUContext &context) { AX_ASSERT_EQ(cuCtxGetCurrent(&context.pimpl->context), CUDA_SUCCESS); }
-  void set_current_context(const GPUContext &context) { AX_ASSERT_EQ(cuCtxSetCurrent(context.pimpl->context), CUDA_SUCCESS); }
+  void register_context(GPUContext &context) { AX_ASSERT_EQ(cuCtxGetCurrent(&context.pimpl->context), CUDA_SUCCESS); }
+  void apply_context(const GPUContext &context) { AX_ASSERT_EQ(cuCtxSetCurrent(context.pimpl->context), CUDA_SUCCESS); }
   void pop_context(GPUContext &context) { AX_ASSERT_EQ(cuCtxPopCurrent(&context.pimpl->context), CUDA_SUCCESS); }
   void push_context(GPUContext &context) { AX_ASSERT_EQ(cuCtxPushCurrent(context.pimpl->context), CUDA_SUCCESS); }
 

@@ -18,9 +18,9 @@ namespace device::gpgpu {
   void init_driver_API();
   void create_context(GPUContext &context);
   /** Sets 'context' as the current gpu context.*/
-  void set_current_context(const GPUContext &context);
+  void apply_context(const GPUContext &context);
   /** Registers the current gpu context inside the opaque type 'context'.*/
-  void get_current_context(GPUContext &context);
+  void register_context(GPUContext &context);
   void pop_context(GPUContext &context);
   void push_context(GPUContext &context);
 
