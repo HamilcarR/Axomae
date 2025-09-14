@@ -92,7 +92,7 @@ Note that:
 - Building Unit tests is enabled by default , set ```-DAXOMAE_BUILD_TESTS=OFF``` if they are not needed. 
 - Building QT from source is enabled by default. It is more reliable to build Axomae and it's dependencies through a unique toolchain, but it will take longer(~15 min on an 8 cores ... Build time optimizations are on the backlog. )
 - If nonetheless you can use your own QT system library , use ```-DAXOMAE_FROMSOURCE_QT_BUILD=OFF``` .
-- For CUDA , use ```-DAXOMAE_USE_CUDA=ON```.
+- For CUDA , use ```-DAXOMAE_USE_CUDA=ON``` and ```-DAXOMAE_USE_OPTIX``` for ray-tracing gpu acceleration (Currently uses RTX hardware for acceleration, a native solution using only CUDA is on the backlog for non RTX cards).
 ```
 $ cd Axomae
 $ cmake -S . -B ../build -DAXOMAE_BUILD_TESTS=OFF -DAXOMAE_FROMSOURCE_QT_BUILD=OFF
