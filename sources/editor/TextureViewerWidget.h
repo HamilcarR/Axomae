@@ -8,6 +8,7 @@
 
 #include <QImage>
 #include <QMainWindow>
+#include <QMouseEvent>
 #include <QResizeEvent>
 
 namespace threading {
@@ -59,11 +60,16 @@ class HdrTextureViewerWidget : public TextureViewerWidget {
 };
 /*********************************************************************************************************************************************/
 
-class HdrRenderViewerWidget : public QWidget {
-  using EventManager = controller::event::Event;
+namespace nova {
+  class RenderBuffer;
+}
+
+class AbstractHdrRenderViewerWidget : public QWidget {
   Q_OBJECT
- private:
-  const image::ImageHolder<float> *target_buffer;  // Read only, need to be stored in a database , or in the main controller class.
+
+ protected:
+  using EventManager = controller::event::Event;
+
   Ui::texture_viewer window{};
   std::unique_ptr<editor::RgbDisplayerLabel> label{};
   QImage image;
@@ -73,7 +79,33 @@ class HdrRenderViewerWidget : public QWidget {
   std::unique_ptr<ContextMenuWidget> context_menu;
 
  public:
-  /* If use_timer = true , update of the canvas is done through a timer. Else , we use a signal. */
+  explicit AbstractHdrRenderViewerWidget(controller::Controller *app_controller, bool use_timer = true, QWidget *parent = nullptr);
+  ~AbstractHdrRenderViewerWidget() override;
+  AbstractHdrRenderViewerWidget(const AbstractHdrRenderViewerWidget &other) = delete;
+  AbstractHdrRenderViewerWidget(AbstractHdrRenderViewerWidget &&other) noexcept = delete;
+  AbstractHdrRenderViewerWidget &operator=(const AbstractHdrRenderViewerWidget &other) = delete;
+  AbstractHdrRenderViewerWidget &operator=(AbstractHdrRenderViewerWidget &&other) noexcept = delete;
+  void mouseMoveEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  void resizeEvent(QResizeEvent *event) override;
+  void closeEvent(QCloseEvent *event) override;
+  virtual void notifyUpdate() = 0;
+
+ signals:
+  void viewerClosed(QWidget *widget_address);
+  void onStopRenderQuery();
+  void onNotifyUpdate();
+ public slots:
+  virtual void updateImage() = 0;
+};
+
+class HdrRenderViewerWidget : public AbstractHdrRenderViewerWidget {
+  Q_OBJECT
+
+ protected:
+  const image::ImageHolder<float> *target_buffer{nullptr};  // Read only, need to be stored in a database , or in the main controller class.
+
+ public:
   HdrRenderViewerWidget(const image::ImageHolder<float> *tex,
                         controller::Controller *app_controller,
                         bool use_timer = true,
@@ -87,15 +119,32 @@ class HdrRenderViewerWidget : public QWidget {
   void mouseReleaseEvent(QMouseEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
   void closeEvent(QCloseEvent *event) override;
-  void notifyUpdate();
+  void notifyUpdate() override;
+  void updateImage() override;
 
- signals:
-  void viewerClosed(QWidget *widget_address);
+  signals:
   void onSaveRenderQuery(const image::ImageHolder<float> &target_buffer);
-  void onStopRenderQuery();
-  void onNotifyUpdate();
- public slots:
-  void updateImage();
+};
+
+class HdrNovaRenderViewerWidget : public AbstractHdrRenderViewerWidget {
+  Q_OBJECT
+
+ protected:
+  nova::RenderBuffer *render_buffer{nullptr};
+
+ public:
+  HdrNovaRenderViewerWidget(nova::RenderBuffer *render_buffer,
+                            controller::Controller *app_controller,
+                            bool use_timer = true,
+                            QWidget *parent = nullptr);
+  ~HdrNovaRenderViewerWidget() override;
+  HdrNovaRenderViewerWidget(const HdrNovaRenderViewerWidget &other) = delete;
+  HdrNovaRenderViewerWidget(HdrNovaRenderViewerWidget &&other) noexcept = delete;
+  HdrNovaRenderViewerWidget &operator=(const HdrNovaRenderViewerWidget &other) = delete;
+  HdrNovaRenderViewerWidget &operator=(HdrNovaRenderViewerWidget &&other) noexcept = delete;
+  void mouseMoveEvent(QMouseEvent *event) override;
+  void notifyUpdate() override;
+  void updateImage() override;
 };
 
 #endif  // TEXTUREVIEWERWIDGET_H

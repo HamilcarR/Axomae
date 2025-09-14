@@ -1,7 +1,7 @@
 #include "TextureViewerWidget.h"
-#include "Config.h"
 #include "GUIWindow.h"
 #include "event/EventController.h"
+#include <QCloseEvent>
 #include <QTimer>
 #include <internal/common/image/image_utils.h>
 
@@ -120,28 +120,8 @@ HdrRenderViewerWidget::HdrRenderViewerWidget(const image::ImageHolder<float> *te
                                              controller::Controller *app_controller,
                                              bool use_timer,
                                              QWidget *parent)
-    : QWidget(parent) {
-
-  window.setupUi(this);
-  widget_event_struct = std::make_unique<EventManager>();
-  target_buffer = tex;
-  QObject::connect(this, &HdrRenderViewerWidget::viewerClosed, app_controller, &controller::Controller::slot_on_closed_spawn_window);
+    : AbstractHdrRenderViewerWidget(app_controller, use_timer, parent), target_buffer(tex) {
   QObject::connect(this, &HdrRenderViewerWidget::onSaveRenderQuery, app_controller, &controller::Controller::slot_nova_save_bake);
-  QObject::connect(this, &HdrRenderViewerWidget::onStopRenderQuery, app_controller, &controller::Controller::slot_nova_stop_bake);
-  label = std::make_unique<editor::RgbDisplayerLabel>(this);
-  label->setScaledContents(true);
-  context_menu = std::make_unique<ContextMenuWidget>(this);
-
-  setMouseTracking(true);
-
-  if (use_timer) {
-    timer = std::make_unique<QTimer>();
-    timer->start(1000);
-    QObject::connect(timer.get(), &QTimer::timeout, this, &HdrRenderViewerWidget::updateImage);
-  } else {
-    QObject::connect(this, &HdrRenderViewerWidget::onNotifyUpdate, this, &HdrRenderViewerWidget::updateImage);
-    updateImage();
-  }
 }
 
 void HdrRenderViewerWidget::notifyUpdate() { emit onNotifyUpdate(); }
@@ -169,6 +149,7 @@ void HdrRenderViewerWidget::mouseMoveEvent(QMouseEvent *event) {
   }
   widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_MOVE;
 }
+
 void HdrRenderViewerWidget::mouseReleaseEvent(QMouseEvent *event) {
   QWidget::mouseReleaseEvent(event);
   QPoint p = event->pos();
@@ -196,6 +177,9 @@ void HdrRenderViewerWidget::closeEvent(QCloseEvent *event) {
 }
 
 void HdrRenderViewerWidget::updateImage() {
+  if (!target_buffer)
+    return;
+
   AX_ASSERT_EQ(target_buffer->data().size(), target_buffer->metadata.width * target_buffer->metadata.height * target_buffer->metadata.channels);
 
   std::vector<uint8_t> normalized = hdr_utils::hdr2image(axstd::span<const float>(target_buffer->data().data(), target_buffer->data().size()),
@@ -205,5 +189,117 @@ void HdrRenderViewerWidget::updateImage() {
                                                          !target_buffer->metadata.color_corrected);
 
   image = QImage(normalized.data(), target_buffer->metadata.width, target_buffer->metadata.height, QImage::Format_ARGB32);
+  label->setPixmap(QPixmap::fromImage(image));
+}
+
+/************************************************************************************************************************************************************/
+
+AbstractHdrRenderViewerWidget::AbstractHdrRenderViewerWidget(controller::Controller *app_controller, bool use_timer, QWidget *parent)
+    : QWidget(parent) {
+  window.setupUi(this);
+  widget_event_struct = std::make_unique<EventManager>();
+  QObject::connect(this, &AbstractHdrRenderViewerWidget::viewerClosed, app_controller, &controller::Controller::slot_on_closed_spawn_window);
+  QObject::connect(this, &AbstractHdrRenderViewerWidget::onStopRenderQuery, app_controller, &controller::Controller::slot_nova_stop_bake);
+  label = std::make_unique<editor::RgbDisplayerLabel>(this);
+  label->setScaledContents(true);
+  context_menu = std::make_unique<ContextMenuWidget>(this);
+
+  setMouseTracking(true);
+
+  if (use_timer) {
+    timer = std::make_unique<QTimer>();
+    timer->start(200);
+    QObject::connect(timer.get(), &QTimer::timeout, this, &AbstractHdrRenderViewerWidget::updateImage);
+  } else {
+    QObject::connect(this, &AbstractHdrRenderViewerWidget::onNotifyUpdate, this, &AbstractHdrRenderViewerWidget::updateImage);
+  }
+  setWindowFlag(Qt::Window);
+}
+
+AbstractHdrRenderViewerWidget::~AbstractHdrRenderViewerWidget() = default;
+
+void AbstractHdrRenderViewerWidget::mouseMoveEvent(QMouseEvent *event) { QWidget::mouseMoveEvent(event); }
+
+void AbstractHdrRenderViewerWidget::mouseReleaseEvent(QMouseEvent *event) {
+  QWidget::mouseReleaseEvent(event);
+  QPoint p = event->pos();
+  if (event->button() == Qt::RightButton) {
+    widget_event_struct->flag |= EventManager::EVENT_MOUSE_R_RELEASE;
+    ContextMenuWidget::ACTION action = context_menu->spawnMenuOnPos(p);
+    if (action == ContextMenuWidget::STOP) {
+      emit onStopRenderQuery();
+    }
+    widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_R_RELEASE;
+  }
+}
+
+void AbstractHdrRenderViewerWidget::resizeEvent(QResizeEvent *event) {
+  QWidget::resizeEvent(event);
+  if (label)
+    label->resize(event->size().width(), event->size().height());
+}
+
+void AbstractHdrRenderViewerWidget::closeEvent(QCloseEvent *event) {
+  QWidget::closeEvent(event);
+  emit viewerClosed(this);
+}
+
+/************************************************************************************************************************************************************/
+
+HdrNovaRenderViewerWidget::HdrNovaRenderViewerWidget(nova::RenderBuffer *render_buffer,
+                                                     controller::Controller *app_controller,
+                                                     bool use_timer,
+                                                     QWidget *parent)
+    : AbstractHdrRenderViewerWidget(app_controller, use_timer, parent), render_buffer(render_buffer) {}
+
+HdrNovaRenderViewerWidget::~HdrNovaRenderViewerWidget() = default;
+
+void HdrNovaRenderViewerWidget::notifyUpdate() { emit onNotifyUpdate(); }
+
+void HdrNovaRenderViewerWidget::mouseMoveEvent(QMouseEvent *event) {
+  QWidget::mouseMoveEvent(event);
+  if (!render_buffer)
+    return;
+  QPoint p = event->pos();
+
+  widget_event_struct->flag |= EventManager::EVENT_MOUSE_MOVE;
+  if (p.x() < width() && p.y() < height() && p.x() >= 0 && p.y() >= 0) {
+    unsigned int image_width = render_buffer->getWidth();
+    unsigned int image_height = render_buffer->getHeight();
+    p = mapToImage(static_cast<int>(image_width), static_cast<int>(image_height), p, width(), height());
+
+    auto frame_buffer = render_buffer->getFrameBuffer();
+    if (!frame_buffer.color_buffer.empty() && p.x() >= 0 && p.y() >= 0 && p.x() < static_cast<int>(image_width) &&
+        p.y() < static_cast<int>(image_height))
+    {
+      unsigned int index = (p.y() * image_width + p.x()) * frame_buffer.color_buffer_channels;
+      float r_ = frame_buffer.color_buffer[index];
+      float g_ = frame_buffer.color_buffer[index + 1];
+      float b_ = frame_buffer.color_buffer[index + 2];
+      float a_ = 1.f;
+      const float rgb[4] = {r_, g_, b_, a_};
+      label->updateLabel(rgb, p.x(), p.y(), width(), height(), false);
+    }
+  }
+  widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_MOVE;
+}
+
+void HdrNovaRenderViewerWidget::updateImage() {
+  if (!render_buffer)
+    return;
+  auto frame_buffer = render_buffer->getFrameBuffer();
+  if (frame_buffer.color_buffer.empty())
+    return;
+  unsigned int image_width = frame_buffer.color_buffer_width;
+  unsigned int image_height = frame_buffer.color_buffer_height;
+  unsigned int channels = frame_buffer.color_buffer_channels;
+
+  std::vector<uint8_t> normalized = hdr_utils::hdr2image(axstd::span<const float>(frame_buffer.color_buffer),
+                                                         static_cast<int>(image_width),
+                                                         static_cast<int>(image_height),
+                                                         static_cast<int>(channels),
+                                                         true);
+
+  image = QImage(normalized.data(), static_cast<int>(image_width), static_cast<int>(image_height), QImage::Format_ARGB32);
   label->setPixmap(QPixmap::fromImage(image));
 }
