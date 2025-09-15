@@ -41,11 +41,6 @@ inline glm::mat4 convert_transform(const float transform[16]) {
 }
 
 namespace nova {
-  struct trimesh_group_s {
-    std::vector<std::unique_ptr<Trimesh>> mesh_geometry;
-    std::vector<std::unique_ptr<Material>> mesh_material;
-  };
-
   Object3D to_obj3d(const Trimesh &trimesh);
   material::NovaMaterialInterface setup_material_data(const AbstractMesh &mesh, const Material &material, NovaResourceManager &manager);
 }  // namespace nova

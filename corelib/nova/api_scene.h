@@ -23,6 +23,8 @@ namespace nova {
 
     virtual const Texture *getEnvmap(unsigned id) const = 0;
 
+    virtual void clearEnvmaps() = 0;
+
     /**
      * @brief Get the Current Envmap Id
      *
@@ -36,6 +38,8 @@ namespace nova {
      * @return ID of the camera
      */
     virtual unsigned addCamera(CameraPtr camera) = 0;
+
+    virtual void clearCameras() = 0;
 
     /**
      * @brief Set the current camera ID.
@@ -55,6 +59,8 @@ namespace nova {
     virtual int getCurrentCameraId() const = 0;
 
     virtual Camera *getCamera(unsigned id) = 0;
+
+    virtual void cleanup() = 0;
 
     virtual const Camera *getCamera(unsigned id) const = 0;
 

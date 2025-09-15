@@ -6,7 +6,6 @@ namespace nova {
   /** Must point to a valid managed buffer */
   template<class T>
   struct RenderBuffers {
-    T *accumulator_buffer;
     T *partial_buffer;
     T *depth_buffer;
     T *normal_buffer;

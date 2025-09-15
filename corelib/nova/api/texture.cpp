@@ -83,12 +83,12 @@ namespace nova {
     }
 
     ERROR_STATE invertY() override {
-      invert_y ^= true;
+      invert_y = !invert_y;
       return SUCCESS;
     }
 
     ERROR_STATE invertX() override {
-      invert_x ^= true;
+      invert_x = !invert_x;
       return SUCCESS;
     }
 
