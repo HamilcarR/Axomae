@@ -1,9 +1,9 @@
 #include "aggregate/acceleration_interface.h"
 #include "aggregate/aggregate_datastructures.h"
 #include "api_common.h"
+#include "api_datastructures.h"
 #include "api_renderoptions.h"
 #include "engine/nova_engine.h"
-#include "internal/thread/worker/ThreadPool.h"
 #include "manager/NovaExceptionManager.h"
 #include "manager/NovaResourceManager.h"
 #include "primitive/PrimitiveInterface.h"
@@ -11,25 +11,35 @@
 #include "shape/MeshContext.h"
 #include "texturing/NovaTextureInterface.h"
 #include "texturing/nova_texturing.h"
+#include <internal/common/exception/GenericException.h>
+#include <internal/common/math/math_utils.h>
 #include <internal/common/utils.h>
 #include <internal/geometry/Object3D.h>
 #include <internal/macro/project_macros.h>
+#include <internal/thread/worker/ThreadPool.h>
 #include <memory>
 
-using RenderEngineInterfacePtr = std::unique_ptr<NovaRenderEngineInterface>;
-using EngineExceptionManagerPtr = std::unique_ptr<nova::NovaExceptionManager>;
-using ThreadpoolPtr = std::unique_ptr<threading::ThreadPool>;
-
-static const char *const _NOVA_HOST_TAG = "_NOVA_HOST_TAG";
 namespace nova {
   class NvEngineInstance : public Engine {
+    using RenderFutureResult = std::future<ERROR_STATE>;
+    using RenderEngineInterfacePtr = std::unique_ptr<NovaRenderEngineInterface>;
+    using EngineExceptionManagerPtr = std::unique_ptr<nova::NovaExceptionManager>;
+    using ThreadpoolPtr = std::unique_ptr<threading::ThreadPool>;
+    static constexpr char NOVA_ASYNC_RENDER_TAG[] = "_NOVA_HOST_TAG";
+
     NovaResourceManager manager;
     ThreadpoolPtr threadpool;
-    EngineExceptionManagerPtr engine_exception_manager;
-    RenderBufferPtr render_buffer;
-    RenderOptionsPtr render_options;  // is synced with the manager's data.
+
     RenderEngineInterfacePtr render_engine;
+    EngineExceptionManagerPtr engine_exception_manager;
+
+    RenderBufferPtr render_buffer;
+
+    RenderOptionsPtr render_options;  // is synced with the manager's data.
+    EngineUserCallbackHandlerPtr user_callback;
+
     ScenePtr scene;
+    RenderFutureResult render_result{};
     bool scene_built{false};
 
    public:
@@ -222,9 +232,10 @@ namespace nova {
     ERROR_STATE cleanup() override {
       manager.clearResources();
       scene_built = false;
-      if (!render_buffer)
-        return INVALID_BUFFER_STATE;
+      if (!render_buffer || !scene)
+        return INVALID_ENGINE_STATE;
       render_buffer->resetBuffers();
+      scene->cleanup();
       return SUCCESS;
     }
 
@@ -241,9 +252,9 @@ namespace nova {
         if (!threadpool)
           return THREADPOOL_NOT_INITIALIZED;
         /* Empty scheduler list. */
-        threadpool->emptyQueue(_NOVA_HOST_TAG);
+        threadpool->emptyQueue(NOVA_ASYNC_RENDER_TAG);
         /* Synchronize the threads. */
-        threadpool->fence(_NOVA_HOST_TAG);
+        threadpool->fence(NOVA_ASYNC_RENDER_TAG);
       }
       /* Cleanup gpu resources */
       manager.getShapeData().releaseResources();
@@ -260,15 +271,24 @@ namespace nova {
       resrc.tiles_width = render_options.getTileDimensionWidth();
       resrc.tiles_height = render_options.getTileDimensionHeight();
       resrc.integrator_flag = render_options.getIntegratorFlag();
+      resrc.threadpool_tag = NOVA_ASYNC_RENDER_TAG;
     }
 
     static void allocate_environment_maps(texturing::TextureResourcesHolder &resrc, const nova::Scene &scene) {
-      resrc.allocateEnvironmentMaps(scene.getEnvmapCollection().size());
-      resrc.setEnvmapId(scene.getCurrentEnvmapId());
-      for (const TexturePtr &texture : scene.getEnvmapCollection()) {
+      CsteTextureCollection env_collection = scene.getEnvmapCollection();
+      resrc.allocateEnvironmentMaps(env_collection.size());
+      int env_id = scene.getCurrentEnvmapId();
+      AX_ASSERT_GE(env_id, 0);
+      resrc.setEnvmapId(env_id);
+      for (const TexturePtr &texture : env_collection) {
         AX_ASSERT_EQ(texture->getFormat(), texture::FLOATX4);
-        std::size_t index = resrc.addTexture(
-            static_cast<const float *>(texture->getTextureBuffer()), texture->getWidth(), texture->getHeight(), texture->getChannels());
+        std::size_t index = resrc.addTexture(static_cast<const float *>(texture->getTextureBuffer()),
+                                             texture->getWidth(),
+                                             texture->getHeight(),
+                                             texture->getChannels(),
+                                             texture->getInvertX(),
+                                             texture->getInvertY(),
+                                             texture->getInteropID());
         resrc.addNovaTexture<texturing::EnvmapTexture>(index);
       }
     }
@@ -288,10 +308,209 @@ namespace nova {
       return SUCCESS;
     }
 
-    ERROR_STATE startRender(HdrBufferStruct *buffers) override { return INVALID_ARGUMENT; }
+    bool isRendering() const override { return manager.getEngineData().is_rendering; }
+
+    /* returns true if exception needs to shutdown renderer  */
+    bool isExceptionShutdown() const {
+      using namespace exception;
+      if (get_error_status(*engine_exception_manager) != 0) {
+        auto exception_list = get_error_list(*engine_exception_manager);
+        bool must_shutdown = false;
+        for (const auto &elem : exception_list) {
+          switch (elem) {
+            case NOERR:
+              must_shutdown |= false;
+              break;
+            case INVALID_RENDER_MODE:
+              LOGS("Render mode not selected.");
+              must_shutdown = true;
+              break;
+            case INVALID_INTEGRATOR:
+              LOGS("Provided integrator is invalid.");
+              must_shutdown = true;
+              break;
+            case INVALID_SAMPLER_DIM:
+            case SAMPLER_INIT_ERROR:
+            case SAMPLER_DOMAIN_EXHAUSTED:
+            case SAMPLER_INVALID_ARG:
+            case SAMPLER_INVALID_ALLOC:
+              LOGS("Sampler initialization error");
+              must_shutdown = true;
+              break;
+            case GENERAL_ERROR:
+              LOGS("Renderer general error.");
+              must_shutdown = true;
+              break;
+            case INVALID_RENDERBUFFER_STATE:
+              LOGS("Render buffer is invalid.");
+              must_shutdown = true;
+              break;
+            case INVALID_ENGINE_INSTANCE:
+              LOGS("Engine instance is invalid.");
+              must_shutdown = true;
+              break;
+            case INVALID_RENDERBUFFER_DIM:
+              LOGS("Wrong buffer width / height dimension.");
+              must_shutdown = true;
+              break;
+            default:
+              must_shutdown |= false;
+              break;
+          }
+        }
+        return must_shutdown;
+      }
+      return false;
+    }
+
+    void getRenderEngineError(char error_log[1024], size_t &size) override {}
+
+    void writeFramebuffer(unsigned sample_index) {
+      HdrBufferStruct rb = render_buffer->getRenderBuffers();
+      FloatView accumulator_buffer = render_buffer->getAccumulator();
+      FloatView final_buffer = render_buffer->backBuffer();
+
+      AX_ASSERT_FALSE(accumulator_buffer.empty());
+      for (size_t i = 0; i < render_buffer->getHeight() * render_buffer->getWidth() * render_buffer->getChannel(texture::COLOR); i++) {
+        float partial = rb.partial_buffer[i];
+        accumulator_buffer[i] += partial;
+        float accumulated = accumulator_buffer[i] / float(sample_index + 1);
+        final_buffer[i] = accumulated;
+      }
+    }
+
+    struct render_data_s {
+      HdrBufferStruct buffers;
+      unsigned image_width{}, image_height{};
+    };
+
+    class EngineCallbackManager {
+      EngineUserCallbackHandler *cback;
+
+     public:
+      EngineCallbackManager(EngineUserCallbackHandler *opt) {
+        cback = opt;
+        if (cback)
+          cback->framePreRenderRoutine();
+      }
+      ~EngineCallbackManager() {
+        if (cback)
+          cback->framePostRenderRoutine();
+      }
+
+      EngineCallbackManager(const EngineCallbackManager &) = default;
+      EngineCallbackManager(EngineCallbackManager &&) = delete;
+      EngineCallbackManager &operator=(const EngineCallbackManager &) = default;
+      EngineCallbackManager &operator=(EngineCallbackManager &&) = delete;
+    };
+
+    static void setup_camera(NovaResourceManager &manager, Camera *scene_camera) {
+      camera::CameraResourcesHolder &camera = manager.getCameraData();
+      if (!scene_camera)
+        return;
+
+      float vec3[3]{}, mat16[16]{};
+
+      scene_camera->getUpVector(vec3);
+      camera.up_vector = f3_to_vec3(vec3);
+
+      scene_camera->getProjectionMatrix(mat16);
+      camera.P = f16_to_mat4(mat16);
+
+      scene_camera->getViewMatrix(mat16);
+      camera.V = f16_to_mat4(mat16);
+
+      scene_camera->getProjectionViewMatrix(mat16);
+      camera.PV = f16_to_mat4(mat16);
+
+      scene_camera->getInverseProjectionViewMatrix(mat16);
+      camera.inv_PV = f16_to_mat4(mat16);
+
+      scene_camera->getInverseProjectionMatrix(mat16);
+      camera.inv_P = f16_to_mat4(mat16);
+
+      scene_camera->getInverseViewMatrix(mat16);
+      camera.inv_V = f16_to_mat4(mat16);
+
+      scene_camera->getPosition(vec3);
+      camera.position = f3_to_vec3(vec3);
+
+      scene_camera->getDirection(vec3);
+      camera.direction = f3_to_vec3(vec3);
+
+      camera.far = scene_camera->getClipPlaneFar();
+      camera.near = scene_camera->getClipPlaneNear();
+      camera.fov = scene_camera->getFov();
+      camera.screen_width = scene_camera->getResolutionWidth();
+      camera.screen_height = scene_camera->getResolutionHeight();
+    }
+
+    ERROR_STATE renderGpu(render_data_s render_data) { return INVALID_ARGUMENT; }
+
+    ERROR_STATE renderCpu(render_data_s render_data) {
+      int sample_increment = 1;
+      unsigned current_cam_id = scene->getCurrentCameraId();
+      Camera *scene_camera = scene->getCamera(current_cam_id);
+      setup_camera(manager, scene_camera);
+      float serie_max = math::calculus::compute_serie_term(render_options->getMaxSamples());
+      while (sample_increment < serie_max && isRendering()) {
+        manager.getEngineData().sample_increment = sample_increment;
+        int new_depth = manager.getEngineData().max_depth < render_options->getMaxDepth() ? manager.getEngineData().max_depth + 1 :
+                                                                                            render_options->getMaxDepth();
+        manager.getEngineData().max_depth = new_depth;
+        EngineCallbackManager callback_manager(user_callback.get());
+        try {
+          nova_eng_internals internals{&manager, engine_exception_manager.get()};
+          draw(&render_data.buffers, render_data.image_width, render_data.image_height, render_engine.get(), threadpool.get(), internals);
+          synchronize();
+        } catch (const ::exception::GenericException &e) {
+          synchronize();
+          return RENDERER_EXCEPTION;
+        }
+        if (isExceptionShutdown())
+          return RENDERER_EXCEPTION;
+        writeFramebuffer(sample_increment);
+
+        render_buffer->swapBackBuffer();
+        sample_increment++;
+      }
+      return SUCCESS;
+    }
+
+    ERROR_STATE preRenderChecks() const {
+      if (!threadpool)
+        return THREADPOOL_NOT_INITIALIZED;
+      if (!render_options)
+        return RENDER_OPTIONS_NOT_INITIALIZED;
+      if (!render_buffer)
+        return RENDER_BUFFER_NOT_INITIALIZED;
+      if (!render_engine)
+        return RENDER_ENGINE_NOT_INITIALIZED;
+      if (!scene_built)
+        return SCENE_NOT_PROCESSED;
+
+      return SUCCESS;
+    }
+    using RenderCallback = std::function<ERROR_STATE(render_data_s)>;
 
     ERROR_STATE startRender() override {
+      HdrBufferStruct buffers = render_buffer->getRenderBuffers();
+      ERROR_STATE pre_render_checks = preRenderChecks();
+      if (pre_render_checks != SUCCESS)
+        return pre_render_checks;
+      RenderCallback render_callback;
+      render_data_s callback_data;
+      callback_data.buffers = buffers;
+      callback_data.image_width = render_buffer->getWidth();
+      callback_data.image_height = render_buffer->getHeight();
+      if (!render_options->isUsingGpu()) {
+        render_callback = [&](render_data_s data) { return renderCpu(data); };
+      } else {
+        render_callback = [&](render_data_s data) { return renderGpu(data); };
+      }
+
       manager.getEngineData().is_rendering = true;
+      render_result = threadpool->addTask(threading::ALL_TASK, render_callback, callback_data);
       return SUCCESS;
     }
 
@@ -301,6 +520,8 @@ namespace nova {
       render_options = std::move(opts);
       return SUCCESS;
     }
+
+    void setUserCallback(EngineUserCallbackHandlerPtr callback) override { user_callback = std::move(callback); }
 
     const RenderOptions *getRenderOptions() const override { return render_options.get(); }
 
@@ -313,7 +534,7 @@ namespace nova {
     ERROR_STATE synchronize() override {
       if (!threadpool)
         return THREADPOOL_NOT_INITIALIZED;
-      threadpool->fence(_NOVA_HOST_TAG);
+      threadpool->fence(NOVA_ASYNC_RENDER_TAG);
       return SUCCESS;
     }
 

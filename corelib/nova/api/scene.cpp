@@ -3,6 +3,11 @@
 #include <memory>
 namespace nova {
 
+  struct trimesh_group_s {
+    std::vector<std::unique_ptr<Trimesh>> mesh_geometry;
+    std::vector<std::unique_ptr<Material>> mesh_material;
+  };
+
   class NvScene final : public Scene {
     trimesh_group_s trimesh_group;
 
@@ -15,6 +20,17 @@ namespace nova {
     TransformPtr transform;  // root transform
 
    public:
+    void cleanup() override {
+      envmaps.clear();
+      selected_envmap_id = -1;
+
+      cameras.clear();
+      selected_camera_id = -1;
+
+      trimesh_group.mesh_geometry.clear();
+      trimesh_group.mesh_material.clear();
+    }
+
     ERROR_STATE addMesh(TrimeshPtr mesh, MaterialPtr material) override {
       trimesh_group.mesh_geometry.emplace_back(std::move(mesh));
       trimesh_group.mesh_material.emplace_back(std::move(material));
@@ -34,6 +50,11 @@ namespace nova {
 
     const Texture *getEnvmap(unsigned id) const override { return envmaps.size() <= id ? nullptr : envmaps[id].get(); }
 
+    void clearEnvmaps() override {
+      selected_envmap_id = -1;
+      envmaps.clear();
+    }
+
     unsigned addEnvmap(TexturePtr envmap_texture) override {
       envmaps.push_back(std::move(envmap_texture));
       if (selected_envmap_id == -1)
@@ -49,6 +70,11 @@ namespace nova {
     }
 
     Camera *getCamera(unsigned id) override { return cameras.size() <= id ? nullptr : cameras[id].get(); }
+
+    void clearCameras() override {
+      selected_camera_id = -1;
+      cameras.clear();
+    }
 
     const Camera *getCamera(unsigned id) const override { return cameras.size() <= id ? nullptr : cameras[id].get(); }
 

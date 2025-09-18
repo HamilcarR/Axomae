@@ -22,6 +22,32 @@
 namespace nova {
 
   /**
+   * @brief Interface for engine-internal callback handlers.
+   *
+   * This abstract class allows users to define custom routines that are executed
+   * before and after each render frame. Implementations can be used to manage
+   * device contexts or perform per-frame setup/teardown.
+   */
+  class EngineUserCallbackHandler {
+   public:
+    virtual ~EngineUserCallbackHandler() = default;
+
+    /**
+     * @brief Called before each render frame.
+     * Implement this to perform any setup required before rendering a frame,
+     * such as setting the current GPU context.
+     */
+    virtual void framePreRenderRoutine() = 0;
+
+    /**
+     * @brief Called after each render frame.
+     * Implement this to perform any cleanup or state restoration after rendering a frame,
+     * such as resetting the GPU context.
+     */
+    virtual void framePostRenderRoutine() = 0;
+  };
+
+  /**
    * @brief Abstract interface for the rendering engine.
    *
    * This class defines the core API for interacting with a render engine,
@@ -48,7 +74,7 @@ namespace nova {
      * @brief Builds the acceleration structure (e.g., BVH) for the current scene.
      *
      * buildScene() must be called successfully before this.
-     * GPU acceleration structures are built if useGpu() enables them.
+     * GPU acceleration structures are built if render options enable them.
      * @return ERROR_STATE
      *   - SUCCESS: Acceleration structure built successfully.
      *   - SCENE_NOT_PROCESSED: Scene has not been built yet.
@@ -111,24 +137,31 @@ namespace nova {
      * @brief Initiates a new rendering process.
      * This method starts the rendering pipeline with the current scene and render options.
      * It triggers the engine to begin processing the scene and writing output to the internal render buffers.
-     * @return ERROR_STATE
+     *  @return ERROR_STATE
      *   - SUCCESS: Rendering started successfully.
+     *   - INVALID_ARGUMENT: ctx_manager is null but renderer is set to use interops for GPGPU rendering.
      *   - SCENE_NOT_PROCESSED: Scene has not been built or is invalid.
      */
     virtual ERROR_STATE startRender() = 0;
 
     /**
-     * @brief Initiates a new rendering process.
-     * This method starts the rendering pipeline with the current scene and render options.
-     * It triggers the engine to begin processing the scene and writing output to the buffer passed as parameters.
-     * @param buffers A structure containing addresses of buffers allocated by the client.
-     * @note In case GPU rendering is used, make sure to provide pinned or device managed buffers.
-     * @return ERROR_STATE
-     *   - SUCCESS: Rendering started successfully.
-     *   - SCENE_NOT_PROCESSED: Scene has not been built or is invalid.
+     * @brief Sets a custom callback that executes before and after a drawcall.
+     * @param user_callback Pointer to a callback functor, provides for the user a way to execute code inside the render loop before and after a
+     * drawcall. Can be used for setting up context switching for cuda gl interops. Can be null.
+     * @see EngineInternalCallbackHandler.
+     *
      */
+    virtual void setUserCallback(EngineUserCallbackHandlerPtr user_callback) = 0;
 
-    virtual ERROR_STATE startRender(HdrBufferStruct *buffers) = 0;
+    /**
+     * @brief Checks if the engine is currently rendering.
+     *
+     * This method returns true if a rendering process is currently active,
+     * and false otherwise. It can be used to query the engine's state to
+     * determine if rendering is in progress.
+     * @return true if the engine is rendering, false otherwise.
+     */
+    virtual bool isRendering() const = 0;
 
     /**
      * @brief Synchronizes the rendering engine with the host (CPU) to ensure consistency.
@@ -158,9 +191,26 @@ namespace nova {
      */
     virtual ERROR_STATE prepareRender() = 0;
 
+    /**
+     * @brief Retrieves the latest error message from the render engine.
+     *
+     * Fills the provided character array with a human-readable error message
+     * describing the most recent error encountered by the render engine. The actual number
+     * of characters written (excluding the null terminator) is returned via the 'size' parameter.
+     *
+     * @param error_log A character array of size 1024 to receive the error message.
+     * @param size Reference to a size_t variable that will be set to the length of the error message.
+     */
+    virtual void getRenderEngineError(char error_log[1024], size_t &size) = 0;
+
     // TODO: DELETE AT THE END
     virtual NovaResourceManager &getResrcManager() = 0;
   };
+  // TODO: Same with this.
+  inline uint64_t get_error_status(const NovaExceptionManager &exception_manager) { return exception_manager.checkErrorStatus(); }
+  inline std::vector<exception::ERROR> get_error_list(const nova::NovaExceptionManager &exception_manager) {
+    return exception_manager.getErrorList();
+  }
 
   EnginePtr create_engine();
 

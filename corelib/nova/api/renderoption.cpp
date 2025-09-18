@@ -54,7 +54,7 @@ namespace nova {
       tile_dimension_height = height;
     }
 
-    void flipV() override { flip_v ^= flip_v; }
+    void flipV() override { flip_v = !flip_v; }
 
     bool isFlippedV() const override { return flip_v; }
 

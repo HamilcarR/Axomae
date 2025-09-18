@@ -12,6 +12,9 @@ namespace nova {
     INVALID_SCENE_TYPE,
     INVALID_TRANSFORM_TYPE,
 
+    RENDER_BUFFER_NOT_INITIALIZED,
+    RENDER_OPTIONS_NOT_INITIALIZED,
+    RENDER_ENGINE_NOT_INITIALIZED,
     SCENE_NOT_PROCESSED,
     NOT_GPU_BUILD,
     OUT_OF_MEMORY,
@@ -19,6 +22,8 @@ namespace nova {
     THREADPOOL_CREATION_ERROR,
     THREADPOOL_NOT_INITIALIZED,
     INVALID_ARGUMENT,
+
+    RENDERER_EXCEPTION,
   };
 
   namespace integrator {
@@ -43,13 +48,23 @@ namespace nova {
 
   }
 
+  namespace camera {
+    struct CameraResourcesHolder;
+  }
+
   namespace texture {
     enum FORMAT {
       UINT8X4,
       FLOATX4,
     };
 
-  }
+    enum CHANNEL_TYPE {
+      COLOR,
+      DEPTH,
+      NORMAL,
+    };
+
+  }  // namespace texture
 
   namespace mesh {
     // Only triangle is supported for now.
@@ -66,6 +81,7 @@ namespace nova {
   class Texture;
   class RenderBuffer;
   class RenderOptions;
+  class EngineUserCallbackHandler;
 
   using RenderBufferPtr = std::unique_ptr<RenderBuffer>;
   using EnginePtr = std::unique_ptr<Engine>;
@@ -76,10 +92,14 @@ namespace nova {
   using TrimeshPtr = std::unique_ptr<Trimesh>;
   using CameraPtr = std::unique_ptr<Camera>;
   using MaterialPtr = std::unique_ptr<Material>;
+  using EngineUserCallbackHandlerPtr = std::unique_ptr<EngineUserCallbackHandler>;
   using CsteTriMeshCollection = axstd::span<const TrimeshPtr>;
   using CsteCameraCollection = axstd::span<const CameraPtr>;
   using CsteMaterialCollection = axstd::span<const MaterialPtr>;
   using CsteTextureCollection = axstd::span<const TexturePtr>;
+
+  using CsteFloatView = axstd::span<const float>;
+  using FloatView = axstd::span<float>;
 
 }  // namespace nova
 #endif
