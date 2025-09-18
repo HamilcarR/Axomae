@@ -8,25 +8,25 @@
 
 namespace controller::cmd {
 
-  API::API(int &argv_, char **argc_, std::thread::id main_thread_id) : config(main_thread_id) {
+  API::API(int &argv_, char **argc_, std::thread::id main_thread_id) : config(std::make_unique<ApplicationConfig>(main_thread_id)) {
     argv = &argv_;
     argc = argc_;
   }
 
-  void API::disableLogging() { config.flag &= ~CONF_ENABLE_LOGS; }
+  void API::disableLogging() { config->flag &= ~CONF_ENABLE_LOGS; }
 
   void API::initializeThreadPool(int n) {
-    config.flag |= CONF_USE_MTHREAD;
-    config.initializeThreadPool(n);
+    config->flag |= CONF_USE_MTHREAD;
+    config->initializeThreadPool(n);
   }
 
-  void API::enableLogging() { config.flag |= CONF_ENABLE_LOGS; }
+  void API::enableLogging() { config->flag |= CONF_ENABLE_LOGS; }
 
-  void API::enableEditor() { config.flag |= CONF_USE_EDITOR; }
+  void API::enableEditor() { config->flag |= CONF_USE_EDITOR; }
 
-  void API::disableEditor() { config.flag &= ~CONF_USE_EDITOR; }
+  void API::disableEditor() { config->flag &= ~CONF_USE_EDITOR; }
 
-  void API::enableGpu() { config.flag |= CONF_USE_CUDA; }
+  void API::enableGpu() { config->flag |= CONF_USE_CUDA; }
 
   void API::launchHdrTextureViewer(const std::string &file) {
     IO::Loader loader(nullptr);
@@ -49,7 +49,7 @@ namespace controller::cmd {
       TextureOperations<float> process_texture(texture_view, data.metadata.width, data.metadata.height, data.metadata.channels);
       image::ImageHolder<float> texture;
       if (envmap.baketype == "irradiance") {
-        texture = process_texture.computeDiffuseIrradiance(envmap.width_output, envmap.height_output, envmap.samples, (config.flag & CONF_USE_CUDA));
+        texture = process_texture.computeDiffuseIrradiance(envmap.width_output, envmap.height_output, envmap.samples, (config->flag & CONF_USE_CUDA));
       }
       loader.writeHdr(envmap.path_output.c_str(), texture);
       QApplication qapp(*argv, argc);
@@ -63,16 +63,16 @@ namespace controller::cmd {
 
   void API::setUvEditorOptions(const uv::UVEDITORDATA &data) {
     if (data.projection_type == "tangent")
-      config.flag |= CONF_UV_TSPACE;
+      config->flag |= CONF_UV_TSPACE;
     else if (data.projection_type == "object")
-      config.flag |= CONF_UV_OSPACE;
+      config->flag |= CONF_UV_OSPACE;
     else {
       std::cerr << "Wrong projection type.";
-      config.flag |= CONF_UV_TSPACE;
+      config->flag |= CONF_UV_TSPACE;
       return;
     }
-    config.setUvEditorResolutionWidth(data.resolution_width);
-    config.setUvEditorResolutionHeight(data.resolution_height);
+    config->setUvEditorResolutionWidth(data.resolution_width);
+    config->setUvEditorResolutionHeight(data.resolution_height);
   }
 
 }  // namespace controller::cmd

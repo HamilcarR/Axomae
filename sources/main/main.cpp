@@ -37,11 +37,10 @@ int main(int argv, char **argc) {
     if (argv >= 2) {
       options_manager.processArgs(argv, argc);
       api.configure();
-      ApplicationConfig &&configuration = api.getConfig();
-      if (configuration.flag & CONF_USE_EDITOR) {
+      std::unique_ptr<ApplicationConfig> configuration = api.getConfig();
+      if (configuration->flag & CONF_USE_EDITOR) {
         QApplication app(argv, argc);
-        controller::Controller win;
-        win.setApplicationConfig(std::forward<ApplicationConfig>(configuration));
+        controller::Controller win(std::move(configuration));
         win.show();
         int ret = app.exec();
         cleanup();
@@ -51,10 +50,9 @@ int main(int argv, char **argc) {
       return EXIT_SUCCESS;
     }
     QApplication app(argv, argc);
-    controller::Controller win;
     api.configureDefault();
-    ApplicationConfig &&configuration = api.getConfig();
-    win.setApplicationConfig(std::forward<ApplicationConfig>(configuration));
+    std::unique_ptr<ApplicationConfig> configuration = api.getConfig();
+    controller::Controller win(std::move(configuration));
     win.show();
     int ret = app.exec();
     cleanup();
