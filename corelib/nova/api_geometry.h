@@ -11,11 +11,10 @@ namespace nova {
    public:
     virtual ~AbstractMesh() = default;
     /**
-     * @brief
-     * Registers the transformation matrix of a mesh.
+     * @brief Registers the transformation matrix of a mesh.
      * Format is in column major.
      */
-    virtual ERROR_STATE registerTransform(const Transform &t_ptr) = 0;
+    virtual ERROR_STATE registerTransform(TransformPtr transform) = 0;
     virtual const Transform &getTransform() const = 0;
   };
 

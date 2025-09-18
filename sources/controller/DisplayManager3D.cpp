@@ -1,10 +1,9 @@
 #include "DisplayManager3D.h"
-
 #include "Config.h"
 #include "RenderPipeline.h"
-#include "aggregate/acceleration_interface.h"
+#include "internal/macro/project_macros.h"
 #include "nova/bake.h"
-#include "primitive/PrimitiveInterface.h"
+#include <nova/api_engine.h>
 
 namespace exception {
   class SceneTreeInitializationException : public CatastrophicFailureException {
@@ -41,10 +40,13 @@ namespace controller {
     nova_viewer->getRenderer().getRenderPipeline().setProgressManager(progress_manager);
     nova_viewer->setProgressManager(progress_manager);
     nova_viewer->setApplicationConfig(global_application_config);
-
-    nova_resource_manager = std::make_unique<nova::NovaResourceManager>();
+    nova_engine = nova::create_engine();
+    nova::ERROR_STATE err = nova_engine->setThreadSize(global_application_config->getThreadPoolSize());
+    nova::RenderOptions *render_options = nova_engine->getRenderOptions();
+    AX_ASSERT_NOTNULL(render_options);
+    render_options->useInterops(true);
     SceneChangeData scene_data;
-    scene_data.nova_resource_manager = nova_resource_manager.get();
+    scene_data.nova_resource_manager = &nova_engine->getResrcManager();
     nova_viewer->setNewScene(scene_data);
     connect_slots();
   }
@@ -57,13 +59,6 @@ namespace controller {
   void DisplayManager3D::resumeRenderers() { emit signal_resume_renderers(); }
 
   void DisplayManager3D::onEnvmapChange() { nova_viewer->signalEnvmapChange(); }
-
-  template<class T>
-  axstd::span<uint8_t> convert_to_byte_span(const axstd::span<T> &to_convert) {
-    std::size_t size_in_bytes = sizeof(T) * to_convert.size();
-    auto buffer_in_bytes = reinterpret_cast<uint8_t *>(to_convert.data());
-    return {buffer_in_bytes, size_in_bytes};
-  }
 
   static void notify_simple_progress(const char *str, IProgressManager &progress_manager) {
     progress_manager.initProgress(str, 100.f);
@@ -94,7 +89,7 @@ namespace controller {
     return mesh_transf;
   }
 
-  /* Allows to retrieve only the meshes of the imported scene file ... Other meshes like skyboxes , bounding boxes , sprites are discarded . */
+  /* Retrieves only the geometric meshes of the imported scene file ... Other meshes like skyboxes , bounding boxes , sprites are discarded . */
   static std::vector<nova_baker_utils::drawable_original_transform> retrieve_scene_main_drawables(
       const std::vector<Drawable *> &scene_retrieved_drawables_ptrs, const std::vector<mesh_transform_t> &loaded_meshes) {
 
@@ -110,7 +105,7 @@ namespace controller {
 
   void DisplayManager3D::setNewScene(SceneChangeData &scene_data, ProgressStatus *progress_status) {
     prepareSceneChange();
-    scene_data.nova_resource_manager = nova_resource_manager.get();
+    scene_data.nova_resource_manager = &nova_engine->getResrcManager();
     IProgressManager progress_manager;
     progress_manager.setProgressManager(progress_status);
 
@@ -125,25 +120,17 @@ namespace controller {
     const Scene &realtime_scene = realtime_renderer.getScene();
     auto drawable_collection = retrieve_scene_main_drawables(realtime_scene.getDrawables(), original_transforms);
     realtime_viewer->makeCurrent();
-    nova_baker_utils::build_scene(drawable_collection, *nova_resource_manager);
+    nova::Scene *nova_scene = nova_engine->getScene();
+    AX_ASSERT_NOTNULL(nova_scene);
+    nova_baker_utils::build_scene(drawable_collection, nova_scene);
+    nova_engine->buildScene();
     realtime_viewer->doneCurrent();
-    nova::primitive::primitives_view_tn primitive_list_view = nova_resource_manager->getPrimitiveData().getPrimitiveView();
-    nova::shape::MeshBundleViews mesh_geometry = nova_resource_manager->getShapeData().getMeshSharedViews();
-    nova::aggregate::primitive_aggregate_data_s aggregate;
-    aggregate.primitive_list_view = primitive_list_view;
-    aggregate.mesh_geometry = mesh_geometry;
-    auto accelerator = nova_baker_utils::build_api_managed_acceleration_structure(aggregate);
-    nova_resource_manager->setManagedCpuAccelerationStructure(std::move(accelerator));
-#ifdef AXOMAE_USE_CUDA
-    auto device_accelerator = nova_baker_utils::build_device_managed_acceleration_structure(aggregate);
-    nova_resource_manager->setManagedGpuAccelerationStructure(std::move(device_accelerator));
-#endif
-
+    nova_engine->buildAcceleration();
     progress_manager.reset();
   }
 
   void DisplayManager3D::prepareSceneChange() {
-    nova_resource_manager->clearResources();
+    nova_engine->cleanup();
     nova_viewer->signalEnvmapChange();
     realtime_viewer->prepareRendererSceneChange();
     nova_viewer->prepareRendererSceneChange();

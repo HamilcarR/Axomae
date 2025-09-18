@@ -30,7 +30,6 @@ class GLViewer : public QOpenGLWidget, public controller::IProgressManager {
 
   Q_OBJECT
 
- public:
   ApplicationConfig *global_application_config{};
 
  protected:

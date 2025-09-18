@@ -71,8 +71,10 @@ namespace nova {
       return SUCCESS;
     }
 
-    ERROR_STATE registerTransform(const Transform &t_ptr) override {
-      transform->clone(t_ptr);
+    ERROR_STATE registerTransform(TransformPtr trsf) override {
+      if (!trsf)
+        return INVALID_ARGUMENT;
+      transform = std::move(trsf);
       return SUCCESS;
     }
 

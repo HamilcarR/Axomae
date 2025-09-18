@@ -2,7 +2,7 @@
 #define NOVABAKE_H
 #include "bake_render_data.h"
 #include <internal/common/axstd/span.h>
-#include <nova/api.h>
+#include <nova/api_engine.h>
 
 class Camera;
 class TextureGroup;
@@ -30,15 +30,17 @@ namespace image {
 }
 namespace nova_baker_utils {
 
-  void build_scene(const std::vector<drawable_original_transform> &drawables, nova::NovaResourceManager &manager);
-  nova::aggregate::DefaultAccelerator build_api_managed_acceleration_structure(nova::aggregate::primitive_aggregate_data_s primitive_geometry);
-  std::unique_ptr<nova::aggregate::DeviceAcceleratorInterface> build_device_managed_acceleration_structure(
-      nova::aggregate::primitive_aggregate_data_s primitive_geometry);
+  void build_scene(const std::vector<drawable_original_transform> &drawables, nova::Scene *nova_scene);
 
   /* Takes an initialized NovaResourceManager.*/
   void bake_scene(render_scene_context &rendering_data);
   void bake_scene_gpu(render_scene_context &rendering_data, nova::gputils::gpu_util_structures_t &gpu_structures);
-  void initialize_nova_manager(const engine_data &render_data, nova::NovaResourceManager &nova_resource_manager);
+  void initialize_engine(const engine_data &render_data, nova::Engine &nova_engine);
+  nova::CameraPtr initialize_camera(const camera_data &scene_camera);
+  nova::RenderOptionsPtr initialize_options(const engine_data &engine_opts);
+  void initialize_envmaps(const envmap_data_s &envmaps, nova::Scene &nova_scene);
+
+  // TODO: replace by intialize_scene
   void initialize_scene_data(const camera_data &scene_camera,
                              const scene_transform_data &scene_data,
                              nova::scene::SceneTransformations &scene_transform,
@@ -50,8 +52,5 @@ namespace nova_baker_utils {
   void cancel_render(engine_data &data);
   std::unique_ptr<NovaRenderEngineInterface> create_engine(const engine_data &engine_type);
   void synchronize_render_threads(render_scene_context &scene_data, const std::string &tag);
-  uint64_t get_error_status(const nova::NovaExceptionManager &exception_manager);
-  std::vector<nova::exception::ERROR> get_error_list(const nova::NovaExceptionManager &exception_manager);
-
 }  // namespace nova_baker_utils
 #endif  // BAKE_H

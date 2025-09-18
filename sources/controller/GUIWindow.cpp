@@ -222,7 +222,8 @@ namespace controller {
   }
 
   /***************************************************************************************************************************************************************************************/
-  Controller::Controller(QWidget *parent) : QMainWindow(parent), resource_database(ResourceDatabaseManager::getInstance()) {
+  Controller::Controller(std::unique_ptr<ApplicationConfig> config, QWidget *parent)
+      : QMainWindow(parent), resource_database(ResourceDatabaseManager::getInstance()) {
     timer = std::make_unique<QTimer>();
 
     /*Initialize databases*/
@@ -233,7 +234,7 @@ namespace controller {
     current_workspace = std::make_unique<WorkspaceTracker>(&main_window_ui);
 
     /* Configuration structure initialization */
-    global_application_config = std::make_unique<ApplicationConfig>();
+    global_application_config = std::move(config);
 
     /* UI progress bar operator initialization for objects that need to show progress*/
     main_window_ui.progressBar->setValue(0);
@@ -266,9 +267,9 @@ namespace controller {
 
   Controller::~Controller() { delete _MemManagement; }
 
-  void Controller::setApplicationConfig(ApplicationConfig &&config) {
+  void Controller::setApplicationConfig(std::unique_ptr<ApplicationConfig> config) {
     AX_ASSERT(global_application_config, "Application config property is invalid.");
-    *global_application_config = std::move(config);
+    global_application_config = std::move(config);
   }
 
   /**************************************************************************************************************/

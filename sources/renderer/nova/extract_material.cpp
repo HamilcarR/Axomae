@@ -5,82 +5,39 @@
 #include "extract_scene_internal.h"
 #include <internal/common/exception/GenericException.h>
 #include <internal/macro/project_macros.h>
-#include <nova/api.h>
-
-namespace exception {
-  class InvalidTexTypeConversionException : public CatastrophicFailureException {
-   public:
-    InvalidTexTypeConversionException() : CatastrophicFailureException() { saveErrorString("Invalid tag pointer conversion."); }
-  };
-}  // namespace exception
+#include <nova/api_engine.h>
 
 namespace nova_baker_utils {
 
-  nova::texturing::ImageTexture<uint32_t> *extract_texture(const TextureGroup &tgroup,
-                                                           nova::NovaResourceManager &manager,
-                                                           GenericTexture::TYPE type) {
+  nova::TexturePtr extract_texture(const TextureGroup &tgroup, GenericTexture::TYPE type) {
     const GenericTexture *gltexture = tgroup.getTexturePointer(type);
     if (!gltexture) {
       LOG("Texture lookup in Nova scene initialization has returned null for texture type: " + std::string(type2str(type)), LogLevel::INFO);
-      return nullptr;
+      return {};
     }
-    const uint32_t *buffer_ptr = gltexture->getData();
-    int w = (int)gltexture->getWidth();
-    int h = (int)gltexture->getHeight();
-    nova::texturing::TextureResourcesHolder &texture_manager = manager.getTexturesData();
-    std::size_t texture_index = texture_manager.addTexture(buffer_ptr, w, h, 4, false, false, gltexture->getSamplerID());
-    auto ret = texture_manager.addNovaTexture<nova::texturing::ImageTexture<uint32_t>>(texture_index);
-    auto *image_tex = ret.get<nova::texturing::ImageTexture<uint32_t>>();
-    if (!image_tex)
-      throw exception::InvalidTexTypeConversionException();
-    return image_tex;
+    nova::TexturePtr image_texture = nova::create_texture();
+    image_texture->setTextureBuffer(gltexture->getData());
+    image_texture->setWidth(gltexture->getWidth());
+    image_texture->setHeight(gltexture->getHeight());
+    image_texture->setChannels(4);
+    image_texture->setInteropID(gltexture->getSamplerID());
+    return image_texture;
   }
 
-  static nova::material::texture_pack extract_texture_pack(const MaterialInterface *material, nova::NovaResourceManager &manager) {
-    const TextureGroup &texture_group = material->getTextureGroup();
-    nova::material::texture_pack tpack{};
-    tpack.albedo = extract_texture(texture_group, manager, GenericTexture::DIFFUSE);
-    tpack.metallic = extract_texture(texture_group, manager, GenericTexture::METALLIC);
-    tpack.normalmap = extract_texture(texture_group, manager, GenericTexture::NORMAL);
-    tpack.roughness = extract_texture(texture_group, manager, GenericTexture::ROUGHNESS);
-    tpack.ao = extract_texture(texture_group, manager, GenericTexture::AMBIANTOCCLUSION);
-    tpack.emissive = extract_texture(texture_group, manager, GenericTexture::EMISSIVE);
-    tpack.opacity = extract_texture(texture_group, manager, GenericTexture::OPACITY);
-    tpack.specular = extract_texture(texture_group, manager, GenericTexture::SPECULAR);
-    return tpack;
+  static void set_material_textures(const MaterialInterface *client_material, nova::Material &material) {
+    const TextureGroup &texture_group = client_material->getTextureGroup();
+    material.registerAlbedo(extract_texture(texture_group, GenericTexture::DIFFUSE));
+    material.registerMetallic(extract_texture(texture_group, GenericTexture::METALLIC));
+    material.registerNormal(extract_texture(texture_group, GenericTexture::NORMAL));
+    material.registerRoughness(extract_texture(texture_group, GenericTexture::ROUGHNESS));
+    material.registerAmbientOcclusion(extract_texture(texture_group, GenericTexture::AMBIANTOCCLUSION));
+    material.registerEmissive(extract_texture(texture_group, GenericTexture::EMISSIVE));
+    material.registerOpacity(extract_texture(texture_group, GenericTexture::OPACITY));
+    material.registerSpecular(extract_texture(texture_group, GenericTexture::SPECULAR));
   }
 
-  // For now it assigns materials randomly, I don't want to waste time with a proper material translation system since I'm gonna scrape it for a more
-  // uniform pipeline with PBR
-  static nova::material::NovaMaterialInterface assign_random_material(nova::material::texture_pack &tpack, nova::NovaResourceManager &manager) {
-    math::random::CPUPseudoRandomGenerator rand_gen;
-    nova::material::NovaMaterialInterface mat_ptr{};
-    int r = rand_gen.nrandi(0, 2);
-    switch (r) {
-      case 0:
-        mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaConductorMaterial>(tpack, rand_gen.nrandf(0.001, 0.5));
-        break;
-      case 1:
-        mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaDielectricMaterial>(tpack, rand_gen.nrandf(1.5, 2.4));
-        break;
-      case 2:
-        mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaDiffuseMaterial>(tpack);
-        break;
-      default:
-        mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaConductorMaterial>(tpack, 0.004);
-        break;
-    }
-    return mat_ptr;
-  }
-
-  nova::material::NovaMaterialInterface setup_material_data(const Drawable &drawable, nova::NovaResourceManager &manager) {
-    const Mesh *mesh = drawable.getMeshPointer();
-    const MaterialInterface *material = mesh->getMaterial();
-    if (!material) {
-      return nullptr;
-    }
-    nova::material::texture_pack tpack = extract_texture_pack(mesh->getMaterial(), manager);
-    nova::material::NovaMaterialInterface mat = assign_random_material(tpack, manager);
-    return mat;
+  void setup_material(const drawable_original_transform &drawable, nova::Material &material) {
+    const MaterialInterface *mesh_material = drawable.mesh->getMeshPointer()->getMaterial();
+    set_material_textures(mesh_material, material);
   }
 }  // namespace nova_baker_utils

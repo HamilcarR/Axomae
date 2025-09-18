@@ -93,11 +93,10 @@ namespace nova {
     }
 
     ERROR_STATE setMatrices(const float projection_matrix[16], const float view_matrix[16]) override {
-      for (int i = 0; i < 16; i++)
+      for (int i = 0; i < 16; i++) {
         glm::value_ptr(camera.P)[i] = projection_matrix[i];
-      for (int i = 0; i < 16; i++)
         glm::value_ptr(camera.V)[i] = view_matrix[i];
-
+      }
       camera.inv_P = glm::inverse(camera.P);
       camera.inv_V = glm::inverse(camera.V);
       camera.PV = camera.P * camera.V;

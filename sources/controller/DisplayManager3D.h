@@ -2,7 +2,6 @@
 #define DISPLAYMANAGER3D_H
 #include "nova/bake_render_data.h"
 #include "ui_main_window.h"
-#include <nova/api.h>
 
 class ApplicationConfig;
 
@@ -17,17 +16,17 @@ namespace controller {
     GLViewer *realtime_viewer{};
     /* Raytracing engine display*/
     GLViewer *nova_viewer{};
-    std::unique_ptr<nova::NovaResourceManager> nova_resource_manager{};
+    nova::EnginePtr nova_engine{};
     nova::device_shared_caches_t shared_caches;
     //  TODO : add EnvmapManager instance here ?
    public:
     void init(Ui::MainWindow &main_window_ui, ApplicationConfig *global_application_config, OperatorProgressStatus *progress_manager);
-    ax_no_discard GLViewer *getRealtimeViewer() const { return realtime_viewer; };
-    ax_no_discard GLViewer *getNovaViewer() const { return nova_viewer; };
-    ax_no_discard SceneTree &getSceneTree() const;
-    ax_no_discard const nova::device_shared_caches_t &getSharedCaches() const { return shared_caches; }
-    ax_no_discard nova::device_shared_caches_t &getSharedCaches() { return shared_caches; }
-    ax_no_discard nova::NovaResourceManager *getNovaResourceManager() const { return nova_resource_manager.get(); };
+    GLViewer *getRealtimeViewer() const { return realtime_viewer; };
+    GLViewer *getNovaViewer() const { return nova_viewer; };
+    SceneTree &getSceneTree() const;
+    const nova::device_shared_caches_t &getSharedCaches() const { return shared_caches; }
+    nova::device_shared_caches_t &getSharedCaches() { return shared_caches; }
+    nova::Engine *getNovaEngineInstance() { return nova_engine.get(); }
     void setNewScene(SceneChangeData &scene_change_data, ProgressStatus *progress_manager = nullptr);
     void prepareSceneChange();
     void haltRenderers();

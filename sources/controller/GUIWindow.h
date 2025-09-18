@@ -72,14 +72,14 @@ namespace controller {
     static HeapManagement *_MemManagement;  // TODO : Useless , Refactor
 
    public:
-    explicit Controller(QWidget *parent = nullptr);
+    explicit Controller(std::unique_ptr<ApplicationConfig> config, QWidget *parent = nullptr);
     ~Controller() override;
     Controller(const Controller &) = delete;
     Controller(Controller &&) = delete;
     Controller &operator=(const Controller &) = delete;
     Controller &operator=(Controller &&) = delete;
 
-    void setApplicationConfig(ApplicationConfig &&configuration);
+    void setApplicationConfig(std::unique_ptr<ApplicationConfig> configuration);
     ax_no_discard ApplicationConfig *getApplicationConfig() const { return global_application_config.get(); }
     Ui::MainWindow &getUi() { return main_window_ui; }
     static SDL_Surface *copy_surface(SDL_Surface *surface);

@@ -7,7 +7,7 @@
 #include <cstring>
 #include <internal/device/rendering/opengl/GLMutablePixelBufferObject.h>
 #include <internal/macro/project_macros.h>
-#include <nova/api.h>
+#include <nova/api_engine.h>
 
 static constexpr int MAX_RECUR_DEPTH = 20;
 static constexpr int MAX_SAMPLES = 10000;
@@ -87,7 +87,6 @@ void NovaRenderer::resetToBaseState() {
 }
 
 void NovaRenderer::draw() {
-  engine_render_buffers.accumulator_buffer = accumulated_render_buffer.data();
   engine_render_buffers.partial_buffer = partial_render_buffer.data();
   engine_render_buffers.depth_buffer = depth_buffer.data();
   engine_render_buffers.byte_size_color_buffers = screen_size.height * screen_size.width * sizeof(float) * 4;
