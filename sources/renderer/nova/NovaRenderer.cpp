@@ -9,7 +9,7 @@
 #include "TextureProcessing.h"
 #include "event/EventController.h"
 #include <internal/device/rendering/opengl/GLMutablePixelBufferObject.h>
-#include <nova/api.h>
+#include <nova/api_engine.h>
 #include <unistd.h>
 
 static std::mutex mutex;

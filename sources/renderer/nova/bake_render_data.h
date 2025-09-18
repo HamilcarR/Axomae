@@ -3,7 +3,7 @@
 #include "Image.h"
 #include <QWidget>
 #include <internal/common/math/utils_3D.h>
-#include <nova/api.h>
+#include <nova/api_engine.h>
 
 class Mesh;
 class Drawable;

@@ -17,7 +17,7 @@ namespace controller::cmd {
    private:
     int *argv;
     char **argc;
-    ApplicationConfig config;
+    std::unique_ptr<ApplicationConfig> config;
 
    public:
     API(int &argv, char **argc, std::thread::id main_thread_id);
@@ -26,7 +26,7 @@ namespace controller::cmd {
      * Use this method after completing the ApplicationConfig structure states.
      * Will move the final config property , and invalidate the current instance.
      */
-    ax_no_discard ApplicationConfig &&getConfig() {
+    std::unique_ptr<ApplicationConfig> getConfig() {
       argv = nullptr;
       argc = nullptr;
       return std::move(config);

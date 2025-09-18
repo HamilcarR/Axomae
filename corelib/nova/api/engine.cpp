@@ -125,8 +125,8 @@ namespace nova {
     static void add_trimesh_geometry(const Trimesh &mesh, const glm::mat4 &final_transform, NovaResourceManager &manager, bool use_interops) {
       nova::shape::ShapeResourcesHolder &res_holder = manager.getShapeData();
       const Object3D &geometry = to_obj3d(mesh);
-      std::size_t stored_mesh_index = res_holder.addTriangleMesh(geometry);
 
+      std::size_t stored_mesh_index = res_holder.addTriangleMesh(geometry);
       res_holder.addTransform(final_transform, stored_mesh_index);
       if (core::build::is_gpu_build && use_interops) {
         shape::triangle::mesh_vbo_ids vbo_pack = create_vbo_pack(mesh);

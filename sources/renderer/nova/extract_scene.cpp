@@ -1,11 +1,13 @@
 #include "Drawable.h"
 #include "EnvmapTextureManager.h"
 #include "Mesh.h"
+#include "PackedGLGeometryBuffer.h"
+#include "api_material.h"
 #include "bake.h"
 #include "extract_scene_internal.h"
 #include "nova/bake_render_data.h"
 #include <internal/common/axstd/span.h>
-#include <nova/api.h>
+#include <nova/api_engine.h>
 
 namespace nova_baker_utils {
 
@@ -37,46 +39,6 @@ namespace nova_baker_utils {
     return meshes;
   }
 
-  struct resource_holders_inits_s {
-    std::size_t triangle_mesh_number;
-    std::size_t triangle_number;
-
-    std::size_t dielectrics_number;
-    std::size_t diffuse_number;
-    std::size_t conductors_number;
-
-    std::size_t image_texture_number;
-    std::size_t constant_texture_number;
-    std::size_t hdr_texture_number;
-  };
-
-  static void initialize_resources_holders(nova::NovaResourceManager &manager, const resource_holders_inits_s &resrc) {
-    nova::shape::shape_init_record_s shape_init_data{};
-    shape_init_data.total_triangle_meshes = resrc.triangle_mesh_number;
-    shape_init_data.total_triangles = resrc.triangle_number;
-    auto &shape_reshdr = manager.getShapeData();
-    shape_reshdr.init(shape_init_data);
-
-    nova::primitive::primitive_init_record_s primitive_init_data{};
-    primitive_init_data.geometric_primitive_count = resrc.triangle_number;
-    primitive_init_data.total_primitive_count = primitive_init_data.geometric_primitive_count;
-    auto &primitive_reshdr = manager.getPrimitiveData();
-    primitive_reshdr.init(primitive_init_data);
-
-    nova::material::material_init_record_s material_init_data{};
-    material_init_data.conductors_size = resrc.conductors_number;
-    material_init_data.dielectrics_size = resrc.dielectrics_number;
-    material_init_data.diffuse_size = resrc.diffuse_number;
-    auto &material_resrc = manager.getMaterialData();
-    material_resrc.init(material_init_data);
-
-    nova::texturing::texture_init_record_s texture_init_data{};
-    texture_init_data.total_constant_textures = resrc.constant_texture_number;
-    texture_init_data.total_image_textures = resrc.image_texture_number;
-    auto &texture_resrc = manager.getTexturesData();
-    texture_resrc.allocateMeshTextures(texture_init_data);
-  }
-
   void setup_envmaps(const EnvmapTextureManager &envmap_manager, nova_baker_utils::envmap_data_s &envmap_data) {
     axstd::span<const texture::envmap::EnvmapTextureGroup> baked_envmaps = envmap_manager.getBakesViews();
     nova_baker_utils::envmap_data_s envmap_infos;
@@ -99,26 +61,14 @@ namespace nova_baker_utils {
     envmap_data = envmap_infos;
   }
 
-  void build_scene(const std::vector<drawable_original_transform> &drawables_orig_transfo, nova::NovaResourceManager &manager) {
+  void build_scene(const std::vector<drawable_original_transform> &drawables_orig_transfo, nova::Scene *scene) {
     std::vector<Mesh *> meshes = retrieve_meshes_from_drawables(drawables_orig_transfo);
-    /* Allocate for triangles */
-    std::size_t primitive_number = compute_primitive_number(meshes);
-
-    resource_holders_inits_s resrc{};
-    resrc.triangle_mesh_number = meshes.size();
-    resrc.triangle_number = primitive_number;
-    resrc.conductors_number = meshes.size();
-    resrc.diffuse_number = meshes.size();
-    resrc.dielectrics_number = meshes.size();
-    resrc.image_texture_number = meshes.size() * PBR_PIPELINE_TEX_NUM;
-    resrc.hdr_texture_number = 1;  // At least 1 for Environment map.
-    initialize_resources_holders(manager, resrc);
-
-    std::size_t mesh_index = 0;
     for (const drawable_original_transform &dtf : drawables_orig_transfo) {
-      nova::material::NovaMaterialInterface material = setup_material_data(*dtf.mesh, manager);
-      setup_geometry_data(dtf, material, manager, mesh_index);
-      mesh_index++;
+      nova::TrimeshPtr mesh = nova::create_trimesh();
+      nova::MaterialPtr material = nova::create_material();
+      setup_mesh(dtf, *mesh);
+      setup_material(dtf, *material);
+      scene->addMesh(std::move(mesh), std::move(material));
     }
   }
 

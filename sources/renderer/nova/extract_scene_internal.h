@@ -5,10 +5,7 @@
 
 namespace nova_baker_utils {
 
-  void setup_geometry_data(const drawable_original_transform &drawable,
-                           nova::material::NovaMaterialInterface &material,
-                           nova::NovaResourceManager &manager,
-                           std::size_t mesh_index);
-  nova::material::NovaMaterialInterface setup_material_data(const Drawable &drawable, nova::NovaResourceManager &manager);
+  void setup_mesh(const drawable_original_transform &drawable, nova::Trimesh &mesh);
+  void setup_material(const drawable_original_transform &drawable, nova::Material &material);
 }  // namespace nova_baker_utils
 #endif
