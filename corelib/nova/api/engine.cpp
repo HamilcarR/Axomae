@@ -14,6 +14,7 @@
 #include <internal/common/exception/GenericException.h>
 #include <internal/common/math/math_utils.h>
 #include <internal/common/utils.h>
+#include <internal/debug/Logger.h>
 #include <internal/geometry/Object3D.h>
 #include <internal/macro/project_macros.h>
 #include <internal/thread/worker/ThreadPool.h>

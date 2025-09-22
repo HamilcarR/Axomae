@@ -77,7 +77,7 @@ namespace nova_baker_utils {
       texture_resources_holder.addNovaTexture<nova::texturing::EnvmapTexture>(index);
     }
   }
-
+  /*********************************************************************************************************************************************/
   void initialize_envmaps(const envmap_data_s &envmaps, nova::Scene &nova_scene) {
     nova_scene.clearEnvmaps();
     for (const auto &element : envmaps.env_textures) {
@@ -136,6 +136,8 @@ namespace nova_baker_utils {
     if (engine_opts.flip_v)
       render_options->flipV();
     render_options->setIntegratorFlag(engine_opts.engine_type_flag);
+    render_options->useGpu(engine_opts.use_gpu);
+    render_options->useInterops(true);
     return render_options;
   }
 
