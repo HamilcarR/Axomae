@@ -86,16 +86,17 @@ namespace controller {
   }
 
   static void setup_engine(nova_baker_utils::engine_data &engine_data,
-                           const ui_render_options &engine_options,
+                           const ui_render_options &interface_eng_options,
                            const engine_misc_options &misc_options) {
-    engine_data.aa_samples = engine_options.aa_samples;
-    engine_data.depth_max = engine_options.max_depth;
-    engine_data.samples_max = engine_options.max_samples;
-    engine_data.num_tiles_w = engine_data.num_tiles_h = engine_options.tiles;
-    engine_data.samples_increment = engine_data.samples_max;
+    engine_data.aa_samples = interface_eng_options.aa_samples;
+    engine_data.depth_max = interface_eng_options.max_depth;
+    engine_data.samples_max = interface_eng_options.max_samples;
+    engine_data.num_tiles_w = engine_data.num_tiles_h = interface_eng_options.tiles;
+    engine_data.samples_increment = 0;
     engine_data.engine_type_flag = misc_options.engine_type_flag;
     engine_data.flip_v = misc_options.flip_v;
     engine_data.threadpool_tag = NOVABAKE_POOL_TAG;
+    engine_data.use_gpu = misc_options.use_gpu;
   }
 
   nova_baker_utils::engine_data generate_engine_data(const std::vector<Mesh *> &mesh_collection,
@@ -220,103 +221,6 @@ namespace controller {
     QWidget *img_ptr = texture_widget.get();
     img_ptr->show();
   }
-  // TODO : update widget display on timer
-  static void update_display(QWidget *display_widget) { dynamic_cast<HdrRenderViewerWidget *>(display_widget)->notifyUpdate(); }
-
-#ifdef AXOMAE_USE_CUDA
-  static nova::device_traversal_param_s fill_params(const nova::HdrBufferStruct &render_buffers,
-                                                    unsigned grid_width,
-                                                    unsigned grid_height,
-                                                    unsigned grid_depth,
-                                                    unsigned sample_index,
-                                                    const nova::NovaResourceManager *resrc_manager,
-                                                    const nova::gputils::gpu_util_structures_t &gpu_utils) {
-
-    nova::device_traversal_param_s params;
-    params.device_random_generators.rqmc_generator = gpu_utils.random_generator.sobol;
-    params.render_buffers = render_buffers;
-    params.material_view = resrc_manager->getMaterialData().getMaterialView();
-    params.mesh_bundle_views = resrc_manager->getShapeData().getMeshSharedViews();
-    params.primitives_view = resrc_manager->getPrimitiveData().getPrimitiveView();
-    params.texture_bundle_views = resrc_manager->getTexturesData().getTextureBundleViews();
-    params.current_envmap_index = resrc_manager->getTexturesData().getEnvmapId();
-    params.camera = resrc_manager->getCameraData();
-    params.width = grid_width;
-    params.height = grid_height;
-    params.depth = grid_depth;
-
-    params.sample_max = resrc_manager->getEngineData().renderer_max_samples;
-    params.sample_index = sample_index;
-    return params;
-  }
-
-  template<class T>
-  class GPUWorkerRetAction : public nova_baker_utils::WorkerRetAction {
-    T gpu_context;
-
-   public:
-    explicit GPUWorkerRetAction(T &&ctx) : gpu_context(std::move(ctx)) {}
-    void pushContext() { device::gpgpu::apply_context(gpu_context); }
-    void popContext() { device::gpgpu::register_context(gpu_context); }
-    void cleanup() override { LOG("Finishing GPU Worker", LogLevel::INFO); }
-  };
-
-  static std::unique_ptr<nova_baker_utils::WorkerRetAction> do_progressive_render_gpu(nova_baker_utils::render_scene_context &render_scene_data,
-                                                                                      image::ImageHolder<float> &image_holder,
-                                                                                      device::gpgpu::GPUContext &&gpu_context,
-                                                                                      QWidget *display_widget) {
-
-    nova::gputils::domain2d domain{(unsigned)render_scene_data.width, (unsigned)render_scene_data.height};
-    nova::gputils::initialize_gpu_structures(domain, render_scene_data.gpu_util_structures);
-
-    progressive_render_metadata metadata = create_render_metadata(render_scene_data);
-
-    auto act = std::make_unique<GPUWorkerRetAction<device::gpgpu::GPUContext>>(std::move(gpu_context));
-    act->pushContext();
-
-    int sample_index = 0;
-    while (sample_index < metadata.max_samples && is_rendering(render_scene_data)) {
-      int new_depth = render_scene_data.nova_resource_manager->getEngineData().max_depth < metadata.max_depth ?
-                          render_scene_data.nova_resource_manager->getEngineData().max_depth + 1 :
-                          metadata.max_depth;
-
-      render_scene_data.nova_resource_manager->getEngineData().sample_increment = sample_index;
-      render_scene_data.nova_resource_manager->getEngineData().max_depth = new_depth;
-      nova::device_traversal_param_s traversal_parameters = fill_params(*render_scene_data.buffers,
-                                                                        render_scene_data.width,
-                                                                        render_scene_data.height,
-                                                                        new_depth,
-                                                                        sample_index,
-                                                                        render_scene_data.nova_resource_manager,
-                                                                        render_scene_data.gpu_util_structures);
-
-      render_scene_data.nova_resource_manager->registerDeviceParameters(traversal_parameters);
-
-      try {
-        nova::nova_eng_internals internals;
-        internals.resource_manager = render_scene_data.nova_resource_manager;
-        internals.exception_manager = render_scene_data.nova_exception_manager.get();
-        nova::gpu_draw(traversal_parameters, internals);
-        std::this_thread::sleep_for(
-            std::chrono::milliseconds(60));  // TODO : temporary . Replace by an opengl viewer + interop for in-device texture display.
-        update_display(display_widget);
-      } catch (const exception::GenericException &e) {
-        ExceptionInfoBoxHandler::handle(e);
-        act->popContext();
-        return act;
-      }
-
-      if (on_exception_shutdown(*render_scene_data.nova_exception_manager)) {
-        act->popContext();
-        return act;
-      }
-      // color_correct_buffers(render_scene_data.buffers.get(), image_holder, (float)sample_index);
-      sample_index++;
-    }
-    act->popContext();
-    return act;
-  }
-#endif
 
   template<class T>
   class CudaContext : public nova::EngineUserCallbackHandler {
@@ -380,7 +284,6 @@ namespace controller {
       return;
     }
 
-    /* Meshes */
     ignore_skybox(renderer, true);
     const Scene &scene = renderer.getScene();
     const std::vector<Mesh *> &mesh_collection = scene.getMeshCollection();

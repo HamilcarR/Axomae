@@ -76,7 +76,7 @@ namespace nova_baker_utils {
     int depth_max;
     int num_tiles_w, num_tiles_h;
     int engine_type_flag;
-    bool flip_v;
+    bool flip_v, use_gpu{false};
     std::string threadpool_tag;
   };
 
@@ -116,8 +116,6 @@ namespace nova_baker_utils {
       bake_buffers.partial.clear();
       /* Remove reference to the widget. */
       spawned_window = nullptr;
-      /* If gpu is used , cleanup whatever has been allocated */
-      nova::gputils::cleanup_gpu_structures(render_context.gpu_util_structures);
     }
   };
 
