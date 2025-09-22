@@ -68,25 +68,20 @@ namespace nova::integrator {
 
           const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
           glm::vec4 rgb{};
-          // TODO : probably need a range of samples instead of a count from 0. current solution hashes the same samples over and over . See optix
-          // integrator for ex.
-          for (int i = 0; i < tile.sample_per_tile; i++) {
-            unsigned depth = nova_resource_manager->getEngineData().max_depth;
-            uint32_t p_idx = pixel_index(x, y, tile.width_end - tile.width_start);
-            sampler.reset(p_idx * tile.sample_per_tile + i);
-            if (!nova_resource_manager->getEngineData().is_rendering)
-              return;
-            /* Samples random direction around the pixel for AA. */
-            float sampled_camera_directions[2] = {};
-            sampler.sample2D(sampled_camera_directions);
-            const float dx = sampled_camera_directions[0] * RAND_DX;
-            const float dy = sampled_camera_directions[1] * RAND_DY;
-            math::camera::camera_ray r = math::camera::ray_inv_mat(
-                ndc.x + dx, ndc.y + dy, nova_resource_manager->getCameraData().inv_P, nova_resource_manager->getCameraData().inv_V);
-            Ray ray(r.near, r.far);
-            rgb += Li(ray, nova_internals, depth, sampler);
-          }
-          rgb /= (float)(tile.sample_per_tile);
+          unsigned depth = nova_resource_manager->getEngineData().max_depth;
+          uint32_t p_idx = pixel_index(x, y, tile.width_end - tile.width_start);
+          sampler.reset(p_idx * tile.sample_per_tile + nova_resource_manager->getEngineData().sample_increment);
+          if (!nova_resource_manager->getEngineData().is_rendering)
+            return;
+          /* Samples random direction around the pixel for AA. */
+          float sampled_camera_directions[2] = {};
+          sampler.sample2D(sampled_camera_directions);
+          const float dx = sampled_camera_directions[0] * RAND_DX;
+          const float dy = sampled_camera_directions[1] * RAND_DY;
+          math::camera::camera_ray r = math::camera::ray_inv_mat(
+              ndc.x + dx, ndc.y + dy, nova_resource_manager->getCameraData().inv_P, nova_resource_manager->getCameraData().inv_V);
+          Ray ray(r.near, r.far);
+          rgb = Li(ray, nova_internals, depth, sampler);
           accumulateRgbRenderbuffer(buffers, idx, rgb);
         }
       tile.finished_render = true;
