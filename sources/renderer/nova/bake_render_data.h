@@ -82,38 +82,13 @@ namespace nova_baker_utils {
 
   struct bake_temp_buffers {
     image::ThumbnailImageHolder<float> image_holder;
-    axstd::managed_vector<float> accumulator;
-    axstd::managed_vector<float> partial;
-    axstd::managed_vector<float> depth;
-  };
-
-  class WorkerRetAction {
-   public:
-    virtual ~WorkerRetAction() = default;
-    virtual void cleanup() = 0;
   };
 
   struct NovaBakingStructure {
     bake_temp_buffers bake_buffers;
     std::unique_ptr<QWidget> spawned_window;
-    render_scene_context render_context;
-    std::thread worker_baking_thread;
-    std::future<std::unique_ptr<WorkerRetAction>> on_cleanup;
 
     void reinitialize() {
-      auto &nova_resource_manager = render_context.nova_resource_manager;
-      if (nova_resource_manager)
-        nova_resource_manager->getEngineData().is_rendering = false;
-      if (on_cleanup.valid()) {
-        auto action = on_cleanup.get();
-        if (action)
-          action->cleanup();
-      }
-
-      /* Clear the render buffers. */
-      bake_buffers.image_holder.clear();
-      bake_buffers.accumulator.clear();
-      bake_buffers.partial.clear();
       /* Remove reference to the widget. */
       spawned_window = nullptr;
     }
