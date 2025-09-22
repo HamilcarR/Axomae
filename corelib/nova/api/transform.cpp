@@ -18,21 +18,6 @@ namespace nova {
       setTransformMatrix(temp_array);
     }
 
-    NvTransform(const Transform &transform) {
-      float array[16];
-      transform.getTransformMatrix(array);
-      setTransformMatrix(array);
-    }
-
-    NvTransform &operator=(const Transform &transform) {
-      float array[16];
-      if (this != &transform) {
-        transform.getTransformMatrix(array);
-        setTransformMatrix(array);
-      }
-      return *this;
-    }
-
     void setTransformMatrix(const float transform_array[16]) override {
       for (int i = 0; i < 16; i++)
         glm::value_ptr(transform)[i] = transform_array[i];

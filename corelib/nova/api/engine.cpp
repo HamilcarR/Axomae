@@ -27,6 +27,8 @@ namespace nova {
     using ThreadpoolPtr = std::unique_ptr<threading::ThreadPool>;
     static constexpr char NOVA_ASYNC_RENDER_TAG[] = "_NOVA_HOST_TAG";
 
+    // TODO: properties need mutex protection or a move operation in rendering threads .
+
     NovaResourceManager manager;
     ThreadpoolPtr threadpool;
 
@@ -42,15 +44,19 @@ namespace nova {
     RenderFutureResult render_result{};
     bool scene_built{false};
 
+    gputils::gpu_util_structures_t gpu_structures;
+
    public:
     NvEngineInstance() {
       render_options = create_renderoptions();
       render_buffer = create_renderbuffer();
       scene = create_scene();
-
       engine_exception_manager = std::make_unique<NovaExceptionManager>();
       render_engine = std::make_unique<NovaRenderEngineLR>();
+      gpu_structures = nova::gputils::initialize_gpu_structures();
     }
+
+    ~NvEngineInstance() override { nova::gputils::cleanup_gpu_structures(gpu_structures); }
 
     ERROR_STATE setThreadSize(unsigned threads) override {
       try {
@@ -213,10 +219,10 @@ namespace nova {
       if (!scene_built)
         return SCENE_NOT_PROCESSED;
       primitive::primitives_view_tn primitive_list_view = manager.getPrimitiveData().getPrimitiveView();
-      shape::MeshBundleViews mesh_geoemtry = manager.getShapeData().getMeshSharedViews();
+      shape::MeshBundleViews mesh_geometry = manager.getShapeData().getMeshSharedViews();
       aggregate::primitive_aggregate_data_s aggregate;
       aggregate.primitive_list_view = primitive_list_view;
-      aggregate.mesh_geometry = mesh_geoemtry;
+      aggregate.mesh_geometry = mesh_geometry;
 
       auto accelerator = build_cpu_managed_accelerator(aggregate);
       manager.setManagedCpuAccelerationStructure(std::move(accelerator));
@@ -231,6 +237,7 @@ namespace nova {
 
     ERROR_STATE cleanup() override {
       manager.clearResources();
+      manager = {};
       scene_built = false;
       if (!render_buffer || !scene)
         return INVALID_ENGINE_STATE;
@@ -243,23 +250,6 @@ namespace nova {
       if (!buffers)
         return INVALID_BUFFER_STATE;
       render_buffer = std::move(buffers);
-      return SUCCESS;
-    }
-
-    ERROR_STATE stopRender() override {
-      manager.getEngineData().is_rendering = false;
-      if (!render_options->isUsingGpu()) {
-        if (!threadpool)
-          return THREADPOOL_NOT_INITIALIZED;
-        /* Empty scheduler list. */
-        threadpool->emptyQueue(NOVA_ASYNC_RENDER_TAG);
-        /* Synchronize the threads. */
-        threadpool->fence(NOVA_ASYNC_RENDER_TAG);
-      }
-      /* Cleanup gpu resources */
-      manager.getShapeData().releaseResources();
-      manager.getTexturesData().releaseResources();
-
       return SUCCESS;
     }
 
@@ -445,7 +435,72 @@ namespace nova {
       camera.screen_height = scene_camera->getResolutionHeight();
     }
 
-    ERROR_STATE renderGpu(render_data_s render_data) { return INVALID_ARGUMENT; }
+    static nova::device_traversal_param_s fill_params(const nova::HdrBufferStruct &render_buffers,
+                                                      unsigned grid_width,
+                                                      unsigned grid_height,
+                                                      unsigned grid_depth,
+                                                      unsigned sample_index,
+                                                      const nova::NovaResourceManager *resrc_manager,
+                                                      const nova::gputils::gpu_util_structures_t &gpu_utils) {
+
+      nova::device_traversal_param_s params;
+      params.device_random_generators.rqmc_generator = gpu_utils.random_generator.sobol;
+      params.render_buffers = render_buffers;
+      params.material_view = resrc_manager->getMaterialData().getMaterialView();
+      params.mesh_bundle_views = resrc_manager->getShapeData().getMeshSharedViews();
+      params.primitives_view = resrc_manager->getPrimitiveData().getPrimitiveView();
+      params.texture_bundle_views = resrc_manager->getTexturesData().getTextureBundleViews();
+      params.current_envmap_index = resrc_manager->getTexturesData().getEnvmapId();
+      params.camera = resrc_manager->getCameraData();
+      params.width = grid_width;
+      params.height = grid_height;
+      params.depth = grid_depth;
+
+      params.sample_max = resrc_manager->getEngineData().renderer_max_samples;
+      params.sample_index = sample_index;
+      return params;
+    }
+
+    ERROR_STATE renderGpu(render_data_s render_data) {
+      unsigned current_cam_id = scene->getCurrentCameraId();
+      Camera *scene_camera = scene->getCamera(current_cam_id);
+      setup_camera(manager, scene_camera);
+      int sample_increment = 0;
+      while (sample_increment < render_options->getMaxSamples() && isRendering()) {
+        int new_depth = manager.getEngineData().max_depth < render_options->getMaxDepth() ? manager.getEngineData().max_depth + 1 :
+                                                                                            render_options->getMaxDepth();
+        manager.getEngineData().sample_increment = sample_increment;
+        manager.getEngineData().max_depth = new_depth;
+        EngineCallbackManager callback_manager(user_callback.get());
+
+        nova::device_traversal_param_s traversal_parameters = fill_params(render_buffer->getRenderBuffers(),
+                                                                          render_buffer->getWidth(),
+                                                                          render_buffer->getHeight(),
+                                                                          new_depth,
+                                                                          sample_increment,
+                                                                          &manager,
+                                                                          gpu_structures);
+
+        manager.registerDeviceParameters(traversal_parameters);
+        try {
+          nova::nova_eng_internals internals;
+          internals.resource_manager = &manager;
+          internals.exception_manager = engine_exception_manager.get();
+          nova::gpu_draw(traversal_parameters, internals);
+        } catch (const ::exception::GenericException &e) {
+          DEVICE_ERROR_CHECK(device::gpgpu::synchronize_device().error_status);
+          return RENDERER_EXCEPTION;
+        }
+
+        if (isExceptionShutdown())
+          return RENDERER_EXCEPTION;
+
+        writeFramebuffer(sample_increment);
+        render_buffer->swapBackBuffer();
+        sample_increment++;
+      }
+      return SUCCESS;
+    }
 
     ERROR_STATE renderCpu(render_data_s render_data) {
       int sample_increment = 1;
@@ -453,7 +508,7 @@ namespace nova {
       Camera *scene_camera = scene->getCamera(current_cam_id);
       setup_camera(manager, scene_camera);
       float serie_max = math::calculus::compute_serie_term(render_options->getMaxSamples());
-      while (sample_increment < serie_max && isRendering()) {
+      while (sample_increment < render_options->getMaxSamples() && isRendering()) {
         manager.getEngineData().sample_increment = sample_increment;
         int new_depth = manager.getEngineData().max_depth < render_options->getMaxDepth() ? manager.getEngineData().max_depth + 1 :
                                                                                             render_options->getMaxDepth();
@@ -499,10 +554,10 @@ namespace nova {
       if (pre_render_checks != SUCCESS)
         return pre_render_checks;
       RenderCallback render_callback;
-      render_data_s callback_data;
-      callback_data.buffers = buffers;
-      callback_data.image_width = render_buffer->getWidth();
-      callback_data.image_height = render_buffer->getHeight();
+      render_data_s rd;
+      rd.buffers = buffers;
+      rd.image_width = render_buffer->getWidth();
+      rd.image_height = render_buffer->getHeight();
       if (!render_options->isUsingGpu()) {
         render_callback = [&](render_data_s data) { return renderCpu(data); };
       } else {
@@ -510,7 +565,24 @@ namespace nova {
       }
 
       manager.getEngineData().is_rendering = true;
-      render_result = threadpool->addTask(threading::ALL_TASK, render_callback, callback_data);
+      render_result = threadpool->addTask(threading::ALL_TASK, render_callback, rd);
+      return SUCCESS;
+    }
+
+    ERROR_STATE stopRender() override {
+      manager.getEngineData().is_rendering = false;
+      if (!render_options->isUsingGpu()) {
+        if (!threadpool)
+          return THREADPOOL_NOT_INITIALIZED;
+        /* Empty scheduler list. */
+        threadpool->emptyQueue(NOVA_ASYNC_RENDER_TAG);
+        /* Synchronize the threads. */
+        threadpool->fence(NOVA_ASYNC_RENDER_TAG);
+      }
+      threadpool->fence(threading::ALL_TASK);
+      /* unmap gpu resources */
+      manager.getShapeData().releaseResources();
+      manager.getTexturesData().releaseResources();
       return SUCCESS;
     }
 
