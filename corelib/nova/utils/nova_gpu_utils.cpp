@@ -22,7 +22,7 @@ namespace nova::gputils {
       }
   }
 
-  static gpu_random_generator_t initialize_rand(const kernel_argpack_t &argpack) {
+  static gpu_random_generator_t initialize_rand() {
     gpu_random_generator_t gpu_generators;
     gpu_generators.sobol.allocDeviceLookupTable();
     return gpu_generators;
@@ -30,17 +30,10 @@ namespace nova::gputils {
 
   void clean_generators(gpu_random_generator_t &generators) { generators.sobol.deallocDeviceLookupTable(); }
 
-  void initialize_gpu_structures(const domain2d &domain, gpu_util_structures_t &gpu_structures) {
-    kernel_argpack_t argpack;
-    argpack.block_size = {AX_GPU_WARP_SIZE / 2, AX_GPU_WARP_SIZE / 2};
-    unsigned block_x = std::ceil((domain.x + argpack.block_size.x - 1) / argpack.block_size.x);
-    unsigned block_y = std::ceil((domain.y + argpack.block_size.y - 1) / argpack.block_size.y);
-    argpack.num_blocks = {block_x, block_y};
-    std::size_t max_blocks = argpack.num_blocks.x * argpack.num_blocks.y * argpack.num_blocks.z;
-    AX_ASSERT_LT(max_blocks, AX_GPU_MAX_BLOCKS);
-    gpu_structures.threads_distribution = argpack;
-
-    gpu_structures.random_generator = initialize_rand(argpack);
+  gpu_util_structures_t initialize_gpu_structures() {
+    gpu_util_structures_t gpu_structs;
+    gpu_structs.random_generator = initialize_rand();
+    return gpu_structs;
   }
 
   void cleanup_gpu_structures(gpu_util_structures_t &gpu_structures) { clean_generators(gpu_structures.random_generator); }
@@ -53,7 +46,7 @@ namespace nova::gputils {
 
   void cleanup_gpu_structures(gpu_util_structures_t &) { EMPTY_FUNCBODY }
 
-  void initialize_gpu_structures(const domain2d &, gpu_util_structures_t &) { EMPTY_FUNCBODY }
+  void initialize_gpu_structures() { EMPTY_FUNCBODY }
 
 #endif
 }  // namespace nova::gputils

@@ -60,7 +60,7 @@ namespace nova::gputils {
 
 #endif
 
-  void initialize_gpu_structures(const domain2d &domain, gpu_util_structures_t &gpu_util_structures);
+  gpu_util_structures_t initialize_gpu_structures();
   void cleanup_gpu_structures(gpu_util_structures_t &gpu_structures);
 
   void clean_generators(gpu_random_generator_t &generators);

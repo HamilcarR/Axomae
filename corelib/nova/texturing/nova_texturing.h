@@ -41,6 +41,12 @@ namespace nova::texturing {
     ImgTexCollection images() const;
     void clearImage();
 
+    // Not needed for now, implemented it for the API.
+    NovaTextureInterface add(const ImageTexture<float> &image_tex) {
+      AX_UNREACHABLE;
+      return nullptr;
+    }
+
     NovaTextureInterface add(const EnvmapTexture &envmap_tex) { return append(envmap_tex, envmap_textures); }
     void allocEnvmap(std::size_t total_env_tex);
     bool isEnvmapEmpty() const { return envmap_textures.empty(); }
