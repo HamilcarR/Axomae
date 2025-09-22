@@ -44,9 +44,11 @@ namespace nova::gputils {
 
   void clean_generators(gpu_random_generator_t &) { EMPTY_FUNCBODY }
 
-  void cleanup_gpu_structures(gpu_util_structures_t &) { EMPTY_FUNCBODY }
+  void cleanup_gpu_structures(gpu_util_structures_t &){EMPTY_FUNCBODY}
 
-  void initialize_gpu_structures() { EMPTY_FUNCBODY }
+  gpu_util_structures_t initialize_gpu_structures() {
+    return {};
+  }
 
 #endif
 }  // namespace nova::gputils

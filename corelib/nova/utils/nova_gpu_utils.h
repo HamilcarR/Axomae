@@ -46,19 +46,15 @@ namespace nova::gputils {
     unsigned y;
   };
 
-#if defined(AXOMAE_USE_CUDA)
   struct gpu_random_generator_t {
     math::random::SobolGenerator sobol;
   };
   struct gpu_util_structures_t {
     gpu_random_generator_t random_generator;
+#ifdef AXOMAE_USE_CUDA
     kernel_argpack_t threads_distribution;
-  };
-#else
-  struct gpu_random_generator_t {};
-  struct gpu_util_structures_t {};
-
 #endif
+  };
 
   gpu_util_structures_t initialize_gpu_structures();
   void cleanup_gpu_structures(gpu_util_structures_t &gpu_structures);
