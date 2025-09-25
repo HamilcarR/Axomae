@@ -120,8 +120,8 @@ namespace nova {
     FloatView backBuffer() override { return FloatView(back_ptr, render_buffers->front.size()); }
     FloatView frontBuffer() override { return FloatView(front_ptr, render_buffers->front.size()); }
 
-    RenderOutput getFrameBuffer() const override {
-      RenderOutput output;
+    Framebuffer getFramebuffer() const override {
+      Framebuffer output;
       output.color_buffer = FloatView(front_ptr, render_buffers->front.size());
       output.color_buffer_channels = render_buffers->CHANNELS_COLOR;
       output.color_buffer_width = render_buffers->width;

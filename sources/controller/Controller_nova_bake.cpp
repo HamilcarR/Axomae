@@ -124,7 +124,7 @@ namespace controller {
     metadata.height = rb.getHeight();
     metadata.width = rb.getWidth();
     metadata.is_hdr = true;
-    const nova::RenderOutput &framebuffer = rb.getFrameBuffer();
+    const nova::Framebuffer &framebuffer = rb.getFramebuffer();
     image_holder = image::ThumbnailImageHolder(framebuffer.color_buffer, metadata, nullptr, false);
   }
 

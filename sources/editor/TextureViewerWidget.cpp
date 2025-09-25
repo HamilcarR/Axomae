@@ -268,7 +268,7 @@ void HdrNovaRenderViewerWidget::mouseMoveEvent(QMouseEvent *event) {
     unsigned int image_height = render_buffer->getHeight();
     p = mapToImage(static_cast<int>(image_width), static_cast<int>(image_height), p, width(), height());
 
-    auto frame_buffer = render_buffer->getFrameBuffer();
+    auto frame_buffer = render_buffer->getFramebuffer();
     if (!frame_buffer.color_buffer.empty() && p.x() >= 0 && p.y() >= 0 && p.x() < static_cast<int>(image_width) &&
         p.y() < static_cast<int>(image_height))
     {
@@ -287,7 +287,7 @@ void HdrNovaRenderViewerWidget::mouseMoveEvent(QMouseEvent *event) {
 void HdrNovaRenderViewerWidget::updateImage() {
   if (!render_buffer)
     return;
-  auto frame_buffer = render_buffer->getFrameBuffer();
+  auto frame_buffer = render_buffer->getFramebuffer();
   if (frame_buffer.color_buffer.empty())
     return;
   unsigned int image_width = frame_buffer.color_buffer_width;

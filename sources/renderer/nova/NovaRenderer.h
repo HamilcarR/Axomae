@@ -19,13 +19,10 @@ class NovaRenderEngineInterface;
 
 class NovaRenderer final : public IRenderer {
 
- private:
   struct NovaInternalMetadata {
     float max_channel_color_value;
   };
 
-  // TODO Make private ?
- public:
   std::unique_ptr<RenderPipeline> render_pipeline;
   std::unique_ptr<CameraFrameBuffer> camera_framebuffer;
   bool start_draw{};
@@ -37,7 +34,6 @@ class NovaRenderer final : public IRenderer {
   LightingDatabase light_database;
   GLViewer *gl_widget{};
 
- private:
   GenericTexture *framebuffer_texture{};
   std::unique_ptr<GLMutablePixelBufferObject> pbo_read;
   std::unique_ptr<NovaRenderEngineInterface> nova_engine;
@@ -57,7 +53,6 @@ class NovaRenderer final : public IRenderer {
   NovaInternalMetadata renderer_data{};
   nova::HdrBufferStruct engine_render_buffers;  // TODO : replace by render_scene_data
 
- private:
   void updateNovaCameraFields();
   void copyBufferToPbo(float *pbo_mapped_buffer, int width, int height, int channels);
   void initializeEngine();
@@ -79,6 +74,9 @@ class NovaRenderer final : public IRenderer {
   /* renders with the normal data , samples to max , depth to max etc*/
   void doProgressiveRender();
   void displayProgress(float current, float target);
+  void syncRenderEngineThreads();
+  void populateNovaSceneResources();
+  void setProgressStatus(const std::string &progress_status);
 
  public:
   NovaRenderer(unsigned width, unsigned height, GLViewer *widget = nullptr);
@@ -91,9 +89,7 @@ class NovaRenderer final : public IRenderer {
 
   ax_no_discard const EnvmapTextureManager &getCurrentEnvmapId() const override { return *envmap_manager; }
   void prepSceneChange() override;
-  void syncRenderEngineThreads();
   void getScreenPixelColor(int x, int y, float r_screen_pixel_color[4]) override;
-  void populateNovaSceneResources();
   void initialize(ApplicationConfig *app_conf) override;
   bool prep_draw() override;
   void draw() override;
@@ -121,7 +117,6 @@ class NovaRenderer final : public IRenderer {
   void setRasterizerWireframe() override;
   void displayBoundingBoxes(bool display) override;
   void setViewerWidget(GLViewer *widget) override;
-  void setProgressStatus(const std::string &progress_status);
   void onHideEvent() override;
   void onShowEvent() override;
   void updateEnvmap() override;

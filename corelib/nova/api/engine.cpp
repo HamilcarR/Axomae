@@ -26,6 +26,8 @@ namespace nova {
     using RenderEngineInterfacePtr = std::unique_ptr<NovaRenderEngineInterface>;
     using EngineExceptionManagerPtr = std::unique_ptr<nova::NovaExceptionManager>;
     using ThreadpoolPtr = std::unique_ptr<threading::ThreadPool>;
+    using AtomicIndex = std::atomic<unsigned>;
+
     static constexpr char NOVA_ASYNC_RENDER_TAG[] = "_NOVA_HOST_TAG";
 
     // TODO: properties need mutex protection or a move operation in rendering threads .
@@ -44,8 +46,9 @@ namespace nova {
     ScenePtr scene;
     RenderFutureResult render_result{};
     bool scene_built{false};
-
     gputils::gpu_util_structures_t gpu_structures;
+
+    AtomicIndex frame_index{};
 
    public:
     NvEngineInstance() {
@@ -354,9 +357,11 @@ namespace nova {
       return false;
     }
 
+    unsigned getFrameIndex() const override { return frame_index; }
+
     void getRenderEngineError(char error_log[1024], size_t &size) override {}
 
-    void writeFramebuffer(unsigned sample_index) {
+    void writeFramebuffer() {
       HdrBufferStruct rb = render_buffer->getRenderBuffers();
       FloatView accumulator_buffer = render_buffer->getAccumulator();
       FloatView final_buffer = render_buffer->backBuffer();
@@ -365,7 +370,7 @@ namespace nova {
       for (size_t i = 0; i < render_buffer->getHeight() * render_buffer->getWidth() * render_buffer->getChannel(texture::COLOR); i++) {
         float partial = rb.partial_buffer[i];
         accumulator_buffer[i] += partial;
-        float accumulated = accumulator_buffer[i] / float(sample_index + 1);
+        float accumulated = accumulator_buffer[i] / float(frame_index + 1);
         final_buffer[i] = accumulated;
       }
     }
@@ -466,11 +471,10 @@ namespace nova {
       unsigned current_cam_id = scene->getCurrentCameraId();
       Camera *scene_camera = scene->getCamera(current_cam_id);
       setup_camera(manager, scene_camera);
-      int sample_increment = 0;
-      while (sample_increment < render_options->getMaxSamples() && isRendering()) {
+      while (frame_index < render_options->getMaxSamples() && isRendering()) {
         int new_depth = manager.getEngineData().max_depth < render_options->getMaxDepth() ? manager.getEngineData().max_depth + 1 :
                                                                                             render_options->getMaxDepth();
-        manager.getEngineData().sample_increment = sample_increment;
+        manager.getEngineData().sample_increment = frame_index;
         manager.getEngineData().max_depth = new_depth;
         EngineCallbackManager callback_manager(user_callback.get());
 
@@ -478,7 +482,7 @@ namespace nova {
                                                                           render_buffer->getWidth(),
                                                                           render_buffer->getHeight(),
                                                                           new_depth,
-                                                                          sample_increment,
+                                                                          frame_index,
                                                                           &manager,
                                                                           gpu_structures);
 
@@ -496,21 +500,20 @@ namespace nova {
         if (isExceptionShutdown())
           return RENDERER_EXCEPTION;
 
-        writeFramebuffer(sample_increment);
+        writeFramebuffer();
         render_buffer->swapBackBuffer();
-        sample_increment++;
+        frame_index++;
       }
       return SUCCESS;
     }
 
     ERROR_STATE renderCpu(render_data_s render_data) {
-      int sample_increment = 1;
       unsigned current_cam_id = scene->getCurrentCameraId();
       Camera *scene_camera = scene->getCamera(current_cam_id);
       setup_camera(manager, scene_camera);
       float serie_max = math::calculus::compute_serie_term(render_options->getMaxSamples());
-      while (sample_increment < render_options->getMaxSamples() && isRendering()) {
-        manager.getEngineData().sample_increment = sample_increment;
+      while (frame_index < render_options->getMaxSamples() && isRendering()) {
+        manager.getEngineData().sample_increment = frame_index;
         int new_depth = manager.getEngineData().max_depth < render_options->getMaxDepth() ? manager.getEngineData().max_depth + 1 :
                                                                                             render_options->getMaxDepth();
         manager.getEngineData().max_depth = new_depth;
@@ -525,10 +528,10 @@ namespace nova {
         }
         if (isExceptionShutdown())
           return RENDERER_EXCEPTION;
-        writeFramebuffer(sample_increment);
+        writeFramebuffer();
 
         render_buffer->swapBackBuffer();
-        sample_increment++;
+        frame_index++;
       }
       return SUCCESS;
     }
@@ -584,6 +587,7 @@ namespace nova {
       /* unmap gpu resources */
       manager.getShapeData().releaseResources();
       manager.getTexturesData().releaseResources();
+      frame_index = 1;
       return SUCCESS;
     }
 

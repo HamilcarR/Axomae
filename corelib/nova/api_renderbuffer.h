@@ -3,7 +3,7 @@
 #include "api_common.h"
 #include "engine/datastructures.h"
 namespace nova {
-  struct RenderOutput {
+  struct Framebuffer {
     FloatView color_buffer{};
     unsigned color_buffer_channels{};
     unsigned color_buffer_width{};
@@ -21,16 +21,16 @@ namespace nova {
 
   /**
    * @brief Abstract interface for a render buffer.
-   * 
+   *
    * This class defines the API for creating and accessing render buffers that the Nova rendering
    * engine will write to. A render buffer manages multiple types of rendering data including:
    * - Color buffers (RGBA32F format) for final rendered images
    * - Depth buffers for depth testing and post-processing
    * - Normal buffers for lighting calculations and post-processing effects
    * - Accumulator buffers for progressive rendering techniques
-   * 
+   *
    * The buffer supports double buffering with front/back buffer swapping for smooth rendering.
-   * 
+   *
    * @note All buffer data is stored in 32-bit floating point format for high dynamic range support.
    * @note The buffer dimensions are uniform across all buffer types (color, depth, normal).
    */
@@ -108,14 +108,14 @@ namespace nova {
      * @brief Gets the complete frame buffer output containing all render data.
      * This method returns a structured output containing color, depth, and normal
      * buffer data along with their dimensions and channel information.
-     * @return RenderOutput A structure containing:
+     * @return Framebuffer A structure containing:
      *   - color_buffer: RGBA color data (4 channels)
      *   - depth_buffer: Depth buffer data (1 channel)
      *   - normal_buffer: Normal buffer data (3 channels)
      *   - Associated width, height, and channel count for each buffer
      * @note All buffers share the same width and height dimensions.
      */
-    virtual RenderOutput getFrameBuffer() const = 0;
+    virtual Framebuffer getFramebuffer() const = 0;
 
     /**
      * @brief Gets the width of the render buffer.

@@ -203,6 +203,8 @@ namespace nova {
      */
     virtual void getRenderEngineError(char error_log[1024], size_t &size) = 0;
 
+    virtual unsigned getFrameIndex() const = 0;
+
     // TODO: DELETE AT THE END
     virtual NovaResourceManager &getResrcManager() = 0;
   };
