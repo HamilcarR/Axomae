@@ -164,25 +164,6 @@ namespace nova {
     virtual bool isRendering() const = 0;
 
     /**
-     * @brief Synchronizes the rendering engine with the host (CPU) to ensure consistency.
-     * This method is typically used to ensure that GPU-side operations are complete and visible on the CPU.
-     * It may be necessary for certain rendering workflows or when using interop with external graphics APIs.
-     * @return ERROR_STATE
-     *   - SUCCESS: Synchronization completed successfully.
-     */
-    virtual ERROR_STATE synchronize() = 0;
-
-    /**
-     * @brief Sets the number of rendering threads to use.
-     * This allows users to control the parallelism of the rendering process.
-     * More threads can improve performance on multi-core systems, but may increase memory usage.
-     * @param threads Number of threads to use (must be positive).
-     * @return ERROR_STATE
-     *   - SUCCESS: Thread count set successfully.
-     */
-    virtual ERROR_STATE setThreadSize(unsigned threads) = 0;
-
-    /**
      * @brief Prepares the engine for rendering by performing any necessary setup steps.
      * This may include initializing internal state, checking dependencies, or allocating temporary buffers.
      * It is typically called before startRender() to ensure a clean and ready state.
@@ -215,6 +196,18 @@ namespace nova {
   }
 
   EnginePtr create_engine();
+
+  /**
+   * @brief Sets the number of rendering threads to use.
+   * This allows users to control the parallelism of the rendering process.
+   * Slow function, introduces synchronization and thread pool re-creation.
+   * @param threads Number of threads to use (must be positive).
+   * @return ERROR_STATE
+   *   - SUCCESS: Thread count set successfully.
+   *   - THREADPOOL_CREATION_ERROR: Failed creating threadpool.
+   */
+
+  ERROR_STATE init_threadpool(unsigned number_threads);
 
 }  // namespace nova
 

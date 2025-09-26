@@ -41,7 +41,8 @@ namespace controller {
     nova_viewer->setProgressManager(progress_manager);
     nova_viewer->setApplicationConfig(global_application_config);
     nova_engine = nova::create_engine();
-    nova::ERROR_STATE err = nova_engine->setThreadSize(global_application_config->getThreadPoolSize());
+    nova::ERROR_STATE err = nova::init_threadpool(global_application_config->getThreadPoolSize());
+    AX_ASSERT_EQ(err, nova::SUCCESS);
     nova::RenderOptions *render_options = nova_engine->getRenderOptions();
     AX_ASSERT_NOTNULL(render_options);
     render_options->useInterops(true);

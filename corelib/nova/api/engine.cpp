@@ -33,7 +33,6 @@ namespace nova {
     // TODO: properties need mutex protection or a move operation in rendering threads .
 
     NovaResourceManager manager;
-    ThreadpoolPtr threadpool;
 
     RenderEngineInterfacePtr render_engine;
     EngineExceptionManagerPtr engine_exception_manager;
@@ -51,6 +50,8 @@ namespace nova {
     AtomicIndex frame_index{};
 
    public:
+    static ThreadpoolPtr threadpool;
+
     NvEngineInstance() {
       render_options = create_renderoptions();
       render_buffer = create_renderbuffer();
@@ -62,14 +63,23 @@ namespace nova {
 
     ~NvEngineInstance() override { nova::gputils::cleanup_gpu_structures(gpu_structures); }
 
-    ERROR_STATE setThreadSize(unsigned threads) override {
+    static ERROR_STATE synchronize() {
+      if (!threadpool)
+        return THREADPOOL_NOT_INITIALIZED;
+      threadpool->fence(NOVA_ASYNC_RENDER_TAG);
+      return SUCCESS;
+    }
+
+    static ERROR_STATE setThreadSize(unsigned threads) {
       try {
+        synchronize();
         threadpool = std::make_unique<threading::ThreadPool>(threads);
       } catch (...) {
         return THREADPOOL_CREATION_ERROR;
       }
       return SUCCESS;
     }
+
     struct resource_holders_inits_s {
       std::size_t triangle_mesh_number;
       std::size_t triangle_number;
@@ -573,21 +583,26 @@ namespace nova {
       return SUCCESS;
     }
 
+    static ERROR_STATE syncAndEmptyPool() {
+      if (!threadpool)
+        return THREADPOOL_NOT_INITIALIZED;
+      /* Empty scheduler list. */
+      threadpool->emptyQueue(NOVA_ASYNC_RENDER_TAG);
+      /* Synchronize the threads. */
+      threadpool->fence(NOVA_ASYNC_RENDER_TAG);
+      threadpool->fence(threading::ALL_TASK);
+      return SUCCESS;
+    }
+
     ERROR_STATE stopRender() override {
       manager.getEngineData().is_rendering = false;
-      if (!render_options->isUsingGpu()) {
-        if (!threadpool)
-          return THREADPOOL_NOT_INITIALIZED;
-        /* Empty scheduler list. */
-        threadpool->emptyQueue(NOVA_ASYNC_RENDER_TAG);
-        /* Synchronize the threads. */
-        threadpool->fence(NOVA_ASYNC_RENDER_TAG);
-      }
-      threadpool->fence(threading::ALL_TASK);
+      ERROR_STATE err = syncAndEmptyPool();
       /* unmap gpu resources */
       manager.getShapeData().releaseResources();
       manager.getTexturesData().releaseResources();
       frame_index = 1;
+      if (err != SUCCESS)
+        return err;
       return SUCCESS;
     }
 
@@ -608,15 +623,11 @@ namespace nova {
 
     RenderBuffer *getRenderBuffers() override { return render_buffer.get(); }
 
-    ERROR_STATE synchronize() override {
-      if (!threadpool)
-        return THREADPOOL_NOT_INITIALIZED;
-      threadpool->fence(NOVA_ASYNC_RENDER_TAG);
-      return SUCCESS;
-    }
-
     NovaResourceManager &getResrcManager() override { return manager; }
   };
+
+  std::unique_ptr<threading::ThreadPool> NvEngineInstance::threadpool = nullptr;
+  ERROR_STATE init_threadpool(unsigned number_threads) { return NvEngineInstance::setThreadSize(number_threads); }
 
   EnginePtr create_engine() { return std::make_unique<NvEngineInstance>(); }
 
