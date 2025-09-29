@@ -627,7 +627,7 @@ namespace nova {
   };
 
   std::unique_ptr<threading::ThreadPool> NvEngineInstance::threadpool = nullptr;
-  ERROR_STATE init_threadpool(unsigned number_threads) { return NvEngineInstance::setThreadSize(number_threads); }
+  ERROR_STATE init_threads(unsigned number_threads) { return NvEngineInstance::setThreadSize(number_threads); }
 
   EnginePtr create_engine() { return std::make_unique<NvEngineInstance>(); }
 

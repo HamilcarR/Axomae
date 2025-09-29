@@ -201,13 +201,13 @@ namespace nova {
    * @brief Sets the number of rendering threads to use.
    * This allows users to control the parallelism of the rendering process.
    * Slow function, introduces synchronization and thread pool re-creation.
-   * @param threads Number of threads to use (must be positive).
+   * @param threads Number of threads to use.
    * @return ERROR_STATE
    *   - SUCCESS: Thread count set successfully.
    *   - THREADPOOL_CREATION_ERROR: Failed creating threadpool.
    */
 
-  ERROR_STATE init_threadpool(unsigned number_threads);
+  ERROR_STATE init_threads(unsigned number_threads);
 
 }  // namespace nova
 
