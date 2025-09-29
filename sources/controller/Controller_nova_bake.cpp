@@ -129,7 +129,7 @@ namespace controller {
   }
 
   static nova::HdrBufferStruct setup_render_buffer(const ui_render_options &render_options, nova::RenderBuffer &render_buffer) {
-    render_buffer.createRenderBuffer(render_options.width, render_options.height);
+    render_buffer.resize(render_options.width, render_options.height);
     return render_buffer.getRenderBuffers();
   }
 

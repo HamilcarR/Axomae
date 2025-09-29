@@ -39,16 +39,34 @@ namespace nova {
     virtual ~RenderBuffer() = default;
 
     /**
-     * @brief Creates a render buffer of the given dimensions.
-     * Data format is always RGBA32F.
-     * @param width The width of the buffer.
-     * @param height The height of the buffer.
+     * @brief Preallocate internal buffers to the maximum required size.
+     *
+     * This method allocates memory for all internal buffers (color, depth, normal, accumulator, etc.)
+     * to accommodate the specified maximum width and height. This is useful for avoiding repeated
+     * allocations when resizing the render buffer multiple times, as it allows for efficient reuse
+     * of preallocated memory.
+     *
+     * @param width The maximum width to preallocate.
+     * @param height The maximum height to preallocate.
      * @return ERROR_STATE
-     *   - SUCCESS: Buffer created successfully.
-     *   - OUT_OF_MEMORY: Failed to allocate memory for the buffer.
-     *   - INVALID_BUFFER_STATE: Buffer could not be created due to invalid state.
+     *    - SUCCESS: Preallocation succeeded.
+     *    - OUT_OF_MEMORY: Failed to allocate memory.
      */
-    virtual ERROR_STATE createRenderBuffer(unsigned width, unsigned height) = 0;
+    virtual ERROR_STATE preallocate(unsigned width, unsigned height) = 0;
+
+    /**
+     * @brief Set the active dimensions of the render buffer.
+     *
+     * This method sets the current width and height of the render buffer, and updates all internal
+     * buffers. Must call preallocate() first.
+     *
+     * @param width The new width of the buffer.
+     * @param height The new height of the buffer.
+     * @return ERROR_STATE
+     *   - SUCCESS: Buffer resized successfully.
+     *   - OUT_OF_MEMORY: Failed to allocate memory for the buffer.
+     */
+    virtual ERROR_STATE resize(unsigned width, unsigned height) = 0;
 
     /**
      * @brief Resets all underlying buffers (color, depth, normal) to zero.

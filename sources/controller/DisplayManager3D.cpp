@@ -1,6 +1,7 @@
 #include "DisplayManager3D.h"
 #include "Config.h"
 #include "RenderPipeline.h"
+#include "api_common.h"
 #include "internal/macro/project_macros.h"
 #include "nova/bake.h"
 #include <nova/api_engine.h>
@@ -40,14 +41,27 @@ namespace controller {
     nova_viewer->getRenderer().getRenderPipeline().setProgressManager(progress_manager);
     nova_viewer->setProgressManager(progress_manager);
     nova_viewer->setApplicationConfig(global_application_config);
+
+    // Nova engine creation
     nova_engine = nova::create_engine();
-    nova::ERROR_STATE err = nova::init_threadpool(global_application_config->getThreadPoolSize());
+    nova::ERROR_STATE err = nova::init_threads(global_application_config->getThreadPoolSize());
     AX_ASSERT_EQ(err, nova::SUCCESS);
+
+    // Setup options
     nova::RenderOptions *render_options = nova_engine->getRenderOptions();
     AX_ASSERT_NOTNULL(render_options);
     render_options->useInterops(true);
+
+    // Setup render buffers
+    nova::RenderBuffer *render_buffers = nova_engine->getRenderBuffers();
+    AX_ASSERT_NOTNULL(render_buffers);
+    unsigned INITIAL_WIDTH = 500;
+    unsigned INITIAL_HEIGHT = 500;
+    err = render_buffers->preallocate(INITIAL_WIDTH, INITIAL_HEIGHT);
+    AX_ASSERT_EQ(err, nova::SUCCESS);
+
     SceneChangeData scene_data;
-    scene_data.nova_resource_manager = &nova_engine->getResrcManager();
+    scene_data.nova_engine = nova_engine.get();
     nova_viewer->setNewScene(scene_data);
     connect_slots();
   }
@@ -106,7 +120,7 @@ namespace controller {
 
   void DisplayManager3D::setNewScene(SceneChangeData &scene_data, ProgressStatus *progress_status) {
     prepareSceneChange();
-    scene_data.nova_resource_manager = &nova_engine->getResrcManager();
+    scene_data.nova_engine = nova_engine.get();
     IProgressManager progress_manager;
     progress_manager.setProgressManager(progress_status);
 
