@@ -1,5 +1,6 @@
 #include "api_common.h"
 #include "api_renderbuffer.h"
+#include "internal/macro/project_macros.h"
 #include "private_includes.h"
 #include <atomic>
 namespace nova {
@@ -39,6 +40,23 @@ namespace nova {
       normal_buffer.resize(capacity * CHANNELS_NORMALS);
     }
 
+    /* Resets the totality of the buffers. */
+    void cleanBuffers() {
+      for (size_t i = 0; i < capacity; i++) {
+        for (size_t c = 0; c < CHANNELS_COLOR; c++) {
+          partial_buffer[i * CHANNELS_COLOR + c] = 0.f;
+          accumulator_buffer[i * CHANNELS_COLOR + c] = 0.f;
+          front[i * CHANNELS_COLOR + c] = 0.f;
+          back[i * CHANNELS_COLOR + c] = 0.f;
+        }
+        for (size_t c = 0; c < CHANNELS_DEPTH; c++)
+          depth_buffer[i * CHANNELS_DEPTH + c] = 0.f;
+        for (size_t c = 0; c < CHANNELS_NORMALS; c++)
+          normal_buffer[i * CHANNELS_NORMALS + c] = 0.f;
+      }
+    }
+
+    /* Resets only the displayed canvas.*/
     void cleanCanvas() {
       for (size_t i = 0; i < width * height; i++) {
         for (size_t c = 0; c < CHANNELS_COLOR; c++) {
@@ -101,7 +119,7 @@ namespace nova {
     ERROR_STATE resetBuffers() override {
       if (!render_buffers)
         return INVALID_BUFFER_STATE;
-      render_buffers->cleanCanvas();
+      render_buffers->cleanBuffers();
       return SUCCESS;
     }
 
@@ -152,6 +170,39 @@ namespace nova {
     }
     FloatView frontBuffer() override {
       return FloatView(front_ptr, render_buffers->getWidth() * render_buffers->getHeight() * RenderBufferPack::CHANNELS_COLOR);
+    }
+
+    frgba_s sampleColor(unsigned x, unsigned y) const override {
+      AX_ASSERT_LT(x, render_buffers->getWidth());
+      AX_ASSERT_LT(y, render_buffers->getHeight());
+      AX_ASSERT_NOTNULL(front_ptr);
+      size_t idx = (x * render_buffers->getHeight() + y) * RenderBufferPack::CHANNELS_COLOR;
+      frgba_s pix{};
+      pix.r = front_ptr[idx];
+      pix.g = front_ptr[idx + 1];
+      pix.b = front_ptr[idx + 2];
+      pix.a = front_ptr[idx + 3];
+      return pix;
+    }
+
+    frgb_s sampleNormal(unsigned x, unsigned y) const override {
+      AX_ASSERT_LT(x, render_buffers->getWidth());
+      AX_ASSERT_LT(y, render_buffers->getHeight());
+      AX_ASSERT_NOTNULL(front_ptr);
+      size_t idx = (x * render_buffers->getHeight() + y) * RenderBufferPack::CHANNELS_NORMALS;
+      frgb_s pix{};
+      pix.r = front_ptr[idx];
+      pix.g = front_ptr[idx + 1];
+      pix.b = front_ptr[idx + 2];
+      return pix;
+    }
+
+    float sampleDepth(unsigned x, unsigned y) const override {
+      AX_ASSERT_LT(x, render_buffers->getWidth());
+      AX_ASSERT_LT(y, render_buffers->getHeight());
+      AX_ASSERT_NOTNULL(front_ptr);
+      size_t idx = (x * render_buffers->getHeight() + y) * RenderBufferPack::CHANNELS_DEPTH;
+      return front_ptr[idx];
     }
 
     Framebuffer getFramebuffer() const override {

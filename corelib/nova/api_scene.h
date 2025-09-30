@@ -58,6 +58,11 @@ namespace nova {
      */
     virtual int getCurrentCameraId() const = 0;
 
+    /**
+     * @brief Get the camera object from its ID.
+     * @return Camera*
+     *        - nullptr if the id doesn't exist.
+     */
     virtual Camera *getCamera(unsigned id) = 0;
 
     virtual void cleanup() = 0;

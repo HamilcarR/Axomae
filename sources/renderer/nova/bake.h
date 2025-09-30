@@ -37,6 +37,7 @@ namespace nova_baker_utils {
   void bake_scene_gpu(render_scene_context &rendering_data, nova::gputils::gpu_util_structures_t &gpu_structures);
   void initialize_engine(const engine_data &render_data, nova::Engine &nova_engine);
   nova::CameraPtr initialize_camera(const camera_data &scene_camera);
+  void initialize_camera(const camera_data &scene_camera, nova::Camera *camera);
   nova::RenderOptionsPtr initialize_options(const engine_data &engine_opts);
   void initialize_envmaps(const envmap_data_s &envmaps, nova::Scene &nova_scene);
 

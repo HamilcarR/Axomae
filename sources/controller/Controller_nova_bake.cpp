@@ -299,7 +299,10 @@ namespace controller {
       nova_baker_utils::engine_data engine_data = generate_engine_data(mesh_collection, render_options, misc_options, *renderer_camera, renderer);
 
       initialize_engine(engine_data, *nova_engine);
+
       nova::RenderBuffer *render_buffer = nova_engine->getRenderBuffers();
+      if (render_buffer->resetBuffers() != nova::SUCCESS)
+        LOGS("Error resetting render buffers");
       nova::HdrBufferStruct target_buffers = setup_render_buffer(render_options, *render_buffer);
 
       allocate_display_widget_buffer(nova_baking_structure.bake_buffers.image_holder, *render_buffer);

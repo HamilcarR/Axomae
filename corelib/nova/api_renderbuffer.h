@@ -19,6 +19,14 @@ namespace nova {
     unsigned normal_buffer_height{};
   };
 
+  struct frgba_s {
+    float r, g, b, a;
+  };
+
+  struct frgb_s {
+    float r, g, b;
+  };
+
   /**
    * @brief Abstract interface for a render buffer.
    *
@@ -159,6 +167,10 @@ namespace nova {
      * @note Returns COLOR channel count for unknown types.
      */
     virtual unsigned getChannel(texture::CHANNEL_TYPE type) const = 0;
+
+    virtual frgba_s sampleColor(unsigned x, unsigned y) const = 0;
+    virtual frgb_s sampleNormal(unsigned x, unsigned y) const = 0;
+    virtual float sampleDepth(unsigned x, unsigned y) const = 0;
   };
 
   /**

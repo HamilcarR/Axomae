@@ -61,7 +61,8 @@ namespace controller {
     AX_ASSERT_EQ(err, nova::SUCCESS);
 
     SceneChangeData scene_data;
-    scene_data.nova_engine = nova_engine.get();
+    scene_data.nova_scene = nova_engine->getScene();
+    scene_data.nova_resource_manager = &nova_engine->getResrcManager();
     nova_viewer->setNewScene(scene_data);
     connect_slots();
   }
@@ -120,7 +121,8 @@ namespace controller {
 
   void DisplayManager3D::setNewScene(SceneChangeData &scene_data, ProgressStatus *progress_status) {
     prepareSceneChange();
-    scene_data.nova_engine = nova_engine.get();
+    scene_data.nova_scene = nova_engine->getScene();
+    scene_data.nova_resource_manager = &nova_engine->getResrcManager();
     IProgressManager progress_manager;
     progress_manager.setProgressManager(progress_status);
 

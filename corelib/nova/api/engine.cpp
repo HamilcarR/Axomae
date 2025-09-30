@@ -267,17 +267,6 @@ namespace nova {
       return SUCCESS;
     }
 
-    static void setup_engine_data(engine::EngineResourcesHolder &resrc, const RenderOptions &render_options) {
-      resrc.aliasing_samples = render_options.getAliasingSamples();
-      resrc.max_depth = render_options.getMaxDepth();
-      resrc.sample_increment = render_options.getSamplesIncrement();
-      resrc.vertical_invert = render_options.isFlippedV();
-      resrc.tiles_width = render_options.getTileDimensionWidth();
-      resrc.tiles_height = render_options.getTileDimensionHeight();
-      resrc.integrator_flag = render_options.getIntegratorFlag();
-      resrc.threadpool_tag = NOVA_ASYNC_RENDER_TAG;
-    }
-
     static void allocate_environment_maps(texturing::TextureResourcesHolder &resrc, const nova::Scene &scene) {
       CsteTextureCollection env_collection = scene.getEnvmapCollection();
       resrc.allocateEnvironmentMaps(env_collection.size());
@@ -295,21 +284,6 @@ namespace nova {
                                              texture->getInteropID());
         resrc.addNovaTexture<texturing::EnvmapTexture>(index);
       }
-    }
-
-    ERROR_STATE prepareRender() override {
-      texturing::TextureResourcesHolder &textures_manager = manager.getTexturesData();
-      shape::ShapeResourcesHolder &shape_manager = manager.getShapeData();
-      engine::EngineResourcesHolder &opts_manager = manager.getEngineData();
-      setup_engine_data(opts_manager, *render_options);
-      allocate_environment_maps(textures_manager, *scene);
-      if (render_options->isUsingGpu()) {
-        shape_manager.lockResources();
-        shape_manager.mapBuffers();
-        textures_manager.lockResources();
-        textures_manager.mapBuffers();
-      }
-      return SUCCESS;
     }
 
     bool isRendering() const override { return manager.getEngineData().is_rendering; }
@@ -560,6 +534,18 @@ namespace nova {
 
       return SUCCESS;
     }
+
+    static void setup_engine_data(engine::EngineResourcesHolder &resrc, const RenderOptions &render_options) {
+      resrc.aliasing_samples = render_options.getAliasingSamples();
+      resrc.max_depth = render_options.getMaxDepth();
+      resrc.sample_increment = render_options.getSamplesIncrement();
+      resrc.vertical_invert = render_options.isFlippedV();
+      resrc.tiles_width = render_options.getTileDimensionWidth();
+      resrc.tiles_height = render_options.getTileDimensionHeight();
+      resrc.integrator_flag = render_options.getIntegratorFlag();
+      resrc.threadpool_tag = NOVA_ASYNC_RENDER_TAG;
+    }
+
     using RenderCallback = std::function<ERROR_STATE(render_data_s)>;
 
     ERROR_STATE startRender() override {
@@ -580,6 +566,21 @@ namespace nova {
 
       manager.getEngineData().is_rendering = true;
       render_result = threadpool->addTask(threading::ALL_TASK, render_callback, rd);
+      return SUCCESS;
+    }
+
+    ERROR_STATE prepareRender() override {
+      texturing::TextureResourcesHolder &textures_manager = manager.getTexturesData();
+      shape::ShapeResourcesHolder &shape_manager = manager.getShapeData();
+      engine::EngineResourcesHolder &opts_manager = manager.getEngineData();
+      setup_engine_data(opts_manager, *render_options);
+      allocate_environment_maps(textures_manager, *scene);
+      if (render_options->isUsingGpu()) {
+        shape_manager.lockResources();
+        shape_manager.mapBuffers();
+        textures_manager.lockResources();
+        textures_manager.mapBuffers();
+      }
       return SUCCESS;
     }
 

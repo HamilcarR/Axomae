@@ -47,7 +47,6 @@ namespace nova::texturing {
   }
 
   /***********************************************************************************************************************************/
-  // TODO : use indexed_append
   std::size_t HostPolicy::add(const U32Texture &host_stored_texture) {
     return indexed_append(cpu_storage.rgba_textures, cpu_storage.u32_id_tracker, host_stored_texture);
   }

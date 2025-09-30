@@ -268,16 +268,10 @@ void HdrNovaRenderViewerWidget::mouseMoveEvent(QMouseEvent *event) {
     unsigned int image_height = render_buffer->getHeight();
     p = mapToImage(static_cast<int>(image_width), static_cast<int>(image_height), p, width(), height());
 
-    auto frame_buffer = render_buffer->getFramebuffer();
-    if (!frame_buffer.color_buffer.empty() && p.x() >= 0 && p.y() >= 0 && p.x() < static_cast<int>(image_width) &&
-        p.y() < static_cast<int>(image_height))
-    {
-      unsigned int index = (p.y() * image_width + p.x()) * frame_buffer.color_buffer_channels;
-      float r_ = frame_buffer.color_buffer[index];
-      float g_ = frame_buffer.color_buffer[index + 1];
-      float b_ = frame_buffer.color_buffer[index + 2];
-      float a_ = 1.f;
-      const float rgb[4] = {r_, g_, b_, a_};
+    if (p.x() >= 0 && p.y() >= 0 && p.x() < static_cast<int>(image_width) && p.y() < static_cast<int>(image_height)) {
+      unsigned int index = (p.y() * image_width + p.x()) * render_buffer->getChannel(nova::texture::COLOR);
+      nova::frgba_s color = render_buffer->sampleColor(p.x(), p.y());
+      const float rgb[4] = {color.r, color.g, color.b, color.a};
       label->updateLabel(rgb, p.x(), p.y(), width(), height(), false);
     }
   }

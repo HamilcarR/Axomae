@@ -124,6 +124,35 @@ namespace nova_baker_utils {
     return camera;
   }
 
+  void initialize_camera(const camera_data &scene_camera, nova::Camera *camera) {
+    if (!camera)
+      return;
+    /* Camera data */
+    glm::vec3 up_vector = scene_camera.up_vector;
+    glm::mat4 P = scene_camera.projection;
+    // this syncs the view from nova to the Realtime renderer.
+    glm::mat4 V = glm::rotate(scene_camera.view, glm::radians(90.f), glm::vec3(-1.f, 0.f, 0.f));
+    glm::vec3 position = scene_camera.position;
+    glm::vec3 direction = scene_camera.direction;
+    float far_clip = scene_camera.far;
+    float near_clip = scene_camera.near;
+    int screen_width = scene_camera.width;
+    int screen_height = scene_camera.height;
+    float fov = scene_camera.fov;
+
+    AX_ASSERT_NOTNULL(camera);
+
+    camera->setUpVector(glm::value_ptr(up_vector));
+    camera->setMatrices(glm::value_ptr(P), glm::value_ptr(V));
+    camera->setPosition(glm::value_ptr(position));
+    camera->setDirection(glm::value_ptr(direction));
+    camera->setClipPlaneFar(far_clip);
+    camera->setClipPlaneNear(near_clip);
+    camera->setResolutionWidth(screen_width);
+    camera->setResolutionHeight(screen_height);
+    camera->setFov(fov);
+  }
+
   nova::RenderOptionsPtr initialize_options(const engine_data &engine_opts) {
     nova::RenderOptionsPtr render_options = nova::create_renderoptions();
     AX_ASSERT_NOTNULL(render_options);

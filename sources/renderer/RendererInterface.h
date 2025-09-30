@@ -22,6 +22,10 @@ namespace nova::aggregate {
 struct SceneChangeData {
   SceneTree *scene{};
   std::vector<Mesh *> mesh_list;
+
+  nova::Scene *nova_scene{};
+
+  // TODO : Replace
   nova::NovaResourceManager *nova_resource_manager{};
 };
 
