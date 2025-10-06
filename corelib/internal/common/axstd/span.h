@@ -112,4 +112,9 @@ namespace axstd {
 }
 #endif
 
+namespace axstd {
+  template<class T>
+  using cspan = axstd::span<const T>;
+
+}
 #endif  // SPAN_H
