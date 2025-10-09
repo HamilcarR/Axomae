@@ -44,9 +44,9 @@ namespace nova::material {
    public:
     CLASS_CM(NovaDiffuseMaterial)
 
-    ax_device_callable NovaDiffuseMaterial(const texture_pack &texture) : t_pack(texture) {}
+    ax_device_callable_inlined NovaDiffuseMaterial(const texture_pack &texture) : t_pack(texture) {}
 
-    ax_device_callable bool scatter(
+    ax_device_callable_inlined bool scatter(
         const Ray & /*in*/, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler, shading_data_s &mat_ctx) const {
       AX_ASSERT_NOTNULL(mat_ctx.texture_aggregate);
       TexturePackSampler texture_pack_sampler(t_pack);
@@ -71,11 +71,12 @@ namespace nova::material {
    public:
     CLASS_CM(NovaConductorMaterial)
 
-    ax_device_callable NovaConductorMaterial(const texture_pack &texture) : t_pack(texture) {}
+    ax_device_callable_inlined NovaConductorMaterial(const texture_pack &texture) : t_pack(texture) {}
 
-    ax_device_callable NovaConductorMaterial(const texture_pack &texture, float fuzz_) : t_pack(texture), fuzz(fuzz_) {}
+    ax_device_callable_inlined NovaConductorMaterial(const texture_pack &texture, float fuzz_) : t_pack(texture), fuzz(fuzz_) {}
 
-    ax_device_callable bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler, shading_data_s &mat_ctx) const {
+    ax_device_callable_inlined bool scatter(
+        const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler, shading_data_s &mat_ctx) const {
       AX_ASSERT_NOTNULL(mat_ctx.texture_aggregate);
 
       TexturePackSampler texture_pack_sampler(t_pack);
@@ -121,11 +122,12 @@ namespace nova::material {
    public:
     CLASS_CM(NovaDielectricMaterial)
 
-    ax_device_callable NovaDielectricMaterial(const texture_pack &texture) : t_pack(texture), eta(1.f) {}
+    ax_device_callable_inlined NovaDielectricMaterial(const texture_pack &texture) : t_pack(texture), eta(1.f) {}
 
-    ax_device_callable NovaDielectricMaterial(const texture_pack &texture, float ior) : t_pack(texture), eta(ior) {}
+    ax_device_callable_inlined NovaDielectricMaterial(const texture_pack &texture, float ior) : t_pack(texture), eta(ior) {}
 
-    ax_device_callable bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler, shading_data_s &mat_ctx) const {
+    ax_device_callable_inlined bool scatter(
+        const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler, shading_data_s &mat_ctx) const {
       TexturePackSampler texture_pack_sampler(t_pack);
       const glm::mat3 tbn = math::geometry::construct_tbn(hit_d.normal, hit_d.tangent, hit_d.bitangent);
       glm::vec3 perturbed_normal = compute_map_normal(hit_d, texture_pack_sampler, tbn, *mat_ctx.texture_aggregate);
@@ -166,7 +168,8 @@ namespace nova::material {
   class NovaMaterialInterface : public core::tag_ptr<NovaDiffuseMaterial, NovaDielectricMaterial, NovaConductorMaterial> {
    public:
     using tag_ptr::tag_ptr;
-    ax_device_callable bool scatter(const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler, shading_data_s &mat_ctx) const {
+    ax_device_callable_inlined bool scatter(
+        const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler, shading_data_s &mat_ctx) const {
       auto disp = [&](auto material) { return material->scatter(in, out, hit_d, sampler, mat_ctx); };
       return dispatch(disp);
     }
