@@ -34,11 +34,7 @@ namespace nova::material {
   ax_device_callable_inlined glm::vec3 hemi_sample(const glm::mat3 &tbn, sampler::SamplerInterface &sampler) {
     float ret[2] = {};
     sampler.sample2D(ret);
-    const float u = ret[0];
-    const float v = ret[1];
-    glm::vec2 sph = math::spherical::uvToSpherical({u, v});
-    glm::vec3 tangent_space_dir = math::spherical::sphericalToCartesian(sph);
-    return tbn * tangent_space_dir;
+    return tbn * bxdf::hemisphere_sample_uniform(ret);
   }
 
   class NovaDiffuseMaterial {
