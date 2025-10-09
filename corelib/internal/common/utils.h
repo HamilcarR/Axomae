@@ -27,6 +27,12 @@ namespace core::build {
   constexpr bool is_opencl_build = false;
 #endif
 
+#ifdef AXOMAE_USE_SPECTRUM
+  constexpr bool is_spectrum_build = true;
+#else
+  constexpr bool is_spectrum_build = false;
+#endif
+
   constexpr bool is_gpu_build = is_cuda_build || is_hip_build || is_opencl_build;
 
   static_assert(static_cast<int>(is_cuda_build) + static_cast<int>(is_hip_build) + static_cast<int>(is_opencl_build) <= 1,
