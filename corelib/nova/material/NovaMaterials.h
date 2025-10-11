@@ -1,5 +1,6 @@
 #ifndef NOVAMATERIALS_H
 #define NOVAMATERIALS_H
+#include "BxDF.h"
 #include "TexturePackSampler.h"
 #include "glm/fwd.hpp"
 #include "material_datastructures.h"
