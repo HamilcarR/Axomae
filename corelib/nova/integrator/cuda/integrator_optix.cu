@@ -94,7 +94,7 @@ extern "C" ax_kernel void __closesthit__minimum_intersect() {
   pld.prim_idx = ax_prim_idx;
   pld.traversal_stopped = false;
   geometry::face_data_tri face = get_primitive_triangle(pld.prim_idx);
-  nv_shape::transform::transform4x4_t transform = get_primitive_transform(pld.prim_idx);
+  transform4x4_t transform = get_primitive_transform(pld.prim_idx);
   float3 ori = ax_wray_ori;
   float3 dir = ax_wray_dir;
   nova::Ray wi = make_ray(ori, dir);

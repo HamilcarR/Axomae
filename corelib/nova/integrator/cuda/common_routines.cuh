@@ -252,7 +252,7 @@ ax_device_force_inlined geometry::face_data_tri get_primitive_triangle(uint64_t 
   return face_data.data.triangle_face;
 }
 
-ax_device_force_inlined nv_shape::transform::transform4x4_t get_primitive_transform(uint64_t prim_idx) {
+ax_device_force_inlined transform4x4_t get_primitive_transform(uint64_t prim_idx) {
   const nv_prim::NovaPrimitiveInterface &prim = ax_primitive_view[prim_idx];
   nv_shape::MeshCtx ctx(ax_mesh_bundle);
   return prim.getTransform(ctx);
@@ -300,7 +300,7 @@ ax_device_callable_inlined void fill_normals(const float3 normals[3],
 }
 
 ax_device_callable_inlined geometry::interpolates_s compute_lerps(
-    const geometry::face_data_tri &face, const nv_shape::transform::transform4x4_t &transform, float u, float v, float t, const nova::Ray &ray) {
+    const geometry::face_data_tri &face, const transform4x4_t &transform, float u, float v, float t, const nova::Ray &ray) {
   float3 obj_normals[3] = {
       {face.n0[0], face.n0[1], face.n0[2]},
       {face.n1[0], face.n1[1], face.n1[2]},

@@ -43,4 +43,26 @@ namespace math::geometry {
 
 }  // namespace math::geometry
 
+struct transform4x4_t {
+  glm::mat4 m;
+  glm::mat4 inv;  // inverse
+  glm::mat4 t;    // transpose
+  glm::mat3 n;    // normal ( mat3(transpose(invert(m)) )
+  ax_device_callable bool operator==(const transform4x4_t &other) const {
+    // no need to compare the others , waste of cycles. If the other matrices are not equal, we raise this in the assert.
+    bool equal = m == other.m;
+    AX_ASSERT(!equal || (inv == other.inv && t == other.t && n == other.n), "Invalid transform matrix");
+    return equal;
+  }
+  ax_device_callable static constexpr std::size_t padding() { return 57; }  // how many elements in the record
+};
+
+struct transform3x3_t {
+  glm::mat3 m;
+  glm::mat3 inv;
+  glm::mat3 t;
+  bool operator==(const transform3x3_t &other) const { return m == other.m; }
+  static constexpr std::size_t padding() { return 27; }
+};
+
 #endif

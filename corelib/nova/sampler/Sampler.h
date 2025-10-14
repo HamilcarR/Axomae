@@ -29,14 +29,14 @@ namespace nova::sampler {
 
     ax_device_callable explicit SobolSampler(const T &generator_) : generator(generator_) {}
 
-    ax_device_callable sample_type sample1D() { return generator.generate(index, dimension_counter++); }
+    ax_device_callable_inlined sample_type sample1D() { return generator.generate(index, dimension_counter++); }
 
-    ax_device_callable void sample2D(sample_type out_values[2]) {
+    ax_device_callable_inlined void sample2D(sample_type out_values[2]) {
       out_values[0] = sample1D();
       out_values[1] = sample1D();
     }
 
-    ax_device_callable void sample3D(sample_type out_values[3]) {
+    ax_device_callable_inlined void sample3D(sample_type out_values[3]) {
       out_values[0] = sample1D();
       out_values[1] = sample1D();
       out_values[2] = sample1D();

@@ -29,7 +29,7 @@ namespace nova::shape {
     ax_device_callable ax_no_discard glm::vec3 centroid(const MeshCtx &geometry) const { return center; }
     ax_device_callable ax_no_discard geometry::BoundingBox computeAABB(const MeshCtx &geometry) const;
     ax_device_callable ax_no_discard float area(const MeshCtx &geometry) const { return glm::length(side_w) * glm::length(side_h); }
-    ax_device_callable_inlined transform::transform4x4_t getTransform(const MeshCtx &geometry) const {
+    ax_device_callable_inlined transform4x4_t getTransform(const MeshCtx &geometry) const {
       AX_UNREACHABLE;
       return {};
     }

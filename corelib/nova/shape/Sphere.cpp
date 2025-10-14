@@ -1,5 +1,6 @@
 #include "Sphere.h"
 #include "MeshContext.h"
+#include "ray/IntersectFrame.h"
 #include "ray/Ray.h"
 
 namespace nova::shape {
@@ -11,20 +12,24 @@ namespace nova::shape {
     const float a = glm::dot(r.direction, r.direction);
     const float c = glm::dot(oc, oc) - radius * radius;
     const float determinant = b * b - 4 * a * c;
+    glm::vec3 normal;
     if (determinant > 0) {
       float t1 = (-b - std::sqrt(determinant)) * 0.5f / a;
       if (t1 < tmax && t1 > tmin) {
         data.t = t1;
-        data.normal = r.pointAt(data.t) - origin;
+        normal = r.pointAt(data.t) - origin;
+        data.shading_frame = IntersectFrame({}, {}, normal);
         return true;
       }
       t1 = (-b + std::sqrt(determinant)) * 0.5f / a;
       if (t1 < tmax && t1 > tmin) {
         data.t = t1;
-        data.normal = r.pointAt(data.t) - origin;
+        normal = r.pointAt(data.t) - origin;
+        data.shading_frame = IntersectFrame({}, {}, normal);
         return true;
       }
     }
+
     return false;
   }
 

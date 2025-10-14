@@ -22,7 +22,7 @@ namespace math::spherical {
   ax_device_callable_inlined glm::vec2 uvToSpherical(const glm::vec2 &uv) { return uvToSpherical(uv.x, uv.y); }
 
   template<class T>
-  ax_device_callable glm::vec2 sphericalToUv(const T &phi, const T &theta) {
+  ax_device_callable_inlined glm::vec2 sphericalToUv(const T &phi, const T &theta) {
     const T u = phi * INV_2PI;
     const T v = theta * INV_PI;
     return {u, v};

@@ -17,13 +17,13 @@ static glm::mat4 gen_rand_mat4(math::random::CPUPseudoRandomGenerator &gen) {
 }
 
 TEST(transform4x4_t, hash_test) {
-  transform::transform4x4_t trfm{};
+  transform4x4_t trfm{};
   math::random::CPUPseudoRandomGenerator gen;
   glm::mat4 m;
   for (int j = 0; j < 100; j++) {
     trfm.m = gen_rand_mat4(gen);
-    std::size_t h0 = hash(trfm);
-    std::size_t h1 = hash(trfm);
+    std::size_t h0 = transform::hash(trfm);
+    std::size_t h1 = transform::hash(trfm);
     ASSERT_EQ(h0, h1);
   }
 }
@@ -59,13 +59,13 @@ TEST(matrix_element_storage_t, reconstruct_transform4x4_t) {
     storage.add(transforms.back(), i);
   }
   int offset = 0;
-  transform::transform4x4_t transform{};
+  transform4x4_t transform{};
   for (int i = 0; i < 100; i++) {
 
     bool valid = storage.reconstructTransform4x4(transform, offset);
     ASSERT_TRUE(valid);
     ASSERT_EQ(transform.m, transforms[i]);
-    offset += transform::transform4x4_t::padding();
+    offset += transform4x4_t::padding();
   }
   ASSERT_FALSE(storage.reconstructTransform4x4(transform, offset));
 }
