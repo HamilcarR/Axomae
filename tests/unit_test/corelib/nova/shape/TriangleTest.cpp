@@ -29,7 +29,7 @@ TEST(TriangleTest, getTransform) {
   nova::shape::MeshCtx ctx = ctx_builder.getCtx();
   nova::shape::Triangle triangle = nova::shape::Triangle(0, 0);
 
-  nova::shape::transform::transform4x4_t transform = triangle.getTransform(ctx);
+  transform4x4_t transform = triangle.getTransform(ctx);
   ASSERT_EQ(transform.m, glm::mat4(1.f));
 }
 

@@ -31,7 +31,7 @@ namespace nova::shape {
     ax_device_callable ax_no_discard geometry::BoundingBox computeAABB(const MeshCtx & /*mesh_geometry*/) const { return aabb; }
     ax_device_callable ax_no_discard geometry::BoundingBox computeAABB() const { return aabb; }
     ax_device_callable ax_no_discard float area(const MeshCtx &) const { return 2.f * aabb.halfArea(); }
-    ax_device_callable_inlined transform::transform4x4_t getTransform(const MeshCtx &geometry) const {
+    ax_device_callable_inlined transform4x4_t getTransform(const MeshCtx &geometry) const {
       AX_UNREACHABLE;
       return {};
     }

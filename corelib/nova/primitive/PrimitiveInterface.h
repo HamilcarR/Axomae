@@ -38,7 +38,7 @@ namespace nova::primitive {
       return dispatch(disp);
     }
 
-    ax_device_callable_inlined shape::transform::transform4x4_t getTransform(const shape::MeshCtx &geometry) const {
+    ax_device_callable_inlined transform4x4_t getTransform(const shape::MeshCtx &geometry) const {
       auto disp = [&](auto prim) { return prim->getTransform(geometry); };
       return dispatch(disp);
     }

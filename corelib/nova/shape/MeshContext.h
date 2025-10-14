@@ -53,11 +53,11 @@ namespace nova::shape {
       return triangle_views[mesh_id];
     }
 
-    ax_device_callable_inlined transform::transform4x4_t reconstructTransform4x4(size_t mesh_index) const {
+    ax_device_callable_inlined transform4x4_t reconstructTransform4x4(size_t mesh_index) const {
       AX_ASSERT_LT(mesh_index, transforms.mesh_offsets_to_matrix.size());
       std::size_t transform_offset = transform::get_transform_offset(mesh_index, transforms);
       AX_ASSERT_NEQ(transform_offset, transform::INVALID_OFFSET);
-      transform::transform4x4_t returned_transform4x4{};
+      transform4x4_t returned_transform4x4{};
       int err = transform::reconstruct_transform4x4(returned_transform4x4, transform_offset, transforms);
       AX_ASSERT(err == 0, "Error reconstructing transformation matrix");
       return returned_transform4x4;
@@ -86,7 +86,7 @@ namespace nova::shape {
     /**
      * @brief: Retrieves the transformation of a triangle based mesh.
      */
-    ax_device_callable_inlined transform::transform4x4_t getTriMeshTransform(size_t mesh_index) const {
+    ax_device_callable_inlined transform4x4_t getTriMeshTransform(size_t mesh_index) const {
       return geometry_views.reconstructTransform4x4(mesh_index);
     }
 

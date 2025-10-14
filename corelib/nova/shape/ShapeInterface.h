@@ -42,7 +42,7 @@ namespace nova::shape {
       return dispatch(d);
     }
 
-    ax_device_callable_inlined transform::transform4x4_t getTransform(const MeshCtx &geometry) const {
+    ax_device_callable_inlined transform4x4_t getTransform(const MeshCtx &geometry) const {
       auto d = [&](auto shape) { return shape->getTransform(geometry); };
       return dispatch(d);
     }

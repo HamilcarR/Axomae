@@ -3,7 +3,7 @@
 #include <shape/nova_shape.h>
 
 class MeshContextBuilder {
-  nova::shape::transform::TransformStorage transform_storage;
+  transform4x4_tStorage transform_storage;
   nova::shape::triangle::GeometryReferenceStorage host_storage;
 
  public:
