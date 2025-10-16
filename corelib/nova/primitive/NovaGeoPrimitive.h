@@ -20,21 +20,21 @@ namespace nova::primitive {
    public:
     CLASS_DCM(NovaGeoPrimitive)
 
-    ax_device_callable NovaGeoPrimitive(const shape::NovaShapeInterface &shape_, const material::NovaMaterialInterface &material_)
+    ax_device_callable_inlined NovaGeoPrimitive(const shape::NovaShapeInterface &shape_, const material::NovaMaterialInterface &material_)
         : material(material_), shape(shape_) {}
 
-    ax_device_callable bool hit(const Ray &r, float tmin, float tmax, hit_data &data, const shape::MeshCtx &geometry) const {
+    ax_device_callable_inlined bool hit(const Ray &r, float tmin, float tmax, hit_data &data, const shape::MeshCtx &geometry) const {
       return shape.hit(r, tmin, tmax, data, geometry);
     }
 
-    ax_device_callable bool scatter(
+    ax_device_callable_inlined bool scatter(
         const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler, material::shading_data_s &material_ctx) const {
       return material.scatter(in, out, data, sampler, material_ctx);
     }
 
-    ax_device_callable glm::vec3 centroid(const shape::MeshCtx &geometry) const { return shape.centroid(geometry); }
+    ax_device_callable_inlined glm::vec3 centroid(const shape::MeshCtx &geometry) const { return shape.centroid(geometry); }
 
-    ax_device_callable geometry::BoundingBox computeAABB(const shape::MeshCtx &geometry) const { return shape.computeAABB(geometry); }
+    ax_device_callable_inlined geometry::BoundingBox computeAABB(const shape::MeshCtx &geometry) const { return shape.computeAABB(geometry); }
 
     ax_device_callable_inlined shape::face_data_s getFace(const shape::MeshCtx &geometry) const { return shape.getFace(geometry); }
 

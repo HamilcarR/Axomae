@@ -22,8 +22,8 @@ TEST(transform4x4_t, hash_test) {
   glm::mat4 m;
   for (int j = 0; j < 100; j++) {
     trfm.m = gen_rand_mat4(gen);
-    std::size_t h0 = hash(trfm);
-    std::size_t h1 = hash(trfm);
+    std::size_t h0 = transform::hash(trfm);
+    std::size_t h1 = transform::hash(trfm);
     ASSERT_EQ(h0, h1);
   }
 }

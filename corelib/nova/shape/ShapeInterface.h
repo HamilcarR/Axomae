@@ -18,26 +18,26 @@ namespace nova::shape {
    public:
     using tag_ptr::tag_ptr;
 
-    ax_device_callable glm::vec3 centroid(const MeshCtx &geometry) const {
+    ax_device_callable_inlined glm::vec3 centroid(const MeshCtx &geometry) const {
       auto d = [&](auto shape) { return shape->centroid(geometry); };
       return dispatch(d);
     }
-    ax_device_callable geometry::BoundingBox computeAABB(const MeshCtx &geometry) const {
+    ax_device_callable_inlined geometry::BoundingBox computeAABB(const MeshCtx &geometry) const {
       auto d = [&](auto shape) { return shape->computeAABB(geometry); };
       return dispatch(d);
     }
-    ax_device_callable float area(const MeshCtx &geometry) const {
+    ax_device_callable_inlined float area(const MeshCtx &geometry) const {
       auto d = [&](auto shape) { return shape->area(geometry); };
       return dispatch(d);
     }
 
     /* Takes a world space ray , and fills data with world space positions , normals etc. */
-    ax_device_callable bool hit(const Ray &r, float tmin, float tmax, hit_data &data, const MeshCtx &geometry) const {
+    ax_device_callable_inlined bool hit(const Ray &r, float tmin, float tmax, hit_data &data, const MeshCtx &geometry) const {
       auto d = [&](auto shape) { return shape->hit(r, tmin, tmax, data, geometry); };
       return dispatch(d);
     }
 
-    ax_device_callable face_data_s getFace(const MeshCtx &geometry) const {
+    ax_device_callable_inlined face_data_s getFace(const MeshCtx &geometry) const {
       auto d = [&](auto shape) { return shape->getFace(geometry); };
       return dispatch(d);
     }
