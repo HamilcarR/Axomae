@@ -24,7 +24,7 @@ namespace nova {
     texturing::TextureBundleViews texture_bundle_views;
     primitive::CstPrimitivesView primitives_view;
     material::CstNovaMatIntfView material_view;
-    camera::CameraResourcesHolder camera;  // TODO: fix GLM alignment issue on device
+    camera::CameraResourcesHolder camera;
     uint32_t width, height, depth, current_envmap_index, sample_index, sample_max;
   };
 

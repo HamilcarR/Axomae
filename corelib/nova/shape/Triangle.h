@@ -1,6 +1,7 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 #include "MeshContext.h"
+#include <internal/device/gpgpu/device_macros.h>
 #include "ray/Hitable.h"
 #include "ray/IntersectFrame.h"
 #include "ray/Ray.h"
@@ -75,6 +76,8 @@ namespace nova::shape {
 
     ax_device_callable_inlined transform4x4_t getTransform(const MeshCtx &geometry) const { return geometry.getTriMeshTransform(mesh_id); }
 
+    ax_device_callable_inlined const float *getTransformAddr(const MeshCtx &geometry) const { return geometry.getTriMeshTransformAddr(mesh_id); }
+
     ax_device_callable_inlined Triangle(std::size_t mesh_id_, std::size_t triangle_id_) {
       AX_ASSERT_LT(mesh_id, uint32_t(-1));
       AX_ASSERT_LT(triangle_id, uint32_t(-1));  // For cuda compatibility
@@ -144,7 +147,6 @@ namespace nova::shape {
       if (isDegenerate(geometry))
         return false;
       const transform4x4_t transform = getTransform(geometry);
-      data.intersect_transform = transform;
       const glm::vec3 origin = transform.inv * glm::vec4(in_ray.origin, 1.f);
       const glm::vec3 direction = transform.inv * glm::vec4(in_ray.direction, 0.f);
       const Ray ray = Ray(origin, direction);

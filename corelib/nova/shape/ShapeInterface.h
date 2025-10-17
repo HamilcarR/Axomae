@@ -46,6 +46,11 @@ namespace nova::shape {
       auto d = [&](auto shape) { return shape->getTransform(geometry); };
       return dispatch(d);
     }
+
+    ax_device_callable_inlined const float *getTransformAddr(const MeshCtx &geometry) const {
+      auto d = [&](auto shape) { return shape->getTransformAddr(geometry); };
+      return dispatch(d);
+    }
   };
 
   using TYPELIST = NovaShapeInterface::type_pack;

@@ -39,6 +39,8 @@ namespace nova::primitive {
     ax_device_callable_inlined shape::face_data_s getFace(const shape::MeshCtx &geometry) const { return shape.getFace(geometry); }
 
     ax_device_callable_inlined transform4x4_t getTransform(const shape::MeshCtx &geometry) const { return shape.getTransform(geometry); }
+
+    ax_device_callable_inlined const float *getTransformAddr(const shape::MeshCtx &geometry) const { return shape.getTransformAddr(geometry); }
   };
 }  // namespace nova::primitive
 #endif  // NOVAGEOPRIMITIVE_H

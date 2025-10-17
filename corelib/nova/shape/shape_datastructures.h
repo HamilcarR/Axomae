@@ -61,6 +61,20 @@ namespace nova::shape {
       return 0;
     }
 
+    ax_device_callable_inlined int reconstruct_transform4x4(transform4x4_t &ret_transform, const float *matrix_array_buffer) {
+      if (!matrix_array_buffer)
+        return -1;
+      for (size_t i = 0; i < 16; i++) {
+        glm::value_ptr(ret_transform.m)[i] = matrix_array_buffer[i];
+        glm::value_ptr(ret_transform.inv)[i] = matrix_array_buffer[i + 16];
+        glm::value_ptr(ret_transform.t)[i] = matrix_array_buffer[i + 32];
+      }
+      for (size_t i = 0; i < 9; i++) {
+        glm::value_ptr(ret_transform.n)[i] = matrix_array_buffer[i + 48];
+      }
+      return 0;
+    }
+
   }  // namespace transform
 
   enum FACE { TRIANGLE, BOX, SQUARE, SPHERE };

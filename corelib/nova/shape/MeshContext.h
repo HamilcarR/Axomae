@@ -1,5 +1,6 @@
 #ifndef MESHCONTEXT_H
 #define MESHCONTEXT_H
+#include <internal/device/gpgpu/device_macros.h>
 #include "shape_datastructures.h"
 #include <internal/device/gpgpu/device_utils.h>
 
@@ -32,7 +33,7 @@ namespace nova::shape {
       return triangle_mesh_geometry.host_geometry_view;
 #endif
     }
-    ax_device_callable std::size_t triangleCount(size_t mesh_index) const {
+    ax_device_callable_inlined std::size_t triangleCount(size_t mesh_index) const {
       auto triangle_views = getTriangleGeometryViews();
       AX_ASSERT(!triangle_views.empty(), "");
       AX_ASSERT_LT(mesh_index, triangle_views.size());
@@ -41,13 +42,13 @@ namespace nova::shape {
       return obj.indices.size() / 3;
     }
 
-    ax_device_callable std::size_t triMeshCount() const {
+    ax_device_callable_inlined std::size_t triMeshCount() const {
       auto triangle_views = getTriangleGeometryViews();
       AX_ASSERT(!triangle_views.empty(), "");
       return triangle_views.size();
     }
 
-    ax_device_callable const Object3D &getTriangleMesh(size_t mesh_id) const {
+    ax_device_callable_inlined const Object3D &getTriangleMesh(size_t mesh_id) const {
       auto triangle_views = getTriangleGeometryViews();
       AX_ASSERT_LT(mesh_id, triangle_views.size());
       return triangle_views[mesh_id];
@@ -63,7 +64,14 @@ namespace nova::shape {
       return returned_transform4x4;
     }
 
-    ax_device_callable size_t getTransformOffset(size_t mesh_index) const { return transform::get_transform_offset(mesh_index, transforms); }
+    ax_device_callable_inlined const float *getTransformAddr(size_t mesh_index) const {
+      AX_ASSERT_LT(mesh_index, transforms.mesh_offsets_to_matrix.size());
+      std::size_t transform_offset = transform::get_transform_offset(mesh_index, transforms);
+      AX_ASSERT_NEQ(transform_offset, transform::INVALID_OFFSET);
+      return &transforms.matrix_components_view[transform_offset];
+    }
+
+    ax_device_callable_inlined size_t getTransformOffset(size_t mesh_index) const { return transform::get_transform_offset(mesh_index, transforms); }
   };
 
   /**
@@ -76,12 +84,12 @@ namespace nova::shape {
    public:
     CLASS_DCM(MeshCtx)
 
-    ax_device_callable MeshCtx(const MeshBundleViews &geo) : geometry_views(geo) {}
+    ax_device_callable_inlined MeshCtx(const MeshBundleViews &geo) : geometry_views(geo) {}
 
     /**
      * @brief: Retrieves a triangle based mesh from a mesh_index.
      */
-    ax_device_callable const Object3D &getTriMesh(size_t index) const { return geometry_views.getTriangleMesh(index); }
+    ax_device_callable_inlined const Object3D &getTriMesh(size_t index) const { return geometry_views.getTriangleMesh(index); }
 
     /**
      * @brief: Retrieves the transformation of a triangle based mesh.
@@ -90,7 +98,9 @@ namespace nova::shape {
       return geometry_views.reconstructTransform4x4(mesh_index);
     }
 
-    ax_device_callable const MeshBundleViews &getGeometryViews() const { return geometry_views; }
+    ax_device_callable_inlined const float *getTriMeshTransformAddr(size_t mesh_index) const { return geometry_views.getTransformAddr(mesh_index); }
+
+    ax_device_callable_inlined const MeshBundleViews &getGeometryViews() const { return geometry_views; }
   };
 
 }  // namespace nova::shape
