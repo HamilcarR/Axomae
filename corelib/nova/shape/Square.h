@@ -33,6 +33,10 @@ namespace nova::shape {
       AX_UNREACHABLE;
       return {};
     }
+    ax_device_callable_inlined const float *getTransformAddr(const MeshCtx &geometry) const {
+      AX_UNREACHABLE;
+      return {};
+    }
     ax_device_callable face_data_s getFace(const MeshCtx & /*geometry*/) const {
       AX_UNREACHABLE;
       return {};
