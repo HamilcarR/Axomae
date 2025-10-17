@@ -460,6 +460,7 @@ namespace nova {
                                                                                             render_options->getMaxDepth();
         manager.getEngineData().sample_increment = frame_index;
         manager.getEngineData().max_depth = new_depth;
+        manager.getEngineData().renderer_max_samples = render_options->getMaxSamples();
         EngineCallbackManager callback_manager(user_callback.get());
 
         nova::device_traversal_param_s traversal_parameters = fill_params(render_buffer->getRenderBuffers(),
