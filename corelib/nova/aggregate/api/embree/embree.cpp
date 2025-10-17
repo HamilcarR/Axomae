@@ -4,6 +4,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "primitive/PrimitiveInterface.h"
 #include "ray/Hitable.h"
+#include "ray/IntersectFrame.h"
 #include "shape/shape_datastructures.h"
 #include <cstring>
 #include <embree4/rtcore.h>
@@ -88,6 +89,13 @@ namespace nova::aggregate {
   }
 
   template<class T>
+  void validate9(const T *value) {
+    AX_ASSERT_NOTNULL(value);
+    for (unsigned i = 0; i < 9; i++)
+      AX_ASSERT(!ISNAN(value[i]), "");
+  }
+
+  template<class T>
   void assert_not_zero(T value[3]) {
     AX_ASSERT_NOTNULL(value);
     AX_ASSERT(value[0] != 0 || value[1] != 0 || value[2] != 0, "");
@@ -143,7 +151,7 @@ namespace nova::aggregate {
         const Object3D &current_mesh = mesh_geometry.getTriangleMesh(mesh_index);
         std::size_t transform_offset = mesh_geometry.getTransformOffset(mesh_index);
 
-        shape::transform::transform4x4_t transform = mesh_geometry.reconstructTransform4x4(mesh_index);
+        transform4x4_t transform = mesh_geometry.reconstructTransform4x4(mesh_index);
 
         RTCGeometry inst_geometry = addInstancedTriangleMesh(current_mesh, transform, mesh_index);
 
@@ -215,7 +223,7 @@ namespace nova::aggregate {
           geom, RTC_BUFFER_TYPE_VERTEX_ATTRIBUTE, 3, RTC_FORMAT_FLOAT2, mesh.uv.data(), 0, 2 * sizeof(float), mesh.uv.size() / 2);
     }
 
-    RTCGeometry addInstancedTriangleMesh(const Object3D &mesh_geometry, const shape::transform::transform4x4_t &transform, std::size_t mesh_index) {
+    RTCGeometry addInstancedTriangleMesh(const Object3D &mesh_geometry, const transform4x4_t &transform, std::size_t mesh_index) {
       RTCGeometry geometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
       initializeGeometry(geometry, mesh_geometry);
       RTCScene sub_scene = rtcNewScene(device);
@@ -273,9 +281,10 @@ namespace nova::aggregate {
 
     void validate(const bvh_hit_data &hit_return_data) const {
       auto hit_d = hit_return_data.hit_d;
-      validate3(glm::value_ptr(hit_d.normal));
-      validate3(glm::value_ptr(hit_d.bitangent));
-      validate3(glm::value_ptr(hit_d.tangent));
+      const IntersectFrame &frame = hit_d.shading_frame;
+      const glm::mat3 &local_matrix = frame.getFrame();
+
+      validate9(glm::value_ptr(local_matrix));
       validate3(glm::value_ptr(hit_d.position));
       validate1(hit_d.t);
       validate1(hit_d.u);
@@ -291,16 +300,22 @@ namespace nova::aggregate {
       hit_return_data.hit_d.position = ray.pointAt(result.ray.tfar);
 
       auto *user_g = static_cast<const user_geometry_structure_s *>(rtcGetGeometryUserDataFromScene(root_scene, result.hit.geomID));
-      auto transform = scene_geometry_data.mesh_geometry.reconstructTransform4x4(user_g->mesh_index);
 
       hit_return_data.last_primit = getPrimitiveFromGlobalOffset(result.hit.geomID, result.hit.primID, primitive_global_offset, scene_geometry_data);
       float normals[3]{}, tangents[3]{}, bitangents[3]{}, uv[2]{};
       interpolate(result, normals, tangents, bitangents, uv);
       hit_return_data.hit_d.u = uv[0];
       hit_return_data.hit_d.v = uv[1];
-      hit_return_data.hit_d.normal = glm::normalize(transform.n * glm::vec3(normals[0], normals[1], normals[2]));
-      hit_return_data.hit_d.tangent = glm::normalize(transform.n * glm::vec3(tangents[0], tangents[1], tangents[2]));
-      hit_return_data.hit_d.bitangent = glm::normalize(transform.n * glm::vec3(bitangents[0], bitangents[1], bitangents[2]));
+
+      auto transform = scene_geometry_data.mesh_geometry.reconstructTransform4x4(user_g->mesh_index);
+
+      glm::vec3 transformed_normal = transform.n * glm::vec3(normals[0], normals[1], normals[2]);
+      glm::vec3 transformed_tangent = transform.n * glm::vec3(tangents[0], tangents[1], tangents[2]);
+      glm::vec3 transformed_bitangent = transform.n * glm::vec3(bitangents[0], bitangents[1], bitangents[2]);
+
+      IntersectFrame intersection_frame(transformed_tangent, transformed_bitangent, transformed_normal, true);
+
+      hit_return_data.hit_d.shading_frame = intersection_frame;
     }
   };
 

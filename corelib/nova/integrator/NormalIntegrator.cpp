@@ -42,7 +42,7 @@ namespace nova::integrator {
       shading.texture_aggregate = &texture_data;
       if (!hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, sampler, shading) || depth < 0)
         return glm::vec4(0.f);
-      glm::vec4 normal = {hit.hit_d.normal, 1.f};
+      glm::vec4 normal = {hit.hit_d.shading_frame.getNormal(), 1.f};
       return normal;
     }
     return glm::vec4(0.f);

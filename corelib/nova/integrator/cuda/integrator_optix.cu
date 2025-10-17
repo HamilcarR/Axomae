@@ -7,9 +7,10 @@ ax_device_force_inlined void AX_THROW(unsigned code, Args... detail) {
 
 ax_device_force_inlined nova::hit_data payload2hitd(const path_payload_s &pld, const nova::Ray &wray) {
   nova::hit_data hit_d;
-  hit_d.normal = glm::vec3(pld.normal_matrix[0], pld.normal_matrix[1], pld.normal_matrix[2]);
-  hit_d.tangent = glm::vec3(pld.normal_matrix[3], pld.normal_matrix[4], pld.normal_matrix[5]);
-  hit_d.bitangent = glm::vec3(pld.normal_matrix[6], pld.normal_matrix[7], pld.normal_matrix[8]);
+  glm::vec3 normal = glm::vec3(pld.normal_matrix[0], pld.normal_matrix[1], pld.normal_matrix[2]);
+  glm::vec3 tangent = glm::vec3(pld.normal_matrix[3], pld.normal_matrix[4], pld.normal_matrix[5]);
+  glm::vec3 bitangent = glm::vec3(pld.normal_matrix[6], pld.normal_matrix[7], pld.normal_matrix[8]);
+  hit_d.shading_frame = IntersectFrame(tangent, bitangent, normal, true);
   hit_d.u = pld.u;
   hit_d.v = pld.v;
   hit_d.t = pld.t;

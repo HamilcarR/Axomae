@@ -1,6 +1,8 @@
 #ifndef HITABLE_H
 #define HITABLE_H
-#include <internal/common/math/math_utils.h>
+#include "IntersectFrame.h"
+#include <internal/common/math/utils_3D.h>
+
 namespace nova {
 
   /**
@@ -19,11 +21,11 @@ namespace nova {
 
   /* Each hit with a shape , primitive and their materials, fills this structure with the hit computed data. */
   struct hit_data {
+    IntersectFrame shading_frame{};
+
     glm::vec4 attenuation{};
     glm::vec4 emissive{};
-    glm::vec3 normal{};
-    glm::vec3 tangent{};
-    glm::vec3 bitangent{};
+
     glm::vec3 position{};
     float u{}, v{}, t{1e30f};
   };
