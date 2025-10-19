@@ -64,10 +64,11 @@ namespace nova::integrator {
       Ray out{};
       material::shading_data_s shading{};
       shading.texture_aggregate = &texture_sampling_data;
-      if (depth < 0 || !hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, sampler, shading))
+      material_record_s mat_record{};
+      if (depth < 0 || !hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, mat_record, sampler, shading))
         return glm::vec4(0.f);
-      glm::vec4 color = hit.hit_d.attenuation;
-      glm::vec4 emit = hit.hit_d.emissive;
+      glm::vec4 color = glm::vec4(mat_record.attenuation.toRgb({}, {}), 1.f);
+      glm::vec4 emit = glm::vec4(mat_record.emissive.toRgb({}, {}), 1.f);
       /* Here in case the value returned by the subsequent call to Li() is a NaN or Inf, we invalidate the color of the pixel altogether and set it
       * to zero. This helps keep a more uniform and precise value as the next sampling pass will be joined to the current pass and set a valid value
        to the pixel.*/

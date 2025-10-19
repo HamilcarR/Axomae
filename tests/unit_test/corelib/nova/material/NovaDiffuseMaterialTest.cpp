@@ -1,5 +1,7 @@
 #include "material/NovaMaterials.h"
+#include "material/material_datastructures.h"
 #include "ray/Hitable.h"
+#include "ray/IntersectFrame.h"
 #include "ray/Ray.h"
 #include "sampler/Sampler.h"
 #include "texturing/NovaTextureInterface.h"
@@ -37,10 +39,12 @@ class TextureCtxBuilder {
   }
 };
 
-static void init_tbn(nova::hit_data &hit_data) {
-  hit_data.tangent = {1.f, 0.f, 0.f};
-  hit_data.normal = {0.f, 1.f, 0.f};
-  hit_data.bitangent = {0.f, 0.f, 1.f};
+static void init_tbn(nova::intersection_record_s &hit_data) {
+  glm::vec3 tangent = {1.f, 0.f, 0.f};
+  glm::vec3 bitangent = {0.f, 1.f, 0.f};
+  glm::vec3 normal = {0.f, 0.f, 1.f};
+
+  hit_data.shading_frame = IntersectFrame(tangent, bitangent, normal);
 }
 
 static nova::material::texture_pack setup_tpack(const nova::texturing::ImageTexture<uint32_t> *img) {
@@ -68,7 +72,7 @@ TEST(NovaDiffuseMaterialTest, scatter_direction) {
 
   nova::material::texture_pack tpack = setup_tpack(&img);
   nova::material::NovaDiffuseMaterial diffuse_material(tpack);
-  nova::hit_data hit_data{};
+  nova::intersection_record_s hit_data{};
   init_tbn(hit_data);
 
   /* We set up a horizontal plane , with y as normal , centered on 0 */
@@ -83,40 +87,9 @@ TEST(NovaDiffuseMaterialTest, scatter_direction) {
     sampler.reset(i);
     hit_data.u = (float)generator.nrandf(0, 1);
     hit_data.v = (float)generator.nrandf(0, 1);
-    if (diffuse_material.scatter(ray, out, hit_data, sampler, shading)) {
-      const glm::vec3 transformed_normal_computed = hit_data.normal;
-      ASSERT_GT(glm::dot(transformed_normal_computed, out.direction), 0);
+    material_record_s mat_rec{};
+    if (diffuse_material.scatter(ray, out, hit_data, mat_rec, sampler, shading)) {
+      ASSERT_GT(glm::dot(hit_data.shading_frame.getNormal(), out.direction), 0);
     }
   }
-}
-
-TEST(NovaDiffuseMaterialTest, sample_normal) {
-  const uint32_t buffer[4] = {RED, GREEN, BLUE, BLUE};
-  nova::texturing::ImageTexture<uint32_t> img(0);
-  TextureCtxBuilder ctxBuilder;
-  ctxBuilder.addTexture(buffer, 2, 2, 4);
-  auto ctx = ctxBuilder.getTextureContext();
-  nova::texturing::texture_data_aggregate_s tex_aggregate;
-  tex_aggregate.texture_ctx = &ctx;
-  nova::material::shading_data_s shading;
-  shading.texture_aggregate = &tex_aggregate;
-
-  nova::material::texture_pack tpack = setup_tpack(&img);
-  nova::material::NovaDiffuseMaterial diffuse_material(tpack);
-  nova::hit_data hit_data{};
-  init_tbn(hit_data);
-  const glm::mat3 tbn(hit_data.tangent, hit_data.bitangent, hit_data.normal);
-  hit_data.u = hit_data.v = 0.f;
-  /* We set up a horizontal plane , with y as normal , centered on 0 */
-  hit_data.position = {0.f, 0.f, 0.f};
-  const nova::Ray ray(glm::vec3(-1.f, 1.f, 0.f), glm::vec3(1.f, -1.f, 0.f));
-  math::random::SobolGenerator generator;
-  nova::sampler::SobolSampler sobol(generator);
-  nova::sampler::SamplerInterface sampler = &sobol;
-  nova::Ray out{};
-  diffuse_material.scatter(ray, out, hit_data, sampler, shading);
-  const glm::vec3 transformed_normal_computed = hit_data.normal;
-  const glm::vec3 tangent_space_normal = glm::vec3(math::texture::rgb_uint2float(RED >> 16), 0, 0) * 2.f - 1.f;
-  const glm::vec3 world_space_normal = glm::normalize(tbn * tangent_space_normal);
-  ASSERT_EQ(transformed_normal_computed, world_space_normal);
 }

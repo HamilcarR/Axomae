@@ -12,14 +12,18 @@ namespace nova::primitive {
   class NovaPrimitiveInterface : public core::tag_ptr<NovaGeoPrimitive> {
    public:
     using tag_ptr::tag_ptr;
-    ax_device_callable_inlined bool hit(const Ray &r, float tmin, float tmax, hit_data &data, const shape::MeshCtx &geometry) const {
+    ax_device_callable_inlined bool hit(const Ray &r, float tmin, float tmax, intersection_record_s &data, const shape::MeshCtx &geometry) const {
       auto disp = [&](auto prim) { return prim->hit(r, tmin, tmax, data, geometry); };
       return dispatch(disp);
     }
 
-    ax_device_callable_inlined bool scatter(
-        const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler, material::shading_data_s &mat_ctx) const {
-      auto disp = [&](auto prim) { return prim->scatter(in, out, data, sampler, mat_ctx); };
+    ax_device_callable_inlined bool scatter(const Ray &in,
+                                            Ray &out,
+                                            const intersection_record_s &data,
+                                            material_record_s &sampled_pixel_material,
+                                            sampler::SamplerInterface &sampler,
+                                            material::shading_data_s &mat_ctx) const {
+      auto disp = [&](auto prim) { return prim->scatter(in, out, data, sampled_pixel_material, sampler, mat_ctx); };
       return dispatch(disp);
     }
 

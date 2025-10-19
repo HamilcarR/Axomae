@@ -32,7 +32,7 @@ namespace nova::shape {
     }
 
     /* Takes a world space ray , and fills data with world space positions , normals etc. */
-    ax_device_callable_inlined bool hit(const Ray &r, float tmin, float tmax, hit_data &data, const MeshCtx &geometry) const {
+    ax_device_callable_inlined bool hit(const Ray &r, float tmin, float tmax, intersection_record_s &data, const MeshCtx &geometry) const {
       auto d = [&](auto shape) { return shape->hit(r, tmin, tmax, data, geometry); };
       return dispatch(d);
     }

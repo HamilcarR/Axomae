@@ -1,13 +1,13 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 #include "MeshContext.h"
-#include <internal/device/gpgpu/device_macros.h>
 #include "ray/Hitable.h"
 #include "ray/IntersectFrame.h"
 #include "ray/Ray.h"
 #include "shape_datastructures.h"
 #include <internal/common/math/math_utils.h>
 #include <internal/common/math/utils_3D.h>
+#include <internal/device/gpgpu/device_macros.h>
 #include <internal/device/gpgpu/device_utils.h>
 #include <internal/geometry/BoundingBox.h>
 #include <internal/geometry/Object3D.h>
@@ -143,7 +143,8 @@ namespace nova::shape {
     /*
      * https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
      */
-    ax_device_callable_inlined bool hit(const Ray &in_ray, float tmin, float last_hit_tmax, hit_data &data, const MeshCtx &geometry) const {
+    ax_device_callable_inlined bool hit(
+        const Ray &in_ray, float tmin, float last_hit_tmax, intersection_record_s &data, const MeshCtx &geometry) const {
       if (isDegenerate(geometry))
         return false;
       const transform4x4_t transform = getTransform(geometry);

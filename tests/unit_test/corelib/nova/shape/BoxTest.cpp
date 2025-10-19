@@ -27,7 +27,7 @@ TEST(BoxTest, outIntersection) {
       isoutside = is_outside_box(out_position, B1.computeAABB());
     } while (!isoutside);
     const nova::Ray ray(out_position, glm::normalize(B1.getPosition() - out_position));
-    nova::hit_data data;
+    nova::intersection_record_s data;
     EXPECT_TRUE(B1.hit(ray, 0.001, 10000.f, data, {}));
   }
 }
@@ -50,7 +50,7 @@ TEST(BoxTest, inIntersection) {
       const glm::vec3 direction{directions[i], directions[i + 1], directions[i + 2]};
       const nova::Ray ray(out_position, direction);
       glm::vec3 n;
-      nova::hit_data data;
+      nova::intersection_record_s data;
       EXPECT_TRUE(B1.hit(ray, 0.001, 10000.f, data, {}));
     }
   }

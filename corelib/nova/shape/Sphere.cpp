@@ -6,7 +6,7 @@
 namespace nova::shape {
   ax_device_callable Sphere::Sphere(const glm::vec3 &o, float r) : origin(o), radius(r) {}
 
-  ax_device_callable bool Sphere::hit(const Ray &r, float tmin, float tmax, hit_data &data, const MeshCtx & /*geometry*/) const {
+  ax_device_callable bool Sphere::hit(const Ray &r, float tmin, float tmax, intersection_record_s &data, const MeshCtx & /*geometry*/) const {
     const glm::vec3 oc = r.origin - origin;
     const float b = 2.f * glm::dot(r.direction, oc);
     const float a = glm::dot(r.direction, r.direction);

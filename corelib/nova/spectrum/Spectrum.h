@@ -1,5 +1,6 @@
 #ifndef SPECTRUM_H
 #define SPECTRUM_H
+#include "internal/device/gpgpu/device_macros.h"
 #include "spectrum/BaseSpectrum.h"
 namespace nova {
 
@@ -18,7 +19,21 @@ namespace nova {
     float samples[SPECTRUM_SAMPLES]{};
 
    public:
-    ax_device_callable_inlined ColorSpectrum() = default;
+    ax_device_callable_inlined ColorSpectrum(const glm::vec3 &color) {
+      for (unsigned i = 0; i < SPECTRUM_SAMPLES; i++)
+        samples[i] = (&color.x)[i];
+    }
+
+    ax_device_callable_inlined ColorSpectrum &operator=(const glm::vec3 &color) {
+      for (unsigned i = 0; i < SPECTRUM_SAMPLES; i++)
+        samples[i] = (&color.x)[i];
+      return *this;
+    }
+
+    ax_device_callable_inlined ColorSpectrum() {
+      for (unsigned i = 0; i < SPECTRUM_SAMPLES; i++)
+        samples[i] = 1.f;
+    }
 
     ax_device_callable_inlined ColorSpectrum(float v) {
       for (unsigned i = 0; i < SPECTRUM_SAMPLES; i++)

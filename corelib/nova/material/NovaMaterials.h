@@ -8,6 +8,7 @@
 #include "ray/IntersectFrame.h"
 #include "ray/Ray.h"
 #include "sampler/Sampler.h"
+#include "spectrum/Spectrum.h"
 #include "texturing/texture_datastructures.h"
 #include <internal/common/axstd/span.h>
 #include <internal/common/math/math_includes.h>
@@ -51,8 +52,12 @@ namespace nova::material {
 
     ax_device_callable_inlined NovaDiffuseMaterial(const texture_pack &texture) : t_pack(texture) {}
 
-    ax_device_callable_inlined bool scatter(
-        const Ray & /*in*/, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler, shading_data_s &mat_ctx) const {
+    ax_device_callable_inlined bool scatter(const Ray & /*in*/,
+                                            Ray &out,
+                                            const intersection_record_s &hit_d,
+                                            material_record_s &mat_rec,
+                                            sampler::SamplerInterface &sampler,
+                                            shading_data_s &mat_ctx) const {
       AX_ASSERT_NOTNULL(mat_ctx.texture_aggregate);
       TexturePackSampler texture_pack_sampler(t_pack);
       const IntersectFrame &shading_frame = hit_d.shading_frame;
@@ -64,8 +69,11 @@ namespace nova::material {
       out.origin = hit_d.position + geometric_world_normal * INTERSECT_OFFSET;
 
       mat_ctx.texture_aggregate->geometric_data.sampling_vector = hit_d.position;
-      hit_d.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
-      hit_d.emissive = texture_pack_sampler.emissive(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
+
+      mat_rec = {};
+      mat_rec.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
+      mat_rec.emissive = texture_pack_sampler.emissive(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
+      mat_rec.normal = perturbed_world_normal;
       return glm::dot(geometric_world_normal, out.direction) > 0;
     }
   };
@@ -82,8 +90,12 @@ namespace nova::material {
 
     ax_device_callable_inlined NovaConductorMaterial(const texture_pack &texture, float fuzz_) : t_pack(texture), fuzz(fuzz_) {}
 
-    ax_device_callable_inlined bool scatter(
-        const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler, shading_data_s &mat_ctx) const {
+    ax_device_callable_inlined bool scatter(const Ray &in,
+                                            Ray &out,
+                                            const intersection_record_s &hit_d,
+                                            material_record_s &mat_rec,
+                                            sampler::SamplerInterface &sampler,
+                                            shading_data_s &mat_ctx) const {
       AX_ASSERT_NOTNULL(mat_ctx.texture_aggregate);
       TexturePackSampler texture_pack_sampler(t_pack);
       const IntersectFrame &shading_frame = hit_d.shading_frame;
@@ -99,8 +111,12 @@ namespace nova::material {
       out.direction = DENAN(glm::normalize(reflected + generated_direction_vector * fuzz), glm::normalize(reflected));
 
       mat_ctx.texture_aggregate->geometric_data.sampling_vector = hit_d.position;
-      hit_d.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
-      hit_d.emissive = texture_pack_sampler.emissive(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
+
+      mat_rec = {};
+      mat_rec.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
+      mat_rec.emissive = texture_pack_sampler.emissive(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
+      mat_rec.normal = perturbed_world_normal;
+
       return glm::dot(geometric_world_normal, out.direction) > 0;
     }
   };
@@ -134,8 +150,12 @@ namespace nova::material {
 
     ax_device_callable_inlined NovaDielectricMaterial(const texture_pack &texture, float ior) : t_pack(texture), eta(ior) {}
 
-    ax_device_callable_inlined bool scatter(
-        const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler, shading_data_s &mat_ctx) const {
+    ax_device_callable_inlined bool scatter(const Ray &in,
+                                            Ray &out,
+                                            const intersection_record_s &hit_d,
+                                            material_record_s &mat_rec,
+                                            sampler::SamplerInterface &sampler,
+                                            shading_data_s &mat_ctx) const {
       TexturePackSampler texture_pack_sampler(t_pack);
       const IntersectFrame &shading_frame = hit_d.shading_frame;
 
@@ -149,8 +169,7 @@ namespace nova::material {
       out.origin = hit_d.position;
       AX_ASSERT_NOTNULL(mat_ctx.texture_aggregate);
       mat_ctx.texture_aggregate->geometric_data.sampling_vector = out.origin;
-      hit_d.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
-      hit_d.emissive = texture_pack_sampler.emissive(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
+
       float index = eta;
       float reflect_prob = 0.f;
       float cosine = 0.f;
@@ -172,6 +191,12 @@ namespace nova::material {
       else
         out.direction = glm::normalize(refracted);
       AX_ASSERT(!ISNAN(out.direction), "");
+
+      mat_rec = {};
+      mat_rec.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
+      mat_rec.emissive = texture_pack_sampler.emissive(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
+      mat_rec.normal = perturbed_world_normal;
+
       return true;
     }
   };
@@ -179,9 +204,13 @@ namespace nova::material {
   class NovaMaterialInterface : public core::tag_ptr<NovaDiffuseMaterial, NovaDielectricMaterial, NovaConductorMaterial> {
    public:
     using tag_ptr::tag_ptr;
-    ax_device_callable_inlined bool scatter(
-        const Ray &in, Ray &out, hit_data &hit_d, sampler::SamplerInterface &sampler, shading_data_s &mat_ctx) const {
-      auto disp = [&](auto material) { return material->scatter(in, out, hit_d, sampler, mat_ctx); };
+    ax_device_callable_inlined bool scatter(const Ray &in,
+                                            Ray &out,
+                                            const intersection_record_s &hit_d,
+                                            material_record_s &mat_rec,
+                                            sampler::SamplerInterface &sampler,
+                                            shading_data_s &mat_ctx) const {
+      auto disp = [&](auto material) { return material->scatter(in, out, hit_d, mat_rec, sampler, mat_ctx); };
       return dispatch(disp);
     }
   };

@@ -11,7 +11,7 @@ namespace nova::shape {
     center = (side_h + side_w) * 0.5f;
   }
 
-  bool Square::hit(const Ray &ray, float tmin, float tmax, hit_data &data, const MeshCtx & /*geometry*/) const {
+  bool Square::hit(const Ray &ray, float tmin, float tmax, intersection_record_s &data, const MeshCtx & /*geometry*/) const {
     glm::vec3 n = normal;
     if (glm::dot(ray.origin - origin, n) < 0)
       n = -n;
