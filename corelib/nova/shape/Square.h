@@ -25,7 +25,7 @@ namespace nova::shape {
      **/
     ax_device_callable Square(const glm::vec3 &origin_, const glm::vec3 &side_w_, const glm::vec3 &side_h_);
 
-    ax_device_callable bool hit(const Ray &ray, float tmin, float tmax, hit_data &data, const MeshCtx &geometry) const;
+    ax_device_callable bool hit(const Ray &ray, float tmin, float tmax, intersection_record_s &data, const MeshCtx &geometry) const;
     ax_device_callable ax_no_discard glm::vec3 centroid(const MeshCtx &geometry) const { return center; }
     ax_device_callable ax_no_discard geometry::BoundingBox computeAABB(const MeshCtx &geometry) const;
     ax_device_callable ax_no_discard float area(const MeshCtx &geometry) const { return glm::length(side_w) * glm::length(side_h); }

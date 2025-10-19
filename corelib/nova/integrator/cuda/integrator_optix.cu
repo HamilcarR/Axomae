@@ -1,12 +1,14 @@
 #include "common_routines.cuh"
 
+// TODO: Provide unified API between CPU integrator and GPU integrator.
+
 template<typename... Args>
 ax_device_force_inlined void AX_THROW(unsigned code, Args... detail) {
   optixThrowException(code, detail...);
 }
 
-ax_device_force_inlined nova::hit_data payload2hitd(const path_payload_s &pld, const nova::Ray &wray) {
-  nova::hit_data hit_d;
+ax_device_force_inlined nova::intersection_record_s payload2hitd(const path_payload_s &pld, const nova::Ray &wray) {
+  nova::intersection_record_s hit_d;
   glm::vec3 normal = glm::vec3(pld.normal_matrix[0], pld.normal_matrix[1], pld.normal_matrix[2]);
   glm::vec3 tangent = glm::vec3(pld.normal_matrix[3], pld.normal_matrix[4], pld.normal_matrix[5]);
   glm::vec3 bitangent = glm::vec3(pld.normal_matrix[6], pld.normal_matrix[7], pld.normal_matrix[8]);
@@ -64,17 +66,20 @@ extern "C" ax_kernel void __raygen__main() {
       break;
     }
     nv_prim::NovaPrimitiveInterface prim = ax_primitive_view[pld.prim_idx];
-    nova::hit_data hit_d = payload2hitd(pld, wi);
+    nova::intersection_record_s hit_d = payload2hitd(pld, wi);
     nv_tex::TextureCtx ctx(ax_texture_bundle);
     nv_tex::texture_data_aggregate_s tex_aggregate;
     tex_aggregate.texture_ctx = &ctx;
     nv_mat::shading_data_s shading;
     shading.texture_aggregate = &tex_aggregate;
     nova::Ray wo;
-    if (prim.scatter(wi, wo, hit_d, sampler, shading)) {
+    material_record_s mat_rec = {};
+    if (prim.scatter(wi, wo, hit_d, mat_rec, sampler, shading)) {
       origin = {wo.origin.x, wo.origin.y, wo.origin.z};
       direction = {wo.direction.x, wo.direction.y, wo.direction.z};
-      attenuation = DENAN(10.f * hit_d.emissive + hit_d.attenuation * attenuation);
+      glm::vec4 color = glm::vec4(mat_rec.attenuation.toRgb({}, {}), 1.f);
+      glm::vec4 emissive = glm::vec4(mat_rec.emissive.toRgb({}, {}), 1.f);
+      attenuation = DENAN(10.f * emissive + color * attenuation);
     } else {
       attenuation = glm::vec4(0.f);
       break;

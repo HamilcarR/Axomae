@@ -247,7 +247,7 @@ void Scene::focusOnRenderable(int x, int y) {
     const glm::mat4 world_mat = elem.drawable->getMeshPointer()->computeFinalTransformation();
     const glm::mat4 inv_world_mat = glm::inverse(world_mat);
     const nova::Ray ray(inv_world_mat * glm::vec4(r.near, 1.f), inv_world_mat * glm::vec4(r.far, 0.f));
-    nova::hit_data data{};
+    nova::intersection_record_s data{};
     if (elem.aabb.hit(ray, scene_camera->getNear(), scene_camera->getFar(), data, {})) {
       glm::vec3 pos = elem.aabb.getPosition();
       const glm::vec3 box_center_worldspace = world_mat * glm::vec4(pos, 1.f);

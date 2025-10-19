@@ -6,7 +6,7 @@
 struct bvh_hit_data {
   bool is_hit{false};
   const nova::primitive::NovaPrimitiveInterface *last_primit{nullptr};
-  nova::hit_data hit_d;
+  nova::intersection_record_s hit_d;
   float prim_min_t{};
   float prim_max_t{};
   const bool *is_rendering{nullptr};

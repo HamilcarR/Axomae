@@ -23,13 +23,17 @@ namespace nova::primitive {
     ax_device_callable_inlined NovaGeoPrimitive(const shape::NovaShapeInterface &shape_, const material::NovaMaterialInterface &material_)
         : material(material_), shape(shape_) {}
 
-    ax_device_callable_inlined bool hit(const Ray &r, float tmin, float tmax, hit_data &data, const shape::MeshCtx &geometry) const {
+    ax_device_callable_inlined bool hit(const Ray &r, float tmin, float tmax, intersection_record_s &data, const shape::MeshCtx &geometry) const {
       return shape.hit(r, tmin, tmax, data, geometry);
     }
 
-    ax_device_callable_inlined bool scatter(
-        const Ray &in, Ray &out, hit_data &data, sampler::SamplerInterface &sampler, material::shading_data_s &material_ctx) const {
-      return material.scatter(in, out, data, sampler, material_ctx);
+    ax_device_callable_inlined bool scatter(const Ray &in,
+                                            Ray &out,
+                                            const intersection_record_s &data,
+                                            material_record_s &sampled_material,
+                                            sampler::SamplerInterface &sampler,
+                                            material::shading_data_s &material_ctx) const {
+      return material.scatter(in, out, data, sampled_material, sampler, material_ctx);
     }
 
     ax_device_callable_inlined glm::vec3 centroid(const shape::MeshCtx &geometry) const { return shape.centroid(geometry); }

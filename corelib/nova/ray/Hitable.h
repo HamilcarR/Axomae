@@ -2,7 +2,6 @@
 #define HITABLE_H
 #include "IntersectFrame.h"
 #include <internal/common/math/utils_3D.h>
-
 namespace nova {
 
   /**
@@ -19,13 +18,8 @@ namespace nova {
     T data;
   };
 
-  /* Each hit with a shape , primitive and their materials, fills this structure with the hit computed data. */
-  struct hit_data {
+  struct intersection_record_s {
     IntersectFrame shading_frame{};
-
-    glm::vec4 attenuation{};
-    glm::vec4 emissive{};
-
     glm::vec3 position{};
     float u{}, v{}, t{1e30f};
   };
@@ -34,7 +28,7 @@ namespace nova {
   class Hitable {
    public:
     virtual ~Hitable() = default;
-    virtual bool hit(const Ray &r, float tmin, float tmax, hit_data &data, base_options *user_options) const = 0;
+    virtual bool hit(const Ray &r, float tmin, float tmax, intersection_record_s &data, base_options *user_options) const = 0;
   };
 }  // namespace nova
 #endif  // Hitable_H

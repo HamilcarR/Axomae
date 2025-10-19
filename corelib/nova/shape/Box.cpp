@@ -1,6 +1,7 @@
 
 #include "Box.h"
 #include "MeshContext.h"
+#include "ray/Hitable.h"
 #include "ray/Ray.h"
 namespace nova::shape {
   Box::Box(const glm::vec3 &min_coords, const glm::vec3 &max_coords) : aabb(min_coords, max_coords) {}
@@ -66,7 +67,7 @@ namespace nova::shape {
     return true;
   }
 
-  bool Box::hit(const Ray &ray, float tmin, float tmax, hit_data &data, const MeshCtx & /*geometry*/) const {
+  bool Box::hit(const Ray &ray, float tmin, float tmax, intersection_record_s &data, const MeshCtx & /*geometry*/) const {
     const glm::vec3 x_axis = glm::vec3(1, 0, 0);
     const glm::vec3 y_axis = glm::vec3(0, 1, 0);
     const glm::vec3 z_axis = glm::vec3(0, 0, 1);
