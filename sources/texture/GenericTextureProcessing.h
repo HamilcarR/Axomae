@@ -15,7 +15,7 @@
  */
 
 template<class T>
-class TextureData : public core::memory::Serializable {
+class TextureData : public axstd::Serializable {
  public:
   enum CHANNELS : unsigned { RGB = 0, RGBA = 1 };
   uint8_t nb_components{};

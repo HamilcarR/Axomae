@@ -1,11 +1,12 @@
 #ifndef MEMORYARENA_H
 #define MEMORYARENA_H
-#include "internal/debug/debug_utils.h"
-#include "internal/macro/project_macros.h"
+#include "Allocator.h"
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <cstddef>
+#include <internal/debug/debug_utils.h>
+#include <internal/macro/project_macros.h>
 #include <list>
 #include <new>
 #include <unordered_map>
@@ -18,7 +19,7 @@
  * store small struct like objects.
  * Deallocation of individual resource should be made by the caller.This structures doesn't execute destructors.
  */
-namespace core::memory {
+namespace axstd {
   constexpr std::size_t B256_ALIGN = 256;
   constexpr std::size_t B128_ALIGN = 128;
   constexpr std::size_t B64_ALIGN = 64;
@@ -33,7 +34,6 @@ namespace core::memory {
   constexpr std::size_t DEFAULT_BLOCK_SIZE = 262144;
   template<class T = std::byte>
   class MemoryArena {
-   private:
     using value_type = T;
     /* Keep track of named allocations... useful for debug */
     using tag_map_t = std::unordered_map<const void *, const char *>;
@@ -54,7 +54,6 @@ namespace core::memory {
     using internal_block_alloc_map_t = std::unordered_map<const void *, ptr_list_t>;
     using block_list_t = std::list<block_t>;
 
-   private:
     std::size_t block_size;
     /* This is implicit block, used block list can be empty ,
      * but current_block_ptr can be used , so there's in fact 1 used block even though used_blocks is empty*/
@@ -63,6 +62,79 @@ namespace core::memory {
     block_list_t used_blocks, free_blocks;
     tag_map_t tag_map;
     internal_block_alloc_map_t internal_block_alloc_map;
+
+    std::size_t compute_alignment(std::size_t value, std::size_t align = PLATFORM_ALIGN) { return (value + align - 1) & ~(align - 1); }
+
+    bool belong(const void *address, const block_t &block) const {
+      auto ptr_address = reinterpret_cast<std::uintptr_t>(address);
+      auto block_address = reinterpret_cast<std::uintptr_t>(block.current_block_ptr);
+      if (ptr_address >= block_address && ptr_address < block_address + block.current_alloc_size)
+        return true;
+      return false;
+    }
+
+    block_t searchBlock(const void *ptr) const {
+      if (belong(ptr, current_block))
+        return current_block;
+      for (const block_t &block : used_blocks)
+        if (belong(ptr, block))
+          return block;
+      return {};
+    }
+    const_block_t getCurrentBlock() const {
+      const_block_t current;
+      current.current_block_ptr = current_block.current_block_ptr;
+      current.current_alloc_size = current_block.current_alloc_size;
+      current.current_alignment = current_block.current_alignment;
+      return current;
+    }
+
+    template<class U>
+    U *allocAlign(std::size_t count, std::size_t align = PLATFORM_ALIGN) {
+      std::size_t total_size = count * sizeof(U);
+      auto alignment = static_cast<std::align_val_t>(align);
+      void *ptr = ::operator new(total_size, alignment);
+      return static_cast<U *>(ptr);
+    }
+
+    void freeAlign(void *ptr, std::size_t align = PLATFORM_ALIGN) {
+      auto alignment = static_cast<std::align_val_t>(align);
+      ::operator delete(ptr, alignment);
+    }
+
+    typename block_list_t::const_iterator getUsedBlockItr(void *ptr) const {
+      T *block_ptr = static_cast<T *>(ptr);
+      for (typename block_list_t::const_iterator block = used_blocks.begin(); block != used_blocks.end(); block++) {
+        if (block->current_block_ptr == block_ptr)
+          return block;
+      }
+      return used_blocks.end();
+    }
+
+    void addCurrentBlockToUsed() {
+      if (current_block.current_block_ptr) {
+        used_blocks.push_back({current_block.current_block_ptr, current_block.current_alignment, current_block.current_alloc_size});
+        current_block.current_block_ptr = nullptr;
+        current_block.current_alloc_size = 0;
+        current_block_offset = 0;
+      }
+    }
+
+    void addCurrentBlockToFree() {
+      if (current_block.current_block_ptr) {
+        free_blocks.push_back({current_block.current_block_ptr, current_block.current_alignment, current_block.current_alloc_size});
+        current_block.current_block_ptr = nullptr;
+        current_block.current_alloc_size = 0;
+        current_block_offset = 0;
+      }
+    }
+
+    void moveUsedToFree(typename block_list_t::const_iterator &to_move) {
+      if (!to_move->current_block_ptr)
+        return;
+      free_blocks.push_back({to_move->current_block_ptr, to_move->current_alignment, to_move->current_alloc_size});
+      used_blocks.erase(to_move);
+    }
 
    public:
     MemoryArena(const MemoryArena &) = delete;
@@ -81,11 +153,11 @@ namespace core::memory {
         freeAlign(block.current_block_ptr, block.current_alignment);
     }
 
-    ax_no_discard std::size_t getFreeBlocksNum() const { return free_blocks.size(); }
+    std::size_t getFreeBlocksNum() const { return free_blocks.size(); }
 
-    ax_no_discard std::size_t getUsedBlocksNum() const { return used_blocks.size(); }
+    std::size_t getUsedBlocksNum() const { return used_blocks.size(); }
 
-    ax_no_discard std::size_t getCurrentAlignment() const { return current_block.current_alignment; }
+    std::size_t getCurrentAlignment() const { return current_block.current_alignment; }
 
     const block_list_t &getFreeBlocks() const { return free_blocks; }
 
@@ -202,82 +274,9 @@ namespace core::memory {
         return;
       moveUsedToFree(to_dealloc);
     }
-
-   private:
-    std::size_t compute_alignment(std::size_t value, std::size_t align = PLATFORM_ALIGN) { return (value + align - 1) & ~(align - 1); }
-
-    bool belong(const void *address, const block_t &block) const {
-      auto ptr_address = reinterpret_cast<std::uintptr_t>(address);
-      auto block_address = reinterpret_cast<std::uintptr_t>(block.current_block_ptr);
-      if (ptr_address >= block_address && ptr_address < block_address + block.current_alloc_size)
-        return true;
-      return false;
-    }
-
-    block_t searchBlock(const void *ptr) const {
-      if (belong(ptr, current_block))
-        return current_block;
-      for (const block_t &block : used_blocks)
-        if (belong(ptr, block))
-          return block;
-      return {};
-    }
-    const_block_t getCurrentBlock() const {
-      const_block_t current;
-      current.current_block_ptr = current_block.current_block_ptr;
-      current.current_alloc_size = current_block.current_alloc_size;
-      current.current_alignment = current_block.current_alignment;
-      return current;
-    }
-
-    template<class U>
-    U *allocAlign(std::size_t count, std::size_t align = PLATFORM_ALIGN) {
-      std::size_t total_size = count * sizeof(U);
-      auto alignment = static_cast<std::align_val_t>(align);
-      void *ptr = ::operator new(total_size, alignment);
-      return static_cast<U *>(ptr);
-    }
-
-    void freeAlign(void *ptr, std::size_t align = PLATFORM_ALIGN) {
-      auto alignment = static_cast<std::align_val_t>(align);
-      ::operator delete(ptr, alignment);
-    }
-
-    typename block_list_t::const_iterator getUsedBlockItr(void *ptr) const {
-      T *block_ptr = static_cast<T *>(ptr);
-      for (typename block_list_t::const_iterator block = used_blocks.begin(); block != used_blocks.end(); block++) {
-        if (block->current_block_ptr == block_ptr)
-          return block;
-      }
-      return used_blocks.end();
-    }
-
-    void addCurrentBlockToUsed() {
-      if (current_block.current_block_ptr) {
-        used_blocks.push_back({current_block.current_block_ptr, current_block.current_alignment, current_block.current_alloc_size});
-        current_block.current_block_ptr = nullptr;
-        current_block.current_alloc_size = 0;
-        current_block_offset = 0;
-      }
-    }
-
-    void addCurrentBlockToFree() {
-      if (current_block.current_block_ptr) {
-        free_blocks.push_back({current_block.current_block_ptr, current_block.current_alignment, current_block.current_alloc_size});
-        current_block.current_block_ptr = nullptr;
-        current_block.current_alloc_size = 0;
-        current_block_offset = 0;
-      }
-    }
-
-    void moveUsedToFree(typename block_list_t::const_iterator &to_move) {
-      if (!to_move->current_block_ptr)
-        return;
-      free_blocks.push_back({to_move->current_block_ptr, to_move->current_alignment, to_move->current_alloc_size});
-      used_blocks.erase(to_move);
-    }
   };
   using ByteArena = MemoryArena<std::byte>;
-}  // namespace core::memory
+
+}  // namespace axstd
 
 #endif  // MEMORYARENA_H

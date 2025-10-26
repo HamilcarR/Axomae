@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <vector>
 
-namespace core::memory {
+namespace axstd {
 
   class Serializable {
    public:
@@ -12,6 +12,6 @@ namespace core::memory {
     virtual std::vector<uint8_t> serialize() const = 0;
   };
 
-}  // namespace core::memory
+}  // namespace axstd
 
 #endif  // SERIALIZERINTERFACE_H

@@ -2,7 +2,7 @@
 #include "internal/memory/MemoryArena.h"
 #include "internal/thread/Mutex.h"
 #include <utility>
-TextureDatabase::TextureDatabase(core::memory::ByteArena *arena, controller::ProgressStatus *progress_manager_) {
+TextureDatabase::TextureDatabase(axstd::ByteArena *arena, controller::ProgressStatus *progress_manager_) {
   progress_manager = progress_manager_;
   setUpCacheMemory(arena);
 }

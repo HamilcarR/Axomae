@@ -3,6 +3,7 @@
 #include "DatabaseStorage.h"
 #include "QueryResult.h"
 
+#include <cstdint>
 #include <internal/macro/project_macros.h>
 
 /**

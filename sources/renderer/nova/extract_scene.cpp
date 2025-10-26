@@ -25,9 +25,7 @@ namespace nova_baker_utils {
    * Each mesh has PBR_PIPELINE_TEX_NUM number of textures
    */
   template<class T>
-  T *allocate_type_texture_buffer(core::memory::ByteArena &memory_arena,
-                                  std::size_t num_textures,
-                                  std::size_t alignment = core::memory::PLATFORM_ALIGN) {
+  T *allocate_type_texture_buffer(axstd::ByteArena &memory_arena, std::size_t num_textures, std::size_t alignment = axstd::PLATFORM_ALIGN) {
     return memory_arena.allocate(sizeof(T) * num_textures, "", alignment);
   }
 
