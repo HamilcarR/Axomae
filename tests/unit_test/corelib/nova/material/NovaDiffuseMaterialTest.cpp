@@ -88,8 +88,9 @@ TEST(NovaDiffuseMaterialTest, scatter_direction) {
     hit_data.u = (float)generator.nrandf(0, 1);
     hit_data.v = (float)generator.nrandf(0, 1);
     material_record_s mat_rec{};
+    /* Tests that the resulting out vector is always on the same side as the geometric normal of the medium.*/
     if (diffuse_material.scatter(ray, out, hit_data, mat_rec, sampler, shading)) {
-      ASSERT_GT(glm::dot(hit_data.shading_frame.getNormal(), out.direction), 0);
+      ASSERT_GT(mat_rec.lobe.costheta, 0);
     }
   }
 }
