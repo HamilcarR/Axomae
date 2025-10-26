@@ -63,7 +63,7 @@ namespace controller {
     /* Timer for renderer synchro */
     std::unique_ptr<QTimer> timer;
 
-    core::memory::ByteArena memory_pool;
+    axstd::ByteArena memory_pool;
     nova_baker_utils::NovaBakingStructure nova_baking_structure;
 
     DisplayManager3D display_manager;

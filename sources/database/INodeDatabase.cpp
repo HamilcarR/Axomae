@@ -1,7 +1,7 @@
 #include "INodeDatabase.h"
 #include <algorithm>
 using namespace datastructure;
-INodeDatabase::INodeDatabase(core::memory::ByteArena *arena, controller::ProgressStatus *progress_manager_) {
+INodeDatabase::INodeDatabase(axstd::ByteArena *arena, controller::ProgressStatus *progress_manager_) {
   setUpCacheMemory(arena);
   progress_manager = progress_manager_;
 }

@@ -3,14 +3,14 @@
 
 #include "Node.h"
 #include "RenderingDatabaseInterface.h"
-#include "internal/common/Factory.h"
-#include "internal/macro/project_macros.h"
+#include <internal/common/Factory.h>
+#include <internal/macro/project_macros.h>
 
 class INodeDatabase final : public IntegerResourceDB<datastructure::NodeInterface> {
   using NodeIdMap ax_maybe_unused = std::map<int, std::unique_ptr<datastructure::NodeInterface>>;
 
  public:
-  explicit INodeDatabase(core::memory::ByteArena *arena = nullptr, controller::ProgressStatus *progress_manager = nullptr);
+  explicit INodeDatabase(axstd::ByteArena *arena = nullptr, controller::ProgressStatus *progress_manager = nullptr);
   ~INodeDatabase() override = default;
   void clean() override;
   void purge() override;

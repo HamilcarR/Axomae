@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <internal/macro/project_macros.h>
+#include <internal/memory/MemoryArena.h>
 #include <memory>
 
 /**
@@ -27,7 +28,7 @@ namespace controller {
   using ProgressStatus = OperatorProgressStatus;
 }  // namespace controller
 
-namespace core::memory {
+namespace axstd {
   template<class T>
   class MemoryArena;
 }
@@ -78,7 +79,7 @@ class ResourceDatabaseManager {
   ax_no_discard RawImageDatabase *getRawImgdatabase() const { return image_database.get(); }
   void setProgressManagerAllDb(controller::ProgressStatus *progress_manager);
 
-  void initializeDatabases(core::memory::MemoryArena<std::byte> &arena, controller::ProgressStatus *progress_manager = nullptr);
+  void initializeDatabases(axstd::MemoryArena<std::byte> &arena, controller::ProgressStatus *progress_manager = nullptr);
 };
 
 #endif

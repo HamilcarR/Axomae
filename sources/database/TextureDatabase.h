@@ -2,15 +2,15 @@
 #define TEXTUREDATABASE_H
 #include "RenderingDatabaseInterface.h"
 #include "Texture.h"
-#include "internal/common/Factory.h"
-#include "internal/macro/project_macros.h"
+#include <internal/common/Factory.h>
+#include <internal/macro/project_macros.h>
 
 /**
  * @file TextureDatabase.h
  *
  */
 
-namespace core::memory {
+namespace axstd {
   template<class T>
   class MemoryArena;
 }
@@ -25,7 +25,7 @@ class TextureDatabase final : public IntegerResourceDB<GenericTexture> {
   std::map<std::string, int> unique_textures;
 
  public:
-  explicit TextureDatabase(core::memory::ByteArena *memory_arena = nullptr, controller::ProgressStatus *progress_manager = nullptr);
+  explicit TextureDatabase(axstd::ByteArena *memory_arena = nullptr, controller::ProgressStatus *progress_manager = nullptr);
   ~TextureDatabase() override = default;
   TextureDatabase(const TextureDatabase &other) = delete;
   TextureDatabase(TextureDatabase &&other) noexcept = delete;

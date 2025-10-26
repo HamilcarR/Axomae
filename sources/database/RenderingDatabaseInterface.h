@@ -12,7 +12,7 @@
 #include <map>
 #include <unordered_map>
 
-namespace core::memory {
+namespace axstd {
   template<class T>
   class MemoryArena;
 }
@@ -35,7 +35,7 @@ constexpr std::size_t DATABASE_CACHE_INVALID_SIZE = -1;
 template<class U, class T>
 class IResourceDB : public DatabaseInterface<U, T>, public ILockable, public controller::IProgressManager {
  private:
-  using CACHE = core::memory::ByteArena;
+  using CACHE = axstd::ByteArena;
   CACHE *memory_arena{nullptr};
 
   struct cache_block_t {

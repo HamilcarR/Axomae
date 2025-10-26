@@ -4,9 +4,9 @@
 #include "RenderingDatabaseInterface.h"
 #include "Thumbnail.h"
 #include "database_utils.h"
-#include "internal/common/Observer.h"
-#include "internal/macro/project_macros.h"
-#include "internal/memory/MemoryArena.h"
+#include <internal/common/Observer.h>
+#include <internal/macro/project_macros.h>
+#include <internal/memory/MemoryArena.h>
 #include <utility>
 
 template<class DATATYPE>
@@ -22,7 +22,7 @@ class ImageDatabase : public IntegerResourceDB<image::ThumbnailImageHolder<DATAT
   std::map<std::string, int> unique_elements;  // map all unique images to avoid duplicates
 
  public:
-  explicit ImageDatabase(core::memory::MemoryArena<std::byte> *arena = nullptr, controller::ProgressStatus *progress_status = nullptr);
+  explicit ImageDatabase(axstd::MemoryArena<std::byte> *arena = nullptr, controller::ProgressStatus *progress_status = nullptr);
   ~ImageDatabase() override = default;
   void purge() override;
   void isSelected(int index);
@@ -62,7 +62,7 @@ using RawImageDatabase = ImageDatabase<uint8_t>;
 /*******************************************************************************************************************************************/
 
 template<class T>
-ImageDatabase<T>::ImageDatabase(core::memory::ByteArena *arena, controller::ProgressStatus *progress_status) {
+ImageDatabase<T>::ImageDatabase(axstd::ByteArena *arena, controller::ProgressStatus *progress_status) {
   BaseType::progress_manager = progress_status;
   BaseType::setUpCacheMemory(arena);
 }

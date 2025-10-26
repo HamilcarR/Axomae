@@ -11,7 +11,7 @@
 #  include <internal/common/math/gpu/math_random_gpu.h>
 #endif
 
-namespace core::memory {
+namespace axstd {
   template<class T>
   class MemoryArena;
 }

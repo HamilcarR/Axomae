@@ -4,7 +4,7 @@
 #include "ResourceDatabaseManager.h"
 #include "ShaderDatabase.h"
 #include "TextureDatabase.h"
-#include "internal/common/string/string_utils.h"
+#include <internal/common/string/string_utils.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -33,8 +33,8 @@ namespace IO {
 
     std::size_t texture_cache_size = total_textures_size(modelScene, &progress_manager);
     std::size_t geometry_cache_size = total_geometry_size(modelScene, &progress_manager);
-    uint8_t *texture_cache_address = texture_database->reserveCache(texture_cache_size, core::memory::PLATFORM_ALIGN);
-    uint8_t *geometry_cache_address = node_database->reserveCache(geometry_cache_size, core::memory::PLATFORM_ALIGN);
+    uint8_t *texture_cache_address = texture_database->reserveCache(texture_cache_size, axstd::PLATFORM_ALIGN);
+    uint8_t *geometry_cache_address = node_database->reserveCache(geometry_cache_size, axstd::PLATFORM_ALIGN);
     scene_data.texture_cache = axstd::span<uint8_t>(texture_cache_address, texture_cache_size);
     scene_data.geometry_cache = axstd::span<uint8_t>(geometry_cache_address, geometry_cache_size);
     std::size_t texcache_element_count = 0, geocache_element_count = 0;

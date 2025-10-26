@@ -26,7 +26,7 @@ void ResourceDatabaseManager::clean() {
   image_database->clean();
 }
 
-void ResourceDatabaseManager::initializeDatabases(core::memory::ByteArena &arena, controller::ProgressStatus *progress_manager) {
+void ResourceDatabaseManager::initializeDatabases(axstd::ByteArena &arena, controller::ProgressStatus *progress_manager) {
   texture_database = std::make_unique<TextureDatabase>(&arena, progress_manager);
   shader_database = std::make_unique<ShaderDatabase>(progress_manager);
   node_database = std::make_unique<INodeDatabase>(&arena, progress_manager);

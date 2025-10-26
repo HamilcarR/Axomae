@@ -8,6 +8,7 @@
 #include "texturing/nova_texturing.h"
 #include <internal/macro/class_macros.h>
 #include <internal/macro/project_macros.h>
+#include <internal/memory/MemoryArena.h>
 
 namespace nova {
 
@@ -29,7 +30,7 @@ namespace nova {
     NovaResources resources;
 
     /* Holds the actual objects refered to by the resource structures.*/
-    core::memory::ByteArena resource_mempool;
+    axstd::ByteArena resource_mempool;
 
    public:
     NovaResourceManager() = default;
@@ -64,8 +65,8 @@ namespace nova {
     scene::SceneTransformations &getSceneTransformation() { return resources.scene_data.scene_transformations; }
     const scene::SceneTransformations &getSceneTransformation() const { return resources.scene_data.scene_transformations; }
 
-    core::memory::MemoryArena<> &getMemoryPool() { return resource_mempool; }
-    const core::memory::MemoryArena<> &getMemoryPool() const { return resource_mempool; }
+    axstd::MemoryArena<> &getMemoryPool() { return resource_mempool; }
+    const axstd::MemoryArena<> &getMemoryPool() const { return resource_mempool; }
 
     /* Will take ownership of acceleration_structure */
     void setManagedCpuAccelerationStructure(aggregate::DefaultAccelerator &&acceleration_structure);
