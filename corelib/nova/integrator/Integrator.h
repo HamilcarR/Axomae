@@ -10,6 +10,7 @@
 #include <internal/common/math/math_camera.h>
 #include <internal/common/math/math_utils.h>
 #include <internal/macro/project_macros.h>
+#include <internal/memory/Allocator.h>
 namespace nova {
   class Ray;
   struct Tile;
@@ -32,7 +33,7 @@ namespace nova::integrator {
       buffers->partial_buffer[pixel_offset + 3] = color.a;
     }
 
-    ax_no_discard unsigned generateImageOffset(const Tile &tile, bool axis_inverted, int x, int y, unsigned channels = 4) const {
+    unsigned generateImageOffset(const Tile &tile, bool axis_inverted, int x, int y, unsigned channels = 4) const {
       if (axis_inverted)
         return ((tile.image_total_height - 1 - y) * tile.image_total_width + x) * channels;
       return (y * tile.image_total_width + x) * channels;
@@ -56,9 +57,10 @@ namespace nova::integrator {
       math::random::SobolGenerator qrmc;
       sampler::SobolSampler sobol_s = sampler::SobolSampler(qrmc);
       sampler::SamplerInterface sampler = &sobol_s;
-
+      axstd::StaticAllocator64kb allocator;
       for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
         for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
+          allocator.reset();
           unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().vertical_invert, x, y);
           validate(sampler, nova_internals);
           if (nova_exception_manager->checkErrorStatus() != exception::NOERR) {
@@ -81,20 +83,28 @@ namespace nova::integrator {
           math::camera::camera_ray r = math::camera::ray_inv_mat(
               ndc.x + dx, ndc.y + dy, nova_resource_manager->getCameraData().inv_P, nova_resource_manager->getCameraData().inv_V);
           Ray ray(r.near, r.far);
-          rgb = Li(ray, nova_internals, depth, sampler);
+          rgb = Li(ray, nova_internals, depth, sampler, allocator);
           accumulateRgbRenderbuffer(buffers, idx, rgb);
         }
       tile.finished_render = true;
     }
 
-    ax_no_discard glm::vec4 Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const {
-      return static_cast<const T *>(this)->Li(ray, nova_internals, depth, sampler);
+    glm::vec4 Li(const Ray &ray,
+                 nova_eng_internals &nova_internals,
+                 int depth,
+                 sampler::SamplerInterface &sampler,
+                 axstd::StaticAllocator64kb &allocator) const {
+      return static_cast<const T *>(this)->Li(ray, nova_internals, depth, sampler, allocator);
     }
   };
 
   class PathIntegrator : public AbstractIntegrator<PathIntegrator> {
    public:
-    ax_no_discard glm::vec4 Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const;
+    glm::vec4 Li(const Ray &ray,
+                 nova_eng_internals &nova_internals,
+                 int depth,
+                 sampler::SamplerInterface &sampler,
+                 axstd::StaticAllocator64kb &allocator) const;
   };
 
 }  // namespace nova::integrator

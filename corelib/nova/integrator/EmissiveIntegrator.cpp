@@ -10,6 +10,7 @@ namespace nova::integrator {
     math::random::SobolGenerator generator;
     sampler::SobolSampler sobol_sampler(generator);
     sampler::SamplerInterface sampler = &sobol_sampler;
+    axstd::StaticAllocator64kb allocator;
     for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
       for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
         unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().vertical_invert, x, y);
@@ -26,13 +27,17 @@ namespace nova::integrator {
         math::camera::camera_ray r = math::camera::ray_inv_mat(
             ndc.x, ndc.y, nova_resource_manager->getCameraData().inv_P, nova_resource_manager->getCameraData().inv_V);
         Ray ray(r.near, r.far);
-        glm::vec4 rgb = Li(ray, nova_internals, nova_resource_manager->getEngineData().max_depth, sampler);
+        glm::vec4 rgb = Li(ray, nova_internals, nova_resource_manager->getEngineData().max_depth, sampler, allocator);
         accumulateRgbRenderbuffer(buffers, idx, rgb);
       }
     tile.finished_render = true;
   }
 
-  glm::vec4 EmissiveIntegrator::Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const {
+  glm::vec4 EmissiveIntegrator::Li(const Ray &ray,
+                                   nova_eng_internals &nova_internals,
+                                   int depth,
+                                   sampler::SamplerInterface &sampler,
+                                   axstd::StaticAllocator64kb &allocator) const {
     bvh_hit_data hit = bvh_hit(ray, nova_internals);
     if (hit.is_hit) {
       Ray out{};
@@ -42,7 +47,7 @@ namespace nova::integrator {
       aggregate.texture_ctx = &texture_context;
       shading.texture_aggregate = &aggregate;
       material_record_s mat_rec = {};
-      if (!hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, mat_rec, sampler, shading) || depth < 0)
+      if (!hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, mat_rec, sampler, allocator, shading) || depth < 0)
         return glm::vec4(0.f);
       glm::vec4 emit = glm::vec4(mat_rec.emissive.toRgb({}, {}), 1.f);
       return emit;

@@ -6,6 +6,7 @@
 #include "shape/shape_datastructures.h"
 #include <internal/device/gpgpu/device_macros.h>
 #include <internal/device/gpgpu/device_utils.h>
+#include <internal/memory/Allocator.h>
 #include <internal/memory/tag_ptr.h>
 
 namespace nova::primitive {
@@ -22,8 +23,9 @@ namespace nova::primitive {
                                             const intersection_record_s &data,
                                             material_record_s &sampled_pixel_material,
                                             sampler::SamplerInterface &sampler,
+                                            axstd::StaticAllocator64kb &allocator,
                                             material::shading_data_s &mat_ctx) const {
-      auto disp = [&](auto prim) { return prim->scatter(in, out, data, sampled_pixel_material, sampler, mat_ctx); };
+      auto disp = [&](auto prim) { return prim->scatter(in, out, data, sampled_pixel_material, sampler, allocator, mat_ctx); };
       return dispatch(disp);
     }
 

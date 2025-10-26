@@ -9,6 +9,7 @@
 #include <internal/device/gpgpu/device_macros.h>
 #include <internal/geometry/BoundingBox.h>
 #include <internal/macro/project_macros.h>
+#include <internal/memory/Allocator.h>
 
 namespace nova::primitive {
 
@@ -32,8 +33,9 @@ namespace nova::primitive {
                                             const intersection_record_s &data,
                                             material_record_s &sampled_material,
                                             sampler::SamplerInterface &sampler,
+                                            axstd::StaticAllocator64kb &allocator,
                                             material::shading_data_s &material_ctx) const {
-      return material.scatter(in, out, data, sampled_material, sampler, material_ctx);
+      return material.scatter(in, out, data, sampled_material, sampler, allocator, material_ctx);
     }
 
     ax_device_callable_inlined glm::vec3 centroid(const shape::MeshCtx &geometry) const { return shape.centroid(geometry); }

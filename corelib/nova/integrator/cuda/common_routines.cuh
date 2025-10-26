@@ -13,6 +13,7 @@
 #include <internal/common/math/utils_3D.h>
 #include <internal/device/gpgpu/device_macros.h>
 #include <internal/device/gpgpu/device_utils.h>
+#include <internal/memory/Allocator.h>
 #include <optix_device.h>
 
 #define U32REG_VAR_LIST_0(register_array_varname) register_array_varname[0]
