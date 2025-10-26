@@ -32,7 +32,7 @@ extern "C" ax_kernel void __raygen__main() {
   nv_sam::SamplerInterface sampler = &sobol_sampler_instance;
   register_stack_t<> reg{};
   glm::vec4 color{};
-
+  axstd::StaticAllocator64kb allocator;
   sampler.reset((idx.x * dim.y + idx.y) * params.sample_max + params.sample_index);
   float rand[2];
   sampler.sample2D(rand);
@@ -73,13 +73,18 @@ extern "C" ax_kernel void __raygen__main() {
     nv_mat::shading_data_s shading;
     shading.texture_aggregate = &tex_aggregate;
     nova::Ray wo;
-    material_record_s mat_rec = {};
-    if (prim.scatter(wi, wo, hit_d, mat_rec, sampler, shading)) {
-      origin = {wo.origin.x, wo.origin.y, wo.origin.z};
-      direction = {wo.direction.x, wo.direction.y, wo.direction.z};
-      glm::vec4 color = glm::vec4(mat_rec.attenuation.toRgb({}, {}), 1.f);
-      glm::vec4 emissive = glm::vec4(mat_rec.emissive.toRgb({}, {}), 1.f);
-      attenuation = DENAN(10.f * emissive + color * attenuation);
+    material_record_s mat_record = {};
+    if (prim.scatter(wi, wo, hit_d, mat_record, sampler, allocator, shading)) {
+
+      nova::Ray out = nova::Ray::spawn(mat_record.lobe.wi, hit_d.shading_frame.getNormal(), hit_d.position);
+      origin = {out.origin.x, out.origin.y, out.origin.z};
+      direction = {out.direction.x, out.direction.y, out.direction.z};
+      nova::Spectrum color = mat_record.lobe.f * mat_record.lobe.costheta / mat_record.lobe.pdf;
+      nova::Spectrum emissive = mat_record.emissive;
+
+      glm::vec4 e = glm::vec4(emissive.toRgb(), 1.f);
+      glm::vec4 c = glm::vec4(color.toRgb(), 1.f);
+      attenuation = DENAN(10.f * e + c * attenuation);
     } else {
       attenuation = glm::vec4(0.f);
       break;

@@ -3,6 +3,7 @@
 #include "BxDF.h"
 #include "TexturePackSampler.h"
 #include "glm/fwd.hpp"
+#include "material/BSDF.h"
 #include "material_datastructures.h"
 #include "ray/Hitable.h"
 #include "ray/IntersectFrame.h"
@@ -16,6 +17,7 @@
 #include <internal/debug/debug_utils.h>
 #include <internal/device/gpgpu/device_macros.h>
 #include <internal/macro/project_macros.h>
+#include <internal/memory/Allocator.h>
 #include <internal/memory/tag_ptr.h>
 
 namespace nova::material {
@@ -44,37 +46,43 @@ namespace nova::material {
   }
 
   class NovaDiffuseMaterial {
-   private:
     texture_pack t_pack{};
 
    public:
-    CLASS_CM(NovaDiffuseMaterial)
+    ax_device_callable_inlined NovaDiffuseMaterial() = default;
 
     ax_device_callable_inlined NovaDiffuseMaterial(const texture_pack &texture) : t_pack(texture) {}
 
-    ax_device_callable_inlined bool scatter(const Ray & /*in*/,
+    ax_device_callable_inlined bool scatter(const Ray &in,
                                             Ray &out,
                                             const intersection_record_s &hit_d,
                                             material_record_s &mat_rec,
                                             sampler::SamplerInterface &sampler,
+                                            axstd::StaticAllocator64kb &allocator,
                                             shading_data_s &mat_ctx) const {
       AX_ASSERT_NOTNULL(mat_ctx.texture_aggregate);
       TexturePackSampler texture_pack_sampler(t_pack);
       const IntersectFrame &shading_frame = hit_d.shading_frame;
-
-      glm::vec3 perturbed_local_normal = compute_local_normal(hit_d.u, hit_d.v, texture_pack_sampler, *mat_ctx.texture_aggregate);
-      glm::vec3 perturbed_world_normal = compute_world_normal(perturbed_local_normal, shading_frame);
-      glm::vec3 geometric_world_normal = shading_frame.getNormal();
-      out.direction = glm::normalize(shading_frame.localToWorld(hemi_sample(sampler)));
-      out.origin = hit_d.position + geometric_world_normal * INTERSECT_OFFSET;
-
-      mat_ctx.texture_aggregate->geometric_data.sampling_vector = hit_d.position;
-
+      glm::vec3 local_normal = compute_local_normal(hit_d.u, hit_d.v, texture_pack_sampler, *mat_ctx.texture_aggregate);
+      glm::vec3 geometric_normal = shading_frame.getNormal();
       mat_rec = {};
-      mat_rec.attenuation = texture_pack_sampler.albedo(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
-      mat_rec.emissive = texture_pack_sampler.emissive(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
-      mat_rec.normal = perturbed_world_normal;
-      return glm::dot(geometric_world_normal, out.direction) > 0;
+
+      mat_rec.normal = compute_world_normal(local_normal, shading_frame);
+      Spectrum R(glm::vec3(texture_pack_sampler.albedo(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate)));
+      Spectrum E(glm::vec3(texture_pack_sampler.emissive(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate)));
+
+      DiffuseBxDF bxdf(R);
+      BSDF bsdf(&bxdf, mat_rec.normal, shading_frame.getTangent());
+      BSDFSample lobe;
+      float uc = sampler.sample1D();
+      float u[2]{};
+      sampler.sample2D(u);
+      if (!bsdf.sample_f(in.direction, uc, u, &lobe))
+        return false;
+      mat_rec.attenuation = lobe.f;
+      mat_rec.emissive = E;
+      mat_rec.lobe = lobe;
+      return true;
     }
   };
 
@@ -95,6 +103,7 @@ namespace nova::material {
                                             const intersection_record_s &hit_d,
                                             material_record_s &mat_rec,
                                             sampler::SamplerInterface &sampler,
+                                            axstd::StaticAllocator64kb &allocator,
                                             shading_data_s &mat_ctx) const {
       AX_ASSERT_NOTNULL(mat_ctx.texture_aggregate);
       TexturePackSampler texture_pack_sampler(t_pack);
@@ -155,6 +164,7 @@ namespace nova::material {
                                             const intersection_record_s &hit_d,
                                             material_record_s &mat_rec,
                                             sampler::SamplerInterface &sampler,
+                                            axstd::StaticAllocator64kb &allocator,
                                             shading_data_s &mat_ctx) const {
       TexturePackSampler texture_pack_sampler(t_pack);
       const IntersectFrame &shading_frame = hit_d.shading_frame;
@@ -209,8 +219,9 @@ namespace nova::material {
                                             const intersection_record_s &hit_d,
                                             material_record_s &mat_rec,
                                             sampler::SamplerInterface &sampler,
+                                            axstd::StaticAllocator64kb &allocator,
                                             shading_data_s &mat_ctx) const {
-      auto disp = [&](auto material) { return material->scatter(in, out, hit_d, mat_rec, sampler, mat_ctx); };
+      auto disp = [&](auto material) { return material->scatter(in, out, hit_d, mat_rec, sampler, allocator, mat_ctx); };
       return dispatch(disp);
     }
   };

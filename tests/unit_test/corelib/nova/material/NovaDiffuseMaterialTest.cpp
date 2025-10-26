@@ -1,3 +1,4 @@
+#include "internal/memory/Allocator.h"
 #include "material/NovaMaterials.h"
 #include "material/material_datastructures.h"
 #include "ray/Hitable.h"
@@ -82,14 +83,14 @@ TEST(NovaDiffuseMaterialTest, scatter_direction) {
   nova::sampler::SobolSampler sobol_sampler(sobol_generator);
   nova::sampler::SamplerInterface sampler = &sobol_sampler;
   nova::Ray out{};
-
+  axstd::StaticAllocator64kb allocator;
   for (int i = 0; i < MAX_ITER; i++) {
     sampler.reset(i);
     hit_data.u = (float)generator.nrandf(0, 1);
     hit_data.v = (float)generator.nrandf(0, 1);
     material_record_s mat_rec{};
     /* Tests that the resulting out vector is always on the same side as the geometric normal of the medium.*/
-    if (diffuse_material.scatter(ray, out, hit_data, mat_rec, sampler, shading)) {
+    if (diffuse_material.scatter(ray, out, hit_data, mat_rec, sampler, allocator, shading)) {
       ASSERT_GT(mat_rec.lobe.costheta, 0);
     }
   }

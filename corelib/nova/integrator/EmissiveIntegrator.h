@@ -6,7 +6,11 @@ namespace nova::integrator {
   class EmissiveIntegrator : public AbstractIntegrator<EmissiveIntegrator> {
    public:
     void render(RenderBuffers<float> *buffers, Tile &tile, nova_eng_internals &nova_internals) const;
-    ax_no_discard glm::vec4 Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler) const;
+    glm::vec4 Li(const Ray &ray,
+                 nova_eng_internals &nova_internals,
+                 int depth,
+                 sampler::SamplerInterface &sampler,
+                 axstd::StaticAllocator64kb &allocator) const;
   };
 }  // namespace nova::integrator
 #endif  // EMISSIVEINTEGRATOR_H
