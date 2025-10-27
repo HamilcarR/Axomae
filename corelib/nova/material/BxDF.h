@@ -61,7 +61,7 @@ namespace nova::material {
      * uc randomly choses between scattering types (reflection / transmission)
      */
     ax_device_callable_inlined bool sample_f(const glm::vec3 &wo,
-                                             const float uc,
+                                             float uc,
                                              const float u[2],
                                              BSDFSample *sample,
                                              TRANSPORT transport_mode = TRANSPORT::RADIANCE,
@@ -73,13 +73,14 @@ namespace nova::material {
       if (wo.z < 0)
         wi.z *= -1.f;
 
+      float costheta = bxdf::costheta(wi);
       sample->wi = wi;
-      sample->pdf = bxdf::costheta(wi) * (float)INV_PI;
+      sample->pdf = costheta * (float)INV_PI;
       sample->flags = BXDFFLAGS::DIFFUSE_REFLECTION;
-      sample->is_pdf_proportionnal = false;
+      sample->pdf_cosine_weighted = true;
       sample->f = R * INV_PI;
       sample->eta = 1.f;
-
+      sample->costheta = costheta;
       return true;
     }
 
@@ -111,7 +112,7 @@ namespace nova::material {
     }
 
     ax_device_callable_inlined bool sample_f(const glm::vec3 &wo,
-                                             const float uc,
+                                             float uc,
                                              const float u[2],
                                              BSDFSample *sample,
                                              TRANSPORT transport_mode = TRANSPORT::RADIANCE,
@@ -134,12 +135,12 @@ namespace nova::material {
      * @return Spectrum
      */
 
-    ax_device_callable_inlined Spectrum rho(const glm::vec3 &wo, axstd::cspan<float> &uc, axstd::cspan<float[2]> u) const {
+    ax_device_callable_inlined Spectrum rho(const glm::vec3 &wo, axstd::cspan<float> &uc, axstd::cspan<uniform_sample2d> u) const {
       AX_ASSERT_EQ(uc.size(), u2.size());
       Spectrum R(0.f);
       for (size_t i = 0; i < u.size(); i++) {
         BSDFSample sample;
-        bool is_sampled = sample_f(wo, uc[i], u[i], &sample);
+        bool is_sampled = sample_f(wo, uc[i], u[i].u, &sample);
         if (is_sampled && sample.pdf > 0)
           R += sample.f * bxdf::costheta(sample.wi) / sample.pdf;
       }

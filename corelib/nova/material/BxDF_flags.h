@@ -26,10 +26,11 @@ namespace nova::material {
   struct BSDFSample {
     Spectrum f;
     glm::vec3 wi;
-    float pdf{};
     BXDFFLAGS flags;
     float eta = 1.f;
-    bool is_pdf_proportionnal = false;
+    float pdf{};
+    float costheta{};
+    bool pdf_cosine_weighted = true;
   };
 
   enum class REFLTRANSFLAG { NONE = 0, TRANSMISSION = 1, REFLECTION = 1 << 1, ALL = TRANSMISSION | REFLECTION };
