@@ -40,7 +40,7 @@ namespace nova {
         samples[i] = v;
     }
 
-    ax_device_callable_inlined glm::vec3 toRgb(const SampledWavelength &wl, const RgbColorSpace &cs) {
+    ax_device_callable_inlined glm::vec3 toRgb(const SampledWavelength &wl = {}, const RgbColorSpace &cs = {}) {
       return glm::vec3(samples[0], samples[1], samples[2]);
     }
 

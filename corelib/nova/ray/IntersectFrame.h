@@ -38,6 +38,13 @@ class IntersectFrame {
                                             bool orthonormalize = false)
       : IntersectFrame((const float *)&tangent, (const float *)&bitangent, (const float *)&normal, orthonormalize) {}
 
+  ax_device_callable_inlined IntersectFrame(glm::vec3 normal, glm::vec3 tangent) {
+    glm::vec3 bitangent = {};
+    orthonormalize(tangent, bitangent, normal);
+    tbn = glm::mat3(tangent, bitangent, normal);
+    tbn_t = glm::transpose(tbn);
+  }
+
   ax_device_callable_inlined glm::vec3 localToWorld(const glm::vec3 &vect) const { return tbn * vect; }
 
   ax_device_callable_inlined glm::vec3 worldToLocal(const glm::vec3 &vect) const { return tbn_t * vect; }

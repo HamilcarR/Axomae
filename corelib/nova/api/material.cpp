@@ -143,7 +143,7 @@ namespace nova {
   static nova::material::NovaMaterialInterface assign_random_material(nova::material::texture_pack &tpack, nova::NovaResourceManager &manager) {
     math::random::CPUPseudoRandomGenerator rand_gen;
     nova::material::NovaMaterialInterface mat_ptr{};
-    int r = 0;  // rand_gen.nrandi(0, 2);
+    int r = 2;  // rand_gen.nrandi(0, 2);
     switch (r) {
       case 0:
         mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaConductorMaterial>(tpack, rand_gen.nrandf(0.001, 0.001));
