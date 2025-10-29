@@ -106,7 +106,8 @@ namespace controller {
 
     /* SLOTS */
    public slots:
-    void slot_nova_save_bake(const image::ImageHolder<float> &image);
+    void slot_nova_save_image(const image::ImageHolder<float> &image);
+    void slot_nova_save_renderbuffer(const nova::RenderBuffer &render_buffer);
     void slot_nova_stop_bake();
     void slot_nova_start_bake();
 

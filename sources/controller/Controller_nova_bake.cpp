@@ -3,6 +3,7 @@
 #include "ExceptionHandlerUI.h"
 #include "GUIWindow.h"
 #include "Image.h"
+#include "Metadata.h"
 #include "TextureViewerWidget.h"
 #include "WorkspaceTracker.h"
 #include "api_common.h"
@@ -436,12 +437,26 @@ namespace controller {
 
   void Controller::slot_nova_stop_bake() { novaStopBake(); }
 
-  void Controller::slot_nova_save_bake(const image::ImageHolder<float> &image_holder) {
+  void Controller::slot_nova_save_image(const image::ImageHolder<float> &image_holder) {
     std::string filename = spawnSaveFileDialogueWidget();
     if (!filename.empty()) {
       IO::Loader loader(getProgress());
       loader.writeHdr(filename.c_str(), image_holder, false);
     }
+  }
+
+  void Controller::slot_nova_save_renderbuffer(const nova::RenderBuffer &render_buffer) {
+    image::Metadata metadata;
+    metadata.channels = render_buffer.getChannel(nova::texture::COLOR);
+    metadata.color_corrected = false;
+    metadata.format = "hdr";
+    metadata.is_hdr = true;
+    metadata.height = render_buffer.getHeight();
+    metadata.width = render_buffer.getWidth();
+
+    nova::FloatView view = render_buffer.getFramebuffer().color_buffer;
+    image::ImageHolder<float> image_holder(view, metadata);
+    slot_nova_save_image(image_holder);
   }
 
 }  // namespace controller

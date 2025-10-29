@@ -89,12 +89,14 @@ class AbstractHdrRenderViewerWidget : public QWidget {
   void mouseReleaseEvent(QMouseEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
   void closeEvent(QCloseEvent *event) override;
-  virtual void notifyUpdate() = 0;
+
+  virtual void notifyUpdate() const = 0;
+  virtual void notifySaveRender() const = 0;
 
  signals:
   void viewerClosed(QWidget *widget_address);
-  void onStopRenderQuery();
-  void onNotifyUpdate();
+  void onStopRenderQuery() const;
+  void onNotifyUpdate() const;
  public slots:
   virtual void updateImage() = 0;
 };
@@ -119,11 +121,13 @@ class HdrRenderViewerWidget : public AbstractHdrRenderViewerWidget {
   void mouseReleaseEvent(QMouseEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
   void closeEvent(QCloseEvent *event) override;
-  void notifyUpdate() override;
+
+  void notifyUpdate() const override;
+  void notifySaveRender() const override;
   void updateImage() override;
 
-  signals:
-  void onSaveRenderQuery(const image::ImageHolder<float> &target_buffer);
+ signals:
+  void onSaveRenderQuery(const image::ImageHolder<float> &target_buffer) const;
 };
 
 class HdrNovaRenderViewerWidget : public AbstractHdrRenderViewerWidget {
@@ -143,8 +147,14 @@ class HdrNovaRenderViewerWidget : public AbstractHdrRenderViewerWidget {
   HdrNovaRenderViewerWidget &operator=(const HdrNovaRenderViewerWidget &other) = delete;
   HdrNovaRenderViewerWidget &operator=(HdrNovaRenderViewerWidget &&other) noexcept = delete;
   void mouseMoveEvent(QMouseEvent *event) override;
-  void notifyUpdate() override;
+
+  void notifyUpdate() const override;
+  void notifySaveRender() const override;
+
   void updateImage() override;
+
+ signals:
+  void onSaveRenderQuery(const nova::RenderBuffer &render_buffer) const;
 };
 
 #endif  // TEXTUREVIEWERWIDGET_H
