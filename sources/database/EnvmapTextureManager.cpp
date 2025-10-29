@@ -54,7 +54,7 @@ static void createFurnace(HdrImageDatabase &database) {
   metadata.channels = 4;
   metadata.color_corrected = true;
   metadata.is_hdr = true;
-  std::vector<float> image_data(metadata.width * metadata.height * metadata.channels, 0.1f);
+  std::vector<float> image_data(metadata.width * metadata.height * metadata.channels, 1.f);
   database::image::store<float>(database, true, image_data, metadata);
 }
 
