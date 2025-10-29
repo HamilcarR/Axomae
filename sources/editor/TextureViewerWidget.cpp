@@ -1,4 +1,5 @@
 #include "TextureViewerWidget.h"
+#include "ContextMenuWidget.h"
 #include "GUIWindow.h"
 #include "event/EventController.h"
 #include <QCloseEvent>
@@ -121,10 +122,10 @@ HdrRenderViewerWidget::HdrRenderViewerWidget(const image::ImageHolder<float> *te
                                              bool use_timer,
                                              QWidget *parent)
     : AbstractHdrRenderViewerWidget(app_controller, use_timer, parent), target_buffer(tex) {
-  QObject::connect(this, &HdrRenderViewerWidget::onSaveRenderQuery, app_controller, &controller::Controller::slot_nova_save_bake);
+  QObject::connect(this, &HdrRenderViewerWidget::onSaveRenderQuery, app_controller, &controller::Controller::slot_nova_save_image);
 }
 
-void HdrRenderViewerWidget::notifyUpdate() { emit onNotifyUpdate(); }
+void HdrRenderViewerWidget::notifyUpdate() const { emit onNotifyUpdate(); }
 
 HdrRenderViewerWidget::~HdrRenderViewerWidget() = default;
 
@@ -151,19 +152,21 @@ void HdrRenderViewerWidget::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void HdrRenderViewerWidget::mouseReleaseEvent(QMouseEvent *event) {
-  QWidget::mouseReleaseEvent(event);
+  AbstractHdrRenderViewerWidget::mouseReleaseEvent(event);
   QPoint p = event->pos();
   if (event->button() == Qt::RightButton) {
     widget_event_struct->flag |= EventManager::EVENT_MOUSE_R_RELEASE;
     ContextMenuWidget::ACTION action = context_menu->spawnMenuOnPos(p);
-    if (action == ContextMenuWidget::SAVE) {
-      if (target_buffer)
-        emit onSaveRenderQuery(*target_buffer);
-    } else if (action == ContextMenuWidget::STOP) {
+    if (action == ContextMenuWidget::STOP) {
       emit onStopRenderQuery();
     }
     widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_R_RELEASE;
   }
+}
+
+void HdrRenderViewerWidget::notifySaveRender() const {
+  if (target_buffer)
+    emit onSaveRenderQuery(*target_buffer);
 }
 
 void HdrRenderViewerWidget::resizeEvent(QResizeEvent *event) {
@@ -228,7 +231,8 @@ void AbstractHdrRenderViewerWidget::mouseReleaseEvent(QMouseEvent *event) {
     ContextMenuWidget::ACTION action = context_menu->spawnMenuOnPos(p);
     if (action == ContextMenuWidget::STOP) {
       emit onStopRenderQuery();
-    }
+    } else if (action == ContextMenuWidget::SAVE)
+      notifySaveRender();
     widget_event_struct->flag &= ~EventManager::EVENT_MOUSE_R_RELEASE;
   }
 }
@@ -250,11 +254,13 @@ HdrNovaRenderViewerWidget::HdrNovaRenderViewerWidget(nova::RenderBuffer *render_
                                                      controller::Controller *app_controller,
                                                      bool use_timer,
                                                      QWidget *parent)
-    : AbstractHdrRenderViewerWidget(app_controller, use_timer, parent), render_buffer(render_buffer) {}
+    : AbstractHdrRenderViewerWidget(app_controller, use_timer, parent), render_buffer(render_buffer) {
+  QObject::connect(this, &HdrNovaRenderViewerWidget::onSaveRenderQuery, app_controller, &controller::Controller::slot_nova_save_renderbuffer);
+}
 
 HdrNovaRenderViewerWidget::~HdrNovaRenderViewerWidget() = default;
 
-void HdrNovaRenderViewerWidget::notifyUpdate() { emit onNotifyUpdate(); }
+void HdrNovaRenderViewerWidget::notifyUpdate() const { emit onNotifyUpdate(); }
 
 void HdrNovaRenderViewerWidget::mouseMoveEvent(QMouseEvent *event) {
   QWidget::mouseMoveEvent(event);
@@ -296,4 +302,9 @@ void HdrNovaRenderViewerWidget::updateImage() {
 
   image = QImage(normalized.data(), static_cast<int>(image_width), static_cast<int>(image_height), QImage::Format_ARGB32);
   label->setPixmap(QPixmap::fromImage(image));
+}
+
+void HdrNovaRenderViewerWidget::notifySaveRender() const {
+  if (render_buffer)
+    emit onSaveRenderQuery(*render_buffer);
 }
