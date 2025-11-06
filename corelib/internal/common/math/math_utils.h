@@ -70,6 +70,24 @@ namespace math {
 
   }  // namespace calculus
 
+  template<class T>
+  ax_device_callable_inlined constexpr T sqr(const T &val) {
+    return val * val;
+  }
+
+  template<class T>
+  ax_device_callable_inlined constexpr T sqrt(T val);
+
+  template<>
+  ax_device_callable_inlined constexpr float sqrt(float val) {
+    return sqrtf(val);
+  }
+
+  template<>
+  ax_device_callable_inlined constexpr double sqrt(double val) {
+    return sqrt(val);
+  }
+
 }  // namespace math
 
 template<class T>
