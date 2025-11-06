@@ -75,7 +75,7 @@ TEST(DiffuseBxDFTest, pdf) {
   glm::vec3 wo(0.5f, 0.5f, 0.5f);
   glm::vec3 wi(0.f, 0.f, 1.f);
   float pdf = diffuse.pdf(wo, wi);
-  ASSERT_NEAR(pdf, bxdf::costheta(wi) * (float)INV_PI, 1e-6f);
+  ASSERT_NEAR(pdf, bxdf::abscostheta(wi) * (float)INV_PI, 1e-6f);
 
   wo = glm::vec3(0.5f, 0.5f, 0.5f);
   wi = glm::vec3(0.f, 0.f, -1.f);
