@@ -25,9 +25,11 @@ namespace nova::material {
 
   struct BSDFSample {
     Spectrum f;
+    Spectrum eta = 1.f;
+
     glm::vec3 wi;
     BXDFFLAGS flags;
-    float eta = 1.f;
+
     float pdf{};
     float costheta{};
     bool pdf_cosine_weighted = true;

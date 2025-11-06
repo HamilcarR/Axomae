@@ -1,5 +1,6 @@
 #ifndef BSDF_H
 #define BSDF_H
+
 #include "material/BxDF.h"
 #include "material/BxDF_flags.h"
 #include "ray/IntersectFrame.h"
@@ -11,10 +12,10 @@
 namespace nova::material {
 
   /*
-   * This class serves as a wrapper around a BxDF instance.
-   * Its goal is about converting direction vectors between shading and world spaces.
+   * Wrapper around a BxDF instance.
+   * Converts direction vectors between shading and world spaces.
+   * All vectors in input must be in world space , and will be returned in world space.
    */
-
   class BSDF {
     IntersectFrame local_frame;
     BxDF bxdf;
@@ -32,6 +33,7 @@ namespace nova::material {
       return bxdf.f(local_wo, local_wi, transport_mode);
     }
 
+    /* wo is entrant (eye -> sample).*/
     ax_device_callable_inlined bool sample_f(const glm::vec3 &wo,
                                              float uc,
                                              const float u[2],
@@ -40,11 +42,18 @@ namespace nova::material {
                                              REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
       AX_ASSERT_NOTNULL(sample);
       glm::vec3 local_wo = local_frame.worldToLocal(wo);
-      if (bxdf.sample_f(local_wo, uc, u, sample)) {
-        sample->wi = local_frame.localToWorld(sample->wi);
-        return true;
-      }
-      return false;
+
+      if (!(bxdf.flags() & (unsigned)sample_flag) && local_wo.z == 0.f)
+        return false;
+
+      if (!bxdf.sample_f(local_wo, uc, u, sample, transport_mode, sample_flag))
+        return false;
+
+      if (!sample->f || sample->pdf == 0.f || sample->wi.z == 0.f)
+        return false;
+
+      sample->wi = local_frame.localToWorld(sample->wi);
+      return true;
     }
 
     ax_device_callable_inlined float pdf(const glm::vec3 &wo,
