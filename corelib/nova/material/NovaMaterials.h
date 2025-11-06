@@ -90,7 +90,8 @@ namespace nova::material {
   class NovaConductorMaterial {
    private:
     texture_pack t_pack{};
-    glm::vec3 tint, reflectivity;
+    glm::vec3 tint{};          // k
+    glm::vec3 reflectivity{};  // eta
 
    public:
     CLASS_CM(NovaConductorMaterial)
@@ -169,7 +170,7 @@ namespace nova::material {
       float uc = sampler.sample1D();
       float u[2];
       sampler.sample2D(u);
-      if (!bsdf.sample_f(in.direction, uc, u, &lobe, TRANSPORT::RADIANCE, REFLTRANSFLAG::TRANSMISSION))
+      if (!bsdf.sample_f(in.direction, uc, u, &lobe))
         return false;
 
       Spectrum R(texture_pack_sampler.albedo(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate));
