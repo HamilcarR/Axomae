@@ -1,7 +1,7 @@
 #ifndef SPECTRUM_H
 #define SPECTRUM_H
-#include "internal/device/gpgpu/device_macros.h"
 #include "spectrum/BaseSpectrum.h"
+#include <internal/device/gpgpu/device_macros.h>
 namespace nova {
 
   // we ignore the wave behavior of light until the engine is numerically stable.
@@ -10,15 +10,17 @@ namespace nova {
   class RgbColorSpace {};
 
   class WaveSpectrum : public BaseSpectrum<WaveSpectrum> {
+   public:
     static constexpr unsigned SPECTRUM_SAMPLES = 4;
     float samples[SPECTRUM_SAMPLES]{};
   };
 
   class ColorSpectrum : public BaseSpectrum<ColorSpectrum> {
+
+   public:
     static constexpr unsigned SPECTRUM_SAMPLES = 3;
     float samples[SPECTRUM_SAMPLES]{};
 
-   public:
     ax_device_callable_inlined ColorSpectrum(const glm::vec3 &color) {
       for (unsigned i = 0; i < SPECTRUM_SAMPLES; i++)
         samples[i] = (&color.x)[i];
@@ -32,7 +34,7 @@ namespace nova {
 
     ax_device_callable_inlined ColorSpectrum() {
       for (unsigned i = 0; i < SPECTRUM_SAMPLES; i++)
-        samples[i] = 1.f;
+        samples[i] = 0.f;
     }
 
     ax_device_callable_inlined ColorSpectrum(float v) {
@@ -43,10 +45,6 @@ namespace nova {
     ax_device_callable_inlined glm::vec3 toRgb(const SampledWavelength &wl = {}, const RgbColorSpace &cs = {}) {
       return glm::vec3(samples[0], samples[1], samples[2]);
     }
-
-    ax_device_callable_inlined float *getSamplesArray() { return samples; }
-    ax_device_callable_inlined const float *getSamplesArray() const { return samples; }
-    ax_device_callable_inlined unsigned getSamplesSize() const { return SPECTRUM_SAMPLES; }
   };
 
   using Spectrum = std::conditional_t<core::build::is_spectrum_build, WaveSpectrum, ColorSpectrum>;
