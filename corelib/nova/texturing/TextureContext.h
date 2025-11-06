@@ -62,37 +62,37 @@ namespace nova::texturing {
    public:
     CLASS_DCM(TextureCtx)
 
-    ax_device_callable const TextureBundleViews &getBundle() const { return bundle; }
+    ax_device_callable_inlined const TextureBundleViews &getBundle() const { return bundle; }
 
-    ax_device_callable const U32Texture &u32texture(std::size_t index) const { return bundle.getU32(index); }
+    ax_device_callable_inlined const U32Texture &u32texture(std::size_t index) const { return bundle.getU32(index); }
 
-    ax_device_callable const F32Texture &f32texture(std::size_t index) const { return bundle.getF32(index); }
+    ax_device_callable_inlined const F32Texture &f32texture(std::size_t index) const { return bundle.getF32(index); }
 
-    ax_device_callable TextureCtx(const TextureBundleViews &b, bool use_itp = true) : bundle(b), use_interop(use_itp) {}
+    ax_device_callable_inlined TextureCtx(const TextureBundleViews &b, bool use_itp = true) : bundle(b), use_interop(use_itp) {}
 
-    ax_device_callable int u32width(std::size_t index) const {
+    ax_device_callable_inlined int u32width(std::size_t index) const {
       const U32Texture tex = bundle.getU32(index);
       return tex.width;
     }
 
-    ax_device_callable int u32height(std::size_t index) const {
+    ax_device_callable_inlined int u32height(std::size_t index) const {
       const U32Texture tex = bundle.getU32(index);
       return tex.height;
     }
 
-    ax_device_callable int f32height(std::size_t index) const {
+    ax_device_callable_inlined int f32height(std::size_t index) const {
       const F32Texture tex = bundle.getF32(index);
       return tex.height;
     }
 
-    ax_device_callable int f32width(std::size_t index) const {
+    ax_device_callable_inlined int f32width(std::size_t index) const {
       const F32Texture tex = bundle.getF32(index);
       return tex.width;
     }
 
-    ax_device_callable int f32channels(std::size_t index) const { return bundle.getChannelsF32(index); }
+    ax_device_callable_inlined int f32channels(std::size_t index) const { return bundle.getChannelsF32(index); }
 
-    ax_device_callable int u32channels(std::size_t index) const { return bundle.getChannelsU32(index); }
+    ax_device_callable_inlined int u32channels(std::size_t index) const { return bundle.getChannelsU32(index); }
 
     ax_device_callable_inlined bool u32IsRGBA(std::size_t index) const {
       const U32Texture tex = bundle.getU32(index);
@@ -125,7 +125,7 @@ namespace nova::texturing {
     }
 
     /* Outputs pixel in BGRA format. */
-    ax_device_callable uint32_t u32pixel(std::size_t texture_index, float u, float v) const {
+    ax_device_callable_inlined uint32_t u32pixel(std::size_t texture_index, float u, float v) const {
       u = u32IsUInverted(texture_index) ? 1 - u : u;
       v = u32IsVInverted(texture_index) ? 1 - v : v;
 

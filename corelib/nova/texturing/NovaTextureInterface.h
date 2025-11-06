@@ -54,11 +54,11 @@ namespace nova::texturing {
     std::size_t texture_index{0};
 
    public:
-    ax_device_callable ImageTexture() = default;
+    ax_device_callable_inlined ImageTexture() = default;
 
-    ax_device_callable ImageTexture(std::size_t index) : texture_index(index) {}
+    ax_device_callable_inlined ImageTexture(std::size_t index) : texture_index(index) {}
 
-    ax_device_callable glm::vec4 sample(float u, float v, const texture_data_aggregate_s &sample_data) const {
+    ax_device_callable_inlined glm::vec4 sample(float u, float v, const texture_data_aggregate_s &sample_data) const {
       u = normalize_uv(u);
       v = normalize_uv(v);
 
@@ -109,7 +109,7 @@ namespace nova::texturing {
       return glm::vec4(0);
     }
 
-    std::size_t getTextureIndex() const { return texture_index; }
+    ax_device_callable_inlined size_t getTextureIndex() const { return texture_index; }
   };
 
   ax_device_callable_inlined glm::vec3 sample_cubemap_plane(const glm::vec3 &sample_vector, const glm::vec3 &up_vector) {
