@@ -22,7 +22,7 @@ Renderer::Renderer()
   default_dir_light.parent = scene_camera;
   default_dir_light.name = "Default-DirectionalLight";
   auto query = database::node::store<DirectionalLight>(*resource_database->getNodeDatabase(), true, default_dir_light);
-  light_database.addLight(query.id);
+  // light_database.addLight(query.id);
   camera_framebuffer = std::make_unique<CameraFrameBuffer>(*resource_database, &screen_size, &default_framebuffer_id);
 }
 
