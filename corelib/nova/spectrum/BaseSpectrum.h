@@ -11,9 +11,9 @@ namespace nova {
   template<class S>
   class BaseSpectrum {
 
-    ax_device_callable_inlined float *samples() { return static_cast<S *>(this)->getSamplesArray(); }
-    ax_device_callable_inlined const float *samples() const { return static_cast<const S *>(this)->getSamplesArray(); }
-    ax_device_callable_inlined unsigned size() const { return static_cast<const S *>(this)->getSamplesSize(); }
+    ax_device_callable_inlined float *samples() { return static_cast<S *>(this)->samples; }
+    ax_device_callable_inlined const float *samples() const { return static_cast<const S *>(this)->samples; }
+    ax_device_callable_inlined unsigned size() const { return static_cast<const S *>(this)->SPECTRUM_SAMPLES; }
 
    public:
     ax_device_callable_inlined bool operator==(const S &other) const {
@@ -125,7 +125,7 @@ namespace nova {
     ax_device_callable_inlined S operator/(const S &other) const {
       S result = *static_cast<const S *>(this);
       for (unsigned i = 0; i < size(); i++) {
-        AX_ASSERT_NEQ(other_samples[i], 0);
+        AX_ASSERT_NEQ(other[i], 0);
         result[i] /= other[i];
       }
       return result;
@@ -151,7 +151,7 @@ namespace nova {
 
     ax_device_callable_inlined S &operator/=(const S &other) {
       for (unsigned i = 0; i < size(); i++) {
-        AX_ASSERT_NEQ(other_samples[i], 0);
+        AX_ASSERT_NEQ(other[i], 0);
         (*this)[i] /= other[i];
       }
       return *static_cast<S *>(this);
@@ -182,15 +182,13 @@ namespace nova {
       return min;
     }
 
-    ax_device_callable_inlined float operator[](int i) const {
+    ax_device_callable_inlined float operator[](unsigned i) const {
       AX_ASSERT_LT(i, size());
-      AX_ASSERT_GE(i, 0);
       return samples()[i];
     }
 
-    ax_device_callable_inlined float &operator[](int i) {
+    ax_device_callable_inlined float &operator[](unsigned i) {
       AX_ASSERT_LT(i, size());
-      AX_ASSERT_GE(i, 0);
       return samples()[i];
     }
 
