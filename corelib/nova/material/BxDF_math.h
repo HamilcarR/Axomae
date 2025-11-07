@@ -52,8 +52,8 @@ namespace bxdf {
 class Fresnel {
 
  public:
-  // Dielectrics.
-  ax_device_callable_inlined float Frf(float costheta_i, float eta) {
+  // Dielectrics, and refractive materials.
+  ax_device_callable_inlined float realIndex(float costheta_i, float eta) {
     costheta_i = glm::clamp(costheta_i, -1.f, 1.f);
     if (costheta_i < 0) {
       eta = 1.f / eta;
@@ -69,8 +69,8 @@ class Fresnel {
     return (math::sqr(rpar) + math::sqr(rperp)) / 2.f;
   }
 
-  // Conductors
-  ax_device_callable_inlined float Frc(float costheta_i, const math::fcomplex &eta) {
+  // Conductors and absorbant materials.
+  ax_device_callable_inlined float complexIndex(float costheta_i, const math::fcomplex &eta) {
     using fcomplex = math::fcomplex;
     costheta_i = glm::clamp(costheta_i, 0.f, 1.f);
     float sin2theta_i = 1 - math::sqr(costheta_i);
