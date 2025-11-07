@@ -6,11 +6,11 @@
 #include "spectrum/Spectrum.h"
 #include <internal/common/axstd/span.h>
 #include <internal/common/math/math_spherical.h>
+#include <internal/common/math/math_utils.h>
+#include <internal/debug/debug_utils.h>
 #include <internal/device/gpgpu/device_macros.h>
 #include <internal/macro/project_macros.h>
 #include <internal/memory/tag_ptr.h>
-#include <internal/common/math/math_utils.h>
-#include <internal/debug/debug_utils.h>
 
 struct uniform_sample2d {
   float u[2];
@@ -99,7 +99,7 @@ namespace nova::material {
 
       if (ggx.isFullSpecular() || eta == 1.f) {
         Fresnel fresnel;
-        float R = fresnel.Frf(costheta_o, eta), T = 1 - R;
+        float R = fresnel.realIndex(costheta_o, eta), T = 1 - R;
         float pr = R, pt = T;
         if (!(sample_flag & REFLTRANSFLAG::REFLECTION))
           pr = 0;
@@ -133,7 +133,7 @@ namespace nova::material {
       Spectrum ret(0.f);
       Fresnel fresnel;
       for (unsigned i = 0; i < Spectrum::SPECTRUM_SAMPLES; i++) {
-        ret.samples[i] = fresnel.Frc(costheta_i, math::fcomplex(eta[i], k[i]));
+        ret.samples[i] = fresnel.complexIndex(costheta_i, math::fcomplex(eta[i], k[i]));
       }
       return ret;
     }
@@ -146,6 +146,7 @@ namespace nova::material {
         return Spectrum(0.f);
       if (ggx.isFullSpecular())
         return Spectrum(0.f);
+
       // Implement rough specular
     }
 
