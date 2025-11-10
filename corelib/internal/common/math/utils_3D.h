@@ -47,6 +47,14 @@ namespace math {
   constexpr T halfvector(const T &v1, const T &v2) {
     return glm::normalize(v1 + v2);
   }
+
+  /* Recomputes orthonormal base to ensure perfect orthonormality (Gram-Shmidt).*/
+  ax_device_callable_inlined void bran_shmidt(const glm::vec3 &n, const glm::vec3 &t, glm::vec3 &n_res, glm::vec3 &t_res, glm::vec3 &b_res) {
+    n_res = glm::normalize(n);
+    t_res = glm::normalize(t - glm::dot(t, n) * n);
+    b_res = glm::normalize(glm::cross(n, t));
+  }
+
 }  // namespace math
 
 struct transform4x4_t {
