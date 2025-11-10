@@ -116,3 +116,4 @@ $ make
 - Stochastic Generation of (t, s) Sample Sequences - Andrew Helmer, Per Christensen, Andrew Kensler
 - Megakernels Considered Harmful: Wavefront Path Tracing on GPUs - Samuli Laine, Tero Karras, Timo Aila
 - Practical Hash-Based Owen Scrambling - Brent Burley
+- Average Irregularity Representation Of A Rough Surface For Ray Reflection - T.S. Trowbridge , K.P. Reitz
