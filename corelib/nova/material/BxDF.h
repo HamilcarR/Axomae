@@ -18,8 +18,6 @@ struct uniform_sample2d {
 
 namespace nova::material {
 
-  ax_device_callable_inlined bool same_hemisphere(const glm::vec3 &w1, const glm::vec3 &w2) { return w1.z * w2.z > 0; }
-
   class CoatedDiffuseBxDF;
   class CoatedConductorBxDF;
   class ThinDielectricBxDF;
@@ -28,7 +26,7 @@ namespace nova::material {
 
   class DielectricBxDF {
     float eta{1.f};  // External medium refraction index.
-    GGX ggx;
+    NDF ggx;
 
     ax_device_callable_inlined bool perfectSpecularReflection(
         glm::vec3 wo, float R, float pr, float pt, float eta, BSDFSample *sample, TRANSPORT transport, REFLTRANSFLAG flag) const {
@@ -77,7 +75,7 @@ namespace nova::material {
     }
 
     ax_device_callable_inlined Spectrum f(const glm::vec3 &wo, const glm::vec3 &wi, TRANSPORT mode = TRANSPORT::RADIANCE) const {
-      if (!same_hemisphere(wo, wi))
+      if (!bxdf::same_hemisphere(wo, wi))
         return Spectrum(0.f);
       if (ggx.isFullSpecular())
         return Spectrum(0.f);
@@ -127,7 +125,7 @@ namespace nova::material {
 
   class ConductorBxDF {
     Spectrum k, eta;
-    GGX ggx;
+    NDF ggx;
 
     ax_device_callable_inlined Spectrum computeFresnel(float costheta_i) const {
       Spectrum ret(0.f);
@@ -142,7 +140,7 @@ namespace nova::material {
     ax_device_callable_inlined ConductorBxDF(Spectrum eta, Spectrum k, float roughness) : eta(eta), k(k), ggx(roughness) {}
 
     ax_device_callable_inlined Spectrum f(const glm::vec3 &wo, const glm::vec3 &wi, TRANSPORT mode = TRANSPORT::RADIANCE) const {
-      if (!same_hemisphere(wo, wi))
+      if (!bxdf::same_hemisphere(wo, wi))
         return Spectrum(0.f);
       if (ggx.isFullSpecular())
         return Spectrum(0.f);
@@ -156,7 +154,7 @@ namespace nova::material {
                                          REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
       if (!(sample_flag & REFLTRANSFLAG::REFLECTION))
         return 0.f;
-      if (!same_hemisphere(wi, wo))
+      if (!bxdf::same_hemisphere(wi, wo))
         return 0.f;
       if (ggx.isFullSpecular())
         return 0.f;
@@ -199,7 +197,7 @@ namespace nova::material {
     ax_device_callable_inlined DiffuseBxDF(Spectrum RR) : R(RR) {}
 
     ax_device_callable_inlined Spectrum f(const glm::vec3 &wo, const glm::vec3 &wi, TRANSPORT mode = TRANSPORT::RADIANCE) const {
-      if (!same_hemisphere(wi, wo))
+      if (!bxdf::same_hemisphere(wi, wo))
         return Spectrum(0.f);
       return R * INV_PI;
     }
@@ -208,7 +206,7 @@ namespace nova::material {
                                          const glm::vec3 &wi,
                                          TRANSPORT transport_mode = TRANSPORT::RADIANCE,
                                          REFLTRANSFLAG flag = REFLTRANSFLAG::ALL) const {
-      if (!same_hemisphere(wi, wo))
+      if (!bxdf::same_hemisphere(wi, wo))
         return 0;
       if (!(flag & REFLTRANSFLAG::REFLECTION))
         return 0;

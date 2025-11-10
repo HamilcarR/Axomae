@@ -1,9 +1,11 @@
 #ifndef BXDF_MATH_H
 #define BXDF_MATH_H
+#include <algorithm>
 #include <cmath>
 #include <internal/common/math/math_complex.h>
 #include <internal/common/math/math_spherical.h>
 #include <internal/common/math/math_utils.h>
+#include <internal/common/math/utils_3D.h>
 #include <internal/device/gpgpu/device_macros.h>
 #include <internal/device/gpgpu/device_utils.h>
 #include <math.h>
@@ -11,10 +13,39 @@
 /* Vectors are assumed to be in tangent space. */
 namespace bxdf {
 
-  ax_device_callable_inlined float costheta(const glm::vec3 &vector) { return vector.z; }
-  ax_device_callable_inlined float abscostheta(const glm::vec3 &direction) { return fabsf(costheta(direction)); }
+  ax_device_callable_inlined bool same_hemisphere(const glm::vec3 &w1, const glm::vec3 &w2) { return w1.z * w2.z > 0; }
 
-  /* Provides a uniform mapping between square to disk .*/
+  ax_device_callable_inlined float costheta(const glm::vec3 &v) { return v.z; }
+
+  ax_device_callable_inlined float abscostheta(const glm::vec3 &v) { return fabsf(costheta(v)); }
+
+  ax_device_callable_inlined float cos2theta(const glm::vec3 &v) { return math::sqr(costheta(v)); }
+
+  ax_device_callable_inlined float sin2theta(const glm::vec3 &v) { return std::max(0.f, 1.f - cos2theta(v)); }
+
+  ax_device_callable_inlined float sintheta(const glm::vec3 &v) { return math::sqrt(sin2theta(v)); }
+
+  ax_device_callable_inlined float sinphi(const glm::vec3 &v) {
+    if (sintheta(v) == 0.f)
+      return 0.f;
+    return std::clamp(v.y / sintheta(v), -1.f, 1.f);
+  }
+
+  ax_device_callable_inlined float sin2phi(const glm::vec3 &v) { return math::sqr(sinphi(v)); }
+
+  ax_device_callable_inlined float tantheta(const glm::vec3 &v) { return sintheta(v) / costheta(v); }
+
+  ax_device_callable_inlined float tan2theta(const glm::vec3 &v) { return sin2theta(v) / cos2theta(v); }
+
+  ax_device_callable_inlined float cosphi(const glm::vec3 &v) {
+    if (sintheta(v) == 0.f)
+      return 1.f;
+    return std::clamp(v.x / sintheta(v), -1.f, 1.f);
+  }
+
+  ax_device_callable_inlined float cos2phi(const glm::vec3 &v) { return math::sqr(cosphi(v)); }
+
+  /* Provides a uniform mapping from square to disk .*/
   ax_device_callable_inlined glm::vec2 shirley_chiu(const float u[2]) {
     float sx = 2 * u[0] - 1;
     float sy = 2 * u[1] - 1;
@@ -46,6 +77,12 @@ namespace bxdf {
   }
 
   ax_device_callable_inlined constexpr float hemisphere_pdf() { return INV_2PI; }
+
+  ax_device_callable_inlined glm::vec2 sample_uniform_disk_polar(const float u[2]) {
+    float r = math::sqrt(u[0]);
+    float t = 2.f * M_PI * u[1];
+    return {r * cos(t), r * sin(t)};
+  }
 
 }  // namespace bxdf
 
@@ -86,23 +123,20 @@ class Fresnel {
   }
 };
 /* Vectors in tangent space.*/
-class GGX {
+class NDF {
   float alpha_x, alpha_x_inv;
   float alpha_y, alpha_y_inv;
 
-  ax_device_callable_inlined float roughnessToAlpha(float roughness) const { return exp2(roughness * 10.f - 10.f); }
+  ax_device_callable_inlined float roughnessToAlpha(float roughness) const { return roughness * roughness; }
   ax_device_callable_inlined float lambda(const glm::vec3 &v) const {
-    float alpha_x_term = math::sqr(alpha_x * v.x);
-    float alpha_y_term = math::sqr(alpha_y * v.y);
-    float z_term = math::sqr(v.z);
-    float total_term = (alpha_x_term + alpha_y_term) / z_term;
-    AX_ASSERT_GE(total_term, 0.f);
-    float sqrt_term = sqrtf(1 + total_term);
-    return (-1 + sqrt_term) * 0.5f;
+    float alpha_x_term = math::sqr(alpha_x) * bxdf::cos2phi(v);
+    float alpha_y_term = math::sqr(alpha_y) * bxdf::sin2phi(v);
+    float alpha2 = math::sqr(alpha_x_term + alpha_y_term);
+    return (math::sqrt(1 + alpha2 * bxdf::tan2theta(v)) - 1) * 0.5f;
   }
 
  public:
-  ax_device_callable_inlined GGX(float roughness) {
+  ax_device_callable_inlined NDF(float roughness) {
     alpha_x = roughnessToAlpha(roughness);
     alpha_y = alpha_x;
 
@@ -110,38 +144,70 @@ class GGX {
     alpha_y_inv = 1.f / alpha_y;
   }
 
-  ax_device_callable_inlined GGX(float roughness_x, float roughness_y) {
-    alpha_x = roughnessToAlpha(roughness_x);
-    alpha_y = roughnessToAlpha(roughness_y);
+  ax_device_callable_inlined NDF(float anisotropy, float roughness) {
+    float aspect = (1.f - 0.9 * anisotropy);
+
+    alpha_x = roughnessToAlpha(roughness) / aspect;
+    alpha_y = roughnessToAlpha(roughness) * aspect;
     alpha_x_inv = 1.f / alpha_x;
     alpha_y_inv = 1.f / alpha_y;
   }
-
-  ax_device_callable_inlined float D(glm::vec3 h) const {
-    if (h.z == 0.f)
+  /*
+   * Anisotropic micrafacets distribution function.
+   * Takes a half-vector or a shading normal.
+   */
+  ax_device_callable_inlined float D(const glm::vec3 &h) const {
+    AX_ASSERT_NEQ(alpha_x, 0.f);
+    AX_ASSERT_NEQ(alpha_y, 0.f);
+    if (bxdf::costheta(h) == 0.f)
       return 0.f;
-    float x_ratio = math::sqr(h.x) * math::sqr(alpha_x_inv);
-    float y_ratio = math::sqr(h.y) * math::sqr(alpha_y_inv);
-    float z_ratio = math::sqr(h.z);
-    float squared_denominator = math::sqr(x_ratio + y_ratio + z_ratio);
-    return alpha_x_inv * alpha_y_inv * M_1_PIf * 1.f / squared_denominator;
+
+    float cos2phi_alpha2_x = bxdf::cos2phi(h) * math::sqr(alpha_x_inv);
+    float sin2phi_alpha2_y = bxdf::sin2phi(h) * math::sqr(alpha_y_inv);
+    float denom = M_PI * alpha_x * alpha_y * math::sqr(bxdf::cos2theta(h)) *
+                  math::sqr(1.f + bxdf::tan2theta(h) * (cos2phi_alpha2_x + sin2phi_alpha2_y));
+    return 1.f / denom;
   }
 
+  /* Masking function : Statistically describes occlusions and backfacing microfacets.
+   * Specifies the fraction of microfacets visible from direction v.
+   */
   ax_device_callable_inlined float G1(glm::vec3 v) const {
     v.z = std::max(v.z, 1e-4f);
     return 1.f / (1.f + lambda(v));
   }
 
-  /* Takes a normal(half-vector) and a view vector.*/
-  ax_device_callable_inlined float Dv(const glm::vec3 &h, const glm::vec3 &v) const {
-    AX_ASSERT_GE(v.z, 0.f);
-    float g1 = G1(v);
-    float hdotv = std::max(0.f, glm::dot(h, v));
-    float d = D(h);
-    return g1 * hdotv * d / bxdf::abscostheta(v);
+  /* Bi-Directional Masking-Shadowing function : Gives the amount of microfacets simultaneously visible from wo and wi.*/
+  ax_device_callable_inlined float G1(const glm::vec3 &wo, const glm::vec3 wi) const { return 1.f / (1.f + lambda(wo) + lambda(wi)); }
+
+  ax_device_callable_inlined float pdf(const glm::vec3 &w, const glm::vec3 &wm) const {
+    return (G1(w) / bxdf::abscostheta(w)) * D(wm) * std::fabsf(glm::dot(w, wm));
   }
 
-  /* Checks if roughness allows for a specular lobe.*/
+  /* Returns a visible microfacet normal.*/
+  ax_device_callable_inlined glm::vec3 sampleWm(const glm::vec3 &w, float uc[2]) const {
+    // Scales w to the alpha ellipsoid.
+    glm::vec3 w_h = glm::vec3(w.x * alpha_x, w.y * alpha_y, w.z < 0 ? -w.z : w.z);
+
+    // Create orthonormal frame.
+    glm::vec3 t, b;
+    if (w_h.z < 1.f)
+      t = glm::normalize(glm::cross(glm::vec3(0, 0, 1), w_h));
+    else
+      t = glm::vec3(1, 0, 0);
+    b = glm::cross(w_h, t);
+    // Generate uniform points on a disk.
+    glm::vec2 p = bxdf::shirley_chiu(uc);
+    // Hemisphere warp.
+    float h = math::sqrt(1 - math::sqr(p.x));
+    p.y = glm::mix(p.y, h, (1 + w_h.z) * 0.5f);
+    // Reproject hemisphere.
+    float pz = math::sqrt(std::max(0.f, 1.f - glm::length2(p)));
+    glm::vec3 nh = p.x * t + p.y * b + pz * w_h;
+    return glm::normalize(glm::vec3(alpha_x * nh.x, alpha_y * nh.y, std::max(1e-6f, nh.z)));
+  }
+
+  /* Checks if roughness allows for a specular lobe or a perfect specular effect.*/
   ax_device_callable_inlined bool isFullSpecular() const { return std::max(alpha_x, alpha_y) < 1e-3; }
 };
 
