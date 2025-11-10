@@ -1,5 +1,6 @@
 #include "Test.h"
 #include "material/BxDF_flags.h"
+#include "material/BxDF_math.h"
 #include "sampler/Sampler.h"
 #include "spectrum/Spectrum.h"
 #include <gtest/gtest.h>
@@ -8,6 +9,39 @@
 #include <nova/material/BxDF.h>
 
 namespace nm = nova::material;
+
+TEST(GGXTest, SampleWm) {
+  NDF test_ggx(0.75f);
+  glm::vec3 sample_vector(0.f, 0.f, 1.f);
+  float uc[2] = {0.13f, 0.21f};
+  glm::vec3 wm = test_ggx.sampleWm(sample_vector, uc);
+
+  // Sampled direction should always be in the same hemisphere as the shading normal.
+  ASSERT_TRUE(bxdf::same_hemisphere(wm, sample_vector));
+
+  // Sampled direction should be normalized.
+  ASSERT_EQ(glm::length(wm), 1.f);
+}
+
+/* Tests the behavior of the masking function G1().
+ * Should return values close to 1 with a vector colinear with the facet's normal , and close to 0 for grazing angles.
+ */
+TEST(GGXTest, G1_bounds) {
+  NDF test_ggx(0.75f);
+  // Visible micrafacets from top view.
+  glm::vec3 sample_vector(0.f, 0.f, 1.f);
+  float visible_micrafacets_probability = test_ggx.G1(sample_vector);
+  EXPECT_GT(visible_micrafacets_probability, 0);
+  EXPECT_LE(visible_micrafacets_probability, 1);
+  EXPECT_NEAR(visible_micrafacets_probability, 1, 1e-3f);
+
+  // Visible microfacets at grazing angle.
+  sample_vector = glm::vec3(1.f, 1.f, 1e-4f);
+  visible_micrafacets_probability = test_ggx.G1(sample_vector);
+  EXPECT_GE(visible_micrafacets_probability, 0);
+  EXPECT_LT(visible_micrafacets_probability, 1.f);
+  EXPECT_NEAR(visible_micrafacets_probability, 0.f, 1e-2f);
+}
 
 /* Tests f(wo , wi , p) = f(wi , wo , p). */
 template<class BxDF>
