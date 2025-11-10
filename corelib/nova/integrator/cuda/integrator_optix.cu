@@ -48,7 +48,7 @@ extern "C" ax_kernel void __raygen__main() {
     optixTrace(parameters.handle,
                origin,
                direction,
-               0.1f,
+               0.001f,
                1e30f,
                0.f,
                OptixVisibilityMask(0xFF),
@@ -84,7 +84,7 @@ extern "C" ax_kernel void __raygen__main() {
 
       glm::vec4 e = glm::vec4(emissive.toRgb(), 1.f);
       glm::vec4 c = glm::vec4(color.toRgb(), 1.f);
-      attenuation = DENAN(10.f * e + c * attenuation);
+      attenuation = DENAN(e + c * attenuation);
     } else {
       attenuation = glm::vec4(0.f);
       break;
