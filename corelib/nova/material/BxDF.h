@@ -139,6 +139,8 @@ namespace nova::material {
 
    public:
     ax_device_callable_inlined ConductorBxDF(Spectrum eta, Spectrum k, float roughness) : eta(eta), k(k), ggx(roughness) {}
+    ax_device_callable_inlined ConductorBxDF(Spectrum eta, Spectrum k, float anisotropy, float roughness)
+        : eta(eta), k(k), ggx(anisotropy, roughness) {}
 
     ax_device_callable_inlined Spectrum f(const glm::vec3 &wo_ori, const glm::vec3 &wi, TRANSPORT mode = TRANSPORT::RADIANCE) const {
       glm::vec3 wo = -wo_ori;
