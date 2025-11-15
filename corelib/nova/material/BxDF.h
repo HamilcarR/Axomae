@@ -243,11 +243,28 @@ namespace nova::material {
    public:
     using tag_ptr::tag_ptr;
 
+    /**
+     * @brief Evalutes BxDF
+     *
+     * @param wo view direction, Always incoming (eye->sample).
+     * @param wi radiance direction, Always outgoing (sample->light).
+     * @param transport_mode Transport Mode.
+     * @return Spectrum
+     */
     ax_device_callable_inlined Spectrum f(const glm::vec3 &wo, const glm::vec3 &wi, TRANSPORT transport_mode = TRANSPORT::RADIANCE) const {
       auto d = [&](auto bxdf) { return bxdf->f(wo, wi, transport_mode); };
       return dispatch(d);
     }
 
+    /**
+     * @brief Computes the PDF of the underlying BXDF
+     *
+     * @param wo view direction . Always incoming (eye->sample)
+     * @param wi radiance direction. Always outgoing (sample-> light).
+     * @param transport_mode Transport Mode.
+     * @param flag Reflection/Transmission flag for rendering passes.
+     * @return float: PDF of the BxDF.
+     */
     ax_device_callable_inlined float pdf(const glm::vec3 &wo,
                                          const glm::vec3 &wi,
                                          TRANSPORT transport_mode = TRANSPORT::RADIANCE,
@@ -256,6 +273,17 @@ namespace nova::material {
       return dispatch(d);
     }
 
+    /**
+     * @brief Generates a valid BxDF lobe when possible.
+     *
+     * @param wo view direction. Always incoming (eye->sample).
+     * @param uc 1D random float.
+     * @param u 2D random floats.
+     * @param sample Computed BXDF lobe.
+     * @param transport_mode Transport Mode.
+     * @param sample_flag Reflection/Transmission flag.
+     * @return bool: If computation of the lobe is possible.
+     */
     ax_device_callable_inlined bool sample_f(const glm::vec3 &wo,
                                              float uc,
                                              const float u[2],
