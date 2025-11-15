@@ -13,6 +13,8 @@
 /* Vectors are assumed to be in tangent space. */
 namespace bxdf {
 
+  ax_device_callable_inlined float absdot(const glm::vec3 &w1, const glm::vec3 &w2) { return glm::abs(glm::dot(w1, w2)); }
+
   ax_device_callable_inlined bool same_hemisphere(const glm::vec3 &w1, const glm::vec3 &w2) { return w1.z * w2.z > 0; }
 
   ax_device_callable_inlined float costheta(const glm::vec3 &v) { return v.z; }
@@ -126,29 +128,26 @@ class Fresnel {
 class NDF {
   float alpha_x, alpha_x_inv;
   float alpha_y, alpha_y_inv;
-
-  ax_device_callable_inlined float roughnessToAlpha(float roughness) const { return roughness * roughness; }
-  ax_device_callable_inlined float lambda(const glm::vec3 &v) const {
-    float alpha_x_term = math::sqr(alpha_x) * bxdf::cos2phi(v);
-    float alpha_y_term = math::sqr(alpha_y) * bxdf::sin2phi(v);
-    float alpha2 = math::sqr(alpha_x_term + alpha_y_term);
-    return (math::sqrt(1 + alpha2 * bxdf::tan2theta(v)) - 1) * 0.5f;
+  static constexpr float PERFECT_SPECULAR_THRESHOLD = 1e-3f;
+  ax_device_callable_inlined float roughnessToAlpha(float roughness) const {
+    return roughness != 0 ? roughness * roughness : PERFECT_SPECULAR_THRESHOLD;
   }
 
  public:
   ax_device_callable_inlined NDF(float roughness) {
     alpha_x = roughnessToAlpha(roughness);
     alpha_y = alpha_x;
-
     alpha_x_inv = 1.f / alpha_x;
     alpha_y_inv = 1.f / alpha_y;
   }
 
   ax_device_callable_inlined NDF(float anisotropy, float roughness) {
-    float aspect = (1.f - 0.9 * anisotropy);
+    float aspect = (1.f - 0.9f * anisotropy);
 
+    AX_ASSERT_NEQ(aspect, 0.f);
     alpha_x = roughnessToAlpha(roughness) / aspect;
     alpha_y = roughnessToAlpha(roughness) * aspect;
+
     alpha_x_inv = 1.f / alpha_x;
     alpha_y_inv = 1.f / alpha_y;
   }
@@ -156,17 +155,27 @@ class NDF {
    * Anisotropic micrafacets distribution function.
    * Takes a half-vector or a shading normal.
    */
-  ax_device_callable_inlined float D(const glm::vec3 &h) const {
+  ax_device_callable_inlined float D(const glm::vec3 &wm) const {
     AX_ASSERT_NEQ(alpha_x, 0.f);
     AX_ASSERT_NEQ(alpha_y, 0.f);
-    if (bxdf::costheta(h) == 0.f)
+    if (bxdf::costheta(wm) == 0.f)
       return 0.f;
 
-    float cos2phi_alpha2_x = bxdf::cos2phi(h) * math::sqr(alpha_x_inv);
-    float sin2phi_alpha2_y = bxdf::sin2phi(h) * math::sqr(alpha_y_inv);
-    float denom = M_PI * alpha_x * alpha_y * math::sqr(bxdf::cos2theta(h)) *
-                  math::sqr(1.f + bxdf::tan2theta(h) * (cos2phi_alpha2_x + sin2phi_alpha2_y));
+    float cos2phi_alpha2_x = bxdf::cos2phi(wm) * math::sqr(alpha_x_inv);
+    float sin2phi_alpha2_y = bxdf::sin2phi(wm) * math::sqr(alpha_y_inv);
+    float denom = M_PI * alpha_x * alpha_y * math::sqr(bxdf::cos2theta(wm)) *
+                  math::sqr(1.f + bxdf::tan2theta(wm) * (cos2phi_alpha2_x + sin2phi_alpha2_y));
     return 1.f / denom;
+  }
+
+  ax_device_callable_inlined float lambda(const glm::vec3 &v) const {
+    float tan2theta = bxdf::tan2theta(v);
+    if (ISINF(tan2theta) || ISNAN(tan2theta))
+      return 0;
+    float alpha_x_term = math::sqr(alpha_x) * bxdf::cos2phi(v);
+    float alpha_y_term = math::sqr(alpha_y) * bxdf::sin2phi(v);
+    float alpha2 = math::sqr(alpha_x_term) + math::sqr(alpha_y_term);
+    return (math::sqrt(1 + alpha2 * tan2theta) - 1) * 0.5f;
   }
 
   /* Masking function : Statistically describes occlusions and backfacing microfacets.
@@ -185,30 +194,31 @@ class NDF {
   }
 
   /* Returns a visible microfacet normal.*/
-  ax_device_callable_inlined glm::vec3 sampleWm(const glm::vec3 &w, float uc[2]) const {
+  ax_device_callable_inlined glm::vec3 sampleGGXVNDF(const glm::vec3 &wo, const float uc[2]) const {
+
     // Scales w to the alpha ellipsoid.
-    glm::vec3 w_h = glm::vec3(w.x * alpha_x, w.y * alpha_y, w.z < 0 ? -w.z : w.z);
+    glm::vec3 wo_h = glm::normalize(glm::vec3(wo.x * alpha_x, wo.y * alpha_y, wo.z));
 
     // Create orthonormal frame.
     glm::vec3 t, b;
-    if (w_h.z < 1.f)
-      t = glm::normalize(glm::cross(glm::vec3(0, 0, 1), w_h));
+    if (wo_h.z < 1.f)
+      t = glm::normalize(glm::cross(glm::vec3(0, 0, 1), wo_h));
     else
       t = glm::vec3(1, 0, 0);
-    b = glm::cross(w_h, t);
-    // Generate uniform points on a disk.
-    glm::vec2 p = bxdf::shirley_chiu(uc);
-    // Hemisphere warp.
-    float h = math::sqrt(1 - math::sqr(p.x));
-    p.y = glm::mix(p.y, h, (1 + w_h.z) * 0.5f);
-    // Reproject hemisphere.
-    float pz = math::sqrt(std::max(0.f, 1.f - glm::length2(p)));
-    glm::vec3 nh = p.x * t + p.y * b + pz * w_h;
+    b = glm::cross(wo_h, t);
+
+    // Sample two uniformly distributesd points on a disk.
+    glm::vec2 polar_samples = bxdf::sample_uniform_disk_polar(uc);
+    // Parameterization of projected area
+    float s = 0.5f * (1.f + wo_h.z);
+    polar_samples.y = math::lerp(math::sqrt(1.f - math::sqr(polar_samples.x)), polar_samples.y, s);
+    glm::vec3 nh = polar_samples.x * t + polar_samples.y * b +
+                   math::sqrt(fmax(0.f, 1.f - math::sqr(polar_samples.x) - math::sqr(polar_samples.y))) * wo_h;
     return glm::normalize(glm::vec3(alpha_x * nh.x, alpha_y * nh.y, std::max(1e-6f, nh.z)));
   }
 
   /* Checks if roughness allows for a specular lobe or a perfect specular effect.*/
-  ax_device_callable_inlined bool isFullSpecular() const { return std::max(alpha_x, alpha_y) < 1e-3; }
+  ax_device_callable_inlined bool isFullSpecular() const { return std::max(alpha_x, alpha_y) <= PERFECT_SPECULAR_THRESHOLD; }
 };
 
 #endif
