@@ -15,6 +15,8 @@ namespace nova::material {
    * Wrapper around a BxDF instance.
    * Converts direction vectors between shading and world spaces.
    * All vectors in input must be in world space , and will be returned in world space.
+   * wo is entrant (eye -> sample).
+   * wi is outgoing (sample -> eye).
    */
   class BSDF {
     IntersectFrame local_frame;
@@ -28,12 +30,11 @@ namespace nova::material {
         : local_frame(shading_normal, dpdu), bxdf(bxdf_instance) {}
 
     ax_device_callable_inlined Spectrum f(const glm::vec3 &wo, const glm::vec3 &wi, TRANSPORT transport_mode = TRANSPORT::RADIANCE) const {
-      glm::vec3 local_wi = local_frame.worldToLocal(wi);
-      glm::vec3 local_wo = local_frame.worldToLocal(wo);
+      glm::vec3 local_wi = glm::normalize(local_frame.worldToLocal(wi));
+      glm::vec3 local_wo = glm::normalize(local_frame.worldToLocal(wo));
       return bxdf.f(local_wo, local_wi, transport_mode);
     }
 
-    /* wo is entrant (eye -> sample).*/
     ax_device_callable_inlined bool sample_f(const glm::vec3 &wo,
                                              float uc,
                                              const float u[2],
@@ -41,7 +42,7 @@ namespace nova::material {
                                              TRANSPORT transport_mode = TRANSPORT::RADIANCE,
                                              REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
       AX_ASSERT_NOTNULL(sample);
-      glm::vec3 local_wo = local_frame.worldToLocal(wo);
+      glm::vec3 local_wo = glm::normalize(local_frame.worldToLocal(wo));
 
       if (!(bxdf.flags() & (unsigned)sample_flag) && local_wo.z == 0.f)
         return false;
@@ -52,7 +53,7 @@ namespace nova::material {
       if (!sample->f || sample->pdf == 0.f || sample->wi.z == 0.f)
         return false;
 
-      sample->wi = local_frame.localToWorld(sample->wi);
+      sample->wi = glm::normalize(local_frame.localToWorld(sample->wi));
       return true;
     }
 
@@ -61,8 +62,8 @@ namespace nova::material {
                                          TRANSPORT transport_mode = TRANSPORT::RADIANCE,
                                          REFLTRANSFLAG flag = REFLTRANSFLAG::ALL) const {
 
-      glm::vec3 local_wo = local_frame.worldToLocal(wo);
-      glm::vec3 local_wi = local_frame.localToWorld(wi);
+      glm::vec3 local_wo = glm::normalize(local_frame.worldToLocal(wo));
+      glm::vec3 local_wi = glm::normalize(local_frame.localToWorld(wi));
 
       return bxdf.pdf(local_wo, local_wi, transport_mode, flag);
     }
