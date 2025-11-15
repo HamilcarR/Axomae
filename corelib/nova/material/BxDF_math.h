@@ -142,7 +142,7 @@ class NDF {
   }
 
   ax_device_callable_inlined NDF(float anisotropy, float roughness) {
-    float aspect = (1.f - 0.9f * anisotropy);
+    float aspect = math::sqrt(1.f - 0.9f * anisotropy);
 
     AX_ASSERT_NEQ(aspect, 0.f);
     alpha_x = roughnessToAlpha(roughness) / aspect;
@@ -174,7 +174,7 @@ class NDF {
       return 0;
     float alpha_x_term = math::sqr(alpha_x) * bxdf::cos2phi(v);
     float alpha_y_term = math::sqr(alpha_y) * bxdf::sin2phi(v);
-    float alpha2 = math::sqr(alpha_x_term) + math::sqr(alpha_y_term);
+    float alpha2 = alpha_x_term + alpha_y_term;
     return (math::sqrt(1 + alpha2 * tan2theta) - 1) * 0.5f;
   }
 
