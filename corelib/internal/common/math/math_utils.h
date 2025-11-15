@@ -6,6 +6,7 @@
 #include "math_spherical.h"
 #include "math_texturing.h"
 
+#define AX_ASSERT_NOTNAN(val) assert(!ISNAN(val) && !ISINF(val));
 struct Dim2 {
   unsigned width;
   unsigned height;
@@ -88,6 +89,10 @@ namespace math {
     return sqrt(val);
   }
 
+  template<class T>
+  ax_device_callable_inlined constexpr T lerp(const T &x, const T &y, const T &a) {
+    return x * (static_cast<T>(1) - a) + a * y;
+  }
 }  // namespace math
 
 template<class T>
