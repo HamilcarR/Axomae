@@ -117,3 +117,4 @@ $ make
 - Megakernels Considered Harmful: Wavefront Path Tracing on GPUs - Samuli Laine, Tero Karras, Timo Aila
 - Practical Hash-Based Owen Scrambling - Brent Burley
 - Average Irregularity Representation Of A Rough Surface For Ray Reflection - T.S. Trowbridge , K.P. Reitz
+- Sampling the GGX Distribution of Visible Normals - Eric Heitz, 
