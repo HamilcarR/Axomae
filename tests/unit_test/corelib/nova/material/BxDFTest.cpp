@@ -10,17 +10,36 @@
 
 namespace nm = nova::material;
 
+static constexpr unsigned RAND_NUM = 10;
+static constexpr float uc_samples[RAND_NUM][2] = {{0.0f, 0.0f},
+                                                  {0.1f, 0.5f},
+                                                  {0.2f, 0.25f},
+                                                  {0.3f, 0.75f},
+                                                  {0.4f, 0.125f},
+                                                  {0.5f, 0.625f},
+                                                  {0.6f, 0.375f},
+                                                  {0.7f, 0.875f},
+                                                  {0.8f, 0.0625f},
+                                                  {0.9f, 0.5625f}};
+
+static constexpr float roughness_values[6] = {1e-4f, 0.1f, 0.45f, 0.75f, 1.f};
+
 TEST(GGXTest, SampleWm) {
-  NDF test_ggx(0.75f);
-  glm::vec3 sample_vector(0.f, 0.f, 1.f);
-  float uc[2] = {0.13f, 0.21f};
-  glm::vec3 wm = test_ggx.sampleWm(sample_vector, uc);
 
-  // Sampled direction should always be in the same hemisphere as the shading normal.
-  ASSERT_TRUE(bxdf::same_hemisphere(wm, sample_vector));
+  glm::vec3 wo(1.2f, 0.4f, 1.f);
 
-  // Sampled direction should be normalized.
-  ASSERT_EQ(glm::length(wm), 1.f);
+  for (float roughness : roughness_values)
+    for (int i = 0; i < 5; i++) {
+      NDF test_ggx(roughness);
+      const float *uc = uc_samples[i];
+      glm::vec3 wm = test_ggx.sampleGGXVNDF(wo, uc);
+
+      // Sampled microfacet normal should always be in the same hemisphere as the view direction.
+      ASSERT_TRUE(bxdf::same_hemisphere(wm, wo));
+
+      // Sampled direction should be normalized.
+      EXPECT_NEAR(glm::length2(wm), 1.f, 1e-4f);
+    }
 }
 
 /* Tests the behavior of the masking function G1().
