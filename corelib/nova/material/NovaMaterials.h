@@ -2,7 +2,7 @@
 #define NOVAMATERIALS_H
 #include "BxDF.h"
 #include "TexturePackSampler.h"
-#include "glm/fwd.hpp"
+#include "glm/common.hpp"
 #include "material/BSDF.h"
 #include "material/BxDF_flags.h"
 #include "material_datastructures.h"
@@ -124,12 +124,12 @@ namespace nova::material {
 
       Spectrum R(glm::vec3(texture_pack_sampler.albedo(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate)));
       Spectrum E(glm::vec3(texture_pack_sampler.emissive(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate)));
-
+      glm::vec3 roughness = texture_pack_sampler.metallic(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate);
       BSDFSample lobe;
       float uc = sampler.sample1D();
       float u[2]{};
       sampler.sample2D(u);
-      ConductorBxDF bxdf(reflectivity, tint, 0.f);
+      ConductorBxDF bxdf(reflectivity, tint, roughness.g);
       BSDF bsdf(&bxdf, mat_rec.normal, shading_frame.getTangent());
       if (!bsdf.sample_f(in.direction, uc, u, &lobe))
         return false;
