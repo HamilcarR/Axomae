@@ -5,6 +5,7 @@
 #include "glm/geometric.hpp"
 #include "spectrum/Spectrum.h"
 #include <internal/common/axstd/span.h>
+#include <internal/common/math/math_includes.h>
 #include <internal/common/math/math_spherical.h>
 #include <internal/common/math/math_utils.h>
 #include <internal/debug/debug_utils.h>
@@ -139,28 +140,55 @@ namespace nova::material {
    public:
     ax_device_callable_inlined ConductorBxDF(Spectrum eta, Spectrum k, float roughness) : eta(eta), k(k), ggx(roughness) {}
 
-    ax_device_callable_inlined Spectrum f(const glm::vec3 &wo, const glm::vec3 &wi, TRANSPORT mode = TRANSPORT::RADIANCE) const {
+    ax_device_callable_inlined Spectrum f(const glm::vec3 &wo_ori, const glm::vec3 &wi, TRANSPORT mode = TRANSPORT::RADIANCE) const {
+      glm::vec3 wo = -wo_ori;
       if (!bxdf::same_hemisphere(wo, wi))
-        return Spectrum(0.f);
+        return 0.f;
       if (ggx.isFullSpecular())
-        return Spectrum(0.f);
+        return 0.f;
 
-      // Implement rough specular
+      // Don't process grazing angles
+      float costheta_wo = bxdf::abscostheta(wo);
+      float costheta_wi = bxdf::abscostheta(wi);
+
+      if (costheta_wi == 0.f || costheta_wo == 0.f)
+        return 0.f;
+
+      glm::vec3 wm = wi + wo;
+      if (glm::length2(wm) == 0.f)
+        return 0.f;
+
+      Spectrum fresnel = computeFresnel(bxdf::absdot(wo, wm));
+      return ggx.D(wm) * fresnel * ggx.G1(wo, wi) / (4 * costheta_wi * costheta_wo);
     }
 
-    ax_device_callable_inlined float pdf(const glm::vec3 &wo,
+    ax_device_callable_inlined float pdf(const glm::vec3 &wo_ori,
                                          const glm::vec3 &wi,
                                          TRANSPORT transport_mode = TRANSPORT::RADIANCE,
                                          REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
+      glm::vec3 wo = -wo_ori;
       if (!(sample_flag & REFLTRANSFLAG::REFLECTION))
         return 0.f;
       if (!bxdf::same_hemisphere(wi, wo))
         return 0.f;
       if (ggx.isFullSpecular())
         return 0.f;
+
+      glm::vec3 wm = wi - wo;  // Gets microfacet's normal
+      if (glm::length2(wm) == 0.f)
+        return 0.f;
+      if (!bxdf::same_hemisphere(wm, glm::vec3(0.f, 0.f, 1.f)))
+        wm.z = -wm.z;
+
+      /* From the law of specular reflection :
+       * w_r = -w_o + 2(w_m.w_o)w_m
+       * dw_m/dw_i = sintheta_m * dtheta_m * dphi_m/sin2theta_m * 2 * dtheta_m * dphi_m
+       * = 1 / 4(w_o . w_m)
+       */
+      return ggx.pdf(-wo, wm) / 4 * bxdf::absdot(-wo, wm);
     }
 
-    ax_device_callable_inlined bool sample_f(const glm::vec3 &wo,
+    ax_device_callable_inlined bool sample_f(const glm::vec3 &wo_incident,
                                              float uc,
                                              const float u[2],
                                              BSDFSample *sample,
@@ -172,8 +200,10 @@ namespace nova::material {
         return false;
       // Models a dirac delta distribution , returns 1.f for pdf as convention.
       if (ggx.isFullSpecular()) {
-        glm::vec3 wi = glm::reflect(wo, glm::vec3(0.f, 0.f, 1.f));
+        glm::vec3 wi = glm::reflect(wo_incident, glm::vec3(0.f, 0.f, 1.f));
         float costheta_i = bxdf::abscostheta(wi);
+        if (costheta_i == 0.f)
+          return false;
         Spectrum fresnel = computeFresnel(costheta_i) / costheta_i;
         sample->costheta = costheta_i;
         sample->eta = eta;
@@ -184,7 +214,35 @@ namespace nova::material {
         sample->flags = BXDFFLAGS::SPECULAR_REFLECTION;
         return true;
       }
-      return false;
+
+      // Models specular roughness.
+      if (wo_incident.z == 0.f)
+        return false;
+      glm::vec3 wo = -wo_incident;
+      glm::vec3 wm = ggx.sampleGGXVNDF(wo, u);
+      glm::vec3 wi = glm::reflect(wo_incident, wm);
+      if (!bxdf::same_hemisphere(wi, wo))
+        return false;
+
+      float costheta_i = bxdf::abscostheta(wi);
+      float costheta_o = bxdf::abscostheta(wo);
+      float wm_dot_wi = bxdf::absdot(wm, wi);
+      if (costheta_i == 0.f || costheta_o == 0.f || wm_dot_wi == 0.f)
+        return false;
+
+      Spectrum fresnel = computeFresnel(wm_dot_wi);
+      float pdf = ggx.pdf(wo, wm) / (4 * bxdf::absdot(wo, wm));
+      if (ISNAN(pdf) || ISINF(pdf))
+        return false;
+      sample->costheta = costheta_i;
+      sample->eta = eta;
+      Spectrum f = ggx.D(wm) * fresnel * ggx.G1(wo, wi) / (4 * costheta_i * costheta_o);
+      sample->f = f;
+      sample->pdf = pdf;
+      sample->pdf_cosine_weighted = true;
+      sample->wi = wi;
+      sample->flags = BXDFFLAGS::GLOSSY_REFLECTION;
+      return true;
     }
 
     ax_device_callable_inlined unsigned flags() const { return ggx.isFullSpecular() ? BXDFFLAGS::SPECULAR_REFLECTION : BXDFFLAGS::GLOSSY_REFLECTION; }
