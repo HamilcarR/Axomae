@@ -19,9 +19,8 @@ namespace nova {
   };
 
   struct intersection_record_s {
-    IntersectFrame shading_frame{};
-    glm::vec3 position{};
-    float u{}, v{}, t{1e30f};
+    glm::vec3 geometric_normal{}, binormal{}, position{};
+    float u{}, v{}, t{1e30f}, wo_dot_n;
   };
 
   class Ray;

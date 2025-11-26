@@ -12,7 +12,9 @@ ax_device_force_inlined nova::intersection_record_s payload2hitd(const path_payl
   glm::vec3 normal = glm::vec3(pld.normal_matrix[0], pld.normal_matrix[1], pld.normal_matrix[2]);
   glm::vec3 tangent = glm::vec3(pld.normal_matrix[3], pld.normal_matrix[4], pld.normal_matrix[5]);
   glm::vec3 bitangent = glm::vec3(pld.normal_matrix[6], pld.normal_matrix[7], pld.normal_matrix[8]);
-  hit_d.shading_frame = IntersectFrame(tangent, bitangent, normal, true);
+  hit_d.geometric_normal = normal;
+  hit_d.binormal = tangent;
+  hit_d.wo_dot_n = glm::dot(-wray.direction, normal);
   hit_d.u = pld.u;
   hit_d.v = pld.v;
   hit_d.t = pld.t;
@@ -76,7 +78,7 @@ extern "C" ax_kernel void __raygen__main() {
     material_record_s mat_record = {};
     if (prim.scatter(wi, wo, hit_d, mat_record, sampler, allocator, shading)) {
 
-      nova::Ray out = nova::Ray::spawn(mat_record.lobe.wi, hit_d.shading_frame.getNormal(), hit_d.position);
+      nova::Ray out = nova::Ray::spawn(mat_record.lobe.wi, hit_d.geometric_normal, hit_d.position);
       origin = {out.origin.x, out.origin.y, out.origin.z};
       direction = {out.direction.x, out.direction.y, out.direction.z};
       nova::Spectrum color = mat_record.lobe.f * mat_record.lobe.costheta / mat_record.lobe.pdf;
