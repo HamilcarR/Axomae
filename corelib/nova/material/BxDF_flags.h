@@ -31,8 +31,8 @@ namespace nova::material {
     BXDFFLAGS flags;
 
     float pdf{};
-    float costheta{};
-    bool pdf_cosine_weighted = true;
+    float costheta{};                  // Always returns abs(costheta(wi)).
+    bool pdf_cosine_weighted = false;  // Indicates if the returned f function already is multiplied with costheta_i.
   };
 
   enum class REFLTRANSFLAG { NONE = 0, TRANSMISSION = 1, REFLECTION = 1 << 1, ALL = TRANSMISSION | REFLECTION };

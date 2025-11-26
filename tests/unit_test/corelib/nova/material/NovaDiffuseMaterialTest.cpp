@@ -1,4 +1,3 @@
-#include "internal/memory/Allocator.h"
 #include "material/NovaMaterials.h"
 #include "material/material_datastructures.h"
 #include "ray/Hitable.h"
@@ -8,6 +7,7 @@
 #include "texturing/NovaTextureInterface.h"
 #include "texturing/TextureContext.h"
 #include "texturing/texture_datastructures.h"
+#include <internal/memory/Allocator.h>
 #include <unit_test/Test.h>
 
 constexpr int MAX_ITER = 30;
@@ -45,7 +45,8 @@ static void init_tbn(nova::intersection_record_s &hit_data) {
   glm::vec3 bitangent = {0.f, 1.f, 0.f};
   glm::vec3 normal = {0.f, 0.f, 1.f};
 
-  hit_data.shading_frame = IntersectFrame(tangent, bitangent, normal);
+  hit_data.geometric_normal = normal;
+  hit_data.binormal = tangent;
 }
 
 static nova::material::texture_pack setup_tpack(const nova::texturing::ImageTexture<uint32_t> *img) {
@@ -90,7 +91,7 @@ TEST(NovaDiffuseMaterialTest, scatter_direction) {
     hit_data.v = (float)generator.nrandf(0, 1);
     material_record_s mat_rec{};
     /* Tests that the resulting out vector is always on the same side as the geometric normal of the medium.*/
-    if (diffuse_material.scatter(ray, out, hit_data, mat_rec, sampler, allocator, shading)) {
+    if (diffuse_material.scatter(ray, hit_data, mat_rec, sampler, allocator, shading)) {
       ASSERT_GT(mat_rec.lobe.costheta, 0);
     }
   }

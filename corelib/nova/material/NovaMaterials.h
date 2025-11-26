@@ -42,7 +42,8 @@ namespace nova::material {
                                                             texturing::texture_data_aggregate_s &sample_data) {
     return t_pack.normal(u, v, sample_data) * 2.f - 1.f;
   }
-  ax_device_callable_inlined glm::vec3 compute_world_normal(const glm::vec3 &local_normal, const IntersectFrame &shading_frame) {
+  ax_device_callable_inlined glm::vec3 compute_world_normal(const glm::vec3 &local_normal, const glm::vec3 &world_normal, const glm::vec3 &binormal) {
+    IntersectFrame shading_frame(world_normal, binormal);
     return glm::normalize(shading_frame.localToWorld(local_normal));
   }
 
@@ -55,7 +56,6 @@ namespace nova::material {
     ax_device_callable_inlined NovaDiffuseMaterial(const texture_pack &texture) : t_pack(texture) {}
 
     ax_device_callable_inlined bool scatter(const Ray &in,
-                                            Ray & /*out*/,
                                             const intersection_record_s &hit_d,
                                             material_record_s &mat_rec,
                                             sampler::SamplerInterface &sampler,
@@ -63,17 +63,16 @@ namespace nova::material {
                                             shading_data_s &mat_ctx) const {
       AX_ASSERT_NOTNULL(mat_ctx.texture_aggregate);
       TexturePackSampler texture_pack_sampler(t_pack);
-      const IntersectFrame &shading_frame = hit_d.shading_frame;
       glm::vec3 local_normal = compute_local_normal(hit_d.u, hit_d.v, texture_pack_sampler, *mat_ctx.texture_aggregate);
-      glm::vec3 geometric_normal = shading_frame.getNormal();
+      glm::vec3 geometric_normal = hit_d.geometric_normal;
       mat_rec = {};
 
-      mat_rec.normal = compute_world_normal(local_normal, shading_frame);
+      mat_rec.normal = compute_world_normal(local_normal, hit_d.geometric_normal, hit_d.binormal);
       Spectrum R(glm::vec3(texture_pack_sampler.albedo(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate)));
       Spectrum E(glm::vec3(texture_pack_sampler.emissive(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate)));
 
       DiffuseBxDF bxdf(R);
-      BSDF bsdf(&bxdf, mat_rec.normal, shading_frame.getTangent());
+      BSDF bsdf(&bxdf, mat_rec.normal, hit_d.binormal, hit_d.wo_dot_n);
       BSDFSample lobe;
       float uc = sampler.sample1D();
       float u[2]{};
@@ -105,7 +104,6 @@ namespace nova::material {
         : t_pack(texture), reflectivity(reflectivity), tint(tint) {}
 
     ax_device_callable_inlined bool scatter(const Ray &in,
-                                            Ray &out,
                                             const intersection_record_s &hit_d,
                                             material_record_s &mat_rec,
                                             sampler::SamplerInterface &sampler,
@@ -114,11 +112,10 @@ namespace nova::material {
 
       AX_ASSERT_NOTNULL(mat_ctx.texture_aggregate);
       TexturePackSampler texture_pack_sampler(t_pack);
-      const IntersectFrame &shading_frame = hit_d.shading_frame;
 
       glm::vec3 perturbed_shading_normal = compute_local_normal(hit_d.u, hit_d.v, texture_pack_sampler, *mat_ctx.texture_aggregate);
-      glm::vec3 perturbed_world_normal = compute_world_normal(perturbed_shading_normal, shading_frame);
-      glm::vec3 geometric_world_normal = shading_frame.getNormal();
+      glm::vec3 perturbed_world_normal = compute_world_normal(perturbed_shading_normal, hit_d.geometric_normal, hit_d.binormal);
+
       mat_rec = {};
       mat_rec.normal = perturbed_world_normal;
 
@@ -130,7 +127,7 @@ namespace nova::material {
       float u[2]{};
       sampler.sample2D(u);
       ConductorBxDF bxdf(reflectivity, tint, roughness.g);
-      BSDF bsdf(&bxdf, mat_rec.normal, shading_frame.getTangent());
+      BSDF bsdf(&bxdf, mat_rec.normal, hit_d.binormal, hit_d.wo_dot_n);
       if (!bsdf.sample_f(in.direction, uc, u, &lobe))
         return false;
       mat_rec.attenuation = lobe.f * R;
@@ -151,32 +148,30 @@ namespace nova::material {
     ax_device_callable_inlined NovaDielectricMaterial(const texture_pack &texture, float ior) : t_pack(texture), eta(ior) {}
 
     ax_device_callable_inlined bool scatter(const Ray &in,
-                                            Ray &out,
                                             const intersection_record_s &hit_d,
                                             material_record_s &mat_rec,
                                             sampler::SamplerInterface &sampler,
                                             axstd::StaticAllocator64kb &allocator,
                                             shading_data_s &mat_ctx) const {
       TexturePackSampler texture_pack_sampler(t_pack);
-      const IntersectFrame &shading_frame = hit_d.shading_frame;
 
       glm::vec3 perturbed_shading_normal = compute_local_normal(hit_d.u, hit_d.v, texture_pack_sampler, *mat_ctx.texture_aggregate);
-      glm::vec3 perturbed_world_normal = compute_world_normal(perturbed_shading_normal, shading_frame);
-      glm::vec3 geometric_world_normal = shading_frame.getNormal();
+      glm::vec3 perturbed_world_normal = compute_world_normal(perturbed_shading_normal, hit_d.geometric_normal, hit_d.binormal);
 
-      DielectricBxDF bxdf(eta, 0.f);
-      BSDF bsdf(&bxdf, perturbed_world_normal, shading_frame.getTangent());
+      Spectrum R(texture_pack_sampler.albedo(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate));
+      Spectrum E(texture_pack_sampler.emissive(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate));
+      Spectrum M(texture_pack_sampler.metallic(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate));
+      float roughness = M.toRgb().g;
+      DielectricBxDF bxdf(eta, roughness);
+      BSDF bsdf(&bxdf, perturbed_world_normal, hit_d.binormal, hit_d.wo_dot_n);
       BSDFSample lobe;
       float uc = sampler.sample1D();
       float u[2];
       sampler.sample2D(u);
       if (!bsdf.sample_f(in.direction, uc, u, &lobe))
         return false;
-
-      Spectrum R(texture_pack_sampler.albedo(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate));
-      Spectrum E(texture_pack_sampler.emissive(hit_d.u, hit_d.v, *mat_ctx.texture_aggregate));
       mat_rec = {};
-      mat_rec.attenuation = lobe.f * R;
+      mat_rec.attenuation = lobe.f;
       mat_rec.emissive = E;
       mat_rec.lobe = lobe;
       mat_rec.normal = perturbed_world_normal;
@@ -189,13 +184,12 @@ namespace nova::material {
    public:
     using tag_ptr::tag_ptr;
     ax_device_callable_inlined bool scatter(const Ray &in,
-                                            Ray &out,
                                             const intersection_record_s &hit_d,
                                             material_record_s &mat_rec,
                                             sampler::SamplerInterface &sampler,
                                             axstd::StaticAllocator64kb &allocator,
                                             shading_data_s &mat_ctx) const {
-      auto disp = [&](auto material) { return material->scatter(in, out, hit_d, mat_rec, sampler, allocator, mat_ctx); };
+      auto disp = [&](auto material) { return material->scatter(in, hit_d, mat_rec, sampler, allocator, mat_ctx); };
       return dispatch(disp);
     }
   };

@@ -26,54 +26,104 @@ namespace nova::material {
   class DiffuseTransmissionBxDF;
 
   class DielectricBxDF {
-    float eta{1.f};  // External medium refraction index.
+    float ior{1.f};  // External medium refraction index.
     NDF ggx;
+
+    ax_device_callable_inlined bool roughSpecularReflection(
+        glm::vec3 wo, const glm::vec3 &wm, float R, float pr, float pt, float eta, BSDFSample *sample, TRANSPORT transport, REFLTRANSFLAG flag)
+        const {
+      glm::vec3 wi = glm::reflect(wo, wm);
+      wo = -wo;  // flip wo for NDF computations.
+      if (!bxdf::same_hemisphere(wo, wi))
+        return false;
+      Spectrum f = ggx.D(wm) * ggx.G(wo, wi) * R / (4 * bxdf::costheta(wi) * bxdf::costheta(wo));
+      if (!f.isValid())
+        return false;
+      float pdf = ggx.pdf(wo, wm) / (4 * bxdf::absdot(wo, wm)) * pr / (pr + pt);
+      sample->f = f;
+      sample->pdf = pdf;
+      sample->wi = wi;
+      sample->costheta = bxdf::abscostheta(wi);
+      sample->pdf_cosine_weighted = false;
+      sample->eta = eta;
+      sample->flags = BXDFFLAGS::GLOSSY_REFLECTION;
+      return true;
+    }
+
+    ax_device_callable_inlined bool roughSpecularTransmission(
+        glm::vec3 wo, glm::vec3 wm, float T, float pr, float pt, float eta, BSDFSample *sample, TRANSPORT transport, REFLTRANSFLAG flag) const {
+
+      wo = -wo;
+      glm::vec3 wi;
+      bool no_tir = true;
+      eta = bxdf::refract(wo, wm, eta, no_tir, wi);
+
+      if (bxdf::same_hemisphere(wi, wo) || wi.z == 0.f || !no_tir)
+        return false;
+      float costheta_i = bxdf::costheta(wi);
+      float costheta_o = bxdf::costheta(wo);
+
+      float denom = math::sqr(glm::dot(wi, wm) + glm::dot(wo, wm) / eta);
+      float jacobian = bxdf::absdot(wi, wm) / denom;
+      float pdf = ggx.pdf(wo, wm) * jacobian * pt / (pt + pr);
+      AX_ASSERT(!ISNAN(pdf) && !ISINF(pdf), "Rough dielectric transmission pdf returned nan or inf.");
+      Spectrum f = T * ggx.D(wm) * ggx.G(wo, wi) * fabsf(glm::dot(wi, wm) * glm::dot(wo, wm) / (costheta_i * costheta_o * denom));
+      if (transport == TRANSPORT::RADIANCE)
+        f /= math::sqr(eta);
+      if (!f.isValid())
+        return false;
+      sample->f = f;
+      sample->eta = eta;
+      sample->costheta = bxdf::abscostheta(wi);
+      sample->pdf = pdf;
+      sample->wi = wi;
+      sample->pdf_cosine_weighted = false;
+      sample->flags = BXDFFLAGS::GLOSSY_TRANSMISSION;
+      return true;
+    }
+
+    ax_device_callable_inlined bool perfectSpecularTransmission(
+        glm::vec3 wo, float T, float pr, float pt, float eta, BSDFSample *sample, TRANSPORT transport, REFLTRANSFLAG flag) const {
+      wo = -wo;
+      bool no_tir = true;
+      glm::vec3 wi;
+      bxdf::refract(wo, glm::vec3(0.f, 0.f, 1.f), eta, no_tir, wi);
+      if (!no_tir)
+        return false;
+      float costheta_i = bxdf::abscostheta(wi);
+      Spectrum f = T / costheta_i;
+      if (transport == RADIANCE)
+        f /= math::sqr(eta);
+      sample->f = f;
+      sample->costheta = costheta_i;
+      sample->pdf = pt / (pr + pt);
+      sample->eta = eta;
+      sample->flags = BXDFFLAGS::SPECULAR_TRANSMISSION;
+      sample->pdf_cosine_weighted = false;
+      sample->wi = wi;
+      return true;
+    }
 
     ax_device_callable_inlined bool perfectSpecularReflection(
         glm::vec3 wo, float R, float pr, float pt, float eta, BSDFSample *sample, TRANSPORT transport, REFLTRANSFLAG flag) const {
-
-      glm::vec3 wi = glm::reflect(wo, glm::vec3(0.f, 0.f, 1.f));
+      glm::vec3 wi = glm::reflect(wo, glm::vec3(0, 0, 1.f));
       float costheta_i = bxdf::abscostheta(wi);
       sample->costheta = costheta_i;
       sample->f = R / costheta_i;
       sample->pdf = pr / (pr + pt);
       sample->eta = eta;
       sample->flags = BXDFFLAGS::SPECULAR_REFLECTION;
-      sample->pdf_cosine_weighted = true;
-      sample->wi = wi;
-      return true;
-    }
-
-    ax_device_callable_inlined bool perfectSpecularTransmission(
-        glm::vec3 wo, float T, float pr, float pt, float eta, BSDFSample *sample, TRANSPORT transport, REFLTRANSFLAG flag) const {
-      glm::vec3 n(0.f, 0.f, 1.f);
-      float costheta_o = bxdf::costheta(wo);
-      if (costheta_o > 0) {
-        n = -n;
-        eta = 1.f / eta;
-      }
-
-      glm::vec3 wi = glm::refract(wo, n, eta);
-      float costheta_i = bxdf::abscostheta(wi);
-      sample->costheta = costheta_i;
-      sample->f = (transport == TRANSPORT::RADIANCE) ? (T / costheta_i) / math::sqr(eta) : (T / costheta_i);
-      sample->pdf = pt / (pt + pr);
-      sample->eta = eta;
-      sample->flags = BXDFFLAGS::SPECULAR_TRANSMISSION;
-      sample->pdf_cosine_weighted = true;
+      sample->pdf_cosine_weighted = false;
       sample->wi = wi;
       return true;
     }
 
    public:
-    ax_device_callable_inlined DielectricBxDF(float n, float roughness) : eta(1.f / n), ggx(roughness) {}
+    ax_device_callable_inlined DielectricBxDF(float n, float roughness) : ior(n), ggx(roughness) {}
 
     ax_device_callable_inlined DielectricBxDF(float roughness) : ggx(roughness) {}
 
-    ax_device_callable_inlined DielectricBxDF(float n1, float n2, float roughness) : ggx(roughness) {
-      AX_ASSERT_NEQ(n2, 0.f);
-      eta = n1 / n2;
-    }
+    ax_device_callable_inlined DielectricBxDF(float eta, float roughness, float anisotropy) : ior(eta), ggx(anisotropy, roughness) {}
 
     ax_device_callable_inlined Spectrum f(const glm::vec3 &wo, const glm::vec3 &wi, TRANSPORT mode = TRANSPORT::RADIANCE) const {
       if (!bxdf::same_hemisphere(wo, wi))
@@ -87,18 +137,18 @@ namespace nova::material {
                                          TRANSPORT mode = TRANSPORT::RADIANCE,
                                          REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {}
 
-    ax_device_callable_inlined bool sample_f(const glm::vec3 &wo,
+    ax_device_callable_inlined bool sample_f(const glm::vec3 &wo_incident,
                                              float uc,
                                              const float u[2],
                                              BSDFSample *sample,
                                              TRANSPORT transport_mode = TRANSPORT::RADIANCE,
                                              REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
 
-      float costheta_o = bxdf::costheta(wo);
+      float eta_computed = 0.f;
+      Fresnel fresnel(ior);
+      if (ggx.isFullSpecular() || ior == 1.f) {
 
-      if (ggx.isFullSpecular() || eta == 1.f) {
-        Fresnel fresnel;
-        float R = fresnel.realIndex(costheta_o, eta), T = 1 - R;
+        float R = fresnel.real(bxdf::costheta(-wo_incident), eta_computed), T = 1 - R;
         float pr = R, pt = T;
         if (!(sample_flag & REFLTRANSFLAG::REFLECTION))
           pr = 0;
@@ -107,21 +157,36 @@ namespace nova::material {
         if (pr == 0.f && pt == 0.f)
           return false;
 
-        if (uc < (pr / (pr + pt))) {  // Specular reflection
-          return perfectSpecularReflection(wo, R, pr, pt, eta, sample, transport_mode, sample_flag);
-        } else {  // Specular Transmission
-          return perfectSpecularTransmission(wo, T, pr, pt, eta, sample, transport_mode, sample_flag);
-        }
+        if (uc < (pr / (pr + pt)))  // Specular reflection
+          return perfectSpecularReflection(wo_incident, R, pr, pt, ior, sample, transport_mode, sample_flag);
+        else  // Specular Transmission
+          return perfectSpecularTransmission(wo_incident, T, pr, pt, ior, sample, transport_mode, sample_flag);
       }
-      return false;
+      // Sample rough dielectric.
+      glm::vec3 wm = ggx.sampleGGXVNDF(-wo_incident, u);
+      float wo_dot_wm = glm::dot(-wo_incident, wm);
+      float R = fresnel.real(wo_dot_wm, eta_computed), T = 1 - R;
+      float pr = R, pt = T;
+      if (!(sample_flag & REFLTRANSFLAG::REFLECTION))
+        pr = 0;
+      if (!(sample_flag & REFLTRANSFLAG::TRANSMISSION))
+        pt = 0;
+      if (pr == 0.f && pt == 0.f)
+        return false;
+      if (uc < (pr / (pr + pt)))
+        return roughSpecularReflection(wo_incident, wm, R, pr, pt, ior, sample, transport_mode, sample_flag);
+      else
+        return roughSpecularTransmission(wo_incident, wm, T, pr, pt, ior, sample, transport_mode, sample_flag);
     }
 
     ax_device_callable_inlined unsigned flags() const {
-      unsigned flag = (eta / eta) == 1.f ? BXDFFLAGS::TRANSMISSION : BXDFFLAGS::REFLECTION | BXDFFLAGS::TRANSMISSION;
+      unsigned flag = ior == 1.f ? BXDFFLAGS::TRANSMISSION : BXDFFLAGS::REFLECTION | BXDFFLAGS::TRANSMISSION;
       if (ggx.isFullSpecular())
         return flag | BXDFFLAGS::SPECULAR;
       return flag | BXDFFLAGS::GLOSSY;
     }
+
+    ax_device_callable_inlined void invertEta() { ior = 1.f / ior; }
   };
 
   class ConductorBxDF {
@@ -130,9 +195,9 @@ namespace nova::material {
 
     ax_device_callable_inlined Spectrum computeFresnel(float costheta_i) const {
       Spectrum ret(0.f);
-      Fresnel fresnel;
       for (unsigned i = 0; i < Spectrum::SPECTRUM_SAMPLES; i++) {
-        ret.samples[i] = fresnel.complexIndex(costheta_i, math::fcomplex(eta[i], k[i]));
+        Fresnel fresnel(eta[i], k[i]);
+        ret.samples[i] = fresnel.complex(costheta_i);
       }
       return ret;
     }
@@ -161,7 +226,7 @@ namespace nova::material {
         return 0.f;
 
       Spectrum fresnel = computeFresnel(bxdf::absdot(wo, wm));
-      return ggx.D(wm) * fresnel * ggx.G1(wo, wi) / (4 * costheta_wi * costheta_wo);
+      return ggx.D(wm) * fresnel * ggx.G(wo, wi) / (4 * costheta_wi * costheta_wo);
     }
 
     ax_device_callable_inlined float pdf(const glm::vec3 &wo_ori,
@@ -238,16 +303,18 @@ namespace nova::material {
         return false;
       sample->costheta = costheta_i;
       sample->eta = eta;
-      Spectrum f = ggx.D(wm) * fresnel * ggx.G1(wo, wi) / (4 * costheta_i * costheta_o);
+      Spectrum f = ggx.D(wm) * fresnel * ggx.G(wo, wi) / (4 * costheta_i * costheta_o);
       sample->f = f;
       sample->pdf = pdf;
-      sample->pdf_cosine_weighted = true;
+      sample->pdf_cosine_weighted = false;
       sample->wi = wi;
       sample->flags = BXDFFLAGS::GLOSSY_REFLECTION;
       return true;
     }
 
     ax_device_callable_inlined unsigned flags() const { return ggx.isFullSpecular() ? BXDFFLAGS::SPECULAR_REFLECTION : BXDFFLAGS::GLOSSY_REFLECTION; }
+
+    ax_device_callable_inlined void invertEta() {}
   };
 
   class DiffuseBxDF {
@@ -287,7 +354,7 @@ namespace nova::material {
       sample->wi = wi;
       sample->pdf = costheta * (float)INV_PI;
       sample->flags = BXDFFLAGS::DIFFUSE_REFLECTION;
-      sample->pdf_cosine_weighted = true;
+      sample->pdf_cosine_weighted = false;
       sample->f = R * INV_PI;
       sample->eta = 1.f;
       sample->costheta = costheta;
@@ -295,6 +362,8 @@ namespace nova::material {
     }
 
     ax_device_callable_inlined unsigned flags() const { return R ? BXDFFLAGS::DIFFUSE_REFLECTION : BXDFFLAGS::NONE; }
+
+    ax_device_callable_inlined void invertEta() {}
   };
 
 #define LISTBxDF DiffuseBxDF, ConductorBxDF, DielectricBxDF
@@ -302,6 +371,11 @@ namespace nova::material {
   class BxDF : public core::tag_ptr<LISTBxDF> {
    public:
     using tag_ptr::tag_ptr;
+
+    ax_device_callable_inlined void invertEta() {
+      auto d = [&](auto bxdf) { bxdf->invertEta(); };
+      dispatch(d);
+    }
 
     /**
      * @brief Evalutes BxDF

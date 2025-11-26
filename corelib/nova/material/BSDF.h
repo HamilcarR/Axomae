@@ -21,14 +21,21 @@ namespace nova::material {
   class BSDF {
     IntersectFrame local_frame;
     BxDF bxdf;
+    float wo_dot_ng;  // Are we entering a medium or exiting.
 
    public:
     ax_device_callable_inlined BSDF() = default;
 
     template<class BXDF>
-    ax_device_callable_inlined BSDF(const BXDF *bxdf_instance, const glm::vec3 &shading_normal, const glm::vec3 &dpdu)
-        : local_frame(shading_normal, dpdu), bxdf(bxdf_instance) {}
-
+    ax_device_callable_inlined BSDF(BXDF *bxdf_instance, const glm::vec3 &shading_normal, const glm::vec3 &dpdu, float wo_dot_ng) {
+      local_frame = IntersectFrame(shading_normal, dpdu);
+      bxdf = bxdf_instance;
+      this->wo_dot_ng = wo_dot_ng;
+      if (wo_dot_ng < 0) {  // TODO: Only valid for non thin materials.
+        local_frame.flipFrame();
+        bxdf.invertEta();
+      }
+    }
     ax_device_callable_inlined Spectrum f(const glm::vec3 &wo, const glm::vec3 &wi, TRANSPORT transport_mode = TRANSPORT::RADIANCE) const {
       glm::vec3 local_wi = glm::normalize(local_frame.worldToLocal(wi));
       glm::vec3 local_wo = glm::normalize(local_frame.worldToLocal(wo));

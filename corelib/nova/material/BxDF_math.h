@@ -8,6 +8,7 @@
 #include <internal/common/math/utils_3D.h>
 #include <internal/device/gpgpu/device_macros.h>
 #include <internal/device/gpgpu/device_utils.h>
+#include <internal/macro/project_macros.h>
 #include <math.h>
 
 /* Vectors are assumed to be in tangent space. */
@@ -23,7 +24,11 @@ namespace bxdf {
 
   ax_device_callable_inlined float cos2theta(const glm::vec3 &v) { return math::sqr(costheta(v)); }
 
+  ax_device_callable_inlined float cos2theta(float sintheta) { return 1.f - math::sqr(sintheta); }
+
   ax_device_callable_inlined float sin2theta(const glm::vec3 &v) { return std::max(0.f, 1.f - cos2theta(v)); }
+
+  ax_device_callable_inlined float sin2theta(float costheta) { return std::max(0.f, 1.f - math::sqr(costheta)); }
 
   ax_device_callable_inlined float sintheta(const glm::vec3 &v) { return math::sqrt(sin2theta(v)); }
 
@@ -43,6 +48,27 @@ namespace bxdf {
     if (sintheta(v) == 0.f)
       return 1.f;
     return std::clamp(v.x / sintheta(v), -1.f, 1.f);
+  }
+  /* wo points to the opposite side of the surface.*/
+  ax_device_callable_inlined float refract(const glm::vec3 &wi, glm::vec3 n, float eta, bool &valid, glm::vec3 &wt) {
+    AX_ASSERT_NEQ(eta, 0);
+    valid = true;
+    float costheta_i = glm::dot(wi, n);
+    if (costheta_i < 0) {
+      n = -n;
+      eta = 1.f / eta;
+      costheta_i = -costheta_i;
+    }
+    float sin2theta_i = sin2theta(costheta_i);
+    float sin2theta_t = sin2theta_i / math::sqr(eta);
+    if (sin2theta_t >= 1.f) {
+      valid = false;
+      return {};
+    }
+    float costheta_t = math::sqrt(1.f - sin2theta_t);
+
+    wt = -wi / eta + (costheta_i / eta - costheta_t) * n;
+    return eta;
   }
 
   ax_device_callable_inlined float cos2phi(const glm::vec3 &v) { return math::sqr(cosphi(v)); }
@@ -88,17 +114,32 @@ namespace bxdf {
 
 }  // namespace bxdf
 
+/* Takes etaX values as eta_incident / eta_transmission.*/
 class Fresnel {
+  using fcomplex = math::fcomplex;
+
+  math::fcomplex etac{};
+  float etar{};
 
  public:
-  // Dielectrics, and refractive materials.
-  ax_device_callable_inlined float realIndex(float costheta_i, float eta) {
+  Fresnel(float eta, float k) : etac(eta, k) {}
+
+  Fresnel(float eta) : etar(eta) {}
+
+  /*
+   * Dielectrics, and refractive materials.
+   * new_etha is the computed eta value depending on costheta_i.
+   * Assumes costheta_i = dot(wo , n)
+   */
+  ax_device_callable_inlined float real(float costheta_i, float &new_eta) {
+    float eta = etar;
     costheta_i = glm::clamp(costheta_i, -1.f, 1.f);
     if (costheta_i < 0) {
       eta = 1.f / eta;
       costheta_i = -costheta_i;
     }
-    float sin2theta_i = 1 - math::sqr(costheta_i);
+    new_eta = eta;
+    float sin2theta_i = bxdf::sin2theta(costheta_i);
     float sin2theta_t = sin2theta_i / math::sqr(eta);
     if (sin2theta_t >= 1)
       return 1.f;
@@ -109,8 +150,8 @@ class Fresnel {
   }
 
   // Conductors and absorbant materials.
-  ax_device_callable_inlined float complexIndex(float costheta_i, const math::fcomplex &eta) {
-    using fcomplex = math::fcomplex;
+  ax_device_callable_inlined float complex(float costheta_i) {
+    fcomplex eta = etac;
     costheta_i = glm::clamp(costheta_i, 0.f, 1.f);
     float sin2theta_i = 1 - math::sqr(costheta_i);
     fcomplex sin2theta_t = sin2theta_i / math::sqr(eta);
@@ -134,6 +175,11 @@ class NDF {
   }
 
  public:
+  /**
+   * @brief Creates an isotropic NDF with alpha_x = alpha_y = 1.f.
+   *
+   * @param roughness
+   */
   ax_device_callable_inlined NDF(float roughness) {
     alpha_x = roughnessToAlpha(roughness);
     alpha_y = alpha_x;
@@ -141,7 +187,14 @@ class NDF {
     alpha_y_inv = 1.f / alpha_y;
   }
 
+  /**
+   * @brief Creates an anisotropic NDF with different alpha_x and alpha_y values.
+   *
+   * @param anisotropy Ratio (alpha_x/alpha_y) x anisotropy² coefficient.
+   * @param roughness Roughness value.
+   */
   ax_device_callable_inlined NDF(float anisotropy, float roughness) {
+    anisotropy = std::clamp(anisotropy, -1.f, 1.f);
     float aspect = math::sqrt(1.f - 0.9f * anisotropy);
 
     AX_ASSERT_NEQ(aspect, 0.f);
@@ -158,13 +211,14 @@ class NDF {
   ax_device_callable_inlined float D(const glm::vec3 &wm) const {
     AX_ASSERT_NEQ(alpha_x, 0.f);
     AX_ASSERT_NEQ(alpha_y, 0.f);
-    if (bxdf::costheta(wm) == 0.f)
+    if (bxdf::costheta(wm) < 1e-6f)
       return 0.f;
 
     float cos2phi_alpha2_x = bxdf::cos2phi(wm) * math::sqr(alpha_x_inv);
     float sin2phi_alpha2_y = bxdf::sin2phi(wm) * math::sqr(alpha_y_inv);
     float denom = M_PI * alpha_x * alpha_y * math::sqr(bxdf::cos2theta(wm)) *
                   math::sqr(1.f + bxdf::tan2theta(wm) * (cos2phi_alpha2_x + sin2phi_alpha2_y));
+    AX_ASSERT_NEQ(denom, 0.f);
     return 1.f / denom;
   }
 
@@ -187,17 +241,20 @@ class NDF {
   }
 
   /* Bi-Directional Masking-Shadowing function : Gives the amount of microfacets simultaneously visible from wo and wi.*/
-  ax_device_callable_inlined float G1(const glm::vec3 &wo, const glm::vec3 wi) const { return 1.f / (1.f + lambda(wo) + lambda(wi)); }
+  ax_device_callable_inlined float G(const glm::vec3 &wo, const glm::vec3 wi) const { return 1.f / (1.f + lambda(wo) + lambda(wi)); }
 
-  ax_device_callable_inlined float pdf(const glm::vec3 &w, const glm::vec3 &wm) const {
-    return (G1(w) / bxdf::abscostheta(w)) * D(wm) * std::fabsf(glm::dot(w, wm));
+  ax_device_callable_inlined float D(const glm::vec3 &wo, const glm::vec3 &wm) const {
+    return (G1(wo) / bxdf::abscostheta(wo)) * D(wm) * bxdf::absdot(wo, wm);
   }
+  ax_device_callable_inlined float pdf(const glm::vec3 &wo, const glm::vec3 &wm) const { return D(wo, wm); }
 
   /* Returns a visible microfacet normal.*/
   ax_device_callable_inlined glm::vec3 sampleGGXVNDF(const glm::vec3 &wo, const float uc[2]) const {
 
     // Scales w to the alpha ellipsoid.
     glm::vec3 wo_h = glm::normalize(glm::vec3(wo.x * alpha_x, wo.y * alpha_y, wo.z));
+    if (wo_h.z < 0)
+      wo_h = -wo_h;
 
     // Create orthonormal frame.
     glm::vec3 t, b;
