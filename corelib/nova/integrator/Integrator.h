@@ -6,6 +6,7 @@
 #include "manager/ManagerInternalStructs.h"
 #include "manager/NovaExceptionManager.h"
 #include "manager/NovaResourceManager.h"
+#include "utils/aliases.h"
 #include "utils/nova_utils.h"
 #include <internal/common/math/math_camera.h>
 #include <internal/common/math/math_utils.h>
@@ -57,7 +58,7 @@ namespace nova::integrator {
       math::random::SobolGenerator qrmc;
       sampler::SobolSampler sobol_s = sampler::SobolSampler(qrmc);
       sampler::SamplerInterface sampler = &sobol_s;
-      axstd::StaticAllocator64kb allocator;
+      StackAllocator allocator;
       for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
         for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
           allocator.reset();
@@ -89,22 +90,14 @@ namespace nova::integrator {
       tile.finished_render = true;
     }
 
-    glm::vec4 Li(const Ray &ray,
-                 nova_eng_internals &nova_internals,
-                 int depth,
-                 sampler::SamplerInterface &sampler,
-                 axstd::StaticAllocator64kb &allocator) const {
+    glm::vec4 Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler, StackAllocator &allocator) const {
       return static_cast<const T *>(this)->Li(ray, nova_internals, depth, sampler, allocator);
     }
   };
 
   class PathIntegrator : public AbstractIntegrator<PathIntegrator> {
    public:
-    glm::vec4 Li(const Ray &ray,
-                 nova_eng_internals &nova_internals,
-                 int depth,
-                 sampler::SamplerInterface &sampler,
-                 axstd::StaticAllocator64kb &allocator) const;
+    glm::vec4 Li(const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler, StackAllocator &allocator) const;
   };
 
 }  // namespace nova::integrator

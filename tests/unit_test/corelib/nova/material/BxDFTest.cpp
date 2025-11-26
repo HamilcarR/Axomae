@@ -8,7 +8,7 @@
 #include <internal/common/math/math_spherical.h>
 #include <nova/material/BxDF.h>
 
-namespace nm = nova::material;
+namespace nm = nova;
 
 static constexpr unsigned RAND_NUM = 10;
 static constexpr float uc_samples[RAND_NUM][2] = {{0.0f, 0.0f},
@@ -127,12 +127,12 @@ void test_reciprocity(const BxDF &bxxdf) {
 template<class BxDF>
 void test_energy_conservation(const BxDF &bxxdf) {
   nova::sampler::SobolSampler sobol;
-  std::vector<uniform_sample2d> u0, u1;
+  std::vector<nova::uniform_sample2d> u0, u1;
   std::vector<float> uc;
 
   for (unsigned i = 0; i < 100; i++) {
     sobol.reset(i);
-    uniform_sample2d v0{}, v2{};
+    nova::uniform_sample2d v0{}, v2{};
     sobol.sample2D(v0.u);
     float v1 = sobol.sample1D();
     sobol.sample2D(v2.u);
@@ -140,8 +140,8 @@ void test_energy_conservation(const BxDF &bxxdf) {
     u1.push_back(v2);
     uc.push_back(v1);
   }
-  axstd::cspan<uniform_sample2d> s0(u0);
-  axstd::cspan<uniform_sample2d> s1(u1);
+  axstd::cspan<nova::uniform_sample2d> s0(u0);
+  axstd::cspan<nova::uniform_sample2d> s1(u1);
   axstd::cspan<float> sc(uc);
   nova::Spectrum R = bxxdf.rho(s0, sc, s1);
 
@@ -197,11 +197,14 @@ TEST(DiffuseBxDF, sample_f) {
 
 /************* Dielectric **************/
 TEST(DielectricBxDF, sample_f) {
-  nm::DielectricBxDF dielectric(1.5f);
+  // Tests specular dielectric transmission.
+  nm::DielectricBxDF dielectric(1.f, 0.f);
   glm::vec3 wo(0, 0, 1.f);
   float uc = 0.533f;
   float u[2] = {0.33f, 1.35f};
   nm::BSDFSample sample;
   bool is_sampled = dielectric.sample_f(wo, uc, u, &sample, nm::RADIANCE, nm::REFLTRANSFLAG::TRANSMISSION);
   ASSERT_TRUE(is_sampled);
+  EXPECT_NEAR(sample.costheta, 1.f, 1e-5f);  // Transmission in a medium with IOR of vacuum shouldn't have deviation from the normal.
+  EXPECT_LE(sample.f, 1.f);
 }

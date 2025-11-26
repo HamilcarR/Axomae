@@ -185,18 +185,17 @@ namespace nova {
     }
   }
 
-  // For now it assigns materials randomly, I don't want to waste time with a proper material translation system since I'm gonna scrape it for a more
-  // uniform pipeline with PBR
+  // TODO: Replace with principled material system.
   static nova::material::NovaMaterialInterface assign_random_material(nova::material::texture_pack &tpack, nova::NovaResourceManager &manager) {
     math::random::CPUPseudoRandomGenerator rand_gen;
     nova::material::NovaMaterialInterface mat_ptr{};
-    int r = 0;  // rand_gen.nrandi(0, 1) == 0 ? 0 : 2;
+    int r = rand_gen.nrandi(0, 2);
     switch (r) {
       case 0:
-        mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaConductorMaterial>(tpack, eta_Co, k_Co);
+        mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaConductorMaterial>(tpack, eta_Au, k_Au);
         break;
       case 1:
-        mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaDielectricMaterial>(tpack, rand_gen.nrandf(1.5, 2.4));
+        mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaDielectricMaterial>(tpack, 1.6f);
         break;
       case 2:
         mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaDiffuseMaterial>(tpack);

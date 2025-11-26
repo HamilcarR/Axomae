@@ -23,7 +23,7 @@ namespace nova::primitive {
                                             const intersection_record_s &data,
                                             material_record_s &sampled_pixel_material,
                                             sampler::SamplerInterface &sampler,
-                                            axstd::StaticAllocator64kb &allocator,
+                                            StackAllocator &allocator,
                                             material::shading_data_s &mat_ctx) const {
       auto disp = [&](auto prim) { return prim->scatter(in, out, data, sampled_pixel_material, sampler, allocator, mat_ctx); };
       return dispatch(disp);

@@ -57,11 +57,8 @@ namespace nova::integrator {
     return hit_ret;
   }
 
-  glm::vec4 PathIntegrator::Li(const Ray &ray,
-                               nova_eng_internals &nova_internals,
-                               int depth,
-                               sampler::SamplerInterface &sampler,
-                               axstd::StaticAllocator64kb &allocator) const {
+  glm::vec4 PathIntegrator::Li(
+      const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler, StackAllocator &allocator) const {
     const NovaResourceManager *nova_resources = nova_internals.resource_manager;
     bvh_hit_data hit = bvh_hit(ray, nova_internals);
     texturing::TextureCtx texture_context = texturing::TextureCtx(nova_internals.resource_manager->getTexturesData().getTextureBundleViews());
@@ -77,10 +74,7 @@ namespace nova::integrator {
       }
       out = Ray::spawn(mat_record.lobe.wi, hit.hit_d.geometric_normal, hit.hit_d.position);
       glm::vec4 next = Li(out, nova_internals, depth - 1, sampler, allocator);
-      /* Here in case the value returned by the subsequent call to Li() is a NaN or Inf, we invalidate the color of the pixel altogether and set it
-      * to zero. This helps keep a more uniform and precise value as the next sampling pass will be joined to the current pass and set a valid value
-       to the pixel.*/
-      const material::BSDFSample &lobe = mat_record.lobe;
+      const BSDFSample &lobe = mat_record.lobe;
       Spectrum color;
       if (lobe.pdf_cosine_weighted)
         color = mat_record.attenuation / mat_record.lobe.pdf;
