@@ -18,7 +18,7 @@ namespace nova::shape {
 
     float NdotTo_O = glm::dot(n, ray.origin - origin);
     float NdotD = glm::dot(n, -ray.direction);
-    data.shading_frame = IntersectFrame({}, {}, n);
+
     if (NdotD <= math::epsilon)
       return false;
     data.t = NdotTo_O / NdotD;

@@ -199,7 +199,11 @@ namespace nova::shape {
       } else {
         bitangent = math::geometry::barycentric_lerp(attrib_bitangents.v0, attrib_bitangents.v1, attrib_bitangents.v2, w, u, v);
       }
-      data.shading_frame = IntersectFrame(transform.n * tangent, transform.n * bitangent, transform.n * normal, true);
+      glm::vec3 transformed_normal = transform.n * normal;
+      glm::vec3 transformed_tangent = transform.n * tangent;
+      data.binormal = transformed_tangent;
+      data.geometric_normal = transformed_normal;
+      data.wo_dot_n = glm::dot(-in_ray.direction, transformed_normal);
       if (hasValidUvs(geometry)) {
         const vertices_attrb2d_t uvs = face.uvs();
         data.u = math::geometry::barycentric_lerp(uvs.v0.s, uvs.v1.s, uvs.v2.s, w, u, v);

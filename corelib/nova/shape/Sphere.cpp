@@ -18,14 +18,12 @@ namespace nova::shape {
       if (t1 < tmax && t1 > tmin) {
         data.t = t1;
         normal = r.pointAt(data.t) - origin;
-        data.shading_frame = IntersectFrame({}, {}, normal);
         return true;
       }
       t1 = (-b + std::sqrt(determinant)) * 0.5f / a;
       if (t1 < tmax && t1 > tmin) {
         data.t = t1;
         normal = r.pointAt(data.t) - origin;
-        data.shading_frame = IntersectFrame({}, {}, normal);
         return true;
       }
     }

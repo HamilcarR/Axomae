@@ -281,10 +281,7 @@ namespace nova::aggregate {
 
     void validate(const bvh_hit_data &hit_return_data) const {
       auto hit_d = hit_return_data.hit_d;
-      const IntersectFrame &frame = hit_d.shading_frame;
-      const glm::mat3 &local_matrix = frame.getFrame();
 
-      validate9(glm::value_ptr(local_matrix));
       validate3(glm::value_ptr(hit_d.position));
       validate1(hit_d.t);
       validate1(hit_d.u);
@@ -313,9 +310,9 @@ namespace nova::aggregate {
       glm::vec3 transformed_tangent = transform.n * glm::vec3(tangents[0], tangents[1], tangents[2]);
       glm::vec3 transformed_bitangent = transform.n * glm::vec3(bitangents[0], bitangents[1], bitangents[2]);
 
-      IntersectFrame intersection_frame(transformed_tangent, transformed_bitangent, transformed_normal, true);
-
-      hit_return_data.hit_d.shading_frame = intersection_frame;
+      hit_return_data.hit_d.geometric_normal = transformed_normal;
+      hit_return_data.hit_d.binormal = transformed_tangent;
+      hit_return_data.hit_d.wo_dot_n = glm::dot(-ray.direction, transformed_normal);
     }
   };
 
