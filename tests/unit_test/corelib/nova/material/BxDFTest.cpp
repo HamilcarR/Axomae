@@ -24,6 +24,51 @@ static constexpr float uc_samples[RAND_NUM][2] = {{0.0f, 0.0f},
 
 static constexpr float roughness_values[6] = {1e-4f, 0.1f, 0.45f, 0.75f, 1.f};
 
+constexpr float IOR_VACUUM = 1.00000f;
+constexpr float IOR_AIR = 1.00028f;
+constexpr float IOR_ICE = 1.309f;
+constexpr float IOR_WATER = 1.333f;
+constexpr float IOR_ETHANOL = 1.361f;
+constexpr float IOR_GLASS = 1.50f;
+constexpr float IOR_ACRYLIC = 1.490f;
+constexpr float IOR_POLYCARB = 1.585f;
+constexpr float IOR_DIAMOND = 2.417f;
+
+/********************** Fresnel **********************/
+
+struct fresnel_result {
+  float eta;
+  float R;
+};
+
+static fresnel_result test_fresnel_real(float ior, float angle_radian) {
+  Fresnel real_fresnel(ior);
+  float new_eta = 0.f;
+  float R = real_fresnel.real(angle_radian, new_eta);
+  return {new_eta, R};
+}
+
+TEST(FresnelTest, real) {
+  fresnel_result result = test_fresnel_real(IOR_GLASS, 0.5);
+  ASSERT_EQ(IOR_GLASS, result.eta);     // IOR should stay the same since we're on the upper hemisphere.
+  EXPECT_GT(1.f - result.R, result.R);  // at 45° , transmission component should be greater than reflection for glass.
+
+  result = test_fresnel_real(IOR_GLASS, 0.001);
+  ASSERT_EQ(IOR_GLASS, result.eta);
+  EXPECT_GT(result.R, 1.f - result.R);
+
+  result = test_fresnel_real(IOR_GLASS, -0.001);
+  ASSERT_NE(IOR_GLASS, result.eta);
+
+  result = test_fresnel_real(IOR_VACUUM, 0.5f);
+  ASSERT_EQ(IOR_VACUUM, result.eta);
+  EXPECT_GT(1.f - result.R, result.R);  // Vacuum has only transmission.
+
+  result = test_fresnel_real(IOR_DIAMOND, 0.1f);
+  EXPECT_GT(result.R, 1.f - result.R);
+}
+
+/********************** GGX / VNDF **********************/
 TEST(GGXTest, SampleWm) {
 
   glm::vec3 wo(1.2f, 0.4f, 1.f);
@@ -34,11 +79,11 @@ TEST(GGXTest, SampleWm) {
       const float *uc = uc_samples[i];
       glm::vec3 wm = test_ggx.sampleGGXVNDF(wo, uc);
 
-      // Sampled microfacet normal should always be in the same hemisphere as the view direction.
-      ASSERT_TRUE(bxdf::same_hemisphere(wm, wo));
-
       // Sampled direction should be normalized.
       EXPECT_NEAR(glm::length2(wm), 1.f, 1e-4f);
+
+      // Sampled microfacet normal should always be in the same hemisphere as the view direction.
+      ASSERT_TRUE(bxdf::same_hemisphere(wm, wo));
     }
 }
 
@@ -61,6 +106,10 @@ TEST(GGXTest, G1_bounds) {
   EXPECT_LT(visible_micrafacets_probability, 1.f);
   EXPECT_NEAR(visible_micrafacets_probability, 0.f, 1e-2f);
 }
+
+/********************** BSDFs **********************/
+
+/************* Diffuse **************/
 
 /* Tests f(wo , wi , p) = f(wi , wo , p). */
 template<class BxDF>
@@ -144,4 +193,15 @@ TEST(DiffuseBxDF, sample_f) {
   nm::BSDFSample sample;
   bool is_sampled = diffuse.sample_f(wo, uc, u, &sample, nm::RADIANCE, nm::REFLTRANSFLAG::NONE);
   ASSERT_FALSE(is_sampled);
+}
+
+/************* Dielectric **************/
+TEST(DielectricBxDF, sample_f) {
+  nm::DielectricBxDF dielectric(1.5f);
+  glm::vec3 wo(0, 0, 1.f);
+  float uc = 0.533f;
+  float u[2] = {0.33f, 1.35f};
+  nm::BSDFSample sample;
+  bool is_sampled = dielectric.sample_f(wo, uc, u, &sample, nm::RADIANCE, nm::REFLTRANSFLAG::TRANSMISSION);
+  ASSERT_TRUE(is_sampled);
 }
