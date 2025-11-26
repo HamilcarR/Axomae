@@ -1,6 +1,7 @@
 #include "EmissiveIntegrator.h"
 #include "material/material_datastructures.h"
 #include "sampler/Sampler.h"
+#include "utils/aliases.h"
 #include <internal/common/math/math_random.h>
 
 namespace nova::integrator {
@@ -10,7 +11,7 @@ namespace nova::integrator {
     math::random::SobolGenerator generator;
     sampler::SobolSampler sobol_sampler(generator);
     sampler::SamplerInterface sampler = &sobol_sampler;
-    axstd::StaticAllocator64kb allocator;
+    StackAllocator allocator;
     for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
       for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
         unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().vertical_invert, x, y);
@@ -33,11 +34,8 @@ namespace nova::integrator {
     tile.finished_render = true;
   }
 
-  glm::vec4 EmissiveIntegrator::Li(const Ray &ray,
-                                   nova_eng_internals &nova_internals,
-                                   int depth,
-                                   sampler::SamplerInterface &sampler,
-                                   axstd::StaticAllocator64kb &allocator) const {
+  glm::vec4 EmissiveIntegrator::Li(
+      const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler, StackAllocator &allocator) const {
     bvh_hit_data hit = bvh_hit(ray, nova_internals);
     if (hit.is_hit) {
       Ray out{};

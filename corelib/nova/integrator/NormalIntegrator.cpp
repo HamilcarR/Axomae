@@ -10,7 +10,7 @@ namespace nova::integrator {
     math::random::SobolGenerator generator;
     sampler::SobolSampler sobol_sampler(generator);
     sampler::SamplerInterface sampler = &sobol_sampler;
-    axstd::StaticAllocator64kb allocator;
+    StackAllocator allocator;
     for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
       for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
         allocator.reset();
@@ -34,11 +34,8 @@ namespace nova::integrator {
     tile.finished_render = true;
   }
 
-  glm::vec4 NormalIntegrator::Li(const Ray &ray,
-                                 nova_eng_internals &nova_internals,
-                                 int depth,
-                                 sampler::SamplerInterface &sampler,
-                                 axstd::StaticAllocator64kb &allocator) const {
+  glm::vec4 NormalIntegrator::Li(
+      const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler, StackAllocator &allocator) const {
     bvh_hit_data hit = bvh_hit(ray, nova_internals);
     if (hit.is_hit) {
       Ray out{};

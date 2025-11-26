@@ -32,6 +32,17 @@ namespace nova {
       return *this;
     }
 
+    ax_device_callable_inlined ColorSpectrum(const float color[3]) {
+      for (unsigned i = 0; i < SPECTRUM_SAMPLES; i++)
+        samples[i] = color[i];
+    }
+
+    ax_device_callable_inlined ColorSpectrum &operator=(const float color[3]) {
+      for (unsigned i = 0; i < SPECTRUM_SAMPLES; i++)
+        samples[i] = color[i];
+      return *this;
+    }
+
     ax_device_callable_inlined ColorSpectrum() {
       for (unsigned i = 0; i < SPECTRUM_SAMPLES; i++)
         samples[i] = 0.f;

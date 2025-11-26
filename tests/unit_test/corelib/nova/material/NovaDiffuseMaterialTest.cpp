@@ -7,6 +7,7 @@
 #include "texturing/NovaTextureInterface.h"
 #include "texturing/TextureContext.h"
 #include "texturing/texture_datastructures.h"
+#include "utils/aliases.h"
 #include <internal/memory/Allocator.h>
 #include <unit_test/Test.h>
 
@@ -84,7 +85,7 @@ TEST(NovaDiffuseMaterialTest, scatter_direction) {
   nova::sampler::SobolSampler sobol_sampler(sobol_generator);
   nova::sampler::SamplerInterface sampler = &sobol_sampler;
   nova::Ray out{};
-  axstd::StaticAllocator64kb allocator;
+  StackAllocator allocator;
   for (int i = 0; i < MAX_ITER; i++) {
     sampler.reset(i);
     hit_data.u = (float)generator.nrandf(0, 1);

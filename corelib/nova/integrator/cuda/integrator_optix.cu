@@ -34,7 +34,7 @@ extern "C" ax_kernel void __raygen__main() {
   nv_sam::SamplerInterface sampler = &sobol_sampler_instance;
   register_stack_t<> reg{};
   glm::vec4 color{};
-  axstd::StaticAllocator64kb allocator;
+  StackAllocator allocator;
   sampler.reset((idx.x * dim.y + idx.y) * params.sample_max + params.sample_index);
   float rand[2];
   sampler.sample2D(rand);

@@ -6,6 +6,7 @@
 #include "aggregate/acceleration_interface.h"
 #include "engine/nova_engine.h"
 #include "manager/ManagerInternalStructs.h"
+#include "material/BxDF_flags.h"
 #include "material/BxDF_math.h"
 #include "ray/Hitable.h"
 #include "ray/Ray.h"
@@ -56,11 +57,8 @@ namespace nova::integrator {
     return hit_ret;
   }
 
-  glm::vec4 PathIntegrator::Li(const Ray &ray,
-                               nova_eng_internals &nova_internals,
-                               int depth,
-                               sampler::SamplerInterface &sampler,
-                               axstd::StaticAllocator64kb &allocator) const {
+  glm::vec4 PathIntegrator::Li(
+      const Ray &ray, nova_eng_internals &nova_internals, int depth, sampler::SamplerInterface &sampler, StackAllocator &allocator) const {
     const NovaResourceManager *nova_resources = nova_internals.resource_manager;
     bvh_hit_data hit = bvh_hit(ray, nova_internals);
     texturing::TextureCtx texture_context = texturing::TextureCtx(nova_internals.resource_manager->getTexturesData().getTextureBundleViews());
@@ -74,13 +72,14 @@ namespace nova::integrator {
       if (!hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, mat_record, sampler, allocator, shading)) {
         return glm::vec4(0.f);
       }
-      out = Ray::spawn(mat_record.lobe.wi, hit.hit_d.shading_frame.getNormal(), hit.hit_d.position);
+      out = Ray::spawn(mat_record.lobe.wi, hit.hit_d.geometric_normal, hit.hit_d.position);
       glm::vec4 next = Li(out, nova_internals, depth - 1, sampler, allocator);
-      /* Here in case the value returned by the subsequent call to Li() is a NaN or Inf, we invalidate the color of the pixel altogether and set it
-      * to zero. This helps keep a more uniform and precise value as the next sampling pass will be joined to the current pass and set a valid value
-       to the pixel.*/
-
-      Spectrum color = mat_record.lobe.f * mat_record.lobe.costheta / mat_record.lobe.pdf;
+      const BSDFSample &lobe = mat_record.lobe;
+      Spectrum color;
+      if (lobe.pdf_cosine_weighted)
+        color = mat_record.attenuation / mat_record.lobe.pdf;
+      else
+        color = mat_record.attenuation * mat_record.lobe.costheta / mat_record.lobe.pdf;
       Spectrum emit = mat_record.emissive;
       glm::vec4 e = glm::vec4(emit.toRgb(), 1.f);
       glm::vec4 c = glm::vec4(color.toRgb(), 1.f);

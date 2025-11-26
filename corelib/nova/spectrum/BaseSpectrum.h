@@ -16,6 +16,61 @@ namespace nova {
     ax_device_callable_inlined unsigned size() const { return static_cast<const S *>(this)->SPECTRUM_SAMPLES; }
 
    public:
+    ax_device_callable_inlined friend S operator/(float r, const S &s) {
+      AX_ASSERT_TRUE(s.isValid());
+      S result;
+      for (unsigned i = 0; i < s.size(); i++) {
+        AX_ASSERT_TRUE(s[i] != 0.f);
+        result[i] = r / s[i];
+      }
+      return result;
+    }
+
+    ax_device_callable_inlined bool operator<=(const S &other) const {
+      S self = *static_cast<const S *>(this);
+      AX_ASSERT_EQ(size(), other.size());
+      for (unsigned i = 0; i < size(); i++)
+        if (self[i] > other[i])
+          return false;
+      return true;
+    }
+
+    ax_device_callable_inlined bool operator>=(const S &other) const {
+      S self = *static_cast<const S *>(this);
+      AX_ASSERT_EQ(size(), other.size());
+      for (unsigned i = 0; i < size(); i++)
+        if (self[i] < other[i])
+          return false;
+      return true;
+    }
+
+    ax_device_callable_inlined bool operator!=(const S &other) const {
+      S self = *static_cast<const S *>(this);
+      AX_ASSERT_EQ(size(), other.size());
+      for (unsigned i = 0; i < size(); i++)
+        if (self[i] == other[i])
+          return false;
+      return true;
+    }
+
+    ax_device_callable_inlined bool operator<(const S &other) const {
+      S self = *static_cast<const S *>(this);
+      AX_ASSERT_EQ(size(), other.size());
+      for (unsigned i = 0; i < size(); i++)
+        if (self[i] >= other[i])
+          return false;
+      return true;
+    }
+
+    ax_device_callable_inlined bool operator>(const S &other) const {
+      S self = *static_cast<const S *>(this);
+      AX_ASSERT_EQ(size(), other.size());
+      for (unsigned i = 0; i < size(); i++)
+        if (self[i] <= other[i])
+          return false;
+      return true;
+    }
+
     ax_device_callable_inlined bool operator==(const S &other) const {
       S self = *static_cast<const S *>(this);
       AX_ASSERT_EQ(size(), other.size());

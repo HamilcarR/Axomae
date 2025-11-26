@@ -4,6 +4,7 @@
 #include <internal/device/gpgpu/device_macros.h>
 #include <internal/device/gpgpu/device_utils.h>
 #include <internal/macro/project_macros.h>
+#include <utility>
 
 namespace axstd {
 
