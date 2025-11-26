@@ -165,6 +165,14 @@ namespace nova {
       return false;
     }
 
+    ax_device_callable_inlined bool isValid() const {
+      const S &self = *static_cast<const S *>(this);
+      for (unsigned i = 0; i < size(); i++)
+        if (ISNAN(self[i]) && ISINF(self[i]))
+          return false;
+      return true;
+    }
+
     ax_device_callable_inlined float max() const {
       const S *self = static_cast<const S *>(this);
       float max = -1e30f;
