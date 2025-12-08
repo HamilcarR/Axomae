@@ -87,6 +87,7 @@ namespace nova {
       std::size_t dielectrics_number;
       std::size_t diffuse_number;
       std::size_t conductors_number;
+      std::size_t principled_number;
 
       std::size_t image_texture_number;
       std::size_t constant_texture_number;
@@ -110,6 +111,7 @@ namespace nova {
       material_init_data.conductors_size = resrc.conductors_number;
       material_init_data.dielectrics_size = resrc.dielectrics_number;
       material_init_data.diffuse_size = resrc.diffuse_number;
+      material_init_data.principled_size = resrc.principled_number;
       auto &material_resrc = manager.getMaterialData();
       material_resrc.init(material_init_data);
 
@@ -207,6 +209,7 @@ namespace nova {
       resrc.conductors_number = total_mesh_number;
       resrc.diffuse_number = total_mesh_number;
       resrc.dielectrics_number = total_mesh_number;
+      resrc.principled_number = total_mesh_number;
       resrc.image_texture_number = total_mesh_number * PBR_TEXTURE_PACK_SIZE;
       resrc.hdr_texture_number = 1;  // At least 1 for Environment map.
       initialize_resources_holders(manager, resrc);

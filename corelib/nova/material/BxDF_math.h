@@ -1,5 +1,6 @@
 #ifndef BXDF_MATH_H
 #define BXDF_MATH_H
+#include "spectrum/Spectrum.h"
 #include <algorithm>
 #include <cmath>
 #include <internal/common/math/math_complex.h>
@@ -126,6 +127,11 @@ class Fresnel {
 
   Fresnel(float eta) : etar(eta) {}
 
+  template<class T>
+  ax_device_callable_inlined static T schlick(float abscostheta_i, T F0) {
+    return F0 + (1.f - F0) * std::powf((1.f - abscostheta_i), 5);
+  }
+
   /*
    * Dielectrics, and refractive materials.
    * new_etha is the computed eta value depending on costheta_i.
@@ -169,7 +175,7 @@ class Fresnel {
 class NDF {
   float alpha_x, alpha_x_inv;
   float alpha_y, alpha_y_inv;
-  static constexpr float PERFECT_SPECULAR_THRESHOLD = 1e-3f;
+  static constexpr float PERFECT_SPECULAR_THRESHOLD = 1e-6f;
   ax_device_callable_inlined float roughnessToAlpha(float roughness) const {
     return roughness != 0 ? roughness * roughness : PERFECT_SPECULAR_THRESHOLD;
   }
@@ -275,7 +281,7 @@ class NDF {
   }
 
   /* Checks if roughness allows for a specular lobe or a perfect specular effect.*/
-  ax_device_callable_inlined bool isFullSpecular() const { return std::max(alpha_x, alpha_y) <= PERFECT_SPECULAR_THRESHOLD; }
+  ax_device_callable_inlined bool isFullSpecular() const { return std::max(alpha_x, alpha_y) < 1e-5f; }
 };
 
 #endif

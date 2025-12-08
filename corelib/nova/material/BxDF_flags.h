@@ -4,7 +4,7 @@
 #include "spectrum/Spectrum.h"
 #include <internal/device/gpgpu/device_utils.h>
 
-namespace nova::material {
+namespace nova {
   enum BXDFFLAGS {
     NONE = 0,
     REFLECTION = 1 << 0,
@@ -38,6 +38,5 @@ namespace nova::material {
   enum class REFLTRANSFLAG { NONE = 0, TRANSMISSION = 1, REFLECTION = 1 << 1, ALL = TRANSMISSION | REFLECTION };
   ax_device_callable_inlined unsigned operator&(const REFLTRANSFLAG &a, const REFLTRANSFLAG &b) { return (unsigned)a & (unsigned)b; }
   ax_device_callable_inlined unsigned operator|(const REFLTRANSFLAG &a, const REFLTRANSFLAG &b) { return (unsigned)a | (unsigned)b; }
-
-}  // namespace nova::material
+}  // namespace nova
 #endif

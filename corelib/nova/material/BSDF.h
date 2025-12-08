@@ -5,11 +5,12 @@
 #include "material/BxDF_flags.h"
 #include "ray/IntersectFrame.h"
 #include "spectrum/Spectrum.h"
+#include "utils/aliases.h"
 #include <internal/device/gpgpu/device_macros.h>
 #include <internal/device/gpgpu/device_utils.h>
 #include <internal/macro/project_macros.h>
 
-namespace nova::material {
+namespace nova {
 
   /*
    * Wrapper around a BxDF instance.
@@ -19,9 +20,10 @@ namespace nova::material {
    * wi is outgoing (sample -> eye).
    */
   class BSDF {
+   protected:
     IntersectFrame local_frame;
     BxDF bxdf;
-    float wo_dot_ng;  // Are we entering a medium or exiting.
+    float wo_dot_ng{};  // Are we entering a medium or exiting.
 
    public:
     ax_device_callable_inlined BSDF() = default;
@@ -36,6 +38,7 @@ namespace nova::material {
         bxdf.invertEta();
       }
     }
+
     ax_device_callable_inlined Spectrum f(const glm::vec3 &wo, const glm::vec3 &wi, TRANSPORT transport_mode = TRANSPORT::RADIANCE) const {
       glm::vec3 local_wi = glm::normalize(local_frame.worldToLocal(wi));
       glm::vec3 local_wo = glm::normalize(local_frame.worldToLocal(wo));
@@ -51,7 +54,7 @@ namespace nova::material {
       AX_ASSERT_NOTNULL(sample);
       glm::vec3 local_wo = glm::normalize(local_frame.worldToLocal(wo));
 
-      if (!(bxdf.flags() & (unsigned)sample_flag) && local_wo.z == 0.f)
+      if (!(bxdf.flags() & (unsigned)sample_flag) || local_wo.z == 0.f)
         return false;
 
       if (!bxdf.sample_f(local_wo, uc, u, sample, transport_mode, sample_flag))
@@ -86,6 +89,45 @@ namespace nova::material {
       return bxdf.rho(u0, uc, u1);
     }
   };
+  class PrincipledBSDF : public BSDF {
 
-}  // namespace nova::material
+   public:
+    ax_device_callable_inlined PrincipledBSDF(bsdf_params_s params, StackAllocator &allocator) {
+      local_frame = IntersectFrame(params.shading_normal, params.dpdu);
+      wo_dot_ng = params.wo_dot_ng;
+
+      if (wo_dot_ng < 0) {
+        local_frame.flipFrame();
+        if (!params.thin_surface && params.eta != 0.f)
+          params.eta = 1.f / params.eta;
+      }
+
+      bxdf = allocator.construct<DisneyPrincipledBxDF>(params);
+      AX_ASSERT_NOTNULL(bxdf.get());
+    }
+
+    ax_device_callable_inlined bool sample_f(const glm::vec3 &wo,
+                                             float uc,
+                                             const float u[2],
+                                             BSDFSample *sample,
+                                             TRANSPORT transport_mode = TRANSPORT::RADIANCE,
+                                             REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
+      AX_ASSERT_NOTNULL(sample);
+      glm::vec3 local_wo = glm::normalize(local_frame.worldToLocal(wo));
+
+      if (!(bxdf.flags() & (unsigned)sample_flag) || local_wo.z == 0.f)
+        return false;
+
+      if (!bxdf.sample_f(local_wo, uc, u, sample, transport_mode, sample_flag))
+        return false;
+
+      if (!sample->f || sample->pdf == 0.f || sample->wi.z == 0.f)
+        return false;
+
+      sample->wi = glm::normalize(local_frame.localToWorld(sample->wi));
+      return true;
+    }
+  };
+
+}  // namespace nova
 #endif

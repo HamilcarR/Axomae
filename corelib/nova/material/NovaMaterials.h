@@ -2,7 +2,6 @@
 #define NOVAMATERIALS_H
 #include "BxDF.h"
 #include "TexturePackSampler.h"
-#include "glm/common.hpp"
 #include "material/BSDF.h"
 #include "material/BxDF_flags.h"
 #include "material_datastructures.h"
@@ -12,6 +11,8 @@
 #include "sampler/Sampler.h"
 #include "spectrum/Spectrum.h"
 #include "texturing/texture_datastructures.h"
+#include "utils/aliases.h"
+#include <climits>
 #include <internal/common/axstd/span.h>
 #include <internal/common/math/math_includes.h>
 #include <internal/common/math/utils_3D.h>
@@ -39,7 +40,7 @@ namespace nova::material {
   ax_device_callable_inlined glm::vec3 compute_local_normal(float u,
                                                             float v,
                                                             const TexturePackSampler &t_pack,
-                                                            texturing::texture_data_aggregate_s &sample_data) {
+                                                            const texturing::texture_data_aggregate_s &sample_data) {
     return t_pack.normal(u, v, sample_data) * 2.f - 1.f;
   }
   ax_device_callable_inlined glm::vec3 compute_world_normal(const glm::vec3 &local_normal, const glm::vec3 &world_normal, const glm::vec3 &binormal) {
@@ -59,7 +60,7 @@ namespace nova::material {
                                             const intersection_record_s &hit_d,
                                             material_record_s &mat_rec,
                                             sampler::SamplerInterface &sampler,
-                                            axstd::StaticAllocator64kb &allocator,
+                                            StackAllocator &allocator,
                                             shading_data_s &mat_ctx) const {
       AX_ASSERT_NOTNULL(mat_ctx.texture_aggregate);
       TexturePackSampler texture_pack_sampler(t_pack);
@@ -77,7 +78,7 @@ namespace nova::material {
       float uc = sampler.sample1D();
       float u[2]{};
       sampler.sample2D(u);
-      if (!bsdf.sample_f(in.direction, uc, u, &lobe))
+      if (!bsdf.sample_f(-in.direction, uc, u, &lobe))
         return false;
       mat_rec.attenuation = lobe.f;
       mat_rec.emissive = E;
@@ -93,8 +94,6 @@ namespace nova::material {
     glm::vec3 reflectivity{};  // eta
 
    public:
-    CLASS_CM(NovaConductorMaterial)
-
     ax_device_callable_inlined NovaConductorMaterial(const texture_pack &texture) : t_pack(texture) {
       reflectivity = glm::vec3(0.18, 0.42, 1.37);
       tint = glm::vec3(3.42, 2.35, 1.77);
@@ -107,7 +106,7 @@ namespace nova::material {
                                             const intersection_record_s &hit_d,
                                             material_record_s &mat_rec,
                                             sampler::SamplerInterface &sampler,
-                                            axstd::StaticAllocator64kb &allocator,
+                                            StackAllocator &allocator,
                                             shading_data_s &mat_ctx) const {
 
       AX_ASSERT_NOTNULL(mat_ctx.texture_aggregate);
@@ -128,7 +127,7 @@ namespace nova::material {
       sampler.sample2D(u);
       ConductorBxDF bxdf(reflectivity, tint, roughness.g);
       BSDF bsdf(&bxdf, mat_rec.normal, hit_d.binormal, hit_d.wo_dot_n);
-      if (!bsdf.sample_f(in.direction, uc, u, &lobe))
+      if (!bsdf.sample_f(-in.direction, uc, u, &lobe))
         return false;
       mat_rec.attenuation = lobe.f * R;
       mat_rec.emissive = E;
@@ -151,7 +150,7 @@ namespace nova::material {
                                             const intersection_record_s &hit_d,
                                             material_record_s &mat_rec,
                                             sampler::SamplerInterface &sampler,
-                                            axstd::StaticAllocator64kb &allocator,
+                                            StackAllocator &allocator,
                                             shading_data_s &mat_ctx) const {
       TexturePackSampler texture_pack_sampler(t_pack);
 
@@ -168,7 +167,7 @@ namespace nova::material {
       float uc = sampler.sample1D();
       float u[2];
       sampler.sample2D(u);
-      if (!bsdf.sample_f(in.direction, uc, u, &lobe))
+      if (!bsdf.sample_f(-in.direction, uc, u, &lobe))
         return false;
       mat_rec = {};
       mat_rec.attenuation = lobe.f;
@@ -180,14 +179,66 @@ namespace nova::material {
     }
   };
 
-  class NovaMaterialInterface : public core::tag_ptr<NovaDiffuseMaterial, NovaDielectricMaterial, NovaConductorMaterial> {
+  class PrincipledMaterial {
+    texture_pack t_pack{};
+    Spectrum eta, k;
+
+   public:
+    ax_device_callable_inlined PrincipledMaterial(const texture_pack &texture) : t_pack(texture) {}
+    ax_device_callable_inlined PrincipledMaterial(const texture_pack &texture, float eta[3], float k[3]) : t_pack(texture), eta(eta), k(k) {}
+
+    ax_device_callable_inlined bool scatter(const Ray &in,
+                                            const intersection_record_s &hit_d,
+                                            material_record_s &mat_rec,
+                                            sampler::SamplerInterface &sampler,
+                                            StackAllocator &allocator,
+                                            shading_data_s &mat_ctx) const {
+
+      TexturePackSampler texture_pack_sampler(t_pack);
+      bsdf_params_s bsdf_params{};
+      float u = hit_d.u, v = hit_d.v;
+      glm::vec3 geometric_normal = hit_d.geometric_normal, binormal = hit_d.binormal;
+      glm::vec3 shading_normal = compute_local_normal(u, v, texture_pack_sampler, *mat_ctx.texture_aggregate);
+
+      bsdf_params.dpdu = binormal;
+      bsdf_params.wo_dot_ng = hit_d.wo_dot_n;
+      bsdf_params.shading_normal = compute_world_normal(shading_normal, geometric_normal, binormal);
+      glm::vec4 albedo = texture_pack_sampler.albedo(u, v, *mat_ctx.texture_aggregate);
+      bsdf_params.albedo = albedo;
+      // TODO for test : change this to sample roughness texture.
+      bsdf_params.roughness = texture_pack_sampler.metallic(u, v, *mat_ctx.texture_aggregate).g;
+      bsdf_params.metal = texture_pack_sampler.metallic(u, v, *mat_ctx.texture_aggregate).b;
+      bsdf_params.transmission = 1.f - albedo.a;
+      bsdf_params.anisotropy_ratio = 1.f;
+      bsdf_params.thin_surface = false;
+      bsdf_params.eta = eta;
+      bsdf_params.k = k;
+
+      PrincipledBSDF bsdf(bsdf_params, allocator);
+      float uc = sampler.sample1D();
+      float u0[2];
+      sampler.sample2D(u0);
+      BSDFSample sample{};
+      if (!bsdf.sample_f(-in.direction, uc, u0, &sample))
+        return false;
+
+      mat_rec = {};
+      mat_rec.attenuation = sample.f;
+      mat_rec.emissive = texture_pack_sampler.emissive(u, v, *mat_ctx.texture_aggregate);
+      mat_rec.lobe = sample;
+      mat_rec.normal = bsdf_params.shading_normal;
+      return true;
+    }
+  };
+
+  class NovaMaterialInterface : public core::tag_ptr<NovaDiffuseMaterial, NovaDielectricMaterial, NovaConductorMaterial, PrincipledMaterial> {
    public:
     using tag_ptr::tag_ptr;
     ax_device_callable_inlined bool scatter(const Ray &in,
                                             const intersection_record_s &hit_d,
                                             material_record_s &mat_rec,
                                             sampler::SamplerInterface &sampler,
-                                            axstd::StaticAllocator64kb &allocator,
+                                            StackAllocator &allocator,
                                             shading_data_s &mat_ctx) const {
       auto disp = [&](auto material) { return material->scatter(in, hit_d, mat_rec, sampler, allocator, mat_ctx); };
       return dispatch(disp);
