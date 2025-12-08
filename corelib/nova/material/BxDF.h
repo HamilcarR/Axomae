@@ -2,8 +2,8 @@
 #define BXDF_H
 #include "BxDF_flags.h"
 #include "BxDF_math.h"
-#include "glm/geometric.hpp"
 #include "spectrum/Spectrum.h"
+#include <cmath>
 #include <internal/common/axstd/span.h>
 #include <internal/common/math/math_includes.h>
 #include <internal/common/math/math_spherical.h>
@@ -13,11 +13,30 @@
 #include <internal/macro/project_macros.h>
 #include <internal/memory/tag_ptr.h>
 
-struct uniform_sample2d {
-  float u[2];
-};
+namespace nova {
 
-namespace nova::material {
+  struct bsdf_params_s {
+    glm::vec3 shading_normal;
+    glm::vec3 dpdu;
+
+    float wo_dot_ng;
+    float roughness;
+    float metal;
+    float transmission{0.f};      // 0 = opaque , 1 = transparent dielectric.
+    float anisotropy_ratio{1.f};  // [-1,1]
+    float subsurface_scattering{0.f};
+    float sheen;
+    float clearcoat;
+    float specular{1.f};
+    bool thin_surface{false};
+
+    Spectrum eta, k;
+    Spectrum albedo;
+  };
+
+  struct uniform_sample2d {
+    float u[2];
+  };
 
   class CoatedDiffuseBxDF;
   class CoatedConductorBxDF;
@@ -26,14 +45,13 @@ namespace nova::material {
   class DiffuseTransmissionBxDF;
 
   class DielectricBxDF {
-    float ior{1.f};  // External medium refraction index.
+    Spectrum ior{1.f};
     NDF ggx;
 
     ax_device_callable_inlined bool roughSpecularReflection(
         glm::vec3 wo, const glm::vec3 &wm, float R, float pr, float pt, float eta, BSDFSample *sample, TRANSPORT transport, REFLTRANSFLAG flag)
         const {
-      glm::vec3 wi = glm::reflect(wo, wm);
-      wo = -wo;  // flip wo for NDF computations.
+      glm::vec3 wi = glm::reflect(-wo, wm);
       if (!bxdf::same_hemisphere(wo, wi))
         return false;
       Spectrum f = ggx.D(wm) * ggx.G(wo, wi) * R / (4 * bxdf::costheta(wi) * bxdf::costheta(wo));
@@ -53,7 +71,6 @@ namespace nova::material {
     ax_device_callable_inlined bool roughSpecularTransmission(
         glm::vec3 wo, glm::vec3 wm, float T, float pr, float pt, float eta, BSDFSample *sample, TRANSPORT transport, REFLTRANSFLAG flag) const {
 
-      wo = -wo;
       glm::vec3 wi;
       bool no_tir = true;
       eta = bxdf::refract(wo, wm, eta, no_tir, wi);
@@ -84,7 +101,6 @@ namespace nova::material {
 
     ax_device_callable_inlined bool perfectSpecularTransmission(
         glm::vec3 wo, float T, float pr, float pt, float eta, BSDFSample *sample, TRANSPORT transport, REFLTRANSFLAG flag) const {
-      wo = -wo;
       bool no_tir = true;
       glm::vec3 wi;
       bxdf::refract(wo, glm::vec3(0.f, 0.f, 1.f), eta, no_tir, wi);
@@ -106,7 +122,7 @@ namespace nova::material {
 
     ax_device_callable_inlined bool perfectSpecularReflection(
         glm::vec3 wo, float R, float pr, float pt, float eta, BSDFSample *sample, TRANSPORT transport, REFLTRANSFLAG flag) const {
-      glm::vec3 wi = glm::reflect(wo, glm::vec3(0, 0, 1.f));
+      glm::vec3 wi = glm::reflect(-wo, glm::vec3(0, 0, 1.f));
       float costheta_i = bxdf::abscostheta(wi);
       sample->costheta = costheta_i;
       sample->f = R / costheta_i;
@@ -119,23 +135,27 @@ namespace nova::material {
     }
 
    public:
-    ax_device_callable_inlined DielectricBxDF(float n, float roughness) : ior(n), ggx(roughness) {}
+    ax_device_callable_inlined DielectricBxDF(Spectrum eta, float roughness) : ior(eta), ggx(roughness) {}
 
     ax_device_callable_inlined DielectricBxDF(float roughness) : ggx(roughness) {}
 
-    ax_device_callable_inlined DielectricBxDF(float eta, float roughness, float anisotropy) : ior(eta), ggx(anisotropy, roughness) {}
+    ax_device_callable_inlined DielectricBxDF(Spectrum eta, float roughness, float anisotropy) : ior(eta), ggx(anisotropy, roughness) {}
 
     ax_device_callable_inlined Spectrum f(const glm::vec3 &wo, const glm::vec3 &wi, TRANSPORT mode = TRANSPORT::RADIANCE) const {
-      if (!bxdf::same_hemisphere(wo, wi))
+      if (ggx.isFullSpecular() || ior == 1.f)
         return Spectrum(0.f);
-      if (ggx.isFullSpecular())
-        return Spectrum(0.f);
+
+      return 0.f;
     }
 
     ax_device_callable_inlined float pdf(const glm::vec3 &wo,
                                          const glm::vec3 &wi,
                                          TRANSPORT mode = TRANSPORT::RADIANCE,
-                                         REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {}
+                                         REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
+
+      if (ior == 1.f || ggx.isFullSpecular())
+        return 0.f;
+    }
 
     ax_device_callable_inlined bool sample_f(const glm::vec3 &wo_incident,
                                              float uc,
@@ -145,10 +165,11 @@ namespace nova::material {
                                              REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
 
       float eta_computed = 0.f;
-      Fresnel fresnel(ior);
+      float cste_ior = ior[0];  // TODO : Make dielectric wavelength dependent
+      Fresnel fresnel(cste_ior);
       if (ggx.isFullSpecular() || ior == 1.f) {
 
-        float R = fresnel.real(bxdf::costheta(-wo_incident), eta_computed), T = 1 - R;
+        float R = fresnel.real(bxdf::costheta(wo_incident), eta_computed), T = 1 - R;
         float pr = R, pt = T;
         if (!(sample_flag & REFLTRANSFLAG::REFLECTION))
           pr = 0;
@@ -158,13 +179,13 @@ namespace nova::material {
           return false;
 
         if (uc < (pr / (pr + pt)))  // Specular reflection
-          return perfectSpecularReflection(wo_incident, R, pr, pt, ior, sample, transport_mode, sample_flag);
+          return perfectSpecularReflection(wo_incident, R, pr, pt, cste_ior, sample, transport_mode, sample_flag);
         else  // Specular Transmission
-          return perfectSpecularTransmission(wo_incident, T, pr, pt, ior, sample, transport_mode, sample_flag);
+          return perfectSpecularTransmission(wo_incident, T, pr, pt, cste_ior, sample, transport_mode, sample_flag);
       }
       // Sample rough dielectric.
-      glm::vec3 wm = ggx.sampleGGXVNDF(-wo_incident, u);
-      float wo_dot_wm = glm::dot(-wo_incident, wm);
+      glm::vec3 wm = ggx.sampleGGXVNDF(wo_incident, u);
+      float wo_dot_wm = glm::dot(wo_incident, wm);
       float R = fresnel.real(wo_dot_wm, eta_computed), T = 1 - R;
       float pr = R, pt = T;
       if (!(sample_flag & REFLTRANSFLAG::REFLECTION))
@@ -174,9 +195,9 @@ namespace nova::material {
       if (pr == 0.f && pt == 0.f)
         return false;
       if (uc < (pr / (pr + pt)))
-        return roughSpecularReflection(wo_incident, wm, R, pr, pt, ior, sample, transport_mode, sample_flag);
+        return roughSpecularReflection(wo_incident, wm, R, pr, pt, cste_ior, sample, transport_mode, sample_flag);
       else
-        return roughSpecularTransmission(wo_incident, wm, T, pr, pt, ior, sample, transport_mode, sample_flag);
+        return roughSpecularTransmission(wo_incident, wm, T, pr, pt, cste_ior, sample, transport_mode, sample_flag);
     }
 
     ax_device_callable_inlined unsigned flags() const {
@@ -189,26 +210,17 @@ namespace nova::material {
     ax_device_callable_inlined void invertEta() { ior = 1.f / ior; }
   };
 
-  class ConductorBxDF {
-    Spectrum k, eta;
+  template<class T>
+  class BaseConductorBxDF {
+   protected:
     NDF ggx;
 
-    ax_device_callable_inlined Spectrum computeFresnel(float costheta_i) const {
-      Spectrum ret(0.f);
-      for (unsigned i = 0; i < Spectrum::SPECTRUM_SAMPLES; i++) {
-        Fresnel fresnel(eta[i], k[i]);
-        ret.samples[i] = fresnel.complex(costheta_i);
-      }
-      return ret;
-    }
-
    public:
-    ax_device_callable_inlined ConductorBxDF(Spectrum eta, Spectrum k, float roughness) : eta(eta), k(k), ggx(roughness) {}
-    ax_device_callable_inlined ConductorBxDF(Spectrum eta, Spectrum k, float anisotropy, float roughness)
-        : eta(eta), k(k), ggx(anisotropy, roughness) {}
+    ax_device_callable_inlined BaseConductorBxDF(float roughness) : ggx(roughness) {}
 
-    ax_device_callable_inlined Spectrum f(const glm::vec3 &wo_ori, const glm::vec3 &wi, TRANSPORT mode = TRANSPORT::RADIANCE) const {
-      glm::vec3 wo = -wo_ori;
+    ax_device_callable_inlined BaseConductorBxDF(float anisotropy, float roughness) : ggx(anisotropy, roughness) {}
+
+    ax_device_callable_inlined Spectrum f(const glm::vec3 &wo, const glm::vec3 &wi, TRANSPORT mode = TRANSPORT::RADIANCE) const {
       if (!bxdf::same_hemisphere(wo, wi))
         return 0.f;
       if (ggx.isFullSpecular())
@@ -221,19 +233,18 @@ namespace nova::material {
       if (costheta_wi == 0.f || costheta_wo == 0.f)
         return 0.f;
 
-      glm::vec3 wm = wi + wo;
+      glm::vec3 wm = glm::normalize(wi + wo);
       if (glm::length2(wm) == 0.f)
         return 0.f;
 
-      Spectrum fresnel = computeFresnel(bxdf::absdot(wo, wm));
+      Spectrum fresnel = static_cast<const T *>(this)->computeFresnel(bxdf::absdot(wo, wm));
       return ggx.D(wm) * fresnel * ggx.G(wo, wi) / (4 * costheta_wi * costheta_wo);
     }
 
-    ax_device_callable_inlined float pdf(const glm::vec3 &wo_ori,
+    ax_device_callable_inlined float pdf(const glm::vec3 &wo,
                                          const glm::vec3 &wi,
                                          TRANSPORT transport_mode = TRANSPORT::RADIANCE,
                                          REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
-      glm::vec3 wo = -wo_ori;
       if (!(sample_flag & REFLTRANSFLAG::REFLECTION))
         return 0.f;
       if (!bxdf::same_hemisphere(wi, wo))
@@ -241,7 +252,7 @@ namespace nova::material {
       if (ggx.isFullSpecular())
         return 0.f;
 
-      glm::vec3 wm = wi - wo;  // Gets microfacet's normal
+      glm::vec3 wm = glm::normalize(wi + wo);  // Gets microfacet's normal
       if (glm::length2(wm) == 0.f)
         return 0.f;
       if (!bxdf::same_hemisphere(wm, glm::vec3(0.f, 0.f, 1.f)))
@@ -252,10 +263,10 @@ namespace nova::material {
        * dw_m/dw_i = sintheta_m * dtheta_m * dphi_m/sin2theta_m * 2 * dtheta_m * dphi_m
        * = 1 / 4(w_o . w_m)
        */
-      return ggx.pdf(-wo, wm) / 4 * bxdf::absdot(-wo, wm);
+      return ggx.pdf(wo, wm) / 4 * bxdf::absdot(wo, wm);
     }
 
-    ax_device_callable_inlined bool sample_f(const glm::vec3 &wo_incident,
+    ax_device_callable_inlined bool sample_f(const glm::vec3 &wo,
                                              float uc,
                                              const float u[2],
                                              BSDFSample *sample,
@@ -267,42 +278,42 @@ namespace nova::material {
         return false;
       // Models a dirac delta distribution , returns 1.f for pdf as convention.
       if (ggx.isFullSpecular()) {
-        glm::vec3 wi = glm::reflect(wo_incident, glm::vec3(0.f, 0.f, 1.f));
+        glm::vec3 wi = glm::reflect(-wo, glm::vec3(0.f, 0.f, 1.f));
         float costheta_i = bxdf::abscostheta(wi);
         if (costheta_i == 0.f)
           return false;
-        Spectrum fresnel = computeFresnel(costheta_i) / costheta_i;
+        float costheta_o = bxdf::abscostheta(wo);
+        Spectrum fresnel = static_cast<const T *>(this)->computeFresnel(costheta_o) / costheta_i;
         sample->costheta = costheta_i;
-        sample->eta = eta;
+        sample->eta = 0.f;
         sample->f = fresnel;
         sample->pdf = 1.f;
-        sample->pdf_cosine_weighted = true;
+        sample->pdf_cosine_weighted = false;
         sample->wi = wi;
         sample->flags = BXDFFLAGS::SPECULAR_REFLECTION;
         return true;
       }
 
       // Models specular roughness.
-      if (wo_incident.z == 0.f)
+      if (bxdf::costheta(wo) == 0.f)
         return false;
-      glm::vec3 wo = -wo_incident;
       glm::vec3 wm = ggx.sampleGGXVNDF(wo, u);
-      glm::vec3 wi = glm::reflect(wo_incident, wm);
+      glm::vec3 wi = glm::reflect(-wo, wm);
       if (!bxdf::same_hemisphere(wi, wo))
         return false;
 
       float costheta_i = bxdf::abscostheta(wi);
       float costheta_o = bxdf::abscostheta(wo);
-      float wm_dot_wi = bxdf::absdot(wm, wi);
-      if (costheta_i == 0.f || costheta_o == 0.f || wm_dot_wi == 0.f)
+      float wm_dot_wo = bxdf::absdot(wm, wo);
+      if (costheta_i == 0.f || costheta_o == 0.f || wm_dot_wo == 0.f)
         return false;
 
-      Spectrum fresnel = computeFresnel(wm_dot_wi);
+      Spectrum fresnel = static_cast<const T *>(this)->computeFresnel(wm_dot_wo);
       float pdf = ggx.pdf(wo, wm) / (4 * bxdf::absdot(wo, wm));
       if (ISNAN(pdf) || ISINF(pdf))
         return false;
       sample->costheta = costheta_i;
-      sample->eta = eta;
+      sample->eta = 0.f;
       Spectrum f = ggx.D(wm) * fresnel * ggx.G(wo, wi) / (4 * costheta_i * costheta_o);
       sample->f = f;
       sample->pdf = pdf;
@@ -315,6 +326,35 @@ namespace nova::material {
     ax_device_callable_inlined unsigned flags() const { return ggx.isFullSpecular() ? BXDFFLAGS::SPECULAR_REFLECTION : BXDFFLAGS::GLOSSY_REFLECTION; }
 
     ax_device_callable_inlined void invertEta() {}
+  };
+
+  class SchlickConductorBxDF : public BaseConductorBxDF<SchlickConductorBxDF> {
+    Spectrum albedo;
+    float metallic{1.f};
+
+   public:
+    ax_device_callable_inlined SchlickConductorBxDF(Spectrum albedo, float metal, float roughness = 0.f, float anisotropy = 1.f)
+        : albedo(albedo), BaseConductorBxDF(anisotropy, roughness) {}
+
+    ax_device_callable_inlined Spectrum computeFresnel(float abscostheta_i) const { return Fresnel::schlick(abscostheta_i, albedo); }
+  };
+
+  class ConductorBxDF : public BaseConductorBxDF<ConductorBxDF> {
+    Spectrum k, eta;
+
+   public:
+    ax_device_callable_inlined ConductorBxDF(Spectrum eta, Spectrum k, float roughness) : BaseConductorBxDF(roughness), eta(eta), k(k) {}
+    ax_device_callable_inlined ConductorBxDF(Spectrum eta, Spectrum k, float anisotropy, float roughness)
+        : eta(eta), k(k), BaseConductorBxDF(anisotropy, roughness) {}
+
+    ax_device_callable_inlined Spectrum computeFresnel(float abscostheta_i) const {
+      Spectrum ret(0.f);
+      for (unsigned i = 0; i < Spectrum::SPECTRUM_SAMPLES; i++) {
+        Fresnel fresnel(eta[i], k[i]);
+        ret.samples[i] = fresnel.complex(abscostheta_i);
+      }
+      return ret;
+    }
   };
 
   class DiffuseBxDF {
@@ -366,13 +406,163 @@ namespace nova::material {
     ax_device_callable_inlined void invertEta() {}
   };
 
-#define LISTBxDF DiffuseBxDF, ConductorBxDF, DielectricBxDF
+  class DisneyPrincipledBxDF {
+    bsdf_params_s params;
+
+    struct lobe_params_s {
+      Spectrum f{};
+      Spectrum eta{};
+      glm::vec3 wi;
+      float pdf{1.f};
+      BXDFFLAGS flag;
+      bool cosine_weighted{true};
+      bool sampled_success{true};
+    };
+    struct lobe_weights_s {
+      float diffuse, sheen, clearcoat, transmission, specular;
+    };
+
+    ax_device_callable_inlined lobe_params_s diffuse(const glm::vec3 &wo, const float u[2], const lobe_weights_s &weights) const {
+
+      auto fresnel = [](const glm::vec3 &w, float value) { return 1.f + (value - 1) * std::powf(1.f - bxdf::abscostheta(w), 5); };
+
+      glm::vec3 wi = glm::normalize(bxdf::hemisphere_cosine_sample(u));
+      glm::vec3 h = glm::normalize(wi + wo);
+
+      float fd90 = 0.5f + 2 * params.roughness * math::sqr(glm::dot(wi, h));
+      Spectrum fd = params.albedo * M_1_PIf * fresnel(wi, fd90) * fresnel(wo, fd90);
+
+      // TODO: Could replace this part with a specular subsurf lobe, but needs volumetrics.
+      float fss90 = params.roughness * math::sqr(bxdf::absdot(h, wi));
+
+      Spectrum fss = 1.25f * params.albedo * M_1_PIf *
+                     (0.5f + fresnel(wi, fss90) * fresnel(wo, fss90) * (-0.5f + 1 / (bxdf::abscostheta(wo) + bxdf::abscostheta(wi))));
+
+      Spectrum f_diffuse = (1 - params.subsurface_scattering) * fd + params.subsurface_scattering * fss;
+      float pdf = bxdf::abscostheta(wi) * M_1_PIf;
+      return {f_diffuse, params.eta, wi, pdf, DIFFUSE, false, true};
+    }
+
+    ax_device_callable_inlined lobe_params_s specular(const glm::vec3 &wo, const float u[2], const lobe_weights_s &weights) const {
+      NDF ggx(params.anisotropy_ratio, params.roughness);
+      glm::vec3 wi(-wo.x, -wo.y, wo.z);
+
+      auto fresnel = [](float costheta, float metal, const Spectrum &albedo) {
+        Spectrum F0 = 0.04;
+        F0 = math::lerp(F0, albedo, Spectrum(metal));
+        return F0 + (1 - F0) * std::powf(1 - costheta, 5);
+      };
+
+      glm::vec3 wm = ggx.sampleGGXVNDF(wo, u);
+      wi = glm::reflect(-wo, wm);
+      float costheta_i = bxdf::abscostheta(wi);
+      float costheta_o = bxdf::abscostheta(wo);
+      float wm_dot_wo = bxdf::absdot(wm, wo);
+
+      if (!bxdf::same_hemisphere(wo, wi) || costheta_i == 0.f || costheta_o == 0.f || wm_dot_wo == 0.f) {
+        lobe_params_s fail;
+        fail.sampled_success = false;
+        return fail;
+      }
+      Spectrum F0 = fresnel(bxdf::absdot(wo, wm), params.metal, params.albedo);
+      Spectrum f = ggx.D(wm) * F0 * ggx.G(wo, wi) / (4 * costheta_i * costheta_o);
+      float pdf = ggx.pdf(wo, wm) / (4 * bxdf::absdot(wo, wm));
+
+      return {f, params.eta, wi, pdf, GLOSSY_REFLECTION, false, true};
+    }
+
+    ax_device_callable_inlined lobe_weights_s generateWeights() const {
+      float w_diffuse = (1 - params.transmission) * (1 - params.metal);
+      float w_sheen = (1 - params.metal) * params.sheen;
+      float w_clearcoat = 0.25f * params.clearcoat;
+      float w_specular = params.specular;
+      float w_transmission = (1.f - params.metal) * params.transmission;
+
+      float W = w_diffuse + w_sheen + w_clearcoat + w_specular + w_transmission;
+
+      lobe_weights_s weights{};
+      if (W == 0) {
+        weights.specular = 1.f;
+        return weights;
+      }
+
+      weights.diffuse = w_diffuse / W;
+      weights.sheen = w_sheen / W;
+      weights.clearcoat = w_clearcoat / W;
+      weights.transmission = w_transmission / W;
+      weights.specular = w_specular / W;
+      return weights;
+    }
+
+    ax_device_callable_inlined unsigned evalLobeType(float uc, const lobe_weights_s &weights) const {
+      float weight_index = 0.f;
+      if (uc < (weight_index += weights.diffuse))
+        return DIFFUSE;
+      if (uc < (weight_index += weights.specular))
+        return SPECULAR;
+      if (uc < (weight_index += weights.clearcoat))
+        return DIFFUSE | SPECULAR | GLOSSY;
+      if (uc < (weight_index += weights.sheen))
+        return GLOSSY | REFLECTION;
+      else
+        return TRANSMISSION;
+    }
+    ax_device_callable_inlined lobe_params_s sampleLobe(const glm::vec3 &wo, float uc, const float u[2], const lobe_weights_s &weights) const {
+      unsigned flag = evalLobeType(uc, weights);
+
+      switch (flag) {
+        case DIFFUSE:
+          return diffuse(wo, u, weights);
+        case SPECULAR:
+          return specular(wo, u, weights);
+        default:
+          return diffuse(wo, u, weights);
+      }
+    }
+
+   public:
+    ax_device_callable_inlined DisneyPrincipledBxDF(const bsdf_params_s &bsdf_parameters) : params(bsdf_parameters) {}
+
+    ax_device_callable_inlined Spectrum f(const glm::vec3 &wo, const glm::vec3 &wi, TRANSPORT mode = TRANSPORT::RADIANCE) const {}
+
+    ax_device_callable_inlined float pdf(const glm::vec3 &wo,
+                                         const glm::vec3 &wi,
+                                         TRANSPORT transport_mode = TRANSPORT::RADIANCE,
+                                         REFLTRANSFLAG flag = REFLTRANSFLAG::ALL) const {}
+
+    ax_device_callable_inlined bool sample_f(const glm::vec3 &wo,
+                                             float uc,
+                                             const float u[2],
+                                             BSDFSample *sample,
+                                             TRANSPORT transport_mode = TRANSPORT::RADIANCE,
+                                             REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
+      lobe_weights_s weights = generateWeights();
+      lobe_params_s sampled_lobe = sampleLobe(wo, uc, u, weights);
+      if (!sampled_lobe.sampled_success)
+        return false;
+      sample->f = sampled_lobe.f;
+      sample->pdf = sampled_lobe.pdf;
+      sample->wi = sampled_lobe.wi;
+      sample->costheta = bxdf::abscostheta(sampled_lobe.wi);
+      sample->pdf_cosine_weighted = sampled_lobe.cosine_weighted;
+      sample->eta = sampled_lobe.eta;
+      sample->flags = sampled_lobe.flag;
+      return true;
+    }
+
+    // Special case , since sampling decision happens inside this bsdf for simplicity.
+    ax_device_callable_inlined unsigned flags() const { return ALL; }
+
+    ax_device_callable_inlined void invertEta() {}
+  };
+
+#define LISTBxDF DiffuseBxDF, DisneyPrincipledBxDF, ConductorBxDF, SchlickConductorBxDF, DielectricBxDF
 
   class BxDF : public core::tag_ptr<LISTBxDF> {
    public:
     using tag_ptr::tag_ptr;
 
-    ax_device_callable_inlined void invertEta() {
+    ax_device_callable_inlined void invertEta() {  // TODO: Remove asap.
       auto d = [&](auto bxdf) { bxdf->invertEta(); };
       dispatch(d);
     }
@@ -380,7 +570,7 @@ namespace nova::material {
     /**
      * @brief Evalutes BxDF
      *
-     * @param wo view direction, Always incoming (eye->sample).
+     * @param wo view direction. Points outside.
      * @param wi radiance direction, Always outgoing (sample->light).
      * @param transport_mode Transport Mode.
      * @return Spectrum
@@ -393,7 +583,7 @@ namespace nova::material {
     /**
      * @brief Computes the PDF of the underlying BXDF
      *
-     * @param wo view direction . Always incoming (eye->sample)
+     * @param wo view direction . Points outside.
      * @param wi radiance direction. Always outgoing (sample-> light).
      * @param transport_mode Transport Mode.
      * @param flag Reflection/Transmission flag for rendering passes.
@@ -410,7 +600,7 @@ namespace nova::material {
     /**
      * @brief Generates a valid BxDF lobe when possible.
      *
-     * @param wo view direction. Always incoming (eye->sample).
+     * @param wo view direction, points outside.
      * @param uc 1D random float.
      * @param u 2D random floats.
      * @param sample Computed BXDF lobe.
@@ -436,7 +626,7 @@ namespace nova::material {
     /**
      * @brief Computes total reflectance over the hemisphere due to one direction. (Rho_h_d(wo) / hemisphere-direction).
      *
-     * @param wo Direction vector.
+     * @param wo Direction vector, points outwards.
      * @param uc 1D Low discrepancy uniforms.
      * @param u 2D Low discrepancy uniforms.
      * @return Spectrum
@@ -479,6 +669,5 @@ namespace nova::material {
       return R / (float)uc.size() * PI;
     }
   };
-
-}  // namespace nova::material
+}  // namespace nova
 #endif

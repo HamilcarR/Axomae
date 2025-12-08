@@ -1,5 +1,6 @@
 #include "api_common.h"
 #include "manager/NovaResourceManager.h"
+#include "material/NovaMaterials.h"
 #include "private_includes.h"
 #include "texturing/NovaTextureInterface.h"
 #include "texturing/nova_texturing.h"
@@ -185,28 +186,6 @@ namespace nova {
     }
   }
 
-  // TODO: Replace with principled material system.
-  static nova::material::NovaMaterialInterface assign_random_material(nova::material::texture_pack &tpack, nova::NovaResourceManager &manager) {
-    math::random::CPUPseudoRandomGenerator rand_gen;
-    nova::material::NovaMaterialInterface mat_ptr{};
-    int r = rand_gen.nrandi(0, 2);
-    switch (r) {
-      case 0:
-        mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaConductorMaterial>(tpack, eta_Au, k_Au);
-        break;
-      case 1:
-        mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaDielectricMaterial>(tpack, 1.6f);
-        break;
-      case 2:
-        mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaDiffuseMaterial>(tpack);
-        break;
-      default:
-        mat_ptr = manager.getMaterialData().addMaterial<nova::material::NovaDiffuseMaterial>(tpack);
-        break;
-    }
-    return mat_ptr;
-  }
-
   material::NovaMaterialInterface setup_material_data(const AbstractMesh &mesh, const Material &material, NovaResourceManager &manager) {
     material::texture_pack tpack;
     tpack.albedo = build_img_texture(material.getAlbedo(), manager);
@@ -217,7 +196,8 @@ namespace nova {
     tpack.opacity = build_img_texture(material.getOpacity(), manager);
     tpack.specular = build_img_texture(material.getSpecular(), manager);
     tpack.ao = build_img_texture(material.getAmbientOcclusion(), manager);
-    return assign_random_material(tpack, manager);
+
+    return manager.getMaterialData().addMaterial<nova::material::PrincipledMaterial>(tpack);
   }
 
 }  // namespace nova

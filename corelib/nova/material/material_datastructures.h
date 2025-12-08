@@ -9,7 +9,7 @@ struct material_record_s {
   nova::Spectrum emissive;
 
   glm::vec3 normal;
-  nova::material::BSDFSample lobe;
+  nova::BSDFSample lobe;
 };
 
 namespace nova::material {
@@ -18,6 +18,7 @@ namespace nova::material {
     std::size_t dielectrics_size;
     std::size_t conductors_size;
     std::size_t diffuse_size;
+    std::size_t principled_size;
   };
 
 }  // namespace nova::material
