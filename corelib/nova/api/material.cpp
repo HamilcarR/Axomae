@@ -62,8 +62,8 @@ namespace nova {
     TexturePtr opacity;
     TexturePtr specular;
     TexturePtr ao;
-    float refract_coeff{1.0f};
-    float reflect_fuzz{0.0f};
+    float eta[3] = {0.f};
+    float k[3] = {0.f};
 
    public:
     ERROR_STATE registerAlbedo(TexturePtr texture) override {
@@ -106,13 +106,22 @@ namespace nova {
       return SUCCESS;
     }
 
-    ERROR_STATE setRefractCoeff(float eta) override {
-      refract_coeff = eta;
+    ERROR_STATE setRefractiveIndex(const float e[3]) override {
+      eta[0] = e[0];
+      eta[1] = e[1];
+      eta[2] = e[2];
       return SUCCESS;
     }
 
-    ERROR_STATE setReflectFuzz(float fuzz) override {
-      reflect_fuzz = fuzz;
+    ERROR_STATE setRefractiveIndex(const float a[3], const float b[3]) override {
+      eta[0] = a[0];
+      eta[1] = a[1];
+      eta[2] = a[2];
+
+      k[0] = b[0];
+      k[1] = b[1];
+      k[2] = b[2];
+
       return SUCCESS;
     }
 
@@ -148,9 +157,15 @@ namespace nova {
 
     const Texture *getAmbientOcclusion() const override { return ao.get(); }
 
-    float getRefractCoeff() const override { return refract_coeff; }
+    void getRefractiveIndex(float a[3], float b[3]) const override {
+      a[0] = eta[0];
+      a[1] = eta[1];
+      a[2] = eta[2];
 
-    float getReflectFuzz() const override { return reflect_fuzz; }
+      b[0] = k[0];
+      b[1] = k[1];
+      b[2] = k[2];
+    }
   };
 
   std::unique_ptr<Material> create_material() { return std::make_unique<NvMaterial>(); }
@@ -197,7 +212,9 @@ namespace nova {
     tpack.specular = build_img_texture(material.getSpecular(), manager);
     tpack.ao = build_img_texture(material.getAmbientOcclusion(), manager);
 
-    return manager.getMaterialData().addMaterial<nova::material::PrincipledMaterial>(tpack);
+    float eta[3], k[3];
+    material.getRefractiveIndex(eta, k);
+    return manager.getMaterialData().addMaterial<nova::material::PrincipledMaterial>(tpack, eta, k);
   }
 
 }  // namespace nova

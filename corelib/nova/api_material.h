@@ -64,18 +64,20 @@ namespace nova {
     virtual ERROR_STATE registerAmbientOcclusion(TexturePtr texture) = 0;
 
     /**
-     * @brief Set the refraction coefficient (index of refraction) for this material.
+     * @brief Set the refractive index for dielectric materials.
      * @param eta The refraction coefficient.
      * @return SUCCESS if successful.
      */
-    virtual ERROR_STATE setRefractCoeff(float eta) = 0;
+    virtual ERROR_STATE setRefractiveIndex(const float eta[3]) = 0;
 
     /**
-     * @brief Set the reflect fuzziness for this material.
-     * @param fuzz The reflect fuzziness value.
-     * @return SUCCESS if successful.
+     * @brief Set the Refractive index for conductor materials.
+     * Uses complex fresnel.
+     * @param eta Conductor Eta component.
+     * @param k Conductor k component.
+     * @return ERROR_STATE if successful.
      */
-    virtual ERROR_STATE setReflectFuzz(float fuzz) = 0;
+    virtual ERROR_STATE setRefractiveIndex(const float eta[3], const float k[3]) = 0;
 
     virtual Texture *getAlbedo() = 0;
     virtual const Texture *getAlbedo() const = 0;
@@ -94,8 +96,7 @@ namespace nova {
     virtual Texture *getAmbientOcclusion() = 0;
     virtual const Texture *getAmbientOcclusion() const = 0;
 
-    virtual float getRefractCoeff() const = 0;
-    virtual float getReflectFuzz() const = 0;
+    virtual void getRefractiveIndex(float eta[3], float k[3]) const = 0;
   };
 
   MaterialPtr create_material();

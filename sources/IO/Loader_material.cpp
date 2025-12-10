@@ -183,6 +183,13 @@ namespace IO {
       transparency = 1.f - opacity;
     return transparency;
   }
+
+  static float loadRefractiveValue(const aiMaterial *material) {
+    float ior = 0.f;
+    material->Get(AI_MATKEY_REFRACTI, ior);
+    return ior;
+  }
+
   /* id will be incremented by the texture caching system*/
   std::pair<unsigned, GLMaterial> load_materials(const aiScene *scene,
                                                  unsigned mMaterialIndex,
@@ -190,8 +197,13 @@ namespace IO {
                                                  std::size_t &texcache_element_count) {
     const aiMaterial *material = scene->mMaterials[mMaterialIndex];
     GLMaterial mesh_material = loadAllTextures(scene, material, texture_database, texcache_element_count);
+
     float transparency_factor = loadTransparencyValue(material);
     mesh_material.setAlphaFactor(transparency_factor);
+
+    float ior = loadRefractiveValue(material);
+    mesh_material.setRefractiveIndexValue(ior, 0.f);
+
     return {texcache_element_count, mesh_material};
   }
 

@@ -35,7 +35,7 @@ namespace nova {
     bool pdf_cosine_weighted = false;  // Indicates if the returned f function already is multiplied with costheta_i.
   };
 
-  enum class REFLTRANSFLAG { NONE = 0, TRANSMISSION = 1, REFLECTION = 1 << 1, ALL = TRANSMISSION | REFLECTION };
+  enum class REFLTRANSFLAG { NONE = 0, TRAN = 1, REFL = 1 << 1, ALL = TRAN | REFL };
   ax_device_callable_inlined unsigned operator&(const REFLTRANSFLAG &a, const REFLTRANSFLAG &b) { return (unsigned)a & (unsigned)b; }
   ax_device_callable_inlined unsigned operator|(const REFLTRANSFLAG &a, const REFLTRANSFLAG &b) { return (unsigned)a | (unsigned)b; }
 }  // namespace nova
