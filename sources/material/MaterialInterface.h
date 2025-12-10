@@ -1,6 +1,6 @@
 #ifndef MaterialInterface_H
 #define MaterialInterface_H
-#include "internal/common/math/vector/Vector.h"
+#include <internal/common/math/vector/Vector.h>
 class TextureGroup;
 class MaterialInterface {
  public:

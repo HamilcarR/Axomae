@@ -181,7 +181,7 @@ namespace nova::material {
 
   class PrincipledMaterial {
     texture_pack t_pack{};
-    Spectrum eta, k;
+    Spectrum eta{0.f}, k{0.f};
 
    public:
     ax_device_callable_inlined PrincipledMaterial(const texture_pack &texture) : t_pack(texture) {}
@@ -208,7 +208,11 @@ namespace nova::material {
       // TODO for test : change this to sample roughness texture.
       bsdf_params.roughness = texture_pack_sampler.metallic(u, v, *mat_ctx.texture_aggregate).g;
       bsdf_params.metal = texture_pack_sampler.metallic(u, v, *mat_ctx.texture_aggregate).b;
-      bsdf_params.transmission = 1.f - albedo.a;
+      if (eta && !k)
+        bsdf_params.transmission = 1.f;
+      else
+        bsdf_params.transmission = 0.f;
+
       bsdf_params.anisotropy_ratio = 1.f;
       bsdf_params.thin_surface = false;
       bsdf_params.eta = eta;

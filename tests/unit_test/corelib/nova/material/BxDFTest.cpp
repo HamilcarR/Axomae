@@ -203,7 +203,7 @@ TEST(DielectricBxDF, sample_f) {
   float uc = 0.533f;
   float u[2] = {0.33f, 1.35f};
   nm::BSDFSample sample;
-  bool is_sampled = dielectric.sample_f(wo, uc, u, &sample, nm::RADIANCE, nm::REFLTRANSFLAG::TRANSMISSION);
+  bool is_sampled = dielectric.sample_f(wo, uc, u, &sample, nm::RADIANCE, nm::REFLTRANSFLAG::TRAN);
   ASSERT_TRUE(is_sampled);
   EXPECT_NEAR(sample.costheta, 1.f, 1e-5f);  // Transmission in a medium with IOR of vacuum shouldn't have deviation from the normal.
   EXPECT_LE(sample.f, 1.f);

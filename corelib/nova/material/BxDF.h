@@ -24,7 +24,7 @@ namespace nova {
     float metal;
     float transmission{0.f};      // 0 = opaque , 1 = transparent dielectric.
     float anisotropy_ratio{1.f};  // [-1,1]
-    float subsurface_scattering{0.f};
+    float subsurface_scattering{0.8f};
     float sheen;
     float clearcoat;
     float specular{1.f};
@@ -171,9 +171,9 @@ namespace nova {
 
         float R = fresnel.real(bxdf::costheta(wo_incident), eta_computed), T = 1 - R;
         float pr = R, pt = T;
-        if (!(sample_flag & REFLTRANSFLAG::REFLECTION))
+        if (!(sample_flag & REFLTRANSFLAG::REFL))
           pr = 0;
-        if (!(sample_flag & REFLTRANSFLAG::TRANSMISSION))
+        if (!(sample_flag & REFLTRANSFLAG::TRAN))
           pt = 0;
         if (pr == 0.f && pt == 0.f)
           return false;
@@ -188,9 +188,9 @@ namespace nova {
       float wo_dot_wm = glm::dot(wo_incident, wm);
       float R = fresnel.real(wo_dot_wm, eta_computed), T = 1 - R;
       float pr = R, pt = T;
-      if (!(sample_flag & REFLTRANSFLAG::REFLECTION))
+      if (!(sample_flag & REFLTRANSFLAG::REFL))
         pr = 0;
-      if (!(sample_flag & REFLTRANSFLAG::TRANSMISSION))
+      if (!(sample_flag & REFLTRANSFLAG::TRAN))
         pt = 0;
       if (pr == 0.f && pt == 0.f)
         return false;
@@ -245,7 +245,7 @@ namespace nova {
                                          const glm::vec3 &wi,
                                          TRANSPORT transport_mode = TRANSPORT::RADIANCE,
                                          REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
-      if (!(sample_flag & REFLTRANSFLAG::REFLECTION))
+      if (!(sample_flag & REFLTRANSFLAG::REFL))
         return 0.f;
       if (!bxdf::same_hemisphere(wi, wo))
         return 0.f;
@@ -274,7 +274,7 @@ namespace nova {
                                              REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
 
       AX_ASSERT_NOTNULL(sample);
-      if (!(sample_flag & REFLTRANSFLAG::REFLECTION))
+      if (!(sample_flag & REFLTRANSFLAG::REFL))
         return false;
       // Models a dirac delta distribution , returns 1.f for pdf as convention.
       if (ggx.isFullSpecular()) {
@@ -375,7 +375,7 @@ namespace nova {
                                          REFLTRANSFLAG flag = REFLTRANSFLAG::ALL) const {
       if (!bxdf::same_hemisphere(wi, wo))
         return 0;
-      if (!(flag & REFLTRANSFLAG::REFLECTION))
+      if (!(flag & REFLTRANSFLAG::REFL))
         return 0;
       return bxdf::abscostheta(wi) * (float)INV_PI;
     }
@@ -386,7 +386,7 @@ namespace nova {
                                              BSDFSample *sample,
                                              TRANSPORT transport_mode = TRANSPORT::RADIANCE,
                                              REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
-      if (!(sample_flag & REFLTRANSFLAG::REFLECTION))
+      if (!(sample_flag & REFLTRANSFLAG::REFL))
         return false;
       AX_ASSERT_NOTNULL(sample);
       glm::vec3 wi = bxdf::hemisphere_cosine_sample(u);
@@ -471,6 +471,43 @@ namespace nova {
       return {f, params.eta, wi, pdf, GLOSSY_REFLECTION, false, true};
     }
 
+    ax_device_callable_inlined lobe_params_s transmission(const glm::vec3 &wo, float uc, const float u[2], const lobe_weights_s &weights) const {
+
+      NDF ggx(params.anisotropy_ratio, params.roughness);
+      glm::vec3 wm = ggx.sampleGGXVNDF(wo, u);
+
+      float eta = params.eta[0];
+      Fresnel fresnel(eta);
+
+      glm::vec3 wi;
+      bool no_tir = true;
+      eta = bxdf::refract(wo, wm, eta, no_tir, wi);
+      if (bxdf::same_hemisphere(wi, wo) || wi.z == 0.f || !no_tir) {
+        lobe_params_s fail;
+        fail.sampled_success = false;
+        return fail;
+      }
+      float costheta_i = bxdf::costheta(wi);
+      float costheta_o = bxdf::costheta(wo);
+      float refract_eta = 0.f;
+      Spectrum T = (1.f - fresnel.real(glm::dot(wo, wm), refract_eta)) * params.albedo;
+
+      float denom = math::sqr(glm::dot(wi, wm) + glm::dot(wo, wm) / eta);
+      float jacobian = bxdf::absdot(wi, wm) / denom;
+      float pdf = ggx.pdf(wo, wm) * jacobian;
+      AX_ASSERT(!ISNAN(pdf) && !ISINF(pdf), "Rough dielectric transmission pdf returned nan or inf.");
+      Spectrum f = T * ggx.D(wm) * ggx.G(wo, wi) * fabsf(glm::dot(wi, wm) * glm::dot(wo, wm) / (costheta_i * costheta_o * denom));
+      f /= math::sqr(eta);
+
+      if (!f.isValid()) {
+        lobe_params_s fail;
+        fail.sampled_success = false;
+        return fail;
+      }
+
+      return {f, params.eta, wi, pdf, GLOSSY_TRANSMISSION, false, true};
+    }
+
     ax_device_callable_inlined lobe_weights_s generateWeights() const {
       float w_diffuse = (1 - params.transmission) * (1 - params.metal);
       float w_sheen = (1 - params.metal) * params.sheen;
@@ -504,17 +541,20 @@ namespace nova {
         return DIFFUSE | SPECULAR | GLOSSY;
       if (uc < (weight_index += weights.sheen))
         return GLOSSY | REFLECTION;
-      else
+      if (uc < (weight_index += weights.transmission))
         return TRANSMISSION;
+      AX_UNREACHABLE;
     }
+
     ax_device_callable_inlined lobe_params_s sampleLobe(const glm::vec3 &wo, float uc, const float u[2], const lobe_weights_s &weights) const {
       unsigned flag = evalLobeType(uc, weights);
-
       switch (flag) {
         case DIFFUSE:
           return diffuse(wo, u, weights);
         case SPECULAR:
           return specular(wo, u, weights);
+        case TRANSMISSION:
+          return transmission(wo, uc, u, weights);
         default:
           return diffuse(wo, u, weights);
       }

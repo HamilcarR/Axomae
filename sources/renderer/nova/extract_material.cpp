@@ -36,8 +36,15 @@ namespace nova_baker_utils {
     material.registerSpecular(extract_texture(texture_group, GenericTexture::SPECULAR));
   }
 
+  static void set_material_properties(const MaterialInterface *client_material, nova::Material &material) {
+    Vec2f ior = client_material->getRefractiveIndex();
+    float eta[3] = {ior.x, ior.x, ior.x};
+    material.setRefractiveIndex(eta);
+  }
+
   void setup_material(const drawable_original_transform &drawable, nova::Material &material) {
     const MaterialInterface *mesh_material = drawable.mesh->getMeshPointer()->getMaterial();
     set_material_textures(mesh_material, material);
+    set_material_properties(mesh_material, material);
   }
 }  // namespace nova_baker_utils
