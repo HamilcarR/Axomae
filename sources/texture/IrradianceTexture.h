@@ -14,6 +14,10 @@ class IrradianceTexture : public CubemapTexture {
   explicit IrradianceTexture(const F32TexData *data) : IrradianceTexture() { CubemapTexture::setCubeMapTextureData(data); }
 
  public:
+  void initialize(Shader *shader) override;
+  void bind() override;
+  void unbind() override;
+
   const char *getTextureTypeCStr();
   ax_no_discard TYPE getTextureType() const override { return IRRADIANCE; }
 };
