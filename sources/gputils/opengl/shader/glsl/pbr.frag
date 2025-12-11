@@ -303,7 +303,7 @@ void main() {
   vec4 mrao = computeMetallicValue();
   float metallic = mrao.b;
   float roughness = mrao.g;
-  float ambient_occlusion = mrao.r;
+  float ambient_occlusion = 1.f ; //mrao.r; //TODO: temporary , fix AO
   vec4 E = computeEmissiveValue();
   vec4 C = computeDiffuseValue();
   vec3 irrad_sample_coords = inverse(MAT_CUBEMAP_NORMAL) * normal;
@@ -322,7 +322,7 @@ void main() {
   vec3 Fr = computeFresnelRoughness(normal, V, metallic, albedo, roughness, F0);
 
   /*
-  * This part defines variables for multiple scattering  , see : "A Multiple-Scattering Microfacet Model for Real-Time Image-based Lighting - Carmelo
+  * see : "A Multiple-Scattering Microfacet Model for Real-Time Image-based Lighting - Carmelo
   J.Fdez-Aguera"
   /**************************************************************************/
   float Ems = 1 - brdf.x - brdf.y;
