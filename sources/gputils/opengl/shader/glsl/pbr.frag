@@ -178,14 +178,7 @@ vec3 computeRadianceSpotLight(vec3 surface_normal, vec3 fragment_light_direction
 /* DFG FUNCTIONS*/
 
 /**************************** FRESNEL EQUATIONS ***************************************************/
-/* Calculates F0 */
-vec3 fresnelConstant() {
-  float n1 = 1.f;  // We consider incident rays as coming from vacuum
-  float n2 = material.refractive_index.y;
-  float cste = (n1 - n2) / (n1 + n2);
-  cste = cste * cste;
-  return vec3(cste);
-}
+
 
 vec3 fresnelSchlickRoughness(float cos_theta, float metallic, vec3 albedo, float roughness, vec3 F0) {
   return F0 + (max(vec3(1 - roughness), F0) - F0) * pow(clamp(1.f - cos_theta, 0.f, 1.f), 5.f);
