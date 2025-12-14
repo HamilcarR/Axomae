@@ -123,9 +123,9 @@ class Fresnel {
   float etar{};
 
  public:
-  Fresnel(float eta, float k) : etac(eta, k) {}
+  ax_device_callable_inlined Fresnel(float eta, float k) : etac(eta, k) {}
 
-  Fresnel(float eta) : etar(eta) {}
+  ax_device_callable_inlined Fresnel(float eta) : etar(eta) {}
 
   template<class T>
   ax_device_callable_inlined static T schlick(float abscostheta_i, T F0) {

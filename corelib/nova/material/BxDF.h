@@ -429,10 +429,10 @@ namespace nova {
       glm::vec3 wi = glm::normalize(bxdf::hemisphere_cosine_sample(u));
       glm::vec3 h = glm::normalize(wi + wo);
 
-      float fd90 = 0.5f + 2 * params.roughness * math::sqr(glm::dot(wi, h));
+      float fd90 = 0.5f + 2 * params.roughness * math::sqr(bxdf::absdot(wi, h));
       Spectrum fd = params.albedo * M_1_PIf * fresnel(wi, fd90) * fresnel(wo, fd90);
 
-      // TODO: Could replace this part with a specular subsurf lobe, but needs volumetrics.
+      // TODO: Could replace this part with a subsurf lobe, but needs volumetrics.
       float fss90 = params.roughness * math::sqr(bxdf::absdot(h, wi));
 
       Spectrum fss = 1.25f * params.albedo * M_1_PIf *
@@ -445,7 +445,6 @@ namespace nova {
 
     ax_device_callable_inlined lobe_params_s specular(const glm::vec3 &wo, const float u[2], const lobe_weights_s &weights) const {
       NDF ggx(params.anisotropy_ratio, params.roughness);
-      glm::vec3 wi(-wo.x, -wo.y, wo.z);
 
       auto fresnel = [](float costheta, float metal, const Spectrum &albedo) {
         Spectrum F0 = 0.04;
@@ -454,20 +453,19 @@ namespace nova {
       };
 
       glm::vec3 wm = ggx.sampleGGXVNDF(wo, u);
-      wi = glm::reflect(-wo, wm);
+      glm::vec3 wi = glm::reflect(-wo, wm);
       float costheta_i = bxdf::abscostheta(wi);
       float costheta_o = bxdf::abscostheta(wo);
       float wm_dot_wo = bxdf::absdot(wm, wo);
 
-      if (!bxdf::same_hemisphere(wo, wi) || costheta_i == 0.f || costheta_o == 0.f || wm_dot_wo == 0.f) {
-        lobe_params_s fail;
-        fail.sampled_success = false;
-        return fail;
-      }
-      Spectrum F0 = fresnel(bxdf::absdot(wo, wm), params.metal, params.albedo);
-      Spectrum f = ggx.D(wm) * F0 * ggx.G(wo, wi) / (4 * costheta_i * costheta_o);
-      float pdf = ggx.pdf(wo, wm) / (4 * bxdf::absdot(wo, wm));
+      if (!bxdf::same_hemisphere(wo, wi) || costheta_i < 1e-4f || costheta_o < 1e-4f)
+        return failedLobe();
 
+      Spectrum F0 = fresnel(bxdf::absdot(wo, wm), params.metal, params.albedo);
+      Spectrum f = F0 * ggx.D(wm) * ggx.G1(wi) * ggx.G1(wo) / (4 * costheta_o * costheta_i);
+      float pdf = ggx.D(wm) * ggx.G1(wo) / (4 * costheta_o);
+      if (!f.isValid() || ISNAN(pdf) || ISINF(pdf))
+        return failedLobe();
       return {f, params.eta, wi, pdf, GLOSSY_REFLECTION, false, true};
     }
 
@@ -482,11 +480,9 @@ namespace nova {
       glm::vec3 wi;
       bool no_tir = true;
       eta = bxdf::refract(wo, wm, eta, no_tir, wi);
-      if (bxdf::same_hemisphere(wi, wo) || wi.z == 0.f || !no_tir) {
-        lobe_params_s fail;
-        fail.sampled_success = false;
-        return fail;
-      }
+      if (bxdf::same_hemisphere(wi, wo) || wi.z == 0.f || !no_tir)
+        return failedLobe();
+
       float costheta_i = bxdf::costheta(wi);
       float costheta_o = bxdf::costheta(wo);
       float refract_eta = 0.f;
@@ -499,11 +495,8 @@ namespace nova {
       Spectrum f = T * ggx.D(wm) * ggx.G(wo, wi) * fabsf(glm::dot(wi, wm) * glm::dot(wo, wm) / (costheta_i * costheta_o * denom));
       f /= math::sqr(eta);
 
-      if (!f.isValid()) {
-        lobe_params_s fail;
-        fail.sampled_success = false;
-        return fail;
-      }
+      if (!f.isValid())
+        return failedLobe();
 
       return {f, params.eta, wi, pdf, GLOSSY_TRANSMISSION, false, true};
     }
@@ -544,6 +537,7 @@ namespace nova {
       if (uc < (weight_index += weights.transmission))
         return TRANSMISSION;
       AX_UNREACHABLE;
+      return -1;
     }
 
     ax_device_callable_inlined lobe_params_s sampleLobe(const glm::vec3 &wo, float uc, const float u[2], const lobe_weights_s &weights) const {
@@ -555,9 +549,15 @@ namespace nova {
           return specular(wo, u, weights);
         case TRANSMISSION:
           return transmission(wo, uc, u, weights);
-        default:
-          return diffuse(wo, u, weights);
       }
+      AX_UNREACHABLE;
+      return {};
+    }
+
+    ax_device_callable_inlined lobe_params_s failedLobe() const {
+      lobe_params_s fail;
+      fail.sampled_success = false;
+      return fail;
     }
 
    public:
