@@ -40,6 +40,7 @@ namespace nova_baker_utils {
     Vec2f ior = client_material->getRefractiveIndex();
     float eta[3] = {ior.x, ior.x, ior.x};
     material.setRefractiveIndex(eta);
+    material.setAnisotropyFactor(client_material->getAnisotropyFactor());
   }
 
   void setup_material(const drawable_original_transform &drawable, nova::Material &material) {

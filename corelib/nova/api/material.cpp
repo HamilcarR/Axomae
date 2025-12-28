@@ -64,6 +64,7 @@ namespace nova {
     TexturePtr ao;
     float eta[3] = {0.f};
     float k[3] = {0.f};
+    float anisotropy_factor{};
 
    public:
     ERROR_STATE registerAlbedo(TexturePtr texture) override {
@@ -166,6 +167,13 @@ namespace nova {
       b[1] = k[1];
       b[2] = k[2];
     }
+
+    ERROR_STATE setAnisotropyFactor(float f) override {
+      anisotropy_factor = f;
+      return SUCCESS;
+    }
+
+    float getAnisotropyFactor() const override { return anisotropy_factor; }
   };
 
   std::unique_ptr<Material> create_material() { return std::make_unique<NvMaterial>(); }
@@ -214,7 +222,7 @@ namespace nova {
 
     float eta[3], k[3];
     material.getRefractiveIndex(eta, k);
-    return manager.getMaterialData().addMaterial<nova::material::PrincipledMaterial>(tpack, eta, k);
+    return manager.getMaterialData().addMaterial<nova::material::PrincipledMaterial>(tpack, eta, k, material.getAnisotropyFactor());
   }
 
 }  // namespace nova

@@ -79,6 +79,8 @@ namespace nova {
      */
     virtual ERROR_STATE setRefractiveIndex(const float eta[3], const float k[3]) = 0;
 
+    virtual ERROR_STATE setAnisotropyFactor(float anisotropy) = 0;
+
     virtual Texture *getAlbedo() = 0;
     virtual const Texture *getAlbedo() const = 0;
     virtual Texture *getNormal() = 0;
@@ -97,6 +99,7 @@ namespace nova {
     virtual const Texture *getAmbientOcclusion() const = 0;
 
     virtual void getRefractiveIndex(float eta[3], float k[3]) const = 0;
+    virtual float getAnisotropyFactor() const = 0;
   };
 
   MaterialPtr create_material();
