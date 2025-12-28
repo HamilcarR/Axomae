@@ -46,7 +46,7 @@ namespace nova {
 
   class DielectricBxDF {
     Spectrum ior{1.f};
-    NDF ggx;
+    VNDF ggx;
 
     ax_device_callable_inlined bool roughSpecularReflection(
         glm::vec3 wo, const glm::vec3 &wm, float R, float pr, float pt, float eta, BSDFSample *sample, TRANSPORT transport, REFLTRANSFLAG flag)
@@ -213,7 +213,7 @@ namespace nova {
   template<class T>
   class BaseConductorBxDF {
    protected:
-    NDF ggx;
+    VNDF ggx;
 
    public:
     ax_device_callable_inlined BaseConductorBxDF(float roughness) : ggx(roughness) {}
