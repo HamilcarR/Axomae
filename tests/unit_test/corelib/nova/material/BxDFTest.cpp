@@ -75,7 +75,7 @@ TEST(GGXTest, SampleWm) {
 
   for (float roughness : roughness_values)
     for (int i = 0; i < 5; i++) {
-      NDF test_ggx(roughness);
+      VNDF test_ggx(roughness);
       const float *uc = uc_samples[i];
       glm::vec3 wm = test_ggx.sampleGGXVNDF(wo, uc);
 
@@ -91,7 +91,7 @@ TEST(GGXTest, SampleWm) {
  * Should return values close to 1 with a vector colinear with the facet's normal , and close to 0 for grazing angles.
  */
 TEST(GGXTest, G1_bounds) {
-  NDF test_ggx(0.75f);
+  VNDF test_ggx(0.75f);
   // Visible micrafacets from top view.
   glm::vec3 sample_vector(0.f, 0.f, 1.f);
   float visible_micrafacets_probability = test_ggx.G1(sample_vector);

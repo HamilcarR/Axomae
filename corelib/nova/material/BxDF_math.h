@@ -172,21 +172,23 @@ class Fresnel {
   }
 };
 /* Vectors in tangent space.*/
-class NDF {
-  float alpha_x, alpha_x_inv;
-  float alpha_y, alpha_y_inv;
+class VNDF {
+  float alpha_x{0.f}, alpha_x_inv{0.f};
+  float alpha_y{0.f}, alpha_y_inv{0.f};
   static constexpr float PERFECT_SPECULAR_THRESHOLD = 1e-6f;
   ax_device_callable_inlined float roughnessToAlpha(float roughness) const {
     return roughness != 0 ? roughness * roughness : PERFECT_SPECULAR_THRESHOLD;
   }
 
  public:
+  ax_device_callable_inlined VNDF() = default;
+
   /**
    * @brief Creates an isotropic NDF with alpha_x = alpha_y = 1.f.
    *
    * @param roughness
    */
-  ax_device_callable_inlined NDF(float roughness) {
+  ax_device_callable_inlined VNDF(float roughness) {
     alpha_x = roughnessToAlpha(roughness);
     alpha_y = alpha_x;
     alpha_x_inv = 1.f / alpha_x;
@@ -199,7 +201,7 @@ class NDF {
    * @param anisotropy Ratio (alpha_x/alpha_y) x anisotropy² coefficient.
    * @param roughness Roughness value.
    */
-  ax_device_callable_inlined NDF(float anisotropy, float roughness) {
+  ax_device_callable_inlined VNDF(float anisotropy, float roughness) {
     anisotropy = std::clamp(anisotropy, -1.f, 1.f);
     float aspect = math::sqrt(1.f - 0.9f * anisotropy);
 
