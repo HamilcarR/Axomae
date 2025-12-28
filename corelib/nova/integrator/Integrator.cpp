@@ -84,7 +84,7 @@ namespace nova::integrator {
       glm::vec4 e = glm::vec4(emit.toRgb(), 1.f);
       glm::vec4 c = glm::vec4(color.toRgb(), 1.f);
       glm::vec4 final = e + c * next;
-      return final;
+      return DENAN(final);
     }
     // TODO: Replace with a sampling based on visibility test towards the envmap for the case depth < 0.
     glm::vec3 sample_vector = ray.direction;

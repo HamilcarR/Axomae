@@ -16,6 +16,13 @@ namespace nova {
     ax_device_callable_inlined unsigned size() const { return static_cast<const S *>(this)->SPECTRUM_SAMPLES; }
 
    public:
+    ax_device_callable_inlined S sqrt() const {
+      S result;
+      for (unsigned i = 0; i < size(); i++)
+        result[i] = math::sqrt(samples()[i]);
+      return result;
+    }
+
     ax_device_callable_inlined friend S operator/(float r, const S &s) {
       AX_ASSERT_TRUE(s.isValid());
       S result;
@@ -264,4 +271,5 @@ namespace nova {
   };
 
 }  // namespace nova
+
 #endif
