@@ -1,5 +1,7 @@
 #include "Loader.h"
 #include "TextureDatabase.h"
+#include "assimp/material.h"
+#include "assimp/types.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
@@ -173,7 +175,7 @@ namespace IO {
     return mesh_material;
   }
 
-  static float loadTransparencyValue(const aiMaterial *material) {
+  static float load_transparency_value(const aiMaterial *material) {
     float transparency = 1.f;
     float opacity = 1.f;
     aiColor4D col;
@@ -184,12 +186,18 @@ namespace IO {
     return transparency;
   }
 
-  static float loadRefractiveValue(const aiMaterial *material) {
+  static float load_refractive_value(const aiMaterial *material) {
     float ior = 0.f;
     material->Get(AI_MATKEY_REFRACTI, ior);
     return ior;
   }
 
+  static float load_anisotropy_ratio(const aiMaterial *material) {
+    float factor{};
+    if (material->Get(AI_MATKEY_ANISOTROPY_FACTOR, factor) != AI_SUCCESS)
+      return 0.f;
+    return factor;
+  }
   /* id will be incremented by the texture caching system*/
   std::pair<unsigned, GLMaterial> load_materials(const aiScene *scene,
                                                  unsigned mMaterialIndex,
@@ -198,11 +206,14 @@ namespace IO {
     const aiMaterial *material = scene->mMaterials[mMaterialIndex];
     GLMaterial mesh_material = loadAllTextures(scene, material, texture_database, texcache_element_count);
 
-    float transparency_factor = loadTransparencyValue(material);
+    float transparency_factor = load_transparency_value(material);
     mesh_material.setAlphaFactor(transparency_factor);
 
-    float ior = loadRefractiveValue(material);
+    float ior = load_refractive_value(material);
     mesh_material.setRefractiveIndexValue(ior, 0.f);
+
+    float anisotropy_factor = load_anisotropy_ratio(material);
+    mesh_material.setAnisotropyFactor(anisotropy_factor);
 
     return {texcache_element_count, mesh_material};
   }

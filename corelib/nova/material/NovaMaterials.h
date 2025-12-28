@@ -182,10 +182,12 @@ namespace nova::material {
   class PrincipledMaterial {
     texture_pack t_pack{};
     Spectrum eta{0.f}, k{0.f};
+    float anisotropy_factor{0.f};
 
    public:
     ax_device_callable_inlined PrincipledMaterial(const texture_pack &texture) : t_pack(texture) {}
-    ax_device_callable_inlined PrincipledMaterial(const texture_pack &texture, float eta[3], float k[3]) : t_pack(texture), eta(eta), k(k) {}
+    ax_device_callable_inlined PrincipledMaterial(const texture_pack &texture, float eta[3], float k[3], float anisotropy = 0)
+        : t_pack(texture), eta(eta), k(k), anisotropy_factor(anisotropy) {}
 
     ax_device_callable_inlined bool scatter(const Ray &in,
                                             const intersection_record_s &hit_d,
@@ -213,7 +215,7 @@ namespace nova::material {
       else
         bsdf_params.transmission = 0.f;
 
-      bsdf_params.anisotropy_ratio = 1.f;
+      bsdf_params.anisotropy_ratio = anisotropy_factor;
       bsdf_params.thin_surface = false;
       bsdf_params.eta = eta;
       bsdf_params.k = k;
