@@ -15,25 +15,6 @@
 
 namespace nova {
 
-  struct bsdf_params_s {
-    glm::vec3 shading_normal;
-    glm::vec3 dpdu;
-
-    float wo_dot_ng;
-    float roughness;
-    float metal;
-    float transmission{0.f};      // 0 = opaque , 1 = transparent dielectric.
-    float anisotropy_ratio{1.f};  // [-1,1]
-    float subsurface_scattering{0.8f};
-    float sheen;
-    float clearcoat;
-    float specular{1.f};
-    bool thin_surface{false};
-
-    Spectrum eta, k;
-    Spectrum albedo;
-  };
-
   struct uniform_sample2d {
     float u[2];
   };
@@ -405,6 +386,24 @@ namespace nova {
 
     ax_device_callable_inlined void invertEta() {}
   };
+  struct bsdf_params_s {
+    glm::vec3 shading_normal;
+    glm::vec3 dpdu;
+
+    float wo_dot_ng;
+    float roughness;
+    float metal;
+    float transmission{0.f};      // 0 = opaque , 1 = transparent dielectric.
+    float anisotropy_ratio{0.f};  // [-1,1]
+    float subsurface_scattering{0.f};
+    float sheen{0.f};
+    float clearcoat{0.f};
+    float specular{1.f};
+    bool thin_surface{false};
+
+    Spectrum eta, k;
+    Spectrum albedo;
+  };
 
   class DisneyPrincipledBxDF {
     bsdf_params_s params;
@@ -413,27 +412,26 @@ namespace nova {
       Spectrum f{};
       Spectrum eta{};
       glm::vec3 wi;
-      float pdf{1.f};
+      float pdf{0.f};
       BXDFFLAGS flag;
       bool cosine_weighted{true};
-      bool sampled_success{true};
+      bool evaluation_success{true};
     };
-    struct lobe_weights_s {
-      float diffuse, sheen, clearcoat, transmission, specular;
-    };
-
-    ax_device_callable_inlined lobe_params_s diffuse(const glm::vec3 &wo, const float u[2], const lobe_weights_s &weights) const {
+    // This breaks energy conservation a bit, replace later with true Oren Nayar ?
+    ax_device_callable_inlined lobe_params_s diffuse(const glm::vec3 &wo, const glm::vec3 &wi) const {
 
       auto fresnel = [](const glm::vec3 &w, float value) { return 1.f + (value - 1) * std::powf(1.f - bxdf::abscostheta(w), 5); };
 
-      glm::vec3 wi = glm::normalize(bxdf::hemisphere_cosine_sample(u));
-      glm::vec3 h = glm::normalize(wi + wo);
+      if (!bxdf::same_hemisphere(wi, wo))
+        return failedLobe();
 
-      float fd90 = 0.5f + 2 * params.roughness * math::sqr(bxdf::absdot(wi, h));
+      glm::vec3 h = glm::normalize(wi + wo);
+      float roughness = math::sqr(params.roughness);
+      float fd90 = 0.5f + 2 * roughness * math::sqr(bxdf::absdot(wi, h));
       Spectrum fd = params.albedo * M_1_PIf * fresnel(wi, fd90) * fresnel(wo, fd90);
 
       // TODO: Could replace this part with a subsurf lobe, but needs volumetrics.
-      float fss90 = params.roughness * math::sqr(bxdf::absdot(h, wi));
+      float fss90 = roughness * math::sqr(bxdf::absdot(h, wi));
 
       Spectrum fss = 1.25f * params.albedo * M_1_PIf *
                      (0.5f + fresnel(wi, fss90) * fresnel(wo, fss90) * (-0.5f + 1 / (bxdf::abscostheta(wo) + bxdf::abscostheta(wi))));
@@ -443,120 +441,128 @@ namespace nova {
       return {f_diffuse, params.eta, wi, pdf, DIFFUSE, false, true};
     }
 
-    ax_device_callable_inlined lobe_params_s specular(const glm::vec3 &wo, const float u[2], const lobe_weights_s &weights) const {
-      NDF ggx(params.anisotropy_ratio, params.roughness);
-
+    ax_device_callable_inlined lobe_params_s specular(const glm::vec3 &wo, const glm::vec3 &wi, const VNDF &ggx) const {
       auto fresnel = [](float costheta, float metal, const Spectrum &albedo) {
-        Spectrum F0 = 0.04;
+        Spectrum F0 = 0.04f;
         F0 = math::lerp(F0, albedo, Spectrum(metal));
         return F0 + (1 - F0) * std::powf(1 - costheta, 5);
       };
 
-      glm::vec3 wm = ggx.sampleGGXVNDF(wo, u);
-      glm::vec3 wi = glm::reflect(-wo, wm);
       float costheta_i = bxdf::abscostheta(wi);
       float costheta_o = bxdf::abscostheta(wo);
-      float wm_dot_wo = bxdf::absdot(wm, wo);
 
-      if (!bxdf::same_hemisphere(wo, wi) || costheta_i < 1e-4f || costheta_o < 1e-4f)
+      if (!bxdf::same_hemisphere(wo, wi) || costheta_i == 0 || costheta_o == 0)
         return failedLobe();
 
+      glm::vec3 wm = glm::normalize(wi + wo);
+      float wm_dot_wo = bxdf::absdot(wm, wo);
       Spectrum F0 = fresnel(bxdf::absdot(wo, wm), params.metal, params.albedo);
-      Spectrum f = F0 * ggx.D(wm) * ggx.G1(wi) * ggx.G1(wo) / (4 * costheta_o * costheta_i);
-      float pdf = ggx.D(wm) * ggx.G1(wo) / (4 * costheta_o);
+      Spectrum f = F0 * ggx.D(wm) * ggx.G(wo, wi) / (4 * costheta_o * costheta_i);
+      float pdf = ggx.pdf(wo, wm) / (4 * wm_dot_wo);
       if (!f.isValid() || ISNAN(pdf) || ISINF(pdf))
         return failedLobe();
       return {f, params.eta, wi, pdf, GLOSSY_REFLECTION, false, true};
     }
 
-    ax_device_callable_inlined lobe_params_s transmission(const glm::vec3 &wo, float uc, const float u[2], const lobe_weights_s &weights) const {
-
-      NDF ggx(params.anisotropy_ratio, params.roughness);
-      glm::vec3 wm = ggx.sampleGGXVNDF(wo, u);
+    ax_device_callable_inlined lobe_params_s transmission(const glm::vec3 &wo, const glm::vec3 &wi, const VNDF &ggx) const {
 
       float eta = params.eta[0];
       Fresnel fresnel(eta);
-
-      glm::vec3 wi;
-      bool no_tir = true;
-      eta = bxdf::refract(wo, wm, eta, no_tir, wi);
-      if (bxdf::same_hemisphere(wi, wo) || wi.z == 0.f || !no_tir)
-        return failedLobe();
+      float new_eta{};
 
       float costheta_i = bxdf::costheta(wi);
       float costheta_o = bxdf::costheta(wo);
-      float refract_eta = 0.f;
-      Spectrum T = (1.f - fresnel.real(glm::dot(wo, wm), refract_eta)) * params.albedo;
-
-      float denom = math::sqr(glm::dot(wi, wm) + glm::dot(wo, wm) / eta);
-      float jacobian = bxdf::absdot(wi, wm) / denom;
-      float pdf = ggx.pdf(wo, wm) * jacobian;
-      AX_ASSERT(!ISNAN(pdf) && !ISINF(pdf), "Rough dielectric transmission pdf returned nan or inf.");
-      Spectrum f = T * ggx.D(wm) * ggx.G(wo, wi) * fabsf(glm::dot(wi, wm) * glm::dot(wo, wm) / (costheta_i * costheta_o * denom));
-      f /= math::sqr(eta);
-
-      if (!f.isValid())
-        return failedLobe();
-
-      return {f, params.eta, wi, pdf, GLOSSY_TRANSMISSION, false, true};
+      float wo_dot_wi = glm::dot(wo, wi);
+      if (wo_dot_wi > 0) {
+        glm::vec3 wm = glm::normalize(wo + wi);
+        float wm_dot_wo = bxdf::absdot(wm, wo);
+        Spectrum F = fresnel.real(wm_dot_wo, new_eta);
+        Spectrum f = params.albedo * F * ggx.D(wm) * ggx.G(wi, wo) / (4 * costheta_i * costheta_o);
+        float pdf = ggx.pdf(wo, wm) / (4 * wm_dot_wo);
+        return {f, params.eta, wi, pdf, GLOSSY_TRANSMISSION, false, true};
+      } else {
+        glm::vec3 wm = glm::normalize(wo + eta * wi);
+        if (glm::dot(wo, wm) < 0)
+          wm = -wm;
+        Spectrum T = 1.f - fresnel.real(bxdf::absdot(wo, wm), new_eta);
+        float denom = std::max(math::sqr(glm::dot(wm, wi) + eta * glm::dot(wm, wo)), 1e-5f);
+        Spectrum f = params.albedo * T * ggx.D(wm) * ggx.G(wo, wi) * bxdf::absdot(wi, wm) * bxdf::absdot(wo, wm) / (costheta_i * costheta_o * denom);
+        float pdf = ggx.pdf(wo, wm) * bxdf::absdot(wi, wm) / denom;
+        return {f / math::sqr(eta), params.eta, wi, pdf, GLOSSY_TRANSMISSION, false, true};
+      }
     }
 
-    ax_device_callable_inlined lobe_weights_s generateWeights() const {
-      float w_diffuse = (1 - params.transmission) * (1 - params.metal);
-      float w_sheen = (1 - params.metal) * params.sheen;
-      float w_clearcoat = 0.25f * params.clearcoat;
-      float w_specular = params.specular;
-      float w_transmission = (1.f - params.metal) * params.transmission;
+    struct lobe_weights_s {
+      float W, w_diffuse, w_sheen, w_clearcoat, w_specular, w_transmission, p_diffuse, p_sheen, p_clearcoat, p_transmission, p_specular;
+    };
 
-      float W = w_diffuse + w_sheen + w_clearcoat + w_specular + w_transmission;
+    ax_device_callable_inlined lobe_weights_s generateWeightsFromParam(float abscostheta_o) const {
 
       lobe_weights_s weights{};
-      if (W == 0) {
-        weights.specular = 1.f;
-        return weights;
+
+      weights.w_diffuse = (1 - params.transmission) * (1 - params.metal);
+      weights.w_sheen = (1 - params.metal) * params.sheen * (1.f - params.transmission);
+      weights.w_clearcoat = 0.25f * params.clearcoat;
+      weights.w_specular = params.specular;
+      weights.w_transmission = (1.f - params.metal) * params.transmission;
+
+      weights.W = weights.w_diffuse + weights.w_specular + weights.w_sheen + weights.w_clearcoat + weights.w_transmission;
+
+      if (weights.W == 0) {
+        weights.p_specular = 1.f;
+        weights.W = 1.f;
       }
 
-      weights.diffuse = w_diffuse / W;
-      weights.sheen = w_sheen / W;
-      weights.clearcoat = w_clearcoat / W;
-      weights.transmission = w_transmission / W;
-      weights.specular = w_specular / W;
+      weights.p_diffuse = weights.w_diffuse / weights.W;
+      weights.p_specular = weights.w_specular / weights.W;
+      weights.p_sheen = weights.w_sheen / weights.W;
+      weights.p_clearcoat = weights.w_clearcoat / weights.W;
+      weights.p_transmission = weights.w_transmission / weights.W;
+
       return weights;
     }
 
-    ax_device_callable_inlined unsigned evalLobeType(float uc, const lobe_weights_s &weights) const {
-      float weight_index = 0.f;
-      if (uc < (weight_index += weights.diffuse))
-        return DIFFUSE;
-      if (uc < (weight_index += weights.specular))
-        return SPECULAR;
-      if (uc < (weight_index += weights.clearcoat))
-        return DIFFUSE | SPECULAR | GLOSSY;
-      if (uc < (weight_index += weights.sheen))
-        return GLOSSY | REFLECTION;
-      if (uc < (weight_index += weights.transmission))
-        return TRANSMISSION;
-      AX_UNREACHABLE;
-      return -1;
-    }
-
     ax_device_callable_inlined lobe_params_s sampleLobe(const glm::vec3 &wo, float uc, const float u[2], const lobe_weights_s &weights) const {
-      unsigned flag = evalLobeType(uc, weights);
-      switch (flag) {
-        case DIFFUSE:
-          return diffuse(wo, u, weights);
-        case SPECULAR:
-          return specular(wo, u, weights);
-        case TRANSMISSION:
-          return transmission(wo, uc, u, weights);
+      glm::vec3 wi{}, wm{};
+      VNDF ggx(params.anisotropy_ratio, params.roughness);
+      float weight_index = 0.f;
+      if (uc < (weight_index += weights.p_diffuse)) {
+        wi = glm::normalize(bxdf::hemisphere_cosine_sample(u));
+        lobe_params_s fd = diffuse(wo, wi);
+        if (fd.evaluation_success) {
+          fd.f = weights.w_diffuse * fd.f;
+          fd.pdf = weights.p_diffuse * fd.pdf;
+          return fd;
+        }
+      } else if (uc < (weight_index += weights.p_specular)) {
+        wm = ggx.sampleGGXVNDF(wo, u);
+        wi = glm::reflect(-wo, wm);
+        lobe_params_s fs = specular(wo, wi, ggx);
+        if (fs.evaluation_success) {
+          fs.f = weights.w_specular * fs.f;
+          fs.pdf = weights.p_specular * fs.pdf;
+          return fs;
+        }
+      } else if (uc < (weight_index += weights.p_transmission)) {
+        wm = ggx.sampleGGXVNDF(wo, u);
+        bool no_tir = true;
+        bxdf::refract(wo, wm, params.eta[0], no_tir, wi);
+        if (!no_tir)
+          failedLobe();
+        lobe_params_s ft = transmission(wo, wi, ggx);
+        if (ft.evaluation_success) {
+          ft.f = weights.w_transmission * ft.f;
+          ft.pdf = weights.p_transmission * ft.pdf;
+          return ft;
+        }
       }
-      AX_UNREACHABLE;
-      return {};
+      return failedLobe();
     }
 
-    ax_device_callable_inlined lobe_params_s failedLobe() const {
+    ax_device_callable_inlined lobe_params_s failedLobe(float default_pdf = 0) const {
       lobe_params_s fail;
-      fail.sampled_success = false;
+      fail.pdf = default_pdf;
+      fail.evaluation_success = false;
       return fail;
     }
 
@@ -576,17 +582,17 @@ namespace nova {
                                              BSDFSample *sample,
                                              TRANSPORT transport_mode = TRANSPORT::RADIANCE,
                                              REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
-      lobe_weights_s weights = generateWeights();
-      lobe_params_s sampled_lobe = sampleLobe(wo, uc, u, weights);
-      if (!sampled_lobe.sampled_success)
+      lobe_weights_s weights = generateWeightsFromParam(bxdf::abscostheta(wo));
+      lobe_params_s eval_lobe = sampleLobe(wo, uc, u, weights);
+      if (!eval_lobe.evaluation_success)
         return false;
-      sample->f = sampled_lobe.f;
-      sample->pdf = sampled_lobe.pdf;
-      sample->wi = sampled_lobe.wi;
-      sample->costheta = bxdf::abscostheta(sampled_lobe.wi);
-      sample->pdf_cosine_weighted = sampled_lobe.cosine_weighted;
-      sample->eta = sampled_lobe.eta;
-      sample->flags = sampled_lobe.flag;
+      sample->f = eval_lobe.f;
+      sample->pdf = eval_lobe.pdf;
+      sample->wi = eval_lobe.wi;
+      sample->costheta = bxdf::abscostheta(eval_lobe.wi);
+      sample->pdf_cosine_weighted = eval_lobe.cosine_weighted;
+      sample->eta = eval_lobe.eta;
+      sample->flags = eval_lobe.flag;
       return true;
     }
 

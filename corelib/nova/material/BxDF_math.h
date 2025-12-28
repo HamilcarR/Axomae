@@ -19,6 +19,10 @@ namespace bxdf {
 
   ax_device_callable_inlined bool same_hemisphere(const glm::vec3 &w1, const glm::vec3 &w2) { return w1.z * w2.z > 0; }
 
+  ax_device_callable_inlined bool same_hemisphere(const glm::vec3 &wi, const glm::vec3 &wo, const glm::vec3 &wm) {
+    return glm::dot(wi, wm) * glm::dot(wo, wm) > 0;
+  }
+
   ax_device_callable_inlined float costheta(const glm::vec3 &v) { return v.z; }
 
   ax_device_callable_inlined float abscostheta(const glm::vec3 &v) { return fabsf(costheta(v)); }
@@ -33,6 +37,8 @@ namespace bxdf {
 
   ax_device_callable_inlined float sintheta(const glm::vec3 &v) { return math::sqrt(sin2theta(v)); }
 
+  ax_device_callable_inlined float sintheta(float costheta) { return math::sqrt(sin2theta(costheta)); }
+
   ax_device_callable_inlined float sinphi(const glm::vec3 &v) {
     if (sintheta(v) == 0.f)
       return 0.f;
@@ -42,6 +48,8 @@ namespace bxdf {
   ax_device_callable_inlined float sin2phi(const glm::vec3 &v) { return math::sqr(sinphi(v)); }
 
   ax_device_callable_inlined float tantheta(const glm::vec3 &v) { return sintheta(v) / costheta(v); }
+
+  ax_device_callable_inlined float tantheta(float costheta) { return sintheta(costheta) / costheta; }
 
   ax_device_callable_inlined float tan2theta(const glm::vec3 &v) { return sin2theta(v) / cos2theta(v); }
 
@@ -137,7 +145,7 @@ class Fresnel {
    * new_etha is the computed eta value depending on costheta_i.
    * Assumes costheta_i = dot(wo , n)
    */
-  ax_device_callable_inlined float real(float costheta_i, float &new_eta) {
+  ax_device_callable_inlined float real(float costheta_i, float &new_eta) const {
     float eta = etar;
     costheta_i = glm::clamp(costheta_i, -1.f, 1.f);
     if (costheta_i < 0) {
@@ -156,7 +164,7 @@ class Fresnel {
   }
 
   // Conductors and absorbant materials.
-  ax_device_callable_inlined float complex(float costheta_i) {
+  ax_device_callable_inlined float complex(float costheta_i) const {
     fcomplex eta = etac;
     costheta_i = glm::clamp(costheta_i, 0.f, 1.f);
     float sin2theta_i = 1 - math::sqr(costheta_i);
@@ -185,7 +193,6 @@ class VNDF {
 
   /**
    * @brief Creates an isotropic NDF with alpha_x = alpha_y = 1.f.
-   *
    * @param roughness
    */
   ax_device_callable_inlined VNDF(float roughness) {
@@ -205,7 +212,6 @@ class VNDF {
     anisotropy = std::clamp(anisotropy, -1.f, 1.f);
     float aspect = math::sqrt(1.f - 0.9f * anisotropy);
 
-    AX_ASSERT_NEQ(aspect, 0.f);
     alpha_x = roughnessToAlpha(roughness) / aspect;
     alpha_y = roughnessToAlpha(roughness) * aspect;
 
@@ -248,18 +254,22 @@ class VNDF {
     return 1.f / (1.f + lambda(v));
   }
 
-  /* Bi-Directional Masking-Shadowing function : Gives the amount of microfacets simultaneously visible from wo and wi.*/
+  /* Bi-Directional Masking-Shadowing function : Gives the amount of microfacets simultaneously visible from wo and wi, based on
+   * a statistical approximation of its elevation relative to its macrosurface.
+   */
   ax_device_callable_inlined float G(const glm::vec3 &wo, const glm::vec3 wi) const { return 1.f / (1.f + lambda(wo) + lambda(wi)); }
 
+  ax_device_callable_inlined float Gs(const glm::vec3 &wo, const glm::vec3 &wi) const { return G1(wo) * G1(wi); }
+
   ax_device_callable_inlined float D(const glm::vec3 &wo, const glm::vec3 &wm) const {
-    return (G1(wo) / bxdf::abscostheta(wo)) * D(wm) * bxdf::absdot(wo, wm);
+    return D(wm) * bxdf::absdot(wo, wm) * G1(wo) / bxdf::abscostheta(wo);
   }
   ax_device_callable_inlined float pdf(const glm::vec3 &wo, const glm::vec3 &wm) const { return D(wo, wm); }
 
   /* Returns a visible microfacet normal.*/
   ax_device_callable_inlined glm::vec3 sampleGGXVNDF(const glm::vec3 &wo, const float uc[2]) const {
 
-    // Scales w to the alpha ellipsoid.
+    // Scales w to the truncated alpha ellipsoid.
     glm::vec3 wo_h = glm::normalize(glm::vec3(wo.x * alpha_x, wo.y * alpha_y, wo.z));
     if (wo_h.z < 0)
       wo_h = -wo_h;
@@ -272,7 +282,10 @@ class VNDF {
       t = glm::vec3(1, 0, 0);
     b = glm::cross(wo_h, t);
 
-    // Sample two uniformly distributesd points on a disk.
+    /* Sample two uniformly distributesd points on the projected disk,
+     * (Raytracing a microsurface is equivalent to sampling its projected hemisphere's disk.
+     * See "Sampling the GGX Distribution of Visible Normals , Eric Heitz" )
+     */
     glm::vec2 polar_samples = bxdf::sample_uniform_disk_polar(uc);
     // Parameterization of projected area
     float s = 0.5f * (1.f + wo_h.z);
@@ -282,7 +295,7 @@ class VNDF {
     return glm::normalize(glm::vec3(alpha_x * nh.x, alpha_y * nh.y, std::max(1e-6f, nh.z)));
   }
 
-  /* Checks if roughness allows for a specular lobe or a perfect specular effect.*/
+  /* Checks if roughness allows for a specular lobe or a perfect specular Delta Dirac.*/
   ax_device_callable_inlined bool isFullSpecular() const { return std::max(alpha_x, alpha_y) < 1e-5f; }
 };
 
