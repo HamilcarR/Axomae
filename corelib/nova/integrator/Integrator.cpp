@@ -69,8 +69,13 @@ namespace nova::integrator {
       material::shading_data_s shading{};
       shading.texture_aggregate = &texture_sampling_data;
       material_record_s mat_record{};
-      if (!hit.last_primit || !hit.last_primit->scatter(ray, out, hit.hit_d, mat_record, sampler, allocator, shading)) {
-        return glm::vec4(0.f);
+      AX_ASSERT_NOTNULL(hit.last_primit);
+      if (!hit.last_primit->scatter(ray, out, hit.hit_d, mat_record, sampler, allocator, shading)) {
+#ifndef NDEBUG
+        return {mat_record.lobe.f.toRgb(), 1.f};
+#else
+        return {};
+#endif
       }
       out = Ray::spawn(mat_record.lobe.wi, hit.hit_d.geometric_normal, hit.hit_d.position);
       glm::vec4 next = Li(out, nova_internals, depth - 1, sampler, allocator);
