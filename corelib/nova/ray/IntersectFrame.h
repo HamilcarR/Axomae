@@ -12,7 +12,7 @@ class IntersectFrame {
 
   ax_device_callable_inlined glm::mat3 construct_tbn(const glm::vec3 &normal, const glm::vec3 &tangent) {
     glm::vec3 norm_n, norm_t, norm_b;
-    math::bran_shmidt(normal, tangent, norm_n, norm_t, norm_b);
+    math::gram_shmidt(normal, tangent, norm_n, norm_t, norm_b);
     tbn = glm::mat3(norm_t, norm_b, norm_n);
     return tbn;
   }
@@ -23,11 +23,11 @@ class IntersectFrame {
   ax_device_callable_inlined IntersectFrame(const float tangent[3], const float bitangent[3], const float normal[3], bool normalize = false) {
     glm::vec3 n(normal[0], normal[1], normal[2]);
     glm::vec3 t(tangent[0], tangent[1], tangent[2]);
-
-    glm::vec3 norm_n, norm_t, norm_b;
+    glm::vec3 b(bitangent[0], bitangent[1], bitangent[2]);
     if (normalize)
-      math::bran_shmidt(n, t, norm_n, norm_t, norm_b);
-    tbn = glm::mat3(norm_t, norm_b, norm_n);
+      tbn = math::gram_shmidt(n, t, b);
+    else
+      tbn = glm::mat3(t, b, n);
   }
 
   ax_device_callable_inlined IntersectFrame(const glm::vec3 &tangent,

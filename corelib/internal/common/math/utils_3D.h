@@ -49,10 +49,25 @@ namespace math {
   }
 
   /* Recomputes orthonormal base to ensure perfect orthonormality (Gram-Shmidt).*/
-  ax_device_callable_inlined void bran_shmidt(const glm::vec3 &n, const glm::vec3 &t, glm::vec3 &n_res, glm::vec3 &t_res, glm::vec3 &b_res) {
+  ax_device_callable_inlined void gram_shmidt(const glm::vec3 &n, const glm::vec3 &t, glm::vec3 &n_res, glm::vec3 &t_res, glm::vec3 &b_res) {
     n_res = glm::normalize(n);
-    t_res = glm::normalize(t - glm::dot(t, n) * n);
-    b_res = glm::normalize(glm::cross(n, t));
+    glm::vec3 t_ortho = glm::normalize(t - glm::dot(t, n_res) * n_res);
+    if (glm::length2(t_ortho) < 1e-10f) {
+      t_ortho = glm::abs(n_res.x) > 0.9f ? glm::vec3(0, 1, 0) : glm::vec3(1, 0, 0);
+      t_ortho -= glm::dot(t_ortho, n_res) * n_res;
+    }
+    t_res = glm::normalize(t_ortho);
+    b_res = glm::cross(n_res, t_res);
+  }
+
+  ax_device_callable_inlined glm::mat3 gram_shmidt(const glm::vec3 &normal, const glm::vec3 &tangent, const glm::vec3 &bitangent) {
+    glm::vec3 N = glm::normalize(normal);
+    glm::vec3 T = glm::normalize(tangent - glm::dot(tangent, N) * N);
+    glm::vec3 B = glm::cross(N, T);
+    if (glm::dot(B, bitangent) < 0.0f)
+      B = -B;
+
+    return glm::mat3(T, B, N);
   }
 
 }  // namespace math
