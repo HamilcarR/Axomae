@@ -18,8 +18,21 @@ namespace nova {
     T data;
   };
 
+  struct derivatives_s {
+    glm::vec3 dpdu;
+    glm::vec3 dpdv;
+    glm::vec3 dndu;
+    glm::vec3 dndv;
+    glm::vec3 dndx;
+    glm::vec3 dndy;
+
+    glm::vec3 e1;
+    glm::vec3 e2;
+  };
+
   struct intersection_record_s {
-    glm::vec3 geometric_normal{}, binormal{}, position{};
+    derivatives_s deriv;
+    glm::vec3 geometric_normal{}, binormal{}, tangent{}, position{};
     float u{}, v{}, t{1e30f}, wo_dot_n;
   };
 

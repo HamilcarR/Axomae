@@ -288,6 +288,44 @@ namespace nova::aggregate {
       validate1(hit_d.v);
     }
 
+    derivatives_s computeDerivativesTriangle(
+        const shape::face_data_s &face, const transform4x4_t &transform, const glm::vec3 &intersect_pos, float u, float v) const {
+
+      derivatives_s dpd{};
+
+      geometry::face_data_tri triface = face.data.triangle_face;
+      float duv02x = triface.uv0[0] - triface.uv2[0], duv02y = triface.uv0[1] - triface.uv2[1];
+      float duv12x = triface.uv1[0] - triface.uv2[0], duv12y = triface.uv1[1] - triface.uv2[1];
+
+      glm::vec2 duv02{duv02x, duv02y};
+      glm::vec2 duv12{duv12x, duv12y};
+
+      float dp02x = triface.v0[0] - triface.v2[0], dp02y = triface.v0[1] - triface.v2[1], dp02z = triface.v0[2] - triface.v2[2];
+      float dp12x = triface.v1[0] - triface.v2[0], dp12y = triface.v1[1] - triface.v2[1], dp12z = triface.v1[2] - triface.v2[2];
+
+      glm::vec3 dp02{dp02x, dp02y, dp02z};
+      glm::vec3 dp12{dp12x, dp12y, dp12z};
+
+      float determinant = duv02x * duv12y - duv02y * duv12x;
+
+      bool isDegenUV = fabsf(determinant) < 1e-9f;
+      AX_ASSERT_FALSE(isDegenUV);
+      if (isDegenUV) {
+        // TODO :Implement degenerate UV case.
+        AX_UNREACHABLE;
+      }
+
+      float invdet = 1.f / determinant;
+      glm::mat3 l_transform = glm::mat3(transform.m);
+      dpd.dpdu = l_transform * (duv12y * dp02 - duv02y * dp12) * invdet;
+      dpd.dpdv = l_transform * (duv02x * dp12 - duv12x * dp02) * invdet;
+
+      dpd.e1 = dp02;
+      dpd.e2 = dp12;
+
+      return dpd;
+    }
+
     void fillHitStructure(const Ray &ray, const RTCRayHit &result, bvh_hit_data &hit_return_data) const {
       hit_return_data.is_hit = true;
       /* hit distance t is registered in tfar for embree.*/
@@ -303,16 +341,18 @@ namespace nova::aggregate {
       interpolate(result, normals, tangents, bitangents, uv);
       hit_return_data.hit_d.u = uv[0];
       hit_return_data.hit_d.v = uv[1];
-
       auto transform = scene_geometry_data.mesh_geometry.reconstructTransform4x4(user_g->mesh_index);
 
       glm::vec3 transformed_normal = transform.n * glm::vec3(normals[0], normals[1], normals[2]);
       glm::vec3 transformed_tangent = transform.n * glm::vec3(tangents[0], tangents[1], tangents[2]);
       glm::vec3 transformed_bitangent = transform.n * glm::vec3(bitangents[0], bitangents[1], bitangents[2]);
-
+      shape::face_data_s face = hit_return_data.last_primit->getFace(scene_geometry_data.mesh_geometry);
+      derivatives_s dpd = computeDerivativesTriangle(face, transform, hit_return_data.hit_d.position, uv[0], uv[1]);
+      hit_return_data.hit_d.deriv = dpd;
       hit_return_data.hit_d.geometric_normal = transformed_normal;
       hit_return_data.hit_d.binormal = transformed_tangent;
-      hit_return_data.hit_d.wo_dot_n = glm::dot(-ray.direction, transformed_normal);
+      hit_return_data.hit_d.tangent = transformed_bitangent;
+      hit_return_data.hit_d.wo_dot_n = glm::dot(-glm::normalize(ray.direction), glm::normalize(transformed_normal));
     }
   };
 
