@@ -309,11 +309,6 @@ namespace nova::aggregate {
       float determinant = duv02x * duv12y - duv02y * duv12x;
 
       bool isDegenUV = fabsf(determinant) < 1e-9f;
-      AX_ASSERT_FALSE(isDegenUV);
-      if (isDegenUV) {
-        // TODO :Implement degenerate UV case.
-        AX_UNREACHABLE;
-      }
 
       float invdet = 1.f / determinant;
       glm::mat3 l_transform = glm::mat3(transform.m);
@@ -322,6 +317,16 @@ namespace nova::aggregate {
 
       dpd.e1 = dp02;
       dpd.e2 = dp12;
+
+      if (isDegenUV || glm::length(glm::cross(dpd.dpdu, dpd.dpdv)) == 0) {
+        glm::vec3 p20 = {-dp02x, -dp02y, 0};
+        glm::vec3 p21 = {-dp12x, -dp12y, 0};
+
+        glm::vec3 n = glm::normalize(glm::cross(p20, p21));
+        AX_ASSERT_NEQ(glm::length(n), 0);
+
+        math::make_onb(n, dpd.dpdu, dpd.dpdv);
+      }
 
       return dpd;
     }

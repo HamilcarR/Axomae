@@ -70,6 +70,14 @@ namespace math {
     return glm::mat3(T, B, N);
   }
 
+  /* Creates one valid orthonormal coordinate system. (see Building An Orthonormal Basis, Revisited.)*/
+  ax_device_callable_inlined void make_onb(const glm::vec3 &n, glm::vec3 &b1, glm::vec3 &b2) {
+    float sign = copysignf(1.f, n.z);
+    float a = -1.f / (sign + n.z);
+    float b = n.x * n.y * a;
+    b1 = {1.f + sign * n.x * n.x * a, sign * b, -sign * n.x};
+    b2 = {b, sign + n.y * n.y * a, -n.y};
+  }
 }  // namespace math
 
 struct transform4x4_t {
