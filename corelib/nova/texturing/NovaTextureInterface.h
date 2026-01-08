@@ -53,15 +53,7 @@ namespace nova::texturing {
   class ImageTexture<uint32_t> {
     std::size_t texture_index{0};
 
-   public:
-    ax_device_callable_inlined ImageTexture() = default;
-
-    ax_device_callable_inlined ImageTexture(std::size_t index) : texture_index(index) {}
-
-    ax_device_callable_inlined glm::vec4 sample(float u, float v, const texture_data_aggregate_s &sample_data) const {
-      u = normalize_uv(u);
-      v = normalize_uv(v);
-
+    ax_device_callable_inlined glm::vec4 getPixelFromFormat(uint32_t pixel_value, bool is_rgba, unsigned channels) const {
       union FORMAT {
         uint32_t rgba;
         struct {
@@ -72,13 +64,12 @@ namespace nova::texturing {
         };
       };
       FORMAT pixel{};
-      pixel.rgba = sample_data.texture_ctx->u32pixel(texture_index, u, v);
+      pixel.rgba = pixel_value;
 
       uint8_t r;
       uint8_t g;
       uint8_t b;
       uint8_t a;
-      bool is_rgba = sample_data.texture_ctx->u32IsRGBA(texture_index);
 
       if (is_rgba) {
         r = pixel.r;
@@ -91,7 +82,7 @@ namespace nova::texturing {
         b = pixel.r;
         a = pixel.a;
       }
-      int channels = sample_data.texture_ctx->u32channels(texture_index);
+
       switch (channels) {
         case 1:
           return {r, 0, 0, 1.f};
@@ -105,8 +96,39 @@ namespace nova::texturing {
           AX_UNREACHABLE
           break;
       }
-      AX_UNREACHABLE
-      return glm::vec4(0);
+      AX_UNREACHABLE;
+    }
+
+    ax_device_callable_inlined glm::vec4 bilinearInterpolate(const uint32_t pixels[4],
+                                                             float tx,
+                                                             float ty,
+                                                             const texture_data_aggregate_s &sample_data) const {
+
+      bool is_rgba = sample_data.texture_ctx->u32IsRGBA(texture_index);
+      int channels = sample_data.texture_ctx->u32channels(texture_index);
+      glm::vec4 v0 = getPixelFromFormat(pixels[0], is_rgba, channels);
+      glm::vec4 v1 = getPixelFromFormat(pixels[1], is_rgba, channels);
+      glm::vec4 v2 = getPixelFromFormat(pixels[2], is_rgba, channels);
+      glm::vec4 v3 = getPixelFromFormat(pixels[3], is_rgba, channels);
+
+      float horizontal_diff = 1 - tx;
+      glm::vec4 top_interp = horizontal_diff * v0 + tx * v1;
+      glm::vec4 bot_interp = horizontal_diff * v2 + tx * v3;
+      return (1 - ty) * top_interp + ty * bot_interp;
+    }
+
+   public:
+    ax_device_callable_inlined ImageTexture() = default;
+
+    ax_device_callable_inlined ImageTexture(std::size_t index) : texture_index(index) {}
+
+    ax_device_callable_inlined glm::vec4 sample(float u, float v, const texture_data_aggregate_s &sample_data) const {
+      u = normalize_uv(u);
+      v = normalize_uv(v);
+      uint32_t pixels[4];
+      float tx{}, ty{};
+      sample_data.texture_ctx->u32pixel(texture_index, u, v, tx, ty, pixels);
+      return bilinearInterpolate(pixels, tx, ty, sample_data);
     }
 
     ax_device_callable_inlined size_t getTextureIndex() const { return texture_index; }

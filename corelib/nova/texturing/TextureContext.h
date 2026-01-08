@@ -1,6 +1,8 @@
 #ifndef TEXTURECONTEXT_H
 #define TEXTURECONTEXT_H
+#include "internal/debug/debug_utils.h"
 #include "texture_datastructures.h"
+#include <cmath>
 #include <internal/device/gpgpu/device_macros.h>
 
 #include <internal/common/math/math_texturing.h>
@@ -122,6 +124,46 @@ namespace nova::texturing {
     ax_device_callable_inlined bool u32IsVInverted(std::size_t index) const {
       const U32Texture tex = bundle.getU32(index);
       return tex.invert_v;
+    }
+
+    ax_device_callable_inlined void u32pixel(std::size_t texture_index, float u, float v, float &tx, float &ty, uint32_t pixels[4]) const {
+
+      auto ensure_bound = [&](unsigned index, unsigned limit) -> unsigned {
+        unsigned val = index;
+        if (val + 1 >= limit)
+          val = limit - 2;
+        if (val > limit)  // Check for wrap-around.
+          val = 0;
+        return val;
+      };
+
+      u = u32IsUInverted(texture_index) ? 1 - u : u;
+      v = u32IsVInverted(texture_index) ? 1 - v : v;
+
+      const int width = u32width(texture_index);
+      const int height = u32height(texture_index);
+
+      float pi = fabsf(u * (float)(width - 1.f));
+      float pj = fabsf(v * (float)(height - 1.f));
+
+      unsigned i = floorf(pi);
+      unsigned j = floorf(pj);
+
+      i = ensure_bound(i, width);
+      j = ensure_bound(j, height);
+
+      unsigned tl[2] = {i, j};
+      unsigned tr[2] = {i + 1, j};
+      unsigned bl[2] = {i, j + 1};
+      unsigned br[2] = {i + 1, j + 1};
+
+      tx = float(pi - tl[0]) / float(tr[0] - tl[0]);
+      ty = float(pj - tl[1]) / float(bl[1] - tl[1]);
+
+      pixels[0] = u32texture(texture_index).raw_data[tl[1] * width + tl[0]];
+      pixels[1] = u32texture(texture_index).raw_data[tr[1] * width + tr[0]];
+      pixels[2] = u32texture(texture_index).raw_data[bl[1] * width + bl[0]];
+      pixels[3] = u32texture(texture_index).raw_data[br[1] * width + br[0]];
     }
 
     /* Outputs pixel in BGRA format. */
