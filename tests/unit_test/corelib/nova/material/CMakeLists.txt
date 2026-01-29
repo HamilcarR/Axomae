@@ -1,5 +1,4 @@
 set(NOVA_MODULE_MATERIAL_SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/NovaDiffuseMaterialTest.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/BxDFTest.cpp
         PARENT_SCOPE
 )

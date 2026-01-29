@@ -22,6 +22,23 @@ static constexpr float uc_samples[RAND_NUM][2] = {{0.0f, 0.0f},
                                                   {0.8f, 0.0625f},
                                                   {0.9f, 0.5625f}};
 
+/********************** Misc Functions **********************/
+
+TEST(BxDF_mathTest, specular_normal_correction) {
+  glm::vec3 wo(0.8f, 0.6f, 0.0f);
+  glm::vec3 ng(0.0f, 1.0f, 0.0f);
+  glm::vec3 ns(0.9f, 0.1f, 0.0f);
+
+  ns = glm::normalize(ns);
+  wo = glm::normalize(wo);
+  glm::vec3 corrected = bsdf::correct_specular_shading_normal(ng, wo, ns);
+
+  glm::vec3 R = glm::reflect(-wo, corrected);
+
+  ASSERT_TRUE(glm::dot(ng, R) > 0);
+  ASSERT_TRUE(glm::dot(corrected, ng) > 0);
+}
+
 static constexpr float roughness_values[6] = {1e-4f, 0.1f, 0.45f, 0.75f, 1.f};
 
 constexpr float IOR_VACUUM = 1.00000f;
@@ -198,7 +215,11 @@ TEST(DiffuseBxDF, sample_f) {
 /************* Dielectric **************/
 TEST(DielectricBxDF, sample_f) {
   // Tests specular dielectric transmission.
-  nm::DielectricBxDF dielectric(1.f, 0.f);
+  nova::bsdf_params_s params;
+  params.eta = 1.f;
+  params.roughness = 0.f;
+  params.anisotropy_ratio = 0.f;
+  nm::DielectricBxDF dielectric(params, 1.f, 1.f);
   glm::vec3 wo(0, 0, 1.f);
   float uc = 0.533f;
   float u[2] = {0.33f, 1.35f};
@@ -207,4 +228,46 @@ TEST(DielectricBxDF, sample_f) {
   ASSERT_TRUE(is_sampled);
   EXPECT_NEAR(sample.costheta, 1.f, 1e-5f);  // Transmission in a medium with IOR of vacuum shouldn't have deviation from the normal.
   EXPECT_LE(sample.f, 1.f);
+}
+
+TEST(DielectricBxDF, f) {
+  nova::bsdf_params_s params;
+  params.albedo = glm::vec3(0.2f, 0.1f, 0.f);
+  params.eta = 1.5f;
+  params.roughness = 0.1f;
+  params.anisotropy_ratio = 0.01f;
+  nm::DielectricBxDF dielectric(params, 1.f, 1.f);
+  glm::vec3 wo(-0.3f, 0.5f, 1.f);
+  wo = glm::normalize(wo);
+  float uc = 0.533f;
+  float u[2]{0.33f, 1.35f};
+
+  nm::BSDFSample sample;
+  bool is_sampled = dielectric.sample_f(wo, uc, u, &sample);
+  ASSERT_TRUE(is_sampled);
+  sample.wi = glm::normalize(sample.wi);
+  nova::Spectrum f = dielectric.f(wo, sample.wi);
+  EXPECT_NEAR(f[0], sample.f[0], 1e-2f);
+  EXPECT_NEAR(f[1], sample.f[1], 1e-2f);
+  EXPECT_NEAR(f[2], sample.f[2], 1e-2f);
+}
+
+TEST(DielectricBxDF, pdf) {
+  nova::bsdf_params_s params;
+  params.albedo = glm::vec3(0.2f, 0.1f, 0.f);
+  params.eta = 1.5f;
+  params.roughness = 0.1f;
+  params.anisotropy_ratio = 0.01f;
+  nm::DielectricBxDF dielectric(params, 1.f, 1.f);
+  glm::vec3 wo(-0.3f, 0.5f, 1.f);
+  wo = glm::normalize(wo);
+  float uc = 0.533f;
+  float u[2]{0.33f, 1.35f};
+
+  nm::BSDFSample sample;
+  bool is_sampled = dielectric.sample_f(wo, uc, u, &sample);
+  ASSERT_TRUE(is_sampled);
+  sample.wi = glm::normalize(sample.wi);
+  float pdf = dielectric.pdf(wo, sample.wi);
+  EXPECT_NEAR(pdf, sample.pdf, 1e-1f);
 }
