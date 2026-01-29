@@ -19,7 +19,10 @@ namespace math {
       return std::isnan(val);
     }
 
-    constexpr bool is_nan_(const glm::vec3 &val) { return std::isnan(val.x) || std::isnan(val.y) || std::isnan(val.z); }
+    template<>
+    constexpr bool is_nan_(const glm::vec3 &val) {
+      return std::isnan(val.x) || std::isnan(val.y) || std::isnan(val.z);
+    }
 
     template<>
     constexpr bool is_nan_(const glm::vec4 &val) {
@@ -81,18 +84,29 @@ namespace math {
 
   template<>
   ax_device_callable_inlined constexpr float sqrt(float val) {
-    return sqrtf(val);
+    return sqrtf(fmax(val, 0.f));
   }
 
   template<>
   ax_device_callable_inlined constexpr double sqrt(double val) {
-    return sqrt(val);
+    return sqrt(fmax(val, 0.));
   }
 
   template<class T>
   ax_device_callable_inlined constexpr T lerp(const T &x, const T &y, const T &a) {
     return x * (static_cast<T>(1) - a) + a * y;
   }
+
+  ax_device_callable_inlined uint32_t tea_hash(uint32_t v0, uint32_t v1) {
+    uint32_t sum = 0;
+    for (int i = 0; i < 4; i++) {
+      sum += 0x9e3779b9;
+      v0 += ((v1 << 4) + 0xa341316c) ^ (v1 + sum) ^ ((v1 >> 5) + 0xc8013ea4);
+      v1 += ((v0 << 4) + 0xad90777d) ^ (v0 + sum) ^ ((v0 >> 5) + 0x7e95761e);
+    }
+    return v0;
+  }
+
 }  // namespace math
 
 template<class T>
