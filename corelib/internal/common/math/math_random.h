@@ -32,7 +32,6 @@ namespace math::random {
     using index_type = uint32_t;
 
    private:
-    unsigned dimension;
     uint64_t seed;
 
     ax_device_callable_inlined index_type dv(unsigned dimension, unsigned seq) const {
@@ -86,11 +85,11 @@ namespace math::random {
     }
 
    public:
-    ax_device_callable SobolGenerator() : seed(0xDEADBEEF), dimension(DIMENSIONS_SIZE) {}
+    ax_device_callable_inlined SobolGenerator() : seed(0xDEADBEEF) {}
 
-    ax_device_callable SobolGenerator(uint64_t s) : seed(s), dimension(DIMENSIONS_SIZE) {}
+    ax_device_callable_inlined SobolGenerator(uint64_t s) : seed(s) {}
 
-    ax_device_callable float generate(uint64_t index, unsigned dimension) const {
+    ax_device_callable_inlined float generate(uint64_t index, unsigned dimension) const {
       AX_ASSERT_LT(index, std::numeric_limits<uint32_t>::max());
       float point = sobol_sample(uint32_t(index), dimension, seed);
       AX_ASSERT(!ISNAN(point), "Sobol bad sample generation.");
@@ -102,7 +101,7 @@ namespace math::random {
     axstd::span<uint32_t> d_direction_vectors_view;
 
    public:
-    ax_host_only void allocDeviceLookupTable() {
+    ax_host_only inline void allocDeviceLookupTable() {
       auto err = device::gpgpu::allocate_buffer(DIMENSIONS_SIZE * SEQUENCE_SIZE * sizeof(index_type));
       DEVICE_ERROR_CHECK(err.error_status);
       d_direction_vectors_view = axstd::span<uint32_t>(static_cast<uint32_t *>(err.device_ptr), DIMENSIONS_SIZE * SEQUENCE_SIZE);
@@ -111,7 +110,7 @@ namespace math::random {
       DEVICE_ERROR_CHECK(err.error_status);
     }
 
-    ax_host_only void deallocDeviceLookupTable() {
+    ax_host_only inline void deallocDeviceLookupTable() {
       auto err = device::gpgpu::deallocate_buffer(static_cast<void *>(d_direction_vectors_view.data()));
       DEVICE_ERROR_CHECK(err.error_status);
       d_direction_vectors_view = {};
