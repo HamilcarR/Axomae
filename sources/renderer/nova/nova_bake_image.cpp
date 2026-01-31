@@ -59,7 +59,7 @@ namespace nova_baker_utils {
     engine_resources_holder.is_rendering = true;
     engine_resources_holder.max_depth = engine_opts.depth_max;
     engine_resources_holder.renderer_max_samples = engine_opts.samples_max;
-    engine_resources_holder.sample_increment = engine_opts.samples_increment;
+    engine_resources_holder.frame_index = engine_opts.samples_increment;
     engine_resources_holder.tiles_width = engine_opts.num_tiles_w;
     engine_resources_holder.tiles_height = engine_opts.num_tiles_h;
     engine_resources_holder.vertical_invert = engine_opts.flip_v;

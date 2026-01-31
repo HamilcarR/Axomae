@@ -70,7 +70,7 @@ void NovaRenderer::doProgressiveRender() {
   nova_resource_manager->getEngineData().max_depth = nova_resource_manager->getEngineData().max_depth < MAX_RECUR_DEPTH ?
                                                          nova_resource_manager->getEngineData().max_depth + 1 :
                                                          MAX_RECUR_DEPTH;
-  nova_resource_manager->getEngineData().sample_increment = current_frame;
+  nova_resource_manager->getEngineData().frame_index = current_frame;
   if (current_frame < smax)
     drawBatch();
 }
@@ -81,7 +81,7 @@ void NovaRenderer::resetToBaseState() {
   emptyScheduler();
   emptyAccumBuffer();
   populateNovaSceneResources();
-  nova_resource_manager->getEngineData().sample_increment = 1;
+  nova_resource_manager->getEngineData().frame_index = 1;
   nova_resource_manager->getEngineData().max_depth = 1;
   nova_resource_manager->getEngineData().is_rendering = true;
 }

@@ -9,7 +9,8 @@ namespace nova {
      public:
       int tiles_width{};
       int tiles_height{};
-      int sample_increment{};
+      int frame_index{};
+      int spp{1};
       int aliasing_samples{};
       int renderer_max_samples{};
       int max_depth{};

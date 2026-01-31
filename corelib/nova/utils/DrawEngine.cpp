@@ -78,7 +78,7 @@ namespace nova {
       auto renderer_callback = [engine_instance](HdrBufferStruct *buffers, Tile &tile, nova::nova_eng_internals &nova_internals) {
         engine_instance->engine_render_tile(buffers, tile, nova_internals);
       };
-      elem.sample_per_tile = nova_internals.resource_manager->getEngineData().sample_increment;
+      elem.sample_per_tile = nova_internals.resource_manager->getEngineData().frame_index;
       elem.image_total_height = height_resolution;
       elem.image_total_width = width_resolution;
       const std::string &tag = nova_internals.resource_manager->getEngineData().threadpool_tag;

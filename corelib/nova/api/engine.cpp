@@ -461,7 +461,7 @@ namespace nova {
       while (frame_index < render_options->getMaxSamples() && isRendering()) {
         int new_depth = manager.getEngineData().max_depth < render_options->getMaxDepth() ? manager.getEngineData().max_depth + 1 :
                                                                                             render_options->getMaxDepth();
-        manager.getEngineData().sample_increment = frame_index;
+        manager.getEngineData().frame_index = frame_index;
         manager.getEngineData().max_depth = new_depth;
         manager.getEngineData().renderer_max_samples = render_options->getMaxSamples();
         EngineCallbackManager callback_manager(user_callback.get());
@@ -501,7 +501,7 @@ namespace nova {
       setup_camera(manager, scene_camera);
       float serie_max = math::calculus::compute_serie_term(render_options->getMaxSamples());
       while (frame_index < render_options->getMaxSamples() && isRendering()) {
-        manager.getEngineData().sample_increment = frame_index;
+        manager.getEngineData().frame_index = frame_index;
         int new_depth = manager.getEngineData().max_depth < render_options->getMaxDepth() ? manager.getEngineData().max_depth + 1 :
                                                                                             render_options->getMaxDepth();
         manager.getEngineData().max_depth = new_depth;
@@ -542,7 +542,7 @@ namespace nova {
     static void setup_engine_data(engine::EngineResourcesHolder &resrc, const RenderOptions &render_options) {
       resrc.aliasing_samples = render_options.getAliasingSamples();
       resrc.max_depth = render_options.getMaxDepth();
-      resrc.sample_increment = render_options.getSamplesIncrement();
+      resrc.frame_index = render_options.getSamplesIncrement();
       resrc.vertical_invert = render_options.isFlippedV();
       resrc.tiles_width = render_options.getTileDimensionWidth();
       resrc.tiles_height = render_options.getTileDimensionHeight();
