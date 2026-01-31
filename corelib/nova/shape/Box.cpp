@@ -73,7 +73,7 @@ namespace nova::shape {
     const glm::vec3 z_axis = glm::vec3(0, 0, 1);
     const glm::vec3 tmin_coords = aabb.getMinCoords();
     const glm::vec3 tmax_coords = aabb.getMaxCoords();
-    bool hit_success = test_intersection(x_axis, y_axis, z_axis, ray.origin, ray.direction, tmin_coords, tmax_coords, tmin, tmax, data.t);
+    bool hit_success = test_intersection(x_axis, y_axis, z_axis, ray.origin, ray.direction, tmin_coords, tmax_coords, tmin, tmax, data.geometry.t);
     if (hit_success) {
       return true;
     }

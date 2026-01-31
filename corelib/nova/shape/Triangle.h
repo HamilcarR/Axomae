@@ -174,8 +174,8 @@ namespace nova::shape {
       if (t < tmin || t > last_hit_tmax)  // Early return in case this triangle is farther than the last intersected shape.
         return false;
 
-      data.t = t;
-      data.position = transform.m * glm::vec4(ray.pointAt(data.t), 1.f);
+      data.geometry.t = t;
+      data.geometry.position = transform.m * glm::vec4(ray.pointAt(t), 1.f);
       const float w = 1 - (u + v);
       /* Computes the normals if there aren't any in the vertex attribute buffer. */
       glm::vec3 normal, bitangent, tangent;

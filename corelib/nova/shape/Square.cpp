@@ -21,10 +21,10 @@ namespace nova::shape {
 
     if (NdotD <= math::epsilon)
       return false;
-    data.t = NdotTo_O / NdotD;
-    if (data.t < tmin || data.t > tmax)
+    data.geometry.t = NdotTo_O / NdotD;
+    if (data.geometry.t < tmin || data.geometry.t > tmax)
       return false;
-    glm::vec3 p = ray.pointAt(data.t);
+    glm::vec3 p = ray.pointAt(data.geometry.t);
     glm::vec3 w_abs = glm::abs(side_w);
     glm::vec3 h_abs = glm::abs(side_h);
     float SdotP_w = glm::dot(p - origin, w_abs);

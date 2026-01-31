@@ -51,7 +51,7 @@ namespace nova::integrator {
   glm::vec4 DepthIntegrator::Li(const Ray &ray, nova_eng_internals &nova_internals, int /*depth*/, sampler::SamplerInterface & /*sampler*/) const {
     bvh_hit_data hit = bvh_hit(ray, nova_internals);
     if (hit.is_hit) {
-      glm::vec3 min_max_intersect{hit.hit_d.t, hit.prim_max_t, MAXFLOAT};
+      glm::vec3 min_max_intersect{hit.hit_d.geometry.t, hit.prim_max_t, MAXFLOAT};
       return {min_max_intersect, 1.f};
     }
     return glm::vec4(MAXFLOAT);

@@ -18,22 +18,32 @@ namespace nova {
     T data;
   };
 
-  struct derivatives_s {
+  struct hit_geometry_s {
     glm::vec3 dpdu;
     glm::vec3 dpdv;
     glm::vec3 dndu;
     glm::vec3 dndv;
     glm::vec3 dndx;
     glm::vec3 dndy;
-
     glm::vec3 e1;
     glm::vec3 e2;
+    glm::vec3 ng;
+    glm::vec3 position;
+
+    float u, v;
+    float t{1e30f};
+    float wo_dot_n;
+
+    bool degenerate;
   };
 
+  struct hit_shading_s {
+    IntersectFrame frame;
+    bool fallback{false};  // In case the mesh doesn't provide attribute buffers;
+  };
   struct intersection_record_s {
-    derivatives_s deriv;
-    glm::vec3 geometric_normal{}, binormal{}, tangent{}, position{};
-    float u{}, v{}, t{1e30f}, wo_dot_n;
+    hit_geometry_s geometry{};
+    hit_shading_s shading{};
   };
 
   class Ray;

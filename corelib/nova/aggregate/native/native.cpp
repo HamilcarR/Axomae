@@ -103,10 +103,10 @@ namespace nova::aggregate {
           if (!prim->hit(r, r.tnear, tmax, hit_result.hit_d, geometry_context))
             continue;
           hit_result.is_hit = true;
-          if (hit_result.hit_d.t <= tmax) {
+          if (hit_result.hit_d.geometry.t <= tmax) {
             hit_result.last_primit = prim;
-            hit_result.prim_min_t = hit_result.hit_d.t;
-            tmax = hit_result.hit_d.t;
+            hit_result.prim_min_t = hit_result.hit_d.geometry.t;
+            tmax = hit_result.hit_d.geometry.t;
           }
         }
       }

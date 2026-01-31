@@ -77,7 +77,7 @@ namespace nova::integrator {
         return {};
 #endif
       }
-      out = Ray::spawn(mat_record.lobe.wi, hit.hit_d.geometric_normal, hit.hit_d.position);
+      out = Ray::spawn(mat_record.lobe.wi, hit.hit_d.geometry.ng, hit.hit_d.geometry.position);
       glm::vec4 next = Li(out, nova_internals, depth - 1, sampler, allocator);
       const BSDFSample &lobe = mat_record.lobe;
       Spectrum color;

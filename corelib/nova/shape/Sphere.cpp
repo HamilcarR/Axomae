@@ -16,14 +16,14 @@ namespace nova::shape {
     if (determinant > 0) {
       float t1 = (-b - std::sqrt(determinant)) * 0.5f / a;
       if (t1 < tmax && t1 > tmin) {
-        data.t = t1;
-        normal = r.pointAt(data.t) - origin;
+        data.geometry.t = t1;
+        normal = r.pointAt(t1) - origin;
         return true;
       }
       t1 = (-b + std::sqrt(determinant)) * 0.5f / a;
       if (t1 < tmax && t1 > tmin) {
-        data.t = t1;
-        normal = r.pointAt(data.t) - origin;
+        data.geometry.t = t1;
+        normal = r.pointAt(t1) - origin;
         return true;
       }
     }
