@@ -71,7 +71,8 @@ namespace math {
   }
 
   /* Creates one valid orthonormal coordinate system. (see Building An Orthonormal Basis, Revisited.)*/
-  ax_device_callable_inlined void make_onb(const glm::vec3 &n, glm::vec3 &b1, glm::vec3 &b2) {
+  ax_device_callable_inlined void make_onb(glm::vec3 n, glm::vec3 &b1, glm::vec3 &b2) {
+    n = glm::normalize(n);
     float sign = copysignf(1.f, n.z);
     float a = -1.f / (sign + n.z);
     float b = n.x * n.y * a;

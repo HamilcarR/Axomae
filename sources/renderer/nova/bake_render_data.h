@@ -13,12 +13,6 @@ class Drawable;
  */
 namespace nova_baker_utils {
 
-  struct material_buffers_t {
-    axstd::span<nova::material::NovaConductorMaterial> conductor_alloc_buffer;
-    axstd::span<nova::material::NovaDielectricMaterial> dielectric_alloc_buffer;
-    axstd::span<nova::material::NovaDiffuseMaterial> diffuse_alloc_buffer;
-  };
-
   struct texture_buffers_t {
     axstd::span<nova::texturing::ImageTexture<uint32_t>> image_alloc_buffer;
   };

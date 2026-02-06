@@ -1,9 +1,9 @@
 #ifndef TEXTUREPACKSAMPLER_H
 #define TEXTUREPACKSAMPLER_H
 
-#include "internal/common/math/math_texturing.h"
 #include "texturing/NovaTextureInterface.h"
 #include "texturing/nova_texturing.h"
+#include <internal/common/math/math_texturing.h>
 #include <internal/macro/project_macros.h>
 
 namespace nova::material {

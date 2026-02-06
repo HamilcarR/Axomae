@@ -34,8 +34,8 @@ Here are some examples of what Axomae can currently render:
 ### Nova Engine
 
 <p align="center">
-  <img src="Documentation/Screenshots/final.jpeg" width="45%" alt="4K Chess Scene" />
-  <img src="Documentation/Screenshots/bathroom.png" width="45%" alt="Bathroom Scene" />
+  <img src="Documentation/Screenshots/chessboard3.png" width="45%" alt="4K Chess Scene" />
+  <img src="Documentation/Screenshots/bathroom_5000s_Optix.png" width="45%" alt="Bathroom Scene" />
 </p>
 
 *High-quality path-traced scenes: Chess scene at 4K resolution and realistic bathroom interior*

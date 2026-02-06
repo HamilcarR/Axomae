@@ -40,6 +40,7 @@ namespace nova {
   struct hit_shading_s {
     IntersectFrame frame;
     bool fallback{false};  // In case the mesh doesn't provide attribute buffers;
+    float handedness{};    // 1.f for right handed , -1.f if not
   };
   struct intersection_record_s {
     hit_geometry_s geometry{};
