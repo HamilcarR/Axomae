@@ -12,6 +12,48 @@
 #include <internal/macro/project_macros.h>
 #include <math.h>
 
+namespace bsdf {
+
+  /*
+   * In some cases, the shading normal can cause reflections to deviate under the hemisphere, even though the geometry
+   *  normal is visible. This causes black seams at grazing and sharp shading normals.
+   * This function allows to compute an alternative version of the shading normal that is raised just enough towards the geometric normal so that
+   * the subsequent reflection lies on the upper hemisphere.
+   * This problem has been described in :
+   * Microfacet-based Normal Mapping for Robust Monte Carlo Path Tracing - Vincent.S , Eric.H , Johannes.H , Cartsen.D
+   * I prefer this little algebra trick for simplicity. */
+
+  ax_device_callable_inlined glm::vec3 correct_specular_shading_normal(const glm::vec3 &ng, const glm::vec3 &wo, glm::vec3 ns) {
+    glm::vec3 R = glm::reflect(-wo, ns);
+    const float woz = glm::dot(wo, ng);
+    AX_ASSERT(woz >= 0, "");
+    const float threshold = fmin(0.9f * woz, 0.01f);
+    if (glm::dot(ng, R) >= threshold)
+      return ns;
+
+    glm::vec3 X = glm::normalize(ns - glm::dot(ns, ng) * ng);
+    if (glm::length2(X) == 0.f)
+      X = ns;
+
+    const float wox = glm::dot(wo, X);
+
+    const float a = math::sqr(wox) + math::sqr(woz);
+    const float b = 2.0f * (a + woz * threshold);
+    const float c = math::sqr(threshold + woz);
+
+    const float Nz2 = (wox < 0) ? 0.25f * (b + math::sqrt(math::sqr(b) - 4.0f * a * c)) / a :
+                                  0.25f * (b - math::sqrt(math::sqr(b) - 4.0f * a * c)) / a;
+    if (Nz2 > 1.f || Nz2 < 0.f)
+      return ng;
+    float Nx = math::sqrt(1.0f - Nz2);
+    float Nz = math::sqrt(Nz2);
+
+    glm::vec3 n = Nx * X + Nz * ng;
+    return n;
+  }
+
+}  // namespace bsdf
+
 /* Vectors are assumed to be in tangent space. */
 namespace bxdf {
 
@@ -20,7 +62,7 @@ namespace bxdf {
   ax_device_callable_inlined bool same_hemisphere(const glm::vec3 &w1, const glm::vec3 &w2) { return w1.z * w2.z > 0; }
 
   ax_device_callable_inlined bool same_hemisphere(const glm::vec3 &wi, const glm::vec3 &wo, const glm::vec3 &wm) {
-    return glm::dot(wi, wm) * glm::dot(wo, wm) > 0;
+    return glm::dot(wi, wm) > 0 && glm::dot(wo, wm) > 0;
   }
 
   ax_device_callable_inlined float costheta(const glm::vec3 &v) { return v.z; }
@@ -58,11 +100,12 @@ namespace bxdf {
       return 1.f;
     return std::clamp(v.x / sintheta(v), -1.f, 1.f);
   }
+
   /* wo points to the opposite side of the surface.*/
-  ax_device_callable_inlined float refract(const glm::vec3 &wi, glm::vec3 n, float eta, bool &valid, glm::vec3 &wt) {
+  ax_device_callable_inlined float refract(const glm::vec3 &wo, glm::vec3 n, float eta, bool &valid, glm::vec3 &wt) {
     AX_ASSERT_NEQ(eta, 0);
     valid = true;
-    float costheta_i = glm::dot(wi, n);
+    float costheta_i = glm::dot(wo, n);
     if (costheta_i < 0) {
       n = -n;
       eta = 1.f / eta;
@@ -76,7 +119,7 @@ namespace bxdf {
     }
     float costheta_t = math::sqrt(1.f - sin2theta_t);
 
-    wt = -wi / eta + (costheta_i / eta - costheta_t) * n;
+    wt = -wo / eta + (costheta_i / eta - costheta_t) * n;
     return eta;
   }
 
@@ -250,7 +293,7 @@ class VNDF {
    * Specifies the fraction of microfacets visible from direction v.
    */
   ax_device_callable_inlined float G1(glm::vec3 v) const {
-    v.z = std::max(v.z, 1e-4f);
+    v.z = std::max(v.z, 1e-6f);
     return 1.f / (1.f + lambda(v));
   }
 

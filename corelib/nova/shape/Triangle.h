@@ -201,13 +201,12 @@ namespace nova::shape {
       }
       glm::vec3 transformed_normal = transform.n * normal;
       glm::vec3 transformed_tangent = transform.n * tangent;
-      data.binormal = transformed_tangent;
-      data.geometric_normal = transformed_normal;
-      data.wo_dot_n = glm::dot(-in_ray.direction, transformed_normal);
+      data.shading.frame = IntersectFrame(transformed_normal, transformed_tangent);
+      data.geometry.wo_dot_n = glm::dot(-in_ray.direction, transformed_normal);
       if (hasValidUvs(geometry)) {
         const vertices_attrb2d_t uvs = face.uvs();
-        data.u = math::geometry::barycentric_lerp(uvs.v0.s, uvs.v1.s, uvs.v2.s, w, u, v);
-        data.v = math::geometry::barycentric_lerp(uvs.v0.t, uvs.v1.t, uvs.v2.t, w, u, v);
+        data.geometry.u = math::geometry::barycentric_lerp(uvs.v0.s, uvs.v1.s, uvs.v2.s, w, u, v);
+        data.geometry.v = math::geometry::barycentric_lerp(uvs.v0.t, uvs.v1.t, uvs.v2.t, w, u, v);
       }
 
       return true;

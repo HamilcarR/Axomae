@@ -24,18 +24,18 @@ namespace nova {
   enum TRANSPORT { RADIANCE, IMPORTANCE };
 
   struct BSDFSample {
-    Spectrum f;
+    Spectrum f = 0.f;
     Spectrum eta = 1.f;
 
     glm::vec3 wi;
     BXDFFLAGS flags;
 
     float pdf{};
-    float costheta{};                  // Always returns abs(costheta(wi)).
-    bool pdf_cosine_weighted = false;  // Indicates if the returned f function already is multiplied with costheta_i.
+    float costheta{};                 // Always returns abs(costheta(wi)).
+    bool pdf_cosine_weighted{false};  // Indicates if the returned f function already is multiplied with costheta_i.
   };
 
-  enum class REFLTRANSFLAG { NONE = 0, TRAN = 1, REFL = 1 << 1, ALL = TRAN | REFL };
+  enum class REFLTRANSFLAG { NONE = 0, TRAN = BXDFFLAGS::TRANSMISSION, REFL = BXDFFLAGS::REFLECTION, ALL = TRAN | REFL };
   ax_device_callable_inlined unsigned operator&(const REFLTRANSFLAG &a, const REFLTRANSFLAG &b) { return (unsigned)a & (unsigned)b; }
   ax_device_callable_inlined unsigned operator|(const REFLTRANSFLAG &a, const REFLTRANSFLAG &b) { return (unsigned)a | (unsigned)b; }
 }  // namespace nova
