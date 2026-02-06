@@ -3,6 +3,7 @@
 #include "aggregate/aggregate_datastructures.h"
 #include "api_common.h"
 #include "engine/datastructures.h"
+#include "engine/nova_engine.h"
 #include "manager/ManagerInternalStructs.h"
 #include "manager/NovaExceptionManager.h"
 #include "manager/NovaResourceManager.h"
@@ -55,37 +56,40 @@ namespace nova::integrator {
 
       const NovaResourceManager *nova_resource_manager = nova_internals.resource_manager;
       NovaExceptionManager *nova_exception_manager = nova_internals.exception_manager;
+      const engine::EngineResourcesHolder &engine_data = nova_resource_manager->getEngineData();
+      const camera::CameraResourcesHolder &camera_data = nova_resource_manager->getCameraData();
       math::random::SobolGenerator qrmc;
       sampler::SobolSampler sobol_s = sampler::SobolSampler(qrmc);
       sampler::SamplerInterface sampler = &sobol_s;
       StackAllocator allocator;
+
       for (int y = tile.height_end - 1; y >= tile.height_start; y = y - 1)
         for (int x = tile.width_start; x < tile.width_end; x = x + 1) {
-          allocator.reset();
-          unsigned int idx = generateImageOffset(tile, nova_resource_manager->getEngineData().vertical_invert, x, y);
-          validate(sampler, nova_internals);
-          if (nova_exception_manager->checkErrorStatus() != exception::NOERR) {
-            prepareAbortRender();
-            return;
-          }
+          unsigned int idx = generateImageOffset(tile, engine_data.vertical_invert, x, y);
 
-          const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
-          glm::vec4 rgb{};
-          unsigned depth = nova_resource_manager->getEngineData().max_depth;
-          uint32_t p_idx = pixel_index(x, y, tile.width_end - tile.width_start);
-          sampler.reset(p_idx * tile.sample_per_tile + nova_resource_manager->getEngineData().sample_increment);
-          if (!nova_resource_manager->getEngineData().is_rendering)
-            return;
-          /* Samples random direction around the pixel for AA. */
-          float sampled_camera_directions[2] = {};
-          sampler.sample2D(sampled_camera_directions);
-          const float dx = sampled_camera_directions[0] * RAND_DX;
-          const float dy = sampled_camera_directions[1] * RAND_DY;
-          math::camera::camera_ray r = math::camera::ray_inv_mat(
-              ndc.x + dx, ndc.y + dy, nova_resource_manager->getCameraData().inv_P, nova_resource_manager->getCameraData().inv_V);
-          Ray ray(r.near, r.far);
-          rgb = Li(ray, nova_internals, depth, sampler, allocator);
-          accumulateRgbRenderbuffer(buffers, idx, rgb);
+          for (int s = 0; s < engine_data.spp; s++) {
+            allocator.reset();
+            if (!engine_data.is_rendering)
+              return;
+            validate(sampler, nova_internals);
+            if (nova_exception_manager->checkErrorStatus() != exception::NOERR) {
+              prepareAbortRender();
+              return;
+            }
+
+            sampler.reset(idx * engine_data.frame_index + engine_data.renderer_max_samples);
+            /* Samples random direction around the pixel for AA. */
+            float sampled_camera_directions[2] = {};
+            sampler.sample2D(sampled_camera_directions);
+            const float dx = sampled_camera_directions[0] * RAND_DX;
+            const float dy = sampled_camera_directions[1] * RAND_DY;
+            const glm::vec2 ndc = math::camera::screen2ndc(x, tile.image_total_height - y, tile.image_total_width, tile.image_total_height);
+            math::camera::camera_ray r = math::camera::ray_inv_mat(ndc.x + dx, ndc.y + dy, camera_data.inv_P, camera_data.inv_V);
+            Ray ray(r.near, r.far);
+            unsigned depth = engine_data.max_depth;
+            glm::vec4 rgb = Li(ray, nova_internals, depth, sampler, allocator);
+            accumulateRgbRenderbuffer(buffers, idx, rgb);
+          }
         }
       tile.finished_render = true;
     }
