@@ -9,7 +9,9 @@
  */
 class IntersectFrame {
   glm::mat3 tbn{1.f};  // orthonormal frame.
-
+#ifndef NDEBUG
+  bool is_inverted{false};
+#endif
   ax_device_callable_inlined glm::mat3 construct_tbn(const glm::vec3 &normal, const glm::vec3 &tangent) {
     glm::vec3 norm_n, norm_t, norm_b;
     math::gram_shmidt(normal, tangent, norm_n, norm_t, norm_b);
@@ -19,6 +21,13 @@ class IntersectFrame {
 
  public:
   ax_device_callable_inlined IntersectFrame() = default;
+
+  ax_device_callable_inlined IntersectFrame(const glm::mat3 &tbn_matrix, bool normalize = false) {
+    if (normalize) {
+      tbn = math::gram_shmidt(tbn_matrix[2], tbn_matrix[0], tbn_matrix[1]);
+    } else
+      tbn = tbn_matrix;
+  }
 
   ax_device_callable_inlined IntersectFrame(const float tangent[3], const float bitangent[3], const float normal[3], bool normalize = false) {
     glm::vec3 n(normal[0], normal[1], normal[2]);
@@ -58,9 +67,21 @@ class IntersectFrame {
   }
 
   ax_device_callable_inlined void flipFrame() {
+    tbn[0] = -tbn[0];
+    tbn[1] = -tbn[1];
+    tbn[2] = -tbn[2];
+#ifndef NDEBUG
+    is_inverted = true;
+#endif
+  }
+
+  ax_device_callable_inlined void flipFrameNT() {
     glm::vec3 flip_normal = -getNormal();
     glm::vec3 flip_tangent = -getTangent();
     tbn = construct_tbn(flip_normal, flip_tangent);
+#ifndef NDEBUG
+    is_inverted = true;
+#endif
   }
 };
 
