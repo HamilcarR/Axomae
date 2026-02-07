@@ -256,7 +256,7 @@ namespace nova {
 
     ax_device_callable_inlined Spectrum f(const glm::vec3 &wo, const glm::vec3 &wi, TRANSPORT mode = TRANSPORT::RADIANCE) const {
 
-      auto fresnel = [](const glm::vec3 &w, float value) { return 1.f + (value - 1) * std::powf(1.f - bxdf::abscostheta(w), 5); };
+      auto fresnel = [](const glm::vec3 &w, float value) { return 1.f + (value - 1) * powf(1.f - bxdf::abscostheta(w), 5); };
       glm::vec3 h = glm::normalize(wi + wo);
       if (!bxdf::same_hemisphere(wo, wi, h))
         return 0.f;
@@ -294,7 +294,7 @@ namespace nova {
                                              TRANSPORT transport_mode = TRANSPORT::RADIANCE,
                                              REFLTRANSFLAG sample_flag = REFLTRANSFLAG::ALL) const {
 
-      auto fresnel = [](const glm::vec3 &w, float value) { return 1.f + (value - 1) * std::powf(1.f - bxdf::abscostheta(w), 5); };
+      auto fresnel = [](const glm::vec3 &w, float value) { return 1.f + (value - 1) * powf(1.f - bxdf::abscostheta(w), 5); };
 
       glm::vec3 wi = glm::normalize(bxdf::hemisphere_cosine_sample(u));
       glm::vec3 h = glm::normalize(wi + wo);
