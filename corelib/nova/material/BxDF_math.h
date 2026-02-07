@@ -180,7 +180,7 @@ class Fresnel {
 
   template<class T>
   ax_device_callable_inlined static T schlick(float abscostheta_i, T F0) {
-    return F0 + (1.f - F0) * std::powf((1.f - abscostheta_i), 5);
+    return F0 + (1.f - F0) * powf((1.f - abscostheta_i), 5);
   }
 
   /*
