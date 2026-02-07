@@ -129,10 +129,16 @@ namespace nova::texturing {
     ax_device_callable_inlined glm::vec4 sample(float u, float v, const texture_data_aggregate_s &sample_data) const {
       u = wrap(u);
       v = wrap(v);
+#ifndef __CUDA_ARCH__
       uint32_t pixels[4];
       float tx{}, ty{};
       sample_data.texture_ctx->u32pixel(texture_index, u, v, tx, ty, pixels);
       return bilinearInterpolate(pixels, tx, ty, sample_data);
+#else
+      return getPixelFromFormat(sample_data.texture_ctx->u32pixel(texture_index, u, v),
+                                sample_data.texture_ctx->u32IsRGBA(texture_index),
+                                sample_data.texture_ctx->u32channels(texture_index));
+#endif
     }
 
     ax_device_callable_inlined size_t getTextureIndex() const { return texture_index; }

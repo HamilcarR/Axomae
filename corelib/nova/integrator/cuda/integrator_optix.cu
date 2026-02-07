@@ -12,13 +12,18 @@ ax_device_force_inlined nova::intersection_record_s payload2hitd(const path_payl
   glm::vec3 normal = glm::vec3(pld.normal_matrix[0], pld.normal_matrix[1], pld.normal_matrix[2]);
   glm::vec3 tangent = glm::vec3(pld.normal_matrix[3], pld.normal_matrix[4], pld.normal_matrix[5]);
   glm::vec3 bitangent = glm::vec3(pld.normal_matrix[6], pld.normal_matrix[7], pld.normal_matrix[8]);
-  hit_d.geometry.ng = normal;
+
+  nova::hit_geometry_s geometry{};
+  geometry.ng = normal;
+  geometry.dpdu = tangent;
+  geometry.dpdu = bitangent;
+  geometry.wo_dot_n = glm::dot(-wray.direction, normal);
+  geometry.u = pld.u;
+  geometry.v = pld.v;
+  geometry.t = pld.t;
+  geometry.position = wray.pointAt(pld.t);
+  hit_d.geometry = geometry;
   hit_d.shading.frame = IntersectFrame(tangent, bitangent, normal, true);
-  hit_d.geometry.wo_dot_n = glm::dot(-wray.direction, normal);
-  hit_d.geometry.u = pld.u;
-  hit_d.geometry.v = pld.v;
-  hit_d.geometry.t = pld.t;
-  hit_d.geometry.position = wray.pointAt(pld.t);
   return hit_d;
 }
 
